@@ -8,6 +8,7 @@ import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
 import optionalRequire from '../../Utils/OptionalRequire';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|
@@ -28,6 +29,7 @@ const MaterialUIContextMenu = React.forwardRef<
   ]);
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
+  const forceUpdate = useForceUpdate();
 
   const menuImplementation = new MaterialUIMenuImplementation({
     onClose: () => setOpenMenu(false),
@@ -58,7 +60,8 @@ const MaterialUIContextMenu = React.forwardRef<
           {...menuImplementation.getMenuProps()}
         >
           {menuImplementation.buildFromTemplate(
-            props.buildMenuTemplate(i18n, buildOptions)
+            props.buildMenuTemplate(i18n, buildOptions),
+            forceUpdate
           )}
         </Menu>
       )}
@@ -82,7 +85,8 @@ const ElectronContextMenu = React.forwardRef<
 
   const open = (x, y, options) => {
     menuImplementation.buildFromTemplate(
-      props.buildMenuTemplate(props.i18n, options)
+      props.buildMenuTemplate(props.i18n, options),
+      () => {}
     );
     menuImplementation.showMenu({
       left: x || 0,

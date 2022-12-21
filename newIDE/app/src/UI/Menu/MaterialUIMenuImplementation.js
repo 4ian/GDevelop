@@ -11,7 +11,10 @@ import Divider from '@material-ui/core/Divider';
 import Fade from '@material-ui/core/Fade';
 import makeStyles from '@material-ui/styles/makeStyles';
 import { adaptAcceleratorString } from '../AcceleratorString';
-import { type MenuItemTemplate } from './Menu.flow';
+import {
+  type MenuItemTemplate,
+  type ContextMenuImplementation,
+} from './Menu.flow';
 
 const useStyles = makeStyles({
   backdropRootForMouse: {
@@ -185,13 +188,17 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
  *  - checked (when `type` is 'checkbox')
  *  - submenu
  */
-export default class MaterialUIMenuImplementation {
+export default class MaterialUIMenuImplementation
+  implements ContextMenuImplementation {
   _onClose: () => void;
   constructor({ onClose }: {| onClose: () => void |}) {
     this._onClose = onClose;
   }
 
-  buildFromTemplate(template: Array<MenuItemTemplate>) {
+  buildFromTemplate(
+    template: Array<MenuItemTemplate>,
+    forceUpdate: () => void
+  ) {
     return template
       .map((item, id) => {
         if (item.visible === false) return null;
@@ -215,13 +222,20 @@ export default class MaterialUIMenuImplementation {
                 // $FlowFixMe - existence should be inferred by Flow.
                 item.enabled === false
               }
-              onClick={() => {
+              onClick={async () => {
                 if (item.enabled === false) {
                   return;
                 }
 
                 if (item.click) {
-                  item.click();
+                  await item.click();
+                  if (item.type === 'checkbox') {
+                    // In case the item click function changes something that React does not detect,
+                    // for instance a change in the project/layout C++ object, the menu must be
+                    // manually updated to display the change.
+                    forceUpdate();
+                    return;
+                  }
                 }
                 this._onClose();
               }}
@@ -238,7 +252,9 @@ export default class MaterialUIMenuImplementation {
             <SubMenuItem
               key={'submenu' + item.label}
               item={item}
-              buildFromTemplate={template => this.buildFromTemplate(template)}
+              buildFromTemplate={template =>
+                this.buildFromTemplate(template, forceUpdate)
+              }
             />
           );
         } else {

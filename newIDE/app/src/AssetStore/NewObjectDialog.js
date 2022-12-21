@@ -26,12 +26,19 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
-import { installPublicAsset } from './InstallAsset';
+import {
+  installPublicAsset,
+  checkRequiredExtensionUpdate,
+} from './InstallAsset';
+import {
+  getPublicAsset,
+  isPrivateAsset,
+} from '../Utils/GDevelopServices/Asset';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
-import { isPrivateAsset } from '../Utils/GDevelopServices/Asset';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -69,6 +76,24 @@ const ObjectListItem = ({
       onClick={onClick}
     />
   );
+};
+
+export const useExtensionUpdateAlertDialog = () => {
+  const { showConfirmation } = useAlertDialog();
+  return async (
+    outOfDateExtensions: Array<ExtensionShortHeader>
+  ): Promise<boolean> => {
+    return await showConfirmation({
+      title: t`Extension update`,
+      message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
+        outOfDateExtensions
+          .map(extension => extension.fullName)
+          .join('\n\n - ') +
+        '\n\n'}Do you want to update it now ?`,
+      confirmButtonLabel: t`Update the extension`,
+      dismissButtonLabel: t`Skip the update`,
+    });
+  };
 };
 
 type Props = {|
@@ -162,10 +187,12 @@ export default function NewObjectDialog({
   const isAssetAddedToScene =
     openedAssetShortHeader &&
     existingAssetStoreIds.has(openedAssetShortHeader.id);
-  const { installPrivateAsset } = React.useContext(
+  const { installPrivateAsset, fetchPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
   const { showAlert } = useAlertDialog();
+
+  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
   const onInstallAsset = React.useCallback(
     () => {
@@ -185,6 +212,28 @@ export default function NewObjectDialog({
               return;
             }
           }
+          const asset = isPrivate
+            ? await fetchPrivateAsset(openedAssetShortHeader, {
+                environment,
+              })
+            : await getPublicAsset(openedAssetShortHeader, { environment });
+          if (!asset) {
+            throw new Error(
+              'Unable to install the asset because it could not be fetched.'
+            );
+          }
+
+          const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
+            {
+              assets: [asset],
+              project,
+            }
+          );
+          const shouldUpdateExtension =
+            requiredExtensionInstallation.outOfDateExtensions.length > 0 &&
+            (await showExtensionUpdateConfirmation(
+              requiredExtensionInstallation.outOfDateExtensions
+            ));
           const installOutput = isPrivate
             ? await installPrivateAsset({
                 assetShortHeader: openedAssetShortHeader,
@@ -192,6 +241,8 @@ export default function NewObjectDialog({
                 project,
                 objectsContainer,
                 environment,
+                requiredExtensionInstallation,
+                shouldUpdateExtension,
               })
             : await installPublicAsset({
                 assetShortHeader: openedAssetShortHeader,
@@ -199,6 +250,8 @@ export default function NewObjectDialog({
                 project,
                 objectsContainer,
                 environment,
+                requiredExtensionInstallation,
+                shouldUpdateExtension,
               });
           if (!installOutput) {
             throw new Error('Unable to install private Asset.');
@@ -233,17 +286,19 @@ export default function NewObjectDialog({
       })();
     },
     [
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      onObjectAddedFromAsset,
       openedAssetShortHeader,
-      openedAssetPack,
+      fetchPrivateAsset,
       environment,
+      project,
+      showExtensionUpdateConfirmation,
       installPrivateAsset,
+      eventsFunctionsExtensionsState,
+      objectsContainer,
+      openedAssetPack,
+      resourceManagementProps,
       canInstallPrivateAsset,
       showAlert,
-      resourceManagementProps,
+      onObjectAddedFromAsset,
     ]
   );
 

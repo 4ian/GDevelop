@@ -35,6 +35,11 @@ void ArbitraryResourceWorker::ExposeJson(gd::String& jsonName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeTilemap(gd::String& tilemapName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -89,6 +94,64 @@ void ArbitraryResourceWorker::ExposeResources(
   for (std::size_t i = 0; i < resources.size(); i++) {
     if (resourcesManager->GetResource(resources[i]).UseFile())
       ExposeResource(resourcesManager->GetResource(resources[i]));
+  }
+}
+
+void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
+  if (resourcesManagers.empty()) return;
+  gd::ResourcesManager* resourcesManager = resourcesManagers[0];
+
+  gd::Resource& resource = resourcesManager->GetResource(resourceName);
+
+  if (!resource.GetMetadata().empty()) {
+    gd::SerializerElement serializerElement = gd::Serializer::FromJSON(resource.GetMetadata());
+
+    if (serializerElement.HasChild("embeddedResourcesMapping")) {
+      bool anyEmbeddedResourceNameWasRenamed = false;
+      gd::SerializerElement& embeddedResourcesMappingElement = serializerElement.GetChild("embeddedResourcesMapping");
+
+      for (const auto& child : embeddedResourcesMappingElement.GetAllChildren()) {
+        const gd::String& targetResourceName = child.second->GetValue().GetString();
+
+          std::cout << targetResourceName << std::endl;
+
+        if (resourcesManager->HasResource(targetResourceName)) {
+          std::cout << targetResourceName << std::endl;
+          gd::Resource& targetResource = resourcesManager->GetResource(targetResourceName);
+          const gd::String& targetResourceKind = targetResource.GetKind();
+
+          gd::String potentiallyUpdatedTargetResourceName = targetResourceName;
+
+          if (targetResourceKind == "audio") {
+            ExposeAudio(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "bitmapFont") {
+            ExposeBitmapFont(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "font") {
+            ExposeFont(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "image") {
+            ExposeImage(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "json") {
+            ExposeJson(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "tilemap") {
+            ExposeTilemap(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "video") {
+            ExposeVideo(potentiallyUpdatedTargetResourceName);
+          }
+          std::cout << potentiallyUpdatedTargetResourceName << std::endl;
+
+          if (potentiallyUpdatedTargetResourceName != targetResourceName) {
+            // The resource name was renamed. Also update the mapping.
+            child.second->SetStringValue(potentiallyUpdatedTargetResourceName);
+            anyEmbeddedResourceNameWasRenamed = true;
+            std::cout <<"renamed" << std::endl;
+          }
+        }
+      }
+
+      if (anyEmbeddedResourceNameWasRenamed) {
+        resource.SetMetadata(gd::Serializer::ToJSON(serializerElement));
+      }
+    }
   }
 }
 
@@ -153,6 +216,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
           } else if (parameterMetadata.GetType() == "jsonResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeJson(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "tilemapResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeTilemap(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });

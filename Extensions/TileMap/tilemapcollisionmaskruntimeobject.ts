@@ -154,6 +154,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
+        0, // levelIndex
         (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already log errors.

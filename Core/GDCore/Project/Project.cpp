@@ -982,8 +982,10 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // (this time for effects). Ideally, this method could be moved outside of
   // gd::Project.
 
+  gd::ResourcesManager* resourcesManager = &GetResourcesManager();
+
   // Add project resources
-  worker.ExposeResources(&GetResourcesManager());
+  worker.ExposeResources(resourcesManager);
   platformSpecificAssets.ExposeResources(worker);
 
   // Add layouts resources

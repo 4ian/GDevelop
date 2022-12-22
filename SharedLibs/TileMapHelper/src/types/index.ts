@@ -1,5 +1,5 @@
-import { LDtkTileMap } from "./LDtkFormat";
-import { TiledTileMap } from "./TiledFormat";
+import { LDtkTileMap } from "../load/ldtk/LDtkFormat";
+import { TiledTileMap } from "../load/tiled/TiledFormat";
 
 export type TileMap =
   | {

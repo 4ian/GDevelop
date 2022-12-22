@@ -14,5 +14,5 @@ export { TileTextureCache } from "./render/TileTextureCache";
 export { PixiTileMapHelper } from "./render/TileMapPixiHelper";
 
 export * from "./types/index";
-export * from "./types/CommonTypes";
-export { TiledTileset } from "./types/TiledFormat";
+export * from "./model/CommonTypes";
+export { TiledTileset } from "./load/tiled/TiledFormat";

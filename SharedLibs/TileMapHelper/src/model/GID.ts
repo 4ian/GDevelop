@@ -1,4 +1,4 @@
-import { integer } from "../types/CommonTypes";
+import { integer } from "./CommonTypes";
 
 export const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
 export const FLIPPED_VERTICALLY_FLAG = 0x40000000;

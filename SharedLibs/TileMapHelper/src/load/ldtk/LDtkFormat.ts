@@ -1,4 +1,4 @@
-import { integer } from "./CommonTypes";
+import { integer } from "../../model/CommonTypes";
 
 /**
  * version 1.1.3 - https://github.com/deepnight/ldtk/blob/66fff7199932357f3ab9b044c2fc2a856f527831/docs/JSON_SCHEMA.json

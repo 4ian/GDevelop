@@ -1,10 +1,10 @@
-import { integer, PolygonVertices } from "../../types/CommonTypes";
+import { integer, PolygonVertices } from "../../model/CommonTypes";
 import {
   EditableTileMap,
   TileDefinition,
   TileObject,
 } from "../../model/TileMapModel";
-import { TiledTileMap } from "../../types/TiledFormat";
+import { TiledTileMap } from "./TiledFormat";
 import {
   decodeBase64LayerData,
   extractTileUidFlippedStates,

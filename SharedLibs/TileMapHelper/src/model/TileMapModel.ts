@@ -1,4 +1,4 @@
-import { PolygonVertices, integer, float } from "../types/CommonTypes";
+import { PolygonVertices, integer, float } from "./CommonTypes";
 import { FlippingHelper } from "./GID";
 
 /**

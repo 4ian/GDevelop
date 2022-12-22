@@ -1,7 +1,7 @@
-import { integer } from "../../types/CommonTypes";
+import { integer } from "../../model/CommonTypes";
 import { EditableTileMap, TileDefinition } from "../../model/TileMapModel";
 import { getLDtkTileId } from "./LDtkTileMapLoaderHelper";
-import { LDtkTileMap } from "../../types/LDtkFormat";
+import { LDtkTileMap } from "./LDtkFormat";
 import { getTileGID } from "../../model/GID";
 
 export namespace LDtkTileMapLoader {

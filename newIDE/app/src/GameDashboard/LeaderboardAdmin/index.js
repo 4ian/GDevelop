@@ -517,7 +517,6 @@ export const LeaderboardAdmin = ({
       <CenteredError>
         <GameRegistration
           project={project}
-          hideIfRegistered
           onGameRegistered={() => {
             setDisplayGameRegistration(false);
             onListLeaderboards();

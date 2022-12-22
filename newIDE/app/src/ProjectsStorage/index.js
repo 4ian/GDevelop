@@ -13,6 +13,7 @@ export type FileMetadata = {|
   fileIdentifier: string,
   lastModifiedDate?: number,
   name?: string,
+  gameId?: string,
 |};
 
 /**
@@ -30,6 +31,10 @@ export type SaveAsLocation = {|
    * (for example, a local file path is stored only in `fileIdentifier`).
    */
   name?: string,
+  /**
+   * The id of the game. Might be null if unused
+   */
+  gameId?: string,
 
   // New fields can be added if a storage provider needs other things to identify
   // a new location where to save a project to.
@@ -97,7 +102,7 @@ export type StorageProviderOperations = {|
   onChangeProjectProperty?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    properties: { name: string } // In order to synchronize project and cloud project names.
+    properties: {| name?: string, gameId?: string |} // In order to synchronize project and cloud project names.
   ) => Promise<boolean>,
 
   // Project auto saving:

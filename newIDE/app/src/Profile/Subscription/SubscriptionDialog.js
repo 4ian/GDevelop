@@ -343,39 +343,40 @@ export default function SubscriptionDialog({
                 </EmptyMessage>
               </Line>
             </Column>
-            {!authenticatedUser.authenticated && (
-              <Dialog
-                open
-                title={<Trans>Create a GDevelop account to continue</Trans>}
-                maxWidth="sm"
-                cannotBeDismissed
-                secondaryActions={[
-                  <FlatButton
-                    key="later"
-                    label={<Trans>Maybe later</Trans>}
-                    onClick={onClose}
-                  />,
-                ]}
-                actions={[
-                  <FlatButton
-                    key="login"
-                    label={<Trans>Login</Trans>}
-                    onClick={authenticatedUser.onLogin}
-                  />,
-                  <DialogPrimaryButton
-                    key="create-account"
-                    label={<Trans>Create my account</Trans>}
-                    primary
-                    onClick={authenticatedUser.onCreateAccount}
-                  />,
-                ]}
-              >
-                <Text>
-                  It's free and you'll get access to online services: cloud
-                  projects, leaderboards, player feedbacks, cloud builds...
-                </Text>
-              </Dialog>
-            )}
+            {!authenticatedUser.authenticated &&
+              authenticatedUser.loginState !== 'loggingIn' && (
+                <Dialog
+                  open
+                  title={<Trans>Create a GDevelop account to continue</Trans>}
+                  maxWidth="sm"
+                  cannotBeDismissed
+                  secondaryActions={[
+                    <FlatButton
+                      key="later"
+                      label={<Trans>Maybe later</Trans>}
+                      onClick={onClose}
+                    />,
+                  ]}
+                  actions={[
+                    <FlatButton
+                      key="login"
+                      label={<Trans>Login</Trans>}
+                      onClick={authenticatedUser.onLogin}
+                    />,
+                    <DialogPrimaryButton
+                      key="create-account"
+                      label={<Trans>Create my account</Trans>}
+                      primary
+                      onClick={authenticatedUser.onCreateAccount}
+                    />,
+                  ]}
+                >
+                  <Text>
+                    It's free and you'll get access to online services: cloud
+                    projects, leaderboards, player feedbacks, cloud builds...
+                  </Text>
+                </Dialog>
+              )}
             {subscriptionPendingDialogOpen && (
               <SubscriptionPendingDialog
                 authenticatedUser={authenticatedUser}

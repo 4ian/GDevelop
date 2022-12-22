@@ -17,7 +17,7 @@ import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { type GameDetailsTab } from '../GameDashboard/GameDetailsDialog';
+import RouterContext from '../MainFrame/RouterContext';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -25,24 +25,23 @@ type Props = {|
   currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
-  initialTab: ProfileTab,
-  gamesDashboardInitialGameId: ?string,
-  gamesDashboardInitialTab: ?GameDetailsTab,
-  onGameDetailsDialogClose: () => void,
 |};
 
-const ProfileDialog = ({
-  currentProject,
-  open,
-  onClose,
-  initialTab,
-  gamesDashboardInitialGameId,
-  gamesDashboardInitialTab,
-  onGameDetailsDialogClose,
-}: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<ProfileTab>(initialTab);
+const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
+  const { appArguments, removeArguments } = React.useContext(RouterContext);
+  const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
+
+  React.useEffect(
+    () => {
+      if (appArguments['initial-dialog'] === 'games-dashboard') {
+        setCurrentTab('games-dashboard');
+        removeArguments(['initial-dialog']);
+      }
+    },
+    [appArguments, removeArguments]
+  );
 
   const [
     isManageSubscriptionLoading,
@@ -169,12 +168,7 @@ const ProfileDialog = ({
             </Line>
           )}
           {currentTab === 'games-dashboard' && (
-            <GamesList
-              project={currentProject}
-              initialGameId={gamesDashboardInitialGameId}
-              initialTab={gamesDashboardInitialTab}
-              onGameDetailsDialogClose={onGameDetailsDialogClose}
-            />
+            <GamesList project={currentProject} />
           )}
         </>
       ) : (

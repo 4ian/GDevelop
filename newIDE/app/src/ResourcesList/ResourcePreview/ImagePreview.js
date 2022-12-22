@@ -29,7 +29,7 @@ import {
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
-const SPRITE_MARGIN_RATIO = 1.3;
+const SPRITE_MARGIN_RATIO = 1.5;
 
 const styles = {
   previewImagePixelated: {

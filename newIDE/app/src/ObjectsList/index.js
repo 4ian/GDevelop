@@ -241,11 +241,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-    const onObjectAddedFromAsset = React.useCallback(
-      (object: gdObject) => {
-        object.setTags(getStringFromTags(selectedObjectTags));
-        onObjectCreated(object);
-
+    const onObjectsAddedFromAssets = React.useCallback(
+      (objects: Array<gdObject>) => {
+        objects.forEach(object => {
+          object.setTags(getStringFromTags(selectedObjectTags));
+          onObjectCreated(object);
+        });
         forceUpdateList();
       },
       [forceUpdateList, onObjectCreated, selectedObjectTags]
@@ -811,7 +812,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               <NewObjectDialog
                 onClose={() => setNewObjectDialogOpen(false)}
                 onCreateNewObject={addObject}
-                onObjectAddedFromAsset={onObjectAddedFromAsset}
+                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
                 project={project}
                 layout={layout}
                 objectsContainer={objectsContainer}

@@ -144,7 +144,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
-  onObjectAddedFromAsset: gdObject => void,
+  onObjectsAddedFromAssets: (Array<gdObject>) => void,
   canInstallPrivateAsset: () => boolean,
   i18n: I18nType,
 |};
@@ -156,7 +156,7 @@ export default function NewObjectDialog({
   resourceManagementProps,
   onClose,
   onCreateNewObject,
-  onObjectAddedFromAsset,
+  onObjectsAddedFromAssets,
   canInstallPrivateAsset,
   i18n,
 }: Props) {
@@ -297,9 +297,7 @@ export default function NewObjectDialog({
             assetPackKind: isPrivate ? 'private' : 'public',
           });
 
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
+          onObjectsAddedFromAssets(installOutput.createdObjects);
 
           await resourceManagementProps.onFetchNewlyAddedResources();
         } catch (error) {
@@ -328,7 +326,7 @@ export default function NewObjectDialog({
       resourceManagementProps,
       canInstallPrivateAsset,
       showAlert,
-      onObjectAddedFromAsset,
+      onObjectsAddedFromAssets,
     ]
   );
 
@@ -479,7 +477,7 @@ export default function NewObjectDialog({
           }}
           project={project}
           objectsContainer={objectsContainer}
-          onObjectAddedFromAsset={onObjectAddedFromAsset}
+          onObjectsAddedFromAssets={onObjectsAddedFromAssets}
           canInstallPrivateAsset={canInstallPrivateAsset}
           resourceManagementProps={resourceManagementProps}
         />

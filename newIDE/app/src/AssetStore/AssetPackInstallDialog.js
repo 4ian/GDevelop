@@ -44,7 +44,7 @@ type Props = {|
   onAssetsAdded: () => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
-  onObjectAddedFromAsset: (object: gdObject) => void,
+  onObjectsAddedFromAssets: (objects: Array<gdObject>) => void,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
 |};
@@ -57,7 +57,7 @@ const AssetPackInstallDialog = ({
   onAssetsAdded,
   project,
   objectsContainer,
-  onObjectAddedFromAsset,
+  onObjectsAddedFromAssets,
   canInstallPrivateAsset,
   resourceManagementProps,
 }: Props) => {
@@ -143,7 +143,9 @@ const AssetPackInstallDialog = ({
 
       setAreAssetsBeingInstalled(true);
       try {
+        console.log('fetchAssets');
         const assets = await fetchAssets(assetShortHeaders);
+        console.log('checkRequiredExtensionUpdate');
         const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
           {
             assets,
@@ -155,6 +157,7 @@ const AssetPackInstallDialog = ({
           (await showExtensionUpdateConfirmation(
             requiredExtensionInstallation.outOfDateExtensions
           ));
+        console.log('installRequiredExtensions');
         await installRequiredExtensions({
           requiredExtensionInstallation,
           shouldUpdateExtension,
@@ -162,6 +165,7 @@ const AssetPackInstallDialog = ({
           project,
         });
 
+        console.log('installAsset');
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { results, errors } = await PromisePool.withConcurrency(6)
           .for(assets)
@@ -192,12 +196,12 @@ const AssetPackInstallDialog = ({
           );
         }
 
-        results.forEach(installOutput => {
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-        });
+        console.log('onObjectsAddedFromAssets');
+        onObjectsAddedFromAssets(
+          results.map(installOutput => installOutput.createdObjects).flat()
+        );
 
+        console.log('onFetchNewlyAddedResources');
         await resourceManagementProps.onFetchNewlyAddedResources();
 
         setAreAssetsBeingInstalled(false);
@@ -217,12 +221,12 @@ const AssetPackInstallDialog = ({
       fetchAssets,
       project,
       showExtensionUpdateConfirmation,
+      eventsFunctionsExtensionsState,
+      onObjectsAddedFromAssets,
       resourceManagementProps,
       onAssetsAdded,
       installPrivateAsset,
-      eventsFunctionsExtensionsState,
       targetObjectsContainer,
-      onObjectAddedFromAsset,
     ]
   );
 

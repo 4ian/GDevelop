@@ -29,7 +29,7 @@ import {
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
-const SPRITE_MARGIN_RATIO = 1.3;
+const SPRITE_MARGIN_RATIO = 1.5;
 
 const styles = {
   previewImagePixelated: {
@@ -167,10 +167,14 @@ const ImagePreview = ({
   // the zoom factor to the image.
   React.useEffect(
     () => {
-      if (hasZoomBeenAdaptedToImageRef.current) return;
+      if (hasZoomBeenAdaptedToImageRef.current || initialZoom) {
+        // Do not adapt zoom to image if a zoom as been provided in the props
+        // or if the zoom has already been adapted.
+        return;
+      }
       hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
     },
-    [adaptZoomFactorToImage]
+    [adaptZoomFactorToImage, initialZoom]
   );
 
   const handleImageLoaded = (e: any) => {

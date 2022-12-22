@@ -21,7 +21,7 @@ const styles = {
     padding: 8,
     overflowY: 'scroll',
     overflowX: 'hidden',
-    flex: 2,
+    flex: 1,
   },
 };
 

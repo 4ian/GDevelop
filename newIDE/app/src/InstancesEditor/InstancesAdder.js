@@ -67,7 +67,9 @@ export default class InstancesAdder {
   |}): Array<gdInitialInstance> => {
     this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
-    const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
+    const sceneForegroundZOrder = this._zOrderFinder.getHighestZOrder() + 1;
+
+    let addedInstancesLowestZOrder = null;
 
     const newInstances = serializedInstances.map(serializedInstance => {
       const instance = new gd.InitialInstance();
@@ -81,13 +83,33 @@ export default class InstancesAdder {
         : roundPositionsToGrid(desiredPosition, this._instancesEditorSettings);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
-      if (addInstancesInTheForeground) instance.setZOrder(zOrder);
+      if (addInstancesInTheForeground) {
+        if (
+          addedInstancesLowestZOrder === null ||
+          addedInstancesLowestZOrder > instance.getZOrder()
+        ) {
+          addedInstancesLowestZOrder = instance.getZOrder();
+        }
+      }
       const newInstance = this._instances
         .insertInitialInstance(instance)
         .resetPersistentUuid();
       instance.delete();
       return newInstance;
     });
+
+    if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
+      newInstances.forEach(instance => {
+        instance.setZOrder(
+          instance.getZOrder() -
+            // Flow is not happy with addedInstancesLowestZOrder possible null value
+            // so 0 is used as a fallback.
+            (addedInstancesLowestZOrder || 0) +
+            sceneForegroundZOrder
+        );
+      });
+    }
+
     return newInstances;
   };
 

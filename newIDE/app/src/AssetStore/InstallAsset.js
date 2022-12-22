@@ -201,9 +201,7 @@ export const addAssetToProject = async ({
     const renamedResourcesMap = toNewGdMapStringString(resourceNewNames);
     const resourcesRenamer = new gd.ResourcesRenamer(renamedResourcesMap);
     renamedResourcesMap.delete();
-    object
-      .getConfiguration()
-      .exposeResources(resourcesRenamer, resourcesManager);
+    object.getConfiguration().exposeResources(resourcesRenamer);
     resourcesRenamer.delete();
 
     createdObjects.push(object);

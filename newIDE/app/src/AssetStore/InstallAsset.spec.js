@@ -225,9 +225,7 @@ describe('InstallAsset', () => {
       const object = layout.getObject('PlayerSpaceship');
 
       const resourcesInUse = new gd.ResourcesInUseHelper();
-      object
-        .getConfiguration()
-        .exposeResources(resourcesInUse, project.getResourcesManager());
+      object.getConfiguration().exposeResources(resourcesInUse);
       const objectResourceNames = resourcesInUse
         .getAllImages()
         .toNewVectorString()

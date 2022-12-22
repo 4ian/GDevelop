@@ -1249,9 +1249,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { project } = this.props;
 
     const resourcesInUse = new gd.ResourcesInUseHelper();
-    object
-      .getConfiguration()
-      .exposeResources(resourcesInUse, project.getResourcesManager());
+    object.getConfiguration().exposeResources(resourcesInUse);
     const objectResourceNames = resourcesInUse
       .getAllImages()
       .toNewVectorString()

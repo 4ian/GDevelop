@@ -18,7 +18,7 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
-import { Line } from '../UI/Grid';
+import { Line, Spacer } from '../UI/Grid';
 import LeftLoader from '../UI/LeftLoader';
 import {
   checkIfHasTooManyCloudProjects,
@@ -28,6 +28,8 @@ import { SubscriptionSuggestionContext } from '../Profile/Subscription/Subscript
 import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
+import Link from '../UI/Link';
+import Window from '../Utils/Window';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -106,6 +108,9 @@ const NewProjectSetupDialog = ({
   const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
     false
   );
+  const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
+    false
+  );
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')
     : '';
@@ -170,6 +175,7 @@ const NewProjectSetupDialog = ({
         width,
         orientation,
         optimizeForPixelArt,
+        allowPlayersToLogIn,
       });
     },
     [
@@ -181,6 +187,7 @@ const NewProjectSetupDialog = ({
       saveAsLocation,
       resolutionOption,
       optimizeForPixelArt,
+      allowPlayersToLogIn,
     ]
   );
 
@@ -331,6 +338,31 @@ const NewProjectSetupDialog = ({
                 setOptimizeForPixelArt(checked);
               }}
               disabled={isOpening}
+            />
+            <Checkbox
+              checked={allowPlayersToLogIn}
+              label={<Trans>Allow players to authenticate in-game</Trans>}
+              onCheck={(e, checked) => {
+                setAllowPlayersToLogIn(checked);
+              }}
+              disabled={isOpening}
+              tooltipOrHelperText={
+                <Line noMargin>
+                  <Trans>Learn more about</Trans>
+                  <Spacer />
+                  <Link
+                    href="https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication"
+                    onClick={() =>
+                      Window.openExternalURL(
+                        'https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication'
+                      )
+                    }
+                  >
+                    <Trans>player authentication</Trans>
+                  </Link>
+                  .
+                </Line>
+              }
             />
           </ColumnStackLayout>
         )}

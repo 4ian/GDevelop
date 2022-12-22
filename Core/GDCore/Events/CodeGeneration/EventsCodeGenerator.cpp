@@ -726,6 +726,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
              metadata.GetType() == "fontResource" ||
              metadata.GetType() == "imageResource" ||
              metadata.GetType() == "jsonResource" ||
+             metadata.GetType() == "tilemapResource" ||
              metadata.GetType() == "videoResource" ||
              // Deprecated, old parameter names:
              metadata.GetType() == "password" || metadata.GetType() == "musicfile" ||

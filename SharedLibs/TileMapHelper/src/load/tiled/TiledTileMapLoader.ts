@@ -1,22 +1,32 @@
-import { integer, PolygonVertices } from "../model/CommonTypes";
+import { integer, PolygonVertices } from "../../model/CommonTypes";
 import {
   EditableTileMap,
   TileDefinition,
   TileObject,
-} from "../model/TileMapModel";
-import { TiledMap } from "./TiledFormat";
+} from "../../model/TileMapModel";
+import { TiledTileMap } from "./TiledFormat";
 import {
-  extractTileUidFlippedStates,
   decodeBase64LayerData,
+  extractTileUidFlippedStates,
   getTileIdFromTiledGUI,
-} from "./TiledLoaderHelper";
+} from "./TiledTileMapLoaderHelper";
 
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.
  */
-export class TiledTileMapLoader {
-  static load(pako: any, tiledMap: TiledMap): EditableTileMap | null {
-    if (!tiledMap.tiledversion) {
+export namespace TiledTileMapLoader {
+  /**
+   * Create a {@link EditableTileMap} from the Tiled JSON.
+   *
+   * @param tiledTileMap A tile map exported from Tiled.
+   * @param pako The zlib library.
+   * @returns A {@link EditableTileMap}
+   */
+  export function load(
+    tiledTileMap: TiledTileMap,
+    pako: any
+  ): EditableTileMap | null {
+    if (!tiledTileMap.tiledversion) {
       console.warn(
         "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
       );
@@ -25,10 +35,11 @@ export class TiledTileMapLoader {
     }
 
     const definitions = new Map<integer, TileDefinition>();
-    for (const tiledSet of tiledMap.tilesets) {
-      const firstGid = tiledSet.firstgid === undefined ? 1 : tiledSet.firstgid;
-      if (tiledSet.tiles) {
-        for (const tile of tiledSet.tiles) {
+    for (const tiledTileSet of tiledTileMap.tilesets) {
+      const firstGid =
+        tiledTileSet.firstgid === undefined ? 1 : tiledTileSet.firstgid;
+      if (tiledTileSet.tiles) {
+        for (const tile of tiledTileSet.tiles) {
           const tileDefinition = new TileDefinition(
             tile.animation ? tile.animation.length : 0
           );
@@ -73,18 +84,18 @@ export class TiledTileMapLoader {
                 ];
               }
               if (polygon) {
-                tileDefinition.add(tag, polygon);
+                tileDefinition.addHitBox(tag, polygon);
               }
             }
           } else if (tile.class && tile.class.length > 0) {
             // When there is no shape, default to the whole tile.
             const polygon: PolygonVertices = [
               [0, 0],
-              [0, tiledMap.tileheight],
-              [tiledMap.tilewidth, tiledMap.tileheight],
-              [tiledMap.tilewidth, 0],
+              [0, tiledTileMap.tileheight],
+              [tiledTileMap.tilewidth, tiledTileMap.tileheight],
+              [tiledTileMap.tilewidth, 0],
             ];
-            tileDefinition.add(tile.class, polygon);
+            tileDefinition.addHitBox(tile.class, polygon);
           }
           definitions.set(
             getTileIdFromTiledGUI(firstGid + tile.id),
@@ -92,7 +103,7 @@ export class TiledTileMapLoader {
           );
         }
       }
-      for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
+      for (let tileIndex = 0; tileIndex < tiledTileSet.tilecount; tileIndex++) {
         const tileId = getTileIdFromTiledGUI(firstGid + tileIndex);
         if (!definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));
@@ -101,14 +112,14 @@ export class TiledTileMapLoader {
     }
 
     const collisionTileMap = new EditableTileMap(
-      tiledMap.tilewidth,
-      tiledMap.tileheight,
-      tiledMap.width,
-      tiledMap.height,
+      tiledTileMap.tilewidth,
+      tiledTileMap.tileheight,
+      tiledTileMap.width,
+      tiledTileMap.height,
       definitions
     );
 
-    for (const tiledLayer of tiledMap.layers) {
+    for (const tiledLayer of tiledTileMap.layers) {
       if (tiledLayer.type === "objectgroup") {
         const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
         objectLayer.setVisible(tiledLayer.visible);

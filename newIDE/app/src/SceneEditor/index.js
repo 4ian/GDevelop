@@ -24,10 +24,7 @@ import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import Toolbar from './Toolbar';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
+import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
@@ -157,7 +154,10 @@ type State = {|
   selectedObjectTags: SelectedTags,
 |};
 
-type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
+type CopyCutPasteOptions = {
+  useLastCursorPosition?: boolean,
+  pasteInTheForeground?: boolean,
+};
 
 export default class SceneEditor extends React.Component<Props, State> {
   static defaultProps = {
@@ -1126,7 +1126,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     return contextMenuItems;
   };
 
-  copySelection = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
+  copySelection = ({
+    useLastCursorPosition,
+    pasteInTheForeground,
+  }: CopyCutPasteOptions = {}) => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
@@ -1138,33 +1141,29 @@ export default class SceneEditor extends React.Component<Props, State> {
       Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
         x: position[0],
         y: position[1],
+        pasteInTheForeground: !!pasteInTheForeground,
         instances: serializedSelection,
       });
     }
   };
 
   cutSelection = (options: CopyCutPasteOptions = {}) => {
-    this.copySelection(options);
+    this.copySelection({ ...options, pasteInTheForeground: true });
     this.deleteSelection();
   };
 
   duplicateSelection = () => {
+    const { editor } = this;
+    if (!editor) return;
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    if (!this.editor) return;
-
-    const newInstances = serializedSelection.map(serializedInstance => {
-      const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
-      instance.setX(instance.getX() + 2 * MOVEMENT_BIG_DELTA);
-      instance.setY(instance.getY() + 2 * MOVEMENT_BIG_DELTA);
-      const newInstance = this.props.initialInstances
-        .insertInitialInstance(instance)
-        .resetPersistentUuid();
-      instance.delete();
-      return newInstance;
+    const newInstances = editor.addSerializedInstances({
+      position: [0, 0],
+      copyReferential: [-2 * MOVEMENT_BIG_DELTA, -2 * MOVEMENT_BIG_DELTA],
+      serializedInstances: serializedSelection,
+      preventSnapToGrid: true,
     });
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
@@ -1176,11 +1175,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    if (!this.editor) return;
+    const { editor } = this;
+    if (!editor) return;
 
     const position = useLastCursorPosition
-      ? this.editor.getLastCursorSceneCoordinates()
-      : this.editor.getLastContextMenuSceneCoordinates();
+      ? editor.getLastCursorSceneCoordinates()
+      : editor.getLastContextMenuSceneCoordinates();
 
     const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
     const instancesContent = SafeExtractor.extractArrayProperty(
@@ -1189,19 +1189,20 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     const x = SafeExtractor.extractNumberProperty(clipboardContent, 'x');
     const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
+    const pasteInTheForeground =
+      SafeExtractor.extractBooleanProperty(
+        clipboardContent,
+        'pasteInTheForeground'
+      ) || false;
     if (x === null || y === null || instancesContent === null) return;
 
-    const newInstances = instancesContent.map(serializedInstance => {
-      const instance = new gd.InitialInstance();
-      unserializeFromJSObject(instance, serializedInstance);
-      instance.setX(instance.getX() - x + position[0]);
-      instance.setY(instance.getY() - y + position[1]);
-      const newInstance = this.props.initialInstances
-        .insertInitialInstance(instance)
-        .resetPersistentUuid();
-      instance.delete();
-      return newInstance;
+    const newInstances = editor.addSerializedInstances({
+      position,
+      copyReferential: [x, y],
+      serializedInstances: instancesContent,
+      addInstancesInTheForeground: pasteInTheForeground,
     });
+
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances({

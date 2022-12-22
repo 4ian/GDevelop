@@ -19,6 +19,8 @@ const normalizeRectangle = (startPoint: Point, endPoint: Point) => {
   }
 };
 
+const TEMPORARY_SELECTION_DEBOUNCE_DURATION = 200;
+
 export default class SelectionRectangle {
   instances: gdInitialInstancesContainer;
   instanceMeasurer: InstanceMeasurer;
@@ -38,6 +40,7 @@ export default class SelectionRectangle {
    * Used to check if an instance is in the selection rectangle
    */
   _temporaryAABB: Rectangle;
+  _temporarySelectionLastExecutionTime: number;
 
   constructor({
     instances,
@@ -58,6 +61,7 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = null;
     this._instancesInSelectionRectangle = [];
     this._temporaryInstancesInSelectionRectangle = [];
+    this._temporarySelectionLastExecutionTime = Date.now();
 
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
@@ -137,26 +141,18 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x, y };
   };
 
-  updateSelectionRectangle = (
-    lastX: number,
-    lastY: number
-  ): Array<gdInitialInstance> => {
-    if (!this.selectionRectangleStart)
-      this.selectionRectangleStart = { x: lastX, y: lastY };
+  updateTemporarySelectedInstances = (startPoint: Point, endPoint: Point) => {
     if (!this.temporarySelectionRectangleEnd) {
       this.temporarySelectionRectangleEnd = {};
     }
     if (!this.temporarySelectionRectangleStart) {
       this.temporarySelectionRectangleStart = {};
     }
-
-    this.selectionRectangleEnd = { x: lastX, y: lastY };
-
     // Update temporary selection rectangle to follow the selection rectangle
-    this.temporarySelectionRectangleEnd.x = this.selectionRectangleEnd.x;
-    this.temporarySelectionRectangleEnd.y = this.selectionRectangleEnd.y;
-    this.temporarySelectionRectangleStart.x = this.selectionRectangleStart.x;
-    this.temporarySelectionRectangleStart.y = this.selectionRectangleStart.y;
+    this.temporarySelectionRectangleEnd.x = endPoint.x;
+    this.temporarySelectionRectangleEnd.y = endPoint.y;
+    this.temporarySelectionRectangleStart.x = startPoint.x;
+    this.temporarySelectionRectangleStart.y = startPoint.y;
 
     this._temporaryInstancesInSelectionRectangle.length = 0;
     // Mutate the temporary selection rectangle so that it's ready for the
@@ -170,6 +166,29 @@ export default class SelectionRectangle {
       // $FlowFixMe - gd.castObject is not supporting typings.
       this.temporarySelector
     );
+    this._temporarySelectionLastExecutionTime = Date.now();
+  };
+
+  updateSelectionRectangle = (
+    lastX: number,
+    lastY: number
+  ): Array<gdInitialInstance> => {
+    if (!this.selectionRectangleStart)
+      this.selectionRectangleStart = { x: lastX, y: lastY };
+
+    this.selectionRectangleEnd = { x: lastX, y: lastY };
+    if (
+      Date.now() >
+      this._temporarySelectionLastExecutionTime +
+        TEMPORARY_SELECTION_DEBOUNCE_DURATION
+    ) {
+      this.updateTemporarySelectedInstances(
+        // $FlowIgnore[incompatible-call] - Flow is afraid Date.now() will set this variable to null
+        this.selectionRectangleStart,
+        // $FlowIgnore[incompatible-call] - Flow is afraid Date.now() will set this variable to null
+        this.selectionRectangleEnd
+      );
+    }
     return this._temporaryInstancesInSelectionRectangle;
   };
 

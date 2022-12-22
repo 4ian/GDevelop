@@ -62,21 +62,19 @@ const Checkbox = (props: Props) => {
     />
   );
   return props.label ? (
-    <>
-      <FormGroup classes={formGroupClasses}>
-        <FormControlLabel
-          control={checkbox}
-          label={props.label}
-          style={{
-            ...props.style,
-            cursor: 'default',
-          }}
-        />
-        {props.tooltipOrHelperText && (
-          <FormHelperText>{props.tooltipOrHelperText}</FormHelperText>
-        )}
-      </FormGroup>
-    </>
+    <FormGroup classes={formGroupClasses}>
+      <FormControlLabel
+        control={checkbox}
+        label={props.label}
+        style={{
+          ...props.style,
+          cursor: 'default',
+        }}
+      />
+      {props.tooltipOrHelperText && (
+        <FormHelperText>{props.tooltipOrHelperText}</FormHelperText>
+      )}
+    </FormGroup>
   ) : (
     checkbox
   );

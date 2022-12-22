@@ -1,11 +1,14 @@
-import { EditableTileMap, EditableTileMapLayer } from "../model/TileMapModel";
-import { TiledMap } from "./TiledFormat";
+import {
+  EditableTileMap,
+  EditableTileMapLayer,
+} from "../../model/TileMapModel";
+import { TiledTileMap } from "./TiledFormat";
 import { TiledTileMapLoader } from "./TiledTileMapLoader";
 
 describe("TiledTileMapLoader", function () {
   describe("without a collision mask", function () {
     // Built from an actual json file exported by Tiled.
-    const tiledMap: TiledMap = {
+    const tiledMap: TiledTileMap = {
       compressionlevel: -1,
       height: 2,
       infinite: false,
@@ -53,7 +56,7 @@ describe("TiledTileMapLoader", function () {
       width: 4,
     };
 
-    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
 
     it("can load map dimensions", function () {
       expect(tileMap.getDimensionX()).to.be(4);
@@ -80,21 +83,21 @@ describe("TiledTileMapLoader", function () {
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
-      expect(layer.get(0, 0)).to.be(0);
-      expect(layer.get(1, 0)).to.be(undefined);
-      expect(layer.get(2, 0)).to.be(1);
-      expect(layer.get(3, 0)).to.be(undefined);
+      expect(layer.getTileId(0, 0)).to.be(0);
+      expect(layer.getTileId(1, 0)).to.be(undefined);
+      expect(layer.getTileId(2, 0)).to.be(1);
+      expect(layer.getTileId(3, 0)).to.be(undefined);
 
-      expect(layer.get(0, 1)).to.be(undefined);
-      expect(layer.get(1, 1)).to.be(0);
-      expect(layer.get(2, 1)).to.be(undefined);
-      expect(layer.get(3, 1)).to.be(1);
+      expect(layer.getTileId(0, 1)).to.be(undefined);
+      expect(layer.getTileId(1, 1)).to.be(0);
+      expect(layer.getTileId(2, 1)).to.be(undefined);
+      expect(layer.getTileId(3, 1)).to.be(1);
     });
   });
 
   describe("with a collision mask", function () {
     // Built from an actual json file exported by Tiled.
-    const tiledMap: TiledMap = {
+    const tiledMap: TiledTileMap = {
       compressionlevel: -1,
       height: 2,
       infinite: false,
@@ -377,7 +380,7 @@ describe("TiledTileMapLoader", function () {
       width: 4,
     };
 
-    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
 
     it("can load map dimensions", function () {
       expect(tileMap.getDimensionX()).to.be(4);
@@ -391,8 +394,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with a rectangle collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(0);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
       expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
@@ -406,16 +409,16 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with an empty collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(1);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(false);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
     });
 
     it("can load a tile set with a polygon collision mask", function () {
       {
         const tileDefinition = tileMap.getTileDefinition(2);
         expect(tileDefinition).to.be.ok();
-        expect(tileDefinition.hasTag("obstacle")).to.be(true);
-        expect(tileDefinition.hasTag("lava")).to.be(false);
+        expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+        expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
         expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
           [
             [0, 8],
@@ -429,8 +432,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with a 2 polygons collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(3);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(false);
       expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
@@ -448,8 +451,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with several collision mask filter tags", function () {
       const tileDefinition = tileMap.getTileDefinition(4);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(true);
       expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
@@ -469,8 +472,8 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile set with only the other filter tag", function () {
       const tileDefinition = tileMap.getTileDefinition(5);
       expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(false);
-      expect(tileDefinition.hasTag("lava")).to.be(true);
+      expect(tileDefinition.hasTaggedHitBox("obstacle")).to.be(false);
+      expect(tileDefinition.hasTaggedHitBox("lava")).to.be(true);
       expect(tileDefinition.getHitBoxes("lava")).to.be.eql([
         [
           [0, 0],
@@ -492,15 +495,15 @@ describe("TiledTileMapLoader", function () {
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
-      expect(layer.get(0, 0)).to.be(0);
-      expect(layer.get(1, 0)).to.be(2);
-      expect(layer.get(2, 0)).to.be(3);
-      expect(layer.get(3, 0)).to.be(4);
+      expect(layer.getTileId(0, 0)).to.be(0);
+      expect(layer.getTileId(1, 0)).to.be(2);
+      expect(layer.getTileId(2, 0)).to.be(3);
+      expect(layer.getTileId(3, 0)).to.be(4);
 
-      expect(layer.get(0, 1)).to.be(2);
-      expect(layer.get(1, 1)).to.be(1);
-      expect(layer.get(2, 1)).to.be(undefined);
-      expect(layer.get(3, 1)).to.be(4);
+      expect(layer.getTileId(0, 1)).to.be(2);
+      expect(layer.getTileId(1, 1)).to.be(1);
+      expect(layer.getTileId(2, 1)).to.be(undefined);
+      expect(layer.getTileId(3, 1)).to.be(4);
       expect(layer.isFlippedVertically(3, 1)).to.be(true);
       expect(layer.isFlippedHorizontally(3, 1)).to.be(false);
       expect(layer.isFlippedDiagonally(3, 1)).to.be(false);
@@ -516,7 +519,7 @@ describe("TiledTileMapLoader", function () {
 
   describe("with a collision mask", function () {
     // Built from an actual json file exported by Tiled.
-    const tiledMap: TiledMap = {
+    const tiledMap: TiledTileMap = {
       compressionlevel: -1,
       height: 2,
       infinite: false,
@@ -619,7 +622,7 @@ describe("TiledTileMapLoader", function () {
       width: 4,
     };
 
-    const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
+    const tileMap: EditableTileMap = TiledTileMapLoader.load(tiledMap, null);
 
     it("can load flipped tiles", function () {
       const layers = new Array(...tileMap.getLayers());
@@ -628,42 +631,42 @@ describe("TiledTileMapLoader", function () {
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
-      expect(layer.get(0, 0)).to.be(2);
+      expect(layer.getTileId(0, 0)).to.be(2);
       expect(layer.isFlippedVertically(0, 0)).to.be(false);
       expect(layer.isFlippedHorizontally(0, 0)).to.be(false);
       expect(layer.isFlippedDiagonally(0, 0)).to.be(false);
 
-      expect(layer.get(1, 0)).to.be(2);
+      expect(layer.getTileId(1, 0)).to.be(2);
       expect(layer.isFlippedVertically(1, 0)).to.be(false);
       expect(layer.isFlippedHorizontally(1, 0)).to.be(true);
       expect(layer.isFlippedDiagonally(1, 0)).to.be(true);
 
-      expect(layer.get(1, 1)).to.be(2);
+      expect(layer.getTileId(1, 1)).to.be(2);
       expect(layer.isFlippedVertically(1, 1)).to.be(true);
       expect(layer.isFlippedHorizontally(1, 1)).to.be(true);
       expect(layer.isFlippedDiagonally(1, 1)).to.be(false);
 
-      expect(layer.get(0, 1)).to.be(2);
+      expect(layer.getTileId(0, 1)).to.be(2);
       expect(layer.isFlippedVertically(0, 1)).to.be(true);
       expect(layer.isFlippedHorizontally(0, 1)).to.be(false);
       expect(layer.isFlippedDiagonally(0, 1)).to.be(true);
 
-      expect(layer.get(2, 0)).to.be(2);
+      expect(layer.getTileId(2, 0)).to.be(2);
       expect(layer.isFlippedVertically(2, 0)).to.be(false);
       expect(layer.isFlippedHorizontally(2, 0)).to.be(false);
       expect(layer.isFlippedDiagonally(2, 0)).to.be(true);
 
-      expect(layer.get(3, 0)).to.be(2);
+      expect(layer.getTileId(3, 0)).to.be(2);
       expect(layer.isFlippedVertically(3, 0)).to.be(false);
       expect(layer.isFlippedHorizontally(3, 0)).to.be(true);
       expect(layer.isFlippedDiagonally(3, 0)).to.be(false);
 
-      expect(layer.get(3, 1)).to.be(2);
+      expect(layer.getTileId(3, 1)).to.be(2);
       expect(layer.isFlippedVertically(3, 1)).to.be(true);
       expect(layer.isFlippedHorizontally(3, 1)).to.be(true);
       expect(layer.isFlippedDiagonally(3, 1)).to.be(true);
 
-      expect(layer.get(2, 1)).to.be(2);
+      expect(layer.getTileId(2, 1)).to.be(2);
       expect(layer.isFlippedVertically(2, 1)).to.be(true);
       expect(layer.isFlippedHorizontally(2, 1)).to.be(false);
       expect(layer.isFlippedDiagonally(2, 1)).to.be(false);

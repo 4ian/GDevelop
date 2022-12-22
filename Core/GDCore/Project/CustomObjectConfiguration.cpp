@@ -38,7 +38,7 @@ gd::ObjectConfiguration &CustomObjectConfiguration::GetChildObjectConfiguration(
     return badObjectConfiguration;
   }
   const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
-  
+
   if (!eventsBasedObject.HasObjectNamed(objectName)) {
     gd::LogError("Tried to get the configuration of a child-object:" + objectName
                 + " that doesn't exist in the event-based object: " + GetType());
@@ -78,7 +78,7 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
     }
     const auto &eventsBasedObject = project->GetEventsBasedObject(GetType());
     const auto &properties = eventsBasedObject.GetPropertyDescriptors();
-    
+
     return gd::CustomConfigurationHelper::UpdateProperty(
         properties,
         objectContent,
@@ -125,8 +125,7 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
   }
 }
 
-void CustomObjectConfiguration::ExposeResources(
-    gd::ArbitraryResourceWorker& worker) {
+void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 
   for (auto& property : properties) {
@@ -148,6 +147,8 @@ void CustomObjectConfiguration::ExposeResources(
         worker.ExposeVideo(newPropertyValue);
       } else if (resourceType == "json") {
         worker.ExposeJson(newPropertyValue);
+      } else if (resourceType == "tilemap") {
+        worker.ExposeTilemap(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

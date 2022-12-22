@@ -25,9 +25,7 @@ class GD_EXTENSION_API TextObject : public gd::ObjectConfiguration {
     return gd::make_unique<TextObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
-#endif
 
   /** \brief Change the text.
    */

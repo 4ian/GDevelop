@@ -24,7 +24,6 @@ import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import { I18n } from '@lingui/react';
 import AlertMessage from '../UI/AlertMessage';
-import { GameRegistration } from '../GameDashboard/GameRegistration';
 import { Tabs } from '../UI/Tabs';
 import { LoadingScreenEditor } from './LoadingScreenEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
@@ -429,10 +428,6 @@ function ProjectPropertiesDialog(props: Props) {
                     />
                   </React.Fragment>
                 ) : null}
-                <Text size="block-title">
-                  <Trans>Analytics</Trans>
-                </Text>
-                <GameRegistration project={project} />
                 <Text size="block-title">
                   <Trans>Resolution and rendering</Trans>
                 </Text>

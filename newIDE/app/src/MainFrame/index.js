@@ -162,6 +162,7 @@ import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppT
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
 import TabsTitlebar from './TabsTitlebar';
+import RouterContext from './RouterContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -249,11 +250,6 @@ type LaunchPreviewOptions = {
 };
 
 export type Props = {|
-  initialDialog?: string,
-  initialGameId?: string,
-  initialGamesDashboardTab?: string,
-  initialAssetPackUserFriendlySlug?: string,
-  introDialog?: React.Element<*>,
   renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
@@ -317,7 +313,6 @@ const MainFrame = (props: Props) => {
   const [projectManagerOpen, openProjectManager] = React.useState<boolean>(
     false
   );
-  const [introDialogOpen, openIntroDialog] = React.useState<boolean>(false);
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
@@ -440,12 +435,7 @@ const MainFrame = (props: Props) => {
     resourceFetcher,
     getStorageProviderOperations,
     getStorageProvider,
-    initialDialog,
-    initialGameId,
-    initialGamesDashboardTab,
-    initialAssetPackUserFriendlySlug,
     initialFileMetadataToOpen,
-    introDialog,
     i18n,
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
@@ -529,9 +519,6 @@ const MainFrame = (props: Props) => {
               openFromFileMetadataWithStorageProvider(
                 fileMetadataAndStorageProviderName
               );
-          } else {
-            // Open the intro dialog if not opening any project.
-            if (introDialog) openIntroDialog(true);
           }
         })
         .catch(() => {
@@ -543,27 +530,13 @@ const MainFrame = (props: Props) => {
     []
   );
 
-  const {
-    openProfileDialogWithTab,
-    profileDialogInitialTab,
-    gamesDashboardInitialGameId,
-    setGamesDashboardInitialGameId,
-    gamesDashboardInitialTab,
-    setGamesDashboardInitialTab,
-  } = useOpenInitialDialog({
-    parameters: {
-      initialDialog,
-      initialGameId,
-      initialGamesDashboardTab,
-      initialAssetPackUserFriendlySlug,
+  useOpenInitialDialog({
+    openOnboardingDialog: () => {
+      selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
     },
-    actions: {
-      openOnboardingDialog: () => {
-        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
-      },
-      openProfileDialog,
-    },
+    openProfileDialog,
   });
+  const { addArguments } = React.useContext(RouterContext);
 
   const _closeSnackMessage = React.useCallback(
     () => {
@@ -741,9 +714,12 @@ const MainFrame = (props: Props) => {
         // (like locally or on Google Drive).
         if (onSaveProject) {
           preferences.insertRecentProjectFile({
-            fileMetadata: fileMetadata.name
-              ? fileMetadata
-              : { ...fileMetadata, name: project.getName() },
+            fileMetadata: {
+              ...fileMetadata,
+              name: project.getName(),
+              gameId: project.getProjectUuid(),
+              lastModifiedDate: Date.now(),
+            },
             storageProviderName: storageProvider.internalName,
           });
         }
@@ -1586,13 +1562,12 @@ const MainFrame = (props: Props) => {
           key: 'start page',
           extraEditorProps: {
             storageProviders: props.storageProviders,
-            initialTab: initialDialog === 'asset-store' ? 'shop' : null,
           },
           closable: false,
         }),
       }));
     },
-    [setState, i18n, initialDialog, props.storageProviders]
+    [setState, i18n, props.storageProviders]
   );
 
   const _openDebugger = React.useCallback(
@@ -1953,7 +1928,6 @@ const MainFrame = (props: Props) => {
       // At the end of the promise below, currentProject and storageProvider
       // may have changed (if the user opened another project). So we read and
       // store their values in variables now.
-      const projectName = currentProject.getName();
       const storageProviderInternalName = newStorageProvider.internalName;
 
       try {
@@ -2004,11 +1978,8 @@ const MainFrame = (props: Props) => {
 
         // Save was done on a new file/location, so save it in the
         // recent projects and in the state.
-        const enrichedFileMetadata = fileMetadata.name
-          ? fileMetadata
-          : { ...fileMetadata, name: projectName };
         const fileMetadataAndStorageProviderName = {
-          fileMetadata: enrichedFileMetadata,
+          fileMetadata,
           storageProviderName: storageProviderInternalName,
         };
         preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
@@ -2039,7 +2010,7 @@ const MainFrame = (props: Props) => {
           // can happen if another project was loaded in the meantime.
           setState(state => ({
             ...state,
-            currentFileMetadata: enrichedFileMetadata,
+            currentFileMetadata: fileMetadata,
           }));
         }
       } catch (rawError) {
@@ -2131,7 +2102,6 @@ const MainFrame = (props: Props) => {
         // At the end of the promise below, currentProject and storageProvider
         // may have changed (if the user opened another project). So we read and
         // store their values in variables now.
-        const projectName = currentProject.getName();
         const storageProviderInternalName = getStorageProvider().internalName;
 
         const { wasSaved, fileMetadata } = await onSaveProject(
@@ -2143,12 +2113,9 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
-          const enrichedFileMetadata = fileMetadata.name
-            ? fileMetadata
-            : { ...fileMetadata, name: projectName };
 
           const fileMetadataAndStorageProviderName = {
-            fileMetadata: enrichedFileMetadata,
+            fileMetadata: fileMetadata,
             storageProviderName: storageProviderInternalName,
           };
           preferences.insertRecentProjectFile(
@@ -2173,7 +2140,7 @@ const MainFrame = (props: Props) => {
             // can happen if another project was loaded in the meantime.
             setState(state => ({
               ...state,
-              currentFileMetadata: enrichedFileMetadata,
+              currentFileMetadata: fileMetadata,
             }));
           }
 
@@ -2656,14 +2623,9 @@ const MainFrame = (props: Props) => {
     onOpenCommandPalette: commandPaletteRef.current
       ? commandPaletteRef.current.open
       : () => {},
-    onOpenProfile: React.useCallback(
-      () => openProfileDialogWithTab('profile'),
-      [openProfileDialogWithTab]
-    ),
-    onOpenGamesDashboard: React.useCallback(
-      () => openProfileDialogWithTab('games-dashboard'),
-      [openProfileDialogWithTab]
-    ),
+    onOpenProfile: () => openProfileDialog(true),
+    onOpenGamesDashboard: () =>
+      addArguments({ 'initial-dialog': 'games-dashboard' }),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -2709,8 +2671,10 @@ const MainFrame = (props: Props) => {
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
-    onOpenProfile: () => openProfileDialogWithTab('profile'),
-    onOpenGamesDashboard: () => openProfileDialogWithTab('games-dashboard'),
+    onOpenProfile: () => openProfileDialog(true),
+    onOpenGamesDashboard: () => {
+      addArguments({ 'initial-dialog': 'games-dashboard' });
+    },
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -2897,7 +2861,7 @@ const MainFrame = (props: Props) => {
                     onCloseProject: () => askToCloseProject(),
                     onCreateProject: exampleShortHeader =>
                       openCreateProjectDialog(true, exampleShortHeader),
-                    onOpenProfile: () => openProfileDialogWithTab('profile'),
+                    onOpenProfile: () => openProfileDialog(true),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
@@ -2974,12 +2938,6 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {!!introDialog &&
-        introDialogOpen &&
-        React.cloneElement(introDialog, {
-          open: true,
-          onClose: () => openIntroDialog(false),
-        })}
       {!!currentProject && platformSpecificAssetsDialogOpen && (
         <PlatformSpecificAssetsDialog
           project={currentProject}
@@ -3023,17 +2981,9 @@ const MainFrame = (props: Props) => {
       {profileDialogOpen && (
         <ProfileDialog
           currentProject={currentProject}
-          initialTab={profileDialogInitialTab}
           open
           onClose={() => {
             openProfileDialog(false);
-          }}
-          gamesDashboardInitialGameId={gamesDashboardInitialGameId}
-          gamesDashboardInitialTab={gamesDashboardInitialTab}
-          onGameDetailsDialogClose={() => {
-            // On dialog close, reset any initial props.
-            setGamesDashboardInitialGameId(null);
-            setGamesDashboardInitialTab('details');
           }}
         />
       )}

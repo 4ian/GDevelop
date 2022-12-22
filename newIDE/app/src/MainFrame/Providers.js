@@ -36,6 +36,7 @@ import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/Announcemen
 import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
 import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
 import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { RouterContextProvider } from './RouterContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -57,19 +58,18 @@ type Props = {|
  * Wrap the children with Drag and Drop, Material UI theme and i18n React providers,
  * so that these modules can be used in the children.
  */
-export default class Providers extends React.Component<Props, {||}> {
-  render() {
-    const {
-      disableCheckForUpdates,
-      authentication,
-      children,
-      makeEventsFunctionCodeWriter,
-      eventsFunctionsExtensionWriter,
-      eventsFunctionsExtensionOpener,
-    } = this.props;
-    return (
-      <DragAndDropContextProvider>
-        <UnsavedChangesContextProvider>
+const Providers = ({
+  disableCheckForUpdates,
+  authentication,
+  children,
+  makeEventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener,
+}: Props) => {
+  return (
+    <DragAndDropContextProvider>
+      <UnsavedChangesContextProvider>
+        <RouterContextProvider>
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
               {({ values }) => {
@@ -136,8 +136,10 @@ export default class Providers extends React.Component<Props, {||}> {
               }}
             </PreferencesContext.Consumer>
           </PreferencesProvider>
-        </UnsavedChangesContextProvider>
-      </DragAndDropContextProvider>
-    );
-  }
-}
+        </RouterContextProvider>
+      </UnsavedChangesContextProvider>
+    </DragAndDropContextProvider>
+  );
+};
+
+export default Providers;

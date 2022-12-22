@@ -375,11 +375,10 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardRelationalOperatorParameters(
+    .useStandardParameters(
       'number',
       gd.ParameterOptions.makeNewOptions()
     )
-    .getCodeExtraInformation()
     .setFunctionName('getLevelndex');
 
   object

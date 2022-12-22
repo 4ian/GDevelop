@@ -115,6 +115,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'Button',
     0
   );
+  buttonExtension.setVersion('1.0.0');
+
   const buttonEventBasedObject = buttonExtension
     .getEventsBasedObjects()
     .insertNew('PanelSpriteButton', 0);

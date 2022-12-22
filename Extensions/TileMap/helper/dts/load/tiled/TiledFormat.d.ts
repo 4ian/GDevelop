@@ -1,8 +1,8 @@
-import { float, integer } from '../model/CommonTypes';
+import { float, integer } from '../../model/CommonTypes';
 /**
- * Tiled JSON format.
+ * Tiled JSON format (https://github.com/mapeditor/tiled/blob/master/docs/reference/json-map-format.rst).
  */
-export declare type TiledMap = {
+export declare type TiledTileMap = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
   backgroundcolor?: string;
   /** The compression level to use for tile layer data (defaults to -1, which means to use the algorithm default) */
@@ -111,6 +111,8 @@ export declare type TiledChunk = {
   y: integer;
 };
 export declare type TiledObject = {
+  /** The class of the object (renamed from type since 1.9, optional) */
+  class?: string;
   /** Used to mark an object as an ellipse */
   ellipse?: boolean;
   /** Global tile ID, only if object represents a tile */
@@ -135,8 +137,6 @@ export declare type TiledObject = {
   template?: string;
   /** Only used for text objects */
   text?: Text;
-  /** String assigned to type Tiledfield in editor */
-  type: string;
   /** Whether object is shown in editor. */
   visible: boolean;
   /** Width in pixels. */
@@ -178,7 +178,7 @@ export declare type TiledTileset = {
   /** The number of tile columns in the tileset */
   columns: integer;
   /** GID corresponding to the first tile in the set */
-  firstgid: integer;
+  firstgid?: integer;
   /** (optional) */
   grid?: TiledGrid;
   /** Image used for tiles in this set */
@@ -251,6 +251,8 @@ export declare type TiledTransformations = {
 export declare type TiledTileDefinition = {
   /** Array of {@link TiledTiles} */
   animation?: Array<TiledTileDefinition>;
+  /** The class of the tile (renamed from type since 1.9, optional) */
+  class?: string;
   /** Local ID of the tile */
   id: integer;
   /** Image representing this tile (optional) */
@@ -267,8 +269,6 @@ export declare type TiledTileDefinition = {
   properties?: Array<TiledProperty>;
   /** Index of terrain for each corner of tile (optional) */
   terrain?: Array<integer>;
-  /** The type of the tile (optional) */
-  type?: string;
 };
 export declare type TiledFrame = {
   /** Frame duration in milliseconds */
@@ -336,4 +336,4 @@ export declare type TiledPoint = {
   /** Y coordinate in pixels */
   y: float;
 };
-//# sourceMappingURL=Tiled.d.ts.map
+//# sourceMappingURL=TiledFormat.d.ts.map

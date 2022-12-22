@@ -73,6 +73,7 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
           <GenericIconPreview renderIcon={props => <Audiotrack {...props} />} />
         );
       case 'json':
+      case 'tilemap':
         return (
           <GenericIconPreview
             renderIcon={props => <InsertDriveFile {...props} />}

@@ -1,4 +1,4 @@
-import { integer, float } from "../types/commons";
+import { integer, float } from "../types/CommonTypes";
 import {
   EditableObjectLayer,
   EditableTileMap,

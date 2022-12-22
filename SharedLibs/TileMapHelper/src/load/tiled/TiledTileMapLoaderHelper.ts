@@ -3,8 +3,8 @@ import {
   FLIPPED_HORIZONTALLY_FLAG,
   FLIPPED_VERTICALLY_FLAG,
 } from "../../model/GID";
-import { integer } from "../../types/commons";
-import { TiledLayer } from "../../types/Tiled";
+import { integer } from "../../types/CommonTypes";
+import { TiledLayer } from "../../types/TiledFormat";
 
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string

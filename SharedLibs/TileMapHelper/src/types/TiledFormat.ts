@@ -1,4 +1,4 @@
-import { float, integer } from "./commons";
+import { float, integer } from "./CommonTypes";
 
 /**
  * Tiled JSON format (https://github.com/mapeditor/tiled/blob/master/docs/reference/json-map-format.rst).

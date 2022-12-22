@@ -1,5 +1,5 @@
 import { TileTextureCache } from "../TileTextureCache";
-import { LDtkTileMap, LDtkTilesetDef } from "../../types/LDtk";
+import { LDtkTileMap, LDtkTilesetDef } from "../../types/LDtkFormat";
 import { getLDtkTileId } from "../../load/ldtk/LDtkTileMapLoaderHelper";
 import PIXI = GlobalPIXIModule.PIXI;
 

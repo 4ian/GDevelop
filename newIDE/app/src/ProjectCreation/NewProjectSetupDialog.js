@@ -11,14 +11,14 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import generateName from '../Utils/ProjectNameGenerator';
 import { type NewProjectSetup } from './CreateProjectDialog';
 import IconButton from '../UI/IconButton';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import { findEmptyPathInWorkspaceFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
-import { Line } from '../UI/Grid';
+import { Line, Spacer } from '../UI/Grid';
 import LeftLoader from '../UI/LeftLoader';
 import {
   checkIfHasTooManyCloudProjects,
@@ -347,8 +347,9 @@ const NewProjectSetupDialog = ({
               }}
               disabled={isOpening}
               tooltipOrHelperText={
-                <LineStackLayout noMargin>
+                <Line noMargin>
                   <Trans>Learn more about</Trans>
+                  <Spacer />
                   <Link
                     href="https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication"
                     onClick={() =>
@@ -359,7 +360,8 @@ const NewProjectSetupDialog = ({
                   >
                     <Trans>player authentication</Trans>
                   </Link>
-                </LineStackLayout>
+                  .
+                </Line>
               }
             />
           </ColumnStackLayout>

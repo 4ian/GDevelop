@@ -2516,9 +2516,10 @@ const MainFrame = (props: Props) => {
         currentProject.setName(newProjectSetup.projectName);
       }
 
-      if (newProjectSetup.allowPlayersToLogIn && authenticatedUser.profile) {
-        // When the login is enabled and user is connected, ensure the game is registered to avoid
-        // having the authentication dialog asking the user to register the game.
+      if (authenticatedUser.profile) {
+        // if the user is connected, try to register the game to avoid
+        // any gdevelop services to ask the user to register the game.
+        // (for instance, leaderboards, player authentication, ...)
         try {
           await registerGame(
             authenticatedUser.getAuthorizationHeader,

@@ -364,10 +364,11 @@ const defineTileMap = function (
     .setFunctionName('getLayerIndex');
 
   object
-    .addCondition(
+    .addExpressionAndCondition(
+      'number',
       'LevelIndex',
       _('Level index'),
-      _('Compare the value of the level index.'),
+      _('the level index being displayed.'),
       _('the level index'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
@@ -380,18 +381,6 @@ const defineTileMap = function (
     )
     .getCodeExtraInformation()
     .setFunctionName('getLevelndex');
-
-  object
-    .addExpression(
-      'LevelIndex',
-      _('Level index'),
-      _('Get the level index being displayed'),
-      '',
-      'JsPlatform/Extensions/tile_map.svg'
-    )
-    .addParameter('object', _('Tile map'), 'TileMap', false)
-    .getCodeExtraInformation()
-    .setFunctionName('getLevelIndex');
 
   object
     .addCondition(

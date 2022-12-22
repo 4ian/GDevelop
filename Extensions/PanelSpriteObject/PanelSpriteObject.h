@@ -28,9 +28,7 @@ class GD_EXTENSION_API PanelSpriteObject : public gd::ObjectConfiguration {
         new PanelSpriteObject(*this));
   }
 
-#if defined(GD_IDE_ONLY)
   virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
-#endif
 
   double GetWidth() const { return width; };
   double GetHeight() const { return height; };

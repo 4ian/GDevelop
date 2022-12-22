@@ -87,9 +87,9 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
   /**
    * Initialize configuration using another configuration. Used by copy-ctor
    * and assign-op.
-   * 
+   *
    * Don't forget to update me if members were changed!
-   * 
+   *
    * It's needed because there is no default copy for childObjectConfigurations
    * and it must be a deep copy.
    */

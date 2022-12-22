@@ -40,6 +40,7 @@ import {
   getUserPublicProfilesByIds,
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
+import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -64,6 +65,10 @@ const styles = {
     maxHeight: '100%',
     verticalAlign: 'middle',
     pointerEvents: 'none',
+    // Compromise between having a preview of the asset slightly more zoomed
+    // compared to the search results and a not too zoomed image for small
+    // smooth assets that could give a sense of bad quality.
+    flex: 0.6,
   },
   arrowContainer: {
     padding: 6,
@@ -152,6 +157,15 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
         scrollViewElement.scrollToPosition(y);
       },
     }));
+
+    const getImagePreviewStyle = (assetShortHeader: Asset) => {
+      return {
+        ...styles.previewImage,
+        imageRendering: isPixelArt(assetShortHeader)
+          ? getPixelatedImageRendering()
+          : undefined,
+      };
+    };
 
     const loadAsset = React.useCallback(
       () => {
@@ -293,7 +307,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                     </Text>
                     {!!assetAuthors &&
                       assetAuthors.map(author => (
-                        <Text size="body">
+                        <Text size="body" key={author.name}>
                           <Link
                             key={author.name}
                             href={author.website}
@@ -310,7 +324,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         const username =
                           userPublicProfile.username || 'GDevelop user';
                         return (
-                          <Text size="body">
+                          <Text size="body" key={userPublicProfile.id}>
                             <Link
                               key={userPublicProfile.id}
                               href="#"
@@ -391,13 +405,13 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                     <div style={styles.previewBackground}>
                       {isAssetPrivate ? (
                         <AuthorizedAssetImage
-                          style={styles.previewImage}
+                          style={getImagePreviewStyle(asset)}
                           url={asset.previewImageUrls[0]}
                           alt={asset.name}
                         />
                       ) : (
                         <CorsAwareImage
-                          style={styles.previewImage}
+                          style={getImagePreviewStyle(asset)}
                           src={asset.previewImageUrls[0]}
                           alt={asset.name}
                         />

@@ -4,37 +4,19 @@ import Rectangle from '../Utils/Rectangle';
 import { type InstanceMeasurer } from './InstancesRenderer';
 const gd: libGDevelop = global.gd;
 
-const getRectangleNormalizedBoundaries = ({
-  startX,
-  startY,
-  endX,
-  endY,
-}: {
-  startX: number,
-  startY: number,
-  endX: number,
-  endY: number,
-}) => {
-  let normalizedStartX = startX;
-  let normalizedStartY = startY;
-  let normalizedEndX = endX;
-  let normalizedEndY = endY;
-  if (normalizedStartX > normalizedEndX) {
-    const tmp = normalizedStartX;
-    normalizedStartX = normalizedEndX;
-    normalizedEndX = tmp;
+type Point = { x: number, y: number };
+
+const normalizeRectangle = (startPoint: Point, endPoint: Point) => {
+  if (startPoint.x > endPoint.x) {
+    const tmp = startPoint.x;
+    startPoint.x = endPoint.x;
+    endPoint.x = tmp;
   }
-  if (normalizedStartY > normalizedEndY) {
-    const tmp = normalizedStartY;
-    normalizedStartY = normalizedEndY;
-    normalizedEndY = tmp;
+  if (startPoint.y > endPoint.y) {
+    const tmp = startPoint.y;
+    startPoint.y = endPoint.y;
+    endPoint.y = tmp;
   }
-  return {
-    startX: normalizedStartX,
-    startY: normalizedStartY,
-    endX: normalizedEndX,
-    endY: normalizedEndY,
-  };
 };
 
 export default class SelectionRectangle {
@@ -43,10 +25,10 @@ export default class SelectionRectangle {
   toSceneCoordinates: (x: number, y: number) => [number, number];
 
   pixiRectangle: PIXI.Graphics;
-  selectionRectangleStart: { x: number, y: number } | null;
-  selectionRectangleEnd: { x: number, y: number } | null;
-  temporarySelectionRectangleStart: { x: number, y: number } | null;
-  temporarySelectionRectangleEnd: { x: number, y: number } | null;
+  selectionRectangleStart: Point | null;
+  selectionRectangleEnd: Point | null;
+  temporarySelectionRectangleStart: Point | null;
+  temporarySelectionRectangleEnd: Point | null;
   _instancesInSelectionRectangle: gdInitialInstance[];
   _temporaryInstancesInSelectionRectangle: gdInitialInstance[];
 
@@ -161,23 +143,28 @@ export default class SelectionRectangle {
   ): Array<gdInitialInstance> => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
+    if (!this.temporarySelectionRectangleEnd) {
+      this.temporarySelectionRectangleEnd = {};
+    }
+    if (!this.temporarySelectionRectangleStart) {
+      this.temporarySelectionRectangleStart = {};
+    }
 
     this.selectionRectangleEnd = { x: lastX, y: lastY };
+
+    // Update temporary selection rectangle to follow the selection rectangle
+    this.temporarySelectionRectangleEnd.x = this.selectionRectangleEnd.x;
+    this.temporarySelectionRectangleEnd.y = this.selectionRectangleEnd.y;
+    this.temporarySelectionRectangleStart.x = this.selectionRectangleStart.x;
+    this.temporarySelectionRectangleStart.y = this.selectionRectangleStart.y;
+
     this._temporaryInstancesInSelectionRectangle.length = 0;
-    const normalizedSelectionRectangle = getRectangleNormalizedBoundaries({
-      startX: this.selectionRectangleStart.x,
-      startY: this.selectionRectangleStart.y,
-      endX: this.selectionRectangleEnd.x,
-      endY: this.selectionRectangleEnd.y,
-    });
-    this.temporarySelectionRectangleStart = {
-      x: normalizedSelectionRectangle.startX,
-      y: normalizedSelectionRectangle.startY,
-    };
-    this.temporarySelectionRectangleEnd = {
-      x: normalizedSelectionRectangle.endX,
-      y: normalizedSelectionRectangle.endY,
-    };
+    // Mutate the temporary selection rectangle so that it's ready for the
+    // functor iteration.
+    normalizeRectangle(
+      this.temporarySelectionRectangleStart,
+      this.temporarySelectionRectangleEnd
+    );
 
     this.instances.iterateOverInstances(
       // $FlowFixMe - gd.castObject is not supporting typings.
@@ -190,20 +177,11 @@ export default class SelectionRectangle {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
-    const normalizedSelectionRectangle = getRectangleNormalizedBoundaries({
-      startX: this.selectionRectangleStart.x,
-      startY: this.selectionRectangleStart.y,
-      endX: this.selectionRectangleEnd.x,
-      endY: this.selectionRectangleEnd.y,
-    });
-    this.selectionRectangleStart = {
-      x: normalizedSelectionRectangle.startX,
-      y: normalizedSelectionRectangle.startY,
-    };
-    this.selectionRectangleEnd = {
-      x: normalizedSelectionRectangle.endX,
-      y: normalizedSelectionRectangle.endY,
-    };
+    normalizeRectangle(
+      this.selectionRectangleStart,
+      this.selectionRectangleEnd
+    );
+
     this.instances.iterateOverInstances(
       // $FlowFixMe - gd.castObject is not supporting typings.
       this.selector

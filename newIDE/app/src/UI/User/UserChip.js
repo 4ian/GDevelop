@@ -28,6 +28,7 @@ const styles = {
     width: 20,
     height: 20,
   },
+  buttonContainer: { flexShrink: 0 },
 };
 
 type Props = {|
@@ -60,27 +61,29 @@ const UserChip = ({ onOpenProfile }: Props) => {
       />
     </DotBadge>
   ) : (
-    <LineStackLayout noMargin>
-      <FlatButton
-        label={
-          <span>
-            <Trans>Log in</Trans>
-          </span>
-        }
-        onClick={onLogin}
-        leftIcon={<Person fontSize="small" />}
-      />
-      <RaisedButton
-        label={
-          <span>
-            <Trans>Create account</Trans>
-          </span>
-        }
-        onClick={onCreateAccount}
-        primary
-        icon={<Person fontSize="small" />}
-      />
-    </LineStackLayout>
+    <div style={styles.buttonContainer}>
+      <LineStackLayout noMargin alignItems="center">
+        <FlatButton
+          label={
+            <span>
+              <Trans>Log in</Trans>
+            </span>
+          }
+          onClick={onLogin}
+          leftIcon={<Person fontSize="small" />}
+        />
+        <RaisedButton
+          label={
+            <span>
+              <Trans>Create account</Trans>
+            </span>
+          }
+          onClick={onCreateAccount}
+          primary
+          icon={<Person fontSize="small" />}
+        />
+      </LineStackLayout>
+    </div>
   );
 };
 

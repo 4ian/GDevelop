@@ -1,16 +1,21 @@
-import { integer } from "../model/CommonTypes";
-import { TiledLayer } from "./TiledFormat";
+import {
+  FLIPPED_DIAGONALLY_FLAG,
+  FLIPPED_HORIZONTALLY_FLAG,
+  FLIPPED_VERTICALLY_FLAG,
+} from "../../model/GID";
+import { integer } from "../../types/CommonTypes";
+import { TiledLayer } from "../../types/TiledFormat";
 
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string
  * by Tiled.
  * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
  * @param pako The zlib library.
- * @param layer The layer data from a Tiled JSON.
+ * @param tiledLayer The layer data from a Tiled JSON.
  * @returns The decoded layer data.
  */
-export const decodeBase64LayerData = (pako: any, layer: TiledLayer) => {
-  const { data, compression } = layer;
+export const decodeBase64LayerData = (pako: any, tiledLayer: TiledLayer) => {
+  const { data, compression } = tiledLayer;
   const dataBase64 = data as string;
   if (!dataBase64) {
     // The layer data is not encoded.
@@ -74,10 +79,6 @@ export type TiledGID = {
 export const extractTileUidFlippedStates = (
   globalTileUid: integer
 ): TiledGID => {
-  const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-  const FLIPPED_VERTICALLY_FLAG = 0x40000000;
-  const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
-
   const flippedHorizontally = globalTileUid & FLIPPED_HORIZONTALLY_FLAG;
   const flippedVertically = globalTileUid & FLIPPED_VERTICALLY_FLAG;
   const flippedDiagonally = globalTileUid & FLIPPED_DIAGONALLY_FLAG;
@@ -101,8 +102,10 @@ export const extractTileUidFlippedStates = (
 /**
  * Tiled use 0 as null, we do too but it's black boxed.
  * This is why the id needs to be decremented.
- * @return the tile identifier used in {@link TilMapModel}.
+ * @return the tile identifier.
  */
-export const getTileIdFromTiledGUI = (
+export function getTileIdFromTiledGUI(
   tiledGUI: number | undefined
-): number | undefined => (tiledGUI === 0 ? undefined : tiledGUI - 1);
+): number | undefined {
+  return tiledGUI === 0 ? undefined : tiledGUI - 1;
+}

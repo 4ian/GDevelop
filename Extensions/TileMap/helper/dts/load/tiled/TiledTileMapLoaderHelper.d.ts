@@ -1,16 +1,16 @@
-import { integer } from '../model/CommonTypes';
-import { TiledLayer } from './TiledFormat';
+import { integer } from '../../types/CommonTypes';
+import { TiledLayer } from '../../types/TiledFormat';
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string
  * by Tiled.
  * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
  * @param pako The zlib library.
- * @param layer The layer data from a Tiled JSON.
+ * @param tiledLayer The layer data from a Tiled JSON.
  * @returns The decoded layer data.
  */
 export declare const decodeBase64LayerData: (
   pako: any,
-  layer: TiledLayer
+  tiledLayer: TiledLayer
 ) => number[];
 export declare type TiledGID = {
   id: integer;
@@ -29,9 +29,9 @@ export declare const extractTileUidFlippedStates: (
 /**
  * Tiled use 0 as null, we do too but it's black boxed.
  * This is why the id needs to be decremented.
- * @return the tile identifier used in {@link TilMapModel}.
+ * @return the tile identifier.
  */
-export declare const getTileIdFromTiledGUI: (
+export declare function getTileIdFromTiledGUI(
   tiledGUI: number | undefined
-) => number | undefined;
-//# sourceMappingURL=TiledLoaderHelper.d.ts.map
+): number | undefined;
+//# sourceMappingURL=TiledTileMapLoaderHelper.d.ts.map

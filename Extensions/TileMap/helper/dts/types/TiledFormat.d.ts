@@ -1,8 +1,8 @@
-import { float, integer } from '../model/CommonTypes';
+import { float, integer } from './CommonTypes';
 /**
- * Tiled JSON format (https://www.mapeditor.org/).
+ * Tiled JSON format (https://github.com/mapeditor/tiled/blob/master/docs/reference/json-map-format.rst).
  */
-export declare type TiledMap = {
+export declare type TiledTileMap = {
   /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
   backgroundcolor?: string;
   /** The compression level to use for tile layer data (defaults to -1, which means to use the algorithm default) */

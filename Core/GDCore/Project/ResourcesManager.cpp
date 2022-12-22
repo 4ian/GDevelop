@@ -85,6 +85,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<VideoResource>();
   else if (kind == "json")
     return std::make_shared<JsonResource>();
+  else if (kind == "tilemap")
+    return std::make_shared<TilemapResource>();
   else if (kind == "bitmapFont")
     return std::make_shared<BitmapFontResource>();
 
@@ -644,6 +646,40 @@ std::map<gd::String, gd::PropertyDescriptor> JsonResource::GetProperties()
 }
 
 bool JsonResource::UpdateProperty(const gd::String& name,
+                                  const gd::String& value) {
+  if (name == "disablePreload") disablePreload = value == "1";
+
+  return true;
+}
+
+void TilemapResource::SetFile(const gd::String& newFile) {
+  file = NormalizePathSeparator(newFile);
+}
+
+void TilemapResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+  DisablePreload(element.GetBoolAttribute("disablePreload", false));
+}
+
+void TilemapResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute("file", GetFile());
+  element.SetAttribute("disablePreload", IsPreloadDisabled());
+}
+
+std::map<gd::String, gd::PropertyDescriptor> TilemapResource::GetProperties()
+    const {
+  std::map<gd::String, gd::PropertyDescriptor> properties;
+  properties["disablePreload"]
+      .SetValue(disablePreload ? "true" : "false")
+      .SetType("Boolean")
+      .SetLabel(_("Disable preloading at game startup"));
+
+  return properties;
+}
+
+bool TilemapResource::UpdateProperty(const gd::String& name,
                                   const gd::String& value) {
   if (name == "disablePreload") disablePreload = value == "1";
 

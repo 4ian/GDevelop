@@ -158,6 +158,7 @@ export const addAssetToProject = async ({
   const objectNewNames = {};
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
+  const resourcesManager: gdResourcesManager = project.getResourcesManager();
 
   // Create objects (and their behaviors)
   asset.objectAssets.forEach(objectAsset => {

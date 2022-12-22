@@ -4,6 +4,39 @@ import Rectangle from '../Utils/Rectangle';
 import { type InstanceMeasurer } from './InstancesRenderer';
 const gd: libGDevelop = global.gd;
 
+const getRectangleNormalizedBoundaries = ({
+  startX,
+  startY,
+  endX,
+  endY,
+}: {
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+}) => {
+  let normalizedStartX = startX;
+  let normalizedStartY = startY;
+  let normalizedEndX = endX;
+  let normalizedEndY = endY;
+  if (normalizedStartX > normalizedEndX) {
+    const tmp = normalizedStartX;
+    normalizedStartX = normalizedEndX;
+    normalizedEndX = tmp;
+  }
+  if (normalizedStartY > normalizedEndY) {
+    const tmp = normalizedStartY;
+    normalizedStartY = normalizedEndY;
+    normalizedEndY = tmp;
+  }
+  return {
+    startX: normalizedStartX,
+    startY: normalizedStartY,
+    endX: normalizedEndX,
+    endY: normalizedEndY,
+  };
+};
+
 export default class SelectionRectangle {
   instances: gdInitialInstancesContainer;
   instanceMeasurer: InstanceMeasurer;
@@ -12,9 +45,13 @@ export default class SelectionRectangle {
   pixiRectangle: PIXI.Graphics;
   selectionRectangleStart: { x: number, y: number } | null;
   selectionRectangleEnd: { x: number, y: number } | null;
+  temporarySelectionRectangleStart: { x: number, y: number } | null;
+  temporarySelectionRectangleEnd: { x: number, y: number } | null;
   _instancesInSelectionRectangle: gdInitialInstance[];
+  _temporaryInstancesInSelectionRectangle: gdInitialInstance[];
 
   selector: gdInitialInstanceJSFunctor;
+  temporarySelector: gdInitialInstanceJSFunctor;
   /**
    * Used to check if an instance is in the selection rectangle
    */
@@ -38,6 +75,7 @@ export default class SelectionRectangle {
     this.selectionRectangleStart = null;
     this.selectionRectangleEnd = null;
     this._instancesInSelectionRectangle = [];
+    this._temporaryInstancesInSelectionRectangle = [];
 
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
@@ -71,6 +109,41 @@ export default class SelectionRectangle {
         this._instancesInSelectionRectangle.push(instance);
       }
     };
+    this.temporarySelector = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
+    this.temporarySelector.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
+      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      const instanceAABB = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        this._temporaryAABB
+      );
+
+      const {
+        temporarySelectionRectangleEnd,
+        temporarySelectionRectangleStart,
+      } = this;
+      if (!temporarySelectionRectangleStart || !temporarySelectionRectangleEnd)
+        return;
+
+      const selectionSceneStart = toSceneCoordinates(
+        temporarySelectionRectangleStart.x,
+        temporarySelectionRectangleStart.y
+      );
+      const selectionSceneEnd = toSceneCoordinates(
+        temporarySelectionRectangleEnd.x,
+        temporarySelectionRectangleEnd.y
+      );
+
+      if (
+        selectionSceneStart[0] <= instanceAABB.left &&
+        instanceAABB.right <= selectionSceneEnd[0] &&
+        selectionSceneStart[1] <= instanceAABB.top &&
+        instanceAABB.bottom <= selectionSceneEnd[1]
+      ) {
+        this._temporaryInstancesInSelectionRectangle.push(instance);
+      }
+    };
   }
 
   hasStartedSelectionRectangle() {
@@ -82,28 +155,55 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x, y };
   };
 
-  updateSelectionRectangle = (lastX: number, lastY: number) => {
+  updateSelectionRectangle = (
+    lastX: number,
+    lastY: number
+  ): Array<gdInitialInstance> => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
 
     this.selectionRectangleEnd = { x: lastX, y: lastY };
+    this._temporaryInstancesInSelectionRectangle.length = 0;
+    const normalizedSelectionRectangle = getRectangleNormalizedBoundaries({
+      startX: this.selectionRectangleStart.x,
+      startY: this.selectionRectangleStart.y,
+      endX: this.selectionRectangleEnd.x,
+      endY: this.selectionRectangleEnd.y,
+    });
+    this.temporarySelectionRectangleStart = {
+      x: normalizedSelectionRectangle.startX,
+      y: normalizedSelectionRectangle.startY,
+    };
+    this.temporarySelectionRectangleEnd = {
+      x: normalizedSelectionRectangle.endX,
+      y: normalizedSelectionRectangle.endY,
+    };
+
+    this.instances.iterateOverInstances(
+      // $FlowFixMe - gd.castObject is not supporting typings.
+      this.temporarySelector
+    );
+    return this._temporaryInstancesInSelectionRectangle;
   };
 
-  endSelectionRectangle = () => {
+  endSelectionRectangle = (): Array<gdInitialInstance> => {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
-    if (this.selectionRectangleStart.x > this.selectionRectangleEnd.x) {
-      const tmp = this.selectionRectangleStart.x;
-      this.selectionRectangleStart.x = this.selectionRectangleEnd.x;
-      this.selectionRectangleEnd.x = tmp;
-    }
-    if (this.selectionRectangleStart.y > this.selectionRectangleEnd.y) {
-      const tmp = this.selectionRectangleStart.y;
-      this.selectionRectangleStart.y = this.selectionRectangleEnd.y;
-      this.selectionRectangleEnd.y = tmp;
-    }
-
+    const normalizedSelectionRectangle = getRectangleNormalizedBoundaries({
+      startX: this.selectionRectangleStart.x,
+      startY: this.selectionRectangleStart.y,
+      endX: this.selectionRectangleEnd.x,
+      endY: this.selectionRectangleEnd.y,
+    });
+    this.selectionRectangleStart = {
+      x: normalizedSelectionRectangle.startX,
+      y: normalizedSelectionRectangle.startY,
+    };
+    this.selectionRectangleEnd = {
+      x: normalizedSelectionRectangle.endX,
+      y: normalizedSelectionRectangle.endY,
+    };
     this.instances.iterateOverInstances(
       // $FlowFixMe - gd.castObject is not supporting typings.
       this.selector

@@ -27,6 +27,7 @@ type Props = {|
   onRotateEnd: () => void,
   toCanvasCoordinates: (x: number, y: number) => [number, number],
   screenType: ScreenType,
+  showHandles: boolean,
 |};
 
 const getButtonSizes = (screenType: ScreenType) => {
@@ -77,6 +78,7 @@ export default class SelectedInstances {
   onRotateEnd: () => void;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   _screenType: ScreenType;
+  showHandles: boolean;
 
   pixiContainer = new PIXI.Container();
   rectanglesContainer = new PIXI.Container();
@@ -93,6 +95,7 @@ export default class SelectedInstances {
     onRotateEnd,
     toCanvasCoordinates,
     screenType,
+    showHandles,
   }: Props) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
@@ -102,33 +105,36 @@ export default class SelectedInstances {
     this.toCanvasCoordinates = toCanvasCoordinates;
     this.instancesSelection = instancesSelection;
     this._screenType = screenType;
+    this.showHandles = showHandles;
 
     this.pixiContainer.addChild(this.rectanglesContainer);
 
-    for (const resizeGrabbingLocation of resizeGrabbingLocationValues) {
-      const resizeButton = new PIXI.Graphics();
-      this.resizeButtons[resizeGrabbingLocation] = resizeButton;
+    if (showHandles) {
+      for (const resizeGrabbingLocation of resizeGrabbingLocationValues) {
+        const resizeButton = new PIXI.Graphics();
+        this.resizeButtons[resizeGrabbingLocation] = resizeButton;
+        this._makeButton(
+          resizeButton,
+          event => {
+            this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
+          },
+          () => {
+            this.onResizeEnd();
+          },
+          resizeGrabbingIconNames[resizeGrabbingLocation]
+        );
+      }
       this._makeButton(
-        resizeButton,
+        this.rotateButton,
         event => {
-          this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
+          this.onRotate(event.deltaX, event.deltaY);
         },
         () => {
-          this.onResizeEnd();
+          this.onRotateEnd();
         },
-        resizeGrabbingIconNames[resizeGrabbingLocation]
+        'url("res/actions/rotate24_black.png"),auto'
       );
     }
-    this._makeButton(
-      this.rotateButton,
-      event => {
-        this.onRotate(event.deltaX, event.deltaY);
-      },
-      () => {
-        this.onRotateEnd();
-      },
-      'url("res/actions/rotate24_black.png"),auto'
-    );
   }
 
   setScreenType(screenType: ScreenType) {
@@ -260,9 +266,10 @@ export default class SelectedInstances {
       this.rectanglesContainer.removeChild(this.selectedRectangles.pop());
     }
 
-    // If there are no unlocked instances, hide the resize buttons.
-    const show =
-      selection.filter(instance => !instance.isLocked()).length !== 0;
+    if (!this.showHandles) return;
+
+    // If there is any unlocked instances, show the resize buttons.
+    const show = selection.some(instance => !instance.isLocked());
 
     // Position the resize buttons.
     for (const grabbingLocation of resizeGrabbingLocationValues) {

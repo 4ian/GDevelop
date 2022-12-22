@@ -29,6 +29,7 @@ import {
   type ExtensionShortHeader,
 } from '../Utils/GDevelopServices/Extension';
 import * as Asset from '../Utils/GDevelopServices/Asset';
+//import { useFetchAssets } from './NewObjectDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -395,6 +396,24 @@ describe('InstallAsset', () => {
     });
   });
 
+  // TODO Find a way to test this
+
+  // describe('fetchAssets', () => {
+  //   it("throws if asset can't be downloaded", async () => {
+  //     mockFn(Asset.getPublicAsset).mockImplementationOnce(() => {
+  //       throw new Error('Fake error - unable to download');
+  //     });
+
+  //     const fetchAssets = useFetchAssets();
+  //     await expect(fetchAssets([fakeAssetShortHeader1])).rejects.toMatchObject({
+  //       message: 'Fake error - unable to download',
+  //     });
+
+  //     expect(getExtensionsRegistry).not.toHaveBeenCalled();
+  //     expect(getExtension).not.toHaveBeenCalled();
+  //   });
+  // });
+
   describe('checkRequiredExtensionUpdate', () => {
     it('can find an extension to install', async () => {
       makeTestExtensions(gd);
@@ -626,45 +645,10 @@ describe('InstallAsset', () => {
       getIncludeFileHashs: () => ({}),
     };
 
-    it("throws if asset can't be downloaded", async () => {
-      makeTestExtensions(gd);
-      const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
-      mockFn(Asset.getPublicAsset).mockImplementationOnce(() => {
-        throw new Error('Fake error - unable to download');
-      });
-
-      await expect(
-        installPublicAsset({
-          assetShortHeader: fakeAssetShortHeader1,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-          environment: 'live',
-          requiredExtensionInstallation: {
-            requiredExtensions: [],
-            missingExtensions: [],
-            outOfDateExtensions: [],
-          },
-          shouldUpdateExtension: true,
-        })
-      ).rejects.toMatchObject({
-        message: 'Fake error - unable to download',
-      });
-
-      expect(getExtensionsRegistry).not.toHaveBeenCalled();
-      expect(getExtension).not.toHaveBeenCalled();
-    });
-
     it("throws if an extension can't be installed, even if its extension was properly found in the registry", async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
-
-      // Get an asset that uses an extension...
-      mockFn(Asset.getPublicAsset).mockImplementationOnce(
-        () => fakeAssetWithFlashExtensionDependency1
-      );
 
       mockFn(getExtension).mockImplementationOnce(
         () => flashExtensionShortHeader
@@ -674,7 +658,8 @@ describe('InstallAsset', () => {
       // extension won't be loaded.
       await expect(
         installPublicAsset({
-          assetShortHeader: fakeAssetShortHeader1,
+          // An asset that uses an extension
+          asset: fakeAssetWithFlashExtensionDependency1,
           project,
           objectsContainer: layout,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -704,15 +689,11 @@ describe('InstallAsset', () => {
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
 
-      // Fake an asset with a custom object of type "Button::PanelSpriteButton",
-      // that is installed already.
-      mockFn(Asset.getPublicAsset).mockImplementationOnce(
-        () => fakeAssetWithCustomObject
-      );
-
       // Install the asset
       await installPublicAsset({
-        assetShortHeader: fakeAssetShortHeader1,
+        // Fake an asset with a custom object of type "Button::PanelSpriteButton",
+        // that is installed already.
+        asset: fakeAssetWithCustomObject,
         project,
         objectsContainer: layout,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,

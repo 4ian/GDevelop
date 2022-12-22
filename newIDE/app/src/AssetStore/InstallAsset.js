@@ -1,9 +1,7 @@
 // @flow
 import {
   type Asset,
-  type AssetShortHeader,
   type Environment,
-  getPublicAsset,
   isPixelArt,
   isPublicAssetResourceUrl,
   extractFilenameWithExtensionFromPublicAssetResourceUrl,
@@ -431,7 +429,7 @@ export const installAsset = async ({
 };
 
 export type InstallAssetShortHeaderArgs = {|
-  assetShortHeader: AssetShortHeader,
+  asset: Asset,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   objectsContainer: gdObjectsContainer,
@@ -441,7 +439,7 @@ export type InstallAssetShortHeaderArgs = {|
 |};
 
 export const installPublicAsset = async ({
-  assetShortHeader,
+  asset,
   eventsFunctionsExtensionsState,
   project,
   objectsContainer,
@@ -449,7 +447,6 @@ export const installPublicAsset = async ({
   requiredExtensionInstallation,
   shouldUpdateExtension,
 }: InstallAssetShortHeaderArgs): Promise<InstallAssetOutput> => {
-  const asset = await getPublicAsset(assetShortHeader, { environment });
   return installAsset({
     asset,
     eventsFunctionsExtensionsState,

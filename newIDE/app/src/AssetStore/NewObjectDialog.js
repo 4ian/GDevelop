@@ -31,6 +31,8 @@ import {
   checkRequiredExtensionUpdate,
 } from './InstallAsset';
 import {
+  type Asset,
+  type AssetShortHeader,
   getPublicAsset,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
@@ -43,6 +45,8 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
+import PromisePool from '@supercharge/promise-pool';
+
 const isDev = Window.isDev();
 
 const ObjectListItem = ({
@@ -93,6 +97,42 @@ export const useExtensionUpdateAlertDialog = () => {
       confirmButtonLabel: t`Update the extension`,
       dismissButtonLabel: t`Skip the update`,
     });
+  };
+};
+
+export const useFetchAssets = () => {
+  const { environment } = React.useContext(AssetStoreContext);
+
+  const { fetchPrivateAsset } = React.useContext(
+    PrivateAssetsAuthorizationContext
+  );
+
+  return async (
+    assetShortHeaders: Array<AssetShortHeader>
+  ): Promise<Array<Asset>> => {
+    const fetchedAssets = await PromisePool.withConcurrency(6)
+      .for(assetShortHeaders)
+      .process<Asset>(async assetShortHeader => {
+        const asset = isPrivateAsset(assetShortHeader)
+          ? await fetchPrivateAsset(assetShortHeader, {
+              environment,
+            })
+          : await getPublicAsset(assetShortHeader, { environment });
+        if (!asset) {
+          throw new Error(
+            'Unable to install the asset because it could not be fetched.'
+          );
+        }
+        return asset;
+      });
+    if (fetchedAssets.errors.length) {
+      throw new Error(
+        'Error(s) while installing assets. The first error is: ' +
+          fetchedAssets.errors[0].message
+      );
+    }
+    const assets = fetchedAssets.results;
+    return assets;
   };
 };
 
@@ -187,11 +227,12 @@ export default function NewObjectDialog({
   const isAssetAddedToScene =
     openedAssetShortHeader &&
     existingAssetStoreIds.has(openedAssetShortHeader.id);
-  const { installPrivateAsset, fetchPrivateAsset } = React.useContext(
+  const { installPrivateAsset } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
   const { showAlert } = useAlertDialog();
 
+  const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
   const onInstallAsset = React.useCallback(
@@ -212,20 +253,11 @@ export default function NewObjectDialog({
               return;
             }
           }
-          const asset = isPrivate
-            ? await fetchPrivateAsset(openedAssetShortHeader, {
-                environment,
-              })
-            : await getPublicAsset(openedAssetShortHeader, { environment });
-          if (!asset) {
-            throw new Error(
-              'Unable to install the asset because it could not be fetched.'
-            );
-          }
-
+          const assets = await fetchAssets([openedAssetShortHeader]);
+          const asset = assets[0];
           const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
             {
-              assets: [asset],
+              assets,
               project,
             }
           );
@@ -236,7 +268,7 @@ export default function NewObjectDialog({
             ));
           const installOutput = isPrivate
             ? await installPrivateAsset({
-                assetShortHeader: openedAssetShortHeader,
+                asset,
                 eventsFunctionsExtensionsState,
                 project,
                 objectsContainer,
@@ -245,7 +277,7 @@ export default function NewObjectDialog({
                 shouldUpdateExtension,
               })
             : await installPublicAsset({
-                assetShortHeader: openedAssetShortHeader,
+                asset,
                 eventsFunctionsExtensionsState,
                 project,
                 objectsContainer,
@@ -287,13 +319,13 @@ export default function NewObjectDialog({
     },
     [
       openedAssetShortHeader,
-      fetchPrivateAsset,
-      environment,
+      fetchAssets,
       project,
       showExtensionUpdateConfirmation,
       installPrivateAsset,
       eventsFunctionsExtensionsState,
       objectsContainer,
+      environment,
       openedAssetPack,
       resourceManagementProps,
       canInstallPrivateAsset,

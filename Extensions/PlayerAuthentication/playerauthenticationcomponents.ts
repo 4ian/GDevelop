@@ -19,10 +19,11 @@ namespace gdjs {
               'If the window did not open, please check your pop-up blocker and click the button below to try again.',
           }
         : {
-            title: 'Your game is not registered!',
+            title: 'Publish your game!',
             text1:
-              'In order to use player authentication, this game must be registered with GDevelop Services first.',
-            text2: 'Head to your Game Dashboard, then try again.',
+              "GDevelop's player accounts are only available for published games.",
+            text2:
+              'Click the button below to learn how to publish your game then try again.',
           };
 
     /**
@@ -119,7 +120,8 @@ namespace gdjs {
     export const addAuthenticationTextsToLoadingContainer = (
       loaderContainer: HTMLDivElement,
       platform,
-      isGameRegistered
+      isGameRegistered,
+      wikiOpenAction
     ) => {
       const textContainer: HTMLDivElement = document.createElement('div');
       textContainer.id = 'authentication-container-texts';
@@ -151,8 +153,20 @@ namespace gdjs {
       textContainer.appendChild(text2);
 
       if (!isGameRegistered) {
-        // Remove the loader.
+        // Remove the loader and add the wiki link.
         loaderContainer.innerHTML = '';
+
+        if (wikiOpenAction) {
+          const link = document.createElement('a');
+          addTouchAndClickEventListeners(link, wikiOpenAction);
+          link.innerText = 'How to publish my game';
+          link.style.color = '#0078d4';
+          link.style.textDecoration = 'none';
+          link.style.textDecoration = 'underline';
+          link.style.cursor = 'pointer';
+
+          textContainer.appendChild(link);
+        }
       }
 
       loaderContainer.prepend(textContainer);
@@ -170,7 +184,7 @@ namespace gdjs {
     ) => {
       const link = document.createElement('a');
       addTouchAndClickEventListeners(link, onClick);
-      link.innerText = 'Click here to authenticate';
+      link.innerText = 'Try again';
       link.style.color = '#0078d4';
       link.style.textDecoration = 'none';
       link.style.textDecoration = 'underline';

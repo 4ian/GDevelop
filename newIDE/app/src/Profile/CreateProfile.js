@@ -4,9 +4,9 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import { Column, LargeSpacer } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import Text from '../UI/Text';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 
 const styles = {
   container: {
@@ -30,8 +30,8 @@ const CreateProfile = ({
 }: Props) => (
   <Column alignItems="center">
     <div style={styles.container}>
-      <Column>
-        <Text>
+      <ColumnStackLayout>
+        <Text noMargin>
           {message || (
             <Trans>
               You are not connected. Create an account to build your game for
@@ -40,7 +40,6 @@ const CreateProfile = ({
             </Trans>
           )}
         </Text>
-        <LargeSpacer />
         <ResponsiveLineStackLayout justifyContent="center" noMargin>
           <RaisedButton
             id="create-account-button"
@@ -50,7 +49,7 @@ const CreateProfile = ({
           />
           <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
         </ResponsiveLineStackLayout>
-      </Column>
+      </ColumnStackLayout>
     </div>
   </Column>
 );

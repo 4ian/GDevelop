@@ -378,6 +378,7 @@ export default class InstancesEditor extends Component<Props> {
       instances: props.initialInstances,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toSceneCoordinates: this.viewPosition.toSceneCoordinates,
+      onInstancesTemporarySelected: this.temporarySelectInstances,
     });
     this.selectedInstances = new SelectedInstances({
       instancesSelection: this.props.instancesSelection,
@@ -626,12 +627,14 @@ export default class InstancesEditor extends Component<Props> {
 
       this.scrollBy(-sceneDeltaX, -sceneDeltaY);
     } else {
-      const temporarySelectedInstances = this.selectionRectangle.updateSelectionRectangle(
-        x,
-        y
-      );
+      this.selectionRectangle.updateSelectionRectangle(x, y);
+    }
+  };
+
+  temporarySelectInstances = (instances: Array<gdInitialInstance>) => {
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
       this.instancesTemporarySelection.selectInstances({
-        instances: temporarySelectedInstances,
+        instances,
         multiSelect: false,
         layersVisibility: this._getLayersVisibility(),
       });

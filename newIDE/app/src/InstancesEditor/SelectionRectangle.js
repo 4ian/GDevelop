@@ -33,6 +33,8 @@ export default class SelectionRectangle {
   temporarySelectionRectangleEnd: Point | null;
   _instancesInSelectionRectangle: gdInitialInstance[];
   _temporaryInstancesInSelectionRectangle: gdInitialInstance[];
+  _temporarySelectionTimeoutId: TimeoutID | null;
+  onInstancesTemporarySelected: (instances: Array<gdInitialInstance>) => void;
 
   selector: gdInitialInstanceJSFunctor;
   temporarySelector: gdInitialInstanceJSFunctor;
@@ -46,10 +48,12 @@ export default class SelectionRectangle {
     instances,
     instanceMeasurer,
     toSceneCoordinates,
+    onInstancesTemporarySelected,
   }: {
     instances: gdInitialInstancesContainer,
     instanceMeasurer: InstanceMeasurer,
     toSceneCoordinates: (x: number, y: number) => [number, number],
+    onInstancesTemporarySelected: (instances: Array<gdInitialInstance>) => void,
   }) {
     this.instances = instances;
     this.instanceMeasurer = instanceMeasurer;
@@ -62,6 +66,8 @@ export default class SelectionRectangle {
     this._instancesInSelectionRectangle = [];
     this._temporaryInstancesInSelectionRectangle = [];
     this._temporarySelectionLastExecutionTime = Date.now();
+    this._temporarySelectionTimeoutId = null;
+    this.onInstancesTemporarySelected = onInstancesTemporarySelected;
 
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
@@ -141,7 +147,27 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x, y };
   };
 
-  updateTemporarySelectedInstances = (startPoint: Point, endPoint: Point) => {
+  updateTemporarySelectedInstances = async (
+    startPoint: Point,
+    endPoint: Point
+  ) => {
+    if (
+      Date.now() <=
+      this._temporarySelectionLastExecutionTime +
+        TEMPORARY_SELECTION_DEBOUNCE_DURATION
+    ) {
+      // If the method is called before the debounce duration has finished
+      // We cancel the current timeout and we set up a new one that will
+      // execute the selection in the near future.
+      if (this._temporarySelectionTimeoutId) {
+        clearTimeout(this._temporarySelectionTimeoutId);
+      }
+      this._temporarySelectionTimeoutId = setTimeout(
+        () => this.updateTemporarySelectedInstances(startPoint, endPoint),
+        TEMPORARY_SELECTION_DEBOUNCE_DURATION
+      );
+      return;
+    }
     if (!this.temporarySelectionRectangleEnd) {
       this.temporarySelectionRectangleEnd = {};
     }
@@ -167,29 +193,21 @@ export default class SelectionRectangle {
       this.temporarySelector
     );
     this._temporarySelectionLastExecutionTime = Date.now();
+    this.onInstancesTemporarySelected(
+      this._temporaryInstancesInSelectionRectangle
+    );
   };
 
-  updateSelectionRectangle = (
-    lastX: number,
-    lastY: number
-  ): Array<gdInitialInstance> => {
+  updateSelectionRectangle = (lastX: number, lastY: number) => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
 
     this.selectionRectangleEnd = { x: lastX, y: lastY };
-    if (
-      Date.now() >
-      this._temporarySelectionLastExecutionTime +
-        TEMPORARY_SELECTION_DEBOUNCE_DURATION
-    ) {
-      this.updateTemporarySelectedInstances(
-        // $FlowIgnore[incompatible-call] - Flow is afraid Date.now() will set this variable to null
-        this.selectionRectangleStart,
-        // $FlowIgnore[incompatible-call] - Flow is afraid Date.now() will set this variable to null
-        this.selectionRectangleEnd
-      );
-    }
-    return this._temporaryInstancesInSelectionRectangle;
+
+    this.updateTemporarySelectedInstances(
+      this.selectionRectangleStart,
+      this.selectionRectangleEnd
+    );
   };
 
   endSelectionRectangle = (): Array<gdInitialInstance> => {

@@ -371,7 +371,6 @@ const defineTileMap = function (
       _('the level index being displayed.'),
       _('the level index'),
       '',
-      'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)

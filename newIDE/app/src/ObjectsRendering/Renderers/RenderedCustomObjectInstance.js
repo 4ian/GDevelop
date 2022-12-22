@@ -5,7 +5,13 @@ import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
 import RenderedTextInstance from './RenderedTextInstance';
 import { mapReverseFor } from '../../Utils/MapFor';
-import { getLayouts, applyChildLayouts, ChildInstance, type ChildLayout, LayoutedParent } from './CustomObjectLayoutingModel';
+import {
+  getLayouts,
+  applyChildLayouts,
+  ChildInstance,
+  type ChildLayout,
+  LayoutedParent,
+} from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
 
 const gd: libGDevelop = global.gd;

@@ -18,9 +18,57 @@ describe('applyChildLayouts', () => {
 
     applyChildLayouts(parent);
 
+    expect(background.getX()).toBe(0);
+    expect(background.getY()).toBe(0);
     expect(background.hasCustomSize()).toBe(true);
     expect(background.getCustomWidth()).toBe(200);
     expect(background.getCustomHeight()).toBe(100);
+  });
+
+  it('can fill the parent with a child with margins', () => {
+    const parent = new MockedParent(200, 100);
+    const background = parent.addChid('Background', {
+      isShown: true,
+      horizontalLayout: {
+        minSideAbsoluteMargin: 10,
+        maxSideAbsoluteMargin: 20,
+      },
+      verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
+    });
+
+    applyChildLayouts(parent);
+
+    expect(background.getX()).toBe(10);
+    expect(background.getY()).toBe(30);
+    expect(background.hasCustomSize()).toBe(true);
+    expect(background.getCustomWidth()).toBe(200 - 10 - 20);
+    expect(background.getCustomHeight()).toBe(100 - 30 - 40);
+  });
+
+  it('can fill the parent with a text child with margins', () => {
+    const parent = new MockedParent(200, 100);
+    const background = parent.addChid(
+      'Background',
+      {
+        isShown: true,
+        horizontalLayout: {
+          minSideAbsoluteMargin: 10,
+          maxSideAbsoluteMargin: 20,
+        },
+        verticalLayout: {
+          minSideAbsoluteMargin: 30,
+          maxSideAbsoluteMargin: 40,
+        },
+      },
+      { heightAfterUpdate: 20 }
+    );
+
+    applyChildLayouts(parent);
+
+    expect(background.getX()).toBe(10);
+    expect(background.getY()).toBe(30 + (100 - 30 - 40 - 20) / 2);
+    expect(background.hasCustomSize()).toBe(true);
+    expect(background.getCustomWidth()).toBe(200 - 10 - 20);
   });
 });
 
@@ -29,16 +77,19 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
   _pixiObject: { height: number };
   defaultWidth: number;
   defaultHeight: number;
+  heightAfterUpdate: ?number;
 
   constructor(
     childInstance: ChildInstance,
     defaultWidth: number,
-    defaultHeight: number
+    defaultHeight: number,
+    heightAfterUpdate: ?number
   ) {
     this._instance = childInstance;
     this._pixiObject = { height: 0 };
     this.defaultWidth = defaultWidth;
     this.defaultHeight = defaultHeight;
+    this.heightAfterUpdate = heightAfterUpdate;
   }
 
   getDefaultWidth(): number {
@@ -49,7 +100,13 @@ class MockedChildRenderedInstance implements ChildRenderedInstance {
     return this.defaultHeight;
   }
 
-  update(): void {}
+  update(): void {
+    this._pixiObject.height =
+      this.heightAfterUpdate ||
+      (this._instance.hasCustomSize()
+        ? this._instance.getCustomHeight()
+        : this.defaultHeight);
+  }
 }
 
 class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
@@ -83,14 +140,18 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
   addChid(
     name: string,
     layout: ChildLayout,
-    defaultWidth: number = 0,
-    defaultHeight: number = 0
+    size?: {|
+      defaultWidth?: number,
+      defaultHeight?: number,
+      heightAfterUpdate?: number,
+    |}
   ) {
     const childInstance = new ChildInstance();
     const childRenderedInstance = new MockedChildRenderedInstance(
       childInstance,
-      defaultWidth,
-      defaultHeight
+      size ? size.defaultWidth || 0 : 0,
+      size ? size.defaultHeight || 0 : 0,
+      size && size.heightAfterUpdate
     );
 
     this.childrenLayouts.push(layout);

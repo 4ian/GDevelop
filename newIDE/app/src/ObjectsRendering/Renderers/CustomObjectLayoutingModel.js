@@ -513,7 +513,15 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
           (childLayout.verticalLayout.maxSideProportionalMargin || 0) * height);
 
       childInstance.y = childMinY;
+      const expectedHeight = childMaxY - childMinY;
       childInstance.setCustomHeight(childMaxY - childMinY);
+
+      renderedInstance.update();
+      // This ensure objects are centered if their dimensions changed from the
+      // custom ones (preferred ones).
+      // For instance, text object dimensions change according to how the text is wrapped.
+      childInstance.y +=
+        (expectedHeight - renderedInstance._pixiObject.height) / 2;
     } else {
       const anchorOrigin = childLayout.verticalLayout.anchorOrigin || 0;
       const anchorTarget = childLayout.verticalLayout.anchorTarget || 0;
@@ -535,13 +543,5 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
       childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
     }
     renderedInstance.update();
-
-    if (childLayout.verticalLayout.anchorOrigin == null) {
-      // This ensure objects are centered if their dimensions changed from the
-      // custom ones (preferred ones).
-      // For instance, text object dimensions change according to how the text is wrapped.
-      childInstance.y = (height - renderedInstance._pixiObject.height) / 2;
-      renderedInstance.update();
-    }
   }
 };

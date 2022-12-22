@@ -145,15 +145,21 @@ export const installResource = (
   resourceNewNames[originalResourceName] = newName;
 };
 
+export type InstallAssetOutput = {|
+  createdObjects: Array<gdObject>,
+|};
+
+export type InstallAssetArgs = {|
+  asset: Asset,
+  project: gdProject,
+  objectsContainer: gdObjectsContainer,
+|};
+
 export const addAssetToProject = async ({
   asset,
   project,
   objectsContainer,
-}: {|
-  asset: Asset,
-  project: gdProject,
-  objectsContainer: gdObjectsContainer,
-|}) => {
+}: InstallAssetArgs): Promise<InstallAssetOutput> => {
   const objectNewNames = {};
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
@@ -209,6 +215,8 @@ export const addAssetToProject = async ({
     createdObjects,
   };
 };
+
+export const installPublicAsset = addAssetToProject;
 
 type RequiredExtension = {|
   extensionName: string,
@@ -403,45 +411,4 @@ export const checkRequiredExtensionUpdate = async ({
   const missingExtensions = filterMissingExtensions(gd, requiredExtensions);
 
   return { requiredExtensions, missingExtensions, outOfDateExtensions };
-};
-
-export type InstallAssetOutput = {|
-  createdObjects: Array<gdObject>,
-|};
-
-type InstallAssetArgs = {|
-  asset: Asset,
-  project: gdProject,
-  objectsContainer: gdObjectsContainer,
-|};
-
-export const installAsset = async ({
-  asset,
-  project,
-  objectsContainer,
-}: InstallAssetArgs): Promise<InstallAssetOutput> => {
-  const output = await addAssetToProject({
-    project,
-    asset,
-    objectsContainer,
-  });
-  return output;
-};
-
-export type InstallAssetShortHeaderArgs = {|
-  asset: Asset,
-  project: gdProject,
-  objectsContainer: gdObjectsContainer,
-|};
-
-export const installPublicAsset = async ({
-  asset,
-  project,
-  objectsContainer,
-}: InstallAssetShortHeaderArgs): Promise<InstallAssetOutput> => {
-  return installAsset({
-    asset,
-    project,
-    objectsContainer,
-  });
 };

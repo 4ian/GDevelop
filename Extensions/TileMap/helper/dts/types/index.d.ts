@@ -1,6 +1,6 @@
-import { LDtkTileMap } from './LDtk';
-import { TiledTileMap } from './Tiled';
-export type TileMap =
+import { LDtkTileMap } from './LDtkFormat';
+import { TiledTileMap } from './TiledFormat';
+export declare type TileMap =
   | {
       kind: 'tiled';
       data: TiledTileMap;

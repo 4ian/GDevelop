@@ -15,4 +15,4 @@ export declare namespace TileMapLoader {
     pako: any
   ): EditableTileMap | null;
 }
-//# sourceMappingURL=Loader.d.ts.map
+//# sourceMappingURL=TileMapLoader.d.ts.map

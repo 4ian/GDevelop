@@ -1,5 +1,5 @@
-import { integer } from '../../types/commons';
-import { TiledLayer } from '../../types/Tiled';
+import { integer } from '../../types/CommonTypes';
+import { TiledLayer } from '../../types/TiledFormat';
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string
  * by Tiled.
@@ -12,7 +12,7 @@ export declare const decodeBase64LayerData: (
   pako: any,
   tiledLayer: TiledLayer
 ) => number[];
-export type TiledGID = {
+export declare type TiledGID = {
   id: integer;
   flippedHorizontally: boolean;
   flippedVertically: boolean;

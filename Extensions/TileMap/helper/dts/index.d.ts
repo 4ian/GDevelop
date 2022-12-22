@@ -7,10 +7,10 @@ export {
   EditableTileMapLayer,
   TileDefinition,
 } from './model/TileMapModel';
-export { TileMapManager } from './render/Manager';
+export { TileMapManager } from './render/TileMapManager';
 export { TileTextureCache } from './render/TileTextureCache';
-export { PixiTileMapHelper } from './render/PixiHelper';
+export { PixiTileMapHelper } from './render/TileMapPixiHelper';
 export * from './types/index';
-export * from './types/commons';
-export { TiledTileset } from './types/Tiled';
+export * from './types/CommonTypes';
+export { TiledTileset } from './types/TiledFormat';
 //# sourceMappingURL=index.d.ts.map

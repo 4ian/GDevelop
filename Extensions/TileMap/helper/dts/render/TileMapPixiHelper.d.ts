@@ -1,4 +1,4 @@
-import { integer, float } from '../types/commons';
+import { integer, float } from '../types/CommonTypes';
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileMap } from '../types';
 import { TileTextureCache } from './TileTextureCache';
@@ -53,4 +53,4 @@ export declare namespace PixiTileMapHelper {
     fillOpacity: float
   ): void;
 }
-//# sourceMappingURL=PixiHelper.d.ts.map
+//# sourceMappingURL=TileMapPixiHelper.d.ts.map

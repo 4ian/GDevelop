@@ -6,7 +6,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 
 import Dialog, { DialogPrimaryButton } from '../Dialog';
 import FlatButton from '../FlatButton';
-import Text from '../Text';
+import { MarkdownText } from '../MarkdownText';
 
 type Props = {|
   open: boolean,
@@ -56,7 +56,7 @@ function ConfirmDialog(props: Props) {
           maxWidth="xs"
           noMobileFullScreen
         >
-          <Text>{i18n._(props.message)}</Text>
+          <MarkdownText translatableSource={props.message} isStandaloneText />
         </Dialog>
       )}
     </I18n>

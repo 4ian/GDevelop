@@ -7,7 +7,7 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import {
   type InstallAssetOutput,
-  type InstallAssetShortHeaderArgs,
+  type InstallAssetArgs,
 } from '../InstallAsset';
 
 export type PrivateAssetsState = {|
@@ -18,7 +18,7 @@ export type PrivateAssetsState = {|
     options: {| environment: Environment |}
   ) => Promise<?Asset>,
   installPrivateAsset: (
-    options: InstallAssetShortHeaderArgs
+    options: InstallAssetArgs
   ) => Promise<?InstallAssetOutput>,
 |};
 

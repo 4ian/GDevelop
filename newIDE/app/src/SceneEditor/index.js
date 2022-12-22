@@ -154,10 +154,10 @@ type State = {|
   selectedObjectTags: SelectedTags,
 |};
 
-type CopyCutPasteOptions = {
+type CopyCutPasteOptions = {|
   useLastCursorPosition?: boolean,
   pasteInTheForeground?: boolean,
-};
+|};
 
 export default class SceneEditor extends React.Component<Props, State> {
   static defaultProps = {
@@ -1147,8 +1147,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  cutSelection = (options: CopyCutPasteOptions = {}) => {
-    this.copySelection({ ...options, pasteInTheForeground: true });
+  cutSelection = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
+    this.copySelection({ useLastCursorPosition, pasteInTheForeground: true });
     this.deleteSelection();
   };
 

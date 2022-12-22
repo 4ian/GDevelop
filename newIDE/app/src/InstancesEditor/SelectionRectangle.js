@@ -4,30 +4,56 @@ import Rectangle from '../Utils/Rectangle';
 import { type InstanceMeasurer } from './InstancesRenderer';
 const gd: libGDevelop = global.gd;
 
+type Point = { x: number, y: number };
+
+const normalizeRectangle = (startPoint: Point, endPoint: Point) => {
+  if (startPoint.x > endPoint.x) {
+    const tmp = startPoint.x;
+    startPoint.x = endPoint.x;
+    endPoint.x = tmp;
+  }
+  if (startPoint.y > endPoint.y) {
+    const tmp = startPoint.y;
+    startPoint.y = endPoint.y;
+    endPoint.y = tmp;
+  }
+};
+
+const TEMPORARY_SELECTION_DEBOUNCE_DURATION = 200;
+
 export default class SelectionRectangle {
   instances: gdInitialInstancesContainer;
   instanceMeasurer: InstanceMeasurer;
   toSceneCoordinates: (x: number, y: number) => [number, number];
 
   pixiRectangle: PIXI.Graphics;
-  selectionRectangleStart: { x: number, y: number } | null;
-  selectionRectangleEnd: { x: number, y: number } | null;
+  selectionRectangleStart: Point | null;
+  selectionRectangleEnd: Point | null;
+  temporarySelectionRectangleStart: Point | null;
+  temporarySelectionRectangleEnd: Point | null;
   _instancesInSelectionRectangle: gdInitialInstance[];
+  _temporaryInstancesInSelectionRectangle: gdInitialInstance[];
+  _temporarySelectionTimeoutId: TimeoutID | null;
+  onInstancesTemporarySelected: (instances: Array<gdInitialInstance>) => void;
 
   selector: gdInitialInstanceJSFunctor;
+  temporarySelector: gdInitialInstanceJSFunctor;
   /**
    * Used to check if an instance is in the selection rectangle
    */
   _temporaryAABB: Rectangle;
+  _temporarySelectionLastExecutionTime: number;
 
   constructor({
     instances,
     instanceMeasurer,
     toSceneCoordinates,
+    onInstancesTemporarySelected,
   }: {
     instances: gdInitialInstancesContainer,
     instanceMeasurer: InstanceMeasurer,
     toSceneCoordinates: (x: number, y: number) => [number, number],
+    onInstancesTemporarySelected: (instances: Array<gdInitialInstance>) => void,
   }) {
     this.instances = instances;
     this.instanceMeasurer = instanceMeasurer;
@@ -38,6 +64,10 @@ export default class SelectionRectangle {
     this.selectionRectangleStart = null;
     this.selectionRectangleEnd = null;
     this._instancesInSelectionRectangle = [];
+    this._temporaryInstancesInSelectionRectangle = [];
+    this._temporarySelectionLastExecutionTime = Date.now();
+    this._temporarySelectionTimeoutId = null;
+    this.onInstancesTemporarySelected = onInstancesTemporarySelected;
 
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
@@ -71,6 +101,41 @@ export default class SelectionRectangle {
         this._instancesInSelectionRectangle.push(instance);
       }
     };
+    this.temporarySelector = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
+    this.temporarySelector.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
+      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      const instanceAABB = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        this._temporaryAABB
+      );
+
+      const {
+        temporarySelectionRectangleEnd,
+        temporarySelectionRectangleStart,
+      } = this;
+      if (!temporarySelectionRectangleStart || !temporarySelectionRectangleEnd)
+        return;
+
+      const selectionSceneStart = toSceneCoordinates(
+        temporarySelectionRectangleStart.x,
+        temporarySelectionRectangleStart.y
+      );
+      const selectionSceneEnd = toSceneCoordinates(
+        temporarySelectionRectangleEnd.x,
+        temporarySelectionRectangleEnd.y
+      );
+
+      if (
+        selectionSceneStart[0] <= instanceAABB.left &&
+        instanceAABB.right <= selectionSceneEnd[0] &&
+        selectionSceneStart[1] <= instanceAABB.top &&
+        instanceAABB.bottom <= selectionSceneEnd[1]
+      ) {
+        this._temporaryInstancesInSelectionRectangle.push(instance);
+      }
+    };
   }
 
   hasStartedSelectionRectangle() {
@@ -82,27 +147,77 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = { x, y };
   };
 
+  updateTemporarySelectedInstances = async (
+    startPoint: Point,
+    endPoint: Point
+  ) => {
+    if (
+      Date.now() <=
+      this._temporarySelectionLastExecutionTime +
+        TEMPORARY_SELECTION_DEBOUNCE_DURATION
+    ) {
+      // If the method is called before the debounce duration has finished
+      // We cancel the current timeout and we set up a new one that will
+      // execute the selection in the near future.
+      if (this._temporarySelectionTimeoutId) {
+        clearTimeout(this._temporarySelectionTimeoutId);
+      }
+      this._temporarySelectionTimeoutId = setTimeout(
+        () => this.updateTemporarySelectedInstances(startPoint, endPoint),
+        TEMPORARY_SELECTION_DEBOUNCE_DURATION
+      );
+      return;
+    }
+    if (!this.temporarySelectionRectangleEnd) {
+      this.temporarySelectionRectangleEnd = {};
+    }
+    if (!this.temporarySelectionRectangleStart) {
+      this.temporarySelectionRectangleStart = {};
+    }
+    // Update temporary selection rectangle to follow the selection rectangle
+    this.temporarySelectionRectangleEnd.x = endPoint.x;
+    this.temporarySelectionRectangleEnd.y = endPoint.y;
+    this.temporarySelectionRectangleStart.x = startPoint.x;
+    this.temporarySelectionRectangleStart.y = startPoint.y;
+
+    this._temporaryInstancesInSelectionRectangle.length = 0;
+    // Mutate the temporary selection rectangle so that it's ready for the
+    // functor iteration.
+    normalizeRectangle(
+      this.temporarySelectionRectangleStart,
+      this.temporarySelectionRectangleEnd
+    );
+
+    this.instances.iterateOverInstances(
+      // $FlowFixMe - gd.castObject is not supporting typings.
+      this.temporarySelector
+    );
+    this._temporarySelectionLastExecutionTime = Date.now();
+    this.onInstancesTemporarySelected(
+      this._temporaryInstancesInSelectionRectangle
+    );
+  };
+
   updateSelectionRectangle = (lastX: number, lastY: number) => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
 
     this.selectionRectangleEnd = { x: lastX, y: lastY };
+
+    this.updateTemporarySelectedInstances(
+      this.selectionRectangleStart,
+      this.selectionRectangleEnd
+    );
   };
 
-  endSelectionRectangle = () => {
+  endSelectionRectangle = (): Array<gdInitialInstance> => {
     if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
-    if (this.selectionRectangleStart.x > this.selectionRectangleEnd.x) {
-      const tmp = this.selectionRectangleStart.x;
-      this.selectionRectangleStart.x = this.selectionRectangleEnd.x;
-      this.selectionRectangleEnd.x = tmp;
-    }
-    if (this.selectionRectangleStart.y > this.selectionRectangleEnd.y) {
-      const tmp = this.selectionRectangleStart.y;
-      this.selectionRectangleStart.y = this.selectionRectangleEnd.y;
-      this.selectionRectangleEnd.y = tmp;
-    }
+    normalizeRectangle(
+      this.selectionRectangleStart,
+      this.selectionRectangleEnd
+    );
 
     this.instances.iterateOverInstances(
       // $FlowFixMe - gd.castObject is not supporting typings.

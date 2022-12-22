@@ -13,13 +13,15 @@ import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 import {
-  copyEmbeddedToProjectFolder,
-  mapEmbeddedFiles,
-} from './EmbeddedResourceSources';
+  copyAllEmbeddedResourcesToProjectFolder,
+  embeddedResourcesParsers,
+  createAndMapEmbeddedResources,
+  type EmbeddedResources,
+  type MappedResources,
+} from './LocalEmbeddedResourceSources';
 import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
-import type { EmbeddedResourceResult } from './EmbeddedResourceSources';
 
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -56,13 +58,7 @@ const localResourceSources: Array<ResourceSource> = [
   // Have the local resource sources first, so they are used by default/shown first when
   // the project is saved locally.
   ...allResourceKindsAndMetadata.map(
-    ({
-      kind,
-      displayName,
-      fileExtensions,
-      createNewResource,
-      listEmbeddedFiles,
-    }) => {
+    ({ kind, displayName, fileExtensions, createNewResource }) => {
       const selectLocalFileResources = async ({
         i18n,
         getLastUsedPath,
@@ -93,27 +89,35 @@ const localResourceSources: Array<ResourceSource> = [
         const lastUsedPath = path.parse(filePaths[0]).dir;
         setLastUsedPath(project, kind, lastUsedPath);
 
-        let outside = filePaths.some(
+        let hasFilesOutsideProjectFolder = filePaths.some(
           path => !isPathInProjectFolder(project, path)
         );
 
-        const embeddedFiles = new Map<string, EmbeddedResourceResult>();
-        if (listEmbeddedFiles) {
+        // Some resources, like tilemaps, can have references to other files.
+        // We parse these files, optionally copy them, then create a mapping from the previous file name
+        // as written inside the tilemap to the name of the resource that is representing this file.
+        const filesWithEmbeddedResources = new Map<string, EmbeddedResources>();
+        const parseEmbeddedResources = embeddedResourcesParsers[kind];
+        if (parseEmbeddedResources) {
           for (const filePath of filePaths) {
-            const result = await listEmbeddedFiles(project, filePath);
+            const embeddedResources = await parseEmbeddedResources(
+              project,
+              filePath
+            );
 
-            if (result) {
-              embeddedFiles.set(filePath, result);
+            if (embeddedResources) {
+              filesWithEmbeddedResources.set(filePath, embeddedResources);
 
-              outside = outside || result.outside;
+              if (embeddedResources.hasAnyEmbeddedResourceOutsideProjectFolder)
+                hasFilesOutsideProjectFolder = true;
             }
           }
         }
-        const hasEmbeddedFiles = embeddedFiles.size > 0;
 
+        // Check if files should be copied in the project folder.
         const newToOldFilePaths = new Map<string, string>();
-
-        if (outside) {
+        let filesWithMappedResources = new Map<string, MappedResources>();
+        if (hasFilesOutsideProjectFolder) {
           const answer = Window.showConfirmDialog(
             i18n._(
               t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
@@ -127,45 +131,40 @@ const localResourceSources: Array<ResourceSource> = [
               newToOldFilePaths
             );
 
-            if (hasEmbeddedFiles) {
-              await copyEmbeddedToProjectFolder(project, embeddedFiles);
-            }
-          }
-
-          if (hasEmbeddedFiles) {
-            mapEmbeddedFiles(project, embeddedFiles);
+            await copyAllEmbeddedResourcesToProjectFolder(
+              project,
+              filesWithEmbeddedResources
+            );
           }
         }
+
+        // In case of resources embedded inside others,
+        // create a mapping from the file name
+        // as written inside the resource (e.g: the tilemap)
+        // to the name of the resource that was created to
+        // represent this file.
+        filesWithMappedResources = createAndMapEmbeddedResources(
+          project,
+          filesWithEmbeddedResources
+        );
 
         return filePaths.map(filePath => {
           const newResource = createNewResource();
           newResource.setFile(path.relative(projectPath, filePath));
           newResource.setName(path.relative(projectPath, filePath));
 
-          if (hasEmbeddedFiles) {
-            let mapping;
+          const filePathWithMapping = newToOldFilePaths.has(filePath)
+            ? newToOldFilePaths.get(filePath)
+            : filePath;
+          if (filePathWithMapping) {
+            const mappedResources = filesWithMappedResources.get(
+              filePathWithMapping
+            );
 
-            if (newToOldFilePaths.has(filePath)) {
-              const oldFilePath = newToOldFilePaths.get(filePath);
-              if (oldFilePath) {
-                const embeddedFile = embeddedFiles.get(oldFilePath);
-
-                if (embeddedFile) {
-                  mapping = embeddedFile.mapping;
-                }
-              }
-            } else {
-              const embeddedFile = embeddedFiles.get(filePath);
-
-              if (embeddedFile) {
-                mapping = embeddedFile.mapping;
-              }
-            }
-
-            if (mapping) {
+            if (mappedResources && mappedResources.mapping) {
               newResource.setMetadata(
                 JSON.stringify({
-                  embeddedResourcesMapping: mapping,
+                  embeddedResourcesMapping: mappedResources.mapping,
                 })
               );
             }

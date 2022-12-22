@@ -13,7 +13,10 @@ import TextButton from '../UI/TextButton';
 import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
-import { installPublicAsset } from './InstallAsset';
+import {
+  installPublicAsset,
+  checkRequiredExtensionUpdate,
+} from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
@@ -27,6 +30,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import { mapFor } from '../Utils/MapFor';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import AlertMessage from '../UI/AlertMessage';
+import {
+  useExtensionUpdateAlertDialog,
+  useFetchAssets,
+} from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
 
 type Props = {|
@@ -85,6 +92,9 @@ const AssetPackInstallDialog = ({
     PrivateAssetsAuthorizationContext
   );
 
+  const fetchAssets = useFetchAssets();
+  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
+
   const { environment } = React.useContext(AssetStoreContext);
 
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
@@ -135,24 +145,41 @@ const AssetPackInstallDialog = ({
 
       setAreAssetsBeingInstalled(true);
       try {
+        const assets = await fetchAssets(assetShortHeaders);
+        const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
+          {
+            assets,
+            project,
+          }
+        );
+        const shouldUpdateExtension =
+          requiredExtensionInstallation.outOfDateExtensions.length > 0 &&
+          (await showExtensionUpdateConfirmation(
+            requiredExtensionInstallation.outOfDateExtensions
+          ));
+
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { results, errors } = await PromisePool.withConcurrency(6)
-          .for(assetShortHeaders)
-          .process<InstallAssetOutput>(async assetShortHeader => {
-            const installOutput = isPrivateAsset(assetShortHeader)
+          .for(assets)
+          .process<InstallAssetOutput>(async asset => {
+            const installOutput = isPrivateAsset(asset)
               ? await installPrivateAsset({
-                  assetShortHeader,
+                  asset,
                   eventsFunctionsExtensionsState,
                   project,
                   objectsContainer: targetObjectsContainer,
                   environment,
+                  requiredExtensionInstallation,
+                  shouldUpdateExtension,
                 })
               : await installPublicAsset({
-                  assetShortHeader,
+                  asset,
                   eventsFunctionsExtensionsState,
                   project,
                   objectsContainer: targetObjectsContainer,
                   environment,
+                  requiredExtensionInstallation,
+                  shouldUpdateExtension,
                 });
 
             if (!installOutput) {
@@ -191,14 +218,16 @@ const AssetPackInstallDialog = ({
       }
     },
     [
-      eventsFunctionsExtensionsState,
+      fetchAssets,
       project,
-      targetObjectsContainer,
-      onObjectAddedFromAsset,
-      onAssetsAdded,
-      environment,
-      installPrivateAsset,
+      showExtensionUpdateConfirmation,
       resourceManagementProps,
+      onAssetsAdded,
+      installPrivateAsset,
+      eventsFunctionsExtensionsState,
+      targetObjectsContainer,
+      environment,
+      onObjectAddedFromAsset,
     ]
   );
 

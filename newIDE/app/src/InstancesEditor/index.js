@@ -103,6 +103,7 @@ export default class InstancesEditor extends Component<Props> {
   lastContextMenuY = 0;
   lastCursorX = 0;
   lastCursorY = 0;
+  instancesTemporarySelection = new InstancesSelection();
   fpsLimiter = new FpsLimiter(28);
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
@@ -112,6 +113,7 @@ export default class InstancesEditor extends Component<Props> {
   _instancesAdder: InstancesAdder;
   selectionRectangle: SelectionRectangle;
   selectedInstances: SelectedInstances;
+  temporarySelectedInstances: SelectedInstances;
   highlightedInstance: HighlightedInstance;
   instancesResizer: InstancesResizer;
   instancesRotator: InstancesRotator;
@@ -383,6 +385,18 @@ export default class InstancesEditor extends Component<Props> {
       onResizeEnd: this._onResizeEnd,
       onRotate: this._onRotate,
       onRotateEnd: this._onRotateEnd,
+      showHandles: true,
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+      screenType: this.props.screenType,
+    });
+    this.temporarySelectedInstances = new SelectedInstances({
+      instancesSelection: this.instancesTemporarySelection,
+      onResize: () => {},
+      onResizeEnd: () => {},
+      onRotate: () => {},
+      onRotateEnd: () => {},
+      showHandles: false,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
       screenType: this.props.screenType,
@@ -425,6 +439,9 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiContainer.addChild(this.windowBorder.getPixiObject());
     this.pixiContainer.addChild(this.windowMask.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
+    this.pixiContainer.addChild(
+      this.temporarySelectedInstances.getPixiContainer()
+    );
     this.pixiContainer.addChild(this.highlightedInstance.getPixiObject());
     this.pixiContainer.addChild(this.statusBar.getPixiObject());
   }
@@ -488,6 +505,7 @@ export default class InstancesEditor extends Component<Props> {
 
     if (nextProps.screenType !== this.props.screenType) {
       this.selectedInstances.setScreenType(this.props.screenType);
+      this.temporarySelectedInstances.setScreenType(this.props.screenType);
     }
 
     if (
@@ -608,7 +626,15 @@ export default class InstancesEditor extends Component<Props> {
 
       this.scrollBy(-sceneDeltaX, -sceneDeltaY);
     } else {
-      this.selectionRectangle.updateSelectionRectangle(x, y);
+      const temporarySelectedInstances = this.selectionRectangle.updateSelectionRectangle(
+        x,
+        y
+      );
+      this.instancesTemporarySelection.selectInstances({
+        instances: temporarySelectedInstances,
+        multiSelect: false,
+        layersVisibility: this._getLayersVisibility(),
+      });
     }
   };
 
@@ -636,6 +662,7 @@ export default class InstancesEditor extends Component<Props> {
       });
       instancesSelected = this.props.instancesSelection.getSelectedInstances();
       this.props.onInstancesSelected(instancesSelected);
+      this.instancesTemporarySelection.clearSelection();
     }
   };
 
@@ -960,6 +987,7 @@ export default class InstancesEditor extends Component<Props> {
       this.instancesRenderer.render();
       this.highlightedInstance.render();
       this.selectedInstances.render();
+      this.temporarySelectedInstances.render();
       this.selectionRectangle.render();
       this.windowBorder.render();
       this.windowMask.render();

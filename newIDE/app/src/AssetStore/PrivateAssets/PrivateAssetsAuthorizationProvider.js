@@ -8,9 +8,9 @@ import {
   type Environment,
 } from '../../Utils/GDevelopServices/Asset';
 import {
-  installAsset,
+  addAssetToProject,
   type InstallAssetOutput,
-  type InstallAssetShortHeaderArgs,
+  type InstallAssetArgs,
 } from '../InstallAsset';
 import {
   createProductAuthorizedUrl,
@@ -106,25 +106,13 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
   };
 
   const installPrivateAsset = async ({
-    assetShortHeader,
-    eventsFunctionsExtensionsState,
+    asset,
     project,
     objectsContainer,
-    environment,
-  }: InstallAssetShortHeaderArgs): Promise<?InstallAssetOutput> => {
+  }: InstallAssetArgs): Promise<?InstallAssetOutput> => {
     if (!profile) {
       throw new Error(
         'Unable to install the asset because no profile was found.'
-      );
-    }
-
-    const asset: ?Asset = await fetchPrivateAsset(assetShortHeader, {
-      environment,
-    });
-
-    if (!asset) {
-      throw new Error(
-        'Unable to install the asset because it could not be fetched.'
       );
     }
 
@@ -136,12 +124,10 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       token
     );
 
-    return installAsset({
+    return addAssetToProject({
       asset: assetWithAuthorizedResourceUrls,
-      eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      environment,
     });
   };
 

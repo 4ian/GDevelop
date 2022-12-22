@@ -103,7 +103,7 @@ export const LayoutPublicAssetInstallSuccess = () => {
           onAssetsAdded={action('onAssetsAdded')}
           project={testProject.project}
           objectsContainer={testProject.testLayout}
-          onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
           resourceManagementProps={{
             getStorageProvider: () => emptyStorageProvider,
             onFetchNewlyAddedResources: async () => {},
@@ -136,7 +136,7 @@ export const LayoutPublicAssetInstallFailure = () => {
           onAssetsAdded={action('onAssetsAdded')}
           project={testProject.project}
           objectsContainer={testProject.testLayout}
-          onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
           resourceManagementProps={{
             getStorageProvider: () => emptyStorageProvider,
             onFetchNewlyAddedResources: async () => {},
@@ -165,7 +165,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
       objectsContainer={testProject.testLayout}
-      onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={{
         getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
@@ -191,7 +191,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
         objectsContainer={testProject.testLayout}
-        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
@@ -230,7 +230,7 @@ export const LayoutPrivateAssetInstallSuccess = () => (
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
         objectsContainer={testProject.testLayout}
-        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
@@ -265,7 +265,7 @@ export const LayoutPrivateAssetInstallFailure = () => (
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
         objectsContainer={testProject.testLayout}
-        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
@@ -289,7 +289,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
       objectsContainer={testProject.testLayout}
-      onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={{
         getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
@@ -315,7 +315,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => (
         onAssetsAdded={action('onAssetsAdded')}
         project={testProject.project}
         objectsContainer={null}
-        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+        onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
@@ -343,7 +343,7 @@ export const NoObjectsContainerPrivateAssetButCantInstall = () => (
       onAssetsAdded={action('onAssetsAdded')}
       project={testProject.project}
       objectsContainer={null}
-      onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={{
         getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},

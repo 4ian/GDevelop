@@ -26,7 +26,7 @@ export const Default = () => (
           layout={testProject.testLayout}
           onClose={action('onClose')}
           onCreateNewObject={action('onCreateNewObject')}
-          onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
+          onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
           objectsContainer={testProject.testLayout}
           resourceManagementProps={{
             getStorageProvider: () => emptyStorageProvider,

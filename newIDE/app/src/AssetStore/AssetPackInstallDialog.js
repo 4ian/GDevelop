@@ -13,11 +13,14 @@ import TextButton from '../UI/TextButton';
 import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
-import { installPublicAsset } from './InstallAsset';
+import {
+  checkRequiredExtensionUpdate,
+  installRequiredExtensions,
+  installPublicAsset,
+} from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
-import { AssetStoreContext } from './AssetStoreContext';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import PromisePool from '@supercharge/promise-pool';
@@ -27,6 +30,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import { mapFor } from '../Utils/MapFor';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import AlertMessage from '../UI/AlertMessage';
+import {
+  useExtensionUpdateAlertDialog,
+  useFetchAssets,
+} from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
 
 type Props = {|
@@ -37,7 +44,7 @@ type Props = {|
   onAssetsAdded: () => void,
   project: gdProject,
   objectsContainer: ?gdObjectsContainer,
-  onObjectAddedFromAsset: (object: gdObject) => void,
+  onObjectsAddedFromAssets: (objects: Array<gdObject>) => void,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
 |};
@@ -50,7 +57,7 @@ const AssetPackInstallDialog = ({
   onAssetsAdded,
   project,
   objectsContainer,
-  onObjectAddedFromAsset,
+  onObjectsAddedFromAssets,
   canInstallPrivateAsset,
   resourceManagementProps,
 }: Props) => {
@@ -85,7 +92,8 @@ const AssetPackInstallDialog = ({
     PrivateAssetsAuthorizationContext
   );
 
-  const { environment } = React.useContext(AssetStoreContext);
+  const fetchAssets = useFetchAssets();
+  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
     ''
@@ -135,24 +143,39 @@ const AssetPackInstallDialog = ({
 
       setAreAssetsBeingInstalled(true);
       try {
+        const assets = await fetchAssets(assetShortHeaders);
+        const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
+          {
+            assets,
+            project,
+          }
+        );
+        const shouldUpdateExtension =
+          requiredExtensionInstallation.outOfDateExtensions.length > 0 &&
+          (await showExtensionUpdateConfirmation(
+            requiredExtensionInstallation.outOfDateExtensions
+          ));
+        await installRequiredExtensions({
+          requiredExtensionInstallation,
+          shouldUpdateExtension,
+          eventsFunctionsExtensionsState,
+          project,
+        });
+
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { results, errors } = await PromisePool.withConcurrency(6)
-          .for(assetShortHeaders)
-          .process<InstallAssetOutput>(async assetShortHeader => {
-            const installOutput = isPrivateAsset(assetShortHeader)
+          .for(assets)
+          .process<InstallAssetOutput>(async asset => {
+            const installOutput = isPrivateAsset(asset)
               ? await installPrivateAsset({
-                  assetShortHeader,
-                  eventsFunctionsExtensionsState,
+                  asset,
                   project,
                   objectsContainer: targetObjectsContainer,
-                  environment,
                 })
               : await installPublicAsset({
-                  assetShortHeader,
-                  eventsFunctionsExtensionsState,
+                  asset,
                   project,
                   objectsContainer: targetObjectsContainer,
-                  environment,
                 });
 
             if (!installOutput) {
@@ -169,11 +192,9 @@ const AssetPackInstallDialog = ({
           );
         }
 
-        results.forEach(installOutput => {
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-        });
+        onObjectsAddedFromAssets(
+          results.map(installOutput => installOutput.createdObjects).flat()
+        );
 
         await resourceManagementProps.onFetchNewlyAddedResources();
 
@@ -191,14 +212,15 @@ const AssetPackInstallDialog = ({
       }
     },
     [
-      eventsFunctionsExtensionsState,
+      fetchAssets,
       project,
-      targetObjectsContainer,
-      onObjectAddedFromAsset,
-      onAssetsAdded,
-      environment,
-      installPrivateAsset,
+      showExtensionUpdateConfirmation,
+      eventsFunctionsExtensionsState,
+      onObjectsAddedFromAssets,
       resourceManagementProps,
+      onAssetsAdded,
+      installPrivateAsset,
+      targetObjectsContainer,
     ]
   );
 

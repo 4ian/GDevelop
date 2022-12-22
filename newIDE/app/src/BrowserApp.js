@@ -64,10 +64,6 @@ export const create = (authentication: Authentication) => {
               renderPreviewLauncher={(props, ref) => (
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
-              initialDialog={appArguments['initial-dialog']}
-              initialGameId={appArguments['game-id']}
-              initialGamesDashboardTab={appArguments['games-dashboard-tab']}
-              initialAssetPackUserFriendlySlug={appArguments['asset-pack']}
               renderExportDialog={props => (
                 <ExportDialog
                   project={props.project}

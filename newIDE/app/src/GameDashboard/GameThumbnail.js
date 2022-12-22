@@ -19,9 +19,14 @@ const styles = {
 type Props = {|
   thumbnailUrl?: string,
   gameName: string,
+  background?: 'light' | 'medium' | 'dark',
 |};
 
-export const GameThumbnail = ({ thumbnailUrl, gameName }: Props) =>
+export const GameThumbnail = ({
+  thumbnailUrl,
+  gameName,
+  background = 'light',
+}: Props) =>
   thumbnailUrl ? (
     <img
       src={thumbnailUrl}
@@ -40,7 +45,7 @@ export const GameThumbnail = ({ thumbnailUrl, gameName }: Props) =>
         whiteSpace: 'normal',
         display: 'flex',
       }}
-      background="light"
+      background={background}
     >
       <EmptyMessage>
         <Trans>No thumbnail set</Trans>

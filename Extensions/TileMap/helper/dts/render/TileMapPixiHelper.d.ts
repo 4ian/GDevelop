@@ -1,4 +1,4 @@
-import { integer, float } from '../types/CommonTypes';
+import { integer, float } from '../model/CommonTypes';
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileMap } from '../types';
 import { TileTextureCache } from './TileTextureCache';

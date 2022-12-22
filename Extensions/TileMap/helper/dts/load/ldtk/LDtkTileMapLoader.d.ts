@@ -1,5 +1,5 @@
 import { EditableTileMap } from '../../model/TileMapModel';
-import { LDtkTileMap } from '../../types/LDtkFormat';
+import { LDtkTileMap } from './LDtkFormat';
 export declare namespace LDtkTileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the LDtk JSON.

@@ -1,4 +1,4 @@
-import { integer } from '../types/CommonTypes';
+import { integer } from '../model/CommonTypes';
 import PIXI = GlobalPIXIModule.PIXI;
 /**
  * A cache to access the tile images.

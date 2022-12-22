@@ -65,6 +65,9 @@ const styles = {
     maxHeight: '100%',
     verticalAlign: 'middle',
     pointerEvents: 'none',
+    // Compromise between having a preview of the asset slightly more zoomed
+    // compared to the search results and a not too zoomed image for small
+    // smooth assets that could give a sense of bad quality.
     flex: 0.6,
   },
   arrowContainer: {

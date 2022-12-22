@@ -293,7 +293,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                     </Text>
                     {!!assetAuthors &&
                       assetAuthors.map(author => (
-                        <Text size="body">
+                        <Text size="body" key={author.name}>
                           <Link
                             key={author.name}
                             href={author.website}
@@ -310,7 +310,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         const username =
                           userPublicProfile.username || 'GDevelop user';
                         return (
-                          <Text size="body">
+                          <Text size="body" key={userPublicProfile.id}>
                             <Link
                               key={userPublicProfile.id}
                               href="#"

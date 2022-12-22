@@ -107,12 +107,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
 
   const installPrivateAsset = async ({
     asset,
-    eventsFunctionsExtensionsState,
     project,
     objectsContainer,
-    environment,
-    requiredExtensionInstallation,
-    shouldUpdateExtension,
   }: InstallAssetShortHeaderArgs): Promise<?InstallAssetOutput> => {
     if (!profile) {
       throw new Error(
@@ -130,12 +126,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
 
     return installAsset({
       asset: assetWithAuthorizedResourceUrls,
-      eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      environment,
-      requiredExtensionInstallation,
-      shouldUpdateExtension,
     });
   };
 

@@ -14,13 +14,13 @@ import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
 import {
-  installPublicAsset,
   checkRequiredExtensionUpdate,
+  installRequiredExtensions,
+  installPublicAsset,
 } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import LinearProgress from '../UI/LinearProgress';
-import { AssetStoreContext } from './AssetStoreContext';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import PromisePool from '@supercharge/promise-pool';
@@ -95,8 +95,6 @@ const AssetPackInstallDialog = ({
   const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
-  const { environment } = React.useContext(AssetStoreContext);
-
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
     ''
   );
@@ -157,6 +155,12 @@ const AssetPackInstallDialog = ({
           (await showExtensionUpdateConfirmation(
             requiredExtensionInstallation.outOfDateExtensions
           ));
+        await installRequiredExtensions({
+          requiredExtensionInstallation,
+          shouldUpdateExtension,
+          eventsFunctionsExtensionsState,
+          project,
+        });
 
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { results, errors } = await PromisePool.withConcurrency(6)
@@ -165,21 +169,13 @@ const AssetPackInstallDialog = ({
             const installOutput = isPrivateAsset(asset)
               ? await installPrivateAsset({
                   asset,
-                  eventsFunctionsExtensionsState,
                   project,
                   objectsContainer: targetObjectsContainer,
-                  environment,
-                  requiredExtensionInstallation,
-                  shouldUpdateExtension,
                 })
               : await installPublicAsset({
                   asset,
-                  eventsFunctionsExtensionsState,
                   project,
                   objectsContainer: targetObjectsContainer,
-                  environment,
-                  requiredExtensionInstallation,
-                  shouldUpdateExtension,
                 });
 
             if (!installOutput) {
@@ -226,7 +222,6 @@ const AssetPackInstallDialog = ({
       installPrivateAsset,
       eventsFunctionsExtensionsState,
       targetObjectsContainer,
-      environment,
       onObjectAddedFromAsset,
     ]
   );

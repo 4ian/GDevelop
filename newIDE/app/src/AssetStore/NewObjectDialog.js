@@ -27,8 +27,9 @@ import RaisedButton from '../UI/RaisedButton';
 import { AssetStoreContext } from './AssetStoreContext';
 import AssetPackInstallDialog from './AssetPackInstallDialog';
 import {
-  installPublicAsset,
   checkRequiredExtensionUpdate,
+  installRequiredExtensions,
+  installPublicAsset,
 } from './InstallAsset';
 import {
   type Asset,
@@ -266,24 +267,22 @@ export default function NewObjectDialog({
             (await showExtensionUpdateConfirmation(
               requiredExtensionInstallation.outOfDateExtensions
             ));
+          await installRequiredExtensions({
+            requiredExtensionInstallation,
+            shouldUpdateExtension,
+            eventsFunctionsExtensionsState,
+            project,
+          });
           const installOutput = isPrivate
             ? await installPrivateAsset({
                 asset,
-                eventsFunctionsExtensionsState,
                 project,
                 objectsContainer,
-                environment,
-                requiredExtensionInstallation,
-                shouldUpdateExtension,
               })
             : await installPublicAsset({
                 asset,
-                eventsFunctionsExtensionsState,
                 project,
                 objectsContainer,
-                environment,
-                requiredExtensionInstallation,
-                shouldUpdateExtension,
               });
           if (!installOutput) {
             throw new Error('Unable to install private Asset.');
@@ -325,7 +324,6 @@ export default function NewObjectDialog({
       installPrivateAsset,
       eventsFunctionsExtensionsState,
       objectsContainer,
-      environment,
       openedAssetPack,
       resourceManagementProps,
       canInstallPrivateAsset,

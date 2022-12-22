@@ -1,7 +1,6 @@
 // @flow
 import {
   type Asset,
-  type Environment,
   isPixelArt,
   isPublicAssetResourceUrl,
   extractFilenameWithExtensionFromPublicAssetResourceUrl,
@@ -245,18 +244,61 @@ const filterMissingExtensions = (
   });
 };
 
-export const downloadExtensions = async (
-  extensions: Array<ExtensionShortHeader>
-): Promise<Array<SerializedExtension>> => {
-  if (!extensions.length) return Promise.resolve([]);
+export type RequiredExtensionInstallation = {|
+  requiredExtensions: Array<ExtensionShortHeader>,
+  missingExtensions: Array<ExtensionShortHeader>,
+  outOfDateExtensions: Array<ExtensionShortHeader>,
+|};
+
+export type InstallRequiredExtensionsArgs = {|
+  requiredExtensionInstallation: RequiredExtensionInstallation,
+  shouldUpdateExtension: boolean,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject,
+|};
+
+export const installRequiredExtensions = async ({
+  requiredExtensionInstallation,
+  shouldUpdateExtension,
+  eventsFunctionsExtensionsState,
+  project,
+}: InstallRequiredExtensionsArgs): Promise<void> => {
+  const {
+    requiredExtensions,
+    missingExtensions,
+    outOfDateExtensions,
+  } = requiredExtensionInstallation;
+
+  if (missingExtensions.length === 0 && outOfDateExtensions.length === 0) {
+    return;
+  }
+
+  const neededExtensions = shouldUpdateExtension
+    ? [...missingExtensions, ...outOfDateExtensions]
+    : missingExtensions;
 
   const serializedExtensions = await Promise.all(
-    uniq(extensions).map(extensionShortHeader =>
+    uniq(neededExtensions).map(extensionShortHeader =>
       getExtension(extensionShortHeader)
     )
   );
 
-  return serializedExtensions;
+  await addSerializedExtensionsToProject(
+    eventsFunctionsExtensionsState,
+    project,
+    serializedExtensions
+  );
+
+  const stillMissingExtensions = filterMissingExtensions(
+    gd,
+    requiredExtensions
+  );
+  if (stillMissingExtensions.length) {
+    throw new Error(
+      'These extensions could not be installed: ' +
+        missingExtensions.map(extension => extension.name).join(', ')
+    );
+  }
 };
 
 /**
@@ -296,12 +338,6 @@ export const addSerializedExtensionsToProject = (
     project
   );
 };
-
-export type RequiredExtensionInstallation = {|
-  requiredExtensions: Array<ExtensionShortHeader>,
-  missingExtensions: Array<ExtensionShortHeader>,
-  outOfDateExtensions: Array<ExtensionShortHeader>,
-|};
 
 type CheckExtensionArgs = {|
   assets: Array<Asset>,
@@ -375,51 +411,15 @@ export type InstallAssetOutput = {|
 
 type InstallAssetArgs = {|
   asset: Asset,
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   objectsContainer: gdObjectsContainer,
-  environment: Environment,
-  requiredExtensionInstallation: RequiredExtensionInstallation,
-  shouldUpdateExtension: boolean,
 |};
 
 export const installAsset = async ({
   asset,
-  eventsFunctionsExtensionsState,
   project,
   objectsContainer,
-  environment,
-  requiredExtensionInstallation,
-  shouldUpdateExtension,
 }: InstallAssetArgs): Promise<InstallAssetOutput> => {
-  const {
-    requiredExtensions,
-    missingExtensions,
-    outOfDateExtensions,
-  } = requiredExtensionInstallation;
-
-  const neededExtensions = shouldUpdateExtension
-    ? [...missingExtensions, ...outOfDateExtensions]
-    : missingExtensions;
-
-  const serializedExtensions = await downloadExtensions(neededExtensions);
-  await addSerializedExtensionsToProject(
-    eventsFunctionsExtensionsState,
-    project,
-    serializedExtensions
-  );
-
-  const stillMissingExtensions = filterMissingExtensions(
-    gd,
-    requiredExtensions
-  );
-  if (stillMissingExtensions.length) {
-    throw new Error(
-      'These extensions could not be installed: ' +
-        missingExtensions.map(extension => extension.name).join(', ')
-    );
-  }
-
   const output = await addAssetToProject({
     project,
     asset,
@@ -430,30 +430,18 @@ export const installAsset = async ({
 
 export type InstallAssetShortHeaderArgs = {|
   asset: Asset,
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
   objectsContainer: gdObjectsContainer,
-  environment: Environment,
-  requiredExtensionInstallation: RequiredExtensionInstallation,
-  shouldUpdateExtension: boolean,
 |};
 
 export const installPublicAsset = async ({
   asset,
-  eventsFunctionsExtensionsState,
   project,
   objectsContainer,
-  environment,
-  requiredExtensionInstallation,
-  shouldUpdateExtension,
 }: InstallAssetShortHeaderArgs): Promise<InstallAssetOutput> => {
   return installAsset({
     asset,
-    eventsFunctionsExtensionsState,
     project,
     objectsContainer,
-    environment,
-    requiredExtensionInstallation,
-    shouldUpdateExtension,
   });
 };

@@ -3,7 +3,7 @@ import {
   addAssetToProject,
   addSerializedExtensionsToProject,
   getRequiredExtensionsFromAsset,
-  downloadExtensions,
+  installRequiredExtensions,
   sanitizeObjectName,
   installPublicAsset,
   checkRequiredExtensionUpdate,
@@ -372,30 +372,6 @@ describe('InstallAsset', () => {
     eventsFunctionsCount: 0,
   };
 
-  describe('downloadExtensions', () => {
-    it('loads the required extensions ', async () => {
-      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
-        version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
-      }));
-
-      mockFn(getExtension).mockImplementationOnce(
-        () => fireBulletExtensionShortHeader
-      );
-
-      await expect(
-        downloadExtensions([
-          { ...emptyExtensionShortHeader, name: 'FireBullet' },
-        ])
-      ).resolves.toEqual([fireBulletExtensionShortHeader]);
-    });
-  });
-
   // TODO Find a way to test this
 
   // describe('fetchAssets', () => {
@@ -418,6 +394,7 @@ describe('InstallAsset', () => {
     it('can find an extension to install', async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Flash')).toBe(false);
 
       // Get an asset that uses an extension...
       mockFn(Asset.getPublicAsset).mockImplementationOnce(
@@ -453,6 +430,7 @@ describe('InstallAsset', () => {
     it('can find an up to date extension from the project', async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
 
       // Get an asset that uses an extension...
       mockFn(Asset.getPublicAsset).mockImplementationOnce(
@@ -487,6 +465,7 @@ describe('InstallAsset', () => {
     it('can find an extension to update', async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
 
       // Get an asset that uses an extension...
       mockFn(Asset.getPublicAsset).mockImplementationOnce(
@@ -645,10 +624,63 @@ describe('InstallAsset', () => {
       getIncludeFileHashs: () => ({}),
     };
 
+    it('loads the required extensions ', async () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('FireBullet')).toBe(
+        false
+      );
+
+      mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
+        version: '1.0.0',
+        allTags: [''],
+        allCategories: [''],
+        extensionShortHeaders: [
+          flashExtensionShortHeader,
+          fireBulletExtensionShortHeader,
+        ],
+      }));
+
+      mockFn(getExtension).mockImplementationOnce(
+        () => fireBulletExtensionShortHeader
+      );
+
+      // Install the extension
+      await expect(
+        installRequiredExtensions({
+          requiredExtensionInstallation: {
+            requiredExtensions: [
+              {
+                ...emptyExtensionShortHeader,
+                name: 'FireBullet',
+                version: '1.0.0',
+              },
+            ],
+            missingExtensions: [
+              {
+                ...emptyExtensionShortHeader,
+                name: 'FireBullet',
+                version: '1.0.0',
+              },
+            ],
+            outOfDateExtensions: [],
+          },
+          shouldUpdateExtension: true,
+          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          project,
+        })
+      ).rejects.toMatchObject({
+        // It's just because the mock doesn't reloadProjectEventsFunctionsExtensions.
+        message: 'These extensions could not be installed: FireBullet',
+      });
+
+      expect(getExtension).toHaveBeenCalledTimes(1);
+      expect(project.hasEventsFunctionsExtensionNamed('FireBullet')).toBe(true);
+    });
+
     it("throws if an extension can't be installed, even if its extension was properly found in the registry", async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
-      const layout = project.insertNewLayout('MyTestLayout', 0);
 
       mockFn(getExtension).mockImplementationOnce(
         () => flashExtensionShortHeader
@@ -657,19 +689,16 @@ describe('InstallAsset', () => {
       // Verify that, because we use `mockEventsFunctionsExtensionsState`, the
       // extension won't be loaded.
       await expect(
-        installPublicAsset({
+        installRequiredExtensions({
           // An asset that uses an extension
-          asset: fakeAssetWithFlashExtensionDependency1,
-          project,
-          objectsContainer: layout,
-          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-          environment: 'live',
           requiredExtensionInstallation: {
             requiredExtensions: [flashExtensionShortHeader],
             missingExtensions: [flashExtensionShortHeader],
             outOfDateExtensions: [],
           },
           shouldUpdateExtension: true,
+          eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+          project,
         })
       ).rejects.toMatchObject({
         message: 'These extensions could not be installed: Flash',
@@ -687,17 +716,11 @@ describe('InstallAsset', () => {
     it('install an asset with an event-based object that is already installed', async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
+      expect(project.hasEventsFunctionsExtensionNamed('Button')).toBe(true);
       const layout = project.insertNewLayout('MyTestLayout', 0);
 
-      // Install the asset
-      await installPublicAsset({
-        // Fake an asset with a custom object of type "Button::PanelSpriteButton",
-        // that is installed already.
-        asset: fakeAssetWithCustomObject,
-        project,
-        objectsContainer: layout,
-        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
-        environment: 'live',
+      // Install the extension
+      await installRequiredExtensions({
         requiredExtensionInstallation: {
           requiredExtensions: [
             {
@@ -710,11 +733,21 @@ describe('InstallAsset', () => {
           outOfDateExtensions: [],
         },
         shouldUpdateExtension: true,
+        eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
+        project,
       });
 
       // No extensions fetched because the extension is already installed.
       expect(getExtension).not.toHaveBeenCalled();
-      expect(getExtensionsRegistry).not.toHaveBeenCalled();
+
+      // Install the asset
+      await installPublicAsset({
+        // Fake an asset with a custom object of type "Button::PanelSpriteButton",
+        // that is installed already.
+        asset: fakeAssetWithCustomObject,
+        project,
+        objectsContainer: layout,
+      });
 
       // Check that the object was created.
       expect(layout.getObjectsCount()).toBe(1);

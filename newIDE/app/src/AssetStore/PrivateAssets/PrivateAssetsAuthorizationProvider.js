@@ -106,25 +106,13 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
   };
 
   const installPrivateAsset = async ({
-    assetShortHeader,
-    eventsFunctionsExtensionsState,
+    asset,
     project,
     objectsContainer,
-    environment,
   }: InstallAssetShortHeaderArgs): Promise<?InstallAssetOutput> => {
     if (!profile) {
       throw new Error(
         'Unable to install the asset because no profile was found.'
-      );
-    }
-
-    const asset: ?Asset = await fetchPrivateAsset(assetShortHeader, {
-      environment,
-    });
-
-    if (!asset) {
-      throw new Error(
-        'Unable to install the asset because it could not be fetched.'
       );
     }
 
@@ -138,10 +126,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
 
     return installAsset({
       asset: assetWithAuthorizedResourceUrls,
-      eventsFunctionsExtensionsState,
       project,
       objectsContainer,
-      environment,
     });
   };
 

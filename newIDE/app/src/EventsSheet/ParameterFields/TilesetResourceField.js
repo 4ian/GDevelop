@@ -35,7 +35,7 @@ export default class TilesetResourceField extends Component<
         fullWidth
         initialResourceName={this.props.value}
         onChange={this.props.onChange}
-        floatingLabelText={<Trans>Choose the JSON/LDtk file to use</Trans>}
+        floatingLabelText={<Trans>Choose the tileset to use</Trans>}
         onRequestClose={this.props.onRequestClose}
         onApply={this.props.onApply}
         ref={field => (this._field = field)}

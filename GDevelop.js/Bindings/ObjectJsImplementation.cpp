@@ -189,6 +189,8 @@ void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker
       } else if (resourceType == "tilemap") {
         worker.ExposeTilemap(newPropertyValue);
         worker.ExposeEmbeddeds(newPropertyValue);
+      } else if (resourceType == "tileset") {
+        worker.ExposeTileset(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

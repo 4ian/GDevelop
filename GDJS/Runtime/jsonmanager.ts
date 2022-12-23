@@ -110,7 +110,9 @@ namespace gdjs {
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.find(function (resource) {
         return (
-          (resource.kind === 'json' || resource.kind === 'tilemap') &&
+          (resource.kind === 'json' ||
+            resource.kind === 'tilemap' ||
+            resource.kind === 'tileset') &&
           resource.name === resourceName
         );
       });

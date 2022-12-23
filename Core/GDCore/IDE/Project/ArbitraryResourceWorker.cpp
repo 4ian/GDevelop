@@ -40,6 +40,11 @@ void ArbitraryResourceWorker::ExposeTilemap(gd::String& tilemapName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeTileset(gd::String& tilesetName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -137,6 +142,8 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
             ExposeJson(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "tilemap") {
             ExposeTilemap(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "tileset") {
+            ExposeTileset(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "video") {
             ExposeVideo(potentiallyUpdatedTargetResourceName);
           }
@@ -221,6 +228,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
           } else if (parameterMetadata.GetType() == "tilemapResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeTilemap(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "tilesetResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeTileset(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });

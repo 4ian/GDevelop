@@ -241,4 +241,5 @@ declare type ResourceKind =
   | 'video'
   | 'json'
   | 'tilemap'
+  | 'tileset'
   | 'bitmapFont';

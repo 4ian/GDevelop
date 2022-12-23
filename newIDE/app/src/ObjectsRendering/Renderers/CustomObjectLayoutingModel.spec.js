@@ -170,7 +170,7 @@ describe('applyChildLayouts', () => {
     const parent = new MockedParent(200, 100);
     // The child is hidden by RenderedCustomObjectInstance constructor
     // which is not covered by tests.
-    // The constructor removes the child from its Pixi container. 
+    // The constructor removes the child from its Pixi container.
     // This test actually doesn't cover more than the previous one.
     const background = parent.addChid('Background', {
       isShown: false,

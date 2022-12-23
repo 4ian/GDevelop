@@ -62,6 +62,7 @@ import LeaderboardIdField, {
 } from './ParameterFields/LeaderboardIdField';
 import { IdentifierField } from './ParameterFields/IdentifierField';
 import TilemapResourceField from './ParameterFields/TilemapResourceField';
+import TilesetResourceField from './ParameterFields/TilesetResourceField';
 
 const gd: libGDevelop = global.gd;
 
@@ -107,6 +108,7 @@ const components = {
   leaderboardId: LeaderboardIdField,
   identifier: IdentifierField,
   tilemapResource: TilemapResourceField,
+  tilesetResource: TilesetResourceField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,

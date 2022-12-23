@@ -308,7 +308,11 @@ export default class PixiResourcesLoader {
       );
 
     const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'json' && resource.getKind() !== 'tilemap')
+    if (
+      resource.getKind() !== 'json' &&
+      resource.getKind() !== 'tilemap' &&
+      resource.getKind() !== 'tileset'
+    )
       return Promise.reject(
         new Error(`The resource called ${resourceName} is not a json file.`)
       );

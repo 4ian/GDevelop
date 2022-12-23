@@ -41,6 +41,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
   std::set<gd::String>& GetAllJsons() { return GetAll("json"); };
   std::set<gd::String>& GetAllTilemaps() { return GetAll("tilemap"); };
+  std::set<gd::String>& GetAllTilesets() { return GetAll("tileset"); };
   std::set<gd::String>& GetAllVideos() { return GetAll("video"); };
   std::set<gd::String>& GetAllBitmapFonts() { return GetAll("bitmapFont"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
@@ -49,6 +50,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
     if (resourceType == "font") return allFonts;
     if (resourceType == "json") return allJsons;
     if (resourceType == "tilemap") return allTilemaps;
+    if (resourceType == "tileset") return allTilesets;
     if (resourceType == "video") return allVideos;
     if (resourceType == "bitmapFont") return allBitmapFonts;
 
@@ -73,6 +75,9 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   virtual void ExposeTilemap(gd::String& tilemapResourceName) override {
     allTilemaps.insert(tilemapResourceName);
   };
+  virtual void ExposeTileset(gd::String& tilesetResourceName) override {
+    allTilesets.insert(tilesetResourceName);
+  };
   virtual void ExposeVideo(gd::String& videoResourceName) override {
     allVideos.insert(videoResourceName);
   };
@@ -86,6 +91,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String> allFonts;
   std::set<gd::String> allJsons;
   std::set<gd::String> allTilemaps;
+  std::set<gd::String> allTilesets;
   std::set<gd::String> allVideos;
   std::set<gd::String> allBitmapFonts;
   std::set<gd::String> emptyResources;

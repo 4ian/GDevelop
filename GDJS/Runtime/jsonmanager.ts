@@ -76,7 +76,12 @@ namespace gdjs {
     ): void {
       const resources = this._resources;
       const jsonResources = resources.filter(function (resource) {
-        return resource.kind === 'json' && !resource.disablePreload;
+        return (
+          (resource.kind === 'json' ||
+            resource.kind === 'tilemap' ||
+            resource.kind === 'tileset') &&
+          !resource.disablePreload
+        );
       });
       if (jsonResources.length === 0) {
         return onComplete(jsonResources.length);

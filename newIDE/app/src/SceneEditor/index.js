@@ -152,6 +152,9 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+
+  renamedObjectWithContext: ?ObjectWithContext,
+  selectedObjectWithContext: ?ObjectWithContext,
 |};
 
 type CopyCutPasteOptions = {|
@@ -213,6 +216,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
 
       selectedObjectTags: [],
+
+      renamedObjectWithContext: null,
+      selectedObjectWithContext: null,
     };
   }
 
@@ -250,6 +256,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.openSceneProperties}
+        canRenameObject={this.state.selectedObjectWithContext != null}
+        onRenameObject={this._startRenamingObject}
       />
     );
   }
@@ -446,16 +454,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _onObjectSelected = (selectedObjectName: string) => {
-    if (!selectedObjectName) {
-      this.setState({
-        selectedObjectNames: [],
-      });
-    } else {
-      this.setState({
-        selectedObjectNames: [selectedObjectName],
-      });
+  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
+    const selectedObjectNames = [];
+    if (objectWithContext) {
+      selectedObjectNames.push(objectWithContext.object.getName());
     }
+
+    this.setState(
+      {
+        selectedObjectNames,
+        selectedObjectWithContext: objectWithContext,
+      },
+      () => {
+        // We update toolbar because we need to update the objects selected (for the rename shortcut)
+        this.updateToolbar();
+      }
+    );
   };
 
   _createNewObjectAndInstanceUnderCursor = () => {
@@ -673,6 +687,22 @@ export default class SceneEditor extends React.Component<Props, State> {
         );
       },
     });
+  };
+
+  _onEditRenameObject = (objectWithContext: ?ObjectWithContext) => {
+    this.setState(
+      {
+        renamedObjectWithContext: objectWithContext,
+        selectedObjectWithContext: objectWithContext,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
+  };
+
+  _startRenamingObject = () => {
+    this._onEditRenameObject(this.state.selectedObjectWithContext);
   };
 
   _onRenameLayer = (
@@ -1456,6 +1486,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
+                renamedObjectWithContext={this.state.renamedObjectWithContext}
+                setRenamedObjectWithContext={this._onEditRenameObject}
                 onRenameObject={this._onRenameObject}
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}

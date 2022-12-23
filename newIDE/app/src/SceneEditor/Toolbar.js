@@ -20,6 +20,7 @@ import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import GridIcon from '../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
+import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 
 type Props = {|
   openObjectsList: () => void,
@@ -41,6 +42,8 @@ type Props = {|
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
+  canRenameObject: boolean,
+  onRenameObject: () => void,
 |};
 
 const Toolbar = (props: Props) => {
@@ -63,6 +66,8 @@ const Toolbar = (props: Props) => {
         canDeleteSelection={
           props.instancesSelection.getSelectedInstances().length !== 0
         }
+        canRenameObject={props.canRenameObject}
+        onRenameObject={props.onRenameObject}
       />
       <ToolbarGroup lastChild>
         <IconButton

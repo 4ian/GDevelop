@@ -37,6 +37,7 @@ export type CommandName =
   | 'TOGGLE_LAYERS_PANEL'
   | 'SCENE_EDITOR_UNDO'
   | 'SCENE_EDITOR_REDO'
+  | 'SCENE_OBJECT_RENAME'
   | 'DELETE_INSTANCES'
   | 'TOGGLE_WINDOW_MASK'
   | 'TOGGLE_GRID'
@@ -233,6 +234,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'SCENE',
     displayText: t`Redo the last changes`,
     noShortcut: true,
+  },
+  SCENE_OBJECT_RENAME: {
+    area: 'SCENE',
+    displayText: t`Rename the selected object`,
   },
   DELETE_INSTANCES: {
     area: 'SCENE',

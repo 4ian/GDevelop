@@ -78,6 +78,7 @@ const defineTileMap = function (
       new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
         .setType('resource')
         .addExtraInfo('tilemap')
+        .addExtraInfo('json')
         .setLabel(_('Tilemap Tiled JSON or LDtk file'))
         .setDescription(
           _('This is the JSON/LDtk file that was saved or exported from Tiled/LDtk.')

@@ -31,6 +31,7 @@ export default class TilemapResourceField extends Component<
         resourceManagementProps={this.props.resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind="tilemap"
+        fallbackResourceKind="json"
         fullWidth
         initialResourceName={this.props.value}
         onChange={this.props.onChange}

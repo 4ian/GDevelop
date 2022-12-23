@@ -1,132 +1,5 @@
 // @flow
 
-// TODO EBO Make an event-based object instance editor (like the one for the scene)
-// and use real instances instead of this.
-export class ChildInstance {
-  x: number;
-  y: number;
-  _hasCustomSize: boolean;
-  _customWidth: number;
-  _customHeight: number;
-
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this._customWidth = 0;
-    this._customHeight = 0;
-    this._hasCustomSize = false;
-  }
-
-  getX() {
-    return this.x;
-  }
-
-  getY() {
-    return this.y;
-  }
-
-  getAngle() {
-    return 0;
-  }
-
-  setObjectName(name: string) {}
-
-  getObjectName() {
-    return '';
-  }
-
-  setX(x: number) {}
-
-  setY(y: number) {}
-
-  setAngle(angle: number) {}
-
-  isLocked() {
-    return false;
-  }
-
-  setLocked(lock: boolean) {}
-
-  isSealed() {
-    return false;
-  }
-
-  setSealed(seal: boolean) {}
-
-  getZOrder() {
-    return 0;
-  }
-
-  setZOrder(zOrder: number) {}
-
-  getLayer() {
-    return '';
-  }
-
-  setLayer(layer: string) {}
-
-  setHasCustomSize(enable: boolean) {
-    this._hasCustomSize = enable;
-  }
-
-  hasCustomSize() {
-    return this._hasCustomSize;
-  }
-
-  setCustomWidth(width: number) {
-    this._customWidth = width;
-    this._hasCustomSize = true;
-  }
-
-  getCustomWidth() {
-    return this._customWidth;
-  }
-
-  setCustomHeight(height: number) {
-    this._customHeight = height;
-    this._hasCustomSize = true;
-  }
-
-  getCustomHeight() {
-    return this._customHeight;
-  }
-
-  resetPersistentUuid() {
-    return this;
-  }
-
-  updateCustomProperty(
-    name: string,
-    value: string,
-    project: gdProject,
-    layout: gdLayout
-  ) {}
-
-  getCustomProperties(project: gdProject, layout: gdLayout) {
-    return null;
-  }
-
-  getRawDoubleProperty(name: string) {
-    return 0;
-  }
-
-  getRawStringProperty(name: string) {
-    return '';
-  }
-
-  setRawDoubleProperty(name: string, value: number) {}
-
-  setRawStringProperty(name: string, value: string) {}
-
-  getVariables() {
-    return [];
-  }
-
-  serializeTo(element: gdSerializerElement) {}
-
-  unserializeFrom(element: gdSerializerElement) {}
-}
-
 type AxisLayout = {
   /**
    * The origin of the anchor on the object to place
@@ -427,6 +300,133 @@ export const getLayouts = (
   }
   return layouts;
 };
+
+// TODO EBO Make an event-based object instance editor (like the one for the scene)
+// and use real instances instead of this.
+export class ChildInstance {
+  x: number;
+  y: number;
+  _hasCustomSize: boolean;
+  _customWidth: number;
+  _customHeight: number;
+
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this._customWidth = 0;
+    this._customHeight = 0;
+    this._hasCustomSize = false;
+  }
+
+  getX() {
+    return this.x;
+  }
+
+  getY() {
+    return this.y;
+  }
+
+  getAngle() {
+    return 0;
+  }
+
+  setObjectName(name: string) {}
+
+  getObjectName() {
+    return '';
+  }
+
+  setX(x: number) {}
+
+  setY(y: number) {}
+
+  setAngle(angle: number) {}
+
+  isLocked() {
+    return false;
+  }
+
+  setLocked(lock: boolean) {}
+
+  isSealed() {
+    return false;
+  }
+
+  setSealed(seal: boolean) {}
+
+  getZOrder() {
+    return 0;
+  }
+
+  setZOrder(zOrder: number) {}
+
+  getLayer() {
+    return '';
+  }
+
+  setLayer(layer: string) {}
+
+  setHasCustomSize(enable: boolean) {
+    this._hasCustomSize = enable;
+  }
+
+  hasCustomSize() {
+    return this._hasCustomSize;
+  }
+
+  setCustomWidth(width: number) {
+    this._customWidth = width;
+    this._hasCustomSize = true;
+  }
+
+  getCustomWidth() {
+    return this._customWidth;
+  }
+
+  setCustomHeight(height: number) {
+    this._customHeight = height;
+    this._hasCustomSize = true;
+  }
+
+  getCustomHeight() {
+    return this._customHeight;
+  }
+
+  resetPersistentUuid() {
+    return this;
+  }
+
+  updateCustomProperty(
+    name: string,
+    value: string,
+    project: gdProject,
+    layout: gdLayout
+  ) {}
+
+  getCustomProperties(project: gdProject, layout: gdLayout) {
+    return null;
+  }
+
+  getRawDoubleProperty(name: string) {
+    return 0;
+  }
+
+  getRawStringProperty(name: string) {
+    return '';
+  }
+
+  setRawDoubleProperty(name: string, value: number) {}
+
+  setRawStringProperty(name: string, value: string) {}
+
+  getVariables() {
+    return [];
+  }
+
+  serializeTo(element: gdSerializerElement) {}
+
+  unserializeFrom(element: gdSerializerElement) {}
+}
 
 export type InitialInstanceDimension = {
   hasCustomSize(): boolean,

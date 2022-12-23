@@ -27,7 +27,7 @@ describe('applyChildLayouts', () => {
 
   it('can fill the parent with a child with margins', () => {
     const parent = new MockedParent(200, 100);
-    const background = parent.addChid('Background', {
+    const panelBar = parent.addChid('PanelBar', {
       isShown: true,
       horizontalLayout: {
         minSideAbsoluteMargin: 10,
@@ -38,17 +38,17 @@ describe('applyChildLayouts', () => {
 
     applyChildLayouts(parent);
 
-    expect(background.getX()).toBe(10);
-    expect(background.getY()).toBe(30);
-    expect(background.hasCustomSize()).toBe(true);
-    expect(background.getCustomWidth()).toBe(200 - 10 - 20);
-    expect(background.getCustomHeight()).toBe(100 - 30 - 40);
+    expect(panelBar.getX()).toBe(10);
+    expect(panelBar.getY()).toBe(30);
+    expect(panelBar.hasCustomSize()).toBe(true);
+    expect(panelBar.getCustomWidth()).toBe(200 - 10 - 20);
+    expect(panelBar.getCustomHeight()).toBe(100 - 30 - 40);
   });
 
   it('can fill the parent with a text child with margins', () => {
     const parent = new MockedParent(200, 100);
-    const background = parent.addChid(
-      'Background',
+    const label = parent.addChid(
+      'Label',
       {
         isShown: true,
         horizontalLayout: {
@@ -65,10 +65,81 @@ describe('applyChildLayouts', () => {
 
     applyChildLayouts(parent);
 
-    expect(background.getX()).toBe(10);
-    expect(background.getY()).toBe(30 + (100 - 30 - 40 - 20) / 2);
-    expect(background.hasCustomSize()).toBe(true);
-    expect(background.getCustomWidth()).toBe(200 - 10 - 20);
+    expect(label.getX()).toBe(10);
+    expect(label.getY()).toBe(30 + (100 - 30 - 40 - 20) / 2);
+    expect(label.hasCustomSize()).toBe(true);
+    expect(label.getCustomWidth()).toBe(200 - 10 - 20);
+  });
+
+  it('can fill the parent width with margins while keeping default height', () => {
+    const parent = new MockedParent(200, 100);
+    parent.addChid('Background', {
+      isShown: true,
+      horizontalLayout: {},
+      verticalLayout: {},
+    });
+    const tiledBar = parent.addChid(
+      'TiledBar',
+      {
+        isShown: true,
+        horizontalLayout: {
+          minSideAbsoluteMargin: 10,
+          maxSideAbsoluteMargin: 20,
+        },
+        verticalLayout: { anchorOrigin: 0.5, anchorTarget: 0.5 },
+      },
+      { defaultWidth: 30, defaultHeight: 40 }
+    );
+
+    applyChildLayouts(parent);
+
+    expect(tiledBar.getX()).toBe(10);
+    expect(tiledBar.getY()).toBe((100 - 40) / 2);
+    expect(tiledBar.hasCustomSize()).toBe(true);
+    expect(tiledBar.getCustomWidth()).toBe(200 - 10 - 20);
+    expect(tiledBar.getCustomHeight()).toBe(40);
+  });
+
+  it('can anchor a chid to another child', () => {
+    const parent = new MockedParent(200, 100);
+    parent.addChid('Background', {
+      isShown: true,
+      horizontalLayout: {},
+      verticalLayout: {},
+    });
+    parent.addChid('PanelBar', {
+      isShown: true,
+      horizontalLayout: {
+        minSideAbsoluteMargin: 10,
+        maxSideAbsoluteMargin: 20,
+      },
+      verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
+    });
+    const thumb = parent.addChid(
+      'Thumb',
+      {
+        isShown: true,
+        horizontalLayout: {
+          anchorOrigin: 0.5,
+          anchorTarget: 1,
+          anchorTargetObject: 'PanelBar',
+        },
+        verticalLayout: {
+          anchorOrigin: 0.5,
+          anchorTarget: 0.5,
+          anchorTargetObject: 'PanelBar',
+        },
+      },
+      { defaultWidth: 50, defaultHeight: 60 }
+    );
+
+    applyChildLayouts(parent);
+
+    expect(thumb.getX()).toBe(200 - 20 - 50 / 2);
+    expect(thumb.getY()).toBe(30 + (100 - 30 - 40) / 2 - 60 / 2);
+    expect(thumb.hasCustomSize()).toBe(true);
+    expect(thumb.getCustomWidth()).toBe(50);
+    expect(thumb.getCustomHeight()).toBe(60);
   });
 });
 

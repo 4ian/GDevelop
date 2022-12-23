@@ -36,6 +36,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
+  fallbackResourceKind?: ResourceKind,
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,
@@ -115,12 +116,25 @@ export default class ResourceSelector extends React.Component<Props, State> {
   _loadFrom(resourcesManager: gdResourcesManager) {
     this.allResourcesNames = resourcesManager.getAllResourceNames().toJSArray();
     if (this.props.resourceKind) {
-      this.allResourcesNames = this.allResourcesNames.filter(resourceName => {
+      const mainResourcesNames = this.allResourcesNames.filter(resourceName => {
         return (
           resourcesManager.getResource(resourceName).getKind() ===
           this.props.resourceKind
         );
       });
+
+      if (this.props.fallbackResourceKind) {
+        mainResourcesNames.push(
+          ...this.allResourcesNames.filter(resourceName => {
+            return (
+              resourcesManager.getResource(resourceName).getKind() ===
+              this.props.fallbackResourceKind
+            );
+          })
+        );
+      }
+
+      this.allResourcesNames = mainResourcesNames;
     }
     const resourceSourceItems = this._getResourceSourceItems();
     const resourceItems = this.allResourcesNames.map(resourceName => ({

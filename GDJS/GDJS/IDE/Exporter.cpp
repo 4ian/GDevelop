@@ -54,8 +54,8 @@ bool Exporter::ExportWholePixiProject(
 
   auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(project);
 
-  auto exportProject = [this, &exportedProject, &exportOptions, &helper](
-                           gd::String exportDir) {
+  auto exportProject = [this, &exportedProject, &exportOptions, &helper,
+                        &usedExtensions](gd::String exportDir) {
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
         exportOptions["exportForFacebookInstantGames"];
@@ -88,7 +88,8 @@ bool Exporter::ExportWholePixiProject(
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 
-    // Export files for object and behaviors
+    // Export files for free function, object and behaviors
+    helper.ExportFreeFunctionIncludes(exportedProject, includesFiles, usedExtensions);
     helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
     helper.ExportObjectAndBehaviorsRequiredFiles(exportedProject, resourcesFiles);
 

@@ -11,7 +11,6 @@ const makeMarkdownCustomComponents = (
   isStandaloneText: boolean,
   allowParagraphs: boolean
 ) => ({
-  '**': props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
   // Ensure link are opened in a new page
   a: props =>
     props.href ? (
@@ -51,22 +50,27 @@ export const MarkdownText = (props: Props) => {
     [props.isStandaloneText, props.allowParagraphs]
   );
 
-  return (
+  const markdownElement = (
     <I18n>
       {({ i18n }) => (
-        <ReactMarkdown
-          className={classNames({
-            'gd-markdown': true,
-            [gdevelopTheme.markdownRootClassName]: true,
-            'standalone-text-container': props.isStandaloneText,
-          })}
-          components={markdownCustomComponents}
-        >
+        <ReactMarkdown components={markdownCustomComponents}>
           {props.translatableSource
             ? i18n._(props.translatableSource)
             : props.source}
         </ReactMarkdown>
       )}
     </I18n>
+  );
+
+  const className = classNames({
+    'gd-markdown': true,
+    [gdevelopTheme.markdownRootClassName]: true,
+    'standalone-text-container': props.isStandaloneText,
+  });
+
+  return props.isStandaloneText ? (
+    <div className={className}>{markdownElement}</div>
+  ) : (
+    <span className={className}>{markdownElement}</span>
   );
 };

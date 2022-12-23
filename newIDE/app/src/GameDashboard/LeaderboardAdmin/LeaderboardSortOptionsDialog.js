@@ -165,8 +165,8 @@ function LeaderboardSortOptionsDialog({
                     <MarkdownText
                       source={i18n._(
                         sortOrder === 'ASC'
-                          ? `Any submitted score that is lower than the set value will not be saved in the leaderboard.`
-                          : `Any submitted score that is higher than the set value will not be saved in the leaderboard.`
+                          ? t`Any submitted score that is lower than the set value will not be saved in the leaderboard.`
+                          : t`Any submitted score that is higher than the set value will not be saved in the leaderboard.`
                       )}
                     />
                   </FormHelperText>

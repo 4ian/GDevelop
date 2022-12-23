@@ -54,7 +54,7 @@ export const allResourceKindsAndMetadata = [
   {
     kind: 'tilemap',
     displayName: t`Tile Map`,
-    fileExtensions: ['json', 'ldtk'],
+    fileExtensions: ['json', 'ldtk', 'tmj'],
     createNewResource: () => new gd.TilemapResource(),
   },
   {

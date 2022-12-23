@@ -158,12 +158,16 @@ const getVerticalOriginAnchorValue = (
     : getVerticalAnchorValue(verticalAnchorName, properties);
 };
 
+export interface PropertiesContainer {
+  getProperties(): gdMapStringPropertyDescriptor;
+}
+
 /**
  * Build the layouts description from the custom object properties.
  */
 export const getLayouts = (
   eventBasedObject: gdEventsBasedObject,
-  customObjectConfiguration: gdCustomObjectConfiguration
+  customObjectConfiguration: PropertiesContainer
 ): Map<string, ChildLayout> => {
   const layouts: Map<string, ChildLayout> = new Map<string, ChildLayout>();
   const properties = eventBasedObject.getPropertyDescriptors();

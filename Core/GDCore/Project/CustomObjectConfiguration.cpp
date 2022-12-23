@@ -149,6 +149,8 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
         worker.ExposeJson(newPropertyValue);
       } else if (resourceType == "tilemap") {
         worker.ExposeTilemap(newPropertyValue);
+      } else if (resourceType == "tileset") {
+        worker.ExposeTileset(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

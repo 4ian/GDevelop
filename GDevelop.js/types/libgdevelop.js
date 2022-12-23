@@ -99,6 +99,7 @@ declare class libGDevelop {
   VideoResource: Class<gdVideoResource>;
   JsonResource: Class<gdJsonResource>;
   TilemapResource: Class<gdTilemapResource>;
+  TilesetResource: Class<gdTilesetResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;

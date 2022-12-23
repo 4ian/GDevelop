@@ -79,9 +79,9 @@ const defineTileMap = function (
         .setType('resource')
         .addExtraInfo('tilemap')
         .addExtraInfo('json')
-        .setLabel(_('Tilemap Tiled JSON or LDtk file'))
+        .setLabel(_('Tilemap file (Tiled or LDtk)'))
         .setDescription(
-          _('This is the JSON/LDtk file that was saved or exported from Tiled/LDtk.')
+          _('This is the file that was saved or exported from Tiled/LDtk.')
         )
         .setGroup(_('LDtk and Tiled: Tilemap'))
     );
@@ -214,32 +214,32 @@ const defineTileMap = function (
   object
     .addCondition(
       'TilemapJsonFile',
-      _('Tilemap JSON/LDtk file'),
-      _('Check the Tilemap JSON/LDtk file being used.'),
-      _('The Tilemap JSON/LDtk file of _PARAM0_ is _PARAM1_'),
+      _('Tilemap file (Tiled or LDtk)'),
+      _('Check the tilemap file (Tiled or LDtk) being used.'),
+      _('The tilemap file of _PARAM0_ is _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('tilemapResource', _('Tilemap JSON/LDtk file'), '', false)
+    .addParameter('tilemapResource', _('Tilemap file (Tiled or LDtk)'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
 
   object
     .addAction(
       'SetTilemapJsonFile',
-      _('Tilemap JSON/LDtk file'),
+      _('Tilemap file (Tiled or LDtk)'),
       _(
-        'Set the JSON/LDtk file containing the Tilemap data to display. This is usually the JSON/LDtk file from Tiled/LDtk.'
+        'Set the Tiled or LDtk file containing the Tilemap data to display. This is usually the main file exported from Tiled/LDtk.'
       ),
-      _('Set the Tilemap JSON/LDtk file of _PARAM0_ to _PARAM1_'),
+      _('Set the tilemape file of _PARAM0_ to _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('tilemapResource', _('Tilemap JSON/LDtk file'), '', false)
+    .addParameter('tilemapResource', _('Tilemap file (Tiled or LDtk)'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
 
@@ -651,7 +651,7 @@ const defineCollisionMask = function (
         .addExtraInfo('json')
         .setLabel(_('Tilemap JSON file'))
         .setDescription(
-          _('This is the JSON file that was saved or exported from Tiled.')
+          _('This is the JSON file that was saved or exported from Tiled. LDtk is not supported yet for collisions.')
         )
     );
     objectProperties.set(

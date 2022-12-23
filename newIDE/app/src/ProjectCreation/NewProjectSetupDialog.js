@@ -123,7 +123,21 @@ const NewProjectSetupDialog = ({
   );
   const [storageProvider, setStorageProvider] = React.useState<StorageProvider>(
     () => {
-      // First try to use the storage provider stored in user preferences (Cloud by default).
+      const localFileStorageProvider = storageProviders.find(
+        ({ internalName }) => internalName === 'LocalFile'
+      );
+      const cloudStorageProvider = storageProviders.find(
+        ({ internalName }) => internalName === 'Cloud'
+      );
+
+      // If in a tutorial, choose either the local file storage provider or none.
+      // This is to avoid a new user to be messing with account creation.
+      if (!!currentlyRunningInAppTutorial) {
+        if (localFileStorageProvider) return localFileStorageProvider;
+        return emptyStorageProvider;
+      }
+
+      // Try to use the storage provider stored in user preferences.
       if (values.newProjectsDefaultStorageProviderName === 'Empty')
         return emptyStorageProvider;
       const preferredStorageProvider = storageProviders.find(
@@ -134,15 +148,9 @@ const NewProjectSetupDialog = ({
 
       // If preferred storage provider not found, push Cloud storage provider if user authenticated.
       if (authenticatedUser.authenticated) {
-        const cloudStorageProvider = storageProviders.find(
-          ({ internalName }) => internalName === 'Cloud'
-        );
         if (cloudStorageProvider) return cloudStorageProvider;
       }
 
-      const localFileStorageProvider = storageProviders.find(
-        ({ internalName }) => internalName === 'LocalFile'
-      );
       if (localFileStorageProvider) return localFileStorageProvider;
 
       return emptyStorageProvider;

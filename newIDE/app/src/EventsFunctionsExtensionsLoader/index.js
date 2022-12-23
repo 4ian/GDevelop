@@ -43,7 +43,6 @@ type Options = {|
 
 type CodeGenerationContext = {|
   codeNamespacePrefix: string,
-  extensionIncludeFiles: Array<string>,
 |};
 
 const mangleName = (name: string) => {
@@ -146,29 +145,6 @@ const loadProjectEventsFunctionsExtension = (
 };
 
 /**
- * Get the list of mandatory include files when using the
- * extension.
- */
-const getExtensionIncludeFiles = (
-  project: gdProject,
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
-  options: Options,
-  codeNamespacePrefix: string
-): Array<string> => {
-  return mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
-    const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
-
-    const codeNamespace = getFreeFunctionCodeNamespace(
-      eventsFunction,
-      codeNamespacePrefix
-    );
-    const functionName = codeNamespace + '.func'; // TODO
-
-    return options.eventsFunctionCodeWriter.getIncludeFileFor(functionName);
-  }).filter(Boolean);
-};
-
-/**
  * Generate the code for the events based extension
  */
 const generateEventsFunctionExtension = (
@@ -182,15 +158,8 @@ const generateEventsFunctionExtension = (
   const codeNamespacePrefix =
     'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
 
-  const extensionIncludeFiles = getExtensionIncludeFiles(
-    project,
-    eventsFunctionsExtension,
-    options,
-    codeNamespacePrefix
-  );
   const codeGenerationContext = {
     codeNamespacePrefix,
-    extensionIncludeFiles,
   };
 
   return Promise.all(
@@ -246,9 +215,6 @@ const generateEventsFunctionExtension = (
       )
     )
     .then(functionInfos => {
-      if (!options.skipCodeGeneration) {
-        applyFunctionIncludeFilesDependencyTransitivity(functionInfos);
-      }
       return extension;
     });
 };
@@ -301,11 +267,6 @@ const generateFreeFunction = (
     .setIncludeFile(functionFile)
     .setFunctionName(functionName);
 
-  // Always include the extension include files when using a free function.
-  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
-    instructionOrExpression.addIncludeFile(includeFile);
-  });
-
   if (!options.skipCodeGeneration) {
     const includeFiles = new gd.SetString();
     const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
@@ -353,65 +314,6 @@ const generateFreeFunction = (
   }
 };
 
-/**
- * Add dependencies between functions according to transitivity.
- * @param functionInfos free function metadatas
- */
-const applyFunctionIncludeFilesDependencyTransitivity = (
-  functionInfos: Array<{
-    functionFile: string,
-    functionMetadata:
-      | gdInstructionMetadata
-      | gdExpressionMetadata
-      | gdMultipleInstructionMetadata,
-  }>
-): void => {
-  // Note that the iteration order doesn't matter, for instance for:
-  // a -> b
-  // b -> c
-  // c -> d
-  //
-  // going from a to c:
-  // a -> (b -> c)
-  // b -> c
-  // c -> d
-  //
-  // or from c to a:
-  // a -> b
-  // b -> (c -> d)
-  // c -> d
-  //
-  // give the same result:
-  // a -> (b -> (c -> d))
-  // b -> (c -> d)
-  // c -> d
-  const includeFileSets = functionInfos.map(
-    functionInfo =>
-      new Set(functionInfo.functionMetadata.getIncludeFiles().toJSArray())
-  );
-  // For any function A of the extension...
-  for (let index = 0; index < functionInfos.length; index++) {
-    const includeFiles = includeFileSets[index];
-    const functionIncludeFile = functionInfos[index].functionFile;
-
-    // ...and any function B of the extension...
-    for (let otherIndex = 0; otherIndex < functionInfos.length; otherIndex++) {
-      const otherFunctionMetadata = functionInfos[otherIndex].functionMetadata;
-      const otherIncludeFileSet = includeFileSets[otherIndex];
-      // ...where function B depends on function A...
-      if (otherIncludeFileSet.has(functionIncludeFile)) {
-        // ...add function A dependencies to the function B ones.
-        includeFiles.forEach(includeFile => {
-          if (!otherIncludeFileSet.has(includeFile)) {
-            otherIncludeFileSet.add(includeFile);
-            otherFunctionMetadata.addIncludeFile(includeFile);
-          }
-        });
-      }
-    }
-  }
-};
-
 function generateBehavior(
   project: gdProject,
   extension: gdPlatformExtension,
@@ -435,11 +337,6 @@ function generateBehavior(
   );
 
   behaviorMetadata.setIncludeFile(includeFile);
-
-  // Always include the extension include files when using a behavior.
-  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
-    behaviorMetadata.addIncludeFile(includeFile);
-  });
 
   return Promise.resolve().then(() => {
     const behaviorMethodMangledNames = new gd.MapStringString();
@@ -556,11 +453,6 @@ function generateObject(
   );
 
   objectMetadata.setIncludeFile(includeFile);
-
-  // Always include the extension include files when using an object.
-  codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
-    objectMetadata.addIncludeFile(includeFile);
-  });
 
   return Promise.resolve().then(() => {
     const objectMethodMangledNames = new gd.MapStringString();

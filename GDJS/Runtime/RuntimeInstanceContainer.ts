@@ -272,12 +272,7 @@ namespace gdjs {
      * @returns The shared data for the behavior, if any.
      */
     getInitialSharedDataForBehavior(name: string): BehaviorSharedData | null {
-      const behaviorSharedData = this._initialBehaviorSharedData.get(name);
-      if (behaviorSharedData) {
-        return behaviorSharedData;
-      }
-      logger.error("Can't find shared data for behavior with name: " + name);
-      return null;
+      return this._initialBehaviorSharedData.get(name);
     }
 
     /**

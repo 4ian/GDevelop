@@ -183,6 +183,16 @@ namespace gdjs {
       this._timeManager.reset();
     }
 
+    getInitialSharedDataForBehavior(name: string): BehaviorSharedData | null {
+      // TODO Move this error in RuntimeInstanceContainer after deciding
+      // what to do with shared data in custom object.
+      const behaviorSharedData = super.getInitialSharedDataForBehavior(name);
+      if (!behaviorSharedData) {
+        logger.error("Can't find shared data for behavior with name: " + name);
+      }
+      return behaviorSharedData;
+    }
+
     addLayer(layerData: LayerData) {
       this._layers.put(
         layerData.name,

@@ -1,5 +1,11 @@
 // @flow
 
+// - The term "object" is used in comments about the layout declaration because
+//   the layout is done with one instance per object-child and the object name
+//   is used to reference these instances.
+// - The term "instance" is used for the layout calculus because it's actually
+//   instances that are in the scene editor.
+
 type AxisLayout = {
   /**
    * The origin of the anchor on the object to place

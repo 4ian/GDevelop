@@ -89,6 +89,7 @@ const defineTileMap = function (
       'tilesetJsonFile',
       new gd.PropertyDescriptor(objectContent.tilesetJsonFile || '')
         .setType('resource')
+        .addExtraInfo('tileset')
         .addExtraInfo('json')
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(
@@ -254,7 +255,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+    .addParameter('tilesetResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilesetJsonFile');
 
@@ -271,7 +272,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+    .addParameter('tilesetResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
 

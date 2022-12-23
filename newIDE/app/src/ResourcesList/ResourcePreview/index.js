@@ -74,6 +74,7 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
         );
       case 'json':
       case 'tilemap':
+      case 'tileset':
         return (
           <GenericIconPreview
             renderIcon={props => <InsertDriveFile {...props} />}

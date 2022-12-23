@@ -96,6 +96,7 @@ export type PrimitiveValueField =
 type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
+  fallbackResourceKind?: ResourceKind,
   getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
   ...ValueFieldCommonProperties,
@@ -551,6 +552,7 @@ const PropertiesEditor = ({
         resourceManagementProps={resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
+        fallbackResourceKind={field.fallbackResourceKind}
         fullWidth
         initialResourceName={getFieldValue({
           instances,

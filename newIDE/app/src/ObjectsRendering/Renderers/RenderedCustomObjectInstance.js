@@ -79,9 +79,6 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         horizontalLayout: {},
         verticalLayout: {},
       };
-      if (!childLayout.isShown) {
-        return;
-      }
 
       const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
         childObject.getName()
@@ -95,6 +92,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         childObjectConfiguration,
         this._pixiObject
       );
+      if (!childLayout.isShown) {
+        this._pixiObject.removeChild(renderer._pixiObject);
+      }
+
       if (renderer instanceof RenderedTextInstance) {
         // TODO EBO Remove this line when an alignment property is added to the text object.
         renderer._pixiObject.style.align = 'center';

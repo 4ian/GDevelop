@@ -25,6 +25,23 @@ describe('getLayouts', () => {
     expect(layouts.has('Background')).toBe(false);
   });
 
+  it('can fill the parent with an hidden child', () => {
+    const eventBasedObject = createEventBasedObject([
+      { name: 'ShowBackground', extraInfos: ['Background'] },
+    ]);
+    const customObjectConfiguration = createCustomObjectConfiguration(
+      eventBasedObject,
+      [{ name: 'ShowBackground', value: 'false' }]
+    );
+    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+
+    expect(layouts.get('Background')).toStrictEqual({
+      isShown: false,
+      horizontalLayout: {},
+      verticalLayout: {},
+    });
+  });
+
   it('can fill the parent with a child with margins', () => {
     const eventBasedObject = createEventBasedObject([
       { name: 'BarLeftPadding', extraInfos: ['PanelBar'] },
@@ -136,6 +153,27 @@ describe('applyChildLayouts', () => {
     // which is not covered by tests.
     const background = parent.addChid('Background', {
       isShown: true,
+      horizontalLayout: {},
+      verticalLayout: {},
+    });
+
+    applyChildLayouts(parent);
+
+    expect(background.getX()).toBe(0);
+    expect(background.getY()).toBe(0);
+    expect(background.hasCustomSize()).toBe(true);
+    expect(background.getCustomWidth()).toBe(200);
+    expect(background.getCustomHeight()).toBe(100);
+  });
+
+  it('can fill the parent with an hidden child', () => {
+    const parent = new MockedParent(200, 100);
+    // The child is hidden by RenderedCustomObjectInstance constructor
+    // which is not covered by tests.
+    // The constructor removes the child from its Pixi container. 
+    // This test actually doesn't cover more than the previous one.
+    const background = parent.addChid('Background', {
+      isShown: false,
       horizontalLayout: {},
       verticalLayout: {},
     });

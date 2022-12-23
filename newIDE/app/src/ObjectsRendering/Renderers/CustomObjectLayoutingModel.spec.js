@@ -151,7 +151,7 @@ describe('applyChildLayouts', () => {
     const parent = new MockedParent(200, 100);
     // This is the default layout set by RenderedCustomObjectInstance constructor
     // which is not covered by tests.
-    const background = parent.addChid('Background', {
+    const background = parent.addChild('Background', {
       isShown: true,
       horizontalLayout: {},
       verticalLayout: {},
@@ -172,7 +172,7 @@ describe('applyChildLayouts', () => {
     // which is not covered by tests.
     // The constructor removes the child from its Pixi container.
     // This test actually doesn't cover more than the previous one.
-    const background = parent.addChid('Background', {
+    const background = parent.addChild('Background', {
       isShown: false,
       horizontalLayout: {},
       verticalLayout: {},
@@ -189,7 +189,7 @@ describe('applyChildLayouts', () => {
 
   it('can fill the parent with a child with margins', () => {
     const parent = new MockedParent(200, 100);
-    const panelBar = parent.addChid('PanelBar', {
+    const panelBar = parent.addChild('PanelBar', {
       isShown: true,
       horizontalLayout: {
         minSideAbsoluteMargin: 10,
@@ -209,7 +209,7 @@ describe('applyChildLayouts', () => {
 
   it('can fill the parent with a text child with margins', () => {
     const parent = new MockedParent(200, 100);
-    const label = parent.addChid(
+    const label = parent.addChild(
       'Label',
       {
         isShown: true,
@@ -235,12 +235,12 @@ describe('applyChildLayouts', () => {
 
   it('can fill the parent width with margins while keeping default height', () => {
     const parent = new MockedParent(200, 100);
-    parent.addChid('Background', {
+    parent.addChild('Background', {
       isShown: true,
       horizontalLayout: {},
       verticalLayout: {},
     });
-    const tiledBar = parent.addChid(
+    const tiledBar = parent.addChild(
       'TiledBar',
       {
         isShown: true,
@@ -264,12 +264,12 @@ describe('applyChildLayouts', () => {
 
   it('can anchor a chid to another child', () => {
     const parent = new MockedParent(200, 100);
-    parent.addChid('Background', {
+    parent.addChild('Background', {
       isShown: true,
       horizontalLayout: {},
       verticalLayout: {},
     });
-    parent.addChid('PanelBar', {
+    parent.addChild('PanelBar', {
       isShown: true,
       horizontalLayout: {
         minSideAbsoluteMargin: 10,
@@ -277,7 +277,7 @@ describe('applyChildLayouts', () => {
       },
       verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
     });
-    const thumb = parent.addChid(
+    const thumb = parent.addChild(
       'Thumb',
       {
         isShown: true,
@@ -435,7 +435,7 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
     return this.height;
   }
 
-  addChid(
+  addChild(
     name: string,
     layout: ChildLayout,
     size?: {|

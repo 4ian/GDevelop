@@ -401,6 +401,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             value={values.newProjectsDefaultFolder}
             onChange={setNewProjectsDefaultFolder}
             type="default-workspace"
+            required
           />
         </ColumnStackLayout>
       )}

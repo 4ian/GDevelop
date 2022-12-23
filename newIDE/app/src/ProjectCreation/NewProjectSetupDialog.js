@@ -29,6 +29,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
 import { MarkdownText } from '../UI/MarkdownText';
+import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -91,6 +92,9 @@ const NewProjectSetupDialog = ({
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
   );
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -108,7 +112,8 @@ const NewProjectSetupDialog = ({
     false
   );
   const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
-    true
+    // Enable player login by default for new games, unless a tutorial is running.
+    !!currentlyRunningInAppTutorial ? false : true
   );
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')

@@ -981,6 +981,11 @@ interface TilemapResource {
 };
 TilemapResource implements Resource;
 
+interface TilesetResource {
+    void TilesetResource();
+};
+TilesetResource implements Resource;
+
 interface InitialInstance {
     void InitialInstance();
 

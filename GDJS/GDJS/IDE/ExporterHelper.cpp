@@ -117,7 +117,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  includesFiles);
 
   // Export files for free function, object and behaviors
-  ExportFreeFunctionIncludes(exportedProject, includesFiles);
+  auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(exportedProject);
+  ExportFreeFunctionIncludes(exportedProject, includesFiles, usedExtensions);
   ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
   ExportObjectAndBehaviorsRequiredFiles(immutableProject, resourcesFiles);
 
@@ -800,21 +801,21 @@ bool ExporterHelper::ExportIncludesAndLibs(
 }
 
 void ExporterHelper::ExportFreeFunctionIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    gd::Project &project, std::vector<gd::String> &includesFiles,
+    std::set<gd::String> &usedExtensions) {
   auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
     for (const auto &includeFile : newIncludeFiles) {
       InsertUnique(includesFiles, includeFile);
     }
   };
 
-  auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(project);
   for (auto &&usedExtension : usedExtensions) {
     if (project.HasEventsFunctionsExtensionNamed(usedExtension)) {
       auto &extension = project.GetEventsFunctionsExtension(usedExtension);
 
-      for (size_t functionIdex = 0;
-           functionIdex < extension.GetEventsFunctionsCount(); functionIdex++) {
-        auto &function = extension.GetEventsFunction(functionIdex);
+      for (size_t functionIndex = 0;
+           functionIndex < extension.GetEventsFunctionsCount(); functionIndex++) {
+        auto &function = extension.GetEventsFunction(functionIndex);
 
         gd::String fullType = gd::PlatformExtension::GetEventsFunctionFullType(
             usedExtension, function.GetName());

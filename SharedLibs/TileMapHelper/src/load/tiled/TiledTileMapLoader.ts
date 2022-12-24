@@ -158,6 +158,7 @@ export namespace TiledTileMapLoader {
           const collisionTileLayer = collisionTileMap.addTileLayer(
             tiledLayer.id
           );
+          collisionTileLayer.setAlpha(tiledLayer.opacity);
           collisionTileLayer.setVisible(tiledLayer.visible);
           // TODO handle layer offset
 

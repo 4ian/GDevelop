@@ -32,7 +32,6 @@ type Props = {|
   onChange: string => void,
   defaultPath?: string,
   fullWidth?: boolean,
-  required?: boolean,
 |};
 
 type TitleAndMessage = {|
@@ -46,14 +45,11 @@ const LocalFolderPicker = ({
   onChange,
   defaultPath,
   fullWidth,
-  required,
 }: Props) => {
   // Use an internal state to avoid validating the value when the user
   // is typing in the text field. This allows typing a "/" without the
   // formatting kicking in.
   const [textValue, setTextValue] = React.useState(value);
-  const [errorText, setErrorText] = React.useState(null);
-
   const onChooseFolder = async ({ title, message }: TitleAndMessage) => {
     if (!dialog || !electron) return;
 
@@ -65,8 +61,6 @@ const LocalFolderPicker = ({
       defaultPath: defaultPath,
     });
 
-    setErrorText(null);
-
     if (!filePaths || !filePaths.length) return;
 
     const filePath = filePaths[0];
@@ -74,12 +68,7 @@ const LocalFolderPicker = ({
     setTextValue(filePath);
   };
 
-  const onBlur = (i18n: I18nType) => {
-    setErrorText(null);
-    if (textValue === '' && required) {
-      setErrorText(i18n._(t`This field is required`));
-      return;
-    }
+  const onBlur = () => {
     onChange(textValue);
   };
 
@@ -120,8 +109,7 @@ const LocalFolderPicker = ({
               hintText={titleAndMessage.title}
               value={textValue}
               onChange={(event, value) => setTextValue(value)}
-              onBlur={() => onBlur(i18n)}
-              errorText={errorText}
+              onBlur={onBlur}
             />
             <FlatButton
               label={<Trans>Choose folder</Trans>}

@@ -248,12 +248,6 @@ class ExporterHelper {
                             std::vector<gd::String> &includesFiles);
 
   /**
-   * \brief Add the include files for all free functions from used extensions.
-   */
-  void ExportFreeFunctionIncludes(gd::Project &project,
-                                  std::vector<gd::String> &includesFiles,
-                                  std::set<gd::String> &usedExtensions);
-  /**
    * \brief Add the include files for all the objects of the project
    * and their behaviors.
    */

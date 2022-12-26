@@ -97,7 +97,9 @@ export const GameDetailsDialog = ({
   onGameUpdated,
   onGameDeleted,
 }: Props) => {
-  const { appArguments, removeArguments } = React.useContext(RouterContext);
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -120,18 +122,18 @@ export const GameDetailsDialog = ({
   // If a game dashboard tab is specified, switch to it.
   React.useEffect(
     () => {
-      if (appArguments['games-dashboard-tab']) {
+      if (routeArguments['games-dashboard-tab']) {
         // Ensure that the tab is valid.
         const gameDetailsTab = gameDetailsTabs.find(
           gameDetailsTab =>
-            gameDetailsTab.value === appArguments['games-dashboard-tab']
+            gameDetailsTab.value === routeArguments['games-dashboard-tab']
         );
         if (gameDetailsTab) setCurrentTab(gameDetailsTab.value);
         // Cleanup once open, to ensure it is not opened again.
-        removeArguments(['games-dashboard-tab']);
+        removeRouteArguments(['games-dashboard-tab']);
       }
     },
-    [appArguments, removeArguments]
+    [routeArguments, removeRouteArguments]
   );
 
   const loadPublicGame = React.useCallback(

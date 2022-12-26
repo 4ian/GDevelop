@@ -150,7 +150,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     },
     ref
   ) => {
-    const { addArguments } = React.useContext(RouterContext);
+    const { navigateToRoute } = React.useContext(RouterContext);
     const { getRecentProjectFiles, removeRecentProjectFile } = React.useContext(
       PreferencesContext
     );
@@ -306,8 +306,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
           {
             label: i18n._(t`Manage game`),
             click: () =>
-              addArguments({
-                'initial-dialog': 'games-dashboard',
+              navigateToRoute('games-dashboard', {
                 'game-id': gameId,
               }),
           },

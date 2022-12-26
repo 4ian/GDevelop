@@ -538,7 +538,7 @@ const MainFrame = (props: Props) => {
     },
     openProfileDialog,
   });
-  const { addArguments } = React.useContext(RouterContext);
+  const { navigateToRoute } = React.useContext(RouterContext);
 
   const _closeSnackMessage = React.useCallback(
     () => {
@@ -2652,8 +2652,7 @@ const MainFrame = (props: Props) => {
       ? commandPaletteRef.current.open
       : () => {},
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () =>
-      addArguments({ 'initial-dialog': 'games-dashboard' }),
+    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -2700,9 +2699,7 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => {
-      addArguments({ 'initial-dialog': 'games-dashboard' });
-    },
+    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

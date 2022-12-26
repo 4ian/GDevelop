@@ -28,19 +28,21 @@ type Props = {|
 |};
 
 const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
-  const { appArguments, removeArguments } = React.useContext(RouterContext);
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
 
   React.useEffect(
     () => {
-      if (appArguments['initial-dialog'] === 'games-dashboard') {
+      if (routeArguments['initial-dialog'] === 'games-dashboard') {
         setCurrentTab('games-dashboard');
-        removeArguments(['initial-dialog']);
+        removeRouteArguments(['initial-dialog']);
       }
     },
-    [appArguments, removeArguments]
+    [routeArguments, removeRouteArguments]
   );
 
   const [

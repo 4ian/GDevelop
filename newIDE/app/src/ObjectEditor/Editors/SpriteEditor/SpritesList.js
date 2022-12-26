@@ -243,6 +243,7 @@ export default class SpritesList extends Component<Props, void> {
   editWith = (externalEditor: ResourceExternalEditor) => {
     const {
       project,
+      resourceManagementProps,
       direction,
       resourcesLoader,
       onReplaceByDirection,
@@ -271,6 +272,7 @@ export default class SpritesList extends Component<Props, void> {
 
     externalEditor.edit({
       project,
+      getStorageProvider: resourceManagementProps.getStorageProvider,
       resourcesLoader,
       singleFrame: false,
       resourceNames,

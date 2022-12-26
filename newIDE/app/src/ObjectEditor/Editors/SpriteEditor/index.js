@@ -31,7 +31,7 @@ import {
 } from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
-import { Column, Line } from '../../../UI/Grid';
+import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
@@ -40,6 +40,15 @@ import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  animationLine: {
+    // Use a non standard spacing because:
+    // - The SortableAnimationsList won't work with <Spacer /> or <LargeSpacer /> between elements.
+    // - We need to visually show a difference between animations.
+    marginBottom: 16,
+  },
+};
 
 type AnimationProps = {|
   animation: gdAnimation,
@@ -82,7 +91,7 @@ class Animation extends React.Component<AnimationProps, void> {
 
     const animationName = animation.getName();
     return (
-      <Line expand>
+      <div style={styles.animationLine}>
         <Column expand noMargin>
           {isAnimationListLocked && (
             <Column expand noMargin>
@@ -132,7 +141,7 @@ class Animation extends React.Component<AnimationProps, void> {
             );
           })}
         </Column>
-      </Line>
+      </div>
     );
   }
 }

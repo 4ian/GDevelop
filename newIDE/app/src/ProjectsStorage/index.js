@@ -32,7 +32,7 @@ export type SaveAsLocation = {|
    */
   name?: string,
   /**
-   * The id of the game. Might be null if unused
+   * The id of the game. Might be null if no game is published.
    */
   gameId?: string,
 

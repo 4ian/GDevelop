@@ -25,16 +25,18 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'TextInput',
-      _('Text Input'),
-      _('A text field the player can type text into.'),
-      'Florian Rival',
-      'MIT'
-    )
-    .setCategory('User interface');
-    extension.addInstructionOrExpressionGroupMetadata(_("Text Input"))
-        .setIcon("JsPlatform/Extensions/text_input.svg");
+    extension
+      .setExtensionInformation(
+        'TextInput',
+        _('Text Input'),
+        _('A text field the player can type text into.'),
+        'Florian Rival',
+        'MIT'
+      )
+      .setCategory('User interface');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Text Input'))
+      .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -275,7 +277,7 @@ module.exports = {
     const object = extension
       .addObject(
         'TextInputObject',
-        _('Text input (experimental)'),
+        _('Text input'),
         _('A text field the player can type text into.'),
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
@@ -645,8 +647,7 @@ module.exports = {
 
       update() {
         const instance = this._instance;
-        const properties = this._associatedObjectConfiguration
-          .getProperties();
+        const properties = this._associatedObjectConfiguration.getProperties();
 
         const placeholder =
           instance.getRawStringProperty('placeholder') ||

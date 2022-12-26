@@ -28,7 +28,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'P2P',
-        _('P2P (experimental)'),
+        _('P2P'),
         'Allow game instances to communicate remotely using messages sent via WebRTC (P2P).',
         'Arthur Pacaud (arthuro555)',
         'MIT'
@@ -36,7 +36,7 @@ module.exports = {
       .setExtensionHelpPath('/all-features/p2p')
       .setCategory('Network');
     extension
-      .addInstructionOrExpressionGroupMetadata(_('P2P (experimental)'))
+      .addInstructionOrExpressionGroupMetadata(_('P2P'))
       .setIcon('JsPlatform/Extensions/p2picon.svg');
 
     extension

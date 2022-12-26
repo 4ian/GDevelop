@@ -23,7 +23,11 @@ import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 type Props = {|
   i18n: I18n,
@@ -63,6 +67,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShowEventBasedObjectsEditor,
     setNewProjectsDefaultFolder,
   } = React.useContext(PreferencesContext);
+  const [newProjectsFolder, setNewProjectsFolder] = React.useState(
+    values.newProjectsDefaultFolder
+  );
+
+  const onRequestClose = () => {
+    setNewProjectsDefaultFolder(
+      newProjectsFolder === '' ? findDefaultFolder(app) : newProjectsFolder
+    );
+    onClose(languageDidChange);
+  };
 
   return (
     <Dialog
@@ -72,10 +86,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           key="close"
           label={<Trans>Close</Trans>}
           primary={false}
-          onClick={() => onClose(languageDidChange)}
+          onClick={onRequestClose}
         />,
       ]}
-      onRequestClose={() => onClose(languageDidChange)}
+      onRequestClose={onRequestClose}
       open
       maxWidth="sm"
       fixedContent={
@@ -398,8 +412,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
         <ColumnStackLayout noMargin>
           <LocalFolderPicker
             fullWidth
-            value={values.newProjectsDefaultFolder}
-            onChange={setNewProjectsDefaultFolder}
+            value={newProjectsFolder}
+            onChange={setNewProjectsFolder}
             type="default-workspace"
           />
         </ColumnStackLayout>

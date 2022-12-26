@@ -107,7 +107,7 @@ const defineTileMap = function (
         .setLabel(_('Atlas image'))
         .setDescription(
           _(
-            "Tiled only - not useful for LDtk files. The Atlas image containing the tileset."
+            'Tiled only - not useful for LDtk files. The Atlas image containing the tileset.'
           )
         )
         .setGroup(_('Tiled only: Tileset and Atlas image'))
@@ -223,7 +223,12 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('tilemapResource', _('Tilemap file (Tiled or LDtk)'), '', false)
+    .addParameter(
+      'tilemapResource',
+      _('Tilemap file (Tiled or LDtk)'),
+      '',
+      false
+    )
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
 
@@ -240,7 +245,12 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .addParameter('tilemapResource', _('Tilemap file (Tiled or LDtk)'), '', false)
+    .addParameter(
+      'tilemapResource',
+      _('Tilemap file (Tiled or LDtk)'),
+      '',
+      false
+    )
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
 
@@ -376,10 +386,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
-    .useStandardParameters(
-      'number',
-      gd.ParameterOptions.makeNewOptions()
-    )
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .setFunctionName('getLevelndex');
 
   object
@@ -652,7 +659,9 @@ const defineCollisionMask = function (
         .addExtraInfo('json')
         .setLabel(_('Tilemap JSON file'))
         .setDescription(
-          _('This is the JSON file that was saved or exported from Tiled. LDtk is not supported yet for collisions.')
+          _(
+            'This is the JSON file that was saved or exported from Tiled. LDtk is not supported yet for collisions.'
+          )
         )
     );
     objectProperties.set(
@@ -771,7 +780,7 @@ const defineCollisionMask = function (
   const object = extension
     .addObject(
       'CollisionMask',
-      _('Tilemap collision mask (experimental)'),
+      _('Tilemap collision mask'),
       _('Invisible object handling collisions with parts of a tilemap.'),
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject

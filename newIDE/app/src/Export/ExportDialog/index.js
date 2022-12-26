@@ -31,7 +31,6 @@ export type Exporter = {|
   tabName: React.Node,
   helpPage: string,
   disabled?: boolean,
-  experimental?: boolean,
   key: ExporterKey,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
 |};

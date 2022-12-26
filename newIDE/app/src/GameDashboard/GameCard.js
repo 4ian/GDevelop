@@ -185,6 +185,7 @@ export const GameCard = ({
         <>
           <Card
             key={game.id}
+            background={isCurrentGame ? 'dark' : 'medium'}
             cardCornerAction={
               <ElementWithMenu
                 element={
@@ -249,6 +250,7 @@ export const GameCard = ({
                 <GameThumbnail
                   gameName={game.gameName}
                   thumbnailUrl={game.thumbnailUrl}
+                  background={isCurrentGame ? 'medium' : 'light'}
                 />
               </Column>
               <Spacer />

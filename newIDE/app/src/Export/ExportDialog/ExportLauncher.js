@@ -455,7 +455,11 @@ export default class ExportLauncher extends Component<Props, State> {
           })}
         {doneFooterOpen && (
           <Line justifyContent="center">
-            <GameRegistration project={project} hideIfSubscribed hideLoader />
+            <GameRegistration
+              project={project}
+              hideLoader
+              suggestGameStatsEmail
+            />
           </Line>
         )}
       </Column>

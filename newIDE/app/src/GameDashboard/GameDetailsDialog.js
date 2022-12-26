@@ -45,6 +45,7 @@ import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
 import { GameMonetization } from './Monetization/GameMonetization';
+import RouterContext from '../MainFrame/RouterContext';
 
 export type GameDetailsTab =
   | 'details'
@@ -84,7 +85,6 @@ export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
 type Props = {|
   game: Game,
   project: ?gdProject,
-  initialTab: GameDetailsTab,
   onClose: () => void,
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
@@ -93,17 +93,17 @@ type Props = {|
 export const GameDetailsDialog = ({
   game,
   project,
-  initialTab,
   onClose,
   onGameUpdated,
   onGameDeleted,
 }: Props) => {
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [currentTab, setCurrentTab] = React.useState<GameDetailsTab>(
-    initialTab
-  );
+  const [currentTab, setCurrentTab] = React.useState<GameDetailsTab>('details');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [
     gameUnregisterErrorText,
@@ -118,6 +118,23 @@ export const GameDetailsDialog = ({
     isPublicGamePropertiesDialogOpen,
     setIsPublicGamePropertiesDialogOpen,
   ] = React.useState(false);
+
+  // If a game dashboard tab is specified, switch to it.
+  React.useEffect(
+    () => {
+      if (routeArguments['games-dashboard-tab']) {
+        // Ensure that the tab is valid.
+        const gameDetailsTab = gameDetailsTabs.find(
+          gameDetailsTab =>
+            gameDetailsTab.value === routeArguments['games-dashboard-tab']
+        );
+        if (gameDetailsTab) setCurrentTab(gameDetailsTab.value);
+        // Cleanup once open, to ensure it is not opened again.
+        removeRouteArguments(['games-dashboard-tab']);
+      }
+    },
+    [routeArguments, removeRouteArguments]
+  );
 
   const loadPublicGame = React.useCallback(
     async () => {

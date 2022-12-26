@@ -99,6 +99,7 @@ export const Default = () => {
       privateAssetPackListingData={privateAssetPackListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
+      onAssetPackOpen={() => action('open asset pack')()}
     />
   );
 };
@@ -136,6 +137,7 @@ export const WithPurchaseDialogOpen = () => {
       privateAssetPackListingData={privateAssetPackListingData}
       isPurchaseDialogOpen
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
+      onAssetPackOpen={() => action('open asset pack')()}
     />
   );
 };
@@ -175,6 +177,7 @@ export const Loading = () => {
       privateAssetPackListingData={privateAssetPackListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
+      onAssetPackOpen={() => action('open asset pack')()}
     />
   );
 };
@@ -213,6 +216,7 @@ export const With404 = () => {
       privateAssetPackListingData={privateAssetPackListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
+      onAssetPackOpen={() => action('open asset pack')()}
     />
   );
 };
@@ -251,6 +255,7 @@ export const WithUnknownError = () => {
       privateAssetPackListingData={privateAssetPackListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
+      onAssetPackOpen={() => action('open asset pack')()}
     />
   );
 };

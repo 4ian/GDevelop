@@ -43,6 +43,21 @@ export const listListedPrivateAssetPacks = async (): Promise<
   return response.data;
 };
 
+export const listSellerProducts = async ({
+  sellerId,
+  productType,
+}: {|
+  sellerId: string,
+  productType: 'asset-pack',
+|}): Promise<Array<PrivateAssetPackListingData>> => {
+  const response = await client.get(`/user/${sellerId}/product`, {
+    params: {
+      productType,
+    },
+  });
+  return response.data;
+};
+
 export const listUserPurchases = async (
   getAuthorizationHeader: () => Promise<string>,
   {

@@ -28,7 +28,7 @@ export default {
 
 const userId = 'user-id';
 
-const packs = new Array(5).fill(0).map((_, i) => ({
+const assetPacks = new Array(5).fill(0).map((_, i) => ({
   id: `644db285-6ed7-4ba6-abf4-06ea825f441${i}`,
   sellerId: userId,
   createdAt: '2022-12-14T10:11:49.305Z',
@@ -66,7 +66,7 @@ const apiDataFullUser = {
       }/user/${userId}/product?productType=asset-pack`,
       method: 'GET',
       status: 200,
-      response: packs,
+      response: assetPacks,
       delay: 1000,
     },
   ],

@@ -211,7 +211,7 @@ const ProfileDetails = ({
             <UserAchievements
               badges={badges}
               displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
-              displayNotifications={!!isAuthenticatedUserProfile}
+              displayNotifications
             />
           )}
         </ColumnStackLayout>

@@ -169,7 +169,9 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const { appArguments, removeArguments } = React.useContext(RouterContext);
+      const { routeArguments, removeRouteArguments } = React.useContext(
+        RouterContext
+      );
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
       );
@@ -177,14 +179,14 @@ export const HomePage = React.memo<Props>(
       // Open the asset store and a pack if asked to do so.
       React.useEffect(
         () => {
-          if (appArguments['initial-dialog'] === 'asset-store') {
+          if (routeArguments['initial-dialog'] === 'asset-store') {
             setActiveTab('shop');
-            setInitialPackUserFriendlySlug(appArguments['asset-pack']);
+            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
             // Remove the arguments so that the asset store is not opened again.
-            removeArguments(['initial-dialog', 'asset-pack']);
+            removeRouteArguments(['initial-dialog', 'asset-pack']);
           }
         },
-        [appArguments, removeArguments, setInitialPackUserFriendlySlug]
+        [routeArguments, removeRouteArguments, setInitialPackUserFriendlySlug]
       );
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(

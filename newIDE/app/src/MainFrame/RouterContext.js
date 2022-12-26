@@ -3,15 +3,17 @@ import * as React from 'react';
 import Window, { type AppArguments } from '../Utils/Window';
 
 export type Router = {|
-  appArguments: AppArguments,
-  removeArguments: (string[]) => void,
-  addArguments: AppArguments => void,
+  routeArguments: AppArguments,
+  removeRouteArguments: (string[]) => void,
+  addRouteArguments: AppArguments => void,
+  navigateToRoute: (route: string, additionalArgument?: AppArguments) => void,
 |};
 
 const initialState: Router = {
-  appArguments: {},
-  removeArguments: () => {},
-  addArguments: () => {},
+  routeArguments: {},
+  removeRouteArguments: () => {},
+  addRouteArguments: () => {},
+  navigateToRoute: () => {},
 };
 
 const RouterContext = React.createContext<Router>(initialState);
@@ -29,18 +31,21 @@ export const RouterContextProvider = ({ children }: Props) => {
     initialWindowArguments
   );
 
-  const removeArguments = React.useCallback((argumentsToRemove: string[]) => {
-    // Remove them from the window. (only for web)
-    Window.removeArguments(argumentsToRemove);
-    // Update the state accordingly, based on the previous state.
-    setCleanedArguments(oldArguments => {
-      const newArguments = { ...oldArguments };
-      argumentsToRemove.forEach(argument => {
-        delete newArguments[argument];
+  const removeRouteArguments = React.useCallback(
+    (argumentsToRemove: string[]) => {
+      // Remove them from the window. (only for web)
+      Window.removeArguments(argumentsToRemove);
+      // Update the state accordingly, based on the previous state.
+      setCleanedArguments(oldArguments => {
+        const newArguments = { ...oldArguments };
+        argumentsToRemove.forEach(argument => {
+          delete newArguments[argument];
+        });
+        return newArguments;
       });
-      return newArguments;
-    });
-  }, []);
+    },
+    []
+  );
 
   const addArguments = React.useCallback((argumentsToAdd: AppArguments) => {
     // Add them to the window. (only for web)
@@ -52,12 +57,21 @@ export const RouterContextProvider = ({ children }: Props) => {
     }));
   }, []);
 
+  const navigateToRoute = React.useCallback(
+    (route: string, additionalArguments?: AppArguments) => {
+      // add the new route, assumed to be a dialog, and possible additional arguments to the router.
+      addArguments({ ...additionalArguments, 'initial-dialog': route });
+    },
+    [addArguments]
+  );
+
   return (
     <RouterContext.Provider
       value={{
-        appArguments: cleanedArguments,
-        removeArguments,
-        addArguments,
+        routeArguments: cleanedArguments,
+        addRouteArguments: addArguments,
+        removeRouteArguments,
+        navigateToRoute,
       }}
     >
       {children}

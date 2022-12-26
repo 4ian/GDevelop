@@ -16,21 +16,23 @@ export const useOpenInitialDialog = ({
   openOnboardingDialog,
   openProfileDialog,
 }: Props) => {
-  const { appArguments, removeArguments } = React.useContext(RouterContext);
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
 
   React.useEffect(
     () => {
-      switch (appArguments['initial-dialog']) {
+      switch (routeArguments['initial-dialog']) {
         case 'subscription':
           openSubscriptionDialog({ reason: 'Landing dialog at opening' });
-          removeArguments(['initial-dialog']);
+          removeRouteArguments(['initial-dialog']);
           break;
         case 'onboarding':
           openOnboardingDialog(true);
-          removeArguments(['initial-dialog']);
+          removeRouteArguments(['initial-dialog']);
           break;
         case 'games-dashboard':
           openProfileDialog(true);
@@ -42,10 +44,10 @@ export const useOpenInitialDialog = ({
       }
     },
     [
-      appArguments,
+      routeArguments,
       openOnboardingDialog,
       openProfileDialog,
-      removeArguments,
+      removeRouteArguments,
       openSubscriptionDialog,
     ]
   );

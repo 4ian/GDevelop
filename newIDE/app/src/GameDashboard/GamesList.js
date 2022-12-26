@@ -22,9 +22,11 @@ type Props = {|
 |};
 
 export const GamesList = ({ project }: Props) => {
-  const { appArguments, removeArguments, addArguments } = React.useContext(
-    RouterContext
-  );
+  const {
+    routeArguments,
+    addRouteArguments,
+    removeRouteArguments,
+  } = React.useContext(RouterContext);
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
   const {
@@ -97,10 +99,10 @@ export const GamesList = ({ project }: Props) => {
     () => {
       const loadInitialGame = async () => {
         // When games are loaded and we have an initial game id, try to open it.
-        const initialGameId = appArguments['game-id'];
+        const initialGameId = routeArguments['game-id'];
         if (games && initialGameId) {
           const game = games.find(game => game.id === initialGameId);
-          removeArguments(['game-id']);
+          removeRouteArguments(['game-id']);
           if (game) {
             setOpenedGame(game);
           } else {
@@ -131,8 +133,8 @@ export const GamesList = ({ project }: Props) => {
     },
     [
       games,
-      appArguments,
-      removeArguments,
+      routeArguments,
+      removeRouteArguments,
       onRegisterGame,
       showConfirmation,
       showAlert,
@@ -191,7 +193,7 @@ export const GamesList = ({ project }: Props) => {
           isCurrentGame={!!projectUuid && game.id === projectUuid}
           game={game}
           onOpenGameManager={(tab: GameDetailsTab) => {
-            addArguments({ 'games-dashboard-tab': tab });
+            addRouteArguments({ 'games-dashboard-tab': tab });
             setOpenedGame(game);
           }}
           onUpdateGame={loadGames}

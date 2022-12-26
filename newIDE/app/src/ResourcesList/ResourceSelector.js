@@ -215,7 +215,12 @@ export default class ResourceSelector extends React.Component<Props, State> {
   };
 
   _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
-    const { project, resourcesLoader, resourceKind } = this.props;
+    const {
+      project,
+      resourcesLoader,
+      resourceKind,
+      resourceManagementProps,
+    } = this.props;
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
@@ -236,6 +241,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       }
       const externalEditorOptions = {
         project,
+        getStorageProvider: resourceManagementProps.getStorageProvider,
         resourcesLoader,
         singleFrame: true,
         resourceNames,
@@ -259,6 +265,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     } else if (resourceKind === 'audio') {
       const externalEditorOptions = {
         project,
+        getStorageProvider: resourceManagementProps.getStorageProvider,
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {
@@ -280,6 +287,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     ) {
       const externalEditorOptions = {
         project,
+        getStorageProvider: resourceManagementProps.getStorageProvider,
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {

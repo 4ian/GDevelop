@@ -41,7 +41,6 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
@@ -116,9 +115,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
-  // Export files for free function, object and behaviors
-  auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(exportedProject);
-  ExportFreeFunctionIncludes(exportedProject, includesFiles, usedExtensions);
+  // Export files for object and behaviors
   ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
   ExportObjectAndBehaviorsRequiredFiles(immutableProject, resourcesFiles);
 
@@ -798,37 +795,6 @@ bool ExporterHelper::ExportIncludesAndLibs(
   }
 
   return true;
-}
-
-void ExporterHelper::ExportFreeFunctionIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles,
-    std::set<gd::String> &usedExtensions) {
-  auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
-    for (const auto &includeFile : newIncludeFiles) {
-      InsertUnique(includesFiles, includeFile);
-    }
-  };
-
-  for (auto &&usedExtension : usedExtensions) {
-    if (project.HasEventsFunctionsExtensionNamed(usedExtension)) {
-      auto &extension = project.GetEventsFunctionsExtension(usedExtension);
-
-      for (size_t functionIndex = 0;
-           functionIndex < extension.GetEventsFunctionsCount(); functionIndex++) {
-        auto &function = extension.GetEventsFunction(functionIndex);
-
-        gd::String fullType = gd::PlatformExtension::GetEventsFunctionFullType(
-            usedExtension, function.GetName());
-
-        auto metadata = function.IsCondition()
-                            ? gd::MetadataProvider::GetConditionMetadata(
-                                  project.GetCurrentPlatform(), fullType)
-                            : gd::MetadataProvider::GetActionMetadata(
-                                  project.GetCurrentPlatform(), fullType);
-        addIncludeFiles(metadata.GetIncludeFiles());
-      }
-    }
-  }
 }
 
 void ExporterHelper::ExportObjectAndBehaviorsIncludes(

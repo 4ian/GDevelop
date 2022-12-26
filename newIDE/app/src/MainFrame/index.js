@@ -164,11 +164,6 @@ import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrche
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
 import TabsTitlebar from './TabsTitlebar';
 import { registerGame } from '../Utils/GDevelopServices/Game';
-import optionalRequire from '../Utils/OptionalRequire';
-import { findDefaultFolder } from '../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
-
-const remote = optionalRequire('@electron/remote');
-const app = remote ? remote.app : null;
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -3091,9 +3086,6 @@ const MainFrame = (props: Props) => {
           onClose={languageChanged => {
             openPreferencesDialog(false);
             if (languageChanged) _languageDidChange();
-            if (app && preferences.values.newProjectsDefaultFolder === '') {
-              preferences.setNewProjectsDefaultFolder(findDefaultFolder(app));
-            }
           }}
         />
       )}

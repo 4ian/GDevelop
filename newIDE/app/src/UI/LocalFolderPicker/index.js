@@ -8,9 +8,11 @@ import * as React from 'react';
 import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
 import FlatButton from '../FlatButton';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
+const app = remote ? remote.app : null;
 
 const styles = {
   container: {
@@ -77,17 +79,20 @@ const LocalFolderPicker = ({
       return {
         title: i18n._(t`Choose an export folder`),
         message: i18n._(t`Choose where to export the game`),
+        hintText: i18n._(t`Choose an export folder`),
       };
     }
     if (type === 'default-workspace') {
       return {
         title: i18n._(t`Choose a workspace folder`),
         message: i18n._(t`Choose where to create your projects`),
+        hintText: findDefaultFolder(app),
       };
     }
     return {
       title: i18n._(t`Choose a folder for the new game`),
       message: i18n._(t`Choose where to create the game`),
+      hintText: i18n._(t`Choose a folder for the new game`),
     };
   };
 
@@ -106,7 +111,7 @@ const LocalFolderPicker = ({
               margin="dense"
               style={styles.textField}
               type="text"
-              hintText={titleAndMessage.title}
+              hintText={titleAndMessage.hintText}
               value={textValue}
               onChange={(event, value) => setTextValue(value)}
               onBlur={onBlur}

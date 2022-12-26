@@ -8,7 +8,10 @@ import paperDecorator from '../PaperDecorator';
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
-import { GDevelopUserApi } from '../../Utils/GDevelopServices/ApiConfigs';
+import {
+  GDevelopShopApi,
+  GDevelopUserApi,
+} from '../../Utils/GDevelopServices/ApiConfigs';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
@@ -23,34 +26,48 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-const badges = [
-  {
-    achievementId: 'trivial_first-event',
-    seen: true,
-    unlockedAt: '2020-10-05T11:28:24.864Z',
-    userId: 'userId',
-  },
-  {
-    achievementId: 'trivial_first-behavior',
-    seen: false,
-    unlockedAt: '2021-11-15T11:28:24.864Z',
-    userId: 'userId',
-  },
-];
+const userId = 'user-id';
+
+const packs = new Array(5).fill(0).map((_, i) => ({
+  id: `644db285-6ed7-4ba6-abf4-06ea825f441${i}`,
+  sellerId: userId,
+  createdAt: '2022-12-14T10:11:49.305Z',
+  updatedAt: '2022-12-14T10:11:49.305Z',
+  name: 'Blue Girl Platformer Pack',
+  description: '28 assets',
+  sellerStripeAccountId: 'acct_14EN2o46T03ISJOc',
+  productType: 'ASSET_PACK',
+  listing: 'ASSET_PACK',
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/private-assets/Blue Girl Platformer Pack/thumbnail.png',
+  ],
+  stripeProductId: 'prod_MypbkdW56ntnME',
+  prices: [
+    {
+      name: 'default',
+      value: 399,
+      stripePriceId: 'price_1MErwH46T03ISJOcghK9hyKB',
+    },
+  ],
+}));
 
 const apiDataFullUser = {
   mockData: [
     {
-      url: `${GDevelopUserApi.baseUrl}/user-public-profile/user-id`,
+      url: `${GDevelopUserApi.baseUrl}/user-public-profile/${userId}`,
       method: 'GET',
       status: 200,
       response: indieUserProfile,
+      delay: 500,
     },
     {
-      url: `${GDevelopUserApi.baseUrl}/user/user-id/badge`,
+      url: `${
+        GDevelopShopApi.baseUrl
+      }/user/${userId}/product?productType=asset-pack`,
       method: 'GET',
       status: 200,
-      response: badges,
+      response: packs,
+      delay: 1000,
     },
   ],
 };
@@ -58,28 +75,40 @@ const apiDataFullUser = {
 const apiDataEmptyUser = {
   mockData: [
     {
-      url: `${GDevelopUserApi.baseUrl}/user-public-profile/user-id`,
+      url: `${GDevelopUserApi.baseUrl}/user-public-profile/${userId}`,
       method: 'GET',
       status: 200,
       response: indieUserWithoutUsernameNorDescriptionProfile,
+      delay: 1000,
     },
     {
-      url: `${GDevelopUserApi.baseUrl}/user/user-id/badge`,
+      url: `${
+        GDevelopShopApi.baseUrl
+      }/user/${userId}/product?productType=asset-pack`,
       method: 'GET',
       status: 200,
       response: [],
+      delay: 1000,
     },
   ],
 };
 
 export const FullProfile = () => (
-  <PublicProfileDialog userId="user-id" onClose={() => {}} />
+  <PublicProfileDialog
+    userId={userId}
+    onClose={() => {}}
+    onAssetPackOpen={() => {}}
+  />
 );
 FullProfile.decorators = [withMock];
 FullProfile.parameters = apiDataFullUser;
 
 export const EmptyProfile = () => (
-  <PublicProfileDialog userId="user-id" onClose={() => {}} />
+  <PublicProfileDialog
+    userId={userId}
+    onClose={() => {}}
+    onAssetPackOpen={() => {}}
+  />
 );
 EmptyProfile.decorators = [withMock];
 EmptyProfile.parameters = apiDataEmptyUser;

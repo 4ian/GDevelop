@@ -53,7 +53,7 @@ import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import AlertMessage from '../../../../UI/AlertMessage';
-import { ListItemSecondaryAction } from '@material-ui/core';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import RouterContext from '../../../RouterContext';

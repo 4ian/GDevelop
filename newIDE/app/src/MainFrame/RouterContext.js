@@ -30,9 +30,8 @@ export const RouterContextProvider = ({ children }: Props) => {
   );
 
   const removeArguments = React.useCallback((argumentsToRemove: string[]) => {
-    const argumentStrings = argumentsToRemove.map(argument => argument);
     // Remove them from the window. (only for web)
-    Window.removeArguments(argumentStrings);
+    Window.removeArguments(argumentsToRemove);
     // Update the state accordingly, based on the previous state.
     setCleanedArguments(oldArguments => {
       const newArguments = { ...oldArguments };

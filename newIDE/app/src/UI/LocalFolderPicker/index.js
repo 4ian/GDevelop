@@ -9,6 +9,7 @@ import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
 import FlatButton from '../FlatButton';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -39,6 +40,7 @@ type Props = {|
 type TitleAndMessage = {|
   title: string,
   message: string,
+  hintText: string,
 |};
 
 const LocalFolderPicker = ({

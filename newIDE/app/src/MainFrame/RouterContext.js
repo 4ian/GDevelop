@@ -27,7 +27,7 @@ type Props = {|
 export const RouterContextProvider = ({ children }: Props) => {
   const initialWindowArguments = Window.getArguments();
   // Put value in the state, so we can control when the DOM re-renders.
-  const [cleanedArguments, setCleanedArguments] = React.useState(
+  const [routeArguments, setRouteArguments] = React.useState(
     initialWindowArguments
   );
 
@@ -36,7 +36,7 @@ export const RouterContextProvider = ({ children }: Props) => {
       // Remove them from the window. (only for web)
       Window.removeArguments(argumentsToRemove);
       // Update the state accordingly, based on the previous state.
-      setCleanedArguments(oldArguments => {
+      setRouteArguments(oldArguments => {
         const newArguments = { ...oldArguments };
         argumentsToRemove.forEach(argument => {
           delete newArguments[argument];
@@ -47,29 +47,32 @@ export const RouterContextProvider = ({ children }: Props) => {
     []
   );
 
-  const addArguments = React.useCallback((argumentsToAdd: AppArguments) => {
-    // Add them to the window. (only for web)
-    Window.addArguments(argumentsToAdd);
-    // Update the state accordingly, based on the previous state.
-    setCleanedArguments(oldArguments => ({
-      ...oldArguments,
-      ...argumentsToAdd,
-    }));
-  }, []);
+  const addRouteArguments = React.useCallback(
+    (argumentsToAdd: AppArguments) => {
+      // Add them to the window. (only for web)
+      Window.addArguments(argumentsToAdd);
+      // Update the state accordingly, based on the previous state.
+      setRouteArguments(oldArguments => ({
+        ...oldArguments,
+        ...argumentsToAdd,
+      }));
+    },
+    []
+  );
 
   const navigateToRoute = React.useCallback(
     (route: string, additionalArguments?: AppArguments) => {
       // add the new route, assumed to be a dialog, and possible additional arguments to the router.
-      addArguments({ ...additionalArguments, 'initial-dialog': route });
+      addRouteArguments({ ...additionalArguments, 'initial-dialog': route });
     },
-    [addArguments]
+    [addRouteArguments]
   );
 
   return (
     <RouterContext.Provider
       value={{
-        routeArguments: cleanedArguments,
-        addRouteArguments: addArguments,
+        routeArguments,
+        addRouteArguments,
         removeRouteArguments,
         navigateToRoute,
       }}

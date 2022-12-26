@@ -58,12 +58,14 @@ type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
+  onAssetPackOpen: PrivateAssetPackListingData => void,
 |};
 
 const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
+  onAssetPackOpen,
 }: Props) => {
   const { id, name, sellerId, prices } = privateAssetPackListingData;
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
@@ -285,6 +287,10 @@ const PrivateAssetPackInformationPage = ({
             <PublicProfileDialog
               userId={sellerId}
               onClose={() => setOpenSellerPublicProfileDialog(false)}
+              onAssetPackOpen={assetPackListingData => {
+                onAssetPackOpen(assetPackListingData);
+                setOpenSellerPublicProfileDialog(false);
+              }}
             />
           )}
         </>

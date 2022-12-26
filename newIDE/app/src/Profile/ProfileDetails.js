@@ -19,10 +19,15 @@ import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import Window from '../Utils/Window';
 import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 import FlatButton from '../UI/FlatButton';
 import Coffee from '../UI/CustomSvgIcons/Coffee';
+import { GridList } from '@material-ui/core';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
+import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 
 type DisplayedProfile = {
   id: string,
@@ -40,6 +45,8 @@ type Props = {|
   onChangeEmail?: () => void,
   onEditProfile?: () => void,
   badges: ?Array<Badge>,
+  assetPacksListingData?: ?Array<PrivateAssetPackListingData>,
+  onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
 const ProfileDetails = ({
@@ -50,9 +57,16 @@ const ProfileDetails = ({
   onChangeEmail,
   onEditProfile,
   badges,
+  assetPacksListingData,
+  onAssetPackOpen,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
-  return profile ? (
+  const windowWidth = useResponsiveWindowWidth();
+
+  return !!profile &&
+    // ensure asset packs or badges are loaded to avoid a layout shift.
+    ((isAuthenticatedUserProfile && !!badges) ||
+      (!isAuthenticatedUserProfile && !!assetPacksListingData)) ? (
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
@@ -156,11 +170,50 @@ const ProfileDetails = ({
               />
             </ResponsiveLineStackLayout>
           )}
-          <UserAchievements
-            badges={badges}
-            displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
-            displayNotifications={!!isAuthenticatedUserProfile}
-          />
+          {!isAuthenticatedUserProfile &&
+            onAssetPackOpen &&
+            assetPacksListingData &&
+            assetPacksListingData.length > 0 && (
+              <ColumnStackLayout expand noMargin>
+                <Line noMargin>
+                  <Text size="block-title">
+                    <Trans>Asset packs</Trans>
+                  </Text>
+                </Line>
+                <Line expand noMargin justifyContent="center">
+                  <GridList
+                    cols={windowWidth === 'small' ? 1 : 3}
+                    cellHeight="auto"
+                    spacing={2}
+                  >
+                    {assetPacksListingData.map(assetPackListingData => (
+                      <PrivateAssetPackTile
+                        assetPackListingData={assetPackListingData}
+                        onSelect={() => {
+                          sendAssetPackOpened({
+                            assetPackName: assetPackListingData.name,
+                            assetPackId: assetPackListingData.id,
+                            assetPackTag: null,
+                            assetPackKind: 'private',
+                            source: 'author-profile',
+                          });
+                          onAssetPackOpen(assetPackListingData);
+                        }}
+                        owned={false}
+                        key={assetPackListingData.id}
+                      />
+                    ))}
+                  </GridList>
+                </Line>
+              </ColumnStackLayout>
+            )}
+          {isAuthenticatedUserProfile && (
+            <UserAchievements
+              badges={badges}
+              displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
+              displayNotifications
+            />
+          )}
         </ColumnStackLayout>
       )}
     </I18n>

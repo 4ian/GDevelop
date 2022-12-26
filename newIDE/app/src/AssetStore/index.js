@@ -222,6 +222,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           assetPackId: null,
           assetPackName: assetPack.name,
           assetPackKind: 'public',
+          source: 'store-home',
         });
 
         if (assetPack.externalWebLink) {
@@ -267,6 +268,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           assetPackId: assetPackListingData.id,
           assetPackTag: null,
           assetPackKind: 'private',
+          source: 'store-home',
         });
         saveScrollPosition();
         navigationState.openPackPage(receivedAssetPack);
@@ -601,6 +603,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       isPurchaseDialogOpen={
                         !!purchasingPrivateAssetPackListingData
                       }
+                      onAssetPackOpen={selectPrivateAssetPack}
                     />
                   ) : null}
                   {!!purchasingPrivateAssetPackListingData && (

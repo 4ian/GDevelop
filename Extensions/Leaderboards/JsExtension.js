@@ -28,14 +28,14 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Leaderboards',
-        _('Leaderboards (experimental)'),
+        _('Leaderboards'),
         _('Allow your game to send scores to your leaderboards.'),
         'Florian Rival',
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/leaderboards')
       .setCategory('Players')
-      .addInstructionOrExpressionGroupMetadata(_('Leaderboards (experimental)'))
+      .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
     extension

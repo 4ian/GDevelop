@@ -28,7 +28,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'PlayerAuthentication',
-        _('Player Authentication (experimental)'),
+        _('Player Authentication'),
         _('Allow your game to authenticate players.'),
         'Florian Rival',
         'Open source (MIT License)'
@@ -36,9 +36,7 @@ module.exports = {
       .setExtensionHelpPath('/all-features/player-authentication')
       .setCategory('Players');
     extension
-      .addInstructionOrExpressionGroupMetadata(
-        _('Player Authentication (experimental)')
-      )
+      .addInstructionOrExpressionGroupMetadata(_('Player Authentication'))
       .setIcon('JsPlatform/Extensions/authentication.svg');
 
     extension

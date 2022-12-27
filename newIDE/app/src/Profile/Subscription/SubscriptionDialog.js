@@ -10,7 +10,6 @@ import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import { Column, Line } from '../../UI/Grid';
 import {
   getSubscriptionPlans,
-  type PlanDetails,
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
@@ -103,7 +102,10 @@ export default function SubscriptionDialog({
     [open, analyticsMetadata]
   );
 
-  const choosePlan = async (i18n: I18nType, plan: PlanDetails) => {
+  const choosePlan = async (
+    i18n: I18nType,
+    plan: { planId: null | string }
+  ) => {
     const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
     if (!profile || !subscription) return;
     sendChoosePlanClicked(plan.planId);
@@ -263,6 +265,27 @@ export default function SubscriptionDialog({
               const isCurrentPlan =
                 !!authenticatedUser.subscription &&
                 authenticatedUser.subscription.planId === plan.planId;
+
+              // If no plan (free usage), do not display button.
+              const button = !plan.planId ? null : isCurrentPlan ? (
+                <LeftLoader isLoading={isLoading}>
+                  <FlatButton
+                    disabled={isLoading}
+                    label={<Trans>Cancel your subscription</Trans>}
+                    onClick={() => choosePlan(i18n, { planId: null })}
+                  />
+                </LeftLoader>
+              ) : (
+                <LeftLoader isLoading={isLoading}>
+                  <RaisedButton
+                    primary
+                    disabled={isLoading}
+                    label={<Trans>Choose this plan</Trans>}
+                    onClick={() => choosePlan(i18n, plan)}
+                  />
+                </LeftLoader>
+              );
+
               return (
                 <Card key={plan.planId || ''} isHighlighted={isCurrentPlan}>
                   <Text size="block-title">
@@ -301,33 +324,11 @@ export default function SubscriptionDialog({
                       </Column>
                     ))}
                   </Column>
-                  <LineStackLayout expand justifyContent="flex-end">
-                    {authenticatedUser.subscription &&
-                    authenticatedUser.subscription.planId === plan.planId ? (
-                      <FlatButton
-                        disabled
-                        label={<Trans>This is your current plan</Trans>}
-                        onClick={() => choosePlan(i18n, plan)}
-                      />
-                    ) : plan.planId ? (
-                      <LeftLoader isLoading={isLoading}>
-                        <RaisedButton
-                          primary
-                          disabled={isLoading}
-                          label={<Trans>Choose this plan</Trans>}
-                          onClick={() => choosePlan(i18n, plan)}
-                        />
-                      </LeftLoader>
-                    ) : (
-                      <LeftLoader isLoading={isLoading}>
-                        <FlatButton
-                          disabled={isLoading}
-                          label={<Trans>Cancel your subscription</Trans>}
-                          onClick={() => choosePlan(i18n, plan)}
-                        />
-                      </LeftLoader>
-                    )}
-                  </LineStackLayout>
+                  {button && (
+                    <Line expand justifyContent="flex-end">
+                      {button}
+                    </Line>
+                  )}
                 </Card>
               );
             })}

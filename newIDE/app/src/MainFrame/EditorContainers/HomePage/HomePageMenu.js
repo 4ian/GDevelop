@@ -51,23 +51,6 @@ export type HomeTab =
   | 'community'
   | 'shop';
 
-export const getInitialHomeTab = (
-  initialTab: ?string,
-  showGetStartedSection: boolean
-): HomeTab => {
-  if (
-    initialTab === 'get-started' ||
-    initialTab === 'build' ||
-    initialTab === 'learn' ||
-    initialTab === 'play' ||
-    initialTab === 'community' ||
-    initialTab === 'shop'
-  )
-    return initialTab;
-
-  return showGetStartedSection ? 'get-started' : 'build';
-};
-
 const tabs: {
   label: React.Node,
   tab: HomeTab,

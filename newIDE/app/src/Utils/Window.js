@@ -204,13 +204,27 @@ export default class Window {
   }
 
   /**
-   * On web, removes any query params from the URL.
+   * On web, removes a list of query params from the URL.
    */
-  static removeArguments() {
+  static removeArguments(argumentNames: string[]) {
+    // On Electron, we don't have a way to modify global args.
     if (remote) return;
 
     const url = new URL(window.location.href);
-    url.search = '';
+    for (const argumentName of argumentNames) {
+      url.searchParams.delete(argumentName);
+    }
+    window.history.replaceState({}, document.title, url.toString());
+  }
+
+  static addArguments(argumentNamesAndValues: { [key: string]: string }) {
+    // On Electron, we don't have a way to modify global args.
+    if (remote) return;
+
+    const url = new URL(window.location.href);
+    for (const argumentName in argumentNamesAndValues) {
+      url.searchParams.set(argumentName, argumentNamesAndValues[argumentName]);
+    }
     window.history.replaceState({}, document.title, url.toString());
   }
 

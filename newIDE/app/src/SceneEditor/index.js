@@ -831,6 +831,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     object.setName(newName);
+    this._onObjectSelected(objectWithContext);
     done(true);
   };
 

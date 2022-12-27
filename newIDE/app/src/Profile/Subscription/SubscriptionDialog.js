@@ -10,7 +10,6 @@ import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import { Column, Line } from '../../UI/Grid';
 import {
   getSubscriptionPlans,
-  type PlanDetails,
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
@@ -18,7 +17,7 @@ import {
 import RaisedButton from '../../UI/RaisedButton';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { showMessageBox, showErrorBox } from '../../UI/Messages/MessageBox';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 import LeftLoader from '../../UI/LeftLoader';
 import {
   sendSubscriptionDialogShown,
@@ -39,7 +38,7 @@ const styles = {
     marginLeft: 16,
     marginRight: 16,
   },
-  bulletIcon: { width: 20, height: 20, marginLeft: 5, marginRight: 10 },
+  bulletIcon: { width: 20, height: 20, marginRight: 10 },
   bulletText: { flex: 1 },
   diamondIcon: {
     width: 90,
@@ -92,7 +91,7 @@ export default function SubscriptionDialog({
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showAlert } = useAlertDialog();
 
   React.useEffect(
     () => {
@@ -103,7 +102,10 @@ export default function SubscriptionDialog({
     [open, analyticsMetadata]
   );
 
-  const choosePlan = async (i18n: I18nType, plan: PlanDetails) => {
+  const choosePlan = async (
+    i18n: I18nType,
+    plan: { planId: null | string }
+  ) => {
     const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
     if (!profile || !subscription) return;
     sendChoosePlanClicked(plan.planId);
@@ -129,11 +131,10 @@ export default function SubscriptionDialog({
           planId: null,
         });
         await authenticatedUser.onSubscriptionUpdated();
-        showMessageBox(
-          i18n._(
-            t`Your subscription is now cancelled. We're sorry to see you go!`
-          )
-        );
+        showAlert({
+          title: t`Subscription cancelled`,
+          message: t`Your subscription is now cancelled.`,
+        });
       } catch (rawError) {
         await authenticatedUser.onSubscriptionUpdated();
         showErrorBox({
@@ -164,11 +165,10 @@ export default function SubscriptionDialog({
             planId: plan.planId,
           });
           await authenticatedUser.onSubscriptionUpdated();
-          showMessageBox(
-            i18n._(
-              t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`
-            )
-          );
+          showAlert({
+            title: t`Subscription updated`,
+            message: t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`,
+          });
         } catch (rawError) {
           showErrorBox({
             message: i18n._(
@@ -263,71 +263,82 @@ export default function SubscriptionDialog({
               const isCurrentPlan =
                 !!authenticatedUser.subscription &&
                 authenticatedUser.subscription.planId === plan.planId;
+
+              // If no plan (free usage), do not display button.
+              const button = !plan.planId ? null : isCurrentPlan ? (
+                <LeftLoader isLoading={isLoading}>
+                  <FlatButton
+                    disabled={isLoading}
+                    label={<Trans>Cancel your subscription</Trans>}
+                    onClick={() => choosePlan(i18n, { planId: null })}
+                  />
+                </LeftLoader>
+              ) : (
+                <LeftLoader isLoading={isLoading}>
+                  <RaisedButton
+                    primary
+                    disabled={isLoading}
+                    label={<Trans>Choose this plan</Trans>}
+                    onClick={() => choosePlan(i18n, plan)}
+                  />
+                </LeftLoader>
+              );
+
               return (
                 <Card key={plan.planId || ''} isHighlighted={isCurrentPlan}>
-                  <Text size="block-title">
-                    <span>
-                      <b>{plan.name}</b>{' '}
-                      {!plan.monthlyPriceInEuros ? null : (
-                        <>
-                          - <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
-                        </>
+                  <Line
+                    noMargin
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Text size="block-title">
+                      <span>
+                        <b>{plan.name}</b>
+                      </span>
+                    </Text>
+                    <Text color="secondary">
+                      {plan.monthlyPriceInEuros ? (
+                        <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
+                      ) : (
+                        <Trans>Free</Trans>
                       )}
-                    </span>
-                  </Text>
-                  <Text size="sub-title">
+                    </Text>
+                  </Line>
+                  <Text color="secondary" noMargin>
                     {plan.smallDescription ? i18n._(plan.smallDescription) : ''}
                   </Text>
-                  <Column noMargin>
-                    {plan.descriptionBullets.map((descriptionBullet, index) => (
-                      <Column key={index} expand>
-                        <Line noMargin alignItems="center">
-                          {authenticatedUser.subscription &&
-                          authenticatedUser.subscription.planId ===
-                            plan.planId ? (
-                            <CheckCircle
-                              style={{
-                                ...styles.bulletIcon,
-                                color: gdevelopTheme.message.valid,
-                              }}
-                            />
-                          ) : (
-                            <CheckCircle style={styles.bulletIcon} />
-                          )}
-                          <Text style={styles.bulletText}>
-                            {i18n._(descriptionBullet.message)}
-                          </Text>
-                        </Line>
-                      </Column>
-                    ))}
-                  </Column>
-                  <LineStackLayout expand justifyContent="flex-end">
-                    {authenticatedUser.subscription &&
-                    authenticatedUser.subscription.planId === plan.planId ? (
-                      <FlatButton
-                        disabled
-                        label={<Trans>This is your current plan</Trans>}
-                        onClick={() => choosePlan(i18n, plan)}
-                      />
-                    ) : plan.planId ? (
-                      <LeftLoader isLoading={isLoading}>
-                        <RaisedButton
-                          primary
-                          disabled={isLoading}
-                          label={<Trans>Choose this plan</Trans>}
-                          onClick={() => choosePlan(i18n, plan)}
-                        />
-                      </LeftLoader>
-                    ) : (
-                      <LeftLoader isLoading={isLoading}>
-                        <FlatButton
-                          disabled={isLoading}
-                          label={<Trans>Cancel your subscription</Trans>}
-                          onClick={() => choosePlan(i18n, plan)}
-                        />
-                      </LeftLoader>
-                    )}
-                  </LineStackLayout>
+                  <Line>
+                    <Column noMargin>
+                      {plan.descriptionBullets.map(
+                        (descriptionBullet, index) => (
+                          <Column key={index} expand noMargin>
+                            <Line noMargin alignItems="center">
+                              {authenticatedUser.subscription &&
+                              authenticatedUser.subscription.planId ===
+                                plan.planId ? (
+                                <CheckCircle
+                                  style={{
+                                    ...styles.bulletIcon,
+                                    color: gdevelopTheme.message.valid,
+                                  }}
+                                />
+                              ) : (
+                                <CheckCircle style={styles.bulletIcon} />
+                              )}
+                              <Text style={styles.bulletText}>
+                                {i18n._(descriptionBullet.message)}
+                              </Text>
+                            </Line>
+                          </Column>
+                        )
+                      )}
+                    </Column>
+                  </Line>
+                  {button && (
+                    <Line expand justifyContent="flex-end" noMargin>
+                      {button}
+                    </Line>
+                  )}
                 </Card>
               );
             })}

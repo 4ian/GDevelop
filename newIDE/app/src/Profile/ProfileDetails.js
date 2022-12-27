@@ -17,8 +17,6 @@ import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
-import UserAchievements from './Achievement/UserAchievements';
-import { type Badge } from '../Utils/GDevelopServices/Badge';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import Window from '../Utils/Window';
 import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
@@ -44,7 +42,6 @@ type Props = {|
   onRetry?: () => void,
   onChangeEmail?: () => void,
   onEditProfile?: () => void,
-  badges: ?Array<Badge>,
   assetPacksListingData?: ?Array<PrivateAssetPackListingData>,
   onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
 |};
@@ -56,17 +53,27 @@ const ProfileDetails = ({
   onRetry,
   onChangeEmail,
   onEditProfile,
-  badges,
   assetPacksListingData,
   onAssetPackOpen,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
   const windowWidth = useResponsiveWindowWidth();
 
-  return !!profile &&
-    // ensure asset packs or badges are loaded to avoid a layout shift.
-    ((isAuthenticatedUserProfile && !!badges) ||
-      (!isAuthenticatedUserProfile && !!assetPacksListingData)) ? (
+  if (error)
+    return (
+      <PlaceholderError onRetry={onRetry}>
+        <Trans>
+          Unable to load the profile, please verify your internet connection or
+          try again later.
+        </Trans>
+      </PlaceholderError>
+    );
+
+  if (!profile || (!isAuthenticatedUserProfile && !assetPacksListingData)) {
+    return <PlaceholderLoader />;
+  }
+
+  return (
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
@@ -207,25 +214,9 @@ const ProfileDetails = ({
                 </Line>
               </ColumnStackLayout>
             )}
-          {isAuthenticatedUserProfile && (
-            <UserAchievements
-              badges={badges}
-              displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
-              displayNotifications
-            />
-          )}
         </ColumnStackLayout>
       )}
     </I18n>
-  ) : error ? (
-    <PlaceholderError onRetry={onRetry}>
-      <Trans>
-        Unable to load the profile, please verify your internet connection or
-        try again later.
-      </Trans>
-    </PlaceholderError>
-  ) : (
-    <PlaceholderLoader />
   );
 };
 

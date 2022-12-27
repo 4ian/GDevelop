@@ -7,9 +7,19 @@ import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
+import Paper from '../../UI/Paper';
+
+const styles = {
+  diamondIcon: {
+    width: 90,
+    height: 90,
+    flexShrink: 0,
+    objectFit: 'contain',
+  },
+};
 
 type Props = {
   subscription: ?Subscription,
@@ -28,7 +38,7 @@ const SubscriptionDetails = ({
   return subscription ? (
     <Column>
       <Line alignItems="center">
-        <Text size="block-title">My online services subscriptions</Text>
+        <Text size="block-title">My online services subscription</Text>
       </Line>
       {subscription.planId ? (
         <>
@@ -60,24 +70,38 @@ const SubscriptionDetails = ({
         </>
       ) : (
         <>
-          <Line>
-            <Text>
-              <Trans>
-                Get a subscription to unlock more cloud projects, more
-                leaderboards and more player feedbacks. You'll also have more
-                cloud builds to publish your game to Android and on desktop.
-              </Trans>
-            </Text>
-          </Line>
-          <Line justifyContent="flex-end">
-            <RaisedButton
-              label={<Trans>Choose a subscription</Trans>}
-              primary
-              onClick={() =>
-                openSubscriptionDialog({ reason: 'Consult profile' })
-              }
-            />
-          </Line>
+          <Paper background="medium" variant="outlined">
+            <LineStackLayout alignItems="center">
+              <img src="res/diamond.svg" style={styles.diamondIcon} alt="" />
+              <Column>
+                <Line>
+                  <Column noMargin>
+                    <Text noMargin>
+                      <Trans>
+                        Unlock more one-click exports and other exclusive
+                        features.
+                      </Trans>
+                    </Text>
+                    <Text noMargin>
+                      <Trans>
+                        With a subscription, you’re also supporting the
+                        improvement of GDevelop.
+                      </Trans>
+                    </Text>
+                  </Column>
+                </Line>
+                <Line justifyContent="flex-start">
+                  <RaisedButton
+                    label={<Trans>Choose a subscription</Trans>}
+                    primary
+                    onClick={() =>
+                      openSubscriptionDialog({ reason: 'Consult profile' })
+                    }
+                  />
+                </Line>
+              </Column>
+            </LineStackLayout>
+          </Paper>
         </>
       )}
     </Column>

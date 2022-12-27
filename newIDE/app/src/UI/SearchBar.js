@@ -14,7 +14,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { Column, Line } from './Grid';
 import TagChips from './TagChips';
@@ -260,7 +260,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       [parentValue]
     );
 
-    const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+    const shouldAutofocusSearchbar = useShouldAutofocusInput();
     const previousChosenTagsCount = React.useRef<number>(
       tagsHandler ? tagsHandler.chosenTags.size : 0
     );
@@ -476,11 +476,3 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 );
 
 export default SearchBar;
-
-export const useShouldAutofocusSearchbar = () => {
-  // Note: this is not a React hook but is named as one to encourage
-  // components to use it as such, so that it could be reworked
-  // at some point to use a context (verify in this case all usages).
-  const isTouchscreen = useScreenType() === 'touch';
-  return !isTouchscreen;
-};

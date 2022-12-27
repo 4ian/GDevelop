@@ -23,10 +23,7 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs } from '../../UI/Tabs';
 import Subheader from '../../UI/Subheader';
@@ -60,6 +57,7 @@ import {
   sharedFuseConfiguration,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -163,7 +161,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     if (
       this.props.focusOnMount &&
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      useShouldAutofocusSearchbar() &&
+      useShouldAutofocusInput() &&
       this._searchBar.current
     ) {
       this._searchBar.current.focus();

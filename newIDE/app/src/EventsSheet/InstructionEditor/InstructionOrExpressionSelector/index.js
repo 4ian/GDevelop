@@ -6,10 +6,7 @@ import Add from '@material-ui/icons/Add';
 import Fuse from 'fuse.js';
 
 import { List, type ListItemRefType } from '../../../UI/List';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
@@ -31,6 +28,7 @@ import {
   type SearchResult,
   sharedFuseConfiguration,
 } from '../../../UI/Search/UseSearchStructuredItem';
+import { useShouldAutofocusInput } from '../../../UI/Reponsive/ScreenTypeMeasurer';
 const gd: libGDevelop = global.gd;
 
 const getGroupIconSrc = (key: string) => {
@@ -80,7 +78,7 @@ export default class InstructionOrExpressionSelector<
     if (
       this.props.focusOnMount &&
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      useShouldAutofocusSearchbar() &&
+      useShouldAutofocusInput() &&
       this._searchBar
     ) {
       this._searchBar.focus();

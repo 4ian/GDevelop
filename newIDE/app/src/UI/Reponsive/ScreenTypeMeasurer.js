@@ -37,3 +37,11 @@ export const useScreenType = (): ScreenType => {
 
   return userHasTouchedScreen ? 'touch' : 'normal';
 };
+
+export const useShouldAutofocusInput = () => {
+  // Note: this is not a React hook but is named as one to encourage
+  // components to use it as such, so that it could be reworked
+  // at some point to use a context (verify in this case all usages).
+  const isTouchscreen = useScreenType() === 'touch';
+  return !isTouchscreen;
+};

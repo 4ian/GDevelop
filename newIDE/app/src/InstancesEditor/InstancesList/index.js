@@ -10,13 +10,11 @@ import {
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import Lock from '@material-ui/icons/Lock';
 import LockOpen from '@material-ui/icons/LockOpen';
 import NotInterested from '@material-ui/icons/NotInterested';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 const gd = global.gd;
 
 type State = {|
@@ -77,7 +75,7 @@ export default class InstancesList extends Component<Props, State> {
 
   componentDidMount() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    if (useShouldAutofocusSearchbar() && this._searchBar.current)
+    if (useShouldAutofocusInput() && this._searchBar.current)
       this._searchBar.current.focus();
   }
 

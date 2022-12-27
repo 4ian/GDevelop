@@ -33,6 +33,7 @@ const styles = {
     margin: '20px',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   rightContainer: {
     flex: 2,

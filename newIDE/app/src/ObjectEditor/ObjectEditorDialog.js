@@ -201,7 +201,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                     notifyOfChange();
                   }
                 }}
-                autoFocus // Focus the name when the dialog is opened.
+                autoFocus="desktop"
               />
             </Column>
           </Line>

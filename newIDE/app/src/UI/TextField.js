@@ -5,6 +5,7 @@ import MUITextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
+import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 
 type ValueProps =
   // Support "text" and "password" type:
@@ -70,7 +71,7 @@ type Props = {|
   id?: string,
 
   // Keyboard focus:
-  autoFocus?: boolean,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
 
   // String text field:
   maxLength?: number,
@@ -200,6 +201,14 @@ export default class TextField extends React.Component<Props, {||}> {
       <MarkdownText source={props.helperMarkdownText} />
     ) : null;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const shouldAutofocusInput = useShouldAutofocusInput();
+    const shouldAutoFocusTextField = !props.autoFocus
+      ? false
+      : props.autoFocus === 'desktopAndMobileDevices'
+      ? true
+      : shouldAutofocusInput;
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -235,7 +244,7 @@ export default class TextField extends React.Component<Props, {||}> {
             }
             id={props.id}
             // Keyboard focus:
-            autoFocus={props.autoFocus}
+            autoFocus={shouldAutoFocusTextField}
             // Multiline:
             multiline={props.multiline}
             rows={props.rows}

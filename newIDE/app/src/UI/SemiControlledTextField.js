@@ -50,7 +50,7 @@ type Props = {|
   style?: Object,
   rows?: number,
   rowsMax?: number,
-  autoFocus?: boolean,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
   endAdornment?: React.Node,
 |};
 

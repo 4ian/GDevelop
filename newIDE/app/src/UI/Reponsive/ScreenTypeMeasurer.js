@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { useResponsiveWindowWidth } from './ResponsiveWindowMeasurer';
 
 export type ScreenType = 'normal' | 'touch';
 
@@ -43,5 +44,8 @@ export const useShouldAutofocusInput = () => {
   // components to use it as such, so that it could be reworked
   // at some point to use a context (verify in this case all usages).
   const isTouchscreen = useScreenType() === 'touch';
-  return !isTouchscreen;
+  const windowWidth = useResponsiveWindowWidth();
+  return (
+    windowWidth === 'large' || (windowWidth === 'medium' && !isTouchscreen)
+  );
 };

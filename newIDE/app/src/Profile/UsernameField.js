@@ -134,7 +134,7 @@ export const UsernameField = ({
 
   return (
     <TextField
-      autoFocus
+      autoFocus="desktop"
       value={value}
       floatingLabelText={<Trans>Username</Trans>}
       fullWidth

@@ -17,7 +17,7 @@ import {
 import RaisedButton from '../../UI/RaisedButton';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { showMessageBox, showErrorBox } from '../../UI/Messages/MessageBox';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 import LeftLoader from '../../UI/LeftLoader';
 import {
   sendSubscriptionDialogShown,
@@ -91,7 +91,7 @@ export default function SubscriptionDialog({
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showAlert } = useAlertDialog();
 
   React.useEffect(
     () => {
@@ -131,11 +131,10 @@ export default function SubscriptionDialog({
           planId: null,
         });
         await authenticatedUser.onSubscriptionUpdated();
-        showMessageBox(
-          i18n._(
-            t`Your subscription is now cancelled. We're sorry to see you go!`
-          )
-        );
+        showAlert({
+          title: t`Subscription cancelled`,
+          message: t`Your subscription is now cancelled.`,
+        });
       } catch (rawError) {
         await authenticatedUser.onSubscriptionUpdated();
         showErrorBox({
@@ -166,11 +165,10 @@ export default function SubscriptionDialog({
             planId: plan.planId,
           });
           await authenticatedUser.onSubscriptionUpdated();
-          showMessageBox(
-            i18n._(
-              t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`
-            )
-          );
+          showAlert({
+            title: t`Subscription updated`,
+            message: t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`,
+          });
         } catch (rawError) {
           showErrorBox({
             message: i18n._(

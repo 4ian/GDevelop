@@ -3,7 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Background from '../UI/Background';
-import TextField from '../UI/TextField';
+import TextField, { type TextFieldInterface } from '../UI/TextField';
 import { Column, Line } from '../UI/Grid';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
@@ -60,7 +60,7 @@ const SearchPanel = (
   ref
 ) => {
   const windowWidth = useResponsiveWindowWidth();
-  const searchTextField = React.useRef<?TextField>(null);
+  const searchTextField = React.useRef<?TextFieldInterface>(null);
 
   const [searchText, setSearchText] = React.useState<string>('');
   const [replaceText, setReplaceText] = React.useState<string>('');

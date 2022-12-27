@@ -17,7 +17,7 @@ import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
-import TextField from '../../UI/TextField';
+import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import BackgroundText from '../../UI/BackgroundText';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
@@ -127,7 +127,7 @@ export const BuildCard = ({
     differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const nameInput = React.useRef<?TextField>(null);
+  const nameInput = React.useRef<?TextFieldInterface>(null);
   const windowWidth = useResponsiveWindowWidth();
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);

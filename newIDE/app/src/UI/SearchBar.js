@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import IconButton from './IconButton';
-import TextField from './TextField';
+import TextField, { type TextFieldInterface } from './TextField';
 import Collapse from '@material-ui/core/Collapse';
 import MuiTextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
@@ -53,6 +53,7 @@ type Props = {|
   buildMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown. */
   helpPagePath?: ?string,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
 |};
 
 // Defines the space an icon takes with a button, to place the popper accordingly.
@@ -184,6 +185,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       tags,
       buildMenuTemplate,
       helpPagePath,
+      autoFocus,
     },
     ref
   ) => {
@@ -215,7 +217,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       parentValue
     );
 
-    const textField = React.useRef<?TextField>(null);
+    const textField = React.useRef<?TextFieldInterface>(null);
 
     const nonEmpty = !!value && value.length > 0;
     const styles = getStyles({
@@ -352,6 +354,13 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       }
     };
 
+    const shouldAutofocusInput = useShouldAutofocusInput();
+    const shouldAutoFocusTextField = !autoFocus
+      ? false
+      : autoFocus === 'desktopAndMobileDevices'
+      ? true
+      : shouldAutofocusInput;
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -393,6 +402,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                         <MuiTextField
                           margin="none"
                           {...params}
+                          autoFocus={shouldAutoFocusTextField}
                           inputRef={textField}
                           InputProps={{
                             ...params.InputProps,
@@ -419,6 +429,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                       ref={textField}
                       inputStyle={styles.inputStyle}
                       onFocus={handleFocus}
+                      autoFocus={autoFocus}
                     />
                   )}
                 </div>

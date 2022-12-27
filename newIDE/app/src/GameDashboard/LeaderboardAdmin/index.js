@@ -39,7 +39,7 @@ import IconButton from '../../UI/IconButton';
 import PlaceholderError from '../../UI/PlaceholderError';
 import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
-import TextField from '../../UI/TextField';
+import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import SelectField from '../../UI/SelectField';
 import CircularProgress from '../../UI/CircularProgress';
 import SelectOption from '../../UI/SelectOption';
@@ -214,7 +214,7 @@ export const LeaderboardAdmin = ({
   );
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
-  const newNameTextFieldRef = React.useRef<?TextField>(null);
+  const newNameTextFieldRef = React.useRef<?TextFieldInterface>(null);
   const [apiError, setApiError] = React.useState<?ApiError>(null);
   const [
     displayGameRegistration,

@@ -117,7 +117,7 @@ const PublicAssetPackTile = ({
   );
 };
 
-const PrivateAssetPackTile = ({
+export const PrivateAssetPackTile = ({
   assetPackListingData,
   onSelect,
   style,

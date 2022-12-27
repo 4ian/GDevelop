@@ -1,12 +1,20 @@
 // @flow
 import * as React from 'react';
-import Window, { type AppArguments } from '../Utils/Window';
+import Window from '../Utils/Window';
+
+type Route = 'onboarding' | 'subscription' | 'games-dashboard' | 'asset-store';
+type RouteKey =
+  | 'initial-dialog'
+  | 'game-id'
+  | 'games-dashboard-tab'
+  | 'asset-pack';
+type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|
-  routeArguments: AppArguments,
-  removeRouteArguments: (string[]) => void,
-  addRouteArguments: AppArguments => void,
-  navigateToRoute: (route: string, additionalArgument?: AppArguments) => void,
+  routeArguments: RouteArguments,
+  removeRouteArguments: (RouteKey[]) => void,
+  addRouteArguments: RouteArguments => void,
+  navigateToRoute: (route: Route, additionalArgument?: RouteArguments) => void,
 |};
 
 const initialState: Router = {
@@ -25,15 +33,16 @@ type Props = {|
 |};
 
 export const RouterContextProvider = ({ children }: Props) => {
-  const initialWindowArguments = Window.getArguments();
   // Put value in the state, so we can control when the DOM re-renders.
-  const [routeArguments, setRouteArguments] = React.useState(
-    initialWindowArguments
+  const [routeArguments, setRouteArguments] = React.useState<RouteArguments>(
+    // $FlowFixMe - Assume that the arguments are always valid.
+    Window.getArguments()
   );
 
   const removeRouteArguments = React.useCallback(
-    (argumentsToRemove: string[]) => {
+    (argumentsToRemove: RouteKey[]) => {
       // Remove them from the window. (only for web)
+      // $FlowFixMe - Assume that the arguments are always valid.
       Window.removeArguments(argumentsToRemove);
       // Update the state accordingly, based on the previous state.
       setRouteArguments(oldArguments => {
@@ -48,8 +57,9 @@ export const RouterContextProvider = ({ children }: Props) => {
   );
 
   const addRouteArguments = React.useCallback(
-    (argumentsToAdd: AppArguments) => {
+    (argumentsToAdd: RouteArguments) => {
       // Add them to the window. (only for web)
+      // $FlowFixMe - Assume that the arguments are always valid.
       Window.addArguments(argumentsToAdd);
       // Update the state accordingly, based on the previous state.
       setRouteArguments(oldArguments => ({
@@ -61,7 +71,7 @@ export const RouterContextProvider = ({ children }: Props) => {
   );
 
   const navigateToRoute = React.useCallback(
-    (route: string, additionalArguments?: AppArguments) => {
+    (route: Route, additionalArguments?: RouteArguments) => {
       // add the new route, assumed to be a dialog, and possible additional arguments to the router.
       addRouteArguments({ ...additionalArguments, 'initial-dialog': route });
     },

@@ -53,6 +53,10 @@ import BackgroundText from '../../../../UI/BackgroundText';
 import Paper from '../../../../UI/Paper';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import AlertMessage from '../../../../UI/AlertMessage';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton from '../../../../UI/IconButton';
+import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
+import RouterContext from '../../../RouterContext';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -146,6 +150,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
     },
     ref
   ) => {
+    const { navigateToRoute } = React.useContext(RouterContext);
     const { getRecentProjectFiles, removeRecentProjectFile } = React.useContext(
       PreferencesContext
     );
@@ -187,6 +192,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 fileIdentifier: cloudProject.id,
                 lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
                 name: cloudProject.name,
+                gameId: cloudProject.gameId,
               },
             };
             return file;
@@ -268,7 +274,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       ];
       if (file.storageProviderName === 'Cloud') {
         actions = actions.concat([
-          { type: 'separator' },
           {
             label: i18n._(t`Delete`),
             click: () => onDeleteCloudProject(i18n, file),
@@ -280,7 +285,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             label: i18n._(t`Show in local folder`),
             click: () => locateProjectFile(file),
           },
-          { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),
             click: () => onRemoveFromRecentFiles(file),
@@ -288,13 +292,27 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         ]);
       } else {
         actions = actions.concat([
-          { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),
             click: () => onRemoveFromRecentFiles(file),
           },
         ]);
       }
+
+      const gameId = file.fileMetadata.gameId;
+      if (gameId) {
+        actions = actions.concat([
+          { type: 'separator' },
+          {
+            label: i18n._(t`Manage game`),
+            click: () =>
+              navigateToRoute('games-dashboard', {
+                'game-id': gameId,
+              }),
+          },
+        ]);
+      }
+
       return actions;
     };
 
@@ -522,6 +540,20 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                                         </Text>
                                       )}
                                     </Column>
+                                    <ListItemSecondaryAction>
+                                      <IconButton
+                                        size="small"
+                                        edge="end"
+                                        aria-label="menu"
+                                        onClick={event => {
+                                          // prevent triggering the click on the list item.
+                                          event.stopPropagation();
+                                          openContextMenu(event, file);
+                                        }}
+                                      >
+                                        <ThreeDotsMenu />
+                                      </IconButton>
+                                    </ListItemSecondaryAction>
                                   </LineStackLayout>
                                 ) : (
                                   <Column expand>

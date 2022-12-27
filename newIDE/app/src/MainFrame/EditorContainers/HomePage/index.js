@@ -16,13 +16,15 @@ import StoreSection from './StoreSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
-import { getInitialHomeTab, HomePageMenu, type HomeTab } from './HomePageMenu';
+import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
+import RouterContext from '../../RouterContext';
+import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 
 type Props = {|
   project: ?gdProject,
@@ -167,8 +169,28 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(() =>
-        getInitialHomeTab(initialTab, showGetStartedSection)
+      const { routeArguments, removeRouteArguments } = React.useContext(
+        RouterContext
+      );
+      const { setInitialPackUserFriendlySlug } = React.useContext(
+        AssetStoreContext
+      );
+
+      // Open the asset store and a pack if asked to do so.
+      React.useEffect(
+        () => {
+          if (routeArguments['initial-dialog'] === 'asset-store') {
+            setActiveTab('shop');
+            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            // Remove the arguments so that the asset store is not opened again.
+            removeRouteArguments(['initial-dialog', 'asset-pack']);
+          }
+        },
+        [routeArguments, removeRouteArguments, setInitialPackUserFriendlySlug]
+      );
+
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(
+        showGetStartedSection ? 'get-started' : 'build'
       );
 
       return (

@@ -2,7 +2,10 @@
 import * as React from 'react';
 import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
-import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
+import TextField, {
+  noMarginTextFieldInListItemTopOffset,
+  type TextFieldInterface,
+} from '../TextField';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
@@ -56,7 +59,7 @@ function ItemRow<Item>({
   scaleUpItemIconWhenSelected,
   connectIconDragSource,
 }: Props<Item>) {
-  const [textField, setTextField] = React.useState<?TextField>(null);
+  const [textField, setTextField] = React.useState<?TextFieldInterface>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(

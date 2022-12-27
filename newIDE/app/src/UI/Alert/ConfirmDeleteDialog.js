@@ -75,7 +75,7 @@ function ConfirmDeleteDialog(props: Props) {
           <Text size="body">{i18n._(props.message)}</Text>
           <LargeSpacer />
           <TextField
-            autoFocus
+            autoFocus="desktop"
             floatingLabelFixed
             floatingLabelText={i18n._(props.fieldMessage)}
             value={textInput}

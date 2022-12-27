@@ -55,7 +55,7 @@ const PasswordPromptDialog = (props: {
   >
     <TextField
       fullWidth
-      autoFocus
+      autoFocus="desktopAndMobileDevices"
       value={props.passwordValue}
       floatingLabelText={<Trans>Password</Trans>}
       type="password"

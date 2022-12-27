@@ -6,10 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from '../UI/List';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
 import { AddListItem } from '../UI/ListCommonItem';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ProjectPropertiesDialog from './ProjectPropertiesDialog';
@@ -55,6 +52,7 @@ import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -194,8 +192,10 @@ export default class ProjectManager extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
+      // TODO: When this component is refactored into a functional component,
+      // use useShouldAutofocusInput.
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      if (useShouldAutofocusSearchbar() && this._searchBar)
+      if (useScreenType() === 'normal' && this._searchBar)
         this._searchBar.focus();
     }
   }

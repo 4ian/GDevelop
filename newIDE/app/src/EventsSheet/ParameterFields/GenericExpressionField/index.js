@@ -5,7 +5,9 @@ import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import Functions from '@material-ui/icons/Functions';
 import RaisedButton from '../../../UI/RaisedButton';
-import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../../../UI/SemiControlledTextField';
 import { mapVector } from '../../../Utils/MapFor';
 import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import ExpressionParametersEditorDialog, {
@@ -165,7 +167,7 @@ const extractErrors = (
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
-  _field: ?SemiControlledTextField = null;
+  _field: ?SemiControlledTextFieldInterface = null;
   _fieldElement: ?Element = null;
   _inputElement: ?HTMLInputElement = null;
 

@@ -55,7 +55,7 @@ const CloudSaveAsDialog = (props: Props) => {
           flexBody
         >
           <TextField
-            autoFocus
+            autoFocus="desktop"
             fullWidth
             maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
             errorText={error}

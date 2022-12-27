@@ -157,7 +157,7 @@ export function PublicGameProperties({
                 type="text"
                 value={name}
                 onChange={setName}
-                autoFocus
+                autoFocus="desktop"
                 disabled={disabled}
               />
               {setCategories && (
@@ -230,7 +230,6 @@ export function PublicGameProperties({
             type="text"
             value={description || ''}
             onChange={setDescription}
-            autoFocus
             multiline
             rows={5}
             disabled={disabled}
@@ -265,7 +264,6 @@ export function PublicGameProperties({
                   type="text"
                   value={hasGameSlug ? gameSlug || '' : ''}
                   onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
-                  autoFocus
                 />
               </Line>
               {!hasGameSlug && (

@@ -125,7 +125,7 @@ const LoginDialog = ({
         <div style={styles.formContainer}>
           <ColumnStackLayout noMargin>
             <TextField
-              autoFocus
+              autoFocus="desktop"
               value={email}
               floatingLabelText={<Trans>Email</Trans>}
               errorText={getEmailErrorText(error)}

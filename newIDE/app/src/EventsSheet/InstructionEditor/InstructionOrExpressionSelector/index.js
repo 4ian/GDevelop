@@ -6,10 +6,7 @@ import Add from '@material-ui/icons/Add';
 import Fuse from 'fuse.js';
 
 import { List, type ListItemRefType } from '../../../UI/List';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
@@ -77,14 +74,6 @@ export default class InstructionOrExpressionSelector<
   );
 
   componentDidMount() {
-    if (
-      this.props.focusOnMount &&
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useShouldAutofocusSearchbar() &&
-      this._searchBar
-    ) {
-      this._searchBar.focus();
-    }
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
@@ -162,6 +151,7 @@ export default class InstructionOrExpressionSelector<
           }
           helpPagePath={helpPagePath}
           ref={searchBar => (this._searchBar = searchBar)}
+          autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
         />
         <ScrollView autoHideScrollbar ref={this._scrollView}>
           {hasResults && (

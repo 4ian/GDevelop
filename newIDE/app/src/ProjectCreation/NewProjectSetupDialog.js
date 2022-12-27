@@ -259,7 +259,7 @@ const NewProjectSetupDialog = ({
               <Refresh />
             </IconButton>
           }
-          autoFocus // Focus the name field when the dialog is opened.
+          autoFocus="desktop"
         />
         <SelectField
           fullWidth

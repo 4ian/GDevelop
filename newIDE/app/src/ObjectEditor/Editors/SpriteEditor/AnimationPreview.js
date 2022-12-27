@@ -14,7 +14,6 @@ import FlatButton from '../../../UI/FlatButton';
 import Text from '../../../UI/Text';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -72,8 +71,7 @@ const AnimationPreview = ({
   isAssetPrivate,
   hideAnimationLoader,
 }: Props) => {
-  const forceUdpate = useForceUpdate();
-  const windowWidth = useResponsiveWindowWidth();
+  const forceUpdate = useForceUpdate();
 
   // Use state for elements that don't need to be read from inside the animation callback.
   const [fps, setFps] = React.useState<number>(
@@ -122,7 +120,7 @@ const AnimationPreview = ({
     currentFrameIndexRef.current = 0;
     currentFrameElapsedTimeRef.current = 0;
     pausedRef.current = false;
-    forceUdpate();
+    forceUpdate();
   };
 
   // Variables used inside the requestAnimationFrame callback
@@ -191,13 +189,13 @@ const AnimationPreview = ({
             }, 500);
           }
           currentResourceNameRef.current = newResourceName;
-          forceUdpate();
+          forceUpdate();
         }
       }
       requestRef.current = requestAnimationFrame(updateAnimation);
       previousTimeRef.current = updateTimeInMs;
     },
-    [forceUdpate, resourceNames]
+    [forceUpdate, resourceNames]
   );
 
   React.useEffect(
@@ -226,9 +224,9 @@ const AnimationPreview = ({
         clearTimeout(loaderTimeout.current);
         loaderTimeout.current = null;
       }
-      forceUdpate();
+      forceUpdate();
     },
-    [forceUdpate]
+    [forceUpdate]
   );
 
   // When changing animation, the index can be out of bounds, so reset the animation.
@@ -295,7 +293,7 @@ const AnimationPreview = ({
                 min={1}
                 max={100}
                 style={styles.timeField}
-                autoFocus={windowWidth !== 'small'} // Do not autofocus textfield if on mobile
+                autoFocus="desktop"
               />
               <Timer style={styles.timeIcon} />
               <TextField
@@ -336,7 +334,7 @@ const AnimationPreview = ({
                 label={!!pausedRef.current ? 'Play' : 'Pause'}
                 onClick={() => {
                   pausedRef.current = !pausedRef.current;
-                  forceUdpate();
+                  forceUpdate();
                 }}
               />
             </LineStackLayout>

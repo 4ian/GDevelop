@@ -10,6 +10,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { IconContainer } from '../UI/IconContainer';
 import { ListItem } from '../UI/List';
 import TextField, {
+  type TextFieldInterface,
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
@@ -131,7 +132,7 @@ export const Item = ({
   isLastItem,
   dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
 }: ItemProps) => {
-  const textField = React.useRef<?TextField>(null);
+  const textField = React.useRef<?TextFieldInterface>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(

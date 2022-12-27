@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import Dialog, { DialogPrimaryButton } from './Dialog';
-import TextField from './TextField';
+import TextField, { type TextFieldInterface } from './TextField';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import { type Tags, getTagsFromString } from '../Utils/TagsHelper';
@@ -26,7 +26,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
   state = {
     tagsString: this.props.tagsString,
   };
-  _tagsField = React.createRef<TextField>();
+  _tagsField = React.createRef<TextFieldInterface>();
 
   componentDidMount() {
     setTimeout(() => {

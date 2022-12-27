@@ -72,7 +72,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
           </Text>
         ) : (
           <TextField
-            autoFocus
+            autoFocus="desktop"
             value={email}
             floatingLabelText={<Trans>Email</Trans>}
             onChange={(e, value) => {

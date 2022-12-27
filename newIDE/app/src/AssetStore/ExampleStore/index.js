@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react';
-import SearchBar, {
-  type SearchBarInterface,
-  useShouldAutofocusSearchbar,
-} from '../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { ExampleStoreContext } from './ExampleStoreContext';
@@ -14,6 +11,7 @@ import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 // When showing examples, always put the starters first.
 export const prepareExamples = (
@@ -59,7 +57,7 @@ export const ExampleStore = ({
     setSearchText,
   } = React.useContext(ExampleStoreContext);
 
-  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+  const shouldAutofocusSearchbar = useShouldAutofocusInput();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
 
   React.useEffect(

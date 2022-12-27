@@ -23,10 +23,7 @@ import {
   enumerateBehaviorsMetadata,
   filterEnumeratedBehaviorMetadata,
 } from './EnumerateBehaviorsMetadata';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import Window from '../Utils/Window';
@@ -42,6 +39,7 @@ import {
 } from '../Utils/GDevelopServices/Badge';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -136,7 +134,7 @@ export default function NewBehaviorDialog({
     [project, platform, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+  const shouldAutofocusSearchbar = useShouldAutofocusInput();
   React.useEffect(
     () => {
       setTimeout(() => {

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
-import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
+import SearchBar from '../UI/SearchBar';
 import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
@@ -33,6 +33,7 @@ import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
@@ -107,7 +108,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     );
     const searchBar = React.useRef<?SearchBarInterface>(null);
 
-    const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+    const shouldAutofocusSearchbar = useShouldAutofocusInput();
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
       !isOnHomePage && !openedAssetShortHeader
     );

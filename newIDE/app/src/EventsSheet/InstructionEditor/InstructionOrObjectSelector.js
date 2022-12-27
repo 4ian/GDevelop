@@ -23,10 +23,7 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs } from '../../UI/Tabs';
 import Subheader from '../../UI/Subheader';
@@ -160,14 +157,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   );
 
   componentDidMount() {
-    if (
-      this.props.focusOnMount &&
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useShouldAutofocusSearchbar() &&
-      this._searchBar.current
-    ) {
-      this._searchBar.current.focus();
-    }
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
@@ -390,6 +379,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
               onRequestSearch={onSubmitSearch}
               buildMenuTemplate={() => this._buildObjectTagsMenuTemplate(i18n)}
               ref={this._searchBar}
+              autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
               placeholder={
                 isCondition
                   ? t`Search objects or conditions`

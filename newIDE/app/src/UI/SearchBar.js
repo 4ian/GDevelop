@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import IconButton from './IconButton';
-import TextField from './TextField';
+import TextField, { type TextFieldInterface } from './TextField';
 import Collapse from '@material-ui/core/Collapse';
 import MuiTextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
@@ -14,7 +14,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { Column, Line } from './Grid';
 import TagChips from './TagChips';
@@ -53,6 +53,7 @@ type Props = {|
   buildMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown. */
   helpPagePath?: ?string,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
 |};
 
 // Defines the space an icon takes with a button, to place the popper accordingly.
@@ -184,6 +185,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       tags,
       buildMenuTemplate,
       helpPagePath,
+      autoFocus,
     },
     ref
   ) => {
@@ -215,7 +217,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       parentValue
     );
 
-    const textField = React.useRef<?TextField>(null);
+    const textField = React.useRef<?TextFieldInterface>(null);
 
     const nonEmpty = !!value && value.length > 0;
     const styles = getStyles({
@@ -260,7 +262,12 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       [parentValue]
     );
 
-    const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+    const shouldAutofocusSearchbar = useShouldAutofocusInput();
+    const shouldAutoFocusTextField = !autoFocus
+      ? false
+      : autoFocus === 'desktopAndMobileDevices'
+      ? true
+      : shouldAutofocusSearchbar;
     const previousChosenTagsCount = React.useRef<number>(
       tagsHandler ? tagsHandler.chosenTags.size : 0
     );
@@ -270,14 +277,14 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         // It is convenient when using keyboard to remove all tags and
         // quickly get back to the text field.
         if (
-          shouldAutofocusSearchbar &&
+          shouldAutoFocusTextField &&
           tagsHandler &&
           tagsHandler.chosenTags.size === 0 &&
           previousChosenTagsCount.current > 0
         )
           focus();
       },
-      [tagsHandler, shouldAutofocusSearchbar]
+      [tagsHandler, shouldAutoFocusTextField]
     );
 
     const handleBlur = () => {
@@ -393,6 +400,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                         <MuiTextField
                           margin="none"
                           {...params}
+                          autoFocus={shouldAutoFocusTextField}
                           inputRef={textField}
                           InputProps={{
                             ...params.InputProps,
@@ -419,6 +427,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                       ref={textField}
                       inputStyle={styles.inputStyle}
                       onFocus={handleFocus}
+                      autoFocus={autoFocus}
                     />
                   )}
                 </div>
@@ -476,11 +485,3 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 );
 
 export default SearchBar;
-
-export const useShouldAutofocusSearchbar = () => {
-  // Note: this is not a React hook but is named as one to encourage
-  // components to use it as such, so that it could be reworked
-  // at some point to use a context (verify in this case all usages).
-  const isTouchscreen = useScreenType() === 'touch';
-  return !isTouchscreen;
-};

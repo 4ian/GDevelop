@@ -38,7 +38,7 @@ const styles = {
     marginLeft: 16,
     marginRight: 16,
   },
-  bulletIcon: { width: 20, height: 20, marginLeft: 5, marginRight: 10 },
+  bulletIcon: { width: 20, height: 20, marginRight: 10 },
   bulletText: { flex: 1 },
   diamondIcon: {
     width: 90,
@@ -288,44 +288,56 @@ export default function SubscriptionDialog({
 
               return (
                 <Card key={plan.planId || ''} isHighlighted={isCurrentPlan}>
-                  <Text size="block-title">
-                    <span>
-                      <b>{plan.name}</b>{' '}
-                      {!plan.monthlyPriceInEuros ? null : (
-                        <>
-                          - <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
-                        </>
+                  <Line
+                    noMargin
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Text size="block-title">
+                      <span>
+                        <b>{plan.name}</b>
+                      </span>
+                    </Text>
+                    <Text color="secondary">
+                      {plan.monthlyPriceInEuros ? (
+                        <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
+                      ) : (
+                        <Trans>Free</Trans>
                       )}
-                    </span>
-                  </Text>
-                  <Text size="sub-title">
+                    </Text>
+                  </Line>
+                  <Text color="secondary" noMargin>
                     {plan.smallDescription ? i18n._(plan.smallDescription) : ''}
                   </Text>
-                  <Column noMargin>
-                    {plan.descriptionBullets.map((descriptionBullet, index) => (
-                      <Column key={index} expand>
-                        <Line noMargin alignItems="center">
-                          {authenticatedUser.subscription &&
-                          authenticatedUser.subscription.planId ===
-                            plan.planId ? (
-                            <CheckCircle
-                              style={{
-                                ...styles.bulletIcon,
-                                color: gdevelopTheme.message.valid,
-                              }}
-                            />
-                          ) : (
-                            <CheckCircle style={styles.bulletIcon} />
-                          )}
-                          <Text style={styles.bulletText}>
-                            {i18n._(descriptionBullet.message)}
-                          </Text>
-                        </Line>
-                      </Column>
-                    ))}
-                  </Column>
+                  <Line>
+                    <Column noMargin>
+                      {plan.descriptionBullets.map(
+                        (descriptionBullet, index) => (
+                          <Column key={index} expand noMargin>
+                            <Line noMargin alignItems="center">
+                              {authenticatedUser.subscription &&
+                              authenticatedUser.subscription.planId ===
+                                plan.planId ? (
+                                <CheckCircle
+                                  style={{
+                                    ...styles.bulletIcon,
+                                    color: gdevelopTheme.message.valid,
+                                  }}
+                                />
+                              ) : (
+                                <CheckCircle style={styles.bulletIcon} />
+                              )}
+                              <Text style={styles.bulletText}>
+                                {i18n._(descriptionBullet.message)}
+                              </Text>
+                            </Line>
+                          </Column>
+                        )
+                      )}
+                    </Column>
+                  </Line>
                   {button && (
-                    <Line expand justifyContent="flex-end">
+                    <Line expand justifyContent="flex-end" noMargin>
                       {button}
                     </Line>
                   )}

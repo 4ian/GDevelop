@@ -31,6 +31,8 @@ const styles = {
   leftContainer: {
     flex: 1,
     margin: '20px',
+    display: 'flex',
+    alignItems: 'center',
   },
   rightContainer: {
     flex: 2,

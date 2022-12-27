@@ -82,7 +82,6 @@ const AuthenticatedUserProfileDetails = ({
         isAuthenticatedUserProfile
         onChangeEmail={onChangeEmail}
         onEditProfile={onEditProfile}
-        badges={authenticatedUser.badges}
       />
     </ColumnStackLayout>
   ) : (

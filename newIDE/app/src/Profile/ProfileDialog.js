@@ -10,6 +10,7 @@ import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
 import HelpButton from '../UI/HelpButton';
 import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
+import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
@@ -166,6 +167,13 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
                   isManageSubscriptionLoading={isManageSubscriptionLoading}
                 />
                 <ContributionsDetails userId={authenticatedUser.profile.id} />
+                {isConnected && (
+                  <UserAchievements
+                    badges={authenticatedUser.badges}
+                    displayUnclaimedAchievements
+                    displayNotifications
+                  />
+                )}
               </Column>
             </Line>
           )}

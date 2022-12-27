@@ -57,7 +57,6 @@ import {
   sharedFuseConfiguration,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -158,14 +157,6 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   );
 
   componentDidMount() {
-    if (
-      this.props.focusOnMount &&
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useShouldAutofocusInput() &&
-      this._searchBar.current
-    ) {
-      this._searchBar.current.focus();
-    }
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
@@ -388,6 +379,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
               onRequestSearch={onSubmitSearch}
               buildMenuTemplate={() => this._buildObjectTagsMenuTemplate(i18n)}
               ref={this._searchBar}
+              autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
               placeholder={
                 isCondition
                   ? t`Search objects or conditions`

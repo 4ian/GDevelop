@@ -28,7 +28,6 @@ import {
   type SearchResult,
   sharedFuseConfiguration,
 } from '../../../UI/Search/UseSearchStructuredItem';
-import { useShouldAutofocusInput } from '../../../UI/Reponsive/ScreenTypeMeasurer';
 const gd: libGDevelop = global.gd;
 
 const getGroupIconSrc = (key: string) => {
@@ -75,14 +74,6 @@ export default class InstructionOrExpressionSelector<
   );
 
   componentDidMount() {
-    if (
-      this.props.focusOnMount &&
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useShouldAutofocusInput() &&
-      this._searchBar
-    ) {
-      this._searchBar.focus();
-    }
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
@@ -160,6 +151,7 @@ export default class InstructionOrExpressionSelector<
           }
           helpPagePath={helpPagePath}
           ref={searchBar => (this._searchBar = searchBar)}
+          autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
         />
         <ScrollView autoHideScrollbar ref={this._scrollView}>
           {hasResults && (

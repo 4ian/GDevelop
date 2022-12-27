@@ -52,7 +52,7 @@ import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
 import { ShortcutsReminder } from './ShortcutsReminder';
 import Paper from '../UI/Paper';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -192,8 +192,11 @@ export default class ProjectManager extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
+      // TODO: When this component is refactored into a functional component,
+      // use useShouldAutofocusInput.
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      if (useShouldAutofocusInput() && this._searchBar) this._searchBar.focus();
+      if (useScreenType() === 'normal' && this._searchBar)
+        this._searchBar.focus();
     }
   }
 

@@ -14,7 +14,6 @@ import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import Lock from '@material-ui/icons/Lock';
 import LockOpen from '@material-ui/icons/LockOpen';
 import NotInterested from '@material-ui/icons/NotInterested';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 const gd = global.gd;
 
 type State = {|
@@ -72,12 +71,6 @@ export default class InstancesList extends Component<Props, State> {
     isActive: () => false,
     shortcutCallbacks: {},
   });
-
-  componentDidMount() {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    if (useShouldAutofocusInput() && this._searchBar.current)
-      this._searchBar.current.focus();
-  }
 
   // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
   UNSAFE_componentWillMount() {
@@ -313,6 +306,7 @@ export default class InstancesList extends Component<Props, State> {
               ref={this._searchBar}
               placeholder={t`Search instances`}
               aspect="integrated-search-bar"
+              autoFocus="desktop"
             />
           </div>
         )}

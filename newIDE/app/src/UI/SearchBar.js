@@ -263,6 +263,11 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     );
 
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
+    const shouldAutoFocusTextField = !autoFocus
+      ? false
+      : autoFocus === 'desktopAndMobileDevices'
+      ? true
+      : shouldAutofocusSearchbar;
     const previousChosenTagsCount = React.useRef<number>(
       tagsHandler ? tagsHandler.chosenTags.size : 0
     );
@@ -272,14 +277,14 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         // It is convenient when using keyboard to remove all tags and
         // quickly get back to the text field.
         if (
-          shouldAutofocusSearchbar &&
+          shouldAutoFocusTextField &&
           tagsHandler &&
           tagsHandler.chosenTags.size === 0 &&
           previousChosenTagsCount.current > 0
         )
           focus();
       },
-      [tagsHandler, shouldAutofocusSearchbar]
+      [tagsHandler, shouldAutoFocusTextField]
     );
 
     const handleBlur = () => {
@@ -353,13 +358,6 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         changeValueDebounced(newValue || '');
       }
     };
-
-    const shouldAutofocusInput = useShouldAutofocusInput();
-    const shouldAutoFocusTextField = !autoFocus
-      ? false
-      : autoFocus === 'desktopAndMobileDevices'
-      ? true
-      : shouldAutofocusInput;
 
     return (
       <I18n>

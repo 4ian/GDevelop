@@ -19,6 +19,8 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RouterContext from '../MainFrame/RouterContext';
+import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
 
 export type ProfileTab = 'profile' | 'games-dashboard';
 
@@ -32,9 +34,13 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   const { routeArguments, removeRouteArguments } = React.useContext(
     RouterContext
   );
+  const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
+  const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
+
   const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
+  const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
 
   React.useEffect(
     () => {
@@ -44,6 +50,46 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
       }
     },
     [routeArguments, removeRouteArguments]
+  );
+
+  const markBadgesAsSeen = React.useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
+        // If not connected (or loading), do nothing.
+        return;
+      }
+      if (badgesSeenNotificationSentRef.current) {
+        // If already marked as seen, do nothing.
+        return;
+      }
+      if (
+        !entries[0].isIntersecting &&
+        badgesSeenNotificationTimeoutRef.current
+      ) {
+        // If not visible, clear timeout.
+        clearTimeout(badgesSeenNotificationTimeoutRef.current);
+        badgesSeenNotificationTimeoutRef.current = null;
+        return;
+      }
+      if (entries[0].isIntersecting) {
+        if (badgesSeenNotificationTimeoutRef.current) {
+          // If timeout already set, do nothing.
+          return;
+        } else {
+          // Set timeout to mark badges as seen in the future.
+          badgesSeenNotificationTimeoutRef.current = setTimeout(() => {
+            doMarkBadgesAsSeen(authenticatedUser);
+            badgesSeenNotificationSentRef.current = true;
+          }, 5000);
+        }
+      }
+    },
+    [authenticatedUser]
+  );
+
+  useIsElementVisibleInScroll(
+    userAchievementsContainerRef.current,
+    markBadgesAsSeen
   );
 
   const [
@@ -168,11 +214,13 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
                 />
                 <ContributionsDetails userId={authenticatedUser.profile.id} />
                 {isConnected && (
-                  <UserAchievements
-                    badges={authenticatedUser.badges}
-                    displayUnclaimedAchievements
-                    displayNotifications
-                  />
+                  <div ref={userAchievementsContainerRef}>
+                    <UserAchievements
+                      badges={authenticatedUser.badges}
+                      displayUnclaimedAchievements
+                      displayNotifications
+                    />
+                  </div>
                 )}
               </Column>
             </Line>

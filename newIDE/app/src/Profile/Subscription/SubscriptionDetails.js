@@ -92,8 +92,8 @@ const SubscriptionDetails = ({
                   <Column noMargin>
                     <Text noMargin>
                       <Trans>
-                        Unlock more one-click exports and other exclusive
-                        features.
+                        Unlock more one-click exports, cloud projects,
+                        leaderboards and remove the GDevelop splashscreen.
                       </Trans>
                     </Text>
                     <Text noMargin>

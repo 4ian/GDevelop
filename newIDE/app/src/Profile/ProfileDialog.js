@@ -72,6 +72,7 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
         return;
       }
       if (entries[0].isIntersecting) {
+        // If visible
         if (badgesSeenNotificationTimeoutRef.current) {
           // If timeout already set, do nothing.
           return;

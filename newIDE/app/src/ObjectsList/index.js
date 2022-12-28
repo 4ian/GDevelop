@@ -42,6 +42,8 @@ import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -106,6 +108,8 @@ type Props = {|
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
   ) => void,
+  renamedObjectWithContext: ?ObjectWithContext,
+  setRenamedObjectWithContext: (?ObjectWithContext) => void,
   onRenameObject: (
     objectWithContext: ObjectWithContext,
     newName: string,
@@ -121,7 +125,7 @@ type Props = {|
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
-  onObjectSelected: string => void,
+  onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
   onAddObjectInstance: (objectName: string) => void,
@@ -143,6 +147,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObject,
+      renamedObjectWithContext,
+      setRenamedObjectWithContext,
       onRenameObject,
       selectedObjectNames,
       canInstallPrivateAsset,
@@ -165,6 +171,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     }: Props,
     ref
   ) => {
+    const preferences = React.useContext(PreferencesContext);
     const sortableList = React.useRef<?SortableVirtualizedItemList<ObjectWithContext>>(
       null
     );
@@ -194,10 +201,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
     }));
 
-    const [
-      renamedObjectWithContext,
-      setRenamedObjectWithContext,
-    ] = React.useState<?ObjectWithContext>(null);
     const [searchText, setSearchText] = React.useState('');
     const [tagEditedObject, setTagEditedObject] = React.useState<?gdObject>(
       null
@@ -228,7 +231,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          onObjectSelected(name);
+          // Adding an object is always (at the moment) going to the scene (layout),
+          // and not to the project (as a global object) so the context is not global.
+          onObjectSelected(/* objectWithContext */ { object, global: false });
         }
       },
       [
@@ -408,7 +413,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // TODO Should it be called later?
         if (sortableList.current) sortableList.current.forceUpdateGrid();
       },
-      []
+      [setRenamedObjectWithContext]
     );
 
     const duplicateObject = React.useCallback(
@@ -448,7 +453,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           });
         }
       },
-      [canRenameObject, onObjectModified, onRenameObject]
+      [
+        canRenameObject,
+        onObjectModified,
+        onRenameObject,
+        setRenamedObjectWithContext,
+      ]
     );
 
     const lists = enumerateObjects(project, objectsContainer);
@@ -628,9 +638,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const selectObject = React.useCallback(
       (objectWithContext: ?ObjectWithContext) => {
-        onObjectSelected(
-          objectWithContext ? objectWithContext.object.getName() : ''
-        );
+        onObjectSelected(objectWithContext);
       },
       [onObjectSelected]
     );
@@ -709,6 +717,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Rename`),
             click: () => editName(objectWithContext),
+            accelerator: getShortcutDisplayName(
+              preferences.values.userShortcutMap['SCENE_OBJECT_RENAME'] || 'F2'
+            ),
           },
           {
             label: i18n._(t`Set as global object`),
@@ -774,6 +785,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         project,
         setAsGlobalObject,
         eventsFunctionsExtensionWriter,
+        preferences.values.userShortcutMap,
       ]
     );
 

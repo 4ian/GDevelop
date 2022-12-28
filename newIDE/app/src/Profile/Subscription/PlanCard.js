@@ -9,6 +9,7 @@ import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import { LineStackLayout } from '../../UI/Layout';
 
 const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
@@ -72,9 +73,9 @@ const PlanCard = (props: Props) => {
             </Column>
           </Line>
           {props.actions && (
-            <Line expand justifyContent="flex-end" noMargin>
+            <LineStackLayout expand justifyContent="flex-end" noMargin>
               {props.actions}
-            </Line>
+            </LineStackLayout>
           )}
         </Card>
       )}

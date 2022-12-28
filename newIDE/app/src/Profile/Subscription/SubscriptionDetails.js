@@ -1,16 +1,20 @@
 // @flow
 import * as React from 'react';
 import { Column, Line } from '../../UI/Grid';
-import { type Subscription } from '../../Utils/GDevelopServices/Usage';
+import {
+  getSubscriptionPlans,
+  type Subscription,
+} from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
-import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import { LineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Paper from '../../UI/Paper';
+import PlanCard from './PlanCard';
 
 const styles = {
   diamondIcon: {
@@ -35,38 +39,48 @@ const SubscriptionDetails = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+
+  const userPlan = React.useMemo(
+    () => {
+      if (!subscription) return null;
+      return getSubscriptionPlans().find(
+        plan => plan.planId === subscription.planId
+      );
+    },
+    [subscription]
+  );
+
   return subscription ? (
     <Column>
       <Line alignItems="center">
         <Text size="block-title">My online services subscription</Text>
       </Line>
-      {subscription.planId ? (
+      {userPlan && userPlan.planId ? (
         <>
-          <Line>
-            <Text>
-              <Trans>
-                You are subscribed to <b>{subscription.planId}</b>.
-                Congratulations! You have access to more cloud projects,
-                leaderboards, player feedbacks, cloud builds.
-              </Trans>
-            </Text>
-          </Line>
-          <ResponsiveLineStackLayout justifyContent="flex-end">
-            <LeftLoader isLoading={isManageSubscriptionLoading}>
-              <FlatButton
-                label={<Trans>Manage online</Trans>}
+          <PlanCard
+            plan={userPlan}
+            actions={[
+              <LeftLoader
+                key="manage-online"
+                isLoading={isManageSubscriptionLoading}
+              >
+                <FlatButton
+                  label={<Trans>Manage online</Trans>}
+                  primary
+                  onClick={onManageSubscription}
+                />
+              </LeftLoader>,
+              <RaisedButton
+                key="manage"
+                label={<Trans>Manage subscription</Trans>}
                 primary
-                onClick={onManageSubscription}
-              />
-            </LeftLoader>
-            <RaisedButton
-              label={<Trans>Upgrade or cancel</Trans>}
-              primary
-              onClick={() =>
-                openSubscriptionDialog({ reason: 'Consult profile' })
-              }
-            />
-          </ResponsiveLineStackLayout>
+                onClick={() =>
+                  openSubscriptionDialog({ reason: 'Consult profile' })
+                }
+              />,
+            ]}
+            isHighlighted={false}
+          />
         </>
       ) : (
         <>

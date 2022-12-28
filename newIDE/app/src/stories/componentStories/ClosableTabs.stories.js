@@ -281,11 +281,11 @@ export const WithObjectsList = () => (
                   getAllObjectTags={() => []}
                   canRenameObject={() => true}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+                  onRenameStart={() => {}}
+                  onRenameFinish={(objectWithContext, newName, cb) => cb(true)}
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
                   renamedObjectWithContext={null}
-                  setRenamedObjectWithContext={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   canInstallPrivateAsset={() => false}
                 />

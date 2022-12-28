@@ -65,7 +65,7 @@ const ToolbarCommands = (props: Props) => {
     handler: props.setupGrid,
   });
 
-  useCommand('SCENE_OBJECT_RENAME', props.canRenameObject, {
+  useCommand('RENAME_SCENE_OBJECT', props.canRenameObject, {
     handler: props.onRenameObject,
   });
 

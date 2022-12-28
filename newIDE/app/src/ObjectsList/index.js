@@ -43,6 +43,7 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
@@ -109,8 +110,8 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   renamedObjectWithContext: ?ObjectWithContext,
-  setRenamedObjectWithContext: (?ObjectWithContext) => void,
-  onRenameObject: (
+  onRenameStart: (?ObjectWithContext) => void,
+  onRenameFinish: (
     objectWithContext: ObjectWithContext,
     newName: string,
     cb: (boolean) => void
@@ -148,8 +149,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObject,
       renamedObjectWithContext,
-      setRenamedObjectWithContext,
-      onRenameObject,
+      onRenameStart,
+      onRenameFinish,
       selectedObjectNames,
       canInstallPrivateAsset,
 
@@ -231,9 +232,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          // Adding an object is always (at the moment) going to the scene (layout),
-          // and not to the project (as a global object) so the context is not global.
-          onObjectSelected(/* objectWithContext */ { object, global: false });
+          // For now, a new object is always added to the scene (layout)
+          onObjectSelected(/* objectWithContext= */ { object, global: false });
         }
       },
       [
@@ -381,11 +381,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const editName = React.useCallback(
       (objectWithContext: ?ObjectWithContext) => {
-        setRenamedObjectWithContext(objectWithContext);
+        onRenameStart(objectWithContext);
         // TODO Should it be called later?
         if (sortableList.current) sortableList.current.forceUpdateGrid();
       },
-      [setRenamedObjectWithContext]
+      [onRenameStart]
     );
 
     const pasteAndRename = React.useCallback(
@@ -406,12 +406,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
         const { object } = objectWithContext;
-        setRenamedObjectWithContext(null);
+        onRenameStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
         if (canRenameObject(newName)) {
-          onRenameObject(objectWithContext, newName, doRename => {
+          onRenameFinish(objectWithContext, newName, doRename => {
             if (!doRename) return;
 
             object.setName(newName);
@@ -419,12 +419,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           });
         }
       },
-      [
-        canRenameObject,
-        onObjectModified,
-        onRenameObject,
-        setRenamedObjectWithContext,
-      ]
+      [canRenameObject, onObjectModified, onRenameStart, onRenameFinish]
     );
 
     const lists = enumerateObjects(project, objectsContainer);
@@ -684,7 +679,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             label: i18n._(t`Rename`),
             click: () => editName(objectWithContext),
             accelerator: getShortcutDisplayName(
-              preferences.values.userShortcutMap['SCENE_OBJECT_RENAME'] || 'F2'
+              preferences.values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
+                defaultShortcuts.RENAME_SCENE_OBJECT
             ),
           },
           {

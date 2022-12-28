@@ -256,7 +256,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         redo={this.redo}
         onOpenSettings={this.openSceneProperties}
         canRenameObject={this.state.selectedObjectWithContext != null}
-        onRenameObject={this._startRenamingObject}
+        onRenameObject={this._startRenamingSelectedObject}
       />
     );
   }
@@ -465,7 +465,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         selectedObjectWithContext: objectWithContext,
       },
       () => {
-        // We update toolbar because we need to update the objects selected (for the rename shortcut)
+        // We update the toolbar because we need to update the objects selected
+        // (for the rename shortcut)
         this.updateToolbar();
       }
     );
@@ -688,7 +689,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onEditRenameObject = (objectWithContext: ?ObjectWithContext) => {
+  _onRenameStart = (objectWithContext: ?ObjectWithContext) => {
     this.setState(
       {
         renamedObjectWithContext: objectWithContext,
@@ -700,8 +701,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _startRenamingObject = () => {
-    this._onEditRenameObject(this.state.selectedObjectWithContext);
+  _startRenamingSelectedObject = () => {
+    this._onRenameStart(this.state.selectedObjectWithContext);
   };
 
   _onRenameLayer = (
@@ -796,11 +797,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editedObjectWithContext } = this.state;
 
     if (editedObjectWithContext) {
-      this._onRenameObject(editedObjectWithContext, newName, () => {});
+      this._onRenameFinish(editedObjectWithContext, newName, () => {});
     }
   };
 
-  _onRenameObject = (
+  _onRenameFinish = (
     objectWithContext: ObjectWithContext,
     newName: string,
     done: boolean => void
@@ -1485,8 +1486,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
                 renamedObjectWithContext={this.state.renamedObjectWithContext}
-                setRenamedObjectWithContext={this._onEditRenameObject}
-                onRenameObject={this._onRenameObject}
+                onRenameStart={this._onRenameStart}
+                onRenameFinish={this._onRenameFinish}
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}

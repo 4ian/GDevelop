@@ -226,29 +226,33 @@ const ContributionDetails = ({ userId }: Props) => {
             <Trans>Contributions</Trans>
           </Text>
         </Line>
+        {examples && extensions ? (
+          <>
+            <ExtensionsAccordion
+              extensions={extensions}
+              extensionError={extensionError}
+            />
+            <ExamplesAccordion
+              examples={examples}
+              exampleError={exampleError}
+            />
+            <AssetsAccordion examples={examples} />
+            <Column>
+              <BackgroundText>
+                <Trans>
+                  Missing some contributions? If you are the author, create a
+                  Pull Request on the corresponding GitHub repository after
+                  adding your username in the authors of the example or the
+                  extension - or directly ask the original author to add your
+                  username.
+                </Trans>
+              </BackgroundText>
+            </Column>
+          </>
+        ) : (
+          <PlaceholderLoader />
+        )}
       </Column>
-      {examples && extensions ? (
-        <>
-          <ExtensionsAccordion
-            extensions={extensions}
-            extensionError={extensionError}
-          />
-          <ExamplesAccordion examples={examples} exampleError={exampleError} />
-          <AssetsAccordion examples={examples} />
-          <Column>
-            <BackgroundText>
-              <Trans>
-                Missing some contributions? If you are the author, create a Pull
-                Request on the corresponding GitHub repository after adding your
-                username in the authors of the example or the extension - or
-                directly ask the original author to add your username.
-              </Trans>
-            </BackgroundText>
-          </Column>
-        </>
-      ) : (
-        <PlaceholderLoader />
-      )}
     </>
   );
 };

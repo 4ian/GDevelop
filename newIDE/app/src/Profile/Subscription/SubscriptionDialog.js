@@ -3,7 +3,6 @@ import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import Card from '../../UI/Card';
 import FlatButton from '../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
@@ -14,11 +13,8 @@ import {
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
 } from '../../Utils/GDevelopServices/Usage';
-import RaisedButton from '../../UI/RaisedButton';
-import CheckCircle from '@material-ui/icons/CheckCircle';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import LeftLoader from '../../UI/LeftLoader';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
@@ -27,11 +23,13 @@ import {
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from '../RedeemCodeDialog';
+import PlanCard from './PlanCard';
+import LeftLoader from '../../UI/LeftLoader';
+import RaisedButton from '../../UI/RaisedButton';
 
 const styles = {
   descriptionText: {
@@ -90,7 +88,6 @@ export default function SubscriptionDialog({
   ] = React.useState(false);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation, showAlert } = useAlertDialog();
 
   React.useEffect(
@@ -263,83 +260,36 @@ export default function SubscriptionDialog({
               const isCurrentPlan =
                 !!authenticatedUser.subscription &&
                 authenticatedUser.subscription.planId === plan.planId;
-
               // If no plan (free usage), do not display button.
               const button = !plan.planId ? null : isCurrentPlan ? (
-                <LeftLoader isLoading={isLoading}>
-                  <FlatButton
-                    disabled={isLoading}
-                    label={<Trans>Cancel your subscription</Trans>}
-                    onClick={() => choosePlan(i18n, { planId: null })}
-                  />
-                </LeftLoader>
+                <React.Fragment key="cancel">
+                  <LeftLoader isLoading={isLoading}>
+                    <FlatButton
+                      disabled={isLoading}
+                      label={<Trans>Cancel your subscription</Trans>}
+                      onClick={() => choosePlan(i18n, { planId: null })}
+                    />
+                  </LeftLoader>
+                </React.Fragment>
               ) : (
-                <LeftLoader isLoading={isLoading}>
-                  <RaisedButton
-                    primary
-                    disabled={isLoading}
-                    label={<Trans>Choose this plan</Trans>}
-                    onClick={() => choosePlan(i18n, plan)}
-                  />
-                </LeftLoader>
+                <React.Fragment key="upgrade">
+                  <LeftLoader isLoading={isLoading}>
+                    <RaisedButton
+                      primary
+                      disabled={isLoading}
+                      label={<Trans>Choose this plan</Trans>}
+                      onClick={() => choosePlan(i18n, plan)}
+                    />
+                  </LeftLoader>
+                </React.Fragment>
               );
-
               return (
-                <Card key={plan.planId || ''} isHighlighted={isCurrentPlan}>
-                  <Line
-                    noMargin
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Text size="block-title">
-                      <span>
-                        <b>{plan.name}</b>
-                      </span>
-                    </Text>
-                    <Text color="secondary">
-                      {plan.monthlyPriceInEuros ? (
-                        <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
-                      ) : (
-                        <Trans>Free</Trans>
-                      )}
-                    </Text>
-                  </Line>
-                  <Text color="secondary" noMargin>
-                    {plan.smallDescription ? i18n._(plan.smallDescription) : ''}
-                  </Text>
-                  <Line>
-                    <Column noMargin>
-                      {plan.descriptionBullets.map(
-                        (descriptionBullet, index) => (
-                          <Column key={index} expand noMargin>
-                            <Line noMargin alignItems="center">
-                              {authenticatedUser.subscription &&
-                              authenticatedUser.subscription.planId ===
-                                plan.planId ? (
-                                <CheckCircle
-                                  style={{
-                                    ...styles.bulletIcon,
-                                    color: gdevelopTheme.message.valid,
-                                  }}
-                                />
-                              ) : (
-                                <CheckCircle style={styles.bulletIcon} />
-                              )}
-                              <Text style={styles.bulletText}>
-                                {i18n._(descriptionBullet.message)}
-                              </Text>
-                            </Line>
-                          </Column>
-                        )
-                      )}
-                    </Column>
-                  </Line>
-                  {button && (
-                    <Line expand justifyContent="flex-end" noMargin>
-                      {button}
-                    </Line>
-                  )}
-                </Card>
+                <PlanCard
+                  plan={plan}
+                  actions={[button]}
+                  isPending={isLoading}
+                  isHighlighted={isCurrentPlan}
+                />
               );
             })}
             <Column>

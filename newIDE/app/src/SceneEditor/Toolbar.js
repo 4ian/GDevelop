@@ -20,7 +20,6 @@ import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import GridIcon from '../UI/CustomSvgIcons/Grid';
 import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
-import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 
 type Props = {|
   openObjectsList: () => void,

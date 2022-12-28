@@ -87,7 +87,7 @@ const SubscriptionDetails = ({
           <Paper background="medium" variant="outlined">
             <LineStackLayout alignItems="center">
               <img src="res/diamond.svg" style={styles.diamondIcon} alt="" />
-              <Column>
+              <Column expand>
                 <Line>
                   <Column noMargin>
                     <Text noMargin>
@@ -104,7 +104,7 @@ const SubscriptionDetails = ({
                     </Text>
                   </Column>
                 </Line>
-                <Line justifyContent="flex-start">
+                <Line justifyContent="flex-end">
                   <RaisedButton
                     label={<Trans>Choose a subscription</Trans>}
                     primary

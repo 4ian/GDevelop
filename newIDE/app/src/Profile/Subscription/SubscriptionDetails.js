@@ -51,7 +51,7 @@ const SubscriptionDetails = ({
   );
 
   return subscription ? (
-    <Column>
+    <Column noMargin>
       <Line alignItems="center">
         <Text size="block-title">My online services subscription</Text>
       </Line>

@@ -188,7 +188,7 @@ export const Item = ({
             onBeginDrag();
             return {};
           }}
-          canDrag={() => true}
+          canDrag={() => !editingName}
           canDrop={() => true}
           drop={onDrop}
         >

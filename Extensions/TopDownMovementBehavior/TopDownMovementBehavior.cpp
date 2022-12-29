@@ -14,11 +14,10 @@ This project is released under the MIT License.
 #include <set>
 
 #include "GDCore/CommonTools.h"
-#include "GDCore/Project/MeasurementUnit.h"
-#include "GDCore/Tools/Localization.h"
-#include "GDCore/CommonTools.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/MeasurementUnit.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Localization.h"
 #if defined(GD_IDE_ONLY)
 #include <map>
 
@@ -47,7 +46,7 @@ TopDownMovementBehavior::GetProperties(
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
   properties["AllowDiagonals"]
-      .SetLabel(_("Allows diagonals"))
+      .SetLabel(_("Allow diagonals"))
       .SetGroup(_("Movement"))
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
@@ -120,7 +119,7 @@ TopDownMovementBehavior::GetProperties(
       .AddExtraInfo(_("True Isometry (30°)"))
       .AddExtraInfo(_("Custom Isometry"));
   properties["CustomIsometryAngle"]
-      .SetLabel(_("Custom isometry angle"))
+      .SetLabel(_("Custom isometry angle (between 1deg and 44deg)"))
       .SetGroup(_("Viewpoint"))
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
@@ -196,7 +195,7 @@ bool TopDownMovementBehavior::UpdateProperty(
     behaviorContent.SetAttribute("deceleration", value.To<float>());
   else if (name == "MaxSpeed")
     behaviorContent.SetAttribute("maxSpeed", value.To<float>());
-  else if (name == "RotationSpeed")
+  else if (name == "AngularMaxSpeed")
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
   else if (name == "AngleOffset")
     behaviorContent.SetAttribute("angleOffset", value.To<float>());

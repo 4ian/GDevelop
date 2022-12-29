@@ -6,10 +6,8 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import {
   getUserPublicProfile,
-  getUserBadges,
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
-import { type Badge } from '../Utils/GDevelopServices/Badge';
 import {
   type PrivateAssetPackListingData,
   listSellerProducts,
@@ -24,7 +22,6 @@ type Props = {|
 
 const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
   const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
-  const [badges, setBadges] = React.useState<?(Badge[])>(null);
   const [
     assetPacksListingData,
     setAssetPacksListingData,
@@ -63,33 +60,17 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
     [userId]
   );
 
-  const fetchUserBadges = React.useCallback(
-    async () => {
-      if (!userId) return;
-      setBadges(null);
-      try {
-        const badges = await getUserBadges(userId);
-        setBadges(badges);
-      } catch (error) {
-        setError(error);
-      }
-    },
-    [userId]
-  );
-
   React.useEffect(
     () => {
       fetchProfile();
-      fetchUserBadges();
       fetchUserPacks();
     },
-    [userId, fetchProfile, fetchUserBadges, fetchUserPacks]
+    [userId, fetchProfile, fetchUserPacks]
   );
 
   const onRetry = () => {
     setError(null);
     fetchProfile();
-    fetchUserBadges();
   };
 
   return (
@@ -111,7 +92,6 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
         profile={profile}
         error={error}
         onRetry={onRetry}
-        badges={badges}
         assetPacksListingData={assetPacksListingData}
         onAssetPackOpen={onAssetPackOpen}
       />

@@ -219,14 +219,12 @@ const ContributionDetails = ({ userId }: Props) => {
   );
 
   return (
-    <>
-      <Column>
-        <Line alignItems="center">
-          <Text size="block-title">
-            <Trans>Contributions</Trans>
-          </Text>
-        </Line>
-      </Column>
+    <Column noMargin>
+      <Line alignItems="center">
+        <Text size="block-title">
+          <Trans>Contributions</Trans>
+        </Text>
+      </Line>
       {examples && extensions ? (
         <>
           <ExtensionsAccordion
@@ -249,7 +247,7 @@ const ContributionDetails = ({ userId }: Props) => {
       ) : (
         <PlaceholderLoader />
       )}
-    </>
+    </Column>
   );
 };
 

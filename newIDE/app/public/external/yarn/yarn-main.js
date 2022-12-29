@@ -1,20 +1,19 @@
-import { createPathEditorHeader, fileExists } from '../utils/path-editor.js';
+import { createPathEditorHeader } from '../utils/path-editor.js';
+import { fromByteArray } from '../utils/base64.js';
 
 const electron = require('electron');
 const remote = require('@electron/remote');
 const electronWindow = remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
-const fs = require('fs');
 
 let yarn = null;
 
-const saveAndClose = pathEditorHeader => {
-  const savePath = pathEditorHeader.state.fullPath;
-  yarn.data.saveTo(savePath, yarn.data.getSaveData('json'), () => {
-    ipcRenderer.send('yarn-changes-saved', savePath);
-    remote.getCurrentWindow().close();
-  });
-};
+function convertJsonStringToDataUrl(jsonString) {
+  const base64 = fromByteArray(new TextEncoder().encode(jsonString));
+
+  // Return the data URL
+  return `data:application/json;base64,${base64}`;
+}
 
 const closeWindow = () => {
   remote.getCurrentWindow().close();
@@ -23,16 +22,34 @@ const closeWindow = () => {
 const editorFrameEl = document.getElementById('yarn-frame');
 window.addEventListener('yarnReady', e => {
   yarn = e;
-  yarn.app.fs = fs;
-  yarn.app.electron = electron;
-  yarn.app.remote = remote;
+  // yarn.app.fs = fs;
+  // yarn.app.electron = electron;
+  // yarn.app.remote = remote;
   yarn.data.restoreFromLocalStorage(false);
   ipcRenderer.send('yarn-ready');
 });
 editorFrameEl.src = 'yarn-editor/index.html';
 
 // Called to load yarn data. Should be called after the window is fully loaded.
-ipcRenderer.on('yarn-open', (event, receivedData) => {
+ipcRenderer.on('yarn-open', async (event, externalEditorInput) => {
+  const saveAndClose = pathEditor => {
+    const jsonString = yarn.data.getSaveData('json');
+    const dataUrl = convertJsonStringToDataUrl(jsonString);
+    ipcRenderer.send('yarn-closed', {
+      resources: [
+        {
+          name: resource ? pathEditor.state.name : undefined,
+          localFilePath: resource.localFilePath,
+          extension: '.json',
+          dataUrl,
+        },
+      ],
+      baseNameForNewResources: pathEditor.state.name,
+      externalEditorData: null,
+    });
+    remote.getCurrentWindow().close();
+  };
+
   // Make the header.
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const pathEditorHeader = createPathEditorHeader({
@@ -40,9 +57,7 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
     editorContentDocument: document,
     onSaveToGd: saveAndClose,
     onCancelChanges: closeWindow,
-    projectPath: receivedData.projectPath,
-    initialResourcePath: receivedData.resourcePath,
-    extension: '.json',
+    name: externalEditorInput.name,
   });
 
   // Inject custom Apply button.
@@ -59,23 +74,17 @@ ipcRenderer.on('yarn-open', (event, receivedData) => {
   yarn.document.getElementsByClassName('app-search')[0].style = 'right: 45px';
   saveToGdButton.style = 'padding-left: 30px;';
 
-  // Process the json file to open, if any.
-  if (fileExists(receivedData.resourcePath)) {
-    receivedData.externalEditorData = fs
-      .readFileSync(receivedData.resourcePath, 'utf8')
-      .toString();
-
-    yarn.data.loadData(receivedData.externalEditorData, 'json', true);
-    electronWindow.setTitle(
-      'GDevelop Dialogue Tree Editor (Yarn) - ' + receivedData.resourcePath
-    );
-
-    pathEditorHeader.toggle();
-  } else {
-    // Set up a new path for the JSON to be saved if none was passed.
-    receivedData.resourcePath = receivedData.projectPath + '/NewFile.json';
-  }
-
-  yarn.data.editingPath(receivedData.resourcePath);
+  yarn.data.editingPath('');
   yarn.data.editingType('json');
+
+  const resource = externalEditorInput.resources[0];
+  if (resource) {
+    const response = await fetch(resource.dataUrl);
+    const resourceData = await response.json();
+    yarn.data.loadData(JSON.stringify(resourceData), 'json', true);
+    pathEditorHeader.toggle();
+  }
+  electronWindow.setTitle(
+    'GDevelop Dialogue Tree Editor (Yarn) - ' + (resource ? resource.name : 'New Dialogue Tree')
+  );
 });

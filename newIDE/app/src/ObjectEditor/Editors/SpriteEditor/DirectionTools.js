@@ -43,7 +43,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  onEditWith: ResourceExternalEditor => void,
+  onEditWith: ResourceExternalEditor => Promise<void>,
 |};
 
 type State = {|

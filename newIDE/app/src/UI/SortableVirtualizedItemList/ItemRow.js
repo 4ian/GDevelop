@@ -8,7 +8,10 @@ import TextField, {
 } from '../TextField';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
-import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
 import GDevelopThemeContext from '../Theme/ThemeContext';
 
@@ -60,11 +63,13 @@ function ItemRow<Item>({
   connectIconDragSource,
 }: Props<Item>) {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
+  const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
       if (editingName) {
+        shouldDiscardChanges.current = false;
         const timeoutId = setTimeout(() => {
           if (textFieldRef.current) textFieldRef.current.focus();
         }, 100);
@@ -80,10 +85,23 @@ function ItemRow<Item>({
       margin="none"
       ref={textFieldRef}
       defaultValue={itemName}
-      onBlur={e => onRename(e.currentTarget.value)}
+      onBlur={e => {
+        onRename(
+          shouldDiscardChanges.current ? itemName : e.currentTarget.value
+        );
+      }}
       onKeyPress={event => {
         if (shouldValidate(event)) {
           if (textFieldRef.current) textFieldRef.current.blur();
+        }
+      }}
+      onKeyUp={event => {
+        if (shouldCloseOrCancel(event)) {
+          const { current: currentTextField } = textFieldRef;
+          if (currentTextField) {
+            shouldDiscardChanges.current = true;
+            currentTextField.blur();
+          }
         }
       }}
       fullWidth

@@ -59,31 +59,31 @@ function ItemRow<Item>({
   scaleUpItemIconWhenSelected,
   connectIconDragSource,
 }: Props<Item>) {
-  const [textField, setTextField] = React.useState<?TextFieldInterface>(null);
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
       if (editingName) {
         const timeoutId = setTimeout(() => {
-          if (textField) textField.focus();
+          if (textFieldRef.current) textFieldRef.current.focus();
         }, 100);
         return () => clearTimeout(timeoutId);
       }
     },
-    [editingName, textField]
+    [editingName]
   );
 
   const label = editingName ? (
     <TextField
       id="rename-item-field"
       margin="none"
-      ref={textField => setTextField(textField)}
+      ref={textFieldRef}
       defaultValue={itemName}
       onBlur={e => onRename(e.currentTarget.value)}
       onKeyPress={event => {
         if (shouldValidate(event)) {
-          if (textField) textField.blur();
+          if (textFieldRef.current) textFieldRef.current.blur();
         }
       }}
       fullWidth

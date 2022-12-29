@@ -72,6 +72,18 @@ const SubscriptionChecker = React.forwardRef<
       open={dialogOpen}
       title={mode === 'try' ? <Trans>We need your support!</Trans> : title}
       actions={[
+        <FlatButton
+          label={
+            mode === 'try' ? (
+              <Trans>Continue anyway</Trans>
+            ) : (
+              <Trans>Not now, thanks!</Trans>
+            )
+          }
+          key="close"
+          primary={false}
+          onClick={closeDialog}
+        />,
         <DialogPrimaryButton
           label={<Trans>Get a subscription or login</Trans>}
           key="subscribe"
@@ -86,21 +98,8 @@ const SubscriptionChecker = React.forwardRef<
           }}
         />,
       ]}
-      secondaryActions={[
-        <FlatButton
-          label={
-            mode === 'try' ? (
-              <Trans>Continue anyway</Trans>
-            ) : (
-              <Trans>Not now, thanks!</Trans>
-            )
-          }
-          key="close"
-          primary={false}
-          onClick={closeDialog}
-        />,
-      ]}
       onRequestClose={closeDialog}
+      maxWidth="sm"
     >
       <Column noMargin>
         <Line noMargin alignItems="center">

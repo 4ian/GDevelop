@@ -23,6 +23,9 @@ const styles = {
     flexShrink: 0,
     objectFit: 'contain',
   },
+  paper: {
+    paddingRight: 6,
+  },
 };
 
 type Props = {
@@ -84,7 +87,7 @@ const SubscriptionDetails = ({
         </>
       ) : (
         <>
-          <Paper background="medium" variant="outlined">
+          <Paper background="medium" variant="outlined" style={styles.paper}>
             <LineStackLayout alignItems="center">
               <img src="res/diamond.svg" style={styles.diamondIcon} alt="" />
               <Column expand>

@@ -285,6 +285,7 @@ export default function SubscriptionDialog({
               );
               return (
                 <PlanCard
+                  key={plan.planId || 'free'}
                   plan={plan}
                   actions={[button]}
                   isPending={isLoading}

@@ -13,7 +13,10 @@ import TextField, {
   type TextFieldInterface,
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../UI/KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
@@ -132,15 +135,19 @@ export const Item = ({
   isLastItem,
   dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
 }: ItemProps) => {
-  const textField = React.useRef<?TextFieldInterface>(null);
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
+  const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
-      if (editingName)
-        setTimeout(() => {
-          if (textField.current) textField.current.focus();
+      if (editingName) {
+        shouldDiscardChanges.current = false;
+        const timeoutId = setTimeout(() => {
+          if (textFieldRef.current) textFieldRef.current.focus();
         }, 100);
+        return () => clearTimeout(timeoutId);
+      }
     },
     [editingName]
   );
@@ -149,12 +156,33 @@ export const Item = ({
     <TextField
       id="rename-item-field"
       margin="none"
-      ref={textField}
+      ref={textFieldRef}
       defaultValue={primaryText}
-      onBlur={e => onRename(e.currentTarget.value)}
+      onBlur={e =>
+        onRename(
+          shouldDiscardChanges.current ? primaryText : e.currentTarget.value
+        )
+      }
       onKeyPress={event => {
         if (shouldValidate(event)) {
-          if (textField.current) textField.current.blur();
+          if (textFieldRef.current) textFieldRef.current.blur();
+        }
+      }}
+      onKeyUp={event => {
+        if (shouldCloseOrCancel(event)) {
+          const { current: currentTextField } = textFieldRef;
+          if (currentTextField) {
+            shouldDiscardChanges.current = true;
+            currentTextField.blur();
+          }
+        }
+      }}
+      onKeyDown={event => {
+        // Prevent project manager to be closed when pressing escape
+        // to cancel name change.
+        if (shouldCloseOrCancel(event)) {
+          event.preventDefault();
+          event.stopPropagation();
         }
       }}
       fullWidth

@@ -15,7 +15,11 @@ import {
   extractFilenameWithExtensionFromProductAuthorizedUrl,
   isProductAuthorizedResourceUrl,
 } from '../../Utils/GDevelopServices/Shop';
-import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
+import {
+  isBlobURL,
+  isURL,
+  parseLocalFilePathOrExtensionFromMetadata,
+} from '../../ResourcesList/ResourceUtils';
 
 export const moveUrlResourcesToCloudFilesIfPrivate = async ({
   project,
@@ -66,11 +70,16 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
                 filename: filenameWithExtension,
               };
             } else if (isBlobURL(resourceFile)) {
-              result.erroredResources.push({
-                resourceName: resource.getName(),
-                error: new Error('Unsupported blob URL.'),
-              });
-              return null;
+              // This is a Blob URL which is surely a reference to a
+              // resource that was just edited. Upload it.
+              const { extension } = parseLocalFilePathOrExtensionFromMetadata(
+                resource
+              );
+              return {
+                resource,
+                url: resourceFile,
+                filename: resource.getName() + (extension || ''),
+              };
             } else {
               // Public URL resource: nothing to do.
               return null;

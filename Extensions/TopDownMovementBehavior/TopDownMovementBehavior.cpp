@@ -10,19 +10,16 @@ This project is released under the MIT License.
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <set>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/MeasurementUnit.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
-#if defined(GD_IDE_ONLY)
-#include <map>
-
-#include "GDCore/Project/PropertyDescriptor.h"
-#endif
 
 void TopDownMovementBehavior::InitializeContent(
     gd::SerializerElement& behaviorContent) {
@@ -39,7 +36,6 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("movementAngleOffset", 0);
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 TopDownMovementBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
@@ -207,5 +203,3 @@ bool TopDownMovementBehavior::UpdateProperty(
 
   return true;
 }
-
-#endif

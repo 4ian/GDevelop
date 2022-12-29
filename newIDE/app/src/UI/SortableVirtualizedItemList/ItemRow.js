@@ -8,7 +8,10 @@ import TextField, {
 } from '../TextField';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
-import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
 import GDevelopThemeContext from '../Theme/ThemeContext';
 
@@ -59,31 +62,46 @@ function ItemRow<Item>({
   scaleUpItemIconWhenSelected,
   connectIconDragSource,
 }: Props<Item>) {
-  const [textField, setTextField] = React.useState<?TextFieldInterface>(null);
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
+  const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
       if (editingName) {
+        shouldDiscardChanges.current = false;
         const timeoutId = setTimeout(() => {
-          if (textField) textField.focus();
+          if (textFieldRef.current) textFieldRef.current.focus();
         }, 100);
         return () => clearTimeout(timeoutId);
       }
     },
-    [editingName, textField]
+    [editingName]
   );
 
   const label = editingName ? (
     <TextField
       id="rename-item-field"
       margin="none"
-      ref={textField => setTextField(textField)}
+      ref={textFieldRef}
       defaultValue={itemName}
-      onBlur={e => onRename(e.currentTarget.value)}
+      onBlur={e => {
+        onRename(
+          shouldDiscardChanges.current ? itemName : e.currentTarget.value
+        );
+      }}
       onKeyPress={event => {
         if (shouldValidate(event)) {
-          if (textField) textField.blur();
+          if (textFieldRef.current) textFieldRef.current.blur();
+        }
+      }}
+      onKeyUp={event => {
+        if (shouldCloseOrCancel(event)) {
+          const { current: currentTextField } = textFieldRef;
+          if (currentTextField) {
+            shouldDiscardChanges.current = true;
+            currentTextField.blur();
+          }
         }
       }}
       fullWidth

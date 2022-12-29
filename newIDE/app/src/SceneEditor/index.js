@@ -5,7 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import uniq from 'lodash/uniq';
 import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
@@ -134,7 +133,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
-  selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
   editedGroup: ?gdObjectGroup,
@@ -152,6 +150,9 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+
+  renamedObjectWithContext: ?ObjectWithContext,
+  selectedObjects: Array<ObjectWithContext>,
 |};
 
 type CopyCutPasteOptions = {|
@@ -190,7 +191,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
 
@@ -213,6 +213,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
 
       selectedObjectTags: [],
+
+      renamedObjectWithContext: null,
+      selectedObjects: [],
     };
   }
 
@@ -250,6 +253,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.openSceneProperties}
+        canRenameObject={this.state.selectedObjects.length === 1}
+        onRenameObject={this._startRenamingSelectedObject}
       />
     );
   }
@@ -446,16 +451,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _onObjectSelected = (selectedObjectName: string) => {
-    if (!selectedObjectName) {
-      this.setState({
-        selectedObjectNames: [],
-      });
-    } else {
-      this.setState({
-        selectedObjectNames: [selectedObjectName],
-      });
+  _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
+    const selectedObjects = [];
+    if (objectWithContext) {
+      selectedObjects.push(objectWithContext);
     }
+
+    this.setState(
+      {
+        selectedObjects,
+      },
+      () => {
+        // We update the toolbar because we need to update the objects selected
+        // (for the rename shortcut)
+        this.updateToolbar();
+      }
+    );
   };
 
   _createNewObjectAndInstanceUnderCursor = () => {
@@ -472,15 +483,15 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onAddInstanceUnderCursor = () => {
-    if (!this.state.selectedObjectNames.length || !this.editor) {
+    if (!this.state.selectedObjects.length || !this.editor) {
       return;
     }
 
-    const objectSelected = this.state.selectedObjectNames[0];
+    const objectSelected = this.state.selectedObjects[0];
     const cursorPosition = this.editor.getLastCursorSceneCoordinates();
-    this._addInstance(cursorPosition, objectSelected);
+    this._addInstance(cursorPosition, objectSelected.object.getName());
     this.setState({
-      selectedObjectNames: [objectSelected],
+      selectedObjects: [objectSelected],
     });
   };
 
@@ -528,13 +539,21 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
-    this.setState({
-      selectedObjectNames: uniq(
-        instances.map(instance => instance.getObjectName())
-      ),
-    });
-    this.forceUpdatePropertiesEditor();
-    this.updateToolbar();
+    const { project, layout } = this.props;
+    const instancesNames = instances.map(e => e.getObjectName());
+    const selectedObjects = enumerateObjects(
+      project,
+      layout
+    ).allObjectsList.filter(e => instancesNames.includes(e.object.getName()));
+    this.setState(
+      {
+        selectedObjects,
+      },
+      () => {
+        this.forceUpdatePropertiesEditor();
+        this.updateToolbar();
+      }
+    );
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
@@ -675,6 +694,27 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _onRenameStart = (objectWithContext: ?ObjectWithContext) => {
+    const selectedObjects = [];
+    if (objectWithContext) {
+      selectedObjects.push(objectWithContext);
+    }
+
+    this.setState(
+      {
+        renamedObjectWithContext: objectWithContext,
+        selectedObjects,
+      },
+      () => {
+        this.updateToolbar();
+      }
+    );
+  };
+
+  _startRenamingSelectedObject = () => {
+    this._onRenameStart(this.state.selectedObjects[0]);
+  };
+
   _onRenameLayer = (
     oldName: string,
     newName: string,
@@ -767,11 +807,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editedObjectWithContext } = this.state;
 
     if (editedObjectWithContext) {
-      this._onRenameObject(editedObjectWithContext, newName, () => {});
+      this._onRenameFinish(editedObjectWithContext, newName, () => {});
     }
   };
 
-  _onRenameObject = (
+  _onRenameFinish = (
     objectWithContext: ObjectWithContext,
     newName: string,
     done: boolean => void
@@ -802,6 +842,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     object.setName(newName);
+    this._onObjectSelected(objectWithContext);
     done(true);
   };
 
@@ -919,7 +960,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState(
       {
-        selectedObjectNames: [],
+        selectedObjects: [],
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
@@ -992,19 +1033,19 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onContextMenu = (
     x: number,
     y: number,
-    ignoreSelectedObjectNamesForContextMenu?: boolean = false
+    ignoreselectedObjectsForContextMenu?: boolean = false
   ) => {
     if (this.contextMenu)
       this.contextMenu.open(x, y, {
-        ignoreSelectedObjectNamesForContextMenu: !!ignoreSelectedObjectNamesForContextMenu,
+        ignoreselectedObjectsForContextMenu: !!ignoreselectedObjectsForContextMenu,
       });
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {
     let contextMenuItems = [];
     if (
-      options.ignoreSelectedObjectNamesForContextMenu ||
-      this.state.selectedObjectNames.length === 0
+      options.ignoreselectedObjectsForContextMenu ||
+      this.state.selectedObjects.length === 0
     ) {
       contextMenuItems = [
         ...contextMenuItems,
@@ -1076,13 +1117,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         {
           label: i18n._(
             t`Edit object ${shortenString(
-              this.state.selectedObjectNames[0],
+              this.state.selectedObjects[0].object.getName(),
               14
             )}`
           ),
           click: () =>
             this.editObjectByName(
-              this.state.selectedObjectNames[0],
+              this.state.selectedObjects[0].object.getName(),
               'properties'
             ),
         },
@@ -1090,7 +1131,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           label: i18n._(t`Edit object variables`),
           click: () =>
             this.editObjectByName(
-              this.state.selectedObjectNames[0],
+              this.state.selectedObjects[0].object.getName(),
               'variables'
             ),
         },
@@ -1098,14 +1139,17 @@ export default class SceneEditor extends React.Component<Props, State> {
           label: i18n._(t`Edit behaviors`),
           click: () =>
             this.editObjectByName(
-              this.state.selectedObjectNames[0],
+              this.state.selectedObjects[0].object.getName(),
               'behaviors'
             ),
         },
         {
           label: i18n._(t`Edit effects`),
           click: () =>
-            this.editObjectByName(this.state.selectedObjectNames[0], 'effects'),
+            this.editObjectByName(
+              this.state.selectedObjects[0].object.getName(),
+              'effects'
+            ),
         },
       ];
     }
@@ -1395,7 +1439,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             onInstancesMoved={this._onInstancesMoved}
             onInstancesResized={this._onInstancesResized}
             onInstancesRotated={this._onInstancesRotated}
-            selectedObjectNames={this.state.selectedObjectNames}
+            selectedObjectNames={this.state.selectedObjects.map(e =>
+              e.object.getName()
+            )}
             onContextMenu={this._onContextMenu}
             instancesEditorShortcutsCallbacks={{
               onCopy: () => this.copySelection({ useLastCursorPosition: true }),
@@ -1446,7 +1492,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this.onSelectAllInstancesOfObjectInLayout
                 }
                 resourceManagementProps={this.props.resourceManagementProps}
-                selectedObjectNames={this.state.selectedObjectNames}
+                selectedObjectNames={this.state.selectedObjects.map(e =>
+                  e.object.getName()
+                )}
                 canInstallPrivateAsset={this.props.canInstallPrivateAsset}
                 onEditObject={this.props.onEditObject || this.editObject}
                 onExportObject={this.openObjectExporterDialog}
@@ -1456,7 +1504,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 }
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
-                onRenameObject={this._onRenameObject}
+                renamedObjectWithContext={this.state.renamedObjectWithContext}
+                onRenameStart={this._onRenameStart}
+                onRenameFinish={this._onRenameFinish}
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
@@ -1639,7 +1689,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               options to edit the object.
             </Trans>
           }
-          show={!!this.state.selectedObjectNames.length}
+          show={!!this.state.selectedObjects.length}
         />
         <DismissableInfoBar
           identifier="objects-panel-explanation"

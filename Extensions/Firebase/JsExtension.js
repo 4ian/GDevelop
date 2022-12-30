@@ -2037,7 +2037,7 @@ module.exports = {
         _('Update a document in Database'),
         _('Updates a variable on the database.'),
         _(
-          'Update varable _PARAM0_ with _PARAM1_ (store result state in _PARAM2_)'
+          'Update variable _PARAM0_ with _PARAM1_ (store result state in _PARAM2_)'
         ),
         _('Realtime Database'),
         'JsPlatform/Extensions/firebase.png',

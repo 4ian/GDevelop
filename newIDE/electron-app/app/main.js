@@ -13,13 +13,16 @@ const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
 const { serveFolder, stopServer } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
-const { buildElectronMenuFromDeclarativeTemplate, buildPlaceholderMainMenu } = require('./MainMenu');
+const {
+  buildElectronMenuFromDeclarativeTemplate,
+  buildPlaceholderMainMenu,
+} = require('./MainMenu');
 const { loadModalWindow } = require('./ModalWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
-const { downloadLocalFile } = require('./LocalFileDownloader');
+const { downloadLocalFile, saveLocalFileFromArrayBuffer } = require('./LocalFileDownloader');
 const { openPreviewWindow } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -145,7 +148,9 @@ app.on('ready', function() {
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
-    Menu.setApplicationMenu(buildElectronMenuFromDeclarativeTemplate(mainWindow, mainMenuTemplate));
+    Menu.setApplicationMenu(
+      buildElectronMenuFromDeclarativeTemplate(mainWindow, mainMenuTemplate)
+    );
   });
 
   //Prevent any navigation inside the main window.
@@ -174,7 +179,7 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {
+  ipcMain.on('piskel-load', (event, externalEditorInput) => {
     loadModalWindow({
       parentWindow: mainWindow,
       devTools,
@@ -184,27 +189,19 @@ app.on('ready', function() {
       onReady: piskelWindow => {
         piskelWindow.webContents.send(
           'piskel-load-animation',
-          externalEditorData
-        ),
-          piskelWindow.show();
+          externalEditorInput
+        );
+        piskelWindow.show();
       },
     });
   });
 
-  ipcMain.on(
-    'piskel-changes-saved',
-    (event, imageResources, newAnimationName, externalEditorData) => {
-      mainWindow.webContents.send(
-        'piskel-changes-saved',
-        imageResources,
-        newAnimationName,
-        externalEditorData
-      );
-    }
-  );
+  ipcMain.on('piskel-closed', (event, externalEditorOutput) => {
+    mainWindow.webContents.send('piskel-closed', externalEditorOutput);
+  });
 
   // JFXR sound effect generator
-  ipcMain.on('jfxr-create-wav', (event, externalEditorData) => {
+  ipcMain.on('jfxr-load', (event, externalEditorInput) => {
     loadModalWindow({
       parentWindow: mainWindow,
       devTools,
@@ -214,22 +211,18 @@ app.on('ready', function() {
       relativeHeight: 0.8,
       backgroundColor: '#000000',
       onReady: jfxrWindow => {
-        jfxrWindow.webContents.send('jfxr-open', externalEditorData);
+        jfxrWindow.webContents.send('jfxr-open', externalEditorInput);
         jfxrWindow.show();
       },
     });
   });
 
-  ipcMain.on('jfxr-changes-saved', (event, newFilePath, externalEditorData) => {
-    mainWindow.webContents.send(
-      'jfxr-changes-saved',
-      newFilePath,
-      externalEditorData
-    );
+  ipcMain.on('jfxr-closed', (event, externalEditorOutput) => {
+    mainWindow.webContents.send('jfxr-closed', externalEditorOutput);
   });
 
   // Yarn Dialogue Tree Editor
-  ipcMain.on('yarn-create-json', (event, externalEditorData) => {
+  ipcMain.on('yarn-load', (event, externalEditorInput) => {
     loadModalWindow({
       parentWindow: mainWindow,
       devTools,
@@ -239,14 +232,14 @@ app.on('ready', function() {
       relativeHeight: 0.9,
       backgroundColor: '#000000',
       onReady: yarnWindow => {
-        yarnWindow.webContents.send('yarn-open', externalEditorData);
+        yarnWindow.webContents.send('yarn-open', externalEditorInput);
         yarnWindow.show();
       },
     });
   });
 
-  ipcMain.on('yarn-changes-saved', (event, newFilePath) => {
-    mainWindow.webContents.send('yarn-changes-saved', newFilePath);
+  ipcMain.on('yarn-closed', (event, externalEditorOutput) => {
+    mainWindow.webContents.send('yarn-closed', externalEditorOutput);
   });
 
   // LocalFileUploader events:
@@ -289,6 +282,10 @@ app.on('ready', function() {
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {
     const result = await downloadLocalFile(url, outputPath);
+    return result;
+  });
+  ipcMain.handle('local-file-save-from-arraybuffer', async (event, arrayBuffer, outputPath) => {
+    const result = await saveLocalFileFromArrayBuffer(arrayBuffer, outputPath);
     return result;
   });
 

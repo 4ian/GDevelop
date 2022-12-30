@@ -330,6 +330,9 @@ export default function ExpressionAutocompletionsDisplayer({
   const selectedAutocompletionElement = React.useRef(
     (null: ?React$Component<any, any>)
   );
+  // TODO: Is this effect still used? This might error due to scrollTo
+  // calling findDOMNode which fails on using a ref to a functional component
+  // See: https://reactjs.org/docs/refs-and-the-dom.html#callback-refs:~:text=You%20may%20not%20use%20the%20ref%20attribute%20on%20function%20components%20because%20they%20don%E2%80%99t%20have%20instances.
   React.useEffect(
     () => {
       if (scrollView.current && selectedAutocompletionElement.current) {

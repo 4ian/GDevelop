@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import Functions from '@material-ui/icons/Functions';
@@ -168,7 +167,7 @@ const extractErrors = (
 
 export default class ExpressionField extends React.Component<Props, State> {
   _field: ?SemiControlledTextFieldInterface = null;
-  _fieldElement: ?Element = null;
+  _fieldElementWidth: ?number = null;
   _inputElement: ?HTMLInputElement = null;
 
   state = {
@@ -184,10 +183,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this._field) {
-      const node = ReactDOM.findDOMNode(this._field);
-      if (node instanceof Element) {
-        this._fieldElement = node;
-      }
+      this._fieldElementWidth = this._field.getFieldWidth();
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
   }
@@ -521,7 +517,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       : undefined;
 
     const popoverStyle = {
-      width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
+      width: this._fieldElementWidth || 'auto',
       marginLeft: -5, // Remove the offset that the Popper has for some reason with disablePortal={true}
       // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
       // There will be only one ExpressionSelector opened at a time, so it's fair to put the

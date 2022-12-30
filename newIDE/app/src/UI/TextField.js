@@ -171,6 +171,7 @@ export type TextFieldInterface = {|
   focus: () => void,
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
+  getFieldWidth: () => ?number,
 |};
 
 /**
@@ -178,6 +179,7 @@ export type TextFieldInterface = {|
  */
 const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
+  const muiTextFieldRef = React.useRef<?MUITextField>(null);
 
   const focus = () => {
     if (inputRef.current) {
@@ -199,10 +201,18 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     return null;
   };
 
+  const getFieldWidth = () => {
+    if (muiTextFieldRef.current) {
+      return muiTextFieldRef.current.clientWidth;
+    }
+    return null;
+  };
+
   React.useImperativeHandle(ref, () => ({
     focus,
     blur,
     getInputNode,
+    getFieldWidth,
   }));
 
   const onChange = props.onChange || undefined;
@@ -222,6 +232,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     <I18n>
       {({ i18n }) => (
         <MUITextField
+          ref={muiTextFieldRef}
           color="secondary"
           // Value and change handling:
           type={props.type !== undefined ? props.type : undefined}

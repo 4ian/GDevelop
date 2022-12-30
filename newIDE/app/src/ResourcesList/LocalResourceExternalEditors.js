@@ -9,7 +9,12 @@ import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 import optionalRequire from '../Utils/OptionalRequire';
 import { isBlobURL, isURL, updateResourceJsonMetadata } from './ResourceUtils';
-import { downloadUrlsToBlobs, type ItemResult } from '../Utils/BlobDownloader';
+import {
+  convertBlobToDataURL,
+  convertDataURLtoBlob,
+  downloadUrlsToBlobs,
+  type ItemResult,
+} from '../Utils/BlobDownloader';
 import { createNewResource, type ResourceKind } from './ResourceSource';
 import newNameGenerator from '../Utils/NewNameGenerator';
 const path = optionalRequire('path');
@@ -35,36 +40,6 @@ const openAndWaitForExternalEditorWindow = async (
     ipcRenderer.send(`${editorName}-load`, externalEditorInput);
   });
 };
-
-// TODO: move in some utils?
-function convertBlobToDataURL(blob: Blob): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    // $FlowFixMe - it's guaranted for reader.result to be a string.
-    reader.onload = _e => resolve(reader.result);
-    reader.onerror = _e => reject(reader.error);
-    reader.onabort = _e => reject(new Error('Read aborted'));
-    reader.readAsDataURL(blob);
-  });
-}
-
-// TODO: move in some utils?
-function convertDataURLtoBlob(dataUrl: string): ?Blob {
-  const arr = dataUrl.split(',');
-  if (arr.length < 2) return null;
-
-  const mimeMatchResults = arr[0].match(/:(.*?);/);
-  const mime = mimeMatchResults
-    ? mimeMatchResults[1]
-    : 'application/octet-stream';
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new Blob([u8arr], { type: mime });
-}
 
 // TODO: quickly test this.
 const downloadAndPrepareExternalEditorBase64Resources = async ({

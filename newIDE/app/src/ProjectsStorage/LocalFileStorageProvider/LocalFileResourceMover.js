@@ -98,19 +98,19 @@ export const moveUrlResourcesToLocalFiles = async ({
 
       const url = resource.getFile();
       if (isBlobURL(url)) {
-        const {
-          localFilePath,
-          extension,
-        } = parseLocalFilePathOrExtensionFromMetadata(resource);
-        const downloadedFilePath =
-          path.resolve(projectPath, localFilePath) ||
-          generateUnusedFilepath(
-            baseAssetsPath,
-            downloadedFilePaths,
-            resource.getName() + (extension || '')
-          );
-
         try {
+          const {
+            localFilePath,
+            extension,
+          } = parseLocalFilePathOrExtensionFromMetadata(resource);
+          const downloadedFilePath = localFilePath
+            ? path.resolve(projectPath, localFilePath)
+            : generateUnusedFilepath(
+                baseAssetsPath,
+                downloadedFilePaths,
+                resource.getName() + (extension || '')
+              );
+
           await fs.ensureDir(baseAssetsPath);
           await downloadBlobToLocalFile(url, downloadedFilePath);
           resource.setFile(

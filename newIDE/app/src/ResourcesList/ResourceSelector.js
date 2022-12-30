@@ -26,6 +26,7 @@ import FlatButton from '../UI/FlatButton';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { Column } from '../UI/Grid';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -214,7 +215,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     });
   };
 
-  _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
+  _editWith = async (resourceExternalEditor: ResourceExternalEditor) => {
     const {
       project,
       resourcesLoader,
@@ -234,70 +235,78 @@ export default class ResourceSelector extends React.Component<Props, State> {
       }
     }
 
-    if (resourceKind === 'image') {
-      const resourceNames = [];
-      if (resourcesManager.hasResource(resourceName)) {
-        resourceNames.push(resourceName);
-      }
-      const externalEditorOptions = {
-        project,
-        getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourcesLoader,
-        singleFrame: true,
-        resourceNames,
-        extraOptions: {
-          fps: 0,
-          name: resourceName,
-          isLooping: false,
-          externalEditorData: initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          if (!newResourceData.length) return;
+    try {
+      if (resourceKind === 'image') {
+        const resourceNames = [];
+        if (resourcesManager.hasResource(resourceName)) {
+          resourceNames.push(resourceName);
+        }
 
-          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceData[0].name,
-          ]);
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    } else if (resourceKind === 'audio') {
-      const externalEditorOptions = {
-        project,
-        getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourcesLoader,
-        resourceNames: [resourceName],
-        extraOptions: {
-          externalEditorData: initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceData[0].name,
-          ]);
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    } else if (
-      resourceKind === 'json' ||
-      resourceKind === 'tilemap' ||
-      resourceKind === 'tileset'
-    ) {
-      const externalEditorOptions = {
-        project,
-        getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourcesLoader,
-        resourceNames: [resourceName],
-        extraOptions: {
-          initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
+        const { resources } = await resourceExternalEditor.edit({
+          project,
+          getStorageProvider: resourceManagementProps.getStorageProvider,
+          resourceManagementProps,
+          singleFrame: true,
+          resourceNames,
+          extraOptions: {
+            fps: 0,
+            name: resourceName,
+            isLooping: false,
+            externalEditorData: initialResourceMetadata,
+          },
+        });
+        if (!resources.length) return;
+
+        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+        resourcesLoader.burstUrlsCacheForResources(project, [
+          resources[0].name,
+        ]);
+        this.props.onChange(resources[0].name);
+      } else if (resourceKind === 'audio') {
+        const { resources } = await resourceExternalEditor.edit({
+          project,
+          getStorageProvider: resourceManagementProps.getStorageProvider,
+          resourceManagementProps,
+          resourceNames: [resourceName],
+          extraOptions: {
+            externalEditorData: initialResourceMetadata,
+          },
+        });
+        if (!resources.length) return;
+
+        // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
+        resourcesLoader.burstUrlsCacheForResources(project, [
+          resources[0].name,
+        ]);
+        this.props.onChange(resources[0].name);
+      } else if (
+        resourceKind === 'json' ||
+        resourceKind === 'tilemap' ||
+        resourceKind === 'tileset'
+      ) {
+        const { resources } = await resourceExternalEditor.edit({
+          project,
+          getStorageProvider: resourceManagementProps.getStorageProvider,
+          resourceManagementProps,
+          resourceNames: [resourceName],
+          extraOptions: {
+            externalEditorData: initialResourceMetadata,
+          },
+        });
+        if (!resources.length) return;
+
+        this.props.onChange(resources[0].name);
+      }
+    } catch (error) {
+      console.error(
+        'An exception was thrown when launching or reading resources from the external editor:',
+        error
+      );
+      showErrorBox({
+        message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
+        rawError: error,
+        errorId: 'external-editor-error',
+      });
     }
   };
 

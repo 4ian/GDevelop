@@ -12,8 +12,13 @@ import {
   extractFilenameWithExtensionFromPublicAssetResourceUrl,
   isPublicAssetResourceUrl,
 } from '../../Utils/GDevelopServices/Asset';
-import { isFetchableUrl } from '../../ResourcesList/ResourceUtils';
+import {
+  isBlobURL,
+  isURL,
+  parseLocalFilePathOrExtensionFromMetadata,
+} from '../../ResourcesList/ResourceUtils';
 import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
+import axios from 'axios';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
@@ -24,6 +29,44 @@ type Options = {|
   fileMetadata: FileMetadata,
   onProgress: (number, number) => void,
 |};
+
+const generateUnusedFilepath = (
+  basePath: string,
+  alreadyUsedFilePaths: Set<string>,
+  filename: string
+) => {
+  const extension = path.extname(filename);
+  const filenameWithoutExtension = path.basename(filename, extension);
+  const name = newNameGenerator(filenameWithoutExtension, name => {
+    const tentativePath = path.join(basePath, name) + extension;
+    return (
+      fs.existsSync(tentativePath) || alreadyUsedFilePaths.has(tentativePath)
+    );
+  });
+  return path.join(basePath, name) + extension;
+};
+
+const downloadBlobToLocalFile = async (
+  blobUrl: string,
+  filePath: string
+): Promise<void> => {
+  if (!ipcRenderer) throw new Error('Not supported');
+  try {
+    const response = await axios.get(blobUrl, {
+      responseType: 'arraybuffer',
+    });
+    const arrayBuffer = response.data;
+
+    await ipcRenderer.invoke(
+      'local-file-save-from-arraybuffer',
+      arrayBuffer,
+      filePath
+    );
+  } catch (error) {
+    console.error('Unable to write a blob to a file:', error);
+    throw error;
+  }
+};
 
 export const moveUrlResourcesToLocalFiles = async ({
   project,
@@ -38,7 +81,7 @@ export const moveUrlResourcesToLocalFiles = async ({
   const resourceToFetchNames = allResourceNames.filter(resourceName => {
     const resource = resourcesManager.getResource(resourceName);
 
-    return isFetchableUrl(resource.getFile());
+    return isURL(resource.getFile());
   });
 
   const projectPath = path.dirname(fileMetadata.fileIdentifier);
@@ -54,49 +97,66 @@ export const moveUrlResourcesToLocalFiles = async ({
       const resource = resourcesManager.getResource(resourceName);
 
       const url = resource.getFile();
-      let filenameWithExtension;
-      if (isProductAuthorizedResourceUrl(url)) {
-        // Resource is a private asset.
-        filenameWithExtension = extractFilenameWithExtensionFromProductAuthorizedUrl(
-          url
-        );
-      } else if (isPublicAssetResourceUrl(url)) {
-        // Resource is a public asset.
-        filenameWithExtension = extractFilenameWithExtensionFromPublicAssetResourceUrl(
-          url
-        );
-      } else {
-        // Resource is a project resource or a generic url.
-        filenameWithExtension = extractFilenameFromProjectResourceUrl(url);
-      }
-      const extension = path.extname(filenameWithExtension);
-      const filenameWithoutExtension = path.basename(
-        filenameWithExtension,
-        extension
-      );
-      const name = newNameGenerator(filenameWithoutExtension, name => {
-        const tentativePath = path.join(baseAssetsPath, name) + extension;
-        return (
-          fs.existsSync(tentativePath) || downloadedFilePaths.has(tentativePath)
-        );
-      });
-      const downloadedFilePath = path.join(baseAssetsPath, name) + extension;
-      downloadedFilePaths.add(downloadedFilePath);
+      if (isBlobURL(url)) {
+        try {
+          const {
+            localFilePath,
+            extension,
+          } = parseLocalFilePathOrExtensionFromMetadata(resource);
+          const downloadedFilePath = localFilePath
+            ? path.resolve(projectPath, localFilePath)
+            : generateUnusedFilepath(
+                baseAssetsPath,
+                downloadedFilePaths,
+                resource.getName() + (extension || '')
+              );
 
-      try {
-        await retryIfFailed({ times: 2 }, async () => {
           await fs.ensureDir(baseAssetsPath);
-          await ipcRenderer.invoke(
-            'local-file-download',
-            url,
-            downloadedFilePath
-          );
+          await downloadBlobToLocalFile(url, downloadedFilePath);
           resource.setFile(
             path.relative(projectPath, downloadedFilePath).replace(/\\/g, '/')
           );
-        });
-      } catch (error) {
-        erroredResources.push({ resourceName, error });
+        } catch (error) {
+          erroredResources.push({ resourceName, error });
+        }
+      } else {
+        let filename;
+        if (isProductAuthorizedResourceUrl(url)) {
+          // Resource is a private asset.
+          filename = extractFilenameWithExtensionFromProductAuthorizedUrl(url);
+        } else if (isPublicAssetResourceUrl(url)) {
+          // Resource is a public asset.
+          filename = extractFilenameWithExtensionFromPublicAssetResourceUrl(
+            url
+          );
+        } else {
+          // Resource is a project resource or a generic url.
+          filename = extractFilenameFromProjectResourceUrl(url);
+        }
+
+        // Find a new file for the resource to download.
+        const downloadedFilePath = generateUnusedFilepath(
+          baseAssetsPath,
+          downloadedFilePaths,
+          filename
+        );
+        downloadedFilePaths.add(downloadedFilePath);
+
+        try {
+          await retryIfFailed({ times: 2 }, async () => {
+            await fs.ensureDir(baseAssetsPath);
+            await ipcRenderer.invoke(
+              'local-file-download',
+              url,
+              downloadedFilePath
+            );
+            resource.setFile(
+              path.relative(projectPath, downloadedFilePath).replace(/\\/g, '/')
+            );
+          });
+        } catch (error) {
+          erroredResources.push({ resourceName, error });
+        }
       }
 
       onProgress(fetchedResourcesCount++, resourceToFetchNames.length);

@@ -87,7 +87,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
+      .UseStandardRelationalOperatorParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale to compare to (1 by default)")))
@@ -103,7 +103,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters(
+      .UseStandardOperatorParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))

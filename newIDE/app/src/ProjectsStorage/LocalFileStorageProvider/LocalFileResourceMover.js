@@ -63,7 +63,6 @@ const downloadBlobToLocalFile = async (
       filePath
     );
   } catch (error) {
-    console.error('Unable to write a blob to a file:', error);
     throw error;
   }
 };

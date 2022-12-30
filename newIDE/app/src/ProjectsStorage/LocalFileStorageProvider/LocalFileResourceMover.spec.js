@@ -16,6 +16,8 @@ const publicResourceUrl =
   'https://asset-resources.gdevelop.io/public-resources/16x16 Dungeon Tileset/Armor/0a130324cd2501a97027b518b41231896a81e25034fd3a7baaca9581d079f8b6_Imp_Run_2.png';
 const localFileUrl = 'some-local-file.png';
 
+// TODO: add a test with a blob
+
 const makeTestProjectWithResourcesToDownload = () => {
   const { project } = makeTestProject(gd);
 

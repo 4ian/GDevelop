@@ -174,6 +174,43 @@ export const renameResourcesInProject = (
   resourcesRenamer.delete();
 };
 
+export const parseLocalFilePathOrExtensionFromMetadata = (
+  resource: gdResource
+): {|
+  localFilePath: ?string,
+  extension: ?string,
+|} => {
+  const metadataAsString = resource.getMetadata();
+  if (metadataAsString) {
+    try {
+      const metadata = JSON.parse(metadataAsString);
+      if (metadata && typeof metadata === 'object') {
+        return {
+          localFilePath:
+            metadata.localFilePath && typeof metadata.localFilePath === 'string'
+              ? metadata.localFilePath
+              : null,
+          extension:
+            metadata.extension && typeof metadata.extension === 'string'
+              ? metadata.extension
+              : null,
+        };
+      }
+    } catch (error) {
+      console.warn(
+        'Malformed metadata for resource with name ' +
+          resource.getName() +
+          ' - ignoring it.'
+      );
+    }
+  }
+
+  return {
+    localFilePath: null,
+    extension: null,
+  };
+};
+
 export const isFetchableUrl = (url: string) => {
   return (
     url.startsWith('http://') ||

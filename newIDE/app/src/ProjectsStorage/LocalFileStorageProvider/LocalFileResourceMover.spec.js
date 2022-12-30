@@ -1,4 +1,5 @@
 // @flow
+import axios from 'axios';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { moveUrlResourcesToLocalFiles } from './LocalFileResourceMover';
 import { makeTestProject } from '../../fixtures/TestProject';
@@ -6,6 +7,7 @@ import path from 'path';
 const gd: libGDevelop = global.gd;
 
 jest.mock('../../Utils/OptionalRequire');
+jest.mock('axios');
 
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
@@ -15,6 +17,7 @@ const productAuthorizedUrl =
 const publicResourceUrl =
   'https://asset-resources.gdevelop.io/public-resources/16x16 Dungeon Tileset/Armor/0a130324cd2501a97027b518b41231896a81e25034fd3a7baaca9581d079f8b6_Imp_Run_2.png';
 const localFileUrl = 'some-local-file.png';
+const blobUrl = 'blob:http://something.com/1234567';
 
 const makeTestProjectWithResourcesToDownload = () => {
   const { project } = makeTestProject(gd);
@@ -59,6 +62,58 @@ const makeTestProjectWithResourcesToDownload = () => {
   return project;
 };
 
+const makeTestProjectWithBlobResourcesToDownload = () => {
+  const { project } = makeTestProject(gd);
+
+  // Add a resource that uses a blob: URL, which will be download
+  // by the LocalResourceMover.
+  {
+    const newResource = new gd.ImageResource();
+    newResource.setName('MyBlobResourceToDownload');
+    newResource.setFile(blobUrl);
+    project.getResourcesManager().addResource(newResource);
+    newResource.delete();
+  }
+  // Add a blob with metadata indicating where to save the file.
+  {
+    const newResource = new gd.ImageResource();
+    newResource.setName('MyOtherBlobResourceToDownload');
+    newResource.setFile(blobUrl);
+    newResource.setMetadata(
+      '{"localFilePath": "existing-file.png","extension":".png"}'
+    );
+    project.getResourcesManager().addResource(newResource);
+    newResource.delete();
+  }
+
+  return project;
+};
+
+const makeTestProjectWitheBlobResourcesFailingToDownload = () => {
+  const { project } = makeTestProject(gd);
+
+  // Add a resource that uses a blob: URL, which will have an error
+  // when downloaded by the LocalResourceMover.
+  {
+    const newResource = new gd.ImageResource();
+    newResource.setName('MyBlobResourceFailingToDownload');
+    newResource.setFile(blobUrl);
+    project.getResourcesManager().addResource(newResource);
+    newResource.delete();
+  }
+  // Add a blob with an invalid metadata, which will be ignored.
+  {
+    const newResource = new gd.ImageResource();
+    newResource.setName('MyOtherBlobResourceWithInvalidMetadata');
+    newResource.setFile(blobUrl);
+    newResource.setMetadata('{invalid metadata}');
+    project.getResourcesManager().addResource(newResource);
+    newResource.delete();
+  }
+
+  return project;
+};
+
 const makeMoveAllProjectResourcesOptions = (project: gdProject) => ({
   project,
   onProgress: jest.fn(),
@@ -66,14 +121,19 @@ const makeMoveAllProjectResourcesOptions = (project: gdProject) => ({
 });
 
 describe('LocalResourceMover', () => {
+  let project = null;
   beforeEach(() => {
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockReset();
     mockFn(optionalRequire.mockFsExtra.existsSync).mockReset();
     mockFn(optionalRequire.mockElectron.ipcRenderer.invoke).mockReset();
+    mockFn(axios.get).mockReset();
   });
+  afterEach(() => {
+    if (project) project.delete();
+  })
 
   it('fetches resources and can download them', async () => {
-    const project = makeTestProjectWithResourcesToDownload();
+    project = makeTestProjectWithResourcesToDownload();
 
     // Mock a proper download
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockResolvedValue({});
@@ -109,7 +169,7 @@ describe('LocalResourceMover', () => {
   });
 
   it('reports errors in case of download failure', async () => {
-    const project = makeTestProjectWithResourcesToDownload();
+    project = makeTestProjectWithResourcesToDownload();
 
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockResolvedValue({});
     mockFn(optionalRequire.mockFsExtra.existsSync).mockReturnValue(false);
@@ -157,7 +217,7 @@ describe('LocalResourceMover', () => {
   });
 
   it('automatically retries if a resource failed', async () => {
-    const project = makeTestProjectWithResourcesToDownload();
+    project = makeTestProjectWithResourcesToDownload();
 
     // Mock a failed download once, then successful
     mockFn(optionalRequire.mockFsExtra.ensureDir).mockResolvedValue({});
@@ -195,5 +255,86 @@ describe('LocalResourceMover', () => {
       path.join('assets', 'Imp_Run_2.png')
     );
     expect(fetchedResources.erroredResources).toEqual([]);
+  });
+
+  describe('Support for blobs', () => {
+    it('fetches resources with blobs and can download them', async () => {
+      project = makeTestProjectWithBlobResourcesToDownload();
+
+      // Mock a proper download
+      mockFn(optionalRequire.mockFsExtra.ensureDir).mockResolvedValue({});
+      mockFn(optionalRequire.mockFsExtra.existsSync).mockReturnValue(false);
+      mockFn(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).mockResolvedValue();
+      mockFn(axios.get).mockResolvedValue({
+        data: 'fake-array-buffer-content',
+      });
+
+      const options = makeMoveAllProjectResourcesOptions(project);
+      const fetchedResources = await moveUrlResourcesToLocalFiles(options);
+
+      // Verify that download was done
+      expect(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).toHaveBeenCalledWith(
+        'local-file-save-from-arraybuffer',
+        'fake-array-buffer-content',
+        // No extension because none was specified, and the filename is inferred.
+        path.join('assets', 'MyBlobResourceToDownload')
+      );
+      expect(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).toHaveBeenCalledWith(
+        'local-file-save-from-arraybuffer',
+        'fake-array-buffer-content',
+        // The filename in the metadata is used.
+        path.resolve('existing-file.png')
+      );
+      expect(fetchedResources.erroredResources).toEqual([]);
+    });
+
+    it('reports errors in case of failure with blobs', async () => {
+      project = makeTestProjectWitheBlobResourcesFailingToDownload();
+
+      // Mock a failed download
+      mockFn(optionalRequire.mockFsExtra.ensureDir).mockResolvedValue({});
+      mockFn(optionalRequire.mockFsExtra.existsSync).mockReturnValue(false);
+      mockFn(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).mockRejectedValueOnce(new Error('Fake blob download error'));
+      mockFn(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).mockResolvedValueOnce();
+      mockFn(axios.get).mockResolvedValue({
+        data: 'fake-array-buffer-content',
+      });
+
+      const options = makeMoveAllProjectResourcesOptions(project);
+      const fetchedResources = await moveUrlResourcesToLocalFiles(options);
+
+      // Verify that one download was attempted and the other done
+      expect(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).toHaveBeenCalledWith(
+        'local-file-save-from-arraybuffer',
+        'fake-array-buffer-content',
+        path.join('assets', 'MyBlobResourceFailingToDownload')
+      );
+      expect(
+        optionalRequire.mockElectron.ipcRenderer.invoke
+      ).toHaveBeenCalledWith(
+        'local-file-save-from-arraybuffer',
+        'fake-array-buffer-content',
+        // Metadata was invalid, so the name was inferred.
+        path.join('assets', 'MyOtherBlobResourceWithInvalidMetadata')
+      );
+      expect(fetchedResources.erroredResources).toEqual([
+        {
+          error: expect.any(Error),
+          resourceName: 'MyBlobResourceFailingToDownload',
+        },
+      ]);
+    });
   });
 });

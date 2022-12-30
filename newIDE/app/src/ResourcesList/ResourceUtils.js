@@ -211,6 +211,29 @@ export const parseLocalFilePathOrExtensionFromMetadata = (
   };
 };
 
+export const updateResourceJsonMetadata = (
+  resource: gdResource,
+  newMetadata: { [string]: any }
+) => {
+  const metadataAsString = resource.getMetadata();
+  try {
+    const existingMetadata = metadataAsString
+      ? JSON.parse(metadataAsString)
+      : {};
+    resource.setMetadata(
+      JSON.stringify({
+        ...existingMetadata,
+        ...newMetadata,
+      })
+    );
+    return;
+  } catch (error) {
+    // Ignore the error.
+  }
+
+  resource.setMetadata(JSON.stringify(newMetadata));
+};
+
 export const isFetchableUrl = (url: string) => {
   return (
     url.startsWith('http://') ||

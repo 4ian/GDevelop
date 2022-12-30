@@ -8,7 +8,7 @@ import {
 import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 import optionalRequire from '../Utils/OptionalRequire';
-import { isBlobURL, isURL } from './ResourceUtils';
+import { isBlobURL, isURL, updateResourceJsonMetadata } from './ResourceUtils';
 import { downloadUrlsToBlobs, type ItemResult } from '../Utils/BlobDownloader';
 import { createNewResource, type ResourceKind } from './ResourceSource';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -200,11 +200,14 @@ const saveBlobUrlsFromExternalEditorBase64Resources = async ({
   const resourcesManager = project.getResourcesManager();
   const blobs = resources.map(
     ({ name, dataUrl, localFilePath, extension, originalIndex }) => {
+      // Convert the data url to a blob URL.
       const blob = convertDataURLtoBlob(dataUrl);
       const blobUrl = blob ? URL.createObjectURL(blob) : '';
 
       if (!name || !resourcesManager.hasResource(name)) {
         // Insert a new resource.
+        // Store the blob url, as well as indication
+        // about which extension (for a new file) or filename to use (to overwrite existing file).
         const name = newNameGenerator(baseNameForNewResources, name =>
           resourcesManager.hasResource(name)
         );
@@ -234,16 +237,15 @@ const saveBlobUrlsFromExternalEditorBase64Resources = async ({
         };
       } else {
         console.info('Updating resource ' + name + '.');
+
+        // Get the resource and store the blob url, as well as indication
+        // about which extension (for a new file) or filename to use (to overwrite existing file).
         const resource = resourcesManager.getResource(name);
         resource.setFile(blobUrl);
-
-        // TODO: avoid overwriting the rest of the metadata?
-        resource.setMetadata(
-          JSON.stringify({
-            localFilePath,
-            extension,
-          })
-        );
+        updateResourceJsonMetadata(resource, {
+          localFilePath,
+          extension,
+        });
 
         return {
           name,

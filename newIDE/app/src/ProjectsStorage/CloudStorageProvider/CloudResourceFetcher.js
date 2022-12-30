@@ -61,6 +61,8 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
           if (isURL(resourceFile)) {
             if (isProductAuthorizedResourceUrl(resourceFile)) {
+              // This is a file that is temporarily accessible thanks to a token,
+              // so it should be downloaded and stored in the Cloud resources.
               const filenameWithExtension = extractFilenameWithExtensionFromProductAuthorizedUrl(
                 resourceFile
               );

@@ -130,7 +130,7 @@ describe('LocalResourceMover', () => {
   });
   afterEach(() => {
     if (project) project.delete();
-  })
+  });
 
   it('fetches resources and can download them', async () => {
     project = makeTestProjectWithResourcesToDownload();

@@ -54,6 +54,7 @@ export type SemiControlledTextFieldInterface = {|
   forceSetValue: (text: string) => void,
   forceSetSelection: (start: number, end: number) => void,
   getInputNode: () => ?HTMLInputElement,
+  getFieldWidth: () => ?number,
 |};
 
 /**
@@ -90,11 +91,16 @@ const SemiControlledTextField = React.forwardRef<
     if (textFieldRef.current) return textFieldRef.current.getInputNode();
   };
 
+  const getFieldWidth = () => {
+    if (textFieldRef.current) return textFieldRef.current.getFieldWidth();
+  };
+
   React.useImperativeHandle(ref, () => ({
     focus,
     getInputNode,
     forceSetSelection,
     forceSetValue,
+    getFieldWidth,
   }));
 
   const {

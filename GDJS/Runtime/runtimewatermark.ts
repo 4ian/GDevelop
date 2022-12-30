@@ -18,11 +18,12 @@ namespace gdjs {
       _fadeInDelayAfterGameLoaded: number = 1000;
       _fadeInDuration: number = 0.3;
       _fadeOutTimeout: NodeJS.Timeout | null = null;
-      _creatorUsername: string = 'Best_username'; // TODO: use info from game data
+      _authorUsername: string;
       _isDevEnvironment: boolean;
 
-      constructor(game: RuntimeGame) {
+      constructor(game: RuntimeGame, authorUsername: string) {
         this._gameRenderer = game.getRenderer();
+        this._authorUsername = authorUsername;
         this._isDevEnvironment = game.isUsingGDevelopDevelopmentEnvironment();
         this.addStyle();
       }
@@ -63,14 +64,14 @@ namespace gdjs {
       }
 
       private openCreatorProfile() {
-        let targetUrl = `https://liluo.io/${this._creatorUsername}`;
+        let targetUrl = `https://liluo.io/${this._authorUsername}`;
         if (this._isDevEnvironment) targetUrl += '?dev=true';
         this._gameRenderer.openURL(targetUrl);
       }
 
       private createTextElement() {
         const textElement = document.createElement('span');
-        textElement.innerText = this._creatorUsername;
+        textElement.innerText = this._authorUsername;
         return textElement;
       }
 

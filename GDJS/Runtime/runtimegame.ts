@@ -154,7 +154,10 @@ namespace gdjs {
         this,
         this._options.forceFullscreen || false
       );
-      this._watermark = new gdjs.watermark.RuntimeWatermark(this);
+      this._watermark = new gdjs.watermark.RuntimeWatermark(
+        this,
+        data.properties.author // TODO: This is the publisher name, not the GDevelop account username.
+      );
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
       this._injectExternalLayout = this._options.injectExternalLayout || '';

@@ -52,14 +52,19 @@ export const isSameObjectWithContext = (
 export const enumerateObjects = (
   project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  type: ?string = undefined
+  filterType: ?string = undefined,
+  filterNames: ?Array<string> = undefined
 ) => {
-  const filterObject = (object: gdObject): boolean => {
+  const filterObjectByType = (object: gdObject): boolean => {
     return (
-      !type ||
+      !filterType ||
       gd.getTypeOfObject(project, objectsContainer, object.getName(), false) ===
-        type
+        filterType
     );
+  };
+
+  const filterObjectByName = (object: gdObject): boolean => {
+    return !filterNames || filterNames.includes(object.getName());
   };
 
   const containerObjectsList: ObjectWithContextList = mapFor(
@@ -67,14 +72,16 @@ export const enumerateObjects = (
     objectsContainer.getObjectsCount(),
     i => objectsContainer.getObjectAt(i)
   )
-    .filter(filterObject)
+    .filter(filterObjectByType)
+    .filter(filterObjectByName)
     .map((object: gdObject): ObjectWithContext => ({ object, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
     project === objectsContainer
       ? []
       : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i))
-          .filter(filterObject)
+          .filter(filterObjectByType)
+          .filter(filterObjectByName)
           .map(
             (object: gdObject): ObjectWithContext => ({
               object,

@@ -240,7 +240,7 @@ export default class SpritesList extends Component<Props, void> {
     await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
-  editWith = (externalEditor: ResourceExternalEditor) => {
+  editWith = async (externalEditor: ResourceExternalEditor) => {
     const {
       project,
       resourceManagementProps,
@@ -260,77 +260,66 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    let externalEditorData = {};
-    const metadataRaw = direction.getMetadata();
-    if (metadataRaw) {
-      try {
-        externalEditorData = JSON.parse(metadataRaw);
-      } catch (e) {
-        console.error('Malformed metadata', e);
-      }
-    }
-
-    externalEditor.edit({
+    const {
+      resources,
+      newMetadata,
+      newAnimationName,
+    } = await externalEditor.edit({
       project,
       getStorageProvider: resourceManagementProps.getStorageProvider,
-      resourcesLoader,
-      singleFrame: false,
+      resourceManagementProps,
       resourceNames,
       extraOptions: {
+        singleFrame: false,
         fps:
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name:
-          animationName ||
-          (resourceNames.length > 0
-            ? path.basename(resourceNames[0], path.extname(resourceNames[0]))
-            : objectName),
+        name: animationName || resourceNames[0] || objectName,
         isLooping: direction.isLooping(),
-        externalEditorData,
-      },
-      onChangesSaved: resources => {
-        const newDirection = new gd.Direction();
-        newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-        newDirection.setLoop(direction.isLooping());
-        resources.forEach(resource => {
-          const sprite = new gd.Sprite();
-          sprite.setImageName(resource.name);
-          // Restore collision masks and points
-          if (
-            resource.originalIndex !== undefined &&
-            resource.originalIndex !== null
-          ) {
-            const originalSprite = direction.getSprite(resource.originalIndex);
-            copySpritePoints(originalSprite, sprite);
-            copySpritePolygons(originalSprite, sprite);
-          } else {
-            if (allDirectionSpritesHaveSamePoints) {
-              copySpritePoints(direction.getSprite(0), sprite);
-            }
-            if (allDirectionSpritesHaveSameCollisionMasks) {
-              copySpritePolygons(direction.getSprite(0), sprite);
-            }
-          }
-          newDirection.addSprite(sprite);
-          sprite.delete();
-        });
-
-        // set metadata if there is such on the direction
-        if (resources[0].metadata) {
-          newDirection.setMetadata(JSON.stringify(resources[0].metadata));
-        }
-
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
-        onReplaceByDirection(newDirection);
-        // Set optional animation name if the user hasn't done so
-        if (resources[0].newAnimationName) {
-          onChangeName(resources[0].newAnimationName);
-        }
-        newDirection.delete();
+        existingMetadata: direction.getMetadata(),
       },
     });
+
+    const newDirection = new gd.Direction();
+    newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
+    newDirection.setLoop(direction.isLooping());
+    resources.forEach(resource => {
+      const sprite = new gd.Sprite();
+      sprite.setImageName(resource.name);
+      // Restore collision masks and points
+      if (
+        resource.originalIndex !== undefined &&
+        resource.originalIndex !== null
+      ) {
+        const originalSprite = direction.getSprite(resource.originalIndex);
+        copySpritePoints(originalSprite, sprite);
+        copySpritePolygons(originalSprite, sprite);
+      } else {
+        if (allDirectionSpritesHaveSamePoints) {
+          copySpritePoints(direction.getSprite(0), sprite);
+        }
+        if (allDirectionSpritesHaveSameCollisionMasks) {
+          copySpritePolygons(direction.getSprite(0), sprite);
+        }
+      }
+      newDirection.addSprite(sprite);
+      sprite.delete();
+    });
+
+    // Set metadata on the direction to allow editing again in the future.
+    if (newMetadata) {
+      newDirection.setMetadata(JSON.stringify(newMetadata));
+    }
+
+    // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+    resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
+    onReplaceByDirection(newDirection);
+    // Set optional animation name if the user hasn't done so
+    if (newAnimationName) {
+      onChangeName(newAnimationName);
+    }
+    newDirection.delete();
   };
 
   render() {

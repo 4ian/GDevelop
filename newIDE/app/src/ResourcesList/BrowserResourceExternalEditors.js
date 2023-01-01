@@ -20,9 +20,7 @@ const editors: Array<ResourceExternalEditor> = [
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
 
-      return {
-        resources: [],
-      };
+      return null;
     },
   },
   {
@@ -36,9 +34,7 @@ const editors: Array<ResourceExternalEditor> = [
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
 
-      return {
-        resources: [],
-      };
+      return null;
     },
   },
   {
@@ -52,9 +48,7 @@ const editors: Array<ResourceExternalEditor> = [
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
 
-      return {
-        resources: [],
-      };
+      return null;
     },
   },
 ];

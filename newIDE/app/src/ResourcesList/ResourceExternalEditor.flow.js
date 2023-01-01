@@ -56,12 +56,16 @@ export type ExternalEditorInput = {|
  */
 export type ExternalEditorOutput = {|
   resources: Array<ExternalEditorBase64Resource>,
-  newMetadata: ?any,
+  externalEditorData: ?any,
   baseNameForNewResources: string,
 |};
 
+/**
+ * The result of the edition of one or more resources.
+ */
 export type EditWithExternalEditorReturn = {|
-  externalEditorData?: ?any,
+  newMetadata: ?any,
+  newName: ?string,
   resources: Array<{|
     name: string,
     originalIndex?: ?number,
@@ -91,5 +95,5 @@ export type ResourceExternalEditor = {|
   createDisplayName: MessageDescriptor,
   editDisplayName: MessageDescriptor,
   kind: ResourceKind,
-  edit: EditWithExternalEditorOptions => Promise<EditWithExternalEditorReturn>,
+  edit: EditWithExternalEditorOptions => Promise<EditWithExternalEditorReturn | null>,
 |};

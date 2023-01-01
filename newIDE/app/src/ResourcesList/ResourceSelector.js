@@ -222,7 +222,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const initialResource = resourcesManager.getResource(resourceName);
 
     try {
-      const { resources } = await resourceExternalEditor.edit({
+      const editResult = await resourceExternalEditor.edit({
         project,
         getStorageProvider: resourceManagementProps.getStorageProvider,
         resourceManagementProps,
@@ -237,6 +237,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
           isLooping: false,
         },
       });
+      if (!editResult) return;
+
+      const { resources } = editResult;
       if (!resources.length) return;
 
       // Burst the ResourcesLoader cache to force the file to be reloaded (and not cached by the browser).

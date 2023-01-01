@@ -171,7 +171,7 @@ const saveBlobUrlsFromExternalEditorBase64Resources = async ({
   resourceKind: ResourceKind,
 |}): Promise<Array<ResourceWithTemporaryBlobUrl>> => {
   const resourcesManager = project.getResourcesManager();
-  const blobs = resources
+  const blobs: Array<ResourceWithTemporaryBlobUrl> = resources
     .map(({ name, dataUrl, localFilePath, extension, originalIndex }) => {
       // Convert the data url to a blob URL.
       const blob = convertDataURLtoBlob(dataUrl);
@@ -201,11 +201,11 @@ const saveBlobUrlsFromExternalEditorBase64Resources = async ({
             extension,
           })
         );
-        const resource = resourcesManager.addResource(newResource);
+        resourcesManager.addResource(newResource);
         newResource.delete();
 
         return {
-          resource,
+          resource: resourcesManager.getResource(name),
           originalIndex,
           blobUrl,
         };
@@ -342,6 +342,7 @@ const editors: Array<ResourceExternalEditor> = [
           name: resource.getName(),
           originalIndex,
         })),
+        newName: externalEditorOutput.baseNameForNewResources,
         newMetadata: { [metadataKey]: externalEditorOutput.externalEditorData },
       };
     },
@@ -373,7 +374,7 @@ const editors: Array<ResourceExternalEditor> = [
         name: options.extraOptions.name || resourceNames[0] || defaultName,
         resources,
       };
-      const externalEditorOutput = await openAndWaitForExternalEditorWindow(
+      const externalEditorOutput: ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
         'jfxr',
         externalEditorInput
       );
@@ -408,6 +409,7 @@ const editors: Array<ResourceExternalEditor> = [
           name: resource.getName(),
           originalIndex,
         })),
+        newName: externalEditorOutput.baseNameForNewResources,
         newMetadata: { [metadataKey]: externalEditorOutput.externalEditorData },
       };
     },
@@ -439,7 +441,7 @@ const editors: Array<ResourceExternalEditor> = [
         name: options.extraOptions.name || resourceNames[0] || defaultName,
         resources,
       };
-      const externalEditorOutput = await openAndWaitForExternalEditorWindow(
+      const externalEditorOutput: ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
         'yarn',
         externalEditorInput
       );
@@ -474,6 +476,7 @@ const editors: Array<ResourceExternalEditor> = [
           name: resource.getName(),
           originalIndex,
         })),
+        newName: externalEditorOutput.baseNameForNewResources,
         newMetadata: { [metadataKey]: externalEditorOutput.externalEditorData },
       };
     },

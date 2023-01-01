@@ -21,7 +21,10 @@ import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import {
+  type ResourceExternalEditor,
+  type EditWithExternalEditorReturn,
+} from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 const gd: libGDevelop = global.gd;
@@ -259,26 +262,27 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    const {
-      resources,
-      newMetadata,
-      newAnimationName,
-    } = await externalEditor.edit({
-      project,
-      getStorageProvider: resourceManagementProps.getStorageProvider,
-      resourceManagementProps,
-      resourceNames,
-      extraOptions: {
-        singleFrame: false,
-        fps:
-          direction.getTimeBetweenFrames() > 0
-            ? 1 / direction.getTimeBetweenFrames()
-            : 1,
-        name: animationName || resourceNames[0] || objectName,
-        isLooping: direction.isLooping(),
-        existingMetadata: direction.getMetadata(),
-      },
-    });
+    const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
+      {
+        project,
+        getStorageProvider: resourceManagementProps.getStorageProvider,
+        resourceManagementProps,
+        resourceNames,
+        extraOptions: {
+          singleFrame: false,
+          fps:
+            direction.getTimeBetweenFrames() > 0
+              ? 1 / direction.getTimeBetweenFrames()
+              : 1,
+          name: animationName || resourceNames[0] || objectName,
+          isLooping: direction.isLooping(),
+          existingMetadata: direction.getMetadata(),
+        },
+      }
+    );
+
+    if (!editResult) return;
+    const { resources, newMetadata, newName } = editResult;
 
     const newDirection = new gd.Direction();
     newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
@@ -315,8 +319,8 @@ export default class SpritesList extends Component<Props, void> {
     resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
     onReplaceByDirection(newDirection);
     // Set optional animation name if the user hasn't done so
-    if (newAnimationName) {
-      onChangeName(newAnimationName);
+    if (newName) {
+      onChangeName(newName);
     }
     newDirection.delete();
   };

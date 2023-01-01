@@ -135,7 +135,7 @@ describe('ResourceUtils', () => {
 
     it('can update a resource metadata', () => {
       resource = new gd.Resource();
-      updateResourceJsonMetadata(resource, { test: 123, test2: { 4: '56' } });
+      updateResourceJsonMetadata(resource, { test: 123, test2: { '4': '56' } });
       expect(resource.getMetadata()).toMatchInlineSnapshot(
         `"{\\"test\\":123,\\"test2\\":{\\"4\\":\\"56\\"}}"`
       );

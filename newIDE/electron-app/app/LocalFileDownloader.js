@@ -20,6 +20,10 @@ const findGDevelopCloudCookieValue = async () => {
 };
 
 module.exports = {
+  /**
+   * @param {string} url
+   * @param {string} outputPath
+   */
   downloadLocalFile: async (url, outputPath) => {
     const gdevelopCloudCookieValue = await findGDevelopCloudCookieValue();
 
@@ -51,5 +55,12 @@ module.exports = {
         // 'error' callback.
       });
     });
+  },
+  /**
+   * @param {ArrayBuffer} arrayBuffer
+   * @param {string} outputPath
+   */
+  saveLocalFileFromArrayBuffer: async (arrayBuffer, outputPath) => {
+    await fs.promises.writeFile(outputPath, Buffer.from(arrayBuffer));
   },
 };

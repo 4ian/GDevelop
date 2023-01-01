@@ -1,5 +1,9 @@
 // @flow
-import { renameResourcesInProject } from './ResourceUtils';
+import {
+  parseLocalFilePathOrExtensionFromMetadata,
+  renameResourcesInProject,
+  updateResourceJsonMetadata,
+} from './ResourceUtils';
 const gd: libGDevelop = global.gd;
 
 const addNewAnimationWithImageToSpriteObject = (
@@ -120,5 +124,88 @@ describe('ResourceUtils', () => {
         .getParameter(1)
         .getPlainString()
     ).toBe('Audio1');
+  });
+
+  describe('Resource metadata', () => {
+    let resource = null;
+    afterEach(() => {
+      if (resource) resource.delete();
+      resource = null;
+    });
+
+    it('can update a resource metadata', () => {
+      resource = new gd.Resource();
+      updateResourceJsonMetadata(resource, { test: 123, test2: { 4: '56' } });
+      expect(resource.getMetadata()).toMatchInlineSnapshot(
+        `"{\\"test\\":123,\\"test2\\":{\\"4\\":\\"56\\"}}"`
+      );
+      updateResourceJsonMetadata(resource, { test2: 789 });
+      expect(resource.getMetadata()).toMatchInlineSnapshot(
+        `"{\\"test\\":123,\\"test2\\":789}"`
+      );
+
+      resource.setMetadata('invalid json');
+      updateResourceJsonMetadata(resource, {
+        test3: 'this overwrote everything',
+      });
+      expect(resource.getMetadata()).toMatchInlineSnapshot(
+        `"{\\"test3\\":\\"this overwrote everything\\"}"`
+      );
+    });
+
+    it('can extract "localFilePath" and "extension" from the metadata (used for Blob uploads)', () => {
+      resource = new gd.Resource();
+
+      // No extension and no localFilePath found.
+      updateResourceJsonMetadata(resource, { other: 'thing' });
+      expect(parseLocalFilePathOrExtensionFromMetadata(resource))
+        .toMatchInlineSnapshot(`
+        Object {
+          "extension": null,
+          "localFilePath": null,
+        }
+      `);
+
+      // Just an extension found.
+      updateResourceJsonMetadata(resource, {
+        extension: '.png',
+        other: 'thing',
+      });
+      expect(parseLocalFilePathOrExtensionFromMetadata(resource))
+        .toMatchInlineSnapshot(`
+        Object {
+          "extension": ".png",
+          "localFilePath": null,
+        }
+      `);
+
+      // Both found.
+      updateResourceJsonMetadata(resource, {
+        localFilePath: 'test',
+        extension: '.png',
+        other: 'thing',
+      });
+      expect(parseLocalFilePathOrExtensionFromMetadata(resource))
+        .toMatchInlineSnapshot(`
+        Object {
+          "extension": ".png",
+          "localFilePath": "test",
+        }
+      `);
+
+      // Both found but not the proper type.
+      updateResourceJsonMetadata(resource, {
+        localFilePath: 456,
+        extension: 123,
+        other: 'thing',
+      });
+      expect(parseLocalFilePathOrExtensionFromMetadata(resource))
+        .toMatchInlineSnapshot(`
+        Object {
+          "extension": null,
+          "localFilePath": null,
+        }
+      `);
+    });
   });
 });

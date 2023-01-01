@@ -20,6 +20,9 @@ const styles = {
   addButton: {
     cursor: 'pointer',
   },
+  pasteButtonContainer: {
+    marginLeft: '4px',
+  },
 };
 
 type Props = {
@@ -232,7 +235,7 @@ export default function InstructionsList({
                 {addButtonLabel || addButtonDefaultLabel}
               </button>
               {canPaste && (
-                <span>
+                <span style={styles.pasteButtonContainer}>
                   <button
                     style={styles.addButton}
                     className="add-link"

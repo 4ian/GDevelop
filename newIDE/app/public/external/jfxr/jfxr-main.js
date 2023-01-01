@@ -49,7 +49,7 @@ ipcRenderer.on('jfxr-open', (event, externalEditorInput) => {
     });
     const fileReader = new FileReader();
     fileReader.onload = function() {
-      ipcRenderer.send('jfxr-closed', {
+      ipcRenderer.send('jfxr-save', {
         resources: [
           {
             name: hasExistingResource ? pathEditor.state.name : undefined,

@@ -5,8 +5,6 @@ const electronWindow = remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const async = require('async');
 
-let piskelOptions; // The options received from GDevelop
-
 const closeWindow = () => {
   remote.getCurrentWindow().close();
 };
@@ -63,7 +61,7 @@ const saveToGD = async pathEditor => {
     };
   }
 
-  ipcRenderer.send('piskel-closed', {
+  ipcRenderer.send('piskel-save', {
     resources,
     baseNameForNewResources: pathEditor.state.name,
     externalEditorData,
@@ -295,9 +293,7 @@ const loadPiskelDataFromGd = externalEditorInput => {
  * get rid of the new file button,
  * make animation name and path editable
  */
-ipcRenderer.on('piskel-load-animation', (event, externalEditorInput) => {
-  piskelOptions = externalEditorInput;
-
+ipcRenderer.on('piskel-open', (event, externalEditorInput) => {
   const editorContentDocument = document.getElementById('piskel-frame')
     .contentDocument;
   const newButton = editorContentDocument.getElementsByClassName(

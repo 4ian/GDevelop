@@ -30,7 +30,7 @@ ipcRenderer.on('yarn-open', async (event, externalEditorInput) => {
   const saveAndClose = pathEditor => {
     const jsonString = yarn.data.getSaveData('json');
     const dataUrl = convertJsonStringToDataUrl(jsonString);
-    ipcRenderer.send('yarn-closed', {
+    ipcRenderer.send('yarn-save', {
       resources: [
         {
           name: resource ? pathEditor.state.name : undefined,

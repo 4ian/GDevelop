@@ -17,12 +17,15 @@ const {
   buildElectronMenuFromDeclarativeTemplate,
   buildPlaceholderMainMenu,
 } = require('./MainMenu');
-const { loadModalWindow } = require('./ModalWindow');
+const { loadExternalEditorWindow } = require('./LocalExternalEditorWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
-const { downloadLocalFile, saveLocalFileFromArrayBuffer } = require('./LocalFileDownloader');
+const {
+  downloadLocalFile,
+  saveLocalFileFromArrayBuffer,
+} = require('./LocalFileDownloader');
 const { openPreviewWindow } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -179,33 +182,29 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('piskel-load', (event, externalEditorInput) => {
-    loadModalWindow({
+  // Piskel image editor
+  ipcMain.handle('piskel-load', (event, externalEditorInput) => {
+    return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
       readyChannelName: 'piskel-ready',
+      saveChannelName: 'piskel-save',
       indexSubPath: 'piskel/piskel-index.html',
       backgroundColor: '#000000',
       onReady: piskelWindow => {
-        piskelWindow.webContents.send(
-          'piskel-load-animation',
-          externalEditorInput
-        );
+        piskelWindow.webContents.send('piskel-open', externalEditorInput);
         piskelWindow.show();
       },
     });
   });
 
-  ipcMain.on('piskel-closed', (event, externalEditorOutput) => {
-    mainWindow.webContents.send('piskel-closed', externalEditorOutput);
-  });
-
   // JFXR sound effect generator
-  ipcMain.on('jfxr-load', (event, externalEditorInput) => {
-    loadModalWindow({
+  ipcMain.handle('jfxr-load', (event, externalEditorInput) => {
+    return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
       readyChannelName: 'jfxr-ready',
+      saveChannelName: 'jfxr-save',
       indexSubPath: 'jfxr/jfxr-index.html',
       relativeWidth: 0.55,
       relativeHeight: 0.8,
@@ -217,16 +216,13 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('jfxr-closed', (event, externalEditorOutput) => {
-    mainWindow.webContents.send('jfxr-closed', externalEditorOutput);
-  });
-
   // Yarn Dialogue Tree Editor
-  ipcMain.on('yarn-load', (event, externalEditorInput) => {
-    loadModalWindow({
+  ipcMain.handle('yarn-load', (event, externalEditorInput) => {
+    return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
       readyChannelName: 'yarn-ready',
+      saveChannelName: 'yarn-save',
       indexSubPath: 'yarn/yarn-index.html',
       relativeWidth: 0.8,
       relativeHeight: 0.9,
@@ -236,10 +232,6 @@ app.on('ready', function() {
         yarnWindow.show();
       },
     });
-  });
-
-  ipcMain.on('yarn-closed', (event, externalEditorOutput) => {
-    mainWindow.webContents.send('yarn-closed', externalEditorOutput);
   });
 
   // LocalFileUploader events:
@@ -284,10 +276,16 @@ app.on('ready', function() {
     const result = await downloadLocalFile(url, outputPath);
     return result;
   });
-  ipcMain.handle('local-file-save-from-arraybuffer', async (event, arrayBuffer, outputPath) => {
-    const result = await saveLocalFileFromArrayBuffer(arrayBuffer, outputPath);
-    return result;
-  });
+  ipcMain.handle(
+    'local-file-save-from-arraybuffer',
+    async (event, arrayBuffer, outputPath) => {
+      const result = await saveLocalFileFromArrayBuffer(
+        arrayBuffer,
+        outputPath
+      );
+      return result;
+    }
+  );
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {

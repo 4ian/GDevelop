@@ -37,14 +37,12 @@ const openAndWaitForExternalEditorWindow = async (
   externalEditorInput: ExternalEditorInput
 ): Promise<ExternalEditorOutput> => {
   if (!ipcRenderer) throw new Error('Not supported.');
-  return new Promise(resolve => {
-    ipcRenderer.removeAllListeners(`${editorName}-closed`);
-    ipcRenderer.on(`${editorName}-closed`, (event, externalEditorData) => {
-      resolve(externalEditorData);
-    });
 
-    ipcRenderer.send(`${editorName}-load`, externalEditorInput);
-  });
+  const externalEditorOutput = await ipcRenderer.invoke(
+    `${editorName}-load`,
+    externalEditorInput
+  );
+  return externalEditorOutput;
 };
 
 // TODO: quickly test this.
@@ -312,6 +310,8 @@ const editors: Array<ResourceExternalEditor> = [
         'piskel',
         externalEditorInput
       );
+      if (!externalEditorOutput) return null; // Changes cancelled.
+
       const modifiedResources = await saveBlobUrlsFromExternalEditorBase64Resources(
         {
           baseNameForNewResources: externalEditorOutput.baseNameForNewResources,
@@ -377,6 +377,8 @@ const editors: Array<ResourceExternalEditor> = [
         'jfxr',
         externalEditorInput
       );
+      if (!externalEditorOutput) return null; // Changes cancelled.
+
       const modifiedResources = await saveBlobUrlsFromExternalEditorBase64Resources(
         {
           baseNameForNewResources: externalEditorOutput.baseNameForNewResources,
@@ -441,6 +443,8 @@ const editors: Array<ResourceExternalEditor> = [
         'yarn',
         externalEditorInput
       );
+      if (!externalEditorOutput) return null; // Changes cancelled.
+
       const modifiedResources = await saveBlobUrlsFromExternalEditorBase64Resources(
         {
           baseNameForNewResources: externalEditorOutput.baseNameForNewResources,

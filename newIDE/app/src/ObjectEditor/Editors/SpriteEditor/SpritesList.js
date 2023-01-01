@@ -260,38 +260,24 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    let externalEditorData = {};
-    const metadataRaw = direction.getMetadata();
-    if (metadataRaw) {
-      try {
-        externalEditorData = JSON.parse(metadataRaw);
-      } catch (e) {
-        console.error('Malformed metadata', e);
-      }
-    }
-
     const {
       resources,
-      externalEditorData: newExternalEditorData,
+      newMetadata,
       newAnimationName,
     } = await externalEditor.edit({
       project,
       getStorageProvider: resourceManagementProps.getStorageProvider,
       resourceManagementProps,
-      singleFrame: false,
       resourceNames,
       extraOptions: {
+        singleFrame: false,
         fps:
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name:
-          animationName ||
-          (resourceNames.length > 0
-            ? path.basename(resourceNames[0], path.extname(resourceNames[0]))
-            : objectName),
+        name: animationName || resourceNames[0] || objectName,
         isLooping: direction.isLooping(),
-        externalEditorData,
+        existingMetadata: direction.getMetadata(),
       },
     });
 
@@ -321,10 +307,9 @@ export default class SpritesList extends Component<Props, void> {
       sprite.delete();
     });
 
-    // set metadata if there is such on the direction
-    // TODO: verify if it should rather be called "metadata"
-    if (newExternalEditorData) {
-      newDirection.setMetadata(JSON.stringify(newExternalEditorData));
+    // Set metadata on the direction to allow editing again in the future.
+    if (newMetadata) {
+      newDirection.setMetadata(JSON.stringify(newMetadata));
     }
 
     // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).

@@ -85,7 +85,6 @@ ipcRenderer.on('yarn-open', async (event, externalEditorInput) => {
     }
   }
   electronWindow.setTitle(
-    'GDevelop Dialogue Tree Editor (Yarn) - ' +
-      (resource ? resource.name : 'New Dialogue Tree')
+    'GDevelop Dialogue Tree Editor (Yarn) - ' + externalEditorInput.name
   );
 });

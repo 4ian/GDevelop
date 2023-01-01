@@ -216,87 +216,32 @@ export default class ResourceSelector extends React.Component<Props, State> {
   };
 
   _editWith = async (resourceExternalEditor: ResourceExternalEditor) => {
-    const {
-      project,
-      resourcesLoader,
-      resourceKind,
-      resourceManagementProps,
-    } = this.props;
+    const { project, resourcesLoader, resourceManagementProps } = this.props;
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
-    let initialResourceMetadata = {};
-    const initialResourceMetadataRaw = initialResource.getMetadata();
-    if (initialResourceMetadataRaw) {
-      try {
-        initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
-      } catch (e) {
-        console.error('Malformed metadata', e);
-      }
-    }
 
     try {
-      if (resourceKind === 'image') {
-        const resourceNames = [];
-        if (resourcesManager.hasResource(resourceName)) {
-          resourceNames.push(resourceName);
-        }
+      const { resources } = await resourceExternalEditor.edit({
+        project,
+        getStorageProvider: resourceManagementProps.getStorageProvider,
+        resourceManagementProps,
+        resourceNames: [resourceName],
+        extraOptions: {
+          existingMetadata: initialResource.getMetadata(),
 
-        const { resources } = await resourceExternalEditor.edit({
-          project,
-          getStorageProvider: resourceManagementProps.getStorageProvider,
-          resourceManagementProps,
+          // Only useful for images:
           singleFrame: true,
-          resourceNames,
-          extraOptions: {
-            fps: 0,
-            name: resourceName,
-            isLooping: false,
-            externalEditorData: initialResourceMetadata,
-          },
-        });
-        if (!resources.length) return;
+          fps: 0,
+          name: resourceName,
+          isLooping: false,
+        },
+      });
+      if (!resources.length) return;
 
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, [
-          resources[0].name,
-        ]);
-        this.props.onChange(resources[0].name);
-      } else if (resourceKind === 'audio') {
-        const { resources } = await resourceExternalEditor.edit({
-          project,
-          getStorageProvider: resourceManagementProps.getStorageProvider,
-          resourceManagementProps,
-          resourceNames: [resourceName],
-          extraOptions: {
-            externalEditorData: initialResourceMetadata,
-          },
-        });
-        if (!resources.length) return;
-
-        // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, [
-          resources[0].name,
-        ]);
-        this.props.onChange(resources[0].name);
-      } else if (
-        resourceKind === 'json' ||
-        resourceKind === 'tilemap' ||
-        resourceKind === 'tileset'
-      ) {
-        const { resources } = await resourceExternalEditor.edit({
-          project,
-          getStorageProvider: resourceManagementProps.getStorageProvider,
-          resourceManagementProps,
-          resourceNames: [resourceName],
-          extraOptions: {
-            externalEditorData: initialResourceMetadata,
-          },
-        });
-        if (!resources.length) return;
-
-        this.props.onChange(resources[0].name);
-      }
+      // Burst the ResourcesLoader cache to force the file to be reloaded (and not cached by the browser).
+      resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
+      this.props.onChange(resources[0].name);
     } catch (error) {
       console.error(
         'An exception was thrown when launching or reading resources from the external editor:',

@@ -57,11 +57,9 @@ const saveToGD = async pathEditor => {
   const piskelData = pskl.app.piskelController.getPiskel();
   if (piskelData.layers.length > 1) {
     externalEditorData = {
-      // TODO: adapt in rest of file
       data: pskl.utils.serialization.Serializer.serialize(piskelData),
       resourceNames: resources.map(({ name }) => name),
       name: pathEditor.state.name,
-      singleFrame: piskelOptions.singleFrame,
     };
   }
 
@@ -169,11 +167,11 @@ const loadPiskelDataFromGd = externalEditorInput => {
   piskelController.setFPS(externalEditorInput.fps);
 
   const editorResourceNames =
-    externalEditorInput.externalEditorData.pskl.resourceNames;
+    externalEditorInput.externalEditorData.resourceNames;
   let receivedPiskelData;
   try {
     receivedPiskelData = JSON.parse(
-      externalEditorInput.externalEditorData.pskl.data
+      externalEditorInput.externalEditorData.data
     );
   } catch (e) {
     console.error(e);
@@ -335,14 +333,13 @@ ipcRenderer.on('piskel-load-animation', (event, externalEditorInput) => {
   );
 
   electronWindow.setTitle(
-    'GDevelop Pixel Editor (Piskel) - ' +
-      (externalEditorInput.name || 'New Animation')
+    'GDevelop Pixel Editor (Piskel) - ' + externalEditorInput.name
   );
 
   // If there were no resources sent by GD, create an empty piskel document
   if (externalEditorInput.resources.length === 0) {
     piskelCreateAnimation();
-  } else if (externalEditorInput.externalEditorData.pskl) {
+  } else if (externalEditorInput.externalEditorData) {
     // If there is metadata from GD, use it to load the pskl document with frames with layers
     // Note that metadata will be saved only if the user has more than one layers
     loadPiskelDataFromGd(externalEditorInput);

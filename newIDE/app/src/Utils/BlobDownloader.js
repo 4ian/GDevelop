@@ -125,7 +125,6 @@ export const convertBlobToFiles = <
     })
     .filter(Boolean);
 
-
 export function convertBlobToDataURL(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();

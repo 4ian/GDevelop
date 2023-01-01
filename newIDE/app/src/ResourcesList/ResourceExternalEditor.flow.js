@@ -56,7 +56,7 @@ export type ExternalEditorInput = {|
  */
 export type ExternalEditorOutput = {|
   resources: Array<ExternalEditorBase64Resource>,
-  externalEditorData?: ?any,
+  newMetadata: ?any,
   baseNameForNewResources: string,
 |};
 
@@ -75,14 +75,14 @@ export type EditWithExternalEditorOptions = {|
   project: gdProject,
   getStorageProvider: () => StorageProvider,
   resourceManagementProps: ResourceManagementProps,
-  // TODO: rename
-  singleFrame?: boolean, // If set to true, edition should be limited to a single frame
+
   resourceNames: Array<string>,
   extraOptions: {
+    singleFrame?: boolean, // If set to true, edition should be limited to a single frame
     name?: string, //Check what this is used for. Is this "animationName?"
     isLooping?: boolean,
     fps?: number,
-    externalEditorData?: any,
+    existingMetadata: string,
   },
 |};
 

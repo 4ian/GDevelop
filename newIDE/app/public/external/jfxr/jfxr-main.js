@@ -11,10 +11,9 @@ const closeWindow = () => {
   remote.getCurrentWindow().close();
 };
 
-const loadMetaData = externalEditorData => {
-  // TODO: adapt
-  if ('jfxr' in externalEditorData) {
-    jfxr.getSound().parse(externalEditorData.jfxr.data);
+const loadExistingSound = externalEditorData => {
+  if (externalEditorData && externalEditorData.data) {
+    jfxr.getSound().parse(externalEditorData.data);
   } else {
     jfxr.applyPreset(jfxr.presets[1]);
   }
@@ -32,7 +31,7 @@ editorFrameEl.src = 'jfxr-editor/index.html';
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, externalEditorInput) => {
-  loadMetaData(externalEditorInput.externalEditorData);
+  loadExistingSound(externalEditorInput.externalEditorData);
 
   // Jfxr only reads a single resource (a single audio file).
   const resource = externalEditorInput.resources[0] || null;
@@ -78,8 +77,7 @@ ipcRenderer.on('jfxr-open', (event, externalEditorInput) => {
   });
 
   electronWindow.setTitle(
-    'GDevelop Sound Effects Editor (Jfxr) - ' +
-      (externalEditorInput.name || 'New sound effect')
+    'GDevelop Sound Effects Editor (Jfxr) - ' + externalEditorInput.name
   );
 
   if (hasExistingResource) pathEditor.disableNameInput();

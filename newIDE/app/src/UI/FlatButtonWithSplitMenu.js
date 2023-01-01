@@ -14,7 +14,7 @@ type Props = {|
   primary?: boolean,
   disabled?: boolean,
   icon?: React.Node,
-  onClick: ?() => void,
+  onClick: ?() => void | Promise<void>,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
   style?: {|
     marginTop?: number,

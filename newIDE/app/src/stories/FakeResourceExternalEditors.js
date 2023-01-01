@@ -10,8 +10,9 @@ const fakeResourceExternalEditors: Array<ResourceExternalEditor> = [
     createDisplayName: 'Create with Super Image Editor',
     editDisplayName: 'Edit with Super Image Editor',
     kind: 'image',
-    edit: options => {
+    edit: async options => {
       console.log('Open the image editor with these options:', options);
+      return null;
     },
   },
   {
@@ -19,8 +20,9 @@ const fakeResourceExternalEditors: Array<ResourceExternalEditor> = [
     createDisplayName: 'Create a Sound effect with Super Audio Editor',
     editDisplayName: 'Edit the Sound effect with Super Audio Editor',
     kind: 'audio',
-    edit: options => {
+    edit: async options => {
       console.log('Open the audio editor with these options:', options);
+      return null;
     },
   },
   {
@@ -28,8 +30,9 @@ const fakeResourceExternalEditors: Array<ResourceExternalEditor> = [
     createDisplayName: 'Create a Dialogue Tree with Super JSON Dialogue Editor',
     editDisplayName: 'Edit the Dialogue Tree with Super JSON Dialogue Editor',
     kind: 'json',
-    edit: options => {
+    edit: async options => {
       console.log('Open the json editor with these options:', options);
+      return null;
     },
   },
 ];

@@ -2221,8 +2221,12 @@ interface PropertyFunctionGenerator {
     boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] AbstractEventsBasedEntity eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
 };
 
+interface UsedExtensionsResult {
+  [Const, Ref] SetString GetUsedExtensions();
+};
+
 interface UsedExtensionsFinder {
-  [Value] SetString STATIC_ScanProject([Ref] Project project);
+  [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
 };
 
 interface ExtensionAndBehaviorMetadata {

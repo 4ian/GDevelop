@@ -21,18 +21,50 @@ class Behavior;
 
 namespace gd {
 
+class GD_CORE_API UsedExtensionsResult {
+ public:
+  const std::set<gd::String>& GetUsedExtensions() const {
+    return usedExtensions;
+  }
+
+  const std::set<gd::String>& GetUsedIncludeFiles() const {
+    return usedIncludeFiles;
+  }
+
+  const std::set<gd::String>& GetUsedRequiredFiles() const {
+    return usedRequiredFiles;
+  }
+
+  std::set<gd::String>& GetUsedExtensions() {
+    return usedExtensions;
+  }
+
+  std::set<gd::String>& GetUsedIncludeFiles() {
+    return usedIncludeFiles;
+  }
+
+  std::set<gd::String>& GetUsedRequiredFiles() {
+    return usedRequiredFiles;
+  }
+
+ private:
+  std::set<gd::String> usedExtensions;
+  std::set<gd::String> usedIncludeFiles;
+  std::set<gd::String> usedRequiredFiles;
+};
+
 class GD_CORE_API UsedExtensionsFinder
     : public ArbitraryObjectsWorker,
       public ArbitraryEventsWorkerWithContext,
       public ExpressionParser2NodeWorker {
  public:
-  static std::set<gd::String> ScanProject(gd::Project& project);
+  static const UsedExtensionsResult ScanProject(gd::Project& project);
 
  private:
   UsedExtensionsFinder(gd::Project& project_) : project(project_){};
   gd::Project& project;
   gd::String rootType;
-  std::set<gd::String> usedExtensions;
+  UsedExtensionsResult result;
 
   // Object Visitor
   void DoVisitObject(gd::Object& object) override;

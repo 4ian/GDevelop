@@ -22,32 +22,44 @@ class Behavior;
 namespace gd {
 
 class GD_CORE_API UsedExtensionsResult {
- public:
-  const std::set<gd::String>& GetUsedExtensions() const {
+public:
+  /**
+   * The extensions used by the project (or part of it).
+   */
+  const std::set<gd::String> &GetUsedExtensions() const {
     return usedExtensions;
   }
 
-  const std::set<gd::String>& GetUsedIncludeFiles() const {
+  /**
+   * The include files used at runtime by the project (or part of it).
+   */
+  const std::set<gd::String> &GetUsedIncludeFiles() const {
     return usedIncludeFiles;
   }
 
-  const std::set<gd::String>& GetUsedRequiredFiles() const {
+  /**
+   * The additional files required at runtime by the project (or part of it).
+   */
+  const std::set<gd::String> &GetUsedRequiredFiles() const {
     return usedRequiredFiles;
   }
 
-  std::set<gd::String>& GetUsedExtensions() {
-    return usedExtensions;
-  }
+  /**
+   * The extensions used by the project (or part of it).
+   */
+  std::set<gd::String> &GetUsedExtensions() { return usedExtensions; }
 
-  std::set<gd::String>& GetUsedIncludeFiles() {
-    return usedIncludeFiles;
-  }
+  /**
+   * The include files used at runtime by the project (or part of it).
+   */
+  std::set<gd::String> &GetUsedIncludeFiles() { return usedIncludeFiles; }
 
-  std::set<gd::String>& GetUsedRequiredFiles() {
-    return usedRequiredFiles;
-  }
+  /**
+   * The additional files required at runtime by the project (or part of it).
+   */
+  std::set<gd::String> &GetUsedRequiredFiles() { return usedRequiredFiles; }
 
- private:
+private:
   std::set<gd::String> usedExtensions;
   std::set<gd::String> usedIncludeFiles;
   std::set<gd::String> usedRequiredFiles;

@@ -108,6 +108,7 @@ describe('libGD.js', function () {
     it('should have a list of extensions', function () {
       expect(
         gd.UsedExtensionsFinder.scanProject(project)
+          .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
       ).toEqual([]);
@@ -116,6 +117,7 @@ describe('libGD.js', function () {
 
       expect(
         gd.UsedExtensionsFinder.scanProject(project)
+          .getUsedExtensions()
           .toNewVectorString()
           .toJSArray()
       ).toEqual(['Sprite']);

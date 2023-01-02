@@ -26,6 +26,7 @@ import FlatButton from '../UI/FlatButton';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { Column } from '../UI/Grid';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -214,90 +215,46 @@ export default class ResourceSelector extends React.Component<Props, State> {
     });
   };
 
-  _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
-    const {
-      project,
-      resourcesLoader,
-      resourceKind,
-      resourceManagementProps,
-    } = this.props;
+  _editWith = async (resourceExternalEditor: ResourceExternalEditor) => {
+    const { project, resourcesLoader, resourceManagementProps } = this.props;
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
-    let initialResourceMetadata = {};
-    const initialResourceMetadataRaw = initialResource.getMetadata();
-    if (initialResourceMetadataRaw) {
-      try {
-        initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
-      } catch (e) {
-        console.error('Malformed metadata', e);
-      }
-    }
 
-    if (resourceKind === 'image') {
-      const resourceNames = [];
-      if (resourcesManager.hasResource(resourceName)) {
-        resourceNames.push(resourceName);
-      }
-      const externalEditorOptions = {
+    try {
+      const editResult = await resourceExternalEditor.edit({
         project,
         getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourcesLoader,
-        singleFrame: true,
-        resourceNames,
+        resourceManagementProps,
+        resourceNames: [resourceName],
         extraOptions: {
+          existingMetadata: initialResource.getMetadata(),
+
+          // Only useful for images:
+          singleFrame: true,
           fps: 0,
           name: resourceName,
           isLooping: false,
-          externalEditorData: initialResourceMetadata,
         },
-        onChangesSaved: newResourceData => {
-          if (!newResourceData.length) return;
+      });
+      if (!editResult) return;
 
-          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceData[0].name,
-          ]);
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    } else if (resourceKind === 'audio') {
-      const externalEditorOptions = {
-        project,
-        getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourcesLoader,
-        resourceNames: [resourceName],
-        extraOptions: {
-          externalEditorData: initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceData[0].name,
-          ]);
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    } else if (
-      resourceKind === 'json' ||
-      resourceKind === 'tilemap' ||
-      resourceKind === 'tileset'
-    ) {
-      const externalEditorOptions = {
-        project,
-        getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourcesLoader,
-        resourceNames: [resourceName],
-        extraOptions: {
-          initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
+      const { resources } = editResult;
+      if (!resources.length) return;
+
+      // Burst the ResourcesLoader cache to force the file to be reloaded (and not cached by the browser).
+      resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
+      this.props.onChange(resources[0].name);
+    } catch (error) {
+      console.error(
+        'An exception was thrown when launching or reading resources from the external editor:',
+        error
+      );
+      showErrorBox({
+        message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
+        rawError: error,
+        errorId: 'external-editor-error',
+      });
     }
   };
 

@@ -124,3 +124,31 @@ export const convertBlobToFiles = <
       };
     })
     .filter(Boolean);
+
+export function convertBlobToDataURL(blob: Blob): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    // $FlowFixMe - it's guaranted for reader.result to be a string.
+    reader.onload = _e => resolve(reader.result);
+    reader.onerror = _e => reject(reader.error);
+    reader.onabort = _e => reject(new Error('Read aborted'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+export function convertDataURLtoBlob(dataUrl: string): ?Blob {
+  const arr = dataUrl.split(',');
+  if (arr.length < 2) return null;
+
+  const mimeMatchResults = arr[0].match(/:(.*?);/);
+  const mime = mimeMatchResults
+    ? mimeMatchResults[1]
+    : 'application/octet-stream';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}

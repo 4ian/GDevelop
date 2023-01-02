@@ -28,7 +28,60 @@ import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu'
 import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
+import { mapFor } from '../../../../Utils/MapFor';
+
 const gd = global.gd;
+
+/**
+ * Modulo operation
+ * @param x Dividend value.
+ * @param y Divisor value.
+ * @returns Return the remainder using Euclidean division.
+ */
+const mod = function(x: number, y: number): number {
+  return ((x % y) + y) % y;
+};
+
+export const addVertexOnLongestEdge = (vertices: gdVectorVector2f) => {
+  const verticesSize = vertices.size();
+  if (verticesSize > 0) {
+    let longestEdgeEndVertex = 0;
+    {
+      const lastVertex = vertices.at(verticesSize - 1);
+      let previousX = lastVertex.x;
+      let previousY = lastVertex.y;
+      let squaredDistanceMax = -1;
+      mapFor(0, verticesSize, index => {
+        const vertex = vertices.at(index);
+        const x = vertex.x;
+        const y = vertex.y;
+        const deltaX = x - previousX;
+        const deltaY = y - previousY;
+        const squaredDistance = deltaX * deltaX + deltaY * deltaY;
+        if (squaredDistance > squaredDistanceMax) {
+          squaredDistanceMax = squaredDistance;
+          longestEdgeEndVertex = index;
+        }
+        previousX = x;
+        previousY = y;
+      });
+    }
+    const startVertex = vertices.at(
+      mod(longestEdgeEndVertex - 1, verticesSize)
+    );
+    const endVertex = vertices.at(longestEdgeEndVertex);
+    const newVertex = new gd.Vector2f();
+    newVertex.x = (startVertex.x + endVertex.x) / 2;
+    newVertex.y = (startVertex.y + endVertex.y) / 2;
+    vertices.push_back(newVertex);
+    vertices.moveVector2fInVector(verticesSize, longestEdgeEndVertex);
+    newVertex.delete();
+  } else {
+    const newVertex = new gd.Vector2f();
+    vertices.push_back(newVertex);
+    newVertex.delete();
+  }
+};
 
 type VerticesTableProps = {|
   vertices: gdVectorVector2f,
@@ -129,9 +182,7 @@ const VerticesTable = (props: VerticesTableProps) => {
           leftIcon={<AddIcon size="small" />}
           label={<Trans>Add a vertex</Trans>}
           onClick={() => {
-            const newVertice = new gd.Vector2f();
-            props.vertices.push_back(newVertice);
-            newVertice.delete();
+            addVertexOnLongestEdge(props.vertices);
             props.onUpdated();
           }}
         />

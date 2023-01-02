@@ -73,7 +73,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
               };
             } else if (isBlobURL(resourceFile)) {
               // This is a Blob URL which is surely a reference to a
-              // resource that was just edited. Upload it.
+              // resource that was just edited. It will be fetched and uploaded.
               const { extension } = parseLocalFilePathOrExtensionFromMetadata(
                 resource
               );

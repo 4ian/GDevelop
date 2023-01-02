@@ -272,6 +272,24 @@ const freeBlobsAndUpdateMetadata = ({
   });
 };
 
+/**
+ * If the editor is storing the names of the resources (Piskel),
+ * save them now. It will be useful for the editor,
+ * to restore the resources in the proper order.
+ */
+const patchExternalEditorMetadataWithResourcesNamesIfNecessary = (
+  modifiedResourceNames: Array<string>,
+  metadata: ?any
+) => {
+  if (
+    metadata &&
+    typeof metadata === 'object' &&
+    Array.isArray(metadata.resourceNames)
+  ) {
+    metadata.resourceNames = modifiedResourceNames;
+  }
+};
+
 const readMetadata = (metadataKey: string, metadata: ?any): ?any => {
   if (!metadata) return null;
 
@@ -305,10 +323,13 @@ const editWithLocalExternalEditor = async ({
 |}) => {
   const { project, resourceNames, resourceManagementProps } = options;
 
+  // Fetch all edited resources as base64 encoded "data urls" (`data:...`).
   const resources = await downloadAndPrepareExternalEditorBase64Resources({
     project,
     resourceNames,
   });
+
+  // Open the external editor, passing the resources with the data urls.
   const externalEditorInput: ExternalEditorInput = {
     singleFrame: options.extraOptions.singleFrame,
     externalEditorData: readMetadata(
@@ -327,6 +348,8 @@ const editWithLocalExternalEditor = async ({
   );
   if (!externalEditorOutput) return null; // Changes cancelled.
 
+  // Save the edited files back to the GDevelop resources, as "blob urls" (blob:...)
+  // which can then uploaded or saved locally.
   const modifiedResources = await saveBlobUrlsFromExternalEditorBase64Resources(
     {
       baseNameForNewResources: externalEditorOutput.baseNameForNewResources,
@@ -335,6 +358,9 @@ const editWithLocalExternalEditor = async ({
       resourceKind,
     }
   );
+
+  // Ask the project to persist the resources ("blob urls" will be either uploaded
+  // or saved locally).
   try {
     await resourceManagementProps.onFetchNewlyAddedResources();
   } catch (error) {
@@ -344,6 +370,8 @@ const editWithLocalExternalEditor = async ({
     );
   }
 
+  // Free the "blob urls" so that blobs don't stay in memory! They are only temporarily
+  // useful while waiting for an upload/local file save.
   freeBlobsAndUpdateMetadata({
     modifiedResources,
     metadataKey,
@@ -351,6 +379,13 @@ const editWithLocalExternalEditor = async ({
       ? externalEditorOutput.externalEditorData
       : null,
   });
+
+  // Some editors (Piskel) need to have resource names persisted.
+  patchExternalEditorMetadataWithResourcesNamesIfNecessary(
+    modifiedResources.map(({ resource }) => resource.getName()),
+    externalEditorOutput.externalEditorData
+  );
+
   return {
     resources: modifiedResources.map(({ resource, originalIndex }) => ({
       name: resource.getName(),

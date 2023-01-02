@@ -41,6 +41,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
@@ -115,9 +116,15 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
-  // Export files for object and behaviors
-  ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
-  ExportObjectAndBehaviorsRequiredFiles(immutableProject, resourcesFiles);
+  // Export files for free function, object and behaviors
+  auto usedExtensionsResult =
+      gd::UsedExtensionsFinder::ScanProject(exportedProject);
+  for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
+    InsertUnique(includesFiles, includeFile);
+  }
+  for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
+    InsertUnique(resourcesFiles, requiredFile);
+  }
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
@@ -795,98 +802,6 @@ bool ExporterHelper::ExportIncludesAndLibs(
   }
 
   return true;
-}
-
-void ExporterHelper::ExportObjectAndBehaviorsIncludes(
-    const gd::Project &project, std::vector<gd::String> &includesFiles) {
-  auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
-    for (const auto &includeFile : newIncludeFiles) {
-      InsertUnique(includesFiles, includeFile);
-    }
-  };
-
-  auto addObjectIncludeFiles = [&](const gd::Object &object) {
-    // Ensure needed files are included for the object type and its behaviors.
-    const gd::ObjectMetadata &metadata =
-        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(),
-                                                object.GetType());
-    addIncludeFiles(metadata.includeFiles);
-
-    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      const gd::BehaviorMetadata &metadata =
-          gd::MetadataProvider::GetBehaviorMetadata(
-              JsPlatform::Get(),
-              object.GetBehavior(behaviors[j]).GetTypeName());
-      addIncludeFiles(metadata.includeFiles);
-    }
-  };
-
-  auto addObjectsIncludeFiles =
-      [&](const gd::ObjectsContainer &objectsContainer) {
-        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
-          addObjectIncludeFiles(objectsContainer.GetObject(i));
-        }
-      };
-
-  // TODO UsedExtensionsFinder should be used instead to find the file to include.
-  // The Exporter class already use it.
-  addObjectsIncludeFiles(project);
-  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    const gd::Layout &layout = project.GetLayout(i);
-    addObjectsIncludeFiles(layout);
-  }
-  
-  // Event based objects children
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount(); e++) {
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    for (auto&& eventsBasedObjectUniquePtr :
-        eventsFunctionsExtension.GetEventsBasedObjects()
-            .GetInternalVector()) {
-      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
-
-      addObjectsIncludeFiles(*eventsBasedObject);
-    }
-  }
-}
-
-void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
-    const gd::Project &project, std::vector<gd::String> &requiredFiles) {
-  auto addRequiredFiles = [&](const std::vector<gd::String> &newRequiredFiles) {
-    for (const auto &requiredFile : newRequiredFiles) {
-      InsertUnique(requiredFiles, requiredFile);
-    }
-  };
-
-  auto addObjectRequiredFiles = [&](const gd::Object &object) {
-    // Ensure needed files are included for the object type and its behaviors.
-
-    // TODO: Handle required files declared by objects. For now, no objects has
-    // a need for additional required files, so the object metadata do not even
-    // have `requiredFiles`.
-
-    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      const gd::BehaviorMetadata &metadata =
-          gd::MetadataProvider::GetBehaviorMetadata(
-              JsPlatform::Get(),
-              object.GetBehavior(behaviors[j]).GetTypeName());
-      addRequiredFiles(metadata.requiredFiles);
-    }
-  };
-
-  auto addObjectsRequiredFiles =
-      [&](const gd::ObjectsContainer &objectsContainer) {
-        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
-          addObjectRequiredFiles(objectsContainer.GetObject(i));
-        }
-      };
-
-  addObjectsRequiredFiles(project);
-  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    const gd::Layout &layout = project.GetLayout(i);
-    addObjectsRequiredFiles(layout);
-  }
 }
 
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,

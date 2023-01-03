@@ -24,9 +24,10 @@ import {
 import {
   type ResourceExternalEditor,
   type EditWithExternalEditorReturn,
-} from '../../../ResourcesList/ResourceExternalEditor.flow';
+} from '../../../ResourcesList/ResourceExternalEditor';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import { ExternalEditorOpenedDialog } from '../../../UI/ExternalEditorOpenedDialog';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -191,7 +192,15 @@ type Props = {|
   animationName: string, // This is used for the default name of images created with Piskel.
 |};
 
-export default class SpritesList extends Component<Props, void> {
+type State = {|
+  externalEditorOpened: boolean,
+|};
+
+export default class SpritesList extends Component<Props, State> {
+  state = {
+    externalEditorOpened: false,
+  };
+
   onSortEnd = ({
     oldIndex,
     newIndex,
@@ -262,6 +271,7 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
+    this.setState({ externalEditorOpened: true });
     const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
       {
         project,
@@ -281,7 +291,9 @@ export default class SpritesList extends Component<Props, void> {
       }
     );
 
+    this.setState({ externalEditorOpened: false });
     if (!editResult) return;
+
     const { resources, newMetadata, newName } = editResult;
 
     const newDirection = new gd.Direction();
@@ -355,6 +367,7 @@ export default class SpritesList extends Component<Props, void> {
           lockAxis="x"
           axis="x"
         />
+        {this.state.externalEditorOpened && <ExternalEditorOpenedDialog />}
       </div>
     );
   }

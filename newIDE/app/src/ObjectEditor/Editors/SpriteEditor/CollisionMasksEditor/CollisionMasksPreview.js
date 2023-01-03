@@ -240,6 +240,9 @@ const CollisionMasksPreview = (props: Props) => {
     const vertices = props.polygons
       .at(draggedVertex.polygonIndex)
       .getVertices();
+    if (vertices.size() <= 3) {
+      return false;
+    }
     const previousVertex = vertices.at(
       mod(draggedVertex.vertexIndex - 1, vertices.size())
     );

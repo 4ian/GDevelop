@@ -12,6 +12,11 @@ const mockFsExtra = {
 const mockFs = {
   ensureDir: jest.fn(),
   existsSync: jest.fn(),
+  promises: {
+    readFile: jest.fn(filePath =>
+      Promise.resolve('Fake content for file with path:' + filePath)
+    ),
+  },
 };
 const mockProcess = {};
 const mockOs = {
@@ -55,5 +60,6 @@ const mockOptionalRequire = jest.fn(
 
 mockOptionalRequire.mockElectron = mockElectron;
 mockOptionalRequire.mockFsExtra = mockFsExtra;
+mockOptionalRequire.mockFs = mockFs;
 
 module.exports = mockOptionalRequire;

@@ -14,11 +14,13 @@ const editors: Array<ResourceExternalEditor> = [
     createDisplayName: t`Create with Piskel`,
     editDisplayName: t`Edit with Piskel`,
     kind: 'image',
-    edit: () => {
+    edit: async () => {
       sendExternalEditorOpened('piskel');
       Window.showMessageBox(
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
+
+      return null;
     },
   },
   {
@@ -26,11 +28,13 @@ const editors: Array<ResourceExternalEditor> = [
     createDisplayName: t`Create with Jfxr`,
     editDisplayName: t`Edit with Jfxr`,
     kind: 'audio',
-    edit: () => {
+    edit: async () => {
       sendExternalEditorOpened('jfxr');
       Window.showMessageBox(
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
+
+      return null;
     },
   },
   {
@@ -38,11 +42,13 @@ const editors: Array<ResourceExternalEditor> = [
     createDisplayName: t`Create with Yarn`,
     editDisplayName: t`Edit with Yarn`,
     kind: 'json',
-    edit: () => {
+    edit: async () => {
       sendExternalEditorOpened('yarn');
       Window.showMessageBox(
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
+
+      return null;
     },
   },
 ];

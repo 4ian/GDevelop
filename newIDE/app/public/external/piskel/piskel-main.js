@@ -365,7 +365,6 @@ ipcRenderer.on('piskel-open', (event, externalEditorInput) => {
   if (externalEditorInput.resources.length === 0) {
     createEmptyAnimation();
   } else if (externalEditorInput.externalEditorData) {
-    console.log(externalEditorInput.externalEditorData)
     // If there is metadata from GD, use it to load the pskl document with frames with layers
     // Note that metadata will be saved only if the user has more than one layers
     loadPiskelDataFromGd(externalEditorInput);
@@ -380,6 +379,7 @@ ipcRenderer.on('piskel-open', (event, externalEditorInput) => {
     savePathEditor.disableNameInput();
   }
 
+  // Remove the list of frames in case we're editing a single frame and not an animation.
   setTimeout(() => {
     const editorContentDocument = document.getElementById('piskel-frame')
       .contentDocument;

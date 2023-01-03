@@ -228,7 +228,8 @@ export const updateResourceJsonMetadata = (
     );
     return;
   } catch (error) {
-    // Ignore the error.
+    // Ignore the error, the metadata is not valid JSON
+    // so we'll just overwrite it entirely instead of merging it.
   }
 
   resource.setMetadata(JSON.stringify(newMetadata));

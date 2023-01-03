@@ -51,20 +51,17 @@ const downloadBlobToLocalFile = async (
   filePath: string
 ): Promise<void> => {
   if (!ipcRenderer) throw new Error('Not supported');
-  try {
-    const response = await axios.get(blobUrl, {
-      responseType: 'arraybuffer',
-    });
-    const arrayBuffer = response.data;
 
-    await ipcRenderer.invoke(
-      'local-file-save-from-arraybuffer',
-      arrayBuffer,
-      filePath
-    );
-  } catch (error) {
-    throw error;
-  }
+  const response = await axios.get(blobUrl, {
+    responseType: 'arraybuffer',
+  });
+  const arrayBuffer = response.data;
+
+  await ipcRenderer.invoke(
+    'local-file-save-from-arraybuffer',
+    arrayBuffer,
+    filePath
+  );
 };
 
 export const moveUrlResourcesToLocalFiles = async ({

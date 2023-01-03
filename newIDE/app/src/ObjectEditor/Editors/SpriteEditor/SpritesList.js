@@ -318,7 +318,8 @@ export default class SpritesList extends Component<Props, void> {
     // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
     resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
     onReplaceByDirection(newDirection);
-    // Set optional animation name if the user hasn't done so
+
+    // If a name was specified in the external editor, use it for the animation.
     if (newName) {
       onChangeName(newName);
     }

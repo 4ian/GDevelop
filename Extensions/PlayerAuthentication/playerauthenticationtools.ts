@@ -42,8 +42,9 @@ namespace gdjs {
     // Then send a message to the parent iframe to say that the player auth is ready.
     gdjs.registerFirstRuntimeSceneLoadedCallback(
       (runtimeScene: RuntimeScene) => {
+        removeAuthenticationCallbacks(); // Remove any callback that could have been registered before.
         _authenticationMessageCallback = (event: MessageEvent) => {
-          receiveMessageFromLiluo(runtimeScene, event, {
+          receiveAuthenticationMessage(runtimeScene, event, {
             checkOrigin: true,
           });
         };
@@ -52,7 +53,9 @@ namespace gdjs {
           _authenticationMessageCallback,
           true
         );
-        console.info('Notifying parent iframe that player auth is ready.');
+        logger.info(
+          'Notifying parent window that player authentication is ready.'
+        );
         window.parent.postMessage(
           {
             id: 'playerAuthReady',
@@ -61,7 +64,7 @@ namespace gdjs {
         );
         // If no answer after 3 seconds, assume that the game is not embedded in Liluo.io, and remove the listener.
         _initialAuthenticationTimeoutId = setTimeout(() => {
-          console.info('Removing initial auth listener');
+          logger.info('Removing initial authentication listener.');
           removeAuthenticationCallbacks();
         }, 3000);
       }
@@ -292,7 +295,7 @@ namespace gdjs {
     };
 
     /**
-     * When the websocket receives the authentication result, close all the
+     * When the game receives the authentication result, close all the
      * authentication windows, display the notification and focus on the game.
      */
     const handleLoggedInEvent = function (
@@ -327,15 +330,15 @@ namespace gdjs {
      * Reads the event sent by the authentication window and
      * display the appropriate banner.
      */
-    const receiveMessageFromLiluo = function (
+    const receiveAuthenticationMessage = function (
       runtimeScene: gdjs.RuntimeScene,
       event: MessageEvent,
       { checkOrigin }: { checkOrigin: boolean }
     ) {
-      const allowedOrigin = 'https://liluo.io';
+      const allowedOrigins = ['https://liluo.io', 'https://gd.games'];
 
       // Check origin of message.
-      if (checkOrigin && event.origin !== allowedOrigin) {
+      if (checkOrigin && !allowedOrigins.includes(event.origin)) {
         throw new Error(`Unexpected origin: ${event.origin}`);
       }
       // Check that message is not malformed.
@@ -369,7 +372,7 @@ namespace gdjs {
             userToken: event.data.body.token,
           });
           removeAuthenticationCallbacks();
-          refreshAuthenticationBanner(runtimeScene);
+          refreshAuthenticationBannerIfAny(runtimeScene);
           break;
         }
       }
@@ -436,7 +439,7 @@ namespace gdjs {
      */
     const createAuthenticationBanner = function (
       runtimeScene: gdjs.RuntimeScene
-    ) {
+    ): HTMLDivElement {
       const onDismissBanner = () => {
         removeAuthenticationBanner(runtimeScene);
       };
@@ -491,7 +494,7 @@ namespace gdjs {
      * This is useful if the user is already logged in on Liluo.io
      * and we want to display the banner with the username.
      */
-    const refreshAuthenticationBanner = function (
+    const refreshAuthenticationBannerIfAny = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
       if (!_authenticationBanner) return;
@@ -613,7 +616,7 @@ namespace gdjs {
       // know when the user is authenticated.
       if (_authenticationInAppWindow) {
         _cordovaAuthenticationMessageCallback = (event: MessageEvent) => {
-          receiveMessageFromLiluo(runtimeScene, event, {
+          receiveAuthenticationMessage(runtimeScene, event, {
             checkOrigin: false, // For Cordova we don't check the origin, as the message is read from the InAppBrowser directly.
           });
         };
@@ -642,7 +645,7 @@ namespace gdjs {
       // Listen to messages posted by the authentication window, so that we can
       // know when the user is authenticated.
       _authenticationMessageCallback = (event: MessageEvent) => {
-        receiveMessageFromLiluo(runtimeScene, event, {
+        receiveAuthenticationMessage(runtimeScene, event, {
           checkOrigin: true,
         });
       };
@@ -758,7 +761,7 @@ namespace gdjs {
             runtimeScene,
             'Error while checking if the game is registered.'
           );
-          console.error(error);
+          logger.error(error);
         });
     };
 

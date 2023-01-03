@@ -150,7 +150,7 @@ const CollisionMasksPreview = (props: Props) => {
 
     // Confine vertices to inside the sprite frame
     return confinePointToFrame(pointOnSvg.x, pointOnSvg.y);
-  }
+  };
 
   const onPointerDown = (event: any) => {
     const cursorOnFrame = getCursorOnFrame(event);
@@ -159,7 +159,7 @@ const CollisionMasksPreview = (props: Props) => {
     }
     const cursorX = cursorOnFrame.frameX / imageZoomFactor;
     const cursorY = cursorOnFrame.frameY / imageZoomFactor;
-    
+
     const vertexDistanceMin = 20 / imageZoomFactor;
     const edgeDistanceMax = 10 / imageZoomFactor;
 
@@ -235,7 +235,7 @@ const CollisionMasksPreview = (props: Props) => {
    */
   const magnetDraggedVertexForDeletion = (): boolean => {
     if (!draggedVertex) {
-      return null;
+      return false;
     }
     const vertices = props.polygons
       .at(draggedVertex.polygonIndex)
@@ -302,7 +302,7 @@ const CollisionMasksPreview = (props: Props) => {
     cursorY: number,
     vertexDistanceMin: number,
     edgeDistanceMax: number
-  ): ?NewVertexHintPoint => {
+  ): NewVertexHintPoint | null => {
     const vertexSquaredDistanceMin = vertexDistanceMin * vertexDistanceMin;
     const edgeSquaredDistanceMax = edgeDistanceMax * edgeDistanceMax;
 

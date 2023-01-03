@@ -20,6 +20,7 @@ namespace gdjs {
     let _authenticationLoaderContainer: HTMLDivElement | null = null;
     let _authenticationTextContainer: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
+    let _initialAuthenticationTimeoutId: NodeJS.Timeout | null = null;
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
@@ -35,6 +36,36 @@ namespace gdjs {
     gdjs.registerRuntimeScenePostEventsCallback(() => {
       _justLoggedIn = false;
     });
+
+    // If the extension is used, register an eventlistener to know if the user is
+    // logged in while playing the game on Liluo.io.
+    // Then send a message to the parent iframe to say that the player auth is ready.
+    gdjs.registerFirstRuntimeSceneLoadedCallback(
+      (runtimeScene: RuntimeScene) => {
+        _authenticationMessageCallback = (event: MessageEvent) => {
+          receiveMessageFromLiluo(runtimeScene, event, {
+            checkOrigin: true,
+          });
+        };
+        window.addEventListener(
+          'message',
+          _authenticationMessageCallback,
+          true
+        );
+        console.info('Notifying parent iframe that player auth is ready.');
+        window.parent.postMessage(
+          {
+            id: 'playerAuthReady',
+          },
+          '*' // We could restrict to liluo.io but it's not necessary as the message is not sensitive, and it allows easy debugging.
+        );
+        // If no answer after 3 seconds, assume that the game is not embedded in Liluo.io, and remove the listener.
+        _initialAuthenticationTimeoutId = setTimeout(() => {
+          console.info('Removing initial auth listener');
+          removeAuthenticationCallbacks();
+        }, 3000);
+      }
+    );
 
     const getLocalStorageKey = (gameId: string) =>
       `${gameId}_authenticatedUser`;
@@ -228,16 +259,15 @@ namespace gdjs {
       }
     };
 
-    /**
-     * When the websocket receives the authentication result, close all the
-     * authentication windows, display the notification and focus on the game.
-     */
-    const handleLoggedInEvent = function (
-      runtimeScene: gdjs.RuntimeScene,
-      userId: string,
-      username: string | null,
-      userToken: string
-    ) {
+    const saveAuthKeyToStorage = ({
+      username,
+      userId,
+      userToken,
+    }: {
+      username: string | null;
+      userId: string;
+      userToken: string;
+    }) => {
       if (!username) {
         logger.warn('The authenticated player does not have a username');
       }
@@ -259,6 +289,19 @@ namespace gdjs {
           userToken: _userToken,
         })
       );
+    };
+
+    /**
+     * When the websocket receives the authentication result, close all the
+     * authentication windows, display the notification and focus on the game.
+     */
+    const handleLoggedInEvent = function (
+      runtimeScene: gdjs.RuntimeScene,
+      userId: string,
+      username: string | null,
+      userToken: string
+    ) {
+      saveAuthKeyToStorage({ userId, username, userToken });
       cleanUpAuthWindowAndCallbacks(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
 
@@ -284,7 +327,7 @@ namespace gdjs {
      * Reads the event sent by the authentication window and
      * display the appropriate banner.
      */
-    const receiveMessageFromAuthenticationWindow = function (
+    const receiveMessageFromLiluo = function (
       runtimeScene: gdjs.RuntimeScene,
       event: MessageEvent,
       { checkOrigin }: { checkOrigin: boolean }
@@ -313,6 +356,20 @@ namespace gdjs {
             event.data.body.username,
             event.data.body.token
           );
+          break;
+        }
+        case 'alreadyAuthenticated': {
+          if (!(event.data.body && event.data.body.token)) {
+            throw new Error('Malformed message.');
+          }
+
+          saveAuthKeyToStorage({
+            userId: event.data.body.userId,
+            username: event.data.body.username,
+            userToken: event.data.body.token,
+          });
+          removeAuthenticationCallbacks();
+          refreshAuthenticationBanner(runtimeScene);
           break;
         }
       }
@@ -362,13 +419,40 @@ namespace gdjs {
     };
 
     /**
-     * Clear the authentication window timeout.
+     * Clear all existing authentication timeouts.
      * Useful when:
+     * - a new authentication starts
      * - the authentication succeeded
      * - the authentication window is closed
      */
     const clearAuthenticationWindowTimeout = () => {
+      if (_initialAuthenticationTimeoutId)
+        clearTimeout(_initialAuthenticationTimeoutId);
       if (_authenticationTimeoutId) clearTimeout(_authenticationTimeoutId);
+    };
+
+    /**
+     * Helper to create the authentication banner based on the authentication status.
+     */
+    const createAuthenticationBanner = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      const onDismissBanner = () => {
+        removeAuthenticationBanner(runtimeScene);
+      };
+      const onOpenAuthenticationWindow = () => {
+        openAuthenticationWindow(runtimeScene);
+      };
+      return _userToken
+        ? authComponents.computeAuthenticatedBanner(
+            onOpenAuthenticationWindow,
+            onDismissBanner,
+            _username
+          )
+        : authComponents.computeNotAuthenticatedBanner(
+            onOpenAuthenticationWindow,
+            onDismissBanner
+          );
     };
 
     /**
@@ -397,24 +481,37 @@ namespace gdjs {
         );
         return;
       }
-      const onDismissBanner = () => {
-        removeAuthenticationBanner(runtimeScene);
-      };
-      const onOpenAuthenticationWindow = () => {
-        openAuthenticationWindow(runtimeScene);
-      };
-      // We display the corresponding banner depending on the authentication status.
-      _authenticationBanner = _userToken
-        ? authComponents.computeAuthenticatedBanner(
-            onOpenAuthenticationWindow,
-            onDismissBanner,
-            _username
-          )
-        : authComponents.computeNotAuthenticatedBanner(
-            onOpenAuthenticationWindow,
-            onDismissBanner
-          );
+
+      _authenticationBanner = createAuthenticationBanner(runtimeScene);
       domElementContainer.appendChild(_authenticationBanner);
+    };
+
+    /**
+     * Helper to recompute the authentication banner.
+     * This is useful if the user is already logged in on Liluo.io
+     * and we want to display the banner with the username.
+     */
+    const refreshAuthenticationBanner = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      if (!_authenticationBanner) return;
+      const domElementContainer = runtimeScene
+        .getGame()
+        .getRenderer()
+        .getDomElementContainer();
+      if (!domElementContainer) {
+        handleAuthenticationError(
+          runtimeScene,
+          "The div element covering the game couldn't be found, the authentication banner cannot be displayed."
+        );
+        return;
+      }
+      const oldAuthenticationBanner = _authenticationBanner;
+      _authenticationBanner = createAuthenticationBanner(runtimeScene);
+      domElementContainer.replaceChild(
+        _authenticationBanner,
+        oldAuthenticationBanner
+      );
     };
 
     /**
@@ -516,7 +613,7 @@ namespace gdjs {
       // know when the user is authenticated.
       if (_authenticationInAppWindow) {
         _cordovaAuthenticationMessageCallback = (event: MessageEvent) => {
-          receiveMessageFromAuthenticationWindow(runtimeScene, event, {
+          receiveMessageFromLiluo(runtimeScene, event, {
             checkOrigin: false, // For Cordova we don't check the origin, as the message is read from the InAppBrowser directly.
           });
         };
@@ -545,7 +642,7 @@ namespace gdjs {
       // Listen to messages posted by the authentication window, so that we can
       // know when the user is authenticated.
       _authenticationMessageCallback = (event: MessageEvent) => {
-        receiveMessageFromAuthenticationWindow(runtimeScene, event, {
+        receiveMessageFromLiluo(runtimeScene, event, {
           checkOrigin: true,
         });
       };
@@ -678,6 +775,7 @@ namespace gdjs {
     export const removeAuthenticationContainer = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
+      removeAuthenticationCallbacks();
       const domElementContainer = runtimeScene
         .getGame()
         .getRenderer()
@@ -694,6 +792,15 @@ namespace gdjs {
         domElementContainer.removeChild(_authenticationRootContainer);
       }
 
+      _authenticationRootContainer = null;
+      _authenticationLoaderContainer = null;
+      _authenticationTextContainer = null;
+    };
+
+    /*
+     * Remove the authentication callbacks from web or cordova.
+     */
+    const removeAuthenticationCallbacks = function () {
       // Remove the authentication callbacks.
       if (_authenticationMessageCallback) {
         window.removeEventListener(
@@ -705,10 +812,6 @@ namespace gdjs {
         // No need to detach the callback from the InAppBrowser, as it's destroyed when the window is closed.
         _cordovaAuthenticationMessageCallback = null;
       }
-
-      _authenticationRootContainer = null;
-      _authenticationLoaderContainer = null;
-      _authenticationTextContainer = null;
     };
 
     /**

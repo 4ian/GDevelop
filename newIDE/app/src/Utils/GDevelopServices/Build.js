@@ -34,7 +34,7 @@ export type Build = {
   status: 'pending' | 'complete' | 'error',
   type: BuildType,
   targets?: Array<TargetName>,
-  createdAt: number,
+  createdAt?: number, // Not defined for old builds.
   updatedAt: number,
 };
 

@@ -33,7 +33,6 @@ import {
   type Build,
 } from '../../Utils/GDevelopServices/Build';
 import { type Game } from '../../Utils/GDevelopServices/Game';
-import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
@@ -119,7 +118,10 @@ export const BuildCard = ({
   authenticatedUser,
 }: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
-  const buildName = build.name ? build.name : shortenUuidForDisplay(build.id);
+  const defaultBuildName = `${game.gameName
+    .toLowerCase()
+    .replace(/ /g, '-')}-${format(build.updatedAt, 'yyyy-MM-dd-HH-mm-ss')}`;
+  const buildName = build.name ? build.name : defaultBuildName;
   const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
     build &&

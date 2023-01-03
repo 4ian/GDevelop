@@ -1,15 +1,12 @@
+import {
+  closeWindow,
+  onMessageFromParentEditor,
+  sendMessageToParentEditor,
+  setTitle,
+} from '../utils/parent-editor-interface.js';
 import { createPathEditorHeader } from '../utils/path-editor.js';
 
-const electron = require('electron');
-const remote = require('@electron/remote');
-const electronWindow = remote.getCurrentWindow();
-const ipcRenderer = electron.ipcRenderer;
-
 let jfxr = null;
-
-const closeWindow = () => {
-  remote.getCurrentWindow().close();
-};
 
 const loadExistingSound = externalEditorData => {
   if (externalEditorData && externalEditorData.data) {
@@ -24,13 +21,13 @@ const loadExistingSound = externalEditorData => {
 const editorFrameEl = document.getElementById('jfxr-frame');
 window.addEventListener('jfxrReady', e => {
   jfxr = e.mainCtrl;
-  ipcRenderer.send('jfxr-ready');
+  sendMessageToParentEditor('external-editor-ready');
 });
 // Trigger the load of Jfxr manually, to ensure the event listener "jfxrReady" is registered already
 editorFrameEl.src = 'jfxr-editor/index.html';
 
 // Called to load a sound. Should be called after the window is fully loaded.
-ipcRenderer.on('jfxr-open', (event, externalEditorInput) => {
+onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
   loadExistingSound(externalEditorInput.externalEditorData);
 
   // Jfxr only reads a single resource (a single audio file).
@@ -49,7 +46,7 @@ ipcRenderer.on('jfxr-open', (event, externalEditorInput) => {
     });
     const fileReader = new FileReader();
     fileReader.onload = function() {
-      ipcRenderer.send('jfxr-save', {
+      sendMessageToParentEditor('save-external-editor-output', {
         resources: [
           {
             name: hasExistingResource ? pathEditor.state.name : undefined,
@@ -76,7 +73,7 @@ ipcRenderer.on('jfxr-open', (event, externalEditorInput) => {
     name: externalEditorInput.name,
   });
 
-  electronWindow.setTitle(
+  setTitle(
     'GDevelop Sound Effects Editor (Jfxr) - ' + externalEditorInput.name
   );
 

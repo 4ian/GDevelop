@@ -14,7 +14,7 @@ import {
   type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -27,6 +27,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import { ExternalEditorOpenedDialog } from '../UI/ExternalEditorOpenedDialog';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -54,6 +55,7 @@ type Props = {|
 type State = {|
   notExistingError: boolean,
   resourceName: string,
+  externalEditorOpened: boolean,
 |};
 
 export default class ResourceSelector extends React.Component<Props, State> {
@@ -63,6 +65,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     this.state = {
       notExistingError: false,
       resourceName: props.initialResourceName || '',
+      externalEditorOpened: false,
     };
 
     const { project } = props;
@@ -222,6 +225,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const initialResource = resourcesManager.getResource(resourceName);
 
     try {
+      this.setState({ externalEditorOpened: true });
       const editResult = await resourceExternalEditor.edit({
         project,
         getStorageProvider: resourceManagementProps.getStorageProvider,
@@ -237,6 +241,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
           isLooping: false,
         },
       });
+
+      this.setState({ externalEditorOpened: false });
       if (!editResult) return;
 
       const { resources } = editResult;
@@ -244,6 +250,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
       // Burst the ResourcesLoader cache to force the file to be reloaded (and not cached by the browser).
       resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
+
       this.props.onChange(resources[0].name);
     } catch (error) {
       console.error(
@@ -340,6 +347,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
                 }
               />
             ) : null}
+            {this.state.externalEditorOpened && <ExternalEditorOpenedDialog />}
           </ResponsiveLineStackLayout>
         )}
       </I18n>

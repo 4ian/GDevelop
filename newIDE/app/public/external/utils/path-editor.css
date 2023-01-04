@@ -1,12 +1,16 @@
 /**
- * Shared PathEditor styles
+ * The top bar shown for all external editors.
  */
-
 #path-editor-header {
   display: flex;
   align-items: center;
   padding: 4px;
   gap: 4px;
+
+  margin-left: calc(4px + env(titlebar-area-x));
+  margin-top: env(titlebar-area-y);
+  width: calc(env(titlebar-area-width) - 8px);
+  height: env(titlebar-area-height);
 }
 
 #path-editor-header .leftSide {
@@ -20,6 +24,9 @@
   gap: 4px;
 }
 
+/**
+ * A button looking like the GDevelop default dark theme buttons.
+ */
 #path-editor-header button {
   font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, Oxygen-Sans, Ubuntu, 'Helvetica Neue', Helvetica, sans-serif,
@@ -43,6 +50,9 @@
   background-color: rgba(250, 250, 250, 0.08);
 }
 
+/**
+ * A button looking like the GDevelop default dark theme primary buttons.
+ */
 #path-editor-header button.primary {
   background-color: #4f28cd;
   border-color: #4f28cd;
@@ -53,6 +63,9 @@
   border-color: #37238f;
 }
 
+/**
+ * An input looking like the GDevelop default dark theme inputs.
+ */
 #path-editor-header input {
   position: relative;
   font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',

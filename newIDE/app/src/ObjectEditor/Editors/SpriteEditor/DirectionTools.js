@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import { I18n } from '@lingui/react';
@@ -12,7 +12,7 @@ import TextField from '../../../UI/TextField';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
-import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 
@@ -121,11 +121,14 @@ export default class DirectionTools extends Component<Props, State> {
           <div style={styles.container}>
             <ResponsiveWindowMeasurer>
               {windowWidth =>
-                windowWidth !== 'small' &&
                 !!imageResourceExternalEditors.length && (
                   <TextButton
                     label={i18n._(
-                      hasSprites
+                      windowWidth === 'small'
+                        ? hasSprites
+                          ? t`Edit`
+                          : t`Create`
+                        : hasSprites
                         ? imageResourceExternalEditors[0].editDisplayName
                         : imageResourceExternalEditors[0].createDisplayName
                     )}

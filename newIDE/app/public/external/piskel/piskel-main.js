@@ -72,6 +72,7 @@ const saveToGD = async pathEditor => {
   });
 
   // Tell Piskel we saved the changes so that it does not try to prevent closing the window.
+  // We could override the "Unload service" private functions - but it seems even more hacky.
   pskl.app.savedStatusService.onPiskelSaved();
   closeWindow();
 };
@@ -175,11 +176,11 @@ const loadImagesIntoPiskel = async externalEditorInput => {
   // Add original path variable to imported frame objects, so we can overwrite them later when saving changes.
   const layer = piskelController.getLayerAt(0);
   for (let i = 0; i < piskelController.getFrameCount(); i++) {
-    layer.getFrameAt(i).originalLocalFilePath =
+    const frame = layer.getFrameAt(i);
+    frame.originalLocalFilePath =
       externalEditorInput.resources[i].localFilePath;
-    layer.getFrameAt(i).originalResourceName =
-      externalEditorInput.resources[i].name;
-    layer.getFrameAt(i).originalIndex = i;
+    frame.originalResourceName = externalEditorInput.resources[i].name;
+    frame.originalIndex = i;
   }
 };
 
@@ -274,11 +275,10 @@ const loadPiskelDataFromGd = externalEditorInput => {
                     piskelController.getCurrentFrameIndex(),
                     frameIndex
                   );
-                  layer.getFrameAt(frameIndex).originalIndex = frameIndex;
-                  layer.getFrameAt(frameIndex).originalResourceName =
-                    resource.name;
-                  layer.getFrameAt(frameIndex).originalLocalFilePath =
-                    resource.localFilePath;
+                  const frame = layer.getFrameAt(frameIndex);
+                  frame.originalIndex = frameIndex;
+                  frame.originalResourceName = resource.name;
+                  frame.originalLocalFilePath = resource.localFilePath;
                 });
               });
             }
@@ -366,6 +366,7 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     onSaveToGd: saveToGD,
     onCancelChanges: () => {
       // Tell Piskel we saved the changes so that it does not try to prevent closing the window.
+      // We could override the "Unload service" private functions - but it seems even more hacky.
       pskl.app.savedStatusService.onPiskelSaved();
       closeWindow();
     },
@@ -378,8 +379,7 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     externalEditorInput.singleFrame
   );
 
-  setTitle(
-    'GDevelop Pixel Editor (Piskel) - ' + externalEditorInput.name);
+  setTitle('GDevelop Image Editor (Piskel) - ' + externalEditorInput.name);
 
   // If there were no resources sent by GD, create an empty piskel document
   if (externalEditorInput.resources.length === 0) {

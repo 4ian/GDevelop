@@ -27,7 +27,7 @@ onMessageFromParentEditor('open-external-editor-input', async externalEditorInpu
   const saveAndClose = pathEditor => {
     const jsonString = yarn.data.getSaveData('json');
     const dataUrl = convertJsonStringToDataUrl(jsonString);
-    sendMessageToParentEditor.send('save-external-editor-output', {
+    sendMessageToParentEditor('save-external-editor-output', {
       resources: [
         {
           name: resource ? pathEditor.state.name : undefined,

@@ -2,12 +2,25 @@
 import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import {
+  findNearestEdgePoint,
+  getMagnetVertexForDeletion,
+  type NewVertexHintPoint,
+} from './PolygonHelper';
+
+const gd = global.gd;
 
 const styles = {
   vertexCircle: {
     cursor: 'move',
   },
 };
+
+type SelectedVertex = {|
+  vertex: gdVector2f,
+  polygonIndex: number,
+  vertexIndex: number,
+|};
 
 type Props = {|
   polygons: gdVectorPolygon2d,
@@ -25,9 +38,14 @@ type Props = {|
 
 const CollisionMasksPreview = (props: Props) => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
-  const [draggedVertex, setDraggedVertex] = React.useState<gdVector2f | null>(
-    null
-  );
+  const [
+    draggedVertex,
+    setDraggedVertex,
+  ] = React.useState<SelectedVertex | null>(null);
+  const [
+    newVertexHintPoint,
+    setNewVertexHintPoint,
+  ] = React.useState<NewVertexHintPoint | null>(null);
 
   const {
     polygons,
@@ -41,27 +59,34 @@ const CollisionMasksPreview = (props: Props) => {
 
   const forceUpdate = useForceUpdate();
 
-  const onStartDragVertex = (vertex: gdVector2f) => {
+  const onStartDragVertex = (
+    vertex: gdVector2f,
+    polygonIndex: number,
+    vertexIndex: number
+  ) => {
     if (draggedVertex) return;
-    setDraggedVertex(vertex);
+    setDraggedVertex({ vertex, polygonIndex, vertexIndex });
   };
 
   const onEndDragVertex = () => {
-    if (!!draggedVertex) {
-      props.onPolygonsUpdated();
-      props.onClickVertice(draggedVertex.ptr);
+    if (draggedVertex) {
+      if (magnetDraggedVertexForDeletion()) {
+        const vertices = props.polygons
+          .at(draggedVertex.polygonIndex)
+          .getVertices();
+        gd.removeFromVectorVector2f(vertices, draggedVertex.vertexIndex);
+        props.onPolygonsUpdated();
+        props.onClickVertice(null);
+      } else {
+        props.onPolygonsUpdated();
+        props.onClickVertice(draggedVertex.vertex.ptr);
+      }
     }
     setDraggedVertex(null);
   };
 
-  /**
-   * Move a vertex with the mouse. A similar dragging implementation is done in
-   * PointsPreview (but with div and img elements).
-   *
-   * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
-   */
-  const onPointerMove = (event: any) => {
-    if (!draggedVertex || !svgRef.current) return;
+  const getCursorOnFrame = (event: any) => {
+    if (!svgRef.current) return;
 
     // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const pointOnScreen = svgRef.current.createSVGPoint();
@@ -72,11 +97,113 @@ const CollisionMasksPreview = (props: Props) => {
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
     // Confine vertices to inside the sprite frame
-    const { frameX, frameY } = confinePointToFrame(pointOnSvg.x, pointOnSvg.y);
+    return confinePointToFrame(pointOnSvg.x, pointOnSvg.y);
+  };
 
-    draggedVertex.set_x(frameX / imageZoomFactor);
-    draggedVertex.set_y(frameY / imageZoomFactor);
-    forceUpdate();
+  const onPointerDown = (event: any) => {
+    const cursorOnFrame = getCursorOnFrame(event);
+    if (!cursorOnFrame) {
+      return;
+    }
+    const cursorX = cursorOnFrame.frameX / imageZoomFactor;
+    const cursorY = cursorOnFrame.frameY / imageZoomFactor;
+
+    const vertexDistanceMin = 20 / imageZoomFactor;
+    const edgeDistanceMax = 10 / imageZoomFactor;
+
+    const nearestEdgePoint = findNearestEdgePoint(
+      props.polygons,
+      cursorX,
+      cursorY,
+      vertexDistanceMin,
+      edgeDistanceMax
+    );
+    if (nearestEdgePoint) {
+      addVertex(nearestEdgePoint);
+    }
+  };
+
+  /**
+   * Move a vertex with the mouse. A similar dragging implementation is done in
+   * PointsPreview (but with div and img elements).
+   *
+   * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
+   */
+  const onPointerMove = (event: any) => {
+    const cursorOnFrame = getCursorOnFrame(event);
+    if (!cursorOnFrame) {
+      return;
+    }
+    const cursorX = cursorOnFrame.frameX / imageZoomFactor;
+    const cursorY = cursorOnFrame.frameY / imageZoomFactor;
+
+    if (draggedVertex) {
+      draggedVertex.vertex.set_x(cursorX);
+      draggedVertex.vertex.set_y(cursorY);
+
+      magnetDraggedVertexForDeletion();
+
+      forceUpdate();
+    } else {
+      const vertexDistanceMin = 20 / imageZoomFactor;
+      const edgeDistanceMax = 40 / imageZoomFactor;
+
+      setNewVertexHintPoint(
+        findNearestEdgePoint(
+          props.polygons,
+          cursorX,
+          cursorY,
+          vertexDistanceMin,
+          edgeDistanceMax
+        )
+      );
+    }
+  };
+
+  /**
+   * @returns true if the vertex should be deleted.
+   */
+  const magnetDraggedVertexForDeletion = (): boolean => {
+    if (!draggedVertex) {
+      return false;
+    }
+    const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
+    const vertexDistanceMax = 10 / imageZoomFactor;
+    const edgeDistanceMax = 5 / imageZoomFactor;
+    const magnetedPoint = getMagnetVertexForDeletion(
+      vertices,
+      draggedVertex.vertexIndex,
+      vertexDistanceMax,
+      edgeDistanceMax
+    );
+    if (magnetedPoint) {
+      draggedVertex.vertex.set_x(magnetedPoint[0]);
+      draggedVertex.vertex.set_y(magnetedPoint[1]);
+      return true;
+    }
+    return false;
+  };
+
+  const addVertex = (newVertexHintPoint: NewVertexHintPoint) => {
+    const vertices = props.polygons
+      .at(newVertexHintPoint.polygonIndex)
+      .getVertices();
+    const verticesSize = vertices.size();
+    const newVertex = new gd.Vector2f();
+    newVertex.x = newVertexHintPoint.x;
+    newVertex.y = newVertexHintPoint.y;
+    vertices.push_back(newVertex);
+    newVertex.delete();
+    vertices.moveVector2fInVector(verticesSize, newVertexHintPoint.vertexIndex);
+    const vertex = vertices.at(newVertexHintPoint.vertexIndex);
+    setDraggedVertex({
+      vertex,
+      polygonIndex: newVertexHintPoint.polygonIndex,
+      vertexIndex: newVertexHintPoint.vertexIndex,
+    });
+    setNewVertexHintPoint(null);
+    props.onClickVertice(vertex.ptr);
+    props.onPolygonsUpdated();
   };
 
   /**
@@ -95,8 +222,8 @@ const CollisionMasksPreview = (props: Props) => {
   const renderBoundingBox = () => {
     return (
       <polygon
-        fill="rgba(255,0,0,0.2)"
-        stroke="rgba(255,0,0,0.5)"
+        fill="rgba(255,133,105,0.2)"
+        stroke="rgba(255,133,105,0.5)"
         strokeWidth={1}
         fillRule="evenodd"
         points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
@@ -114,9 +241,9 @@ const CollisionMasksPreview = (props: Props) => {
           return (
             <polygon
               key={`polygon-${i}`}
-              fill="rgba(255,0,0,0.2)"
-              stroke="rgba(255,0,0,0.5)"
-              strokeWidth={1}
+              fill="rgba(255,133,105,0.2)"
+              stroke="rgba(255,133,105,0.5)"
+              strokeWidth={2}
               fillRule="evenodd"
               points={mapVector(
                 vertices,
@@ -127,25 +254,25 @@ const CollisionMasksPreview = (props: Props) => {
             />
           );
         })}
-        {mapVector(polygons, (polygon, i) => {
+        {mapVector(polygons, (polygon, polygonIndex) => {
           const vertices = polygon.getVertices();
-          return mapVector(vertices, (vertex, j) => (
+          return mapVector(vertices, (vertex, vertexIndex) => (
             <circle
-              onPointerDown={() => onStartDragVertex(vertex)}
-              key={`polygon-${i}-vertex-${j}`}
+              onPointerDown={() =>
+                onStartDragVertex(vertex, polygonIndex, vertexIndex)
+              }
+              key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
               fill={
-                vertex.ptr === props.selectedVerticePtr
-                  ? 'rgba(0,0,255,0.75)'
-                  : 'rgba(255,0,0,0.75)'
+                vertex.ptr === props.highlightedVerticePtr
+                  ? 'rgba(0,0,0,0.75)'
+                  : vertex.ptr === props.selectedVerticePtr
+                  ? 'rgba(107,175,255,0.75)'
+                  : 'rgba(255,133,105,0.75)'
               }
               stroke={
-                vertex.ptr === props.highlightedVerticePtr
-                  ? vertex.ptr === props.selectedVerticePtr
-                    ? 'white'
-                    : 'black'
-                  : undefined
+                vertex.ptr === props.highlightedVerticePtr ? 'white' : undefined
               }
-              strokeWidth={1}
+              strokeWidth={2}
               cx={vertex.get_x() * imageZoomFactor}
               cy={vertex.get_y() * imageZoomFactor}
               r={5}
@@ -153,6 +280,19 @@ const CollisionMasksPreview = (props: Props) => {
             />
           ));
         })}
+        {newVertexHintPoint && (
+          <circle
+            onPointerDown={() => addVertex(newVertexHintPoint)}
+            key={`new-vertex`}
+            fill={'rgba(0,0,0,0.75)'}
+            stroke={'white'}
+            strokeWidth={2}
+            cx={newVertexHintPoint.x * imageZoomFactor}
+            cy={newVertexHintPoint.y * imageZoomFactor}
+            r={5}
+            style={styles.vertexCircle}
+          />
+        )}
       </React.Fragment>
     );
   };
@@ -177,6 +317,7 @@ const CollisionMasksPreview = (props: Props) => {
       style={containerStyle}
       onPointerMove={onPointerMove}
       onPointerUp={onEndDragVertex}
+      onPointerDown={onPointerDown}
     >
       <svg style={svgStyle} ref={svgRef}>
         {isDefaultBoundingBox && renderBoundingBox()}

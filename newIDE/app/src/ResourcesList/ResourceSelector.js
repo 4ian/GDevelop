@@ -14,7 +14,7 @@ import {
   type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -27,6 +27,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import { ExternalEditorOpenedDialog } from '../UI/ExternalEditorOpenedDialog';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -54,6 +55,7 @@ type Props = {|
 type State = {|
   notExistingError: boolean,
   resourceName: string,
+  externalEditorOpened: boolean,
 |};
 
 export default class ResourceSelector extends React.Component<Props, State> {
@@ -63,6 +65,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     this.state = {
       notExistingError: false,
       resourceName: props.initialResourceName || '',
+      externalEditorOpened: false,
     };
 
     const { project } = props;
@@ -215,15 +218,20 @@ export default class ResourceSelector extends React.Component<Props, State> {
     });
   };
 
-  _editWith = async (resourceExternalEditor: ResourceExternalEditor) => {
+  _editWith = async (
+    i18n: I18nType,
+    resourceExternalEditor: ResourceExternalEditor
+  ) => {
     const { project, resourcesLoader, resourceManagementProps } = this.props;
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
 
     try {
+      this.setState({ externalEditorOpened: true });
       const editResult = await resourceExternalEditor.edit({
         project,
+        i18n,
         getStorageProvider: resourceManagementProps.getStorageProvider,
         resourceManagementProps,
         resourceNames: [resourceName],
@@ -237,6 +245,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
           isLooping: false,
         },
       });
+
+      this.setState({ externalEditorOpened: false });
       if (!editResult) return;
 
       const { resources } = editResult;
@@ -244,8 +254,10 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
       // Burst the ResourcesLoader cache to force the file to be reloaded (and not cached by the browser).
       resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
+
       this.props.onChange(resources[0].name);
     } catch (error) {
+      this.setState({ externalEditorOpened: false });
       console.error(
         'An exception was thrown when launching or reading resources from the external editor:',
         error
@@ -316,7 +328,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
                     ? externalEditors[0].editDisplayName
                     : externalEditors[0].createDisplayName
                 )}
-                onClick={() => this._editWith(externalEditors[0])}
+                onClick={() => this._editWith(i18n, externalEditors[0])}
               />
             )}
             {externalEditors.length > 1 ? (
@@ -327,7 +339,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
                     ? externalEditors[0].editDisplayName
                     : externalEditors[0].createDisplayName
                 )}
-                onClick={() => this._editWith(externalEditors[0])}
+                onClick={() => this._editWith(i18n, externalEditors[0])}
                 buildMenuTemplate={(i18n: I18nType) =>
                   externalEditors.map(externalEditor => ({
                     label: i18n._(
@@ -335,11 +347,12 @@ export default class ResourceSelector extends React.Component<Props, State> {
                         ? externalEditor.editDisplayName
                         : externalEditor.createDisplayName
                     ),
-                    click: () => this._editWith(externalEditor),
+                    click: () => this._editWith(i18n, externalEditor),
                   }))
                 }
               />
             ) : null}
+            {this.state.externalEditorOpened && <ExternalEditorOpenedDialog />}
           </ResponsiveLineStackLayout>
         )}
       </I18n>

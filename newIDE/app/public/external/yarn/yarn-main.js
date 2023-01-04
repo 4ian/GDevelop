@@ -1,10 +1,11 @@
+import {
+  closeWindow,
+  onMessageFromParentEditor,
+  sendMessageToParentEditor,
+  setTitle,
+} from '../utils/parent-editor-interface.js';
 import { createPathEditorHeader } from '../utils/path-editor.js';
 import { fromByteArray } from '../utils/base64.js';
-
-const electron = require('electron');
-const remote = require('@electron/remote');
-const electronWindow = remote.getCurrentWindow();
-const ipcRenderer = electron.ipcRenderer;
 
 let yarn = null;
 
@@ -13,24 +14,20 @@ function convertJsonStringToDataUrl(jsonString) {
   return `data:application/json;base64,${base64}`;
 }
 
-const closeWindow = () => {
-  remote.getCurrentWindow().close();
-};
-
 const editorFrameEl = document.getElementById('yarn-frame');
 window.addEventListener('yarnReady', e => {
   yarn = e;
   yarn.data.restoreFromLocalStorage(false);
-  ipcRenderer.send('yarn-ready');
+  sendMessageToParentEditor('external-editor-ready');
 });
 editorFrameEl.src = 'yarn-editor/index.html';
 
 // Called to load yarn data. Should be called after the window is fully loaded.
-ipcRenderer.on('yarn-open', async (event, externalEditorInput) => {
+onMessageFromParentEditor('open-external-editor-input', async externalEditorInput => {
   const saveAndClose = pathEditor => {
     const jsonString = yarn.data.getSaveData('json');
     const dataUrl = convertJsonStringToDataUrl(jsonString);
-    ipcRenderer.send('yarn-save', {
+    sendMessageToParentEditor.send('save-external-editor-output', {
       resources: [
         {
           name: resource ? pathEditor.state.name : undefined,
@@ -42,7 +39,7 @@ ipcRenderer.on('yarn-open', async (event, externalEditorInput) => {
       baseNameForNewResources: pathEditor.state.name,
       externalEditorData: null,
     });
-    remote.getCurrentWindow().close();
+    closeWindow();
   };
 
   // Make the header.
@@ -84,7 +81,7 @@ ipcRenderer.on('yarn-open', async (event, externalEditorInput) => {
       console.error('Error while loading the resource - ignoring it.', error);
     }
   }
-  electronWindow.setTitle(
+  setTitle(
     'GDevelop Dialogue Tree Editor (Yarn) - ' + externalEditorInput.name
   );
 });

@@ -29,33 +29,14 @@ const externalEditorIndexHtml: { ['piskel' | 'yarn' | 'jfxr']: string } = {
 };
 
 const openAndWaitForExternalEditorWindow = async (
+  externalEditorWindow: any,
   editorName: 'piskel' | 'yarn' | 'jfxr',
   externalEditorInput: ExternalEditorInput
 ): Promise<?ExternalEditorOutput> => {
-  const targetId = 'GDevelopExternalEditor' + nextExternalEditorWindowId++;
-  const width = 800;
-  const height = 600;
-  const left = window.screenX + window.innerWidth / 2 - width / 2;
-  const top = window.screenY + window.innerHeight / 2 - height / 2;
-
   return new Promise((resolve, reject) => {
     let externalEditorLoaded = false;
     let externalEditorClosed = false;
     let externalEditorOutput: ?ExternalEditorOutput = null;
-    const externalEditorWindow = window.open(
-      externalEditorIndexHtml[editorName],
-      targetId,
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-
-    if (!externalEditorWindow) {
-      reject(
-        new Error(
-          "Can't open the external editor because of browser restrictions."
-        )
-      );
-      return;
-    }
 
     const onMessageEvent = (event: MessageEvent) => {
       if (event.source !== externalEditorWindow) {
@@ -70,7 +51,18 @@ const openAndWaitForExternalEditorWindow = async (
       }
 
       const { id, payload } = event.data;
-      if (id === `external-editor-ready`)
+      if (id === `external-editor-ready`) {
+        console.info(`External editor "${editorName}" ready.`);
+
+        // Some browsers like Safari might not trigger the "load" event, but now we can
+        // be sure the editor is loaded: the proof being that we received this message.
+        // Mark the editor as loaded and re-attach a unload listener to be safe.
+        externalEditorLoaded = true;
+        externalEditorWindow.addEventListener('unload', () => {
+          onExternalEditorWindowClosed();
+        });
+
+        // Now that the external editor is loaded and ready, we can ask it to open the resources.
         externalEditorWindow.postMessage(
           {
             id: 'open-external-editor-input',
@@ -80,7 +72,7 @@ const openAndWaitForExternalEditorWindow = async (
           // can receive the message:
           window.location.origin
         );
-      else if (id === `save-external-editor-output`) {
+      } else if (id === `save-external-editor-output`) {
         console.info(`Received data from external editor "${editorName}."`);
         // $FlowFixMe - assuming the typing is good.
         externalEditorOutput = payload;
@@ -111,6 +103,16 @@ const openAndWaitForExternalEditorWindow = async (
       });
     });
 
+    // Change the HTML file displayed by the window so that it starts loading
+    // the editor.
+    // The browser will load the editor HTML/CSS/JS, then will fire the `load` event
+    // (though not on Safari), then the editor will send a `external-editor-ready` event
+    // (on all browsers), after which we will then be ready to have it open the resources.
+    // (see `open-external-editor-input`).
+    externalEditorWindow.location = externalEditorIndexHtml[editorName];
+
+    // If the editor is not ready after 10 seconds and not closed, force it to be closed.
+    // Something wrong is going on and we don't want to block the user.
     setTimeout(() => {
       if (externalEditorLoaded || externalEditorClosed) return;
       console.info(
@@ -216,12 +218,14 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
  */
 const editWithBrowserExternalEditor = async ({
   externalEditorName,
+  externalEditorWindow,
   defaultName,
   metadataKey,
   resourceKind,
   options,
 }: {|
   externalEditorName: 'piskel' | 'yarn' | 'jfxr',
+  externalEditorWindow: any,
   defaultName: string,
   metadataKey: string,
   resourceKind: ResourceKind,
@@ -249,6 +253,7 @@ const editWithBrowserExternalEditor = async ({
 
   sendExternalEditorOpened(externalEditorName);
   const externalEditorOutput: ?ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
+    externalEditorWindow,
     externalEditorName,
     externalEditorInput
   );
@@ -305,6 +310,54 @@ const editWithBrowserExternalEditor = async ({
 const cloudProjectWarning = t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`;
 
 /**
+ * Open a window showing a black "loading..." screen. It's important this is done
+ * NOT in an asynchronous way but JUST after a click. Otherwise, browsers like Safari
+ * will block the window opening.
+ */
+const immediatelyOpenLoadingWindowForExternalEditor = () => {
+  const targetId = 'GDevelopExternalEditor' + nextExternalEditorWindowId++;
+  const width = 800;
+  const height = 600;
+  const left = window.screenX + window.innerWidth / 2 - width / 2;
+  const top = window.screenY + window.innerHeight / 2 - height / 2;
+
+  const externalEditorWindow = window.open(
+    'about:blank',
+    targetId,
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+  if (!externalEditorWindow) {
+    throw new Error(
+      "Can't open the external editor because of browser restrictions."
+    );
+  }
+
+  externalEditorWindow.document.write(`<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #000000;
+        overflow: hidden;
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+      Loading...
+  </body>
+</html>`);
+
+  return externalEditorWindow;
+};
+
+/**
  * This is the list of editors that can be used to edit resources
  * when running in a browser.
  */
@@ -323,8 +376,10 @@ const editors: Array<ResourceExternalEditor> = [
         return null;
       }
 
+      const externalEditorWindow = immediatelyOpenLoadingWindowForExternalEditor();
       return await editWithBrowserExternalEditor({
         options,
+        externalEditorWindow,
         externalEditorName: 'piskel',
         defaultName: 'New image',
         metadataKey: 'pskl',
@@ -346,8 +401,10 @@ const editors: Array<ResourceExternalEditor> = [
         return null;
       }
 
+      const externalEditorWindow = immediatelyOpenLoadingWindowForExternalEditor();
       return await editWithBrowserExternalEditor({
         options,
+        externalEditorWindow,
         externalEditorName: 'jfxr',
         defaultName: 'New sound effect',
         metadataKey: 'jfxr',
@@ -369,8 +426,10 @@ const editors: Array<ResourceExternalEditor> = [
         return null;
       }
 
+      const externalEditorWindow = immediatelyOpenLoadingWindowForExternalEditor();
       return await editWithBrowserExternalEditor({
         options,
+        externalEditorWindow,
         externalEditorName: 'yarn',
         defaultName: 'New dialogue tree',
         metadataKey: 'yarn',

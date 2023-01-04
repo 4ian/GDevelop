@@ -7,24 +7,23 @@ const { load } = require('./Utils/UrlLoader');
 // Generic function to load external editors in a modal window.
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
+/** @type {BrowserWindow | null} */
 let modalWindow = null;
+
+const relativeWidth = 0.7;
+const relativeHeight = 0.9;
+const backgroundColor = '#000000';
 
 /**
  * Open a modal window containing an external HTML5 editor
  */
 const loadExternalEditorWindow = ({
-  onReady,
   devTools,
   parentWindow,
-  readyChannelName,
-  saveChannelName,
   indexSubPath,
-  relativeWidth = 0.7,
-  relativeHeight = 0.9,
-  backgroundColor = 'white',
-  show = false,
+  externalEditorInput,
 }) => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     let externalEditorOutput = null;
 
     const windowOptions = {
@@ -49,14 +48,29 @@ const loadExternalEditorWindow = ({
     // Enable `@electron/remote` module for renderer process
     require('@electron/remote/main').enable(modalWindow.webContents);
 
-    ipcMain.removeAllListeners(readyChannelName);
-    ipcMain.removeAllListeners(saveChannelName);
-    ipcMain.on(readyChannelName, event => {
-      onReady(modalWindow);
-    });
-    ipcMain.on(saveChannelName, (event, newExternalEditorOutput) => {
+    /** @param {import('electron').IpcMainEvent} event */
+    const onReady = event => {
+      if (!modalWindow || event.sender !== modalWindow.webContents) return;
+
+      modalWindow.webContents.send(
+        'open-external-editor-input',
+        externalEditorInput
+      );
+      modalWindow.show();
+    };
+
+    /**
+     * @param {import('electron').IpcMainEvent} event
+     * @param {any} newExternalEditorOutput
+     */
+    const saveExternalEditorOutput = (event, newExternalEditorOutput) => {
+      if (!modalWindow || event.sender !== modalWindow.webContents) return;
+
       externalEditorOutput = newExternalEditorOutput;
-    });
+    };
+
+    ipcMain.on('external-editor-ready', onReady);
+    ipcMain.on('save-external-editor-output', saveExternalEditorOutput);
 
     // Load the index.html of the app.
     load({
@@ -84,7 +98,13 @@ const loadExternalEditorWindow = ({
 
     modalWindow.on('closed', event => {
       modalWindow = null;
-      resolve(externalEditorOutput)
+
+      ipcMain.removeListener('external-editor-ready', onReady);
+      ipcMain.removeListener(
+        'save-external-editor-output',
+        saveExternalEditorOutput
+      );
+      resolve(externalEditorOutput);
     });
 
     modalWindow.on('close', event => {
@@ -92,7 +112,7 @@ const loadExternalEditorWindow = ({
       modalWindow.destroy();
       modalWindow = null;
     });
-  })
+  });
 };
 
 module.exports = {

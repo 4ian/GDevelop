@@ -406,8 +406,8 @@ const CollisionMasksPreview = (props: Props) => {
   const renderBoundingBox = () => {
     return (
       <polygon
-        fill="rgba(255,0,0,0.2)"
-        stroke="rgba(255,0,0,0.5)"
+        fill="rgba(255,133,105,0.2)"
+        stroke="rgba(255,133,105,0.5)"
         strokeWidth={1}
         fillRule="evenodd"
         points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
@@ -425,9 +425,9 @@ const CollisionMasksPreview = (props: Props) => {
           return (
             <polygon
               key={`polygon-${i}`}
-              fill="rgba(255,0,0,0.2)"
-              stroke="rgba(255,0,0,0.5)"
-              strokeWidth={1}
+              fill="rgba(255,133,105,0.2)"
+              stroke="rgba(255,133,105,0.5)"
+              strokeWidth={2}
               fillRule="evenodd"
               points={mapVector(
                 vertices,
@@ -450,13 +450,13 @@ const CollisionMasksPreview = (props: Props) => {
                 vertex.ptr === props.highlightedVerticePtr
                   ? 'rgba(0,0,0,0.75)'
                   : vertex.ptr === props.selectedVerticePtr
-                  ? 'rgba(0,255,255,0.75)'
-                  : 'rgba(255,0,0,0.75)'
+                  ? 'rgba(107,175,255,0.75)'
+                  : 'rgba(255,133,105,0.75)'
               }
               stroke={
                 vertex.ptr === props.highlightedVerticePtr ? 'white' : undefined
               }
-              strokeWidth={1}
+              strokeWidth={2}
               cx={vertex.get_x() * imageZoomFactor}
               cy={vertex.get_y() * imageZoomFactor}
               r={5}
@@ -470,7 +470,7 @@ const CollisionMasksPreview = (props: Props) => {
             key={`new-vertex`}
             fill={'rgba(0,0,0,0.75)'}
             stroke={'white'}
-            strokeWidth={1}
+            strokeWidth={2}
             cx={newVertexHintPoint.x * imageZoomFactor}
             cy={newVertexHintPoint.y * imageZoomFactor}
             r={5}

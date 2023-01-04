@@ -1,6 +1,5 @@
 GDevelop Core (GDCore)
 --------------------------
-
 The MIT License (MIT)
 
 Copyright (c) 2008-2016 Florian Rival

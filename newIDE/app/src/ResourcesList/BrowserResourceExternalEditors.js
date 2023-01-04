@@ -38,7 +38,7 @@ const openAndWaitForExternalEditorWindow = async (
   const left = window.screenX + window.innerWidth / 2 - width / 2;
   const top = window.screenY + window.innerHeight / 2 - height / 2;
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     let externalEditorLoaded = false;
     let externalEditorClosed = false;
     let externalEditorOutput: ?ExternalEditorOutput = null;
@@ -49,8 +49,11 @@ const openAndWaitForExternalEditorWindow = async (
     );
 
     if (!externalEditorWindow) {
-      // If the window can't be opened, at least avoid a crash.
-      resolve(null);
+      reject(
+        new Error(
+          "Can't open the external editor because of browser restrictions."
+        )
+      );
       return;
     }
 

@@ -257,6 +257,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
       this.props.onChange(resources[0].name);
     } catch (error) {
+      this.setState({ externalEditorOpened: false });
       console.error(
         'An exception was thrown when launching or reading resources from the external editor:',
         error

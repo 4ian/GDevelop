@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import {
   createNewResource,
   type ResourceKind,
@@ -81,6 +82,7 @@ export type EditWithExternalEditorReturn = {|
  */
 export type EditWithExternalEditorOptions = {|
   project: gdProject,
+  i18n: I18nType,
   getStorageProvider: () => StorageProvider,
   resourceManagementProps: ResourceManagementProps,
 

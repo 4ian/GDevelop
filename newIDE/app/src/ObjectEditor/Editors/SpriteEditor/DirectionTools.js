@@ -1,6 +1,6 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import { I18n } from '@lingui/react';
 import Timer from '@material-ui/icons/Timer';
@@ -43,7 +43,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  onEditWith: ResourceExternalEditor => Promise<void>,
+  onEditWith: (i18n: I18nType, ResourceExternalEditor) => Promise<void>,
 |};
 
 type State = {|
@@ -133,7 +133,7 @@ export default class DirectionTools extends Component<Props, State> {
                         : imageResourceExternalEditors[0].createDisplayName
                     )}
                     icon={<Brush />}
-                    onClick={() => onEditWith(imageResourceExternalEditors[0])}
+                    onClick={() => onEditWith(i18n, imageResourceExternalEditors[0])}
                   />
                 )
               }

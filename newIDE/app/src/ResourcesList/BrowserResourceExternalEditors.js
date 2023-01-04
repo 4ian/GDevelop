@@ -19,6 +19,7 @@ import {
   downloadUrlsToBlobs,
   type ItemResult,
 } from '../Utils/BlobDownloader';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 let nextExternalEditorWindowId = 0;
 
 const externalEditorIndexHtml: { ['piskel' | 'yarn' | 'jfxr']: string } = {
@@ -293,6 +294,8 @@ const editWithBrowserExternalEditor = async ({
   };
 };
 
+const cloudProjectWarning = t`You need to save this project as a cloud project to install this asset. Please save your project and try again.`;
+
 /**
  * This is the list of editors that can be used to edit resources
  * when running in a browser.
@@ -304,6 +307,14 @@ const editors: Array<ResourceExternalEditor> = [
     editDisplayName: t`Edit with Piskel`,
     kind: 'image',
     edit: async options => {
+      if (options.getStorageProvider().internalName !== 'Cloud') {
+        const { i18n } = options;
+        showWarningBox(i18n._(cloudProjectWarning), {
+          delayToNextTick: true,
+        });
+        return null;
+      }
+
       return await editWithBrowserExternalEditor({
         options,
         externalEditorName: 'piskel',
@@ -319,6 +330,14 @@ const editors: Array<ResourceExternalEditor> = [
     editDisplayName: t`Edit with Jfxr`,
     kind: 'audio',
     edit: async options => {
+      if (options.getStorageProvider().internalName !== 'Cloud') {
+        const { i18n } = options;
+        showWarningBox(i18n._(cloudProjectWarning), {
+          delayToNextTick: true,
+        });
+        return null;
+      }
+
       return await editWithBrowserExternalEditor({
         options,
         externalEditorName: 'jfxr',
@@ -334,6 +353,14 @@ const editors: Array<ResourceExternalEditor> = [
     editDisplayName: t`Edit with Yarn`,
     kind: 'json',
     edit: async options => {
+      if (options.getStorageProvider().internalName !== 'Cloud') {
+        const { i18n } = options;
+        showWarningBox(i18n._(cloudProjectWarning), {
+          delayToNextTick: true,
+        });
+        return null;
+      }
+
       return await editWithBrowserExternalEditor({
         options,
         externalEditorName: 'yarn',

@@ -251,7 +251,7 @@ export default class SpritesList extends Component<Props, State> {
     await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
-  editWith = async (externalEditor: ResourceExternalEditor) => {
+  editWith = async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
     const {
       project,
       resourceManagementProps,
@@ -275,6 +275,7 @@ export default class SpritesList extends Component<Props, State> {
     const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
       {
         project,
+        i18n,
         getStorageProvider: resourceManagementProps.getStorageProvider,
         resourceManagementProps,
         resourceNames,

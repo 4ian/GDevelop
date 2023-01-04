@@ -8,4 +8,4 @@ commit number: a300d17eb88d2b9d1fa2bbe3a810ad1bb76f1f81
 Piskel sources are downloaded by `import-zipped-editor.js` script. They are raw, unchanged sources
 of the Piskel editor build. Sources will be stored in the `piskel-editor` folder.
 See `piskel-main.js` for the code running the editor.
-See `ModalWindow.js` and `LocalPiskelBridge.js` files for the bridge that opens the Window and passes data from GDevelop to Piskel.
+See `LocalExternalEditorWindow.js`, `LocalResourceExternalEditors.js` and `BrowserResourceExternalEditors.js` files for the bridge that opens the Window and passes data from GDevelop to Piskel.

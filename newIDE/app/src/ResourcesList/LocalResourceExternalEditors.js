@@ -5,29 +5,26 @@ import {
   type ExternalEditorOutput,
   type ExternalEditorBase64Resource,
   type EditWithExternalEditorOptions,
-} from './ResourceExternalEditor.flow';
+  readMetadata,
+  saveBlobUrlsFromExternalEditorBase64Resources,
+  freeBlobsAndUpdateMetadata,
+  patchExternalEditorMetadataWithResourcesNamesIfNecessary,
+} from './ResourceExternalEditor';
 import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 import optionalRequire from '../Utils/OptionalRequire';
-import { isBlobURL, isURL, updateResourceJsonMetadata } from './ResourceUtils';
+import { isBlobURL, isURL } from './ResourceUtils';
 import {
   convertBlobToDataURL,
-  convertDataURLtoBlob,
   downloadUrlsToBlobs,
   type ItemResult,
 } from '../Utils/BlobDownloader';
-import { createNewResource, type ResourceKind } from './ResourceSource';
-import newNameGenerator from '../Utils/NewNameGenerator';
+import { type ResourceKind } from './ResourceSource';
+
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-
-type ResourceWithTemporaryBlobUrl = {|
-  resource: gdResource,
-  blobUrl: string,
-  originalIndex?: ?number,
-|};
 
 /**
  * Ask Electron main process to open a window for the specified editor,
@@ -36,7 +33,7 @@ type ResourceWithTemporaryBlobUrl = {|
 const openAndWaitForExternalEditorWindow = async (
   editorName: 'piskel' | 'yarn' | 'jfxr',
   externalEditorInput: ExternalEditorInput
-): Promise<ExternalEditorOutput> => {
+): Promise<?ExternalEditorOutput> => {
   if (!ipcRenderer) throw new Error('Not supported.');
 
   const externalEditorOutput = await ipcRenderer.invoke(
@@ -164,148 +161,6 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
 };
 
 /**
- * Store the given resources, sent by an external editors, into the resources
- * of the game (existing or new ones), with blob URLs - which should then be uploaded/stored
- * locally.
- */
-const saveBlobUrlsFromExternalEditorBase64Resources = async ({
-  project,
-  baseNameForNewResources,
-  resources,
-  resourceKind,
-}: {|
-  project: gdProject,
-  baseNameForNewResources: string,
-  resources: Array<ExternalEditorBase64Resource>,
-  resourceKind: ResourceKind,
-|}): Promise<Array<ResourceWithTemporaryBlobUrl>> => {
-  const resourcesManager = project.getResourcesManager();
-  const blobs: Array<ResourceWithTemporaryBlobUrl> = resources
-    .map(({ name, dataUrl, localFilePath, extension, originalIndex }) => {
-      // Convert the data url to a blob URL.
-      const blob = convertDataURLtoBlob(dataUrl);
-      const blobUrl = blob ? URL.createObjectURL(blob) : '';
-
-      if (!name || !resourcesManager.hasResource(name)) {
-        // Insert a new resource.
-        // Store the blob url, as well as indication
-        // about which extension (for a new file) or filename to use (to overwrite existing file).
-        const name = newNameGenerator(baseNameForNewResources, name =>
-          resourcesManager.hasResource(name)
-        );
-        console.info('Creating new resource ' + name + '...');
-
-        const newResource = createNewResource(resourceKind);
-        if (!newResource) {
-          console.error(
-            'Could not create a resource for kind: ' + resourceKind
-          );
-          return null;
-        }
-        newResource.setName(name);
-        newResource.setFile(blobUrl);
-        newResource.setMetadata(
-          JSON.stringify({
-            localFilePath,
-            extension,
-          })
-        );
-        resourcesManager.addResource(newResource);
-        newResource.delete();
-
-        return {
-          resource: resourcesManager.getResource(name),
-          originalIndex,
-          blobUrl,
-        };
-      } else {
-        console.info('Updating resource ' + name + '.');
-
-        // Get the resource and store the blob url, as well as indication
-        // about which extension (for a new file) or filename to use (to overwrite existing file).
-        const resource = resourcesManager.getResource(name);
-        resource.setFile(blobUrl);
-        updateResourceJsonMetadata(resource, {
-          localFilePath,
-          extension,
-        });
-
-        return {
-          resource,
-          originalIndex,
-          blobUrl,
-        };
-      }
-    })
-    .filter(Boolean);
-
-  return blobs;
-};
-
-/**
- * Free the blob URLs from each resource (to do once these blob URLs have been properly
- * uploaded/stored locally) and update the resources with the given metadata, if any.
- */
-const freeBlobsAndUpdateMetadata = ({
-  modifiedResources,
-  metadataKey,
-  metadata,
-}: {|
-  modifiedResources: Array<ResourceWithTemporaryBlobUrl>,
-  metadataKey: string,
-  metadata: ?any,
-|}) => {
-  modifiedResources.forEach(({ resource, blobUrl }) => {
-    // Free the blob urls that were created just to allow the resources
-    // to be "fetched" to their final destination by `onFetchNewlyAddedResources`.
-    // If we don't revoke these blob urls, they will stay in memory forever, despite
-    // being used only temporarily as a temporary storage before they are uploaded somewhere
-    // (Cloud) or written to the disk (LocalFile).
-    URL.revokeObjectURL(blobUrl);
-
-    // Update the modified resources with the metadata of the editor.
-    if (metadata) {
-      updateResourceJsonMetadata(resource, {
-        [metadataKey]: metadata,
-      });
-    }
-  });
-};
-
-/**
- * If the editor is storing the names of the resources (Piskel),
- * save them now. It will be useful for the editor,
- * to restore the resources in the proper order.
- */
-const patchExternalEditorMetadataWithResourcesNamesIfNecessary = (
-  modifiedResourceNames: Array<string>,
-  metadata: ?any
-) => {
-  if (
-    metadata &&
-    typeof metadata === 'object' &&
-    Array.isArray(metadata.resourceNames)
-  ) {
-    metadata.resourceNames = modifiedResourceNames;
-  }
-};
-
-const readMetadata = (metadataKey: string, metadata: ?any): ?any => {
-  if (!metadata) return null;
-
-  try {
-    const parsedMetadata = JSON.parse(metadata);
-    if (parsedMetadata && typeof parsedMetadata === 'object') {
-      if (parsedMetadata[metadataKey]) return parsedMetadata[metadataKey];
-    }
-  } catch (error) {
-    console.warn('Malformed metadata for a resource - ignoring it.', error);
-  }
-
-  return null;
-};
-
-/**
  * Edit one or more resources with the specified external editor.
  */
 const editWithLocalExternalEditor = async ({
@@ -342,7 +197,7 @@ const editWithLocalExternalEditor = async ({
     resources,
   };
   sendExternalEditorOpened(externalEditorName);
-  const externalEditorOutput: ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
+  const externalEditorOutput: ?ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
     externalEditorName,
     externalEditorInput
   );

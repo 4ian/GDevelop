@@ -1,5 +1,6 @@
 // @flow
 import { addVertexOnLongestEdge } from './PolygonsList';
+
 const gd: libGDevelop = global.gd;
 
 describe('addVertexOnLongestEdge', () => {

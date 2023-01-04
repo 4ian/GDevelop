@@ -48,8 +48,13 @@ const openAndWaitForExternalEditorWindow = async (
       `width=${width},height=${height},left=${left},top=${top}`
     );
 
+    if (!externalEditorWindow) {
+      // If the window can't be opened, at least avoid a crash.
+      resolve(null);
+      return;
+    }
+
     const onMessageEvent = (event: MessageEvent) => {
-      console.log(event.source);
       if (event.source !== externalEditorWindow) {
         return;
       }

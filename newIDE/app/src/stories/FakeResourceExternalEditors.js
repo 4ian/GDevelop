@@ -1,5 +1,5 @@
 // @flow
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 
 /**
  * Fake "external editors" to be used in Storybook.

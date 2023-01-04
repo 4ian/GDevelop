@@ -187,14 +187,8 @@ app.on('ready', function() {
     return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: 'piskel-ready',
-      saveChannelName: 'piskel-save',
-      indexSubPath: 'piskel/piskel-index.html',
-      backgroundColor: '#000000',
-      onReady: piskelWindow => {
-        piskelWindow.webContents.send('piskel-open', externalEditorInput);
-        piskelWindow.show();
-      },
+      indexSubPath: 'piskel/piskel-electron-index.html',
+      externalEditorInput,
     });
   });
 
@@ -203,16 +197,8 @@ app.on('ready', function() {
     return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: 'jfxr-ready',
-      saveChannelName: 'jfxr-save',
-      indexSubPath: 'jfxr/jfxr-index.html',
-      relativeWidth: 0.55,
-      relativeHeight: 0.8,
-      backgroundColor: '#000000',
-      onReady: jfxrWindow => {
-        jfxrWindow.webContents.send('jfxr-open', externalEditorInput);
-        jfxrWindow.show();
-      },
+      indexSubPath: 'jfxr/jfxr-electron-index.html',
+      externalEditorInput,
     });
   });
 
@@ -221,16 +207,8 @@ app.on('ready', function() {
     return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: 'yarn-ready',
-      saveChannelName: 'yarn-save',
-      indexSubPath: 'yarn/yarn-index.html',
-      relativeWidth: 0.8,
-      relativeHeight: 0.9,
-      backgroundColor: '#000000',
-      onReady: yarnWindow => {
-        yarnWindow.webContents.send('yarn-open', externalEditorInput);
-        yarnWindow.show();
-      },
+      indexSubPath: 'yarn/yarn-electron-index.html',
+      externalEditorInput,
     });
   });
 

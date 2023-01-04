@@ -24,9 +24,11 @@ import {
 import {
   type ResourceExternalEditor,
   type EditWithExternalEditorReturn,
-} from '../../../ResourcesList/ResourceExternalEditor.flow';
+} from '../../../ResourcesList/ResourceExternalEditor';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import { ExternalEditorOpenedDialog } from '../../../UI/ExternalEditorOpenedDialog';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -191,7 +193,15 @@ type Props = {|
   animationName: string, // This is used for the default name of images created with Piskel.
 |};
 
-export default class SpritesList extends Component<Props, void> {
+type State = {|
+  externalEditorOpened: boolean,
+|};
+
+export default class SpritesList extends Component<Props, State> {
+  state = {
+    externalEditorOpened: false,
+  };
+
   onSortEnd = ({
     oldIndex,
     newIndex,
@@ -242,7 +252,7 @@ export default class SpritesList extends Component<Props, void> {
     await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
-  editWith = async (externalEditor: ResourceExternalEditor) => {
+  editWith = async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
     const {
       project,
       resourceManagementProps,
@@ -262,68 +272,85 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
-      {
-        project,
-        getStorageProvider: resourceManagementProps.getStorageProvider,
-        resourceManagementProps,
-        resourceNames,
-        extraOptions: {
-          singleFrame: false,
-          fps:
-            direction.getTimeBetweenFrames() > 0
-              ? 1 / direction.getTimeBetweenFrames()
-              : 1,
-          name: animationName || resourceNames[0] || objectName,
-          isLooping: direction.isLooping(),
-          existingMetadata: direction.getMetadata(),
-        },
-      }
-    );
-
-    if (!editResult) return;
-    const { resources, newMetadata, newName } = editResult;
-
-    const newDirection = new gd.Direction();
-    newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-    newDirection.setLoop(direction.isLooping());
-    resources.forEach(resource => {
-      const sprite = new gd.Sprite();
-      sprite.setImageName(resource.name);
-      // Restore collision masks and points
-      if (
-        resource.originalIndex !== undefined &&
-        resource.originalIndex !== null
-      ) {
-        const originalSprite = direction.getSprite(resource.originalIndex);
-        copySpritePoints(originalSprite, sprite);
-        copySpritePolygons(originalSprite, sprite);
-      } else {
-        if (allDirectionSpritesHaveSamePoints) {
-          copySpritePoints(direction.getSprite(0), sprite);
+    try {
+      this.setState({ externalEditorOpened: true });
+      const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
+        {
+          project,
+          i18n,
+          getStorageProvider: resourceManagementProps.getStorageProvider,
+          resourceManagementProps,
+          resourceNames,
+          extraOptions: {
+            singleFrame: false,
+            fps:
+              direction.getTimeBetweenFrames() > 0
+                ? 1 / direction.getTimeBetweenFrames()
+                : 1,
+            name: animationName || resourceNames[0] || objectName,
+            isLooping: direction.isLooping(),
+            existingMetadata: direction.getMetadata(),
+          },
         }
-        if (allDirectionSpritesHaveSameCollisionMasks) {
-          copySpritePolygons(direction.getSprite(0), sprite);
+      );
+
+      this.setState({ externalEditorOpened: false });
+      if (!editResult) return;
+
+      const { resources, newMetadata, newName } = editResult;
+
+      const newDirection = new gd.Direction();
+      newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
+      newDirection.setLoop(direction.isLooping());
+      resources.forEach(resource => {
+        const sprite = new gd.Sprite();
+        sprite.setImageName(resource.name);
+        // Restore collision masks and points
+        if (
+          resource.originalIndex !== undefined &&
+          resource.originalIndex !== null
+        ) {
+          const originalSprite = direction.getSprite(resource.originalIndex);
+          copySpritePoints(originalSprite, sprite);
+          copySpritePolygons(originalSprite, sprite);
+        } else {
+          if (allDirectionSpritesHaveSamePoints) {
+            copySpritePoints(direction.getSprite(0), sprite);
+          }
+          if (allDirectionSpritesHaveSameCollisionMasks) {
+            copySpritePolygons(direction.getSprite(0), sprite);
+          }
         }
+        newDirection.addSprite(sprite);
+        sprite.delete();
+      });
+
+      // Set metadata on the direction to allow editing again in the future.
+      if (newMetadata) {
+        newDirection.setMetadata(JSON.stringify(newMetadata));
       }
-      newDirection.addSprite(sprite);
-      sprite.delete();
-    });
 
-    // Set metadata on the direction to allow editing again in the future.
-    if (newMetadata) {
-      newDirection.setMetadata(JSON.stringify(newMetadata));
+      // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+      resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
+      onReplaceByDirection(newDirection);
+
+      // If a name was specified in the external editor, use it for the animation.
+      if (newName) {
+        onChangeName(newName);
+      }
+      newDirection.delete();
+    } catch (error) {
+      this.setState({ externalEditorOpened: false });
+      console.error(
+        'An exception was thrown when launching or reading resources from the external editor:',
+        error
+      );
+      showErrorBox({
+        message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
+        rawError: error,
+        errorId: 'external-editor-error',
+      });
     }
-
-    // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-    resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
-    onReplaceByDirection(newDirection);
-
-    // If a name was specified in the external editor, use it for the animation.
-    if (newName) {
-      onChangeName(newName);
-    }
-    newDirection.delete();
   };
 
   render() {
@@ -355,6 +382,7 @@ export default class SpritesList extends Component<Props, void> {
           lockAxis="x"
           axis="x"
         />
+        {this.state.externalEditorOpened && <ExternalEditorOpenedDialog />}
       </div>
     );
   }

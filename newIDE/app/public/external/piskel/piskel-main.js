@@ -1,13 +1,10 @@
+import {
+  closeWindow,
+  onMessageFromParentEditor,
+  sendMessageToParentEditor,
+  setTitle,
+} from '../utils/parent-editor-interface.js';
 import { createPathEditorHeader } from '../utils/path-editor.js';
-const electron = require('electron');
-const remote = require('@electron/remote');
-const electronWindow = remote.getCurrentWindow();
-const ipcRenderer = electron.ipcRenderer;
-const async = require('async');
-
-const closeWindow = () => {
-  remote.getCurrentWindow().close();
-};
 
 // Repeatedly try to gain access to piskel's control element and its methods
 // When succeeded, stop trying.
@@ -17,7 +14,8 @@ editorFrameEl.onload = () => {
   const tryToGetPiskel = () => {
     pskl = document.querySelector('#piskel-frame').contentWindow.pskl;
     if (typeof pskl === 'object') {
-      ipcRenderer.send('piskel-ready');
+      sendMessageToParentEditor('external-editor-ready');
+
       clearInterval(retryToGetPiskel);
     }
   };
@@ -67,11 +65,15 @@ const saveToGD = async pathEditor => {
     };
   }
 
-  ipcRenderer.send('piskel-save', {
+  sendMessageToParentEditor('save-external-editor-output', {
     resources,
     baseNameForNewResources: pathEditor.state.name,
     externalEditorData,
   });
+
+  // Tell Piskel we saved the changes so that it does not try to prevent closing the window.
+  // We could override the "Unload service" private functions - but it seems even more hacky.
+  pskl.app.savedStatusService.onPiskelSaved();
   closeWindow();
 };
 
@@ -110,7 +112,7 @@ const createEmptyAnimation = () => {
 };
 
 // Load flattened images into Piskel
-const loadImagesIntoPiskel = externalEditorInput => {
+const loadImagesIntoPiskel = async externalEditorInput => {
   // If no resources are being loaded, create a new animation
   if (externalEditorInput.resources.length === 0) {
     createEmptyAnimation();
@@ -122,48 +124,64 @@ const loadImagesIntoPiskel = externalEditorInput => {
   const imageData = [];
   let maxWidth = -1;
   let maxHeight = -1;
-  async.each(
-    externalEditorInput.resources,
-    (resource, callback) => {
-      const image = new Image();
-      image.onload = () => {
-        imageData.push(image);
-        maxWidth = Math.max(image.width, maxWidth);
-        maxHeight = Math.max(image.height, maxHeight);
-        callback();
-      };
 
-      // onload will fire after `src` is set
-      try {
-        image.src = resource.dataUrl;
-      } catch (error) {
-        // Unable to load the image, ignore it.
-        console.error('Unable to load ', resource, error);
-        callback();
-      }
-    },
-    err => {
-      // Finally load the image objects into piskel
-      const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
-        imageData,
-        externalEditorInput.name,
-        maxWidth,
-        maxHeight,
-        false
-      );
-      piskelController.setPiskel(piskelFile, {});
+  // Load all the images into a DOM `Image`.
+  await Promise.all(
+    externalEditorInput.resources.map(resource => {
+      return new Promise(resolve => {
+        let hasAlreadyLoadedOrErrored = false;
 
-      // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
-      const layer = piskelController.getLayerAt(0);
-      for (let i = 0; i < piskelController.getFrameCount(); i++) {
-        layer.getFrameAt(i).originalLocalFilePath =
-          externalEditorInput.resources[i].localFilePath;
-        layer.getFrameAt(i).originalResourceName =
-          externalEditorInput.resources[i].name;
-        layer.getFrameAt(i).originalIndex = i;
-      }
-    }
+        const image = new Image();
+        image.onload = () => {
+          if (hasAlreadyLoadedOrErrored) return;
+          hasAlreadyLoadedOrErrored = true;
+
+          imageData.push(image);
+          maxWidth = Math.max(image.width, maxWidth);
+          maxHeight = Math.max(image.height, maxHeight);
+          resolve();
+        };
+        image.onerror = event => {
+          if (hasAlreadyLoadedOrErrored) return;
+          hasAlreadyLoadedOrErrored = true;
+          console.error('Unable to load ', resource, event);
+          resolve();
+        };
+
+        try {
+          // `onload` (or `onerror`) will fire after `src` is set.
+          image.src = resource.dataUrl;
+        } catch (error) {
+          if (hasAlreadyLoadedOrErrored) return;
+          hasAlreadyLoadedOrErrored = true;
+
+          // Unable to load the image, ignore it.
+          console.error('Unable to load ', resource, error);
+          resolve();
+        }
+      });
+    })
   );
+
+  // Finally load the `Image` objects into Piskel.
+  const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
+    imageData,
+    externalEditorInput.name,
+    maxWidth,
+    maxHeight,
+    false
+  );
+  piskelController.setPiskel(piskelFile, {});
+
+  // Add original path variable to imported frame objects, so we can overwrite them later when saving changes.
+  const layer = piskelController.getLayerAt(0);
+  for (let i = 0; i < piskelController.getFrameCount(); i++) {
+    const frame = layer.getFrameAt(i);
+    frame.originalLocalFilePath =
+      externalEditorInput.resources[i].localFilePath;
+    frame.originalResourceName = externalEditorInput.resources[i].name;
+    frame.originalIndex = i;
+  }
 };
 
 // Load Layered Piskel document that was stored in GD as metadata
@@ -191,7 +209,7 @@ const loadPiskelDataFromGd = externalEditorInput => {
   if (!savedResourceNames) {
     console.info('Missing resourceNames. Loading flattened images instead...');
     loadImagesIntoPiskel(externalEditorInput);
-    return
+    return;
   }
 
   // Create a Piskel Document from the saved Piskel data that was stored by GDevelop.
@@ -207,9 +225,11 @@ const loadPiskelDataFromGd = externalEditorInput => {
 
           // Find the resource with this name, so that we can also restore the
           // localFilePath which is used to track the file were to save changes.
-          const existingResource = externalEditorInput.resources.find(resource => {
-            return resource.name === frame.originalResourceName
-          });
+          const existingResource = externalEditorInput.resources.find(
+            resource => {
+              return resource.name === frame.originalResourceName;
+            }
+          );
           if (existingResource && existingResource.localFilePath)
             frame.originalLocalFilePath = existingResource.localFilePath;
 
@@ -255,13 +275,10 @@ const loadPiskelDataFromGd = externalEditorInput => {
                     piskelController.getCurrentFrameIndex(),
                     frameIndex
                   );
-                  layer.getFrameAt(frameIndex).originalIndex = frameIndex;
-                  layer.getFrameAt(
-                    frameIndex
-                  ).originalResourceName = resource.name;
-                  layer.getFrameAt(
-                    frameIndex
-                  ).originalLocalFilePath = resource.localFilePath;
+                  const frame = layer.getFrameAt(frameIndex);
+                  frame.originalIndex = frameIndex;
+                  frame.originalResourceName = resource.name;
+                  frame.originalLocalFilePath = resource.localFilePath;
                 });
               });
             }
@@ -325,7 +342,7 @@ const loadPiskelDataFromGd = externalEditorInput => {
  * get rid of the new file button,
  * make animation name and path editable
  */
-ipcRenderer.on('piskel-open', (event, externalEditorInput) => {
+onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
   const editorContentDocument = document.getElementById('piskel-frame')
     .contentDocument;
   const newButton = editorContentDocument.getElementsByClassName(
@@ -347,7 +364,12 @@ ipcRenderer.on('piskel-open', (event, externalEditorInput) => {
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
     onSaveToGd: saveToGD,
-    onCancelChanges: closeWindow,
+    onCancelChanges: () => {
+      // Tell Piskel we saved the changes so that it does not try to prevent closing the window.
+      // We could override the "Unload service" private functions - but it seems even more hacky.
+      pskl.app.savedStatusService.onPiskelSaved();
+      closeWindow();
+    },
     name: externalEditorInput.name,
   });
 
@@ -357,9 +379,7 @@ ipcRenderer.on('piskel-open', (event, externalEditorInput) => {
     externalEditorInput.singleFrame
   );
 
-  electronWindow.setTitle(
-    'GDevelop Pixel Editor (Piskel) - ' + externalEditorInput.name
-  );
+  setTitle('GDevelop Image Editor (Piskel) - ' + externalEditorInput.name);
 
   // If there were no resources sent by GD, create an empty piskel document
   if (externalEditorInput.resources.length === 0) {

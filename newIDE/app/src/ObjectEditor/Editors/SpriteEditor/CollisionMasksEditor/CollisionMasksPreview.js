@@ -221,12 +221,14 @@ const CollisionMasksPreview = (props: Props) => {
     vertices.push_back(newVertex);
     newVertex.delete();
     vertices.moveVector2fInVector(verticesSize, newVertexHintPoint.vertexIndex);
+    const vertex = vertices.at(newVertexHintPoint.vertexIndex);
     setDraggedVertex({
-      vertex: vertices.at(newVertexHintPoint.vertexIndex),
+      vertex,
       polygonIndex: newVertexHintPoint.polygonIndex,
       vertexIndex: newVertexHintPoint.vertexIndex,
     });
     setNewVertexHintPoint(null);
+    props.onClickVertice(vertex.ptr);
     props.onPolygonsUpdated();
   };
 
@@ -445,16 +447,14 @@ const CollisionMasksPreview = (props: Props) => {
               }
               key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
               fill={
-                vertex.ptr === props.selectedVerticePtr
-                  ? 'rgba(0,0,255,0.75)'
+                vertex.ptr === props.highlightedVerticePtr
+                  ? 'rgba(0,0,0,0.75)'
+                  : vertex.ptr === props.selectedVerticePtr
+                  ? 'rgba(0,255,255,0.75)'
                   : 'rgba(255,0,0,0.75)'
               }
               stroke={
-                vertex.ptr === props.highlightedVerticePtr
-                  ? vertex.ptr === props.selectedVerticePtr
-                    ? 'white'
-                    : 'black'
-                  : undefined
+                vertex.ptr === props.highlightedVerticePtr ? 'white' : undefined
               }
               strokeWidth={1}
               cx={vertex.get_x() * imageZoomFactor}
@@ -468,7 +468,7 @@ const CollisionMasksPreview = (props: Props) => {
           <circle
             onPointerDown={() => addVertex(newVertexHintPoint)}
             key={`new-vertex`}
-            fill={'rgba(0,0,255,0.75)'}
+            fill={'rgba(0,0,0,0.75)'}
             stroke={'white'}
             strokeWidth={1}
             cx={newVertexHintPoint.x * imageZoomFactor}

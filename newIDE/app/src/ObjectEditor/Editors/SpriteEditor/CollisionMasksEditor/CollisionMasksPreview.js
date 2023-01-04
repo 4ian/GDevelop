@@ -85,8 +85,8 @@ const CollisionMasksPreview = (props: Props) => {
     setDraggedVertex(null);
   };
 
-  const getCursorOnFrame = (event: any) => {
-    if (!svgRef.current) return;
+  const getCursorPosition = (event: any): [number, number] | null => {
+    if (!svgRef.current) return null;
 
     // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
     const pointOnScreen = svgRef.current.createSVGPoint();
@@ -97,14 +97,16 @@ const CollisionMasksPreview = (props: Props) => {
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
     // Confine vertices to inside the sprite frame
-    return confinePointToFrame(pointOnSvg.x, pointOnSvg.y);
+    return [pointOnSvg.x, pointOnSvg.y];
   };
 
   const onPointerDown = (event: any) => {
-    const cursorOnFrame = getCursorOnFrame(event);
-    if (!cursorOnFrame) {
+    const cursor = getCursorPosition(event);
+    if (!cursor) {
       return;
     }
+    // Confine vertices to inside the sprite frame
+    const cursorOnFrame = confinePointToFrame(cursor[0], cursor[1]);
     const cursorX = cursorOnFrame.frameX / imageZoomFactor;
     const cursorY = cursorOnFrame.frameY / imageZoomFactor;
 
@@ -130,14 +132,16 @@ const CollisionMasksPreview = (props: Props) => {
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
   const onPointerMove = (event: any) => {
-    const cursorOnFrame = getCursorOnFrame(event);
-    if (!cursorOnFrame) {
+    const cursor = getCursorPosition(event);
+    if (!cursor) {
       return;
     }
-    const cursorX = cursorOnFrame.frameX / imageZoomFactor;
-    const cursorY = cursorOnFrame.frameY / imageZoomFactor;
 
     if (draggedVertex) {
+      // Confine vertices to inside the sprite frame
+      const cursorOnFrame = confinePointToFrame(cursor[0], cursor[1]);
+      const cursorX = cursorOnFrame.frameX / imageZoomFactor;
+      const cursorY = cursorOnFrame.frameY / imageZoomFactor;
       draggedVertex.vertex.set_x(cursorX);
       draggedVertex.vertex.set_y(cursorY);
 
@@ -145,6 +149,9 @@ const CollisionMasksPreview = (props: Props) => {
 
       forceUpdate();
     } else {
+      const cursorX = cursor[0] / imageZoomFactor;
+      const cursorY = cursor[1] / imageZoomFactor;
+
       const vertexDistanceMin = 20 / imageZoomFactor;
       const edgeDistanceMax = 40 / imageZoomFactor;
 

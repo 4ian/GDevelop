@@ -2,6 +2,11 @@
 import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import {
+  findNearestEdgePoint,
+  getMagnetVertexForDeletion,
+  type NewVertexHintPoint,
+} from './PolygonHelper';
 
 const gd = global.gd;
 
@@ -10,63 +15,6 @@ const styles = {
     cursor: 'move',
   },
 };
-
-/**
- * Modulo operation
- * @param x Dividend value.
- * @param y Divisor value.
- * @returns Return the remainder using Euclidean division.
- */
-const mod = function(x: number, y: number): number {
-  return ((x % y) + y) % y;
-};
-
-const getSquaredDistance = (
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-): number => {
-  const deltaX = x1 - x2;
-  const deltaY = y1 - y2;
-  return deltaX * deltaX + deltaY * deltaY;
-};
-
-/**
- * @param x point x
- * @param y point y
- * @param x1 segment extremity x
- * @param y1 segment extremity y
- * @param x2 segment extremity x
- * @param y2 segment extremity y
- * @return the point projected on the line
- */
-const projectToSegment = (
-  x: number,
-  y: number,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  result: [number, number] = [0, 0]
-): [number, number] => {
-  const length2 = getSquaredDistance(x1, y1, x2, y2);
-  if (length2 === 0) return [x1, y1];
-  const t = Math.max(
-    0,
-    Math.min(1, ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / length2)
-  );
-  result[0] = x1 + t * (x2 - x1);
-  result[1] = y1 + t * (y2 - y1);
-  return result;
-};
-
-type NewVertexHintPoint = {|
-  x: number,
-  y: number,
-  polygonIndex: number,
-  vertexIndex: number,
-|};
 
 type SelectedVertex = {|
   vertex: gdVector2f,
@@ -164,6 +112,7 @@ const CollisionMasksPreview = (props: Props) => {
     const edgeDistanceMax = 10 / imageZoomFactor;
 
     const nearestEdgePoint = findNearestEdgePoint(
+      props.polygons,
       cursorX,
       cursorY,
       vertexDistanceMin,
@@ -201,6 +150,7 @@ const CollisionMasksPreview = (props: Props) => {
 
       setNewVertexHintPoint(
         findNearestEdgePoint(
+          props.polygons,
           cursorX,
           cursorY,
           vertexDistanceMin,
@@ -208,6 +158,30 @@ const CollisionMasksPreview = (props: Props) => {
         )
       );
     }
+  };
+
+  /**
+   * @returns true if the vertex should be deleted.
+   */
+  const magnetDraggedVertexForDeletion = (): boolean => {
+    if (!draggedVertex) {
+      return false;
+    }
+    const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
+    const vertexDistanceMax = 10 / imageZoomFactor;
+    const edgeDistanceMax = 5 / imageZoomFactor;
+    const magnetedPoint = getMagnetVertexForDeletion(
+      vertices,
+      draggedVertex.vertexIndex,
+      vertexDistanceMax,
+      edgeDistanceMax
+    );
+    if (magnetedPoint) {
+      draggedVertex.vertex.set_x(magnetedPoint[0]);
+      draggedVertex.vertex.set_y(magnetedPoint[1]);
+      return true;
+    }
+    return false;
   };
 
   const addVertex = (newVertexHintPoint: NewVertexHintPoint) => {
@@ -230,164 +204,6 @@ const CollisionMasksPreview = (props: Props) => {
     setNewVertexHintPoint(null);
     props.onClickVertice(vertex.ptr);
     props.onPolygonsUpdated();
-  };
-
-  /**
-   * @returns true if the vertex should be deleted.
-   */
-  const magnetDraggedVertexForDeletion = (): boolean => {
-    if (!draggedVertex) {
-      return false;
-    }
-    const vertices = props.polygons
-      .at(draggedVertex.polygonIndex)
-      .getVertices();
-    if (vertices.size() <= 3) {
-      return false;
-    }
-    const previousVertex = vertices.at(
-      mod(draggedVertex.vertexIndex - 1, vertices.size())
-    );
-    const nextVertex = vertices.at(
-      mod(draggedVertex.vertexIndex + 1, vertices.size())
-    );
-    const x = draggedVertex.vertex.x;
-    const y = draggedVertex.vertex.y;
-    const previousX = previousVertex.x;
-    const previousY = previousVertex.y;
-    const nextX = nextVertex.x;
-    const nextY = nextVertex.y;
-
-    if (
-      getSquaredDistance(x, y, previousX, previousY) <
-      (10 * 10) / (imageZoomFactor * imageZoomFactor)
-    ) {
-      draggedVertex.vertex.set_x(previousX);
-      draggedVertex.vertex.set_y(previousY);
-      return true;
-    }
-
-    if (
-      getSquaredDistance(x, y, nextX, nextY) <
-      (10 * 10) / (imageZoomFactor * imageZoomFactor)
-    ) {
-      draggedVertex.vertex.set_x(nextX);
-      draggedVertex.vertex.set_y(nextY);
-      return true;
-    }
-
-    const projectedPoint = projectToSegment(
-      x,
-      y,
-      previousVertex.x,
-      previousVertex.y,
-      nextVertex.x,
-      nextVertex.y
-    );
-
-    if (
-      getSquaredDistance(
-        draggedVertex.vertex.x,
-        draggedVertex.vertex.y,
-        projectedPoint[0],
-        projectedPoint[1]
-      ) <
-      (5 * 5) / (imageZoomFactor * imageZoomFactor)
-    ) {
-      draggedVertex.vertex.set_x(projectedPoint[0]);
-      draggedVertex.vertex.set_y(projectedPoint[1]);
-      return true;
-    }
-
-    return false;
-  };
-
-  const findNearestEdgePoint = (
-    cursorX: number,
-    cursorY: number,
-    vertexDistanceMin: number,
-    edgeDistanceMax: number
-  ): NewVertexHintPoint | null => {
-    const vertexSquaredDistanceMin = vertexDistanceMin * vertexDistanceMin;
-    const edgeSquaredDistanceMax = edgeDistanceMax * edgeDistanceMax;
-
-    let squaredDistanceMin = Number.POSITIVE_INFINITY;
-    let foundPolygonIndex = 0;
-    let foundEndVertexIndex = 0;
-    let projectedPoint = [0, 0];
-    mapVector(props.polygons, (polygon, polygonIndex) => {
-      const vertices = polygon.getVertices();
-      const previousVertex = vertices.at(vertices.size() - 1);
-      let previousX = previousVertex.x;
-      let previousY = previousVertex.y;
-      mapVector(vertices, (vertex, vertexIndex) => {
-        const vertexX = vertex.x;
-        const vertexY = vertex.y;
-
-        projectedPoint = projectToSegment(
-          cursorX,
-          cursorY,
-          previousX,
-          previousY,
-          vertexX,
-          vertexY,
-          projectedPoint
-        );
-
-        const isFarEnoughFromAnotherVertex =
-          getSquaredDistance(
-            projectedPoint[0],
-            projectedPoint[1],
-            previousX,
-            previousY
-          ) > vertexSquaredDistanceMin &&
-          getSquaredDistance(
-            projectedPoint[0],
-            projectedPoint[1],
-            vertexX,
-            vertexY
-          ) > vertexSquaredDistanceMin;
-        const squaredDistance = getSquaredDistance(
-          cursorX,
-          cursorY,
-          projectedPoint[0],
-          projectedPoint[1]
-        );
-        if (
-          squaredDistance < squaredDistanceMin &&
-          isFarEnoughFromAnotherVertex
-        ) {
-          squaredDistanceMin = squaredDistance;
-          foundPolygonIndex = polygonIndex;
-          foundEndVertexIndex = vertexIndex;
-        }
-        previousX = vertexX;
-        previousY = vertexY;
-      });
-    });
-    if (squaredDistanceMin < edgeSquaredDistanceMax) {
-      const vertices = props.polygons.at(foundPolygonIndex).getVertices();
-      const startVertex = vertices.at(
-        mod(foundEndVertexIndex - 1, vertices.size())
-      );
-      const endVertex = vertices.at(foundEndVertexIndex);
-      projectedPoint = projectToSegment(
-        cursorX,
-        cursorY,
-        startVertex.x,
-        startVertex.y,
-        endVertex.x,
-        endVertex.y,
-        projectedPoint
-      );
-      return {
-        x: projectedPoint[0],
-        y: projectedPoint[1],
-        polygonIndex: foundPolygonIndex,
-        vertexIndex: foundEndVertexIndex,
-      };
-    }
-    return null;
   };
 
   /**

@@ -1,5 +1,5 @@
 // @flow
-import { addVertexOnLongestEdge } from './PolygonsList';
+import { addVertexOnLongestEdge } from './PolygonHelper';
 
 const gd: libGDevelop = global.gd;
 

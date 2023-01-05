@@ -31,7 +31,19 @@ namespace gdjs {
     _mouseY: float = 0;
     _isMouseInsideCanvas: boolean = true;
     _mouseWheelDelta: float = 0;
-    _touches: Hashtable<Touch>;
+    // TODO Remove _touches when there is no longer Button 1.2.0 in the wild.
+    _touches = {
+      firstKey: (): string | number | null => {
+        for (const key in this._mouseOrTouches.items) {
+          // Exclude mouse key.
+          if (key !== '1') {
+            return key;
+          }
+        }
+        return null;
+      },
+    };
+    _mouseOrTouches: Hashtable<Touch>;
     //Identifiers of the touches that started during/before the frame.
     _startedTouches: Array<integer> = [];
 
@@ -53,7 +65,7 @@ namespace gdjs {
       this._releasedKeys = new Hashtable();
       this._pressedMouseButtons = new Array(5);
       this._releasedMouseButtons = new Array(5);
-      this._touches = new Hashtable();
+      this._mouseOrTouches = new Hashtable();
     }
 
     /**
@@ -316,10 +328,10 @@ namespace gdjs {
      * @return the touch X position, relative to the game view.
      */
     getTouchX(publicIdentifier: integer): float {
-      if (!this._touches.containsKey(publicIdentifier)) {
+      if (!this._mouseOrTouches.containsKey(publicIdentifier)) {
         return 0;
       }
-      return this._touches.get(publicIdentifier).x;
+      return this._mouseOrTouches.get(publicIdentifier).x;
     }
 
     /**
@@ -328,10 +340,10 @@ namespace gdjs {
      * @return the touch Y position, relative to the game view.
      */
     getTouchY(publicIdentifier: integer): float {
-      if (!this._touches.containsKey(publicIdentifier)) {
+      if (!this._mouseOrTouches.containsKey(publicIdentifier)) {
         return 0;
       }
-      return this._touches.get(publicIdentifier).y;
+      return this._mouseOrTouches.get(publicIdentifier).y;
     }
 
     /**
@@ -343,7 +355,7 @@ namespace gdjs {
         this._endedTouches.includes(publicIdentifier) &&
         // A touch that end then start in one frame is ignored
         // because it's probably noise.
-        this._touches.get(publicIdentifier).justEnded
+        this._mouseOrTouches.get(publicIdentifier).justEnded
       );
     }
 
@@ -352,8 +364,8 @@ namespace gdjs {
      */
     getAllTouchIdentifiers(): Array<integer> {
       InputManager._allTouchIds.length = 0;
-      for (const id in this._touches.items) {
-        if (this._touches.items.hasOwnProperty(id)) {
+      for (const id in this._mouseOrTouches.items) {
+        if (this._mouseOrTouches.items.hasOwnProperty(id)) {
           InputManager._allTouchIds.push(parseInt(id, 10));
         }
       }
@@ -373,7 +385,11 @@ namespace gdjs {
       // because it's probably noise.
       if (!this._endedTouches.includes(publicIdentifier)) {
         this._startedTouches.push(publicIdentifier);
-        this._touches.put(publicIdentifier, { x: x, y: y, justEnded: false });
+        this._mouseOrTouches.put(publicIdentifier, {
+          x: x,
+          y: y,
+          justEnded: false,
+        });
       }
     }
 
@@ -385,7 +401,7 @@ namespace gdjs {
     }
 
     _moveTouch(publicIdentifier: integer, x: float, y: float): void {
-      const touch = this._touches.get(publicIdentifier);
+      const touch = this._mouseOrTouches.get(publicIdentifier);
       if (!touch) {
         return;
       }
@@ -402,9 +418,9 @@ namespace gdjs {
 
     _removeTouch(publicIdentifier: number): void {
       this._endedTouches.push(publicIdentifier);
-      if (this._touches.containsKey(publicIdentifier)) {
+      if (this._mouseOrTouches.containsKey(publicIdentifier)) {
         //Postpone deletion at the end of the frame
-        this._touches.get(publicIdentifier).justEnded = true;
+        this._mouseOrTouches.get(publicIdentifier).justEnded = true;
       }
     }
 
@@ -472,11 +488,11 @@ namespace gdjs {
      */
     onFrameEnded(): void {
       //Only clear the ended touches at the end of the frame.
-      for (const id in this._touches.items) {
-        if (this._touches.items.hasOwnProperty(id)) {
-          const touch = this._touches.items[id];
+      for (const id in this._mouseOrTouches.items) {
+        if (this._mouseOrTouches.items.hasOwnProperty(id)) {
+          const touch = this._mouseOrTouches.items[id];
           if (touch.justEnded) {
-            this._touches.remove(id);
+            this._mouseOrTouches.remove(id);
           }
         }
       }

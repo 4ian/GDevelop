@@ -85,30 +85,18 @@ const CollisionMasksPreview = (props: Props) => {
     setDraggedVertex(null);
   };
 
-  const getCursorPosition = (event: any): [number, number] | null => {
-    if (!svgRef.current) return null;
-
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
-    const pointOnScreen = svgRef.current.createSVGPoint();
-    pointOnScreen.x = event.clientX;
-    pointOnScreen.y = event.clientY;
-    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
-    const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
-    const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
-
-    // Confine vertices to inside the sprite frame
-    return [pointOnSvg.x, pointOnSvg.y];
-  };
-
   const onPointerDown = (event: any) => {
-    const cursor = getCursorPosition(event);
-    if (!cursor) {
+    const cursorOnFrame = getCursorOnFrame(event);
+    if (!cursorOnFrame) {
       return;
     }
     // Confine vertices to inside the sprite frame
-    const cursorOnFrame = confinePointToFrame(cursor[0], cursor[1]);
-    const cursorX = cursorOnFrame.frameX / imageZoomFactor;
-    const cursorY = cursorOnFrame.frameY / imageZoomFactor;
+    const cursorIntoFrame = confinePointIntoFrame(
+      cursorOnFrame[0],
+      cursorOnFrame[1]
+    );
+    const cursorX = cursorIntoFrame.frameX / imageZoomFactor;
+    const cursorY = cursorIntoFrame.frameY / imageZoomFactor;
 
     const vertexDistanceMin = 20 / imageZoomFactor;
     const edgeDistanceMax = 10 / imageZoomFactor;
@@ -132,16 +120,20 @@ const CollisionMasksPreview = (props: Props) => {
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
   const onPointerMove = (event: any) => {
-    const cursor = getCursorPosition(event);
-    if (!cursor) {
+    /** The cursor position in the frame basis. */
+    const cursorOnFrame = getCursorOnFrame(event);
+    if (!cursorOnFrame) {
       return;
     }
 
     if (draggedVertex) {
       // Confine vertices to inside the sprite frame
-      const cursorOnFrame = confinePointToFrame(cursor[0], cursor[1]);
-      const cursorX = cursorOnFrame.frameX / imageZoomFactor;
-      const cursorY = cursorOnFrame.frameY / imageZoomFactor;
+      const cursorIntoFrame = confinePointIntoFrame(
+        cursorOnFrame[0],
+        cursorOnFrame[1]
+      );
+      const cursorX = cursorIntoFrame.frameX / imageZoomFactor;
+      const cursorY = cursorIntoFrame.frameY / imageZoomFactor;
       draggedVertex.vertex.set_x(cursorX);
       draggedVertex.vertex.set_y(cursorY);
 
@@ -149,8 +141,8 @@ const CollisionMasksPreview = (props: Props) => {
 
       forceUpdate();
     } else {
-      const cursorX = cursor[0] / imageZoomFactor;
-      const cursorY = cursor[1] / imageZoomFactor;
+      const cursorX = cursorOnFrame[0] / imageZoomFactor;
+      const cursorY = cursorOnFrame[1] / imageZoomFactor;
 
       const vertexDistanceMin = 20 / imageZoomFactor;
       const edgeDistanceMax = 40 / imageZoomFactor;
@@ -168,27 +160,33 @@ const CollisionMasksPreview = (props: Props) => {
   };
 
   /**
-   * @returns true if the vertex should be deleted.
+   * @returns The cursor position in the frame basis.
    */
-  const magnetDraggedVertexForDeletion = (): boolean => {
-    if (!draggedVertex) {
-      return false;
-    }
-    const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
-    const vertexDistanceMax = 10 / imageZoomFactor;
-    const edgeDistanceMax = 5 / imageZoomFactor;
-    const magnetedPoint = getMagnetVertexForDeletion(
-      vertices,
-      draggedVertex.vertexIndex,
-      vertexDistanceMax,
-      edgeDistanceMax
-    );
-    if (magnetedPoint) {
-      draggedVertex.vertex.set_x(magnetedPoint[0]);
-      draggedVertex.vertex.set_y(magnetedPoint[1]);
-      return true;
-    }
-    return false;
+  const getCursorOnFrame = (event: any): [number, number] | null => {
+    if (!svgRef.current) return null;
+
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const pointOnScreen = svgRef.current.createSVGPoint();
+    pointOnScreen.x = event.clientX;
+    pointOnScreen.y = event.clientY;
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
+    const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
+
+    return [pointOnSvg.x, pointOnSvg.y];
+  };
+
+  /**
+   * Given a point's coordinates, returns new coordinates that
+   * are confined inside the sprite frame.
+   */
+  const confinePointIntoFrame = (freeX: number, freeY: number) => {
+    const maxX = imageWidth * imageZoomFactor;
+    const maxY = imageHeight * imageZoomFactor;
+
+    const frameX = Math.min(maxX, Math.max(freeX, 0));
+    const frameY = Math.min(maxY, Math.max(freeY, 0));
+    return { frameX, frameY };
   };
 
   const addVertex = (newVertexHintPoint: NewVertexHintPoint) => {
@@ -214,16 +212,27 @@ const CollisionMasksPreview = (props: Props) => {
   };
 
   /**
-   * Given a point's coordinates, returns new coordinates that
-   * are confined inside the sprite frame.
+   * @returns true if the vertex should be deleted.
    */
-  const confinePointToFrame = (freeX: number, freeY: number) => {
-    const maxX = imageWidth * imageZoomFactor;
-    const maxY = imageHeight * imageZoomFactor;
-
-    const frameX = Math.min(maxX, Math.max(freeX, 0));
-    const frameY = Math.min(maxY, Math.max(freeY, 0));
-    return { frameX, frameY };
+  const magnetDraggedVertexForDeletion = (): boolean => {
+    if (!draggedVertex) {
+      return false;
+    }
+    const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
+    const vertexDistanceMax = 10 / imageZoomFactor;
+    const edgeDistanceMax = 5 / imageZoomFactor;
+    const magnetedPoint = getMagnetVertexForDeletion(
+      vertices,
+      draggedVertex.vertexIndex,
+      vertexDistanceMax,
+      edgeDistanceMax
+    );
+    if (magnetedPoint) {
+      draggedVertex.vertex.set_x(magnetedPoint[0]);
+      draggedVertex.vertex.set_y(magnetedPoint[1]);
+      return true;
+    }
+    return false;
   };
 
   const renderBoundingBox = () => {

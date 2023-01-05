@@ -2,6 +2,7 @@
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
@@ -57,21 +58,24 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
     result.GetUsedIncludeFiles().insert(includeFile);
   }
 
-  size_t i = 0;
-  for (auto expression : instruction.GetParameters()) {
-    const gd::String& parameterType =
-        metadata.GetMetadata().GetParameter(i).GetType();
-    i++;
+  gd::ParameterMetadataTools::IterateOverParameters(
+      instruction.GetParameters(),
+      metadata.GetMetadata().GetParameters(),
+      [this](const gd::ParameterMetadata& parameterMetadata,
+          const gd::Expression& parameterValue,
+          const gd::String& lastObjectName) {
+    const gd::String& parameterType = parameterMetadata.GetType();
 
     if (gd::ParameterMetadata::IsExpression("string", parameterType)) {
       rootType = "string";
-      expression.GetRootNode()->Visit(*this);
+      parameterValue.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("number", parameterType)) {
       rootType = "number";
-      expression.GetRootNode()->Visit(*this);
+      parameterValue.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
       result.GetUsedExtensions().insert("BuiltinVariables");
-  }
+  });
+
   return false;
 }
 

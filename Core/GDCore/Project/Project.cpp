@@ -636,6 +636,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   platformSpecificAssets.UnserializeFrom(
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
+  watermark.UnserializeFrom(propElement.GetChild("watermark"));
 
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
@@ -875,6 +876,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
+  watermark.SerializeTo(propElement.AddChild("watermark"));
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
   auto& authorIdsElement = propElement.AddChild("authorIds");
@@ -1107,6 +1109,7 @@ void Project::Init(const gd::Project& game) {
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;
   loadingScreen = game.loadingScreen;
+  watermark = game.watermark;
   objectGroups = game.objectGroups;
 
   extensionProperties = game.extensionProperties;

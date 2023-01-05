@@ -11,6 +11,7 @@
 
 #include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
+#include "GDCore/Project/Watermark.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
@@ -255,6 +256,16 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return a reference to loading screen setup for the project
    */
   const gd::LoadingScreen& GetLoadingScreen() const { return loadingScreen; }
+
+  /**
+   * \brief Return a reference to watermark setup for the project
+   */
+  gd::Watermark& GetWatermark() { return watermark; }
+
+  /**
+   * \brief Return a reference to watermark setup for the project
+   */
+  const gd::Watermark& GetWatermark() const { return watermark; }
 
   /**
    * Change game's main window default width.
@@ -1062,6 +1073,7 @@ class GD_CORE_API Project : public ObjectsContainer {
       currentPlatform;  ///< The platform being used to edit the project.
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
+  gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
   ExtensionProperties

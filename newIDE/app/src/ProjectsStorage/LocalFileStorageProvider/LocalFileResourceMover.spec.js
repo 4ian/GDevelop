@@ -66,10 +66,12 @@ const makeTestProjectWithBlobResourcesToDownload = () => {
   const { project } = makeTestProject(gd);
 
   // Add a resource that uses a blob: URL, which will be download
-  // by the LocalResourceMover.
+  // by the LocalResourceMover. Use a name that needs to be adapted to be a valid filename.
   {
     const newResource = new gd.ImageResource();
-    newResource.setName('MyBlobResourceToDownload');
+    newResource.setName(
+      'My Blob Resource To Download with 汉字 and funk¥/\\character$*\'"'
+    );
     newResource.setFile(blobUrl);
     project.getResourcesManager().addResource(newResource);
     newResource.delete();
@@ -281,7 +283,10 @@ describe('LocalResourceMover', () => {
         'local-file-save-from-arraybuffer',
         'fake-array-buffer-content',
         // No extension because none was specified, and the filename is inferred.
-        path.join('assets', 'MyBlobResourceToDownload')
+        path.join(
+          'assets',
+          "My Blob Resource To Download with 汉字 and funk¥__character$_'_"
+        )
       );
       expect(
         optionalRequire.mockElectron.ipcRenderer.invoke

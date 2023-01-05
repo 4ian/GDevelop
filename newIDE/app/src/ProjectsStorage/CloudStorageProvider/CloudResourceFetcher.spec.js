@@ -17,6 +17,9 @@ jest.mock('../../Utils/BlobDownloader');
 
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 
+const blobResourceName =
+  'My Blob Resource To Download with 汉字 and funk¥/\\character$*\'"';
+
 const makeTestProjectWithResourcesToDownload = () => {
   const { project } = makeTestProject(gd);
 
@@ -43,7 +46,7 @@ const makeTestProjectWithResourcesToDownload = () => {
   // Resource with a blob URL
   {
     const newResource = new gd.ImageResource();
-    newResource.setName('MyBlobResourceToUpload');
+    newResource.setName(blobResourceName);
     newResource.setFile('blob:http://something.com/123456');
     newResource.setMetadata('{"extension":".png"}');
     project.getResourcesManager().addResource(newResource);
@@ -77,7 +80,7 @@ describe('CloudResourceFetcher', () => {
       .getResource('MyResourceToDownloadAndReupload');
     const blobResourceToUpload = project
       .getResourcesManager()
-      .getResource('MyBlobResourceToUpload');
+      .getResource(blobResourceName);
 
     mockFn(downloadUrlsToBlobs).mockImplementationOnce(() => [
       {
@@ -94,7 +97,8 @@ describe('CloudResourceFetcher', () => {
         item: {
           url: 'blob:http://something.com/123456',
           resource: blobResourceToUpload,
-          filename: 'MyBlobResourceToUpload.png',
+          filename:
+            "My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
         },
         blob: 'some blob',
         error: null,
@@ -119,7 +123,7 @@ describe('CloudResourceFetcher', () => {
       },
       {
         url:
-          'https://project-resources.gdevelop.io/fake-cloud-project-id/MyBlobResourceToUpload.png',
+          "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
         error: null,
       },
     ]);
@@ -138,7 +142,8 @@ describe('CloudResourceFetcher', () => {
         {
           url: 'blob:http://something.com/123456',
           resource: expect.any(gd.Resource),
-          filename: 'MyBlobResourceToUpload.png',
+          filename:
+            "My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
         },
       ],
       onProgress: expect.any(Function), // onProgress
@@ -159,7 +164,8 @@ describe('CloudResourceFetcher', () => {
           item: {
             url: 'blob:http://something.com/123456',
             resource: expect.any(gd.Resource),
-            filename: 'MyBlobResourceToUpload.png',
+            filename:
+              "My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
           },
           blob: 'some blob',
           error: null,
@@ -187,9 +193,9 @@ describe('CloudResourceFetcher', () => {
 
     const updatedBlobResource = project
       .getResourcesManager()
-      .getResource('MyBlobResourceToUpload');
+      .getResource(blobResourceName);
     expect(updatedBlobResource.getFile()).toBe(
-      'https://project-resources.gdevelop.io/fake-cloud-project-id/MyBlobResourceToUpload.png'
+      "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character$_'_.png"
     );
   });
 });

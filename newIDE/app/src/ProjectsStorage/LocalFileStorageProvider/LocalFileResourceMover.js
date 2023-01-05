@@ -17,6 +17,7 @@ import {
   isURL,
   parseLocalFilePathOrExtensionFromMetadata,
 } from '../../ResourcesList/ResourceUtils';
+import { sanitizeFilename } from '../../Utils/Filename';
 import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import axios from 'axios';
 const electron = optionalRequire('electron');
@@ -104,7 +105,7 @@ export const moveUrlResourcesToLocalFiles = async ({
             : generateUnusedFilepath(
                 baseAssetsPath,
                 downloadedFilePaths,
-                resource.getName() + (extension || '')
+                sanitizeFilename(resource.getName() + (extension || ''))
               );
 
           await fs.ensureDir(baseAssetsPath);

@@ -28,60 +28,9 @@ import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu'
 import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
-import { mapFor } from '../../../../Utils/MapFor';
+import { addVertexOnLongestEdge } from './PolygonHelper';
 
 const gd = global.gd;
-
-/**
- * Modulo operation
- * @param x Dividend value.
- * @param y Divisor value.
- * @returns Return the remainder using Euclidean division.
- */
-const mod = function(x: number, y: number): number {
-  return ((x % y) + y) % y;
-};
-
-export const addVertexOnLongestEdge = (vertices: gdVectorVector2f) => {
-  const verticesSize = vertices.size();
-  if (verticesSize > 0) {
-    let longestEdgeEndVertex = 0;
-    {
-      const lastVertex = vertices.at(verticesSize - 1);
-      let previousX = lastVertex.x;
-      let previousY = lastVertex.y;
-      let squaredDistanceMax = -1;
-      mapFor(0, verticesSize, index => {
-        const vertex = vertices.at(index);
-        const x = vertex.x;
-        const y = vertex.y;
-        const deltaX = x - previousX;
-        const deltaY = y - previousY;
-        const squaredDistance = deltaX * deltaX + deltaY * deltaY;
-        if (squaredDistance > squaredDistanceMax) {
-          squaredDistanceMax = squaredDistance;
-          longestEdgeEndVertex = index;
-        }
-        previousX = x;
-        previousY = y;
-      });
-    }
-    const startVertex = vertices.at(
-      mod(longestEdgeEndVertex - 1, verticesSize)
-    );
-    const endVertex = vertices.at(longestEdgeEndVertex);
-    const newVertex = new gd.Vector2f();
-    newVertex.x = (startVertex.x + endVertex.x) / 2;
-    newVertex.y = (startVertex.y + endVertex.y) / 2;
-    vertices.push_back(newVertex);
-    vertices.moveVector2fInVector(verticesSize, longestEdgeEndVertex);
-    newVertex.delete();
-  } else {
-    const newVertex = new gd.Vector2f();
-    vertices.push_back(newVertex);
-    newVertex.delete();
-  }
-};
 
 type VerticesTableProps = {|
   vertices: gdVectorVector2f,
@@ -98,27 +47,15 @@ type VerticesTableProps = {|
 |};
 
 const VerticesTable = (props: VerticesTableProps) => {
-  const draggedVerticeIndex = React.useRef<?number>(null);
-
   const updateVerticeX = (vertice: gdVector2f, newValue: number) => {
-    // Ensure vertice stays inside the sprite bounding box.
+    // Ensure the vertex stays inside the sprite bounding box.
     vertice.set_x(Math.min(props.spriteWidth, Math.max(newValue, 0)));
     props.onUpdated();
   };
 
   const updateVerticeY = (vertice: gdVector2f, newValue: number) => {
-    // Ensure vertice stays inside the sprite bounding box.
+    // Ensure the vertex stays inside the sprite bounding box.
     vertice.set_y(Math.min(props.spriteHeight, Math.max(newValue, 0)));
-    props.onUpdated();
-  };
-
-  const dropVertice = (oldIndex: number, newIndex: number) => {
-    if (oldIndex === newIndex) return;
-    gd.moveVector2fInVector(
-      props.vertices,
-      oldIndex,
-      newIndex > oldIndex ? newIndex - 1 : newIndex
-    );
     props.onUpdated();
   };
 
@@ -127,7 +64,6 @@ const VerticesTable = (props: VerticesTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHeaderColumn />
             <TableHeaderColumn style={styles.coordinateColumn}>
               X
             </TableHeaderColumn>
@@ -142,15 +78,6 @@ const VerticesTable = (props: VerticesTableProps) => {
             <VerticeRow
               key={vertice.ptr}
               parentVerticeId={props.vertices.ptr.toString()}
-              setDragged={() => {
-                draggedVerticeIndex.current = verticeIndex;
-              }}
-              drop={() => {
-                const { current } = draggedVerticeIndex;
-                if (!current && current !== 0) return;
-                dropVertice(current, verticeIndex);
-                draggedVerticeIndex.current = null;
-              }}
               onPointerEnter={() => props.onHoverVertice(vertice.ptr)}
               onPointerLeave={props.onHoverVertice}
               selected={props.selectedVerticePtr === vertice.ptr}

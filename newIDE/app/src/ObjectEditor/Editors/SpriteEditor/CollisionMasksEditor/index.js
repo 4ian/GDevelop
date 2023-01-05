@@ -44,7 +44,7 @@ const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
   first: 'preview',
   second: 'properties',
-  splitPercentage: 50,
+  splitPercentage: 66.67,
 };
 
 const verticalMosaicNodes: EditorMosaicNode = {

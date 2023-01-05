@@ -3,7 +3,7 @@ const styles = {
     width: 96,
   },
   toolColumn: {
-    width: 48,
+    width: 24,
   },
 };
 

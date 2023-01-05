@@ -20,6 +20,7 @@ import {
   isURL,
   parseLocalFilePathOrExtensionFromMetadata,
 } from '../../ResourcesList/ResourceUtils';
+import { sanitizeFilename } from '../../Utils/Filename';
 
 export const moveUrlResourcesToCloudFilesIfPrivate = async ({
   project,
@@ -80,7 +81,9 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
               return {
                 resource,
                 url: resourceFile,
-                filename: resource.getName() + (extension || ''),
+                filename: sanitizeFilename(
+                  resource.getName() + (extension || '')
+                ),
               };
             } else {
               // Public URL resource: nothing to do.

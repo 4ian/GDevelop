@@ -4,7 +4,7 @@ import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import {
   findNearestEdgePoint,
-  getMagnetVertexForDeletion,
+  getMagnetizedVertexForDeletion,
   type NewVertexHintPoint,
 } from './PolygonHelper';
 
@@ -70,7 +70,7 @@ const CollisionMasksPreview = (props: Props) => {
 
   const onEndDragVertex = () => {
     if (draggedVertex) {
-      if (magnetDraggedVertexForDeletion()) {
+      if (magnetizeDraggedVertexForDeletion()) {
         const vertices = props.polygons
           .at(draggedVertex.polygonIndex)
           .getVertices();
@@ -137,7 +137,7 @@ const CollisionMasksPreview = (props: Props) => {
       draggedVertex.vertex.set_x(cursorX);
       draggedVertex.vertex.set_y(cursorY);
 
-      magnetDraggedVertexForDeletion();
+      magnetizeDraggedVertexForDeletion();
 
       forceUpdate();
     } else {
@@ -214,14 +214,14 @@ const CollisionMasksPreview = (props: Props) => {
   /**
    * @returns true if the vertex should be deleted.
    */
-  const magnetDraggedVertexForDeletion = (): boolean => {
+  const magnetizeDraggedVertexForDeletion = (): boolean => {
     if (!draggedVertex) {
       return false;
     }
     const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
     const vertexDistanceMax = 10 / imageZoomFactor;
     const edgeDistanceMax = 5 / imageZoomFactor;
-    const magnetedPoint = getMagnetVertexForDeletion(
+    const magnetedPoint = getMagnetizedVertexForDeletion(
       vertices,
       draggedVertex.vertexIndex,
       vertexDistanceMax,

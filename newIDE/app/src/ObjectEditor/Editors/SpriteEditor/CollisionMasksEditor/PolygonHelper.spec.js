@@ -2,7 +2,7 @@
 import { addVertexOnLongestEdge } from './PolygonHelper';
 import {
   findNearestEdgePoint,
-  getMagnetVertexForDeletion,
+  getMagnetizedVertexForDeletion,
 } from './PolygonHelper';
 
 const gd: libGDevelop = global.gd;
@@ -140,7 +140,7 @@ describe('PolygonHelper', () => {
       const vertexDistanceMax = 10;
       const edgeDistanceMax = 5;
       expect(
-        getMagnetVertexForDeletion(
+        getMagnetizedVertexForDeletion(
           vertices,
           2,
           vertexDistanceMax,
@@ -161,7 +161,7 @@ describe('PolygonHelper', () => {
       const vertexDistanceMax = 10;
       const edgeDistanceMax = 5;
       expect(
-        getMagnetVertexForDeletion(
+        getMagnetizedVertexForDeletion(
           vertices,
           2,
           vertexDistanceMax,
@@ -182,7 +182,7 @@ describe('PolygonHelper', () => {
       const vertexDistanceMax = 10;
       const edgeDistanceMax = 5;
       expect(
-        getMagnetVertexForDeletion(
+        getMagnetizedVertexForDeletion(
           vertices,
           2,
           vertexDistanceMax,

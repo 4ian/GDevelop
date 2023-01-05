@@ -161,9 +161,9 @@ export const findNearestEdgePoint = (
  * magneted to its neighbors
  * @param edgeDistanceMax The distance under which the dragged vertex is
  * magneted to the segment between its 2 neighbors
- * @returns The magneted location for the vertex if it should be deleted.
+ * @returns The magnetized location for the vertex if it should be deleted.
  */
-export const getMagnetVertexForDeletion = (
+export const getMagnetizedVertexForDeletion = (
   vertices: gdVectorVector2f,
   vertexIndex: number,
   vertexDistanceMax: number,

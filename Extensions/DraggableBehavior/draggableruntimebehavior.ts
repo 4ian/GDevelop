@@ -59,17 +59,14 @@ namespace gdjs {
 
       const touchIds = inputManager.getStartedTouchIdentifiers();
       for (let i = 0; i < touchIds.length; ++i) {
-        console.log('tryBeginDrag: ' + touchIds[i]);
         const touchDraggableManager = DraggableManager.getTouchManager(
           instanceContainer,
           touchIds[i]
         );
         if (touchDraggableManager.isDragging(this)) {
-          console.log('already dragging');
           continue;
         }
         if (touchDraggableManager.tryAndTakeDragging(instanceContainer, this)) {
-          console.log('draggedByDraggableManager');
           this._draggedByDraggableManager = touchDraggableManager;
           return true;
         }
@@ -101,7 +98,6 @@ namespace gdjs {
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       this._tryBeginDrag(instanceContainer);
       if (this._shouldEndDrag(instanceContainer)) {
-        console.log('shouldEndDrag');
         this._endDrag();
       }
       this._updateObjectPosition(instanceContainer);
@@ -257,9 +253,6 @@ namespace gdjs {
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ): boolean {
       const inputManager = instanceContainer.getGame().getInputManager();
-      console.log(
-        'shouldEndDrag: ' + inputManager.hasTouchEnded(this._touchId)
-      );
       return inputManager.hasTouchEnded(this._touchId);
     }
   }

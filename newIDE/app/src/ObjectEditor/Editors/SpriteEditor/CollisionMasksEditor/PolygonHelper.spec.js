@@ -3,7 +3,6 @@ import { addVertexOnLongestEdge } from './PolygonHelper';
 import {
   findNearestEdgePoint,
   getMagnetVertexForDeletion,
-  type NewVertexHintPoint,
 } from './PolygonHelper';
 
 const gd: libGDevelop = global.gd;

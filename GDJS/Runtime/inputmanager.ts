@@ -339,7 +339,12 @@ namespace gdjs {
      * @returns true if the touch has just ended.
      */
     hasTouchEnded(publicIdentifier: integer): boolean {
-      return this._endedTouches.includes(publicIdentifier);
+      return (
+        this._endedTouches.includes(publicIdentifier) &&
+        // A touch that end then start in one frame is ignored
+        // because it's probably noise.
+        this._touches.get(publicIdentifier).justEnded
+      );
     }
 
     /**
@@ -364,8 +369,12 @@ namespace gdjs {
     }
 
     _addTouch(publicIdentifier: integer, x: float, y: float): void {
-      this._startedTouches.push(publicIdentifier);
-      this._touches.put(publicIdentifier, { x: x, y: y, justEnded: false });
+      // A touch that end then start in one frame is ignored
+      // because it's probably noise.
+      if (!this._endedTouches.includes(publicIdentifier)) {
+        this._startedTouches.push(publicIdentifier);
+        this._touches.put(publicIdentifier, { x: x, y: y, justEnded: false });
+      }
     }
 
     onTouchMove(rawIdentifier: integer, x: float, y: float): void {

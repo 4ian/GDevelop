@@ -188,6 +188,7 @@ declare interface ProjectPropertiesData {
   minFPS: number;
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
+  watermark: WatermarkData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
@@ -198,6 +199,19 @@ declare interface ExtensionProperty {
   extension: string;
   property: string;
   value: string;
+}
+
+declare interface WatermarkData {
+  showWatermark: boolean;
+  placement:
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'bottom'
+    | 'top'
+    | 'right'
+    | 'left';
 }
 
 declare interface LoadingScreenData {

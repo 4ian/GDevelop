@@ -647,6 +647,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
   }
+  authorUsernames.clear();
+  auto& authorUsernamesElement = propElement.GetChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < authorUsernamesElement.GetChildrenCount(); ++i) {
+    authorUsernames.push_back(
+        authorUsernamesElement.GetChild(i).GetStringValue());
+  }
 
   categories.clear();
   auto& categoriesElement = propElement.GetChild("categories");
@@ -883,6 +890,11 @@ void Project::SerializeTo(SerializerElement& element) const {
   authorIdsElement.ConsiderAsArray();
   for (const auto& authorId : authorIds) {
     authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
+  auto& authorUsernamesElement = propElement.AddChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (const auto& authorUsername : authorUsernames) {
+    authorUsernamesElement.AddChild("").SetStringValue(authorUsername);
   }
 
   auto& categoriesElement = propElement.AddChild("categories");

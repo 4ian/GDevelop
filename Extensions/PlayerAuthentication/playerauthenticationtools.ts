@@ -244,7 +244,7 @@ namespace gdjs {
         _checkedLocalStorage = true;
       } catch (err) {
         logger.warn(
-          'Unable to read authentication details from localStorage. Player auth will not be available.',
+          'Unable to read authentication details from localStorage. Player authentication will not be available.',
           err
         );
       }

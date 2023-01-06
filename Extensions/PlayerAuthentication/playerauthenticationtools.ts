@@ -42,6 +42,10 @@ namespace gdjs {
     // Then send a message to the parent iframe to say that the player auth is ready.
     gdjs.registerFirstRuntimeSceneLoadedCallback(
       (runtimeScene: RuntimeScene) => {
+        if (getPlatform(runtimeScene) !== 'web') {
+          // Automatic authentication is only valid when the game is hosted in Liluo.io.
+          return;
+        }
         removeAuthenticationCallbacks(); // Remove any callback that could have been registered before.
         _authenticationMessageCallback = (event: MessageEvent) => {
           receiveAuthenticationMessage(runtimeScene, event, {
@@ -284,14 +288,21 @@ namespace gdjs {
         logger.error('Missing game id in project properties.');
         return;
       }
-      window.localStorage.setItem(
-        getLocalStorageKey(gameId),
-        JSON.stringify({
-          username: _username,
-          userId: _userId,
-          userToken: _userToken,
-        })
-      );
+      try {
+        window.localStorage.setItem(
+          getLocalStorageKey(gameId),
+          JSON.stringify({
+            username: _username,
+            userId: _userId,
+            userToken: _userToken,
+          })
+        );
+      } catch (err) {
+        logger.warn(
+          'Unable to save the authentication details to localStorage',
+          err
+        );
+      }
     };
 
     /**

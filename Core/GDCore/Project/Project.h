@@ -122,6 +122,16 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::vector<gd::String>& GetAuthorIds() { return authorIds; };
 
   /**
+   * \brief Get the author usernames of the project.
+   */
+  const std::vector<gd::String>& GetAuthorUsernames() const { return authorUsernames; };
+
+  /**
+   * \brief Get the author usernames of the project, to modify them (non-const).
+   */
+  std::vector<gd::String>& GetAuthorUsernames() { return authorUsernames; };
+
+  /**
    * Define the project as playable with a keyboard.
    * \param enable True to define the project as playable with a keyboard.
    */
@@ -1054,6 +1064,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;           ///< Game author ids, from GDevelop users DB.
+  std::vector<gd::String>
+      authorUsernames;     ///< Game author usernames, from GDevelop users DB.
   std::vector<gd::String>
       categories;           ///< Game categories
   bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.

@@ -11,6 +11,7 @@ declare class gdProject extends gdObjectsContainer {
   setAuthor(authorName: string): void;
   getAuthor(): string;
   getAuthorIds(): gdVectorString;
+  getAuthorUsernames(): gdVectorString;
   isPlayableWithKeyboard(): boolean;
   setPlayableWithKeyboard(playable: boolean): void;
   isPlayableWithGamepad(): boolean;

@@ -2450,8 +2450,8 @@ namespace gdjs {
       const inputManager = instanceContainer.getGame().getInputManager();
       const layer = instanceContainer.getLayer(this.layer);
       const mousePos = layer.convertCoords(
-        inputManager.getMouseX(),
-        inputManager.getMouseY(),
+        inputManager.getCursorX(),
+        inputManager.getCursorY(),
         0,
         workingPoint
       );

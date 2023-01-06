@@ -153,7 +153,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension
       .AddExpressionAndCondition(
           "number",
-          "MouseX",
+          "CursorX",
           _("Cursor X position"),
           _("the X position of the cursor or of a touch"),
           _("the cursor (or touch) X position"),
@@ -167,13 +167,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetDefaultValue("0");
 
   // Support for deprecated names:
-  extension.AddDuplicatedCondition("SourisX", "MouseX").SetHidden();
-  extension.AddDuplicatedExpression("SourisX", "MouseX").SetHidden();
+  extension.AddDuplicatedCondition("MouseX", "CursorX").SetHidden();
+  extension.AddDuplicatedExpression("MouseX", "CursorX").SetHidden();
+  extension.AddDuplicatedCondition("SourisX", "CursorX").SetHidden();
+  extension.AddDuplicatedExpression("SourisX", "CursorX").SetHidden();
+  extension.AddDuplicatedCondition("SourisX", "CursorX").SetHidden();
+  extension.AddDuplicatedExpression("SourisX", "CursorX").SetHidden();
 
   extension
       .AddExpressionAndCondition(
           "number",
-          "MouseY",
+          "CursorY",
           _("Cursor Y position"),
           _("the Y position of the cursor or of a touch"),
           _("the cursor (or touch) Y position"),
@@ -187,8 +191,48 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetDefaultValue("0");
 
   // Support for deprecated names:
-  extension.AddDuplicatedCondition("SourisY", "MouseY").SetHidden();
-  extension.AddDuplicatedExpression("SourisY", "MouseY").SetHidden();
+  extension.AddDuplicatedCondition("MouseY", "CursorY").SetHidden();
+  extension.AddDuplicatedExpression("MouseY", "CursorY").SetHidden();
+  extension.AddDuplicatedCondition("SourisY", "CursorY").SetHidden();
+  extension.AddDuplicatedExpression("SourisY", "CursorY").SetHidden();
+  extension.AddDuplicatedCondition("SourisY", "CursorY").SetHidden();
+  extension.AddDuplicatedExpression("SourisY", "CursorY").SetHidden();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "MouseOnlyCursorX",
+          _("Mouse cursor X position"),
+          _("the X position of the mouse cursor"),
+          _("the mouse cursor X position"),
+          "",
+          "res/conditions/mouse24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0")
+      // It's only useful for extensions as they can't use TouchSimulateMouse.
+      .SetHidden();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "MouseOnlyCursorY",
+          _("Mouse cursor Y position"),
+          _("the Y position of the mouse cursor"),
+          _("the mouse cursor Y position"),
+          "",
+          "res/conditions/mouse24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0")
+      // It's only useful for extensions as they can't use TouchSimulateMouse.
+      .SetHidden();
 
   extension
       .AddCondition("IsMouseInsideCanvas",

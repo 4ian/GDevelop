@@ -27,6 +27,8 @@ namespace gdjs {
     _lastPressedKey: float = 0;
     _pressedMouseButtons: Array<boolean>;
     _releasedMouseButtons: Array<boolean>;
+    _cursorX: float = 0;
+    _cursorY: float = 0;
     _mouseX: float = 0;
     _mouseY: float = 0;
     _isMouseInsideCanvas: boolean = true;
@@ -196,18 +198,40 @@ namespace gdjs {
      */
     onMouseMove(x: float, y: float): void {
       this._setMousePosition(x, y);
+      this._mouseX = x;
+      this._mouseY = y;
       if (this.isMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON)) {
         this._moveTouch(
           InputManager.MOUSE_TOUCH_ID,
-          this.getMouseX(),
-          this.getMouseY()
+          this.getCursorX(),
+          this.getCursorY()
         );
       }
     }
 
     _setMousePosition(x: float, y: float): void {
-      this._mouseX = x;
-      this._mouseY = y;
+      this._cursorX = x;
+      this._cursorY = y;
+    }
+
+    /**
+     * Get the cursor X position.
+     * The cursor is moved by mouse and touch events.
+     *
+     * @return the cursor X position, relative to the game view.
+     */
+    getCursorX(): float {
+      return this._cursorX;
+    }
+
+    /**
+     * Get the cursor Y position.
+     * The cursor is moved by mouse and touch events.
+     *
+     * @return the cursor Y position, relative to the game view.
+     */
+    getCursorY(): float {
+      return this._cursorY;
     }
 
     /**
@@ -259,8 +283,8 @@ namespace gdjs {
       if (buttonCode === InputManager.MOUSE_LEFT_BUTTON) {
         this._addTouch(
           InputManager.MOUSE_TOUCH_ID,
-          this.getMouseX(),
-          this.getMouseY()
+          this.getCursorX(),
+          this.getCursorY()
         );
       }
     }

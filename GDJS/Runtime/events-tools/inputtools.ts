@@ -285,13 +285,71 @@ namespace gdjs {
         return instanceContainer.getGame().getInputManager().isScrollingDown();
       };
 
+      /**
+       * @deprecated Use getCursorX instead.
+       */
       export const getMouseX = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
+        return getCursorX(instanceContainer, layer, camera);
+      };
+
+      /**
+       * @deprecated Use getCursorY instead.
+       */
+      export const getMouseY = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        return getCursorY(instanceContainer, layer, camera);
+      };
+
+      export const getCursorX = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getMouseX
+          gdjs.evtTools.input.getCursorX
+        ) as FloatPoint;
+        return instanceContainer
+          .getLayer(layer)
+          .convertCoords(
+            instanceContainer.getGame().getInputManager().getCursorX(),
+            instanceContainer.getGame().getInputManager().getCursorY(),
+            0,
+            workingPoint
+          )[0];
+      };
+
+      export const getCursorY = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getCursorY
+        ) as FloatPoint;
+        return instanceContainer
+          .getLayer(layer)
+          .convertCoords(
+            instanceContainer.getGame().getInputManager().getCursorX(),
+            instanceContainer.getGame().getInputManager().getCursorY(),
+            0,
+            workingPoint
+          )[1];
+      };
+
+      export const getMouseOnlyCursorX = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getCursorX
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
@@ -303,13 +361,13 @@ namespace gdjs {
           )[0];
       };
 
-      export const getMouseY = function (
+      export const getMouseOnlyCursorY = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getMouseY
+          gdjs.evtTools.input.getCursorY
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)

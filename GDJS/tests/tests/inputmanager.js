@@ -85,8 +85,8 @@ describe('gdjs.InputManager', () => {
 
   it('should handle mouse events', () => {
     inputManager.onMouseMove(500, 600);
-    expect(inputManager.getMouseX()).to.be(500);
-    expect(inputManager.getMouseY()).to.be(600);
+    expect(inputManager.getCursorX()).to.be(500);
+    expect(inputManager.getCursorY()).to.be(600);
 
     expect(
       inputManager.isMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON)
@@ -192,19 +192,19 @@ describe('gdjs.InputManager', () => {
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);
     inputManager.onTouchStart(46, 510, 610);
     expect(inputManager.isMouseButtonPressed(0)).to.be(true);
-    expect(inputManager.getMouseX()).to.be(510);
-    expect(inputManager.getMouseY()).to.be(610);
+    expect(inputManager.getCursorX()).to.be(510);
+    expect(inputManager.getCursorY()).to.be(610);
     inputManager.onTouchMove(46, 520, 620);
-    expect(inputManager.getMouseX()).to.be(520);
-    expect(inputManager.getMouseY()).to.be(620);
+    expect(inputManager.getCursorX()).to.be(520);
+    expect(inputManager.getCursorY()).to.be(620);
     inputManager.onTouchEnd(46);
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);
 
     inputManager.touchSimulateMouse(false);
     inputManager.onTouchStart(46, 510, 610);
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);
-    expect(inputManager.getMouseX()).to.be(520);
-    expect(inputManager.getMouseY()).to.be(620);
+    expect(inputManager.getCursorX()).to.be(520);
+    expect(inputManager.getCursorY()).to.be(620);
 
     inputManager.onTouchEnd(46);
   });

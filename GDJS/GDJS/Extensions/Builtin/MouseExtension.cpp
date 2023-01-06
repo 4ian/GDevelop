@@ -13,16 +13,26 @@ namespace gdjs {
 MouseExtension::MouseExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMouseExtension(*this);
 
+  GetAllConditions()["CursorX"].SetFunctionName(
+      "gdjs.evtTools.input.getCursorX");
+  GetAllConditions()["CursorY"].SetFunctionName(
+      "gdjs.evtTools.input.getCursorY");
+  GetAllConditions()["MouseOnlyOnlyCursorX"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseOnlyCursorX");
+  GetAllConditions()["MouseOnlyCursorY"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseOnlyCursorY");
+  // Deprecated
   GetAllConditions()["MouseX"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseX");
+      "gdjs.evtTools.input.getCursorX");
+  // Deprecated
   GetAllConditions()["MouseY"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseY");
+      "gdjs.evtTools.input.getCursorY");
   GetAllConditions()["IsMouseInsideCanvas"].SetFunctionName(
       "gdjs.evtTools.input.isMouseInsideCanvas");
   GetAllConditions()["SourisX"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseX"); // Deprecated
+      "gdjs.evtTools.input.getCursorX"); // Deprecated
   GetAllConditions()["SourisY"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseY"); // Deprecated
+      "gdjs.evtTools.input.getCursorY"); // Deprecated
   GetAllConditions()["MouseButtonPressed"].SetFunctionName(
       "gdjs.evtTools.input.isMouseButtonPressed");
   GetAllConditions()["SourisBouton"].SetFunctionName(
@@ -45,14 +55,28 @@ MouseExtension::MouseExtension() {
   GetAllConditions()["IsMouseWheelScrollingDown"].SetFunctionName(
       "gdjs.evtTools.input.isScrollingDown");
 
+  GetAllExpressions()["CursorX"].SetFunctionName(
+      "gdjs.evtTools.input.getCursorX");
+  // Deprecated
   GetAllExpressions()["MouseX"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseX");
+      "gdjs.evtTools.input.getCursorX");
+  // Deprecated
   GetAllExpressions()["SourisX"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseX");  // Deprecated
+      "gdjs.evtTools.input.getCursorX");
+
+  GetAllExpressions()["CursorY"].SetFunctionName(
+      "gdjs.evtTools.input.getCursorY");
+  // Deprecated
   GetAllExpressions()["MouseY"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseY");
+      "gdjs.evtTools.input.getCursorY");
+  // Deprecated
   GetAllExpressions()["SourisY"].SetFunctionName(
-      "gdjs.evtTools.input.getMouseY");  // Deprecated
+      "gdjs.evtTools.input.getCursorY");
+
+  GetAllExpressions()["MouseOnlyCursorX"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseOnlyCursorX");
+  GetAllExpressions()["MouseOnlyCursorY"].SetFunctionName(
+      "gdjs.evtTools.input.getMouseOnlyCursorY");
 
   GetAllConditions()["PopStartedTouch"].SetFunctionName(
       "gdjs.evtTools.input.popStartedTouch");  // Deprecated

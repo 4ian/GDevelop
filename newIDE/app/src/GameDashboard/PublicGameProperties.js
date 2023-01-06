@@ -277,7 +277,9 @@ export function PublicGameProperties({
           )}
           <UsersAutocomplete
             userIds={authorIds}
-            onChange={setAuthorIds}
+            onChange={userData =>
+              setAuthorIds(userData.map(data => data.userId))
+            }
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
               <Trans>
@@ -291,7 +293,9 @@ export function PublicGameProperties({
           {setOwnerIds && (
             <UsersAutocomplete
               userIds={ownerIds || []}
-              onChange={setOwnerIds}
+              onChange={userData =>
+                setOwnerIds(userData.map(data => data.userId))
+              }
               floatingLabelText={<Trans>Owners</Trans>}
               helperText={
                 <Trans>

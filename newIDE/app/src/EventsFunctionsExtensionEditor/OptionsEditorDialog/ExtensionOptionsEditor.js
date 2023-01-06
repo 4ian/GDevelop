@@ -299,7 +299,7 @@ export const ExtensionOptionsEditor = ({
             onChange={userIds => {
               const projectAuthorIds = eventsFunctionsExtension.getAuthorIds();
               projectAuthorIds.clear();
-              userIds.forEach(userId => projectAuthorIds.push_back(userId));
+              userIds.forEach(userData => projectAuthorIds.push_back(userData.userId));
             }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={

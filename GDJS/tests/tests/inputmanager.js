@@ -21,7 +21,7 @@ describe('gdjs.InputManager', () => {
   const inputManager = runtimeScene.getGame().getInputManager();
   const inputTools = gdjs.evtTools.input;
 
-  afterEach(function () {
+  afterEach(() => {
     // Ensure there is no side effect between test cases.
     inputManager.onFrameEnded();
     expect(inputManager.getAllTouchIdentifiers()).to.have.length(0);

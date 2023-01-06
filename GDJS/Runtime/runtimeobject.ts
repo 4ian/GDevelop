@@ -2449,6 +2449,15 @@ namespace gdjs {
       workingPoint.length = 2;
       const inputManager = instanceContainer.getGame().getInputManager();
       const layer = instanceContainer.getLayer(this.layer);
+      const mousePos = layer.convertCoords(
+        inputManager.getMouseX(),
+        inputManager.getMouseY(),
+        0,
+        workingPoint
+      );
+      if (this.insideObject(mousePos[0], mousePos[1])) {
+        return true;
+      }
       const touchIds = inputManager.getAllTouchIdentifiers();
       for (let i = 0; i < touchIds.length; ++i) {
         const touchPos = layer.convertCoords(

@@ -306,7 +306,7 @@ namespace gdjs {
         );
       } catch (err) {
         logger.warn(
-          'Unable to save the authentication details to localStorage. Player auth will not be available.',
+          'Unable to save the authentication details to localStorage. Player authentication will not be available.',
           err
         );
       }

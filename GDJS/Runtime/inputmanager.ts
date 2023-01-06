@@ -31,7 +31,8 @@ namespace gdjs {
     _mouseY: float = 0;
     _isMouseInsideCanvas: boolean = true;
     _mouseWheelDelta: float = 0;
-    // TODO Remove _touches when there is no longer Button 1.2.0 in the wild.
+    // TODO Remove _touches when there is no longer SpritePanelButton 1.2.0
+    // extension in the wild.
     _touches = {
       firstKey: (): string | number | null => {
         for (const key in this._mouseOrTouches.items) {

@@ -123,9 +123,9 @@ describe('gdjs.InputManager', function() {
     inputManager.onFrameEnded();
 
     inputManager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-    expect(inputTools.hasAnyTouchStarted(runtimeScene)).to.be(true);
-    expect(inputTools.getStartedTouchCount(runtimeScene)).to.be(1);
-    expect(inputTools.getStartedTouchIdentifier(runtimeScene, 0)).to.be(1);
+    expect(inputTools.hasAnyTouchOrMouseStarted(runtimeScene)).to.be(true);
+    expect(inputTools.getStartedTouchOrMouseCount(runtimeScene)).to.be(1);
+    expect(inputTools.getStartedTouchOrMouseIdentifier(runtimeScene, 0)).to.be(1);
     expect(inputTools.getTouchX(runtimeScene, 1)).to.be(500);
     expect(inputTools.getTouchY(runtimeScene, 1)).to.be(600);
     inputManager.onFrameEnded();

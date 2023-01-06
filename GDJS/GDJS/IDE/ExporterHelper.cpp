@@ -23,16 +23,17 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/EventsBasedObject.h"
-#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
@@ -41,7 +42,6 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
@@ -90,8 +90,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (!options.fullLoadingScreen) {
     // Most of the time, we skip the logo and minimum duration so that
     // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
-    exportedProject.GetLoadingScreen().SetMinDuration(0);
+    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false).SetMinDuration(
+        0);
+    exportedProject.GetWatermark().ShowGDevelopWatermark(false);
   }
 
   // Export resources (*before* generating events as some resources filenames

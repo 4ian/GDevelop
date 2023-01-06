@@ -36,7 +36,7 @@ import ForceMultiplierField from '../EventsSheet/ParameterFields/ForceMultiplier
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import muiDecorator from './ThemeDecorator';
-import paperDecorator from './PaperDecorator';
+import paperDecorator, { getPaperDecorator } from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
@@ -2982,11 +2982,12 @@ storiesOf('ProjectPropertiesDialog', module)
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
-  .addDecorator(paperDecorator)
+  .addDecorator(getPaperDecorator("medium"))
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor
       loadingScreen={testProject.project.getLoadingScreen()}
+      watermark={testProject.project.getWatermark()}
       onLoadingScreenUpdated={action('onLoadingscreenUpdated')}
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}

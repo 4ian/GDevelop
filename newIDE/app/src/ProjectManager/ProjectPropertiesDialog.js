@@ -670,6 +670,7 @@ function ProjectPropertiesDialog(props: Props) {
             {currentTab === 'loading-screen' && (
               <LoadingScreenEditor
                 loadingScreen={project.getLoadingScreen()}
+                watermark={project.getWatermark()}
                 onLoadingScreenUpdated={notifyOfLoadingScreenChange}
                 onChangeSubscription={onCancelChanges}
                 project={project}

@@ -228,19 +228,26 @@ namespace gdjs {
         logger.error('Missing game id in project properties.');
         return;
       }
-      const authenticatedUserStorageItem = window.localStorage.getItem(
-        getLocalStorageKey(gameId)
-      );
-      if (!authenticatedUserStorageItem) {
-        _checkedLocalStorage = true;
-        return;
-      }
-      const authenticatedUser = JSON.parse(authenticatedUserStorageItem);
+      try {
+        const authenticatedUserStorageItem = window.localStorage.getItem(
+          getLocalStorageKey(gameId)
+        );
+        if (!authenticatedUserStorageItem) {
+          _checkedLocalStorage = true;
+          return;
+        }
+        const authenticatedUser = JSON.parse(authenticatedUserStorageItem);
 
-      _username = authenticatedUser.username;
-      _userId = authenticatedUser.userId;
-      _userToken = authenticatedUser.userToken;
-      _checkedLocalStorage = true;
+        _username = authenticatedUser.username;
+        _userId = authenticatedUser.userId;
+        _userToken = authenticatedUser.userToken;
+        _checkedLocalStorage = true;
+      } catch (err) {
+        logger.warn(
+          'Unable to read authentication details from localStorage. Player auth will not be available.',
+          err
+        );
+      }
     };
 
     /**
@@ -288,14 +295,21 @@ namespace gdjs {
         logger.error('Missing game id in project properties.');
         return;
       }
-      window.localStorage.setItem(
-        getLocalStorageKey(gameId),
-        JSON.stringify({
-          username: _username,
-          userId: _userId,
-          userToken: _userToken,
-        })
-      );
+      try {
+        window.localStorage.setItem(
+          getLocalStorageKey(gameId),
+          JSON.stringify({
+            username: _username,
+            userId: _userId,
+            userToken: _userToken,
+          })
+        );
+      } catch (err) {
+        logger.warn(
+          'Unable to save the authentication details to localStorage. Player auth will not be available.',
+          err
+        );
+      }
     };
 
     /**

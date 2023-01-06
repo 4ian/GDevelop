@@ -55,6 +55,7 @@ type Props = {|
   setDescription: string => void,
   description: ?string,
   setAuthorIds: (string[]) => void,
+  setAuthorUsernames: (string[]) => void,
   authorIds: string[],
   setOrientation: string => void,
   orientation: string,
@@ -89,6 +90,7 @@ export function PublicGameProperties({
   setDescription,
   description,
   setAuthorIds,
+  setAuthorUsernames,
   authorIds,
   setOwnerIds,
   ownerIds,
@@ -277,9 +279,10 @@ export function PublicGameProperties({
           )}
           <UsersAutocomplete
             userIds={authorIds}
-            onChange={userData =>
-              setAuthorIds(userData.map(data => data.userId))
-            }
+            onChange={userData => {
+              setAuthorIds(userData.map(data => data.userId));
+              setAuthorUsernames(userData.map(data => data.username));
+            }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
               <Trans>

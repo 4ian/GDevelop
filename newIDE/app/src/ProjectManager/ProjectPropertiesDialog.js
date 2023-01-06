@@ -54,6 +54,7 @@ type ProjectProperties = {|
   description: string,
   author: string,
   authorIds: string[],
+  authorUsernames: string[],
   version: string,
   packageName: string,
   orientation: string,
@@ -75,6 +76,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     description: project.getDescription(),
     author: project.getAuthor(),
     authorIds: project.getAuthorIds().toJSArray(),
+    authorUsernames: project.getAuthorUsernames().toJSArray(),
     version: project.getVersion(),
     packageName: project.getPackageName(),
     orientation: project.getOrientation(),
@@ -100,6 +102,7 @@ function applyPropertiesToProject(
     name,
     description,
     authorIds,
+    authorUsernames,
     author,
     version,
     packageName,
@@ -119,6 +122,11 @@ function applyPropertiesToProject(
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  const projectAuthorUsernames = project.getAuthorUsernames();
+  projectAuthorUsernames.clear();
+  authorUsernames.forEach(authorUsername =>
+    projectAuthorUsernames.push_back(authorUsername)
+  );
   project.setAuthor(author);
   project.setVersion(version);
   project.setPackageName(packageName);
@@ -146,6 +154,9 @@ function ProjectPropertiesDialog(props: Props) {
     initialProperties.description
   );
   let [authorIds, setAuthorIds] = React.useState(initialProperties.authorIds);
+  let [authorUsernames, setAuthorUsernames] = React.useState(
+    initialProperties.authorUsernames
+  );
   let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
     initialProperties.gameResolutionWidth
   );
@@ -218,6 +229,7 @@ function ProjectPropertiesDialog(props: Props) {
       description,
       author,
       authorIds,
+      authorUsernames,
       version,
       packageName,
       orientation,
@@ -317,6 +329,10 @@ function ProjectPropertiesDialog(props: Props) {
                   authorIds={authorIds}
                   setAuthorIds={newAuthorIds => {
                     setAuthorIds(newAuthorIds);
+                    notifyOfChange();
+                  }}
+                  setAuthorUsernames={newAuthorUsernames => {
+                    setAuthorUsernames(newAuthorUsernames);
                     notifyOfChange();
                   }}
                   orientation={orientation}

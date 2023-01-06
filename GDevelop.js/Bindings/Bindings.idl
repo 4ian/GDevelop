@@ -321,7 +321,7 @@ interface LoadingScreen {
     void LoadingScreen();
 
     boolean IsGDevelopSplashShown();
-    void ShowGDevelopSplash(boolean show);
+    [Ref] LoadingScreen ShowGDevelopSplash(boolean show);
     [Const, Ref] DOMString GetGDevelopLogoStyle();
     [Ref] LoadingScreen SetGDevelopLogoStyle([Const] DOMString value);
     [Const, Ref] DOMString GetBackgroundImageResourceName();
@@ -349,6 +349,18 @@ interface LoadingScreen {
     long GetProgressBarColor();
     [Ref] LoadingScreen SetProgressBarColor(long value);
 
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface Watermark {
+    void Watermark();
+
+    boolean IsGDevelopWatermarkShown();
+    [Ref] Watermark ShowGDevelopWatermark(boolean show);
+    [Const, Ref] DOMString GetPlacement();
+    [Ref] Watermark SetPlacement([Const] DOMString value);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -431,6 +443,7 @@ interface Project {
 
     [Ref] PlatformSpecificAssets GetPlatformSpecificAssets();
     [Ref] LoadingScreen GetLoadingScreen();
+    [Ref] Watermark GetWatermark();
 
     boolean HasLayoutNamed([Const] DOMString name);
     [Ref] Layout GetLayout([Const] DOMString name);

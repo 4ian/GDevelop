@@ -54,6 +54,7 @@ declare class gdProject extends gdObjectsContainer {
   getCurrentPlatform(): gdPlatform;
   getPlatformSpecificAssets(): gdPlatformSpecificAssets;
   getLoadingScreen(): gdLoadingScreen;
+  getWatermark(): gdWatermark;
   hasLayoutNamed(name: string): boolean;
   getLayout(name: string): gdLayout;
   getLayoutAt(index: number): gdLayout;

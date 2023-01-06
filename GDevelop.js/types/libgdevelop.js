@@ -64,6 +64,7 @@ declare class libGDevelop {
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
+  Watermark: Class<gdWatermark>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   ExtensionProperties: Class<gdExtensionProperties>;

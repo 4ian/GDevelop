@@ -2,7 +2,7 @@
 declare class gdLoadingScreen {
   constructor(): void;
   isGDevelopSplashShown(): boolean;
-  showGDevelopSplash(show: boolean): void;
+  showGDevelopSplash(show: boolean): gdLoadingScreen;
   getGDevelopLogoStyle(): string;
   setGDevelopLogoStyle(value: string): gdLoadingScreen;
   getBackgroundImageResourceName(): string;

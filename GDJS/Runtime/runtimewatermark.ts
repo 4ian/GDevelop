@@ -19,12 +19,12 @@ namespace gdjs {
       _fadeInDelayAfterGameLoaded: number = 1000;
       _fadeInDuration: number = 0.3;
       _fadeOutTimeout: NodeJS.Timeout | null = null;
-      _authorUsername: string;
+      _authorUsername: string | undefined;
       _isDevEnvironment: boolean;
 
       constructor(
         game: RuntimeGame,
-        authorUsername: string,
+        authorUsername: string | undefined,
         watermarkData: WatermarkData
       ) {
         this._gameRenderer = game.getRenderer();
@@ -84,7 +84,7 @@ namespace gdjs {
 
       private createTextElement() {
         const textElement = document.createElement('span');
-        textElement.innerText = this._authorUsername;
+        textElement.innerText = this._authorUsername || 'Made with GDevelop';
         return textElement;
       }
 

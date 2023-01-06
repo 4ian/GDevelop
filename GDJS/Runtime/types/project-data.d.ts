@@ -181,6 +181,8 @@ declare interface ProjectPropertiesData {
   version: string;
   name: string;
   author: string;
+  authorIds: string[];
+  authorUsernames: string[];
   windowWidth: number;
   windowHeight: number;
   latestCompilationDirectory: string;

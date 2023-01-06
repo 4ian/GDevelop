@@ -2,7 +2,7 @@
  * Tests for gdjs.InputManager and related.
  */
 
-describe('gdjs.InputManager', () => {
+describe.only('gdjs.InputManager', () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: {
@@ -23,6 +23,7 @@ describe('gdjs.InputManager', () => {
 
   afterEach(() => {
     // Ensure there is no side effect between test cases.
+    inputManager.touchSimulateMouse(true);
     inputManager.onFrameEnded();
     expect(inputManager.getAllTouchIdentifiers()).to.have.length(0);
     expect(
@@ -205,6 +206,25 @@ describe('gdjs.InputManager', () => {
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);
     expect(inputManager.getCursorX()).to.be(520);
     expect(inputManager.getCursorY()).to.be(620);
+
+    inputManager.onTouchEnd(46);
+  });
+
+  it('can give the mouse cursor position without touch events moving it', () => {
+    inputManager.touchSimulateMouse();
+    inputManager.onMouseMove(500, 600);
+    expect(inputManager.getCursorX()).to.be(500);
+    expect(inputManager.getCursorY()).to.be(600);
+    expect(inputManager.getMouseX()).to.be(500);
+    expect(inputManager.getMouseY()).to.be(600);
+    
+    // Touch events only move the cursor.
+    inputManager.onTouchStart(46, 510, 610);
+    inputManager.onTouchMove(46, 520, 620);
+    expect(inputManager.getCursorX()).to.be(520);
+    expect(inputManager.getCursorY()).to.be(620);
+    expect(inputManager.getMouseX()).to.be(500);
+    expect(inputManager.getMouseY()).to.be(600);
 
     inputManager.onTouchEnd(46);
   });

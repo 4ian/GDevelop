@@ -1111,6 +1111,7 @@ void Project::Init(const gd::Project& game) {
 
   author = game.author;
   authorIds = game.authorIds;
+  authorUsernames = game.authorUsernames;
   isPlayableWithKeyboard = game.isPlayableWithKeyboard;
   isPlayableWithGamepad = game.isPlayableWithGamepad;
   isPlayableWithMobile = game.isPlayableWithMobile;

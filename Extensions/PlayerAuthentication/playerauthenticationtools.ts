@@ -288,14 +288,21 @@ namespace gdjs {
         logger.error('Missing game id in project properties.');
         return;
       }
-      window.localStorage.setItem(
-        getLocalStorageKey(gameId),
-        JSON.stringify({
-          username: _username,
-          userId: _userId,
-          userToken: _userToken,
-        })
-      );
+      try {
+        window.localStorage.setItem(
+          getLocalStorageKey(gameId),
+          JSON.stringify({
+            username: _username,
+            userId: _userId,
+            userToken: _userToken,
+          })
+        );
+      } catch (err) {
+        logger.warn(
+          'Unable to save the authentication details to localStorage',
+          err
+        );
+      }
     };
 
     /**

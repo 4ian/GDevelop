@@ -156,7 +156,8 @@ namespace gdjs {
       );
       this._watermark = new gdjs.watermark.RuntimeWatermark(
         this,
-        data.properties.author // TODO: This is the publisher name, not the GDevelop account username.
+        data.properties.author, // TODO: This is the publisher name, not the GDevelop account username.
+        this._data.properties.watermark
       );
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
@@ -669,7 +670,7 @@ namespace gdjs {
               this.getSceneData().name,
           this._injectExternalLayout
         );
-        this._watermark.display();
+        this._watermark.displayAtStartup();
 
         //Uncomment to profile the first x frames of the game.
         // var x = 500;

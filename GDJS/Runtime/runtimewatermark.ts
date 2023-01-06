@@ -5,7 +5,7 @@ namespace gdjs {
     export class RuntimeWatermark {
       _gameRenderer: RuntimeGameRenderer;
       _margin = '10px';
-      _position:
+      _placement:
         | 'top-left'
         | 'top-right'
         | 'bottom-left'
@@ -13,7 +13,8 @@ namespace gdjs {
         | 'bottom'
         | 'top'
         | 'right'
-        | 'left' = 'right';
+        | 'left';
+      _showAtStartup: boolean;
       _displayDuration: number = 10000;
       _fadeInDelayAfterGameLoaded: number = 1000;
       _fadeInDuration: number = 0.3;
@@ -21,11 +22,23 @@ namespace gdjs {
       _authorUsername: string;
       _isDevEnvironment: boolean;
 
-      constructor(game: RuntimeGame, authorUsername: string) {
+      constructor(
+        game: RuntimeGame,
+        authorUsername: string,
+        watermarkData: WatermarkData
+      ) {
         this._gameRenderer = game.getRenderer();
         this._authorUsername = authorUsername;
+        this._placement = watermarkData.placement;
+        this._showAtStartup = watermarkData.showWatermark;
         this._isDevEnvironment = game.isUsingGDevelopDevelopmentEnvironment();
         this.addStyle();
+      }
+
+      displayAtStartup() {
+        if (this._showAtStartup) {
+          this.display();
+        }
       }
 
       display() {
@@ -80,7 +93,7 @@ namespace gdjs {
         divContainer.setAttribute('id', 'watermark');
 
         divContainer.style.opacity = '0';
-        switch (this._position) {
+        switch (this._placement) {
           case 'top-left':
             divContainer.style.top = this._margin;
             divContainer.style.left = this._margin;

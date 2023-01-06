@@ -11,7 +11,7 @@
 namespace gd {
 
 LoadingScreen::LoadingScreen()
-    : showGDevelopSplash(true),
+    : showGDevelopSplash(false),
       gdevelopLogoStyle("light"),
       backgroundImageResourceName(""),
       backgroundColor(0),

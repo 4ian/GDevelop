@@ -284,7 +284,7 @@ function ProjectPropertiesDialog(props: Props) {
                 options={[
                   { label: <Trans>Properties</Trans>, value: 'properties' },
                   {
-                    label: <Trans>Loading screen</Trans>,
+                    label: <Trans>Branding and Loading screen</Trans>,
                     value: 'loading-screen',
                   },
                 ]}

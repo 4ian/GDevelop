@@ -138,6 +138,7 @@ export const LoadingScreenEditor = ({
               loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
               onUpdate();
             }}
+            disabled={!loadingScreen.isGDevelopSplashShown()}
           >
             <SelectOption value="light" primaryText={t`Light (plain)`} />
             <SelectOption
@@ -153,7 +154,11 @@ export const LoadingScreenEditor = ({
           <ResponsiveLineStackLayout noMargin>
             <SemiControlledTextField
               floatingLabelText={
-                <Trans>Logo and progress fade in delay (in seconds)</Trans>
+                loadingScreen.isGDevelopSplashShown() ? (
+                  <Trans>Logo and progress fade in delay (in seconds)</Trans>
+                ) : (
+                  <Trans>Progress fade in delay (in seconds)</Trans>
+                )
               }
               step={0.1}
               fullWidth
@@ -178,7 +183,11 @@ export const LoadingScreenEditor = ({
             />
             <SemiControlledTextField
               floatingLabelText={
-                <Trans>Logo and progress fade in duration (in seconds)</Trans>
+                loadingScreen.isGDevelopSplashShown() ? (
+                  <Trans>Logo and progress fade in duration (in seconds)</Trans>
+                ) : (
+                  <Trans>Progress fade in duration (in seconds)</Trans>
+                )
               }
               step={0.1}
               fullWidth

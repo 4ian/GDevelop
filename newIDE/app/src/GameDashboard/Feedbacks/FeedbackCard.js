@@ -27,6 +27,8 @@ import {
 } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
+import Link from '../../UI/Link';
+import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
@@ -79,6 +81,11 @@ const FeedbackCard = ({
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
 
+  const [
+    openPlayerPublicProfileDialog,
+    setOpenPlayerPublicProfileDialog,
+  ] = React.useState<boolean>(false);
+
   const processComment = async (newProcessed: boolean, i18n: I18nType) => {
     if (!profile) return;
     try {
@@ -113,64 +120,81 @@ const FeedbackCard = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Card
-          disabled={processed}
-          cardCornerAction={
-            <IconButton
-              size="small"
-              tooltip={processed ? t`Mark as unread` : t`Mark as read`}
-              onClick={() => setProcessed(!processed, i18n)}
-            >
-              {processed ? (
-                <CheckCircleIcon htmlColor={theme.message.valid} />
-              ) : (
-                <CheckCircleOutlineIcon />
-              )}
-            </IconButton>
-          }
-          header={
-            <BackgroundText style={styles.backgroundText}>
-              <Trans>{i18n.date(comment.createdAt)}</Trans>
-            </BackgroundText>
-          }
-        >
-          <Column noMargin>
-            <Line noMargin justifyContent="space-between" alignItems="start">
-              <Column noMargin>
-                {buildProperties && (
-                  <Text color="primary">
-                    {buildProperties.name ||
-                      shortenUuidForDisplay(buildProperties.id)}
-                    {buildProperties.isDeleted && (
-                      <>
-                        {' '}
-                        <Trans>(deleted)</Trans>
-                      </>
-                    )}
-                  </Text>
+        <>
+          <Card
+            disabled={processed}
+            cardCornerAction={
+              <IconButton
+                size="small"
+                tooltip={processed ? t`Mark as unread` : t`Mark as read`}
+                onClick={() => setProcessed(!processed, i18n)}
+              >
+                {processed ? (
+                  <CheckCircleIcon htmlColor={theme.message.valid} />
+                ) : (
+                  <CheckCircleOutlineIcon />
                 )}
-                <BackgroundText style={styles.backgroundText} allowSelection>
-                  {comment.playerName}
-                </BackgroundText>
-              </Column>
-            </Line>
-            <Spacer />
-            {ratings && (
-              <ResponsiveLineStackLayout noColumnMargin expand>
-                {ratings.map(rating => (
-                  <Line expand noMargin key={rating.key}>
-                    <Rating label={rating.label} value={rating.value} />
-                    <Spacer />
-                  </Line>
-                ))}
-              </ResponsiveLineStackLayout>
-            )}
-            <LargeSpacer />
-            <Text style={styles.textComment} allowSelection>
-              {comment.text}
-            </Text>
-          </Column>
-        </Card>
+              </IconButton>
+            }
+            header={
+              <BackgroundText style={styles.backgroundText}>
+                <Trans>{i18n.date(comment.createdAt)}</Trans>
+              </BackgroundText>
+            }
+          >
+            <Column noMargin>
+              <Line noMargin justifyContent="space-between" alignItems="start">
+                <Column noMargin>
+                  {buildProperties && (
+                    <Text color="primary">
+                      {buildProperties.name ||
+                        shortenUuidForDisplay(buildProperties.id)}
+                      {buildProperties.isDeleted && (
+                        <>
+                          {' '}
+                          <Trans>(deleted)</Trans>
+                        </>
+                      )}
+                    </Text>
+                  )}
+                  <BackgroundText style={styles.backgroundText} allowSelection>
+                    {comment.playerId ? (
+                      <Link
+                        onClick={() => setOpenPlayerPublicProfileDialog(true)}
+                        href="#"
+                      >
+                        {comment.playerName || 'Anonymous player'}
+                      </Link>
+                    ) : (
+                      comment.playerName || 'Anonymous player'
+                    )}
+                  </BackgroundText>
+                </Column>
+              </Line>
+              <Spacer />
+              {ratings && (
+                <ResponsiveLineStackLayout noColumnMargin expand>
+                  {ratings.map(rating => (
+                    <Line expand noMargin key={rating.key}>
+                      <Rating label={rating.label} value={rating.value} />
+                      <Spacer />
+                    </Line>
+                  ))}
+                </ResponsiveLineStackLayout>
+              )}
+              <LargeSpacer />
+              <Text style={styles.textComment} allowSelection>
+                {comment.text}
+              </Text>
+            </Column>
+          </Card>
+          {comment.playerId && openPlayerPublicProfileDialog && (
+            <PublicProfileDialog
+              userId={comment.playerId}
+              onClose={() => setOpenPlayerPublicProfileDialog(false)}
+            />
+          )}
+        </>
       )}
     </I18n>
   );

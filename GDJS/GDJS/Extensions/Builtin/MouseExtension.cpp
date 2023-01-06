@@ -70,15 +70,25 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.getLastTouchId");  // Deprecated
   GetAllExpressions()["LastEndedTouchId"].SetFunctionName(
       "gdjs.evtTools.input.getLastEndedTouchId");  // Deprecated
-
+  
+  // Deprecated
   GetAllConditions()["HasAnyTouchStarted"].SetFunctionName(
       "gdjs.evtTools.input.hasAnyTouchStarted");
-  GetAllConditions()["HasTouchEnded"].SetFunctionName(
-      "gdjs.evtTools.input.hasTouchEnded");
+  // Deprecated
   GetAllExpressions()["StartedTouchCount"].SetFunctionName(
       "gdjs.evtTools.input.getStartedTouchCount");
+  // Deprecated
   GetAllExpressions()["StartedTouchId"].SetFunctionName(
       "gdjs.evtTools.input.getStartedTouchIdentifier");
+
+  GetAllConditions()["HasAnyTouchOrMouseStarted"].SetFunctionName(
+      "gdjs.evtTools.input.hasAnyTouchOrMouseStarted");
+  GetAllExpressions()["StartedTouchOrMouseCount"].SetFunctionName(
+      "gdjs.evtTools.input.getStartedTouchOrMouseCount");
+  GetAllExpressions()["StartedTouchOrMouseId"].SetFunctionName(
+      "gdjs.evtTools.input.getStartedTouchOrMouseIdentifier");
+  GetAllConditions()["HasTouchEnded"].SetFunctionName(
+      "gdjs.evtTools.input.hasTouchEnded");
 
   GetAllExpressions()["MouseWheelDelta"].SetFunctionName(
       "gdjs.evtTools.input.getMouseWheelDelta");

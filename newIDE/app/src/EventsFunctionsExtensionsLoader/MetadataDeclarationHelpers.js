@@ -883,7 +883,7 @@ const declarePropertyInstructionAndExpression = (
         conditionName,
         propertyLabel,
         i18n._(
-          t`Check the property value for ${'"' + uncapitalizedLabel + '"'}`
+          t`Check the property value for ${'"' + uncapitalizedLabel + '"'}.`
         ),
         i18n._(
           t`Property ${'"' + uncapitalizedLabel + '"'} of _PARAM0_ is true`
@@ -901,7 +901,7 @@ const declarePropertyInstructionAndExpression = (
         actionName,
         propertyLabel,
         i18n._(
-          t`Update the property value for ${'"' + uncapitalizedLabel + '"'}`
+          t`Update the property value for ${'"' + uncapitalizedLabel + '"'}.`
         ),
         i18n._(
           t`Set the property value for ${'"' +
@@ -922,10 +922,11 @@ const declarePropertyInstructionAndExpression = (
         toggleActionName,
         i18n._(t`Toggle ${propertyLabel}`),
         i18n._(
-          t`Toggle the property value for ${'"' + uncapitalizedLabel + '". '}`
+          t`Toggle the property value for ${'"' + uncapitalizedLabel + '"'}.`
         ) +
+          '\n' +
           i18n._(
-            `If it was true, it will become false, and if it was false it will become true`
+            `If it was true, it will become false, and if it was false it will become true.`
           ),
         i18n._(
           t`Toggle the property value for ${'"' +

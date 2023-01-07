@@ -2444,9 +2444,11 @@ interface EventsBasedBehavior {
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyToggleActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetSharedPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetSharedPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetSharedPropertyExpressionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetSharedPropertyToggleActionName([Const] DOMString propertyName);
 };
 EventsBasedBehavior implements AbstractEventsBasedEntity;
 
@@ -2480,6 +2482,7 @@ interface EventsBasedObject {
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyExpressionName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetPropertyToggleActionName([Const] DOMString propertyName);
 
     // Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
@@ -3087,8 +3090,10 @@ interface BehaviorCodeGenerator {
     [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorPropertyToggleFunctionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorSharedPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorSharedPropertySetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetBehaviorSharedPropertyToggleFunctionName([Const] DOMString propertyName);
 };
 
 [Prefix="gdjs::"]
@@ -3097,6 +3102,7 @@ interface ObjectCodeGenerator {
     [Const, Value] DOMString GenerateRuntimeObjectCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedObject eventsBasedObject, [Const] DOMString codeNamespace, [Const, Ref] MapStringString objectMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetObjectPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertySetterName([Const] DOMString propertyName);
+    [Const, Value] DOMString STATIC_GetObjectPropertyToggleFunctionName([Const] DOMString propertyName);
 };
 
 [Prefix="gdjs::"]

@@ -125,6 +125,11 @@ class GD_CORE_API AbstractEventsBasedEntity {
    */
   static gd::String GetPropertyExpressionName(const gd::String& propertyName) { return "Property" + propertyName; };
 
+  /**
+   * \brief Get the name of the action to toggle a boolean property.
+   */
+  static gd::String GetPropertyToggleActionName(const gd::String& propertyName) { return "ToggleProperty" + propertyName; };
+
   /** \name Serialization
    */
   ///@{

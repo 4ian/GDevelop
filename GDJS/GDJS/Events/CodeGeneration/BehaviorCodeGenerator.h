@@ -58,6 +58,15 @@ class BehaviorCodeGenerator {
   }
 
   /**
+   * \brief Generate the name of the method to toggle the value of the boolean
+   * property of a behavior.
+   */
+  static gd::String GetBehaviorPropertyToggleFunctionName(
+      const gd::String &propertyName) {
+    return "_toggle" + propertyName;
+  }
+
+  /**
    * \brief Generate the name of the method to get the value of the shared property
    * of a behavior.
    */
@@ -69,6 +78,13 @@ class BehaviorCodeGenerator {
    * of a behavior.
    */
   static gd::String GetBehaviorSharedPropertySetterName(
+      const gd::String& propertyName);
+
+  /**
+   * \brief Generate the name of the method to toggle the value of the boolean
+   * shared property of a behavior.
+   */
+  static gd::String GetBehaviorSharedPropertyToggleFunctionName(
       const gd::String& propertyName);
 
  private:
@@ -86,6 +102,13 @@ class BehaviorCodeGenerator {
   static gd::String GetBehaviorSharedPropertySetterInternalName(
       const gd::String& propertyName);
 
+  /**
+   * \brief Generate the name of the method to toggle the value of the boolean
+   * shared property of a behavior form within the shared data class.
+   */
+  static gd::String GetBehaviorSharedPropertyToggleFunctionInternalName(
+      const gd::String& propertyName);
+
   gd::String GenerateRuntimeBehaviorTemplateCode(
       const gd::String& extensionName,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
@@ -100,6 +123,10 @@ class BehaviorCodeGenerator {
   gd::String GenerateRuntimeBehaviorPropertyTemplateCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateToggleBooleanPropertyTemplateCode(
+    const gd::String &toggleName, const gd::String &getterName,
+    const gd::String &setterName);
 
   gd::String GenerateInitializePropertyFromDataCode(
       const gd::NamedPropertyDescriptor& property);
@@ -118,6 +145,7 @@ class BehaviorCodeGenerator {
       const gd::NamedPropertyDescriptor& property);
 
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+
   gd::String GenerateUpdatePropertyFromBehaviorDataCode(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::NamedPropertyDescriptor& property);

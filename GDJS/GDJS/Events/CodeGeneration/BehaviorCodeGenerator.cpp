@@ -303,7 +303,7 @@ gd::String BehaviorCodeGenerator::GenerateToggleBooleanPropertyTemplateCode(
     const gd::String &setterName) {
   return gd::String(R"jscode_template(
   TOGGLE_NAME() {
-    return this.SETTER_NAME(!this.GETTER_NAME());
+    this.SETTER_NAME(!this.GETTER_NAME());
   })jscode_template")
       .FindAndReplace("TOGGLE_NAME", toggleFunctionName)
       .FindAndReplace("GETTER_NAME", getterName)

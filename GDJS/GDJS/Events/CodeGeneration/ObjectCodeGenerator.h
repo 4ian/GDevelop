@@ -57,6 +57,15 @@ class ObjectCodeGenerator {
     return "_set" + propertyName;
   }
 
+  /**
+   * \brief Generate the name of the method to toggle the value of the boolean
+   * property of a behavior.
+   */
+  static gd::String GetObjectPropertyToggleFunctionName(
+      const gd::String &propertyName) {
+    return "_toggle" + propertyName;
+  }
+
  private:
   gd::String GenerateRuntimeObjectTemplateCode(
       const gd::String& extensionName,
@@ -66,23 +75,35 @@ class ObjectCodeGenerator {
       std::function<gd::String()> generateMethodsCode,
       std::function<gd::String()> generatePropertiesCode,
       std::function<gd::String()> generateUpdateFromObjectDataCode);
+
   gd::String GenerateRuntimeObjectPropertyTemplateCode(
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::NamedPropertyDescriptor& property);
+
+  gd::String GenerateToggleBooleanPropertyTemplateCode(
+    const gd::String &toggleName, const gd::String &getterName,
+    const gd::String &setterName);
+
   gd::String GenerateInitializePropertyFromDataCode(
       const gd::NamedPropertyDescriptor& property);
+
   gd::String GenerateInitializePropertyFromDefaultValueCode(
       const gd::NamedPropertyDescriptor& property);
+
   gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+
   gd::String GenerateUpdatePropertyFromObjectDataCode(
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::NamedPropertyDescriptor& property);
+
   gd::String GenerateObjectOnDestroyToDeprecatedOnOwnerRemovedFromScene(
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::String& codeNamespace);
+
   gd::String GenerateDefaultDoStepPreEventsFunctionCode(
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::String& codeNamespace);
+
   gd::String GenerateDoStepPreEventsPreludeCode();
 
   gd::Project& project;

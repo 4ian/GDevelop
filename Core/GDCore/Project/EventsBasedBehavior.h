@@ -125,6 +125,13 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
     return "SharedProperty" + propertyName;
   };
 
+  /**
+   * \brief Get the name of the action to toggle a boolean shared property.
+   */
+  static gd::String GetSharedPropertyToggleActionName(const gd::String &propertyName) {
+    return "ToggleSharedProperty" + propertyName;
+  };
+
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(gd::Project& project,

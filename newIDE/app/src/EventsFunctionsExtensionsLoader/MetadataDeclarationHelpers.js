@@ -863,8 +863,10 @@ const declarePropertyInstructionAndExpression = (
   expressionName: string,
   conditionName: string,
   actionName: string,
+  toggleActionName: string,
   setterName: string,
   getterName: string,
+  toggleFunctionName: string,
   valueParameterIndex: number,
   addObjectAndBehaviorParameters: <T: gdInstructionOrExpressionMetadata>(
     instructionOrExpression: T
@@ -880,8 +882,12 @@ const declarePropertyInstructionAndExpression = (
       entityMetadata.addScopedCondition(
         conditionName,
         propertyLabel,
-        i18n._(t`Check the property value for ${uncapitalizedLabel}`),
-        i18n._(t`Property ${uncapitalizedLabel} of _PARAM0_ is true`),
+        i18n._(
+          t`Check the property value for ${'"' + uncapitalizedLabel + '"'}`
+        ),
+        i18n._(
+          t`Property ${'"' + uncapitalizedLabel + '"'} of _PARAM0_ is true`
+        ),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
         getExtensionIconUrl(extension)
@@ -894,9 +900,13 @@ const declarePropertyInstructionAndExpression = (
       entityMetadata.addScopedAction(
         actionName,
         propertyLabel,
-        i18n._(t`Update the property value for ${uncapitalizedLabel}`),
         i18n._(
-          t`Set property value for ${uncapitalizedLabel} of _PARAM0_ to _PARAM${valueParameterIndex}_`
+          t`Update the property value for ${'"' + uncapitalizedLabel + '"'}`
+        ),
+        i18n._(
+          t`Set the property value for ${'"' +
+            uncapitalizedLabel +
+            '"'} of _PARAM0_ to _PARAM${valueParameterIndex}_`
         ),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
@@ -906,6 +916,29 @@ const declarePropertyInstructionAndExpression = (
       .addParameter('yesorno', i18n._(t`New value to set`), '', false)
       .getCodeExtraInformation()
       .setFunctionName(setterName);
+
+    addObjectAndBehaviorParameters(
+      entityMetadata.addScopedAction(
+        toggleActionName,
+        i18n._(t`Toggle ${propertyLabel}`),
+        i18n._(
+          t`Toggle the property value for ${'"' + uncapitalizedLabel + '". '}`
+        ) +
+          i18n._(
+            `If it was true, it will become false, and if it was false it will become true`
+          ),
+        i18n._(
+          t`Toggle the property value for ${'"' +
+            uncapitalizedLabel +
+            '"'} of _PARAM0_`
+        ),
+        eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
+        getExtensionIconUrl(extension),
+        getExtensionIconUrl(extension)
+      )
+    )
+      .getCodeExtraInformation()
+      .setFunctionName(toggleFunctionName);
   } else {
     const typeExtraInfo = getStringifiedExtraInfo(property);
     const parameterOptions = gd.ParameterOptions.makeNewOptions();
@@ -993,10 +1026,16 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const actionName = gd.EventsBasedBehavior.getPropertyActionName(
       propertyName
     );
+    const toggleActionName = gd.EventsBasedBehavior.getPropertyToggleActionName(
+      propertyName
+    );
     const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
       propertyName
     );
     const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
+      propertyName
+    );
+    const toggleFunctionName = gd.BehaviorCodeGenerator.getBehaviorPropertyToggleFunctionName(
       propertyName
     );
 
@@ -1010,8 +1049,10 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       expressionName,
       conditionName,
       actionName,
+      toggleActionName,
       setterName,
       getterName,
+      toggleFunctionName,
       2,
       addObjectAndBehaviorParameters
     );
@@ -1031,10 +1072,16 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const actionName = gd.EventsBasedBehavior.getSharedPropertyActionName(
       propertyName
     );
+    const toggleActionName = gd.EventsBasedBehavior.getSharedPropertyToggleActionName(
+      propertyName
+    );
     const setterName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertySetterName(
       propertyName
     );
     const getterName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertyGetterName(
+      propertyName
+    );
+    const toggleFunctionName = gd.BehaviorCodeGenerator.getBehaviorSharedPropertyToggleFunctionName(
       propertyName
     );
 
@@ -1048,8 +1095,10 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
       expressionName,
       conditionName,
       actionName,
+      toggleActionName,
       setterName,
       getterName,
+      toggleFunctionName,
       2,
       addObjectAndBehaviorParameters
     );
@@ -1098,10 +1147,16 @@ export const declareObjectPropertiesInstructionAndExpressions = (
       propertyName
     );
     const actionName = gd.EventsBasedObject.getPropertyActionName(propertyName);
+    const toggleActionName = gd.EventsBasedObject.getPropertyToggleActionName(
+      propertyName
+    );
     const getterName = gd.ObjectCodeGenerator.getObjectPropertyGetterName(
       propertyName
     );
     const setterName = gd.ObjectCodeGenerator.getObjectPropertySetterName(
+      propertyName
+    );
+    const toggleFunctionName = gd.ObjectCodeGenerator.getObjectPropertyToggleFunctionName(
       propertyName
     );
 
@@ -1115,8 +1170,10 @@ export const declareObjectPropertiesInstructionAndExpressions = (
       expressionName,
       conditionName,
       actionName,
+      toggleActionName,
       setterName,
       getterName,
+      toggleFunctionName,
       1,
       addObjectParameter
     );

@@ -279,7 +279,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
   }
   SETTER_NAME(newValue) {
     this._behaviorData.PROPERTY_NAME = newValue;
-  })jscode_template")
+  }TOGGLE_PROPERTY_CODE)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
                       GetBehaviorPropertyGetterName(property.GetName()))
@@ -287,7 +287,27 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
                       GetBehaviorPropertySetterName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
-                      eventsBasedBehavior.GetName());
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace(
+          "TOGGLE_PROPERTY_CODE",
+          (property.GetType() == "Boolean"
+               ? GenerateToggleBooleanPropertyTemplateCode(
+                     GetBehaviorPropertyToggleFunctionName(property.GetName()),
+                     GetBehaviorPropertyGetterName(property.GetName()),
+                     GetBehaviorPropertySetterName(property.GetName()))
+               : ""));
+}
+
+gd::String BehaviorCodeGenerator::GenerateToggleBooleanPropertyTemplateCode(
+    const gd::String &toggleFunctionName, const gd::String &getterName,
+    const gd::String &setterName) {
+  return gd::String(R"jscode_template(
+  TOGGLE_NAME() {
+    return this.SETTER_NAME(!this.GETTER_NAME());
+  })jscode_template")
+      .FindAndReplace("TOGGLE_NAME", toggleFunctionName)
+      .FindAndReplace("GETTER_NAME", getterName)
+      .FindAndReplace("SETTER_NAME", setterName);
 }
 
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateCode(
@@ -299,7 +319,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateC
   }
   SETTER_NAME(newValue) {
     this.PROPERTY_NAME = newValue;
-  })jscode_template")
+  }TOGGLE_PROPERTY_CODE)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
                       GetBehaviorSharedPropertyGetterInternalName(property.GetName()))
@@ -307,7 +327,15 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateC
                       GetBehaviorSharedPropertySetterInternalName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
-                      eventsBasedBehavior.GetName());
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace(
+          "TOGGLE_PROPERTY_CODE",
+          (property.GetType() == "Boolean"
+               ? GenerateToggleBooleanPropertyTemplateCode(
+                     GetBehaviorSharedPropertyToggleFunctionInternalName(property.GetName()),
+                     GetBehaviorSharedPropertyGetterInternalName(property.GetName()),
+                     GetBehaviorSharedPropertySetterInternalName(property.GetName()))
+               : ""));
 }
 
 gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
@@ -380,6 +408,11 @@ gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertySetterName(
   return "_sharedData." + GetBehaviorSharedPropertySetterInternalName(propertyName);
 }
 
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyToggleFunctionName(
+    const gd::String& propertyName) {
+  return "_sharedData." + GetBehaviorSharedPropertyToggleFunctionInternalName(propertyName);
+}
+
 gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterInternalName(
     const gd::String& propertyName) {
   return "_get" + propertyName;
@@ -388,5 +421,10 @@ gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterInternalName(
 gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertySetterInternalName(
     const gd::String& propertyName) {
   return "_set" + propertyName;
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyToggleFunctionInternalName(
+    const gd::String& propertyName) {
+  return "_toggle" + propertyName;
 }
 }  // namespace gdjs

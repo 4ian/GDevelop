@@ -188,6 +188,9 @@ export const HomePageMenu = ({
           },
           className: 'safe-area-aware-left-container',
         }}
+        onClose={() => {
+          setIsHomePageMenuDrawerOpen(false);
+        }}
         ModalProps={{
           keepMounted: true,
         }}

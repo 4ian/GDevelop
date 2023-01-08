@@ -4,6 +4,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/EventsExposer.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/Project/Behavior.h"
@@ -15,7 +16,7 @@ namespace gd {
 const UsedExtensionsResult UsedExtensionsFinder::ScanProject(gd::Project& project) {
   UsedExtensionsFinder worker(project);
   gd::WholeProjectRefactorer::ExposeProjectObjects(project, worker);
-  gd::WholeProjectRefactorer::ExposeProjectEvents(project, worker);
+  gd::EventsExposer::ExposeProjectEvents(project, worker);
   return worker.result;
 };
 

@@ -39,53 +39,6 @@ namespace gd {
  */
 class GD_CORE_API WholeProjectRefactorer {
  public:
-  /**
-   * \brief Call the specified worker on all events of the project (layout,
-   * external events, events functions...)
-   *
-   * This should be the preferred way to traverse all the events of a project.
-   */
-  static void ExposeProjectEvents(gd::Project& project,
-                                  gd::ArbitraryEventsWorker& worker);
-  /**
-   * \brief Call the specified worker on all events of the project (layout and
-   * external events) but not events from extensions.
-   * 
-   * Only use this for stats.
-   */
-  static void ExposeProjectEventsWithoutExtensions(gd::Project& project,
-                                  gd::ArbitraryEventsWorker& worker);
-
-  /**
-   * \brief Call the specified worker on all events of the project (layout,
-   * external events, events functions...)
-   *
-   * This should be the preferred way to traverse all the events of a project.
-   */
-  static void ExposeProjectEvents(gd::Project& project,
-                                  gd::ArbitraryEventsWorkerWithContext& worker);
-
-  /**
-   * \brief Call the specified worker on all events of the events based behavior
-   *
-   * This should be the preferred way to traverse all the events of an events
-   * based behavior.
-   */
-  static void ExposeEventsBasedBehaviorEvents(
-      gd::Project& project,
-      const gd::EventsBasedBehavior& eventsBasedBehavior,
-      gd::ArbitraryEventsWorkerWithContext& worker);
-
-  /**
-   * \brief Call the specified worker on all events of the events based object
-   *
-   * This should be the preferred way to traverse all the events of an events
-   * based object.
-   */
-  static void ExposeEventsBasedObjectEvents(
-      gd::Project& project,
-      const gd::EventsBasedObject& eventsBasedObject,
-      gd::ArbitraryEventsWorkerWithContext& worker);
 
   /**
    * \brief Call the specified worker on all ObjectContainers of the project
@@ -109,6 +62,16 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldName,
       const gd::String& newName);
+
+  /**
+   * \brief Refactor behavior events after the extension was placed in a new
+   * extension.
+   */
+  static void UpdateExtensionNameInEventsBasedBehavior(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& sourceExtensionName);
 
   /**
    * \brief Refactor the project **before** an events function is renamed.

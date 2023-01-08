@@ -2161,8 +2161,11 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
     [Const, Ref] UnfilledRequiredBehaviorPropertyProblem at(unsigned long index);
 };
 
-interface WholeProjectRefactorer {
+interface EventsExposer {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+};
+
+interface WholeProjectRefactorer {
     void STATIC_RenameEventsFunctionsExtension(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

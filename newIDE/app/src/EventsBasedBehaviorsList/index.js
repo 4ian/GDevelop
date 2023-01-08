@@ -68,6 +68,7 @@ const getEventsBasedBehaviorName = (
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
   onSelectEventsBasedBehavior: (
@@ -85,6 +86,7 @@ type Props = {|
   onEventsBasedBehaviorRenamed: (
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
+  onEventsBasedBehaviorPasted:(eventsBasedBehavior: gdEventsBasedBehavior, sourceExtensionName) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
@@ -208,6 +210,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
       eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),
       name: eventsBasedBehavior.getName(),
+      extensionName: this.props.eventsFunctionsExtension.getName(),
     });
   };
 
@@ -249,6 +252,14 @@ export default class EventsBasedBehaviorsList extends React.Component<
       project
     );
     newEventsBasedBehavior.setName(newName);
+
+    const sourceExtensionName = SafeExtractor.extractStringProperty(clipboardContent, 'extensionName');
+    this.props.onEventsBasedBehaviorPasted(newEventsBasedBehavior, sourceExtensionName);
+
+    this.props.onEventsBasedBehaviorPasted(
+      newEventsBasedBehavior,
+      sourceExtensionName
+    );
 
     this._onEventsBasedBehaviorModified();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);

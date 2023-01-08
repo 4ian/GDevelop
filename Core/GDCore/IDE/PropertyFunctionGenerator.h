@@ -10,6 +10,7 @@ namespace gd {
 class String;
 class Project;
 class EventsFunctionsExtension;
+class EventsFunction;
 class EventsBasedBehavior;
 class EventsBasedObject;
 class AbstractEventsBasedEntity;
@@ -42,6 +43,12 @@ public:
   static bool CanGenerateGetterAndSetter(
       const gd::AbstractEventsBasedEntity &eventsBasedEntity,
       const gd::NamedPropertyDescriptor &property);
+
+  /**
+   * \brief Generate an event with a "return" action.
+   */
+  static void GenerateConditionSkeleton(gd::Project &project,
+                                        gd::EventsFunction &eventFunction);
 
   ~PropertyFunctionGenerator();
 

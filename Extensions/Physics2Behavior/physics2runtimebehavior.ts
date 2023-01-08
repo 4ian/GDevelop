@@ -1416,11 +1416,12 @@ namespace gdjs {
       const body = this._body!;
 
       // Get the linear velocity angle
-       return gdjs.toDegrees(
-       Math.atan2(
-        body.GetLinearVelocity().get_y() * this._sharedData.scaleY,
-        body.GetLinearVelocity().get_x() * this._sharedData.scaleX)
-      ); 
+      return gdjs.toDegrees(
+        Math.atan2(
+          body.GetLinearVelocity().get_y() * this._sharedData.scaleY,
+          body.GetLinearVelocity().get_x() * this._sharedData.scaleX
+        )
+      );
     }
 
     getAngularVelocity(): float {

@@ -1361,6 +1361,40 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityLength');
 
+      aut
+      .addCondition(
+        'LinearVelocityAngle',
+        _('Linear velocity angle'),
+        _('Test an object linear velocity angle.'),
+        _('the linear velocity angle'),
+        _('Velocity'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Angle to compare to (in degrees)')
+        )
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearVelocityAngle');
+
+    aut
+      .addExpression(
+        'LinearVelocityAngle',
+        _('Linear velocity angle'),
+        _('Get the linear velocity angle of an object.'),
+        _('Velocity'),
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearVelocityAngle');
+
     aut
       .addCondition(
         'AngularVelocity',

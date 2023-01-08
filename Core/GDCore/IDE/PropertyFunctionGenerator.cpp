@@ -12,6 +12,7 @@
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
@@ -296,6 +297,18 @@ PropertyFunctionGenerator::UnCapitalizeFirstLetter(const gd::String &string) {
     return string;
   }
   return string.substr(0, 1).LowerCase() + string.substr(1);
+}
+
+void PropertyFunctionGenerator::GenerateConditionSkeleton(
+    gd::Project &project, gd::EventsFunction &eventFunction) {
+  auto &event = dynamic_cast<gd::StandardEvent &>(
+      eventFunction.GetEvents().InsertNewEvent(
+          project, "BuiltinCommonInstructions::Standard", 0));
+
+  gd::Instruction action;
+  action.SetType("SetReturnBoolean");
+  action.AddParameter("True");
+  event.GetActions().Insert(action, 0);
 }
 
 } // namespace gd

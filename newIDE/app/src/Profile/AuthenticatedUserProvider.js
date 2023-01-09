@@ -662,9 +662,12 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
         {
-          hearFrom: form.hearFrom,
           gdevelopUsage: form.gdevelopUsage,
+          teamOrCompanySize: form.teamOrCompanySize,
+          companyName: form.companyName,
           creationExperience: form.creationExperience,
+          creationGoal: form.creationGoal,
+          hearFrom: form.hearFrom,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();

@@ -268,17 +268,17 @@ namespace gdjs {
           animation-delay: 1s;
         }
 
-        @media (hover: hover) {
-          svg path {
-            stroke: #666666;
-            stroke-width: 1px;
-            fill-opacity: ${idleOpacity};
-            stroke-linecap: round;
-            transition-property: stroke-width, stroke, color;
-            transition-duration: ${hoverTransitionDuration}s;
-          }
+        #watermark svg path {
+          stroke: #666666;
+          stroke-width: 1px;
+          fill-opacity: ${idleOpacity};
+          stroke-linecap: round;
+          transition-property: stroke-width, stroke, color;
+          transition-duration: ${hoverTransitionDuration}s;
+        }
 
-          svg:hover path {
+        @media (hover: hover) {
+          #watermark:hover svg path {
             stroke: #444444;
             stroke-width: 2px;
             fill-opacity: 1;

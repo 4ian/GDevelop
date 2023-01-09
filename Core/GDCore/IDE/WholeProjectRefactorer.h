@@ -28,7 +28,7 @@ class ArbitrarySharedDataWorker;
 class Behavior;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
-class EventsExposer;
+class ProjectExposer;
 }  // namespace gd
 
 namespace gd {
@@ -43,31 +43,6 @@ namespace gd {
  */
 class GD_CORE_API WholeProjectRefactorer {
  public:
-
-  /**
-   * \brief Call the specified worker on all ObjectContainers of the project
-   * (global, layouts...)
-   *
-   * This should be the preferred way to traverse all the objects of a project.
-   */
-  static void ExposeProjectObjects(gd::Project& project,
-                                   gd::ArbitraryObjectsWorker& worker);
-
-  /**
-   * \brief Call the specified worker on all FunctionsContainers of the project
-   * (global, layouts...)
-   *
-   * This should be the preferred way to traverse all the function signatures
-   * of a project.
-   */
-  static void ExposeProjectFunctions(gd::Project &project,
-                                     gd::ArbitraryFunctionsWorker &worker);
-
-  static void ExposeProjectEventBasedBehaviors(
-      gd::Project &project, gd::ArbitraryEventBasedBehaviorsWorker &worker);
-
-  static void ExposeProjectSharedDatas(
-      gd::Project &project, gd::ArbitrarySharedDataWorker &worker);
 
   /**
    * \brief Refactor the project **before** an events function extension is
@@ -96,7 +71,7 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldName,
       const gd::String& newName,
-      const gd::EventsExposer& eventsExposer);
+      const gd::ProjectExposer& projectExposer);
 
   /**
    * \brief Refactor behavior events after the extension was placed in a new
@@ -446,15 +421,17 @@ class GD_CORE_API WholeProjectRefactorer {
                                      const gd::EventsFunction& eventsFunction,
                                      const gd::String& oldFullType,
                                      const gd::String& newFullType,
-                                     const gd::EventsExposer& eventsExposer);
+                                     const gd::ProjectExposer& projectExposer);
 
   static void DoRenameBehavior(gd::Project& project,
                                const gd::String& oldBehaviorType,
-                               const gd::String& newBehaviorType);
+                               const gd::String& newBehaviorType,
+                               const gd::ProjectExposer& projectExposer);
 
   static void DoRenameObject(gd::Project& project,
                              const gd::String& oldObjectType,
-                             const gd::String& newObjectType);
+                             const gd::String& newObjectType,
+                             const gd::ProjectExposer& projectExposer);
 
   static void FindDependentBehaviorNames(
       const gd::Project& project,

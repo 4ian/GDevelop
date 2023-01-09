@@ -37,6 +37,11 @@ class GD_CORE_API ArbitraryEventBasedBehaviorsWorker {
    */
   void Launch(gd::SerializableWithNameList<gd::EventsBasedBehavior>& behaviors) { VisitEventBasedBehaviors(behaviors); };
 
+  /**
+   * \brief Launch the worker on the specified function container.
+   */
+  void Launch(EventsBasedBehavior& behavior) { VisitEventBasedBehavior(behavior); };
+
  private:
   void VisitEventBasedBehaviors(gd::SerializableWithNameList<gd::EventsBasedBehavior>& behaviors);
   void VisitEventBasedBehavior(gd::EventsBasedBehavior& behavior);

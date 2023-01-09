@@ -3,10 +3,14 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "EventsExposer.h"
+#include "ProjectExposer.h"
 
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
+#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
+#include "GDCore/IDE/Project/ArbitrarySharedDataWorker.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -17,7 +21,7 @@
 
 namespace gd {
 
-void EventsExposer::ExposeProjectEvents(
+void ProjectExposer::ExposeProjectEvents(
     gd::Project& project, gd::ArbitraryEventsWorker& worker) {
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources).
@@ -59,7 +63,7 @@ void EventsExposer::ExposeProjectEvents(
   }
 }
 
-void EventsExposer::ExposeProjectEvents(
+void ProjectExposer::ExposeProjectEvents(
     gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources) and ExposeProjectEffects (this time for
@@ -116,7 +120,7 @@ void EventsExposer::ExposeProjectEvents(
   }
 }
 
-void EventsExposer::ExposeEventsBasedBehaviorEvents(
+void ProjectExposer::ExposeEventsBasedBehaviorEvents(
     gd::Project& project,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     gd::ArbitraryEventsWorker& worker) {
@@ -126,7 +130,7 @@ void EventsExposer::ExposeEventsBasedBehaviorEvents(
   }
 }
 
-void EventsExposer::ExposeEventsBasedBehaviorEvents(
+void ProjectExposer::ExposeEventsBasedBehaviorEvents(
     gd::Project& project,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     gd::ArbitraryEventsWorkerWithContext& worker) {
@@ -146,7 +150,7 @@ void EventsExposer::ExposeEventsBasedBehaviorEvents(
   }
 }
 
-void EventsExposer::ExposeEventsBasedObjectEvents(
+void ProjectExposer::ExposeEventsBasedObjectEvents(
     gd::Project& project,
     const gd::EventsBasedObject& eventsBasedObject,
     gd::ArbitraryEventsWorkerWithContext& worker) {
@@ -165,4 +169,81 @@ void EventsExposer::ExposeEventsBasedObjectEvents(
         eventsFunction->GetEvents(), globalObjectsAndGroups, objectsAndGroups);
   }
 }
+
+
+void ProjectExposer::ExposeProjectObjects(
+    gd::Project& project, gd::ArbitraryObjectsWorker& worker) {
+
+  // Global objects
+  worker.Launch(project);
+
+  // Layers objects
+  for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
+    worker.Launch(project.GetLayout(i));
+  }
+
+  // Event based objects children
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+      e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+
+    for (auto&& eventsBasedObjectUniquePtr :
+        eventsFunctionsExtension.GetEventsBasedObjects()
+            .GetInternalVector()) {
+      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
+      worker.Launch(*eventsBasedObject);
+    }
+  }
+};
+
+void ProjectExposer::ExposeProjectFunctions(
+    gd::Project& project, gd::ArbitraryFunctionsWorker& worker) {
+
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    worker.Launch(eventsFunctionsExtension);
+
+    for (auto&& eventsBasedBehavior :
+         eventsFunctionsExtension.GetEventsBasedBehaviors()
+             .GetInternalVector()) {
+      worker.Launch(eventsBasedBehavior->GetEventsFunctions());
+    }
+
+    for (auto&& eventsBasedObject :
+         eventsFunctionsExtension.GetEventsBasedObjects()
+             .GetInternalVector()) {
+      worker.Launch(eventsBasedObject->GetEventsFunctions());
+    }
+  }
+};
+
+void ProjectExposer::ExposeProjectEventBasedBehaviors(
+    gd::Project& project, gd::ArbitraryEventBasedBehaviorsWorker& worker) {
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    worker.Launch(eventsFunctionsExtension.GetEventsBasedBehaviors());
+  }
+}
+
+void ProjectExposer::ExposeProjectSharedDatas(
+    gd::Project& project, gd::ArbitrarySharedDataWorker& worker) {
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout& layout = project.GetLayout(i);
+    worker.Launch(layout.GetAllBehaviorSharedData());
+  }
+}
+
+void BehaviorEventsExposer::ExposeFunctions(
+    gd::Project &project, gd::ArbitraryFunctionsWorker &worker) const {
+      worker.Launch(eventsBasedBehavior.GetEventsFunctions());
+    }
+
+void BehaviorEventsExposer::ExposeEventBasedBehaviors(
+    gd::Project &project,
+    gd::ArbitraryEventBasedBehaviorsWorker &worker) const {
+    worker.Launch(eventsBasedBehavior);
+    }
+
 }  // namespace gd

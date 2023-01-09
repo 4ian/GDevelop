@@ -52,36 +52,60 @@ export const isSameObjectWithContext = (
 export const enumerateObjects = (
   project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  filterType: ?string = undefined,
-  filterNames: ?Array<string> = undefined
+  filters: ?{| type?: string, names?: Array<string> |}
 ) => {
-  const filterObjectByType = (object: gdObject): boolean => {
-    return (
-      !filterType ||
-      gd.getTypeOfObject(project, objectsContainer, object.getName(), false) ===
-        filterType
-    );
-  };
+  const typeFilter = (filters && filters.type) || null;
+  const namesFilter = (filters && filters.names) || null;
+  const filterObjectByType = typeFilter
+    ? (object: gdObject): boolean => {
+        return (
+          gd.getTypeOfObject(
+            project,
+            objectsContainer,
+            object.getName(),
+            false
+          ) === typeFilter
+        );
+      }
+    : null;
 
-  const filterObjectByName = (object: gdObject): boolean => {
-    return !filterNames || filterNames.includes(object.getName());
-  };
+  const filterObjectByName = namesFilter
+    ? (object: gdObject): boolean => {
+        return namesFilter.includes(object.getName());
+      }
+    : null;
 
-  const containerObjectsList: ObjectWithContextList = mapFor(
+  let containerObjectsList: ObjectWithContextList = mapFor(
     0,
     objectsContainer.getObjectsCount(),
-    i => objectsContainer.getObjectAt(i)
+    i => {
+      const object = objectsContainer.getObjectAt(i);
+      if (filterObjectByType && !filterObjectByType(object)) {
+        return null;
+      }
+      if (filterObjectByName && !filterObjectByName(object)) {
+        return null;
+      }
+      return object;
+    }
   )
-    .filter(filterObjectByType)
-    .filter(filterObjectByName)
+    .filter(Boolean)
     .map((object: gdObject): ObjectWithContext => ({ object, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
     project === objectsContainer
       ? []
-      : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i))
-          .filter(filterObjectByType)
-          .filter(filterObjectByName)
+      : mapFor(0, project.getObjectsCount(), i => {
+          const object = project.getObjectAt(i);
+          if (filterObjectByType && !filterObjectByType(object)) {
+            return null;
+          }
+          if (filterObjectByName && !filterObjectByName(object)) {
+            return null;
+          }
+          return object;
+        })
+          .filter(Boolean)
           .map(
             (object: gdObject): ObjectWithContext => ({
               object,

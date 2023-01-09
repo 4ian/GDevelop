@@ -547,12 +547,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       instances.map(instance => instance.getObjectName())
     );
 
-    const selectedObjectsWithContext = enumerateObjects(
-      project,
-      layout,
-      null,
-      instancesNames
-    ).allObjectsList;
+    const selectedObjectsWithContext = enumerateObjects(project, layout, {
+      names: instancesNames,
+    }).allObjectsList;
 
     this.setState(
       {

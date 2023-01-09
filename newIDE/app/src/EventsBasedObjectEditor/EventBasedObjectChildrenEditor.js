@@ -26,7 +26,8 @@ type Props = {|
 type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
-  selectedObjectNames: string[],
+  selectedObjectsWithContext: ObjectWithContext[],
+  renamedObjectWithContext: ?ObjectWithContext,
 |};
 
 export default class EventBasedObjectChildrenEditor extends React.Component<
@@ -38,7 +39,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   state = {
     editedObjectWithContext: null,
     editedObjectInitialTab: 'properties',
-    selectedObjectNames: [],
+    selectedObjectsWithContext: [],
+    renamedObjectWithContext: null,
   };
 
   _onDeleteObject = (i18n: I18nType) => (
@@ -95,6 +97,23 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     }
 
     return true;
+  };
+
+  _onRenameObjectStart = (objectWithContext: ?ObjectWithContext) => {
+    const selectedObjectsWithContext = [];
+    if (objectWithContext) {
+      selectedObjectsWithContext.push(objectWithContext);
+    }
+
+    this.setState(
+      {
+        renamedObjectWithContext: objectWithContext,
+        selectedObjectsWithContext,
+      },
+      () => {
+        this.forceUpdateObjectsList();
+      }
+    );
   };
 
   _onRenameEditedObject = (newName: string, i18n: I18nType) => {
@@ -163,14 +182,19 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   };
 
   _onObjectSelected = (objectWithContext: ?ObjectWithContext = null) => {
-    const selectedObjectNames = [];
+    const selectedObjectsWithContext = [];
     if (objectWithContext) {
-      selectedObjectNames.push(objectWithContext.object.getName());
+      selectedObjectsWithContext.push(objectWithContext);
     }
 
-    this.setState({
-      selectedObjectNames,
-    });
+    this.setState(
+      {
+        selectedObjectsWithContext,
+      },
+      () => {
+        this.forceUpdateObjectsList();
+      }
+    );
   };
 
   updateBehaviorsSharedData = () => {
@@ -192,6 +216,10 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
 
   render() {
     const { eventsBasedObject, project, eventsFunctionsExtension } = this.props;
+
+    const selectedObjectNames = this.state.selectedObjectsWithContext.map(
+      objWithContext => objWithContext.object.getName()
+    );
 
     // TODO EBO When adding an object, filter the object types to excludes
     // object that depend (transitively) on this object to avoid cycles.
@@ -219,7 +247,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
                 }}
-                selectedObjectNames={this.state.selectedObjectNames}
+                selectedObjectNames={selectedObjectNames}
                 onEditObject={this.editObject}
                 // Don't allow export as there is no assets.
                 onExportObject={() => {}}
@@ -230,9 +258,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Nothing special to do.
                 onObjectCreated={() => {}}
                 onObjectSelected={this._onObjectSelected}
-                renamedObjectWithContext={null}
-                onRenameStart={() => {}}
-                onRenameFinish={(objectWithContext, newName, done) =>
+                renamedObjectWithContext={this.state.renamedObjectWithContext}
+                onRenameObjectStart={this._onRenameObjectStart}
+                onRenameObjectFinish={(objectWithContext, newName, done) =>
                   this._onRenameObject(objectWithContext, newName, done, i18n)
                 }
                 // Instances can't be created from this context.

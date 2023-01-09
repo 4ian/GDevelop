@@ -281,8 +281,10 @@ export const WithObjectsList = () => (
                   getAllObjectTags={() => []}
                   canRenameObject={() => true}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameStart={() => {}}
-                  onRenameFinish={(objectWithContext, newName, cb) => cb(true)}
+                  onRenameObjectStart={() => {}}
+                  onRenameObjectFinish={(objectWithContext, newName, cb) =>
+                    cb(true)
+                  }
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
                   renamedObjectWithContext={null}

@@ -701,7 +701,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _onRenameStart = (objectWithContext: ?ObjectWithContext) => {
+  _onRenameObjectStart = (objectWithContext: ?ObjectWithContext) => {
     const selectedObjectsWithContext = [];
     if (objectWithContext) {
       selectedObjectsWithContext.push(objectWithContext);
@@ -719,7 +719,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _startRenamingSelectedObject = () => {
-    this._onRenameStart(this.state.selectedObjectsWithContext[0]);
+    this._onRenameObjectStart(this.state.selectedObjectsWithContext[0]);
   };
 
   _onRenameLayer = (
@@ -814,11 +814,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { editedObjectWithContext } = this.state;
 
     if (editedObjectWithContext) {
-      this._onRenameFinish(editedObjectWithContext, newName, () => {});
+      this._onRenameObjectFinish(editedObjectWithContext, newName, () => {});
     }
   };
 
-  _onRenameFinish = (
+  _onRenameObjectFinish = (
     objectWithContext: ObjectWithContext,
     newName: string,
     done: boolean => void
@@ -1491,8 +1491,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
                 renamedObjectWithContext={this.state.renamedObjectWithContext}
-                onRenameStart={this._onRenameStart}
-                onRenameFinish={this._onRenameFinish}
+                onRenameObjectStart={this._onRenameObjectStart}
+                onRenameObjectFinish={this._onRenameObjectFinish}
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}

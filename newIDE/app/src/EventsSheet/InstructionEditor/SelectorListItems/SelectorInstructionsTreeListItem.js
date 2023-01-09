@@ -16,6 +16,7 @@ type Props<T> = {|
   selectedValue: ?string,
   initiallyOpenedPath?: ?Array<string>,
   getGroupIconSrc: string => string,
+  parentGroupIconSrc?: ?string,
 
   // Optional ref that will be filled with the selected ListItem
   selectedItemRef?: { current: null | ListItemRefType },
@@ -32,6 +33,7 @@ export const renderInstructionOrExpressionTree = <
   selectedItemRef,
   initiallyOpenedPath,
   getGroupIconSrc,
+  parentGroupIconSrc,
 }: Props<T>): Array<React$Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
@@ -91,11 +93,12 @@ export const renderInstructionOrExpressionTree = <
               selectedItemRef,
               initiallyOpenedPath: restOfInitiallyOpenedPath,
               getGroupIconSrc,
+              parentGroupIconSrc,
             })
           );
         } else {
           const initiallyOpen = initiallyOpenedKey === key;
-          const iconSrc = getGroupIconSrc(key);
+          const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;
           return (
             <ListItem
               key={key}
@@ -116,6 +119,7 @@ export const renderInstructionOrExpressionTree = <
                     ? restOfInitiallyOpenedPath
                     : undefined,
                   getGroupIconSrc,
+                  parentGroupIconSrc: iconSrc,
                 })
               }
             />

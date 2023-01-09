@@ -20,6 +20,7 @@ namespace gdjs {
 
       _resizeObserver: ResizeObserver | null = null;
 
+      _watermarkContainerElement: HTMLDivElement | null = null;
       _svgElement: SVGElement | null = null;
       _usernameTextElement: HTMLSpanElement | null = null;
       _madeWithTextElement: HTMLSpanElement | null = null;
@@ -84,7 +85,7 @@ namespace gdjs {
         this._logoHeight = Math.round((45 / 56) * this._logoWidth);
       }
 
-      onResizeGameContainer(newLargestDimension: number) {
+      private onResizeGameContainer(newLargestDimension: number) {
         this.updateFontSize(newLargestDimension);
         if (this._madeWithTextElement) {
           this._madeWithTextElement.style.fontSize = `${this._textFontSize}px`;
@@ -107,36 +108,51 @@ namespace gdjs {
         );
         this.updateFontSize(gameViewportLargestDimension);
 
-        const divContainer = this.createDivContainer();
+        this._watermarkContainerElement = this.createDivContainer();
 
         this.generateSVGLogo(gameViewportLargestDimension);
         this.createMadeWithTextElement();
         this.createUsernameTextElement();
-        if (this._svgElement) divContainer.appendChild(this._svgElement);
+        if (this._svgElement)
+          this._watermarkContainerElement.appendChild(this._svgElement);
         if (this._madeWithTextElement)
-          divContainer.appendChild(this._madeWithTextElement);
+          this._watermarkContainerElement.appendChild(
+            this._madeWithTextElement
+          );
         if (this._usernameTextElement)
-          divContainer.appendChild(this._usernameTextElement);
+          this._watermarkContainerElement.appendChild(
+            this._usernameTextElement
+          );
         addTouchAndClickEventListeners(
-          divContainer,
+          this._watermarkContainerElement,
           this.openCreatorProfile.bind(this)
         );
-        container.appendChild(divContainer);
+        container.appendChild(this._watermarkContainerElement);
 
+        this.setupAnimations();
+      }
+
+      private setupAnimations() {
         // Necessary to trigger fade in transition
         requestAnimationFrame(() => {
+          // Display the watermark
           setTimeout(() => {
-            divContainer.style.opacity = '1';
-            divContainer.style.pointerEvents = 'all';
+            if (!this._watermarkContainerElement) return;
+            this._watermarkContainerElement.style.opacity = '1';
+            this._watermarkContainerElement.style.pointerEvents = 'all';
             if (this._svgElement) this._svgElement.classList.add('spinning');
           }, this._fadeInDelayAfterGameLoaded * 1000);
         });
+
+        // Hide the watermark
         this._fadeOutTimeout = setTimeout(() => {
-          divContainer.style.opacity = '0';
+          if (!this._watermarkContainerElement) return;
+          this._watermarkContainerElement.style.opacity = '0';
           this._hideTimeout = setTimeout(
             () => {
-              divContainer.style.pointerEvents = 'none';
-              divContainer.style.display = 'none';
+              if (!this._watermarkContainerElement) return;
+              this._watermarkContainerElement.style.pointerEvents = 'none';
+              this._watermarkContainerElement.style.display = 'none';
               if (this._resizeObserver) this._resizeObserver.disconnect();
             },
             // Deactivate all interaction possibilities with watermark at
@@ -145,6 +161,7 @@ namespace gdjs {
           );
         }, (this._fadeInDelayAfterGameLoaded + this._displayDuration) * 1000);
 
+        // Change text below watermark
         this._fadeOutFirstTextTimeout = setTimeout(() => {
           const { _madeWithTextElement, _usernameTextElement } = this;
           if (!_madeWithTextElement) return;
@@ -232,7 +249,7 @@ namespace gdjs {
        * @param {number} dimension
        * @returns
        */
-      generateSVGLogo(dimension) {
+      private generateSVGLogo(dimension) {
         this._svgElement = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'svg'

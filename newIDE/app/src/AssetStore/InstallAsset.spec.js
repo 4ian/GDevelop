@@ -11,7 +11,6 @@ import {
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import {
-  fakeAssetShortHeader1,
   fakeAsset1,
   fakePixelArtAsset1,
   fakeAssetWithUnknownExtension1,

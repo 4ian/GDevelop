@@ -353,7 +353,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _addNewEventsFunction = () => {
-    const { eventsFunctionsContainer } = this.props;
+    const { eventsFunctionsContainer, project } = this.props;
 
     this.props.onAddEventsFunction(
       (parameters: ?EventsFunctionCreationParameters) => {
@@ -372,6 +372,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           eventsFunctionsContainer.getEventsFunctionsCount()
         );
         eventsFunction.setFunctionType(parameters.functionType);
+
+        if (eventsFunction.isCondition() && !eventsFunction.isExpression()) {
+          gd.PropertyFunctionGenerator.generateConditionSkeleton(
+            project,
+            eventsFunction
+          );
+        }
+
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();
 

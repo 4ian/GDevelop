@@ -2219,6 +2219,8 @@ interface PropertyFunctionGenerator {
     void STATIC_GenerateBehaviorGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property, boolean isSharedProperties);
     void STATIC_GenerateObjectGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedObject eventsBasedObject, [Const, Ref] NamedPropertyDescriptor property);
     boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] AbstractEventsBasedEntity eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
+
+    void STATIC_GenerateConditionSkeleton([Ref] Project project, [Ref] EventsFunction eventFunction);
 };
 
 interface UsedExtensionsResult {

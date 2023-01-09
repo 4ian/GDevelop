@@ -29,14 +29,14 @@ class GD_CORE_API EventsExposer {
     *
     * This should be the preferred way to traverse events of a project.
     */
-   virtual void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) = 0;
+   virtual void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) const = 0;
    /**
     * \brief Call the specified worker on a subset of events (layout,
     * external events, events functions...)
     *
     * This should be the preferred way to traverse events of a project.
     */
-   virtual void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) = 0;
+   virtual void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) const = 0;
 
    virtual ~EventsExposer(){};
 
@@ -101,7 +101,7 @@ class GD_CORE_API ProjectEventsExposer : public EventsExposer {
     *
     * This should be the preferred way to traverse all the events of a project.
     */
-   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) override {
+   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) const override {
       gd::EventsExposer::ExposeProjectEvents(project, worker);
    }
 
@@ -111,7 +111,7 @@ class GD_CORE_API ProjectEventsExposer : public EventsExposer {
     *
     * This should be the preferred way to traverse all the events of a project.
     */
-   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) override {
+   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) const override {
       gd::EventsExposer::ExposeProjectEvents(project, worker);
    }
 };
@@ -127,7 +127,7 @@ class GD_CORE_API BehaviorEventsExposer : public EventsExposer {
     * This should be the preferred way to traverse all the events of an events
     * based behavior.
     */
-   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) override {
+   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) const override {
       gd::EventsExposer::ExposeEventsBasedBehaviorEvents(project, eventsBasedBehavior, worker);
    }
 
@@ -138,7 +138,7 @@ class GD_CORE_API BehaviorEventsExposer : public EventsExposer {
     * This should be the preferred way to traverse all the events of an events
     * based behavior.
     */
-   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) override {
+   void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) const override {
       gd::EventsExposer::ExposeEventsBasedBehaviorEvents(project, eventsBasedBehavior, worker);
    }
 

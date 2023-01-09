@@ -21,6 +21,7 @@ class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryObjectsWorker;
+class ArbitraryFunctionsWorker;
 class ArbitraryEventsWorkerWithContext;
 class Behavior;
 class BehaviorMetadata;
@@ -49,6 +50,16 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void ExposeProjectObjects(gd::Project& project,
                                    gd::ArbitraryObjectsWorker& worker);
+
+  /**
+   * \brief Call the specified worker on all FunctionsContainers of the project
+   * (global, layouts...)
+   *
+   * This should be the preferred way to traverse all the function signatures
+   * of a project.
+   */
+  static void ExposeProjectFunctions(gd::Project &project,
+                                     gd::ArbitraryFunctionsWorker &worker);
 
   /**
    * \brief Refactor the project **before** an events function extension is
@@ -426,7 +437,8 @@ class GD_CORE_API WholeProjectRefactorer {
   static void DoRenameEventsFunction(gd::Project& project,
                                      const gd::EventsFunction& eventsFunction,
                                      const gd::String& oldFullType,
-                                     const gd::String& newFullType);
+                                     const gd::String& newFullType,
+                                     const gd::EventsExposer& eventsExposer);
 
   static void DoRenameBehavior(gd::Project& project,
                                const gd::String& oldBehaviorType,

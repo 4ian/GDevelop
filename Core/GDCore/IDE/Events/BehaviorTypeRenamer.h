@@ -23,17 +23,15 @@ namespace gd {
 
 class GD_CORE_API BehaviorTypeRenamer : public ArbitraryObjectsWorker {
  public:
-  BehaviorTypeRenamer(const gd::Project& project_,
-                          const gd::String& oldType_,
-                          const gd::String& newType_)
-      : project(project_), oldType(oldType_), newType(newType_){};
+  BehaviorTypeRenamer(const gd::String& oldType_,
+                      const gd::String& newType_)
+      : oldType(oldType_), newType(newType_){};
   virtual ~BehaviorTypeRenamer();
 
  private:
   void DoVisitObject(gd::Object& object) override;
   void DoVisitBehavior(gd::Behavior& behavior) override;
 
-  const gd::Project& project;
   gd::String oldType;
   gd::String newType;
 };

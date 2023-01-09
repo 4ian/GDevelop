@@ -23,6 +23,8 @@ class ArbitraryEventsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryFunctionsWorker;
 class ArbitraryEventsWorkerWithContext;
+class ArbitraryEventBasedBehaviorsWorker;
+class ArbitrarySharedDataWorker;
 class Behavior;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
@@ -60,6 +62,12 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void ExposeProjectFunctions(gd::Project &project,
                                      gd::ArbitraryFunctionsWorker &worker);
+
+  static void ExposeProjectEventBasedBehaviors(
+      gd::Project &project, gd::ArbitraryEventBasedBehaviorsWorker &worker);
+
+  static void ExposeProjectSharedDatas(
+      gd::Project &project, gd::ArbitrarySharedDataWorker &worker);
 
   /**
    * \brief Refactor the project **before** an events function extension is

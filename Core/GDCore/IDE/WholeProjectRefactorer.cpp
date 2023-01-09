@@ -22,6 +22,10 @@
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
+#include "GDCore/IDE/Project/ArbitrarySharedDataWorker.h"
+#include "GDCore/IDE/Project/RequiredBehaviorRenamer.h"
+#include "GDCore/IDE/Project/SharedDataBehaviorTypeRenamer.h"
 #include "GDCore/IDE/Project/FunctionParameterBehaviorTypeRenamer.h"
 #include "GDCore/IDE/Project/FunctionParameterObjectTypeRenamer.h"
 #include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
@@ -94,6 +98,23 @@ void WholeProjectRefactorer::ExposeProjectFunctions(
     }
   }
 };
+
+void WholeProjectRefactorer::ExposeProjectEventBasedBehaviors(
+    gd::Project& project, gd::ArbitraryEventBasedBehaviorsWorker& worker) {
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    worker.Launch(eventsFunctionsExtension.GetEventsBasedBehaviors());
+  }
+}
+
+void WholeProjectRefactorer::ExposeProjectSharedDatas(
+    gd::Project& project, gd::ArbitrarySharedDataWorker& worker) {
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout& layout = project.GetLayout(i);
+    worker.Launch(layout.GetAllBehaviorSharedData());
+  }
+}
 
 std::set<gd::String>
 WholeProjectRefactorer::GetAllObjectTypesUsingEventsBasedBehavior(
@@ -1342,44 +1363,10 @@ void WholeProjectRefactorer::DoRenameBehavior(
     gd::Project& project,
     const gd::String& oldBehaviorType,
     const gd::String& newBehaviorType) {
-  auto renameBehaviorTypeInBehaviorContent =
-      [&oldBehaviorType,
-       &newBehaviorType](gd::BehaviorConfigurationContainer& behavior) {
-        if (behavior.GetTypeName() == oldBehaviorType) {
-          behavior.SetTypeName(newBehaviorType);
-        }
-      };
-
-  auto renameBehaviorTypeInRequiredBehaviorProperties =
-      [&oldBehaviorType,
-       &newBehaviorType](gd::NamedPropertyDescriptor& propertyDescriptor) {
-        std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
-        if (propertyDescriptor.GetType() == "Behavior" &&
-            extraInfo.size() > 0) {
-          const gd::String& requiredBehaviorType = extraInfo[0];
-          if (requiredBehaviorType == oldBehaviorType) {
-            extraInfo[0] = newBehaviorType;
-          }
-        }
-      };
 
   // Rename behavior in required behavior properties
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-
-    for (auto&& eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      for (size_t i = 0;
-           i < eventsBasedBehavior->GetPropertyDescriptors().GetCount();
-           i++) {
-        NamedPropertyDescriptor& propertyDescriptor =
-            eventsBasedBehavior->GetPropertyDescriptors().Get(i);
-        renameBehaviorTypeInRequiredBehaviorProperties(propertyDescriptor);
-      }
-    }
-  }
+  auto requiredBehaviorRenamer = gd::RequiredBehaviorRenamer(oldBehaviorType, newBehaviorType);
+  ExposeProjectEventBasedBehaviors(project, requiredBehaviorRenamer);
 
   // Rename behavior in objects lists.
   auto behaviorTypeRenamer =
@@ -1387,13 +1374,8 @@ void WholeProjectRefactorer::DoRenameBehavior(
   ExposeProjectObjects(project, behaviorTypeRenamer);
 
   // Rename behavior in layout behavior shared data.
-  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    gd::Layout& layout = project.GetLayout(i);
-
-    for (auto& behaviorSharedDataContent : layout.GetAllBehaviorSharedData()) {
-      renameBehaviorTypeInBehaviorContent(*behaviorSharedDataContent.second);
-    }
-  }
+  auto sharedDataBehaviorTypeRenamer = gd::SharedDataBehaviorTypeRenamer(oldBehaviorType, newBehaviorType);
+  ExposeProjectSharedDatas(project, sharedDataBehaviorTypeRenamer);
 
   // Rename in parameters of (free/behavior) events function
   auto behaviorParameterRenamer = gd::FunctionParameterBehaviorTypeRenamer(

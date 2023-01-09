@@ -8,8 +8,12 @@ import paperDecorator from '../../../PaperDecorator';
 
 import FeedbackCard from '../../../../GameDashboard/Feedbacks/FeedbackCard';
 
-import { fakeIndieAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
-import { commentUnprocessed } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  commentProcessed,
+  commentUnprocessed,
+  fakeIndieAuthenticatedUser,
+  indieUserProfile,
+} from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'GameDashboard/Feedback/FeedbackCard',
@@ -17,7 +21,7 @@ export default {
   decorators: [muiDecorator, paperDecorator],
 };
 
-export const DefaultFeedbackCard = () => (
+export const Default = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     authenticatedUser={fakeIndieAuthenticatedUser}
@@ -25,13 +29,55 @@ export const DefaultFeedbackCard = () => (
   />
 );
 
-export const FeedbackCardWithNamedBuild = () => (
+export const Processed = () => (
+  <FeedbackCard
+    comment={commentProcessed}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithContact = () => (
+  <FeedbackCard
+    comment={{
+      ...commentUnprocessed,
+      contact: 'Clem#1234',
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithNamedBuild = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{
       id: 'build-id',
       name: 'My magnificient build',
       isDeleted: false,
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithAuthenticatedPlayer = () => (
+  <FeedbackCard
+    comment={{
+      ...commentUnprocessed,
+      playerId: indieUserProfile.id,
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithAuthenticatedPlayerAndContact = () => (
+  <FeedbackCard
+    comment={{
+      ...commentUnprocessed,
+      playerId: indieUserProfile.id,
+      contact: 'Clem#1234',
     }}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}

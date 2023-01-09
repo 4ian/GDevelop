@@ -165,11 +165,12 @@ namespace gdjs {
         this._fadeOutFirstTextTimeout = setTimeout(() => {
           const { _madeWithTextElement, _usernameTextElement } = this;
           if (!_madeWithTextElement) return;
+
           // Do not hide madeWith text if there is no author username to display.
           if (_usernameTextElement) {
             _madeWithTextElement.style.opacity = '0';
             this._fadeInSecondTextTimeout = setTimeout(() => {
-              _usernameTextElement.style.lineHeight = `${this._textFontSize}px`;
+              _usernameTextElement.style.lineHeight = 'normal';
               _usernameTextElement.style.opacity = '1';
               _madeWithTextElement.style.lineHeight = '0';
             }, this._fadeDuration * 1000);

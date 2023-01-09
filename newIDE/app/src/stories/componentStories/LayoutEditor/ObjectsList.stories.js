@@ -47,8 +47,8 @@ export const Default = () => (
           getAllObjectTags={() => []}
           canRenameObject={() => true}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameStart={() => {}}
-          onRenameFinish={(objectWithContext, newName, cb) => cb(true)}
+          onRenameObjectStart={() => {}}
+          onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
           onObjectSelected={() => {}}
           renamedObjectWithContext={null}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
@@ -90,8 +90,8 @@ export const WithTags = () => (
           ]}
           canRenameObject={() => true}
           onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameStart={() => {}}
-          onRenameFinish={(objectWithContext, newName, cb) => cb(true)}
+          onRenameObjectStart={() => {}}
+          onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
           onObjectSelected={() => {}}
           renamedObjectWithContext={null}
           hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}

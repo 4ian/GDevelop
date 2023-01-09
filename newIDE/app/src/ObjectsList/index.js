@@ -110,8 +110,8 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   renamedObjectWithContext: ?ObjectWithContext,
-  onRenameStart: (?ObjectWithContext) => void,
-  onRenameFinish: (
+  onRenameObjectStart: (?ObjectWithContext) => void,
+  onRenameObjectFinish: (
     objectWithContext: ObjectWithContext,
     newName: string,
     cb: (boolean) => void
@@ -149,8 +149,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onSelectAllInstancesOfObjectInLayout,
       onDeleteObject,
       renamedObjectWithContext,
-      onRenameStart,
-      onRenameFinish,
+      onRenameObjectStart,
+      onRenameObjectFinish,
       selectedObjectNames,
       canInstallPrivateAsset,
 
@@ -409,11 +409,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const editName = React.useCallback(
       (objectWithContext: ?ObjectWithContext) => {
-        onRenameStart(objectWithContext);
+        onRenameObjectStart(objectWithContext);
         // TODO Should it be called later?
         if (sortableList.current) sortableList.current.forceUpdateGrid();
       },
-      [onRenameStart]
+      [onRenameObjectStart]
     );
 
     const duplicateObject = React.useCallback(
@@ -440,12 +440,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
         const { object } = objectWithContext;
-        onRenameStart(null);
+        onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
         if (canRenameObject(newName)) {
-          onRenameFinish(objectWithContext, newName, doRename => {
+          onRenameObjectFinish(objectWithContext, newName, doRename => {
             if (!doRename) return;
 
             object.setName(newName);
@@ -453,7 +453,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           });
         }
       },
-      [canRenameObject, onObjectModified, onRenameStart, onRenameFinish]
+      [
+        canRenameObject,
+        onObjectModified,
+        onRenameObjectStart,
+        onRenameObjectFinish,
+      ]
     );
 
     const lists = enumerateObjects(project, objectsContainer);

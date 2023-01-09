@@ -23,6 +23,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .SetCategory("Audio");
   extension.AddInstructionOrExpressionGroupMetadata(_("Sounds and music"))
       .SetIcon("res/actions/music24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Sounds on channels"))
+      .SetIcon("res/actions/son24.png");
 
   extension
       .AddAction("PlaySoundCanal",

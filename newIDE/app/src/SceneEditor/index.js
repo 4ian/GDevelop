@@ -1337,10 +1337,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
       ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
       : null;
-    const selectedObjectNames = uniq(
-      this.state.selectedObjectsWithContext.map(objWithContext =>
-        objWithContext.object.getName()
-      )
+    const selectedObjectNames = this.state.selectedObjectsWithContext.map(
+      objWithContext => objWithContext.object.getName()
     );
 
     const editors = {

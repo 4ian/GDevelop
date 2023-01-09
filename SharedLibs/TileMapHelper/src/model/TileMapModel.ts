@@ -363,8 +363,14 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
       console.error(`Invalid tile definition index: ${tileId}`);
       return;
     }
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return;
+    }
+
     // +1 because 0 mean null
-    this._tiles[y][x] = tileId + 1;
+    tilesRow[x] = tileId + 1;
   }
 
   /**
@@ -372,8 +378,14 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @param y The layer row.
    */
   removeTile(x: integer, y: integer): void {
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return;
+    }
+
     // 0 mean null
-    this._tiles[y][x] = 0;
+    tilesRow[x] = 0;
   }
 
   /**
@@ -386,11 +398,17 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     y: integer,
     flippedHorizontally: boolean
   ): void {
-    const tileId = this._tiles[y][x];
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return;
+    }
+
+    const tileId = tilesRow[x];
     if (tileId === 0) {
       return;
     }
-    this._tiles[y][x] = FlippingHelper.setFlippedHorizontally(
+    tilesRow[x] = FlippingHelper.setFlippedHorizontally(
       tileId,
       flippedHorizontally
     );
@@ -406,11 +424,17 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     y: integer,
     flippedVertically: boolean
   ): void {
-    const tileId = this._tiles[y][x];
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return;
+    }
+
+    const tileId = tilesRow[x];
     if (tileId === 0) {
       return;
     }
-    this._tiles[y][x] = FlippingHelper.setFlippedVertically(
+    tilesRow[x] = FlippingHelper.setFlippedVertically(
       tileId,
       flippedVertically
     );
@@ -426,11 +450,17 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     y: integer,
     flippedDiagonally: boolean
   ): void {
-    const tileId = this._tiles[y][x];
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return;
+    }
+
+    const tileId = tilesRow[x];
     if (tileId === 0) {
       return;
     }
-    this._tiles[y][x] = FlippingHelper.setFlippedDiagonally(
+    tilesRow[x] = FlippingHelper.setFlippedDiagonally(
       tileId,
       flippedDiagonally
     );
@@ -442,7 +472,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @returns true if the tile is flipped horizontally.
    */
   isFlippedHorizontally(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedHorizontally(this._tiles[y][x]);
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return false;
+    }
+
+    return FlippingHelper.isFlippedHorizontally(tilesRow[x]);
   }
 
   /**
@@ -451,7 +487,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @returns true if the tile is flipped vertically.
    */
   isFlippedVertically(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedVertically(this._tiles[y][x]);
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return false;
+    }
+
+    return FlippingHelper.isFlippedVertically(tilesRow[x]);
   }
 
   /**
@@ -460,7 +502,13 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @returns true if the tile is flipped diagonally.
    */
   isFlippedDiagonally(x: integer, y: integer): boolean {
-    return FlippingHelper.isFlippedDiagonally(this._tiles[y][x]);
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length) {
+      // Coordinates are out of bounds, don't do anything.
+      return false;
+    }
+
+    return FlippingHelper.isFlippedDiagonally(tilesRow[x]);
   }
 
   /**
@@ -469,12 +517,12 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @returns The tile's GID (id + flipping bits).
    */
   getTileGID(x: integer, y: integer): integer | undefined {
-    const row = this._tiles[y];
-    if (!row || row[x] === 0) {
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length || tilesRow[x] === 0) {
       return undefined;
     }
     // -1 because 0 is keep for null.
-    return row[x] - 1;
+    return tilesRow[x] - 1;
   }
 
   /**
@@ -483,12 +531,12 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
    * @returns The tile's id.
    */
   getTileId(x: integer, y: integer): integer | undefined {
-    const row = this._tiles[y];
-    if (!row || row[x] === 0) {
+    const tilesRow = this._tiles[y];
+    if (!tilesRow || x >= tilesRow.length || tilesRow[x] === 0) {
       return undefined;
     }
     // -1 because 0 is keep for null.
-    const tileId = FlippingHelper.getTileId(row[x] - 1);
+    const tileId = FlippingHelper.getTileId(tilesRow[x] - 1);
     return tileId;
   }
 

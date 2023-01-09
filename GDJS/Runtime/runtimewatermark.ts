@@ -59,10 +59,19 @@ namespace gdjs {
       }
 
       private addWatermarkToGameContainer(container: HTMLElement) {
+        const gameContainerRectangle = container.getBoundingClientRect();
+
+        const gameViewportLargestDimension = Math.max(
+          gameContainerRectangle.height,
+          gameContainerRectangle.width
+        );
+
         const divContainer = this.createDivContainer();
 
-        const svgElement = RuntimeWatermark.generateSVGLogo();
-        this.createTextElement();
+        const svgElement = RuntimeWatermark.generateSVGLogo(
+          gameViewportLargestDimension
+        );
+        this.createTextElement(gameViewportLargestDimension);
         divContainer.appendChild(svgElement);
         if (this._textElement) divContainer.appendChild(this._textElement);
         addTouchAndClickEventListeners(
@@ -104,9 +113,14 @@ namespace gdjs {
         this._gameRenderer.openURL(targetUrl);
       }
 
-      private createTextElement() {
+      /**
+       * @param {number} dimension
+       * @returns
+       */
+      private createTextElement(dimension) {
         this._textElement = document.createElement('span');
         this._textElement.innerText = 'Made with GDevelop';
+        this._textElement.style.fontSize = `${0.0125 * dimension}px`;
       }
 
       private createDivContainer() {
@@ -156,14 +170,23 @@ namespace gdjs {
         return divContainer;
       }
 
-      static generateSVGLogo() {
+      /**
+       * @param {number} dimension
+       * @returns
+       */
+      static generateSVGLogo(dimension) {
         const svgElement = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'svg'
         );
 
-        svgElement.setAttribute('height', '45'); // TODO: replace with computed value
-        svgElement.setAttribute('width', '56'); // TODO: replace with computed value
+        const svgLargestDimension = Math.round(dimension * 0.05);
+
+        svgElement.setAttribute(
+          'height',
+          Math.round((45 / 56) * svgLargestDimension).toString()
+        );
+        svgElement.setAttribute('width', svgLargestDimension.toString());
         svgElement.setAttribute('viewBox', '-2 -2 59 48');
         svgElement.setAttribute('fill', 'none');
         const path1 = document.createElementNS(

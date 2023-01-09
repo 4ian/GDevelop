@@ -52,29 +52,60 @@ export const isSameObjectWithContext = (
 export const enumerateObjects = (
   project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  type: ?string = undefined
+  filters: ?{| type?: string, names?: Array<string> |}
 ) => {
-  const filterObject = (object: gdObject): boolean => {
-    return (
-      !type ||
-      gd.getTypeOfObject(project, objectsContainer, object.getName(), false) ===
-        type
-    );
-  };
+  const typeFilter = (filters && filters.type) || null;
+  const namesFilter = (filters && filters.names) || null;
+  const filterObjectByType = typeFilter
+    ? (object: gdObject): boolean => {
+        return (
+          gd.getTypeOfObject(
+            project,
+            objectsContainer,
+            object.getName(),
+            false
+          ) === typeFilter
+        );
+      }
+    : null;
 
-  const containerObjectsList: ObjectWithContextList = mapFor(
+  const filterObjectByName = namesFilter
+    ? (object: gdObject): boolean => {
+        return namesFilter.includes(object.getName());
+      }
+    : null;
+
+  let containerObjectsList: ObjectWithContextList = mapFor(
     0,
     objectsContainer.getObjectsCount(),
-    i => objectsContainer.getObjectAt(i)
+    i => {
+      const object = objectsContainer.getObjectAt(i);
+      if (filterObjectByType && !filterObjectByType(object)) {
+        return null;
+      }
+      if (filterObjectByName && !filterObjectByName(object)) {
+        return null;
+      }
+      return object;
+    }
   )
-    .filter(filterObject)
+    .filter(Boolean)
     .map((object: gdObject): ObjectWithContext => ({ object, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
     project === objectsContainer
       ? []
-      : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i))
-          .filter(filterObject)
+      : mapFor(0, project.getObjectsCount(), i => {
+          const object = project.getObjectAt(i);
+          if (filterObjectByType && !filterObjectByType(object)) {
+            return null;
+          }
+          if (filterObjectByName && !filterObjectByName(object)) {
+            return null;
+          }
+          return object;
+        })
+          .filter(Boolean)
           .map(
             (object: gdObject): ObjectWithContext => ({
               object,

@@ -22,8 +22,53 @@ describe('EnumerateObjects', () => {
     expect(allObjectsList).toHaveLength(21);
   });
 
-  it('can enumerate groups from a project and scene', () => {
+  it('can enumerate objects with a filter on object type', () => {
     const { project, testLayout } = makeTestProject(gd);
+    const countByType = {
+      'Button::PanelSpriteButton': 1,
+      'TextObject::Text': 2,
+      Sprite: 12,
+    };
+    Object.entries(countByType).forEach(([type, count]) => {
+      const { allObjectsList } = enumerateObjects(project, testLayout, {
+        type,
+      });
+
+      expect(allObjectsList).toHaveLength(count);
+    });
+  });
+
+  it('can enumerate objects with a filter on object names', () => {
+    const { project, testLayout } = makeTestProject(gd);
+    const { allObjectsList } = enumerateObjects(project, testLayout, {
+      names: [
+        'MyTiledSpriteObject',
+        'MyParticleEmitter',
+        'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
+        'MyButton',
+      ],
+    });
+
+    expect(allObjectsList).toHaveLength(4);
+  });
+
+  it('can enumerate objects with a filter on both object name and type', () => {
+    const { project, testLayout } = makeTestProject(gd);
+    const { allObjectsList } = enumerateObjects(project, testLayout, {
+      type: 'TiledSpriteObject::TiledSprite',
+      names: [
+        'MyTiledSpriteObject',
+        'MyParticleEmitter',
+        'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
+        'MyButton',
+      ],
+    });
+
+    expect(allObjectsList).toHaveLength(1);
+  });
+
+  it('can enumerate groups from a project and scene', () => {
+    const { testLayout } = makeTestProject(gd);
     const allGroupsList = enumerateGroups(testLayout.getObjectGroups());
 
     expect(allGroupsList).toHaveLength(4);
@@ -86,7 +131,7 @@ describe('EnumerateObjects', () => {
   });
 
   it('can do a case-insensitive search in the lists of groups of objects', () => {
-    const { project, testLayout } = makeTestProject(gd);
+    const { testLayout } = makeTestProject(gd);
     const objectGroupsList: GroupWithContextList = enumerateGroups(
       testLayout.getObjectGroups()
     ).map(group => ({ group, global: false }));

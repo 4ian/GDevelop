@@ -18,14 +18,18 @@ namespace gdjs {
       _authorUsername: string | undefined;
       _isDevEnvironment: boolean;
 
+      _textElement: HTMLSpanElement | null = null;
+
       // Durations in seconds
       _displayDuration: number = 10;
+      _changeTextDelay: number = 5;
       _fadeInDelayAfterGameLoaded: number = 1;
       _fadeDuration: number = 0.6;
 
       // Timeout registration
       _fadeOutTimeout: NodeJS.Timeout | null = null;
       _hideTimeout: NodeJS.Timeout | null = null;
+      _changeTextTimeout: NodeJS.Timeout | null = null;
 
       constructor(
         game: RuntimeGame,
@@ -58,9 +62,9 @@ namespace gdjs {
         const divContainer = this.createDivContainer();
 
         const svgElement = RuntimeWatermark.generateSVGLogo();
-        const textElement = this.createTextElement();
+        this.createTextElement();
         divContainer.appendChild(svgElement);
-        divContainer.appendChild(textElement);
+        if (this._textElement) divContainer.appendChild(this._textElement);
         addTouchAndClickEventListeners(
           divContainer,
           this.openCreatorProfile.bind(this)
@@ -87,6 +91,11 @@ namespace gdjs {
             this._fadeDuration * 1000
           );
         }, (this._fadeInDelayAfterGameLoaded + this._displayDuration) * 1000);
+        this._changeTextTimeout = setTimeout(() => {
+          if (this._textElement)
+            this._textElement.innerText =
+              this._authorUsername || 'Made with GDevelop';
+        }, (this._fadeInDelayAfterGameLoaded + this._changeTextDelay) * 1000);
       }
 
       private openCreatorProfile() {
@@ -96,9 +105,8 @@ namespace gdjs {
       }
 
       private createTextElement() {
-        const textElement = document.createElement('span');
-        textElement.innerText = this._authorUsername || 'Made with GDevelop';
-        return textElement;
+        this._textElement = document.createElement('span');
+        this._textElement.innerText = 'Made with GDevelop';
       }
 
       private createDivContainer() {

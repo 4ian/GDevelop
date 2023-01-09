@@ -25,6 +25,7 @@ class ArbitraryEventsWorkerWithContext;
 class Behavior;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
+class EventsExposer;
 }  // namespace gd
 
 namespace gd {
@@ -62,6 +63,21 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldName,
       const gd::String& newName);
+
+  /**
+   * \brief Refactor the project **before** an events function extension is
+   * renamed.
+   *
+   * \warning Do the renaming of the specified extension after calling this.
+   * This is because the extension is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsFunctionsExtension(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& oldName,
+      const gd::String& newName,
+      const gd::EventsExposer& eventsExposer);
 
   /**
    * \brief Refactor behavior events after the extension was placed in a new

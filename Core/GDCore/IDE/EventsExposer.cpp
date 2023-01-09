@@ -43,11 +43,7 @@ void EventsExposer::ExposeProjectEvents(
     for (auto&& eventsBasedBehavior :
          eventsFunctionsExtension.GetEventsBasedBehaviors()
              .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        worker.Launch(eventsFunction->GetEvents());
-      }
+      ExposeEventsBasedBehaviorEvents(project, *eventsBasedBehavior, worker);
     }
 
     // Add (object) events functions
@@ -117,6 +113,16 @@ void EventsExposer::ExposeProjectEvents(
              .GetInternalVector()) {
       ExposeEventsBasedObjectEvents(project, *eventsBasedObject, worker);
     }
+  }
+}
+
+void EventsExposer::ExposeEventsBasedBehaviorEvents(
+    gd::Project& project,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    gd::ArbitraryEventsWorker& worker) {
+  auto& behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
+  for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
+    worker.Launch(eventsFunction->GetEvents());
   }
 }
 

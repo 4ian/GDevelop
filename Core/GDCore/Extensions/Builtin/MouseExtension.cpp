@@ -27,6 +27,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetCategory("Input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Mouse and touch"))
       .SetIcon("res/actions/mouse24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Multitouch"))
+      .SetIcon("res/conditions/touch24.png");
 
   extension
       .AddCondition(

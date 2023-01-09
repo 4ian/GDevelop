@@ -112,20 +112,23 @@ const hearFromOptions = [
 const teacherOrTrainingCreationGoalOptions = [
   {
     value: 'teach-students',
-    label: `Teach students the principles of Game Development and logic`,
+    label: t`Teach students the principles of Game Development and logic`,
   },
-  { value: 'train-workers', label: `Train workers on specific scenarios` },
-  { value: 'therapy', label: `Develop tools for therapy or rehab` },
-  { value: 'learning-support', label: `Create learning supports for students` },
-  { value: 'other', label: `Other` },
+  { value: 'train-workers', label: t`Train workers on specific scenarios` },
+  { value: 'therapy', label: t`Develop tools for therapy or rehab` },
+  {
+    value: 'learning-support',
+    label: t`Create learning supports for students`,
+  },
+  { value: 'other', label: t`Other` },
 ];
 
 const personalOrStudentCreationGoalOptions = [
-  { value: 'learn-gamedev', label: `Learn Game Development principles` },
-  { value: 'create-fun', label: `Create games for fun` },
-  { value: 'create-community', label: `Create games for my community` },
-  { value: 'create-money', label: `Create games for monetisation` },
-  { value: 'other', label: `Other` },
+  { value: 'learn-gamedev', label: t`Learn Game Development principles` },
+  { value: 'create-fun', label: t`Create games for fun` },
+  { value: 'create-community', label: t`Create games for my community` },
+  { value: 'create-money', label: t`Create games for monetisation` },
+  { value: 'other', label: t`Other` },
 ];
 
 const teamOrCompanySizeOptions = [

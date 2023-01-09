@@ -15,12 +15,17 @@ namespace gdjs {
         | 'right'
         | 'left';
       _showAtStartup: boolean;
-      _displayDuration: number = 10000;
-      _fadeInDelayAfterGameLoaded: number = 1000;
-      _fadeInDuration: number = 0.3;
-      _fadeOutTimeout: NodeJS.Timeout | null = null;
       _authorUsername: string | undefined;
       _isDevEnvironment: boolean;
+
+      // Durations in seconds
+      _displayDuration: number = 10;
+      _fadeInDelayAfterGameLoaded: number = 1;
+      _fadeDuration: number = 0.6;
+
+      // Timeout registration
+      _fadeOutTimeout: NodeJS.Timeout | null = null;
+      _hideTimeout: NodeJS.Timeout | null = null;
 
       constructor(
         game: RuntimeGame,
@@ -68,12 +73,20 @@ namespace gdjs {
             divContainer.style.opacity = '1';
             divContainer.style.pointerEvents = 'all';
             svgElement.classList.add('spinning');
-          }, this._fadeInDelayAfterGameLoaded);
+          }, this._fadeInDelayAfterGameLoaded * 1000);
         });
         this._fadeOutTimeout = setTimeout(() => {
           divContainer.style.opacity = '0';
-          divContainer.style.pointerEvents = 'none';
-        }, this._displayDuration);
+          this._hideTimeout = setTimeout(
+            () => {
+              divContainer.style.pointerEvents = 'none';
+              divContainer.style.display = 'none';
+            },
+            // Deactivate all interaction possibilities with watermark at
+            // the end of the animation to make sure it doesn't deactivate too early
+            this._fadeDuration * 1000
+          );
+        }, (this._fadeInDelayAfterGameLoaded + this._displayDuration) * 1000);
       }
 
       private openCreatorProfile() {
@@ -207,7 +220,7 @@ namespace gdjs {
           cursor: pointer;
           align-items: center;
           transition-property: opacity;
-          transition-duration: ${this._fadeInDuration}s;
+          transition-duration: ${this._fadeDuration}s;
           transition-timing-function: ease-out;
         }
 

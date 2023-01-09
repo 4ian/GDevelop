@@ -18,7 +18,8 @@ namespace gdjs {
       _authorUsername: string | undefined;
       _isDevEnvironment: boolean;
 
-      _textElement: HTMLSpanElement | null = null;
+      _usernameTextElement: HTMLSpanElement | null = null;
+      _madeWithTextElement: HTMLSpanElement | null = null;
 
       // Durations in seconds
       _displayDuration: number = 10;
@@ -29,7 +30,10 @@ namespace gdjs {
       // Timeout registration
       _fadeOutTimeout: NodeJS.Timeout | null = null;
       _hideTimeout: NodeJS.Timeout | null = null;
-      _changeTextTimeout: NodeJS.Timeout | null = null;
+      _fadeOutFirstTextTimeout: NodeJS.Timeout | null = null;
+      _fadeInSecondTextTimeout: NodeJS.Timeout | null = null;
+
+      _textFontSize: number = 14;
 
       constructor(
         game: RuntimeGame,
@@ -58,22 +62,30 @@ namespace gdjs {
         }
       }
 
+      private updateFontSize(dimension: number) {
+        this._textFontSize = 0.0125 * dimension;
+      }
+
       private addWatermarkToGameContainer(container: HTMLElement) {
         const gameContainerRectangle = container.getBoundingClientRect();
-
         const gameViewportLargestDimension = Math.max(
           gameContainerRectangle.height,
           gameContainerRectangle.width
         );
+        this.updateFontSize(gameViewportLargestDimension);
 
         const divContainer = this.createDivContainer();
 
         const svgElement = RuntimeWatermark.generateSVGLogo(
           gameViewportLargestDimension
         );
-        this.createTextElement(gameViewportLargestDimension);
+        this.createMadeWithTextElement();
+        this.createUsernameTextElement();
         divContainer.appendChild(svgElement);
-        if (this._textElement) divContainer.appendChild(this._textElement);
+        if (this._madeWithTextElement)
+          divContainer.appendChild(this._madeWithTextElement);
+        if (this._usernameTextElement)
+          divContainer.appendChild(this._usernameTextElement);
         addTouchAndClickEventListeners(
           divContainer,
           this.openCreatorProfile.bind(this)
@@ -100,10 +112,19 @@ namespace gdjs {
             this._fadeDuration * 1000
           );
         }, (this._fadeInDelayAfterGameLoaded + this._displayDuration) * 1000);
-        this._changeTextTimeout = setTimeout(() => {
-          if (this._textElement)
-            this._textElement.innerText =
-              this._authorUsername || 'Made with GDevelop';
+
+        this._fadeOutFirstTextTimeout = setTimeout(() => {
+          const { _madeWithTextElement, _usernameTextElement } = this;
+          if (!_madeWithTextElement) return;
+          // Do not hide madeWith text if there is no author username to display.
+          if (_usernameTextElement) {
+            _madeWithTextElement.style.opacity = '0';
+            this._fadeInSecondTextTimeout = setTimeout(() => {
+              _usernameTextElement.style.lineHeight = `${this._textFontSize}px`;
+              _usernameTextElement.style.opacity = '1';
+              _madeWithTextElement.style.lineHeight = '0';
+            }, this._fadeDuration * 1000);
+          }
         }, (this._fadeInDelayAfterGameLoaded + this._changeTextDelay) * 1000);
       }
 
@@ -113,14 +134,19 @@ namespace gdjs {
         this._gameRenderer.openURL(targetUrl);
       }
 
-      /**
-       * @param {number} dimension
-       * @returns
-       */
-      private createTextElement(dimension) {
-        this._textElement = document.createElement('span');
-        this._textElement.innerText = 'Made with GDevelop';
-        this._textElement.style.fontSize = `${0.0125 * dimension}px`;
+      private createMadeWithTextElement() {
+        this._madeWithTextElement = document.createElement('span');
+        this._madeWithTextElement.innerText = 'Made with GDevelop';
+        this._madeWithTextElement.style.fontSize = `${this._textFontSize}px`;
+      }
+
+      private createUsernameTextElement() {
+        if (!this._authorUsername) return;
+        this._usernameTextElement = document.createElement('span');
+        this._usernameTextElement.innerText = `@${this._authorUsername}`;
+        this._usernameTextElement.style.fontSize = `${this._textFontSize}px`;
+        this._usernameTextElement.style.opacity = '0';
+        this._usernameTextElement.style.lineHeight = '0';
       }
 
       private createDivContainer() {
@@ -197,12 +223,10 @@ namespace gdjs {
           'http://www.w3.org/2000/svg',
           'path'
         );
-        path1.setAttribute('fill', '#c5adff'); // TODO: replace with predefined value
         path1.setAttribute(
           'd',
           'M29.3447 33C25.1061 33 21.0255 31.8475 17.4207 29.3381C14.9081 27.5897 12 23.6418 12 16.9488C12 4.53178 18.3074 0 30.9827 0H53.8027L56 7.07232H32.7217C24.3558 7.07232 19.3813 7.72835 19.3813 16.9488C19.3813 19.9944 20.2354 22.1618 21.9933 23.574C24.9642 25.9612 30.7388 26.0628 34.2673 25.7208C34.2673 25.7208 35.715 21.0394 35.9534 20.2794C36.2327 19.3888 36.1104 19.1763 35.2392 19.1763C33.9808 19.1763 31.7185 19.1763 29.3175 19.1763C27.6349 19.1763 25.9818 18.3247 25.9818 16.2793C25.9818 14.3039 27.5198 13.1573 29.6281 13.1573C33.2786 13.1573 40.7969 13.1573 42.2041 13.1573C44.0489 13.1573 45.9315 13.4233 44.971 16.3601L39.8842 31.8734C39.8845 31.8738 35.7287 33 29.3447 33Z'
         );
-        path2.setAttribute('fill', '#c5adff'); // TODO: replace with predefined value
         path2.setAttribute(
           'd',
           'M43.3039 35.3278C40.7894 37.1212 37.0648 38.1124 30.7449 38.1124C19.852 38.1124 11.8797 34.1251 8.62927 26.3952C7.0925 22.7415 7.24041 18.6005 7.24041 13H0.00129513C0.00129513 18.9056 -0.0984386 23.5361 1.45249 27.8011C5.51933 38.989 15.992 45 30.0606 45C43.6783 45 49.3213 41.0443 53 35.3278H43.3039Z'
@@ -214,9 +238,9 @@ namespace gdjs {
 
       private addStyle() {
         const styleElement = document.createElement('style');
-        const idleOpacity = 0.7;
+        const idleColor = '#7046EC';
+        const hoveredColor = '#4F28CD';
         const hoverTransitionDuration = 0.2;
-        const usernameFontSize = 14;
         styleElement.innerHTML = `
         @keyframes spin {
           0% {
@@ -257,7 +281,9 @@ namespace gdjs {
 
         #watermark span {
           font-family: 'Tahoma', 'Gill sans', 'Helvetica', 'Arial';
-          font-size: ${usernameFontSize}px;
+          font-size: ${this._textFontSize}px;
+          transition-property: opacity;
+          transition-duration: ${this._fadeDuration}s;
         }
 
         #watermark svg.spinning {
@@ -269,20 +295,18 @@ namespace gdjs {
         }
 
         #watermark svg path {
-          stroke: #666666;
+          stroke: #FAFAFA;
           stroke-width: 1px;
-          fill-opacity: ${idleOpacity};
+          fill: ${idleColor};
           stroke-linecap: round;
-          transition-property: stroke-width, stroke, color;
+          transition-property: fill;
           transition-duration: ${hoverTransitionDuration}s;
         }
 
         @media (hover: hover) {
           #watermark:hover svg path {
-            stroke: #444444;
-            stroke-width: 2px;
-            fill-opacity: 1;
-            transition-property: stroke-width, stroke, color;
+            fill: ${hoveredColor};
+            transition-property: fill;
             transition-duration: ${hoverTransitionDuration}s;
           }
         }

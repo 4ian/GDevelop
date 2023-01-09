@@ -25,10 +25,14 @@ export type Profile = {|
   getNewsletterEmail: boolean,
   isCreator: boolean,
   isPlayer: boolean,
-  hearFrom?: string,
-  gdevelopUsage?: string,
-  creationExperience?: string,
   donateLink: ?string,
+
+  gdevelopUsage?: string,
+  teamOrCompanySize?: string,
+  companyName?: string,
+  creationExperience?: string,
+  creationGoal?: string,
+  hearFrom?: string,
 |};
 
 export type LoginForm = {|
@@ -48,9 +52,12 @@ export type RegisterForm = {|
 |};
 
 export type AdditionalUserInfoForm = {|
-  hearFrom?: string,
-  creationExperience?: string,
   gdevelopUsage?: string,
+  teamOrCompanySize?: string,
+  companyName?: string,
+  creationExperience?: string,
+  creationGoal?: string,
+  hearFrom?: string,
 |};
 
 export type EditForm = {|
@@ -296,10 +303,13 @@ export default class Authentication {
       getNewsletterEmail,
       appLanguage,
       isCreator,
-      hearFrom,
-      gdevelopUsage,
-      creationExperience,
       donateLink,
+      gdevelopUsage,
+      teamOrCompanySize,
+      companyName,
+      creationExperience,
+      creationGoal,
+      hearFrom,
     }: {
       username?: string,
       description?: string,
@@ -307,10 +317,13 @@ export default class Authentication {
       getNewsletterEmail?: boolean,
       appLanguage?: string,
       isCreator?: boolean,
-      hearFrom?: string,
-      gdevelopUsage?: string,
-      creationExperience?: string,
       donateLink?: string,
+      gdevelopUsage?: string,
+      teamOrCompanySize?: string,
+      companyName?: string,
+      creationExperience?: string,
+      creationGoal?: string,
+      hearFrom?: string,
     }
   ) => {
     const { currentUser } = this.auth;
@@ -328,10 +341,13 @@ export default class Authentication {
             getNewsletterEmail,
             appLanguage,
             isCreator,
-            hearFrom,
-            gdevelopUsage,
-            creationExperience,
             donateLink,
+            gdevelopUsage,
+            teamOrCompanySize,
+            companyName,
+            creationExperience,
+            creationGoal,
+            hearFrom,
           },
           {
             params: {

@@ -86,7 +86,10 @@ type Props = {|
   onEventsBasedBehaviorRenamed: (
     eventsBasedBehavior: gdEventsBasedBehavior
   ) => void,
-  onEventsBasedBehaviorPasted:(eventsBasedBehavior: gdEventsBasedBehavior, sourceExtensionName) => void,
+  onEventsBasedBehaviorPasted: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    sourceExtensionName: string
+  ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
@@ -253,13 +256,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
     newEventsBasedBehavior.setName(newName);
 
-    const sourceExtensionName = SafeExtractor.extractStringProperty(clipboardContent, 'extensionName');
-    this.props.onEventsBasedBehaviorPasted(newEventsBasedBehavior, sourceExtensionName);
-
-    this.props.onEventsBasedBehaviorPasted(
-      newEventsBasedBehavior,
-      sourceExtensionName
+    const sourceExtensionName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'extensionName'
     );
+    if (sourceExtensionName) {
+      this.props.onEventsBasedBehaviorPasted(
+        newEventsBasedBehavior,
+        sourceExtensionName
+      );
+    }
 
     this._onEventsBasedBehaviorModified();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);

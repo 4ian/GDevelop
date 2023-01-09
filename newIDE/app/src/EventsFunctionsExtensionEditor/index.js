@@ -604,13 +604,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _onEventsBasedBehaviorPasted = (
     eventsBasedBehavior: gdEventsBasedBehavior,
-    sourceExtensionName: string,
+    sourceExtensionName: string
   ) => {
-    if (this.props.eventsBasedExtension.getName() === sourceExtensionName) {
+    const { project, eventsFunctionsExtension } = this.props;
+    if (eventsFunctionsExtension.getName() === sourceExtensionName) {
       return;
     }
-
-    const { project, eventsFunctionsExtension } = this.props;
     gd.WholeProjectRefactorer.updateExtensionNameInEventsBasedBehavior(
       project,
       eventsFunctionsExtension,

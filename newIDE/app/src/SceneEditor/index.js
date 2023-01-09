@@ -543,12 +543,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     const { project, layout } = this.props;
-    const instancesNames = uniq(
+    const instancesObjectNames = uniq(
       instances.map(instance => instance.getObjectName())
     );
 
     const selectedObjectsWithContext = enumerateObjects(project, layout, {
-      names: instancesNames,
+      names: instancesObjectNames,
     }).allObjectsList;
 
     this.setState(

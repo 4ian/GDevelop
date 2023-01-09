@@ -8,7 +8,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons//CheckCircle';
 
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
@@ -157,18 +157,28 @@ const FeedbackCard = ({
                       )}
                     </Text>
                   )}
-                  <BackgroundText style={styles.backgroundText} allowSelection>
-                    {comment.playerId ? (
-                      <Link
-                        onClick={() => setOpenPlayerPublicProfileDialog(true)}
-                        href="#"
-                      >
+                  {comment.playerId ? (
+                    <Link
+                      onClick={() => setOpenPlayerPublicProfileDialog(true)}
+                      href="#"
+                    >
+                      <Text noMargin color="inherit">
                         {comment.playerName || 'Anonymous player'}
-                      </Link>
-                    ) : (
-                      comment.playerName || 'Anonymous player'
-                    )}
-                  </BackgroundText>
+                      </Text>
+                    </Link>
+                  ) : (
+                    <BackgroundText style={styles.backgroundText}>
+                      {comment.playerName || 'Anonymous player'}
+                    </BackgroundText>
+                  )}
+                  {comment.contact && (
+                    <LineStackLayout alignItems="center" noMargin>
+                      <BackgroundText style={styles.backgroundText}>
+                        <Trans>Contact:</Trans>
+                      </BackgroundText>
+                      <Text allowSelection>{comment.contact}</Text>
+                    </LineStackLayout>
+                  )}
                 </Column>
               </Line>
               <Spacer />

@@ -5,7 +5,10 @@ import { t } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { type AdditionalUserInfoForm } from '../Utils/GDevelopServices/Authentication';
+import {
+  type AdditionalUserInfoForm,
+  type Profile,
+} from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
@@ -144,12 +147,70 @@ const teamOrCompanySizeOptions = [
 const COMPANY_NAME_MAX_LENGTH = 60;
 
 type Props = {|
+  profile: Profile,
   onClose: () => void,
   onSaveAdditionalUserInfo: (form: AdditionalUserInfoForm) => Promise<void>,
   updateInProgress: boolean,
 |};
 
+const shouldAskAboutCompany = ({
+  gdevelopUsage,
+}: {|
+  gdevelopUsage: ?string,
+|}) => {
+  return (
+    gdevelopUsage === 'teacher' ||
+    gdevelopUsage === 'work-marketing' ||
+    gdevelopUsage === 'work-gamedev' ||
+    gdevelopUsage === 'work-other'
+  );
+};
+
+const shouldAskAboutCreationGoal = ({
+  gdevelopUsage,
+}: {|
+  gdevelopUsage: ?string,
+|}) => {
+  return (
+    !gdevelopUsage ||
+    gdevelopUsage === 'personal' ||
+    gdevelopUsage === 'student' ||
+    gdevelopUsage === 'teacher'
+  );
+};
+
+export const shouldAskForAdditionalUserInfo = (profile: Profile) => {
+  const {
+    gdevelopUsage,
+    teamOrCompanySize,
+    companyName,
+    creationExperience,
+    creationGoal,
+    hearFrom,
+  } = profile;
+
+  if (shouldAskAboutCompany({ gdevelopUsage })) {
+    // If a company is asked for this usage, ensure the user enters information
+    // about the company name and size - as it's important to know professionals
+    // using GDevelop.
+    if (!teamOrCompanySize || !companyName) return true;
+  }
+
+  if (shouldAskAboutCreationGoal({ gdevelopUsage })) {
+    // If the creation goal is asked for this usage, ensure the user enters
+    // information about their goal - as it's important to know why people are
+    // using GDevelop.
+    if (!creationGoal) return true;
+  }
+
+  // Otherwise, only ask if no information is entered for all the other fields.
+  if (!hearFrom && !gdevelopUsage && !creationExperience) return true;
+
+  return false;
+};
+
 const AdditionalUserInfoDialog = ({
+  profile,
   onClose,
   onSaveAdditionalUserInfo,
   updateInProgress,
@@ -160,14 +221,24 @@ const AdditionalUserInfoDialog = ({
     InAppTutorialContext
   );
 
-  const [gdevelopUsage, setGdevelopUsage] = React.useState<string>('');
-  const [teamOrCompanySize, setTeamOrCompanySize] = React.useState<string>('');
-  const [companyName, setCompanyName] = React.useState<string>('');
-  const [creationExperience, setCreationExperience] = React.useState<string>(
-    ''
+  const [gdevelopUsage, setGdevelopUsage] = React.useState<string>(
+    profile.gdevelopUsage || ''
   );
-  const [creationGoal, setCreationGoal] = React.useState<string>('');
-  const [hearFrom, setHearFrom] = React.useState<string>('');
+  const [teamOrCompanySize, setTeamOrCompanySize] = React.useState<string>(
+    profile.teamOrCompanySize || ''
+  );
+  const [companyName, setCompanyName] = React.useState<string>(
+    profile.companyName || ''
+  );
+  const [creationExperience, setCreationExperience] = React.useState<string>(
+    profile.creationExperience || ''
+  );
+  const [creationGoal, setCreationGoal] = React.useState<string>(
+    profile.creationGoal || ''
+  );
+  const [hearFrom, setHearFrom] = React.useState<string>(
+    profile.hearFrom || ''
+  );
 
   const doSendAdditionalInfos = () => {
     if (updateInProgress) return;
@@ -203,30 +274,22 @@ const AdditionalUserInfoDialog = ({
       title: <Trans>What are you using GDevelop for?</Trans>,
       options: gdevelopUsageOptions,
     },
-    teamOrCompanySize:
-      gdevelopUsage === 'teacher' ||
-      gdevelopUsage === 'work-marketing' ||
-      gdevelopUsage === 'work-gamedev' ||
-      gdevelopUsage === 'work-other'
-        ? {
-            title: <Trans>Company or Team size</Trans>,
-            options: teamOrCompanySizeOptions,
-          }
-        : undefined,
-    companyName:
-      gdevelopUsage === 'teacher' ||
-      gdevelopUsage === 'work-marketing' ||
-      gdevelopUsage === 'work-gamedev' ||
-      gdevelopUsage === 'work-other'
-        ? {
-            title:
-              gdevelopUsage === 'teacher' ? (
-                <Trans>Company, University or School name</Trans>
-              ) : (
-                <Trans>Company name</Trans>
-              ),
-          }
-        : undefined,
+    teamOrCompanySize: shouldAskAboutCompany({ gdevelopUsage })
+      ? {
+          title: <Trans>Company or Team size</Trans>,
+          options: teamOrCompanySizeOptions,
+        }
+      : undefined,
+    companyName: shouldAskAboutCompany({ gdevelopUsage })
+      ? {
+          title:
+            gdevelopUsage === 'teacher' ? (
+              <Trans>Company, University or School name</Trans>
+            ) : (
+              <Trans>Company name</Trans>
+            ),
+        }
+      : undefined,
     creationExperience: {
       title: <Trans>What kind of game engines have you used before?</Trans>,
       options: creationExperienceOptions,

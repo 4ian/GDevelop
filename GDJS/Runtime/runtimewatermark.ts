@@ -4,7 +4,9 @@ namespace gdjs {
   export namespace watermark {
     export class RuntimeWatermark {
       _gameRenderer: RuntimeGameRenderer;
-      _margin = '10px';
+      _isDevEnvironment: boolean;
+
+      // Configuration
       _placement:
         | 'top-left'
         | 'top-right'
@@ -16,14 +18,14 @@ namespace gdjs {
         | 'left';
       _showAtStartup: boolean;
       _authorUsername: string | undefined;
-      _isDevEnvironment: boolean;
 
-      _resizeObserver: ResizeObserver | null = null;
-
+      // Dom elements
       _watermarkContainerElement: HTMLDivElement | null = null;
       _svgElement: SVGElement | null = null;
       _usernameTextElement: HTMLSpanElement | null = null;
       _madeWithTextElement: HTMLSpanElement | null = null;
+
+      _resizeObserver: ResizeObserver | null = null;
 
       // Durations in seconds
       _displayDuration: number = 10;
@@ -37,9 +39,11 @@ namespace gdjs {
       _fadeOutFirstTextTimeout: NodeJS.Timeout | null = null;
       _fadeInSecondTextTimeout: NodeJS.Timeout | null = null;
 
+      // Sizes
       _textFontSize: number = 14;
       _logoWidth: number = 56;
       _logoHeight: number = 45;
+      _margin = '10px';
 
       constructor(
         game: RuntimeGame,

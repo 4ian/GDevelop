@@ -2982,7 +2982,7 @@ storiesOf('ProjectPropertiesDialog', module)
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
-  .addDecorator(getPaperDecorator("medium"))
+  .addDecorator(getPaperDecorator('medium'))
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor

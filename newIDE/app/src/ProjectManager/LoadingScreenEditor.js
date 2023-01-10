@@ -175,7 +175,8 @@ export const LoadingScreenEditor = ({
             {shouldDisplayGetSubscriptionCard && (
               <GetSubscriptionCard subscriptionDialogOpeningReason="Disable GDevelop splash at startup">
                 <Text>
-                  Get a silver or gold subscription to disable GDevelop branding.
+                  Get a silver or gold subscription to disable GDevelop
+                  branding.
                 </Text>
               </GetSubscriptionCard>
             )}

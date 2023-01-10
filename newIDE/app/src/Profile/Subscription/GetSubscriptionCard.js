@@ -26,9 +26,9 @@ const styles = {
 type Props = {|
   children: React.Node,
   subscriptionDialogOpeningReason: SubscriptionDialogDisplayReason,
-  |}
+|};
 
-const GetSubscriptionCard = (props:Props) => {
+const GetSubscriptionCard = (props: Props) => {
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );

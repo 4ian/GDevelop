@@ -121,6 +121,63 @@ namespace gdjs {
       };
 
       /**
+       * Return a new string with the content of `str` where the first occurrence of `pattern`
+       * is replaced by `replacement`.
+       */
+      export const strReplaceOne = function (
+        str: string,
+        pattern: string,
+        replacement: string
+      ) {
+        return str.replace(pattern, replacement);
+      };
+
+      /**
+       * Return a new string with the content of `str` where all occurrences of `pattern`
+       * are replaced by `replacement`.
+       */
+      export const strReplaceAll = function (
+        str: string,
+        pattern: string,
+        replacement: string
+      ) {
+        let updatedStr = str;
+        let searchStartPosition = 0;
+
+        let patternPosition = updatedStr.indexOf(pattern, searchStartPosition);
+        while (patternPosition !== -1) {
+          // Replace the pattern by the replacement.
+          updatedStr =
+            updatedStr.substring(0, patternPosition) +
+            replacement +
+            updatedStr.substring(
+              patternPosition + pattern.length,
+              updatedStr.length
+            );
+
+          // Start the search again after the replacement.
+          // If the pattern to search is empty, add 1 because an empty pattern means that every "empty
+          // space" between each character will be matched. If we don't add 1, we would match again the
+          // "empty space" just after where we added the remplacement.
+          searchStartPosition =
+            patternPosition +
+            replacement.length +
+            (pattern.length === 0 ? 1 : 0);
+
+          // An empty string `indexOf` will return 0 when the pattern is an empty string,
+          // even if `searchStartPosition` is *after* the end of the string.
+          // So bail out manually.
+          // Note that if we are just at the end of the string (`searchStartPosition === updatedStr.length`),
+          // it's still valid to do a search because if the pattern is an empty string,
+          // it should match the "empty space" which is at the very end.
+          if (searchStartPosition > updatedStr.length) break;
+          patternPosition = updatedStr.indexOf(pattern, searchStartPosition);
+        }
+
+        return updatedStr;
+      };
+
+      /**
        * @deprecated
        */
       export const strRFindFrom = gdjs.evtTools.string.strFindLastFrom;

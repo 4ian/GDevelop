@@ -183,6 +183,26 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                     _("Position of the last character in the string to be "
                       "considered in the search"));
 
+  extension
+      .AddStrExpression("StrReplaceOne",
+                        _("Replace the first occurrence of a text by another."),
+                        _("Replace the first occurrence of a text by another."),
+                        "",
+                        "res/conditions/toujours24_black.png")
+      .AddParameter("string", _("Text in which the replacement must be done"))
+      .AddParameter("string", _("Text to find inside the first text"))
+      .AddParameter("string", _("Replacement to put instead of the text to find"));
+
+  extension
+      .AddStrExpression("StrReplaceAll",
+                        _("Replace all occurrences of a text by another."),
+                        _("Replace all occurrences of a text by another."),
+                        "",
+                        "res/conditions/toujours24_black.png")
+      .AddParameter("string", _("Text in which the replacement(s) must be done"))
+      .AddParameter("string", _("Text to find inside the first text"))
+      .AddParameter("string", _("Replacement to put instead of the text to find"));
+
 }
 
 }  // namespace gd

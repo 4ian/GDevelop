@@ -202,4 +202,14 @@ export default class RenderedSpriteInstance extends RenderedInstance {
   getDefaultHeight(): number {
     return Math.abs(this._pixiObject.texture.frame.height);
   }
+
+  getCenterX(): number {
+    if (!this._sprite || !this._pixiObject) return 0;
+    return this._centerX * this._pixiObject.scale.x;
+  }
+
+  getCenterY(): number {
+    if (!this._sprite || !this._pixiObject) return 0;
+    return this._centerY * this._pixiObject.scale.y;
+  }
 }

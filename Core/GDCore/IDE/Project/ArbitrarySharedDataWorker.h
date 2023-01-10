@@ -33,7 +33,7 @@ class GD_CORE_API ArbitrarySharedDataWorker {
   virtual ~ArbitrarySharedDataWorker();
 
   /**
-   * \brief Launch the worker on the specified function container.
+   * \brief Launch the worker on the specified shared data.
    */
   void Launch(const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>& sharedDatas) { VisitSharedDatas(sharedDatas); };
 
@@ -42,12 +42,12 @@ class GD_CORE_API ArbitrarySharedDataWorker {
   void VisitSharedData(gd::BehaviorsSharedData& behavior);
 
   /**
-   * Called to do some work on an function container.
+   * Called to do some work on shared data.
    */
   virtual void DoVisitSharedDatas(const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>& sharedDatas){};
 
   /**
-   * Called to do some work on a function.
+   * Called to do some work on a shared data.
    */
   virtual void DoVisitSharedData(gd::BehaviorsSharedData& sharedData){};
 };

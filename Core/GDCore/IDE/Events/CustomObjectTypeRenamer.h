@@ -8,13 +8,10 @@
 #define GDCORE_CUSTOMOBJECTTYPERENAMER_H
 #include <set>
 
-#include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
-#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 #include "GDCore/String.h"
 
 namespace gd {
-class Project;
 class Object;
 class Behavior;
 }  // namespace gd

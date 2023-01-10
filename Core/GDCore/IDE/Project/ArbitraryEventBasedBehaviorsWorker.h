@@ -22,7 +22,7 @@ namespace gd {
 
 /**
  * \brief ArbitraryFunctionsWorker is an abstract class used to browse
- * event-based behavior and do some work on them. It can be used to implement
+ * event-based behaviors and do some work on them. It can be used to implement
  * refactoring for example.
  *
  * \ingroup IDE
@@ -33,12 +33,12 @@ class GD_CORE_API ArbitraryEventBasedBehaviorsWorker {
   virtual ~ArbitraryEventBasedBehaviorsWorker();
 
   /**
-   * \brief Launch the worker on the specified function container.
+   * \brief Launch the worker on the specified event-based behaviors.
    */
   void Launch(gd::SerializableWithNameList<gd::EventsBasedBehavior>& behaviors) { VisitEventBasedBehaviors(behaviors); };
 
   /**
-   * \brief Launch the worker on the specified function container.
+   * \brief Launch the worker on the specified event-based behavior.
    */
   void Launch(EventsBasedBehavior& behavior) { VisitEventBasedBehavior(behavior); };
 
@@ -47,16 +47,16 @@ class GD_CORE_API ArbitraryEventBasedBehaviorsWorker {
   void VisitEventBasedBehavior(gd::EventsBasedBehavior& behavior);
 
   /**
-   * Called to do some work on an function container.
+   * Called to do some work on event-based behaviors.
    */
   virtual void DoVisitEventBasedBehaviors(gd::SerializableWithNameList<gd::EventsBasedBehavior>& behaviors){};
 
   /**
-   * Called to do some work on a function.
+   * Called to do some work on an event-based behavior.
    */
   virtual void DoVisitEventBasedBehavior(gd::EventsBasedBehavior& behavior){};
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_ARBITRARYFUNCTIONSWORKER_H
+#endif  // GDCORE_ARBITRARYEVENTBASEDBEHAVIORSWORKER_H

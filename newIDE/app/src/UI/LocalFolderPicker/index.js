@@ -8,9 +8,14 @@ import * as React from 'react';
 import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
 import FlatButton from '../FlatButton';
+import IconButton from '../IconButton';
+import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
+const app = remote ? remote.app : null;
 
 const styles = {
   container: {
@@ -72,6 +77,12 @@ const LocalFolderPicker = ({
     onChange(textValue);
   };
 
+  const resetToDefault = () => {
+    const filePath = findDefaultFolder(app);
+    onChange(filePath);
+    setTextValue(filePath);
+  };
+
   const getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
     if (type === 'export') {
       return {
@@ -111,6 +122,20 @@ const LocalFolderPicker = ({
               onChange={(event, value) => setTextValue(value)}
               onBlur={onBlur}
             />
+            {type === 'default-workspace' && (
+              <div
+                style={{
+                  marginLeft: '8px',
+                }}
+              >
+                <IconButton
+                  onClick={() => resetToDefault()}
+                  tooltip={t`Reset to default`}
+                >
+                  <RotateLeftIcon />
+                </IconButton>
+              </div>
+            )}
             <FlatButton
               label={<Trans>Choose folder</Trans>}
               style={styles.button}

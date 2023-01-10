@@ -18,6 +18,7 @@ import {
   DoneFooter,
 } from '../GenericExporters/CordovaExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { toNewGdMapStringString } from '../../Utils/MapStringString';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -107,15 +108,22 @@ export const localCordovaExportPipeline: ExportPipeline<
 
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, localFileSystem }: PreparedExporter
+    { exporter, localFileSystem }: PreparedExporter,
+    projectPropertiesFallback: { [key: string]: string }
   ): Promise<ExportOutput> => {
+    const projectPropertiesFallbackMap = toNewGdMapStringString(
+      projectPropertiesFallback
+    );
+
     const exportOptions = new gd.MapStringBoolean();
     exportOptions.set('exportForCordova', true);
     exporter.exportWholePixiProject(
       context.project,
       context.exportState.outputDir,
-      exportOptions
+      exportOptions,
+      projectPropertiesFallbackMap
     );
+    projectPropertiesFallbackMap.delete();
     exportOptions.delete();
     exporter.delete();
 

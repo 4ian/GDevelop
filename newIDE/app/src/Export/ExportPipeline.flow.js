@@ -59,7 +59,8 @@ export type ExportPipeline<
 
   launchExport: (
     context: ExportPipelineContext<ExportState>,
-    preparedExporter: PreparedExporter
+    preparedExporter: PreparedExporter,
+    projectPropertiesFallback: { [key: string]: string }
   ) => Promise<ExportOutput>,
 
   launchResourcesDownload: (

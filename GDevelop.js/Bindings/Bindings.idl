@@ -3151,7 +3151,7 @@ interface Exporter {
     void SetCodeOutputDirectory([Const] DOMString path);
 
     boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
-    boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions);
+    boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions, [Ref] MapStringString projectPropertiesFallback);
 
     [Const, Ref] DOMString GetLastError();
 };

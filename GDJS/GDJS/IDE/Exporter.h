@@ -17,7 +17,9 @@ class Layout;
 class ExternalLayout;
 class AbstractFileSystem;
 }  // namespace gd
-namespace gdjs { struct PreviewExportOptions; }
+namespace gdjs {
+struct PreviewExportOptions;
+}
 
 namespace gdjs {
 
@@ -45,9 +47,11 @@ class Exporter {
    *
    * Called by ShowProjectExportDialog if the user clicked on Ok.
    */
-  bool ExportWholePixiProject(gd::Project& project,
-                              gd::String exportDir,
-                              std::map<gd::String, bool>& exportOptions);
+  bool ExportWholePixiProject(
+      gd::Project& project,
+      gd::String exportDir,
+      std::map<gd::String, bool>& exportOptions,
+      std::map<gd::String, gd::String>& projectPropertiesFallback);
 
   /**
    * \brief Return the error that occurred during the last export.

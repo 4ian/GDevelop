@@ -22,6 +22,7 @@ import {
   SetupExportHeader,
 } from '../GenericExporters/OnlineElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { toNewGdMapStringString } from '../../Utils/MapStringString';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -105,15 +106,21 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter
+    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter,
+    projectPropertiesFallback: { [key: string]: string }
   ): Promise<ExportOutput> => {
+    const projectPropertiesFallbackMap = toNewGdMapStringString(
+      projectPropertiesFallback
+    );
     const exportOptions = new gd.MapStringBoolean();
     exportOptions.set('exportForElectron', true);
     exporter.exportWholePixiProject(
       context.project,
       temporaryOutputDir,
-      exportOptions
+      exportOptions,
+      projectPropertiesFallbackMap
     );
+    projectPropertiesFallbackMap.delete();
     exportOptions.delete();
     exporter.delete();
 

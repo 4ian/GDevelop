@@ -53,14 +53,19 @@ bool Exporter::ExportProjectForPixiPreview(
 bool Exporter::ExportWholePixiProject(
     gd::Project &project,
     gd::String exportDir,
-    std::map<gd::String, bool> &exportOptions) {
+    std::map<gd::String, bool> &exportOptions,
+    std::map<gd::String, gd::String> &projectPropertiesFallback) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   gd::Project exportedProject = project;
 
   auto usedExtensionsResult = gd::UsedExtensionsFinder::ScanProject(project);
-  auto& usedExtensions = usedExtensionsResult.GetUsedExtensions();
+  auto &usedExtensions = usedExtensionsResult.GetUsedExtensions();
 
-  auto exportProject = [this, &exportedProject, &exportOptions, &helper,
+  auto exportProject = [this,
+                        &exportedProject,
+                        &exportOptions,
+                        &projectPropertiesFallback,
+                        &helper,
                         &usedExtensionsResult](gd::String exportDir) {
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
@@ -70,6 +75,22 @@ bool Exporter::ExportWholePixiProject(
     if (exportForFacebookInstantGames) {
       exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
       exportedProject.GetWatermark().ShowGDevelopWatermark(false);
+    }
+
+    // Use project properties fallback to set empty properties
+    if (exportedProject.GetAuthorIds().empty() &&
+        projectPropertiesFallback.find("authorId") !=
+            projectPropertiesFallback.end()) {
+      exportedProject.GetAuthorIds().push_back(
+          projectPropertiesFallback["authorId"]);
+    }
+    if (exportedProject.GetAuthorUsernames().empty() &&
+        projectPropertiesFallback.find("authorUsername") !=
+            projectPropertiesFallback.end()) {
+      gd::String authorUsername = projectPropertiesFallback["authorUsername"];
+      if (!authorUsername.empty()) {
+        exportedProject.GetAuthorUsernames().push_back(authorUsername);
+      }
     }
 
     // Prepare the export directory

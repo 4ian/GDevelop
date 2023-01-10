@@ -121,6 +121,46 @@ namespace gdjs {
       };
 
       /**
+       * Return a new string with the content of `str` where the first occurrence of `pattern`
+       * is replaced by `replacement`.
+       */
+      export const strReplaceOne = function (
+        str: string,
+        pattern: string,
+        replacement: string
+      ) {
+        return str.replace(pattern, replacement);
+      };
+
+      /**
+       * Return a new string with the content of `str` where all occurrences of `pattern`
+       * are replaced by `replacement`.
+       */
+      export const strReplaceAll = function (
+        str: string,
+        pattern: string,
+        replacement: string
+      ) {
+        let updatedStr = str;
+        let searchStartPosition = 0;
+        let patternPosition = str.indexOf(pattern, searchStartPosition);
+        while (patternPosition !== -1) {
+          updatedStr =
+            updatedStr.substring(0, patternPosition) +
+            replacement +
+            updatedStr.substring(
+              patternPosition + replacement.length,
+              updatedStr.length
+            );
+
+          searchStartPosition = patternPosition + replacement.length + 1;
+          patternPosition = str.indexOf(pattern, searchStartPosition);
+        }
+
+        return updatedStr;
+      };
+
+      /**
        * @deprecated
        */
       export const strRFindFrom = gdjs.evtTools.string.strFindLastFrom;

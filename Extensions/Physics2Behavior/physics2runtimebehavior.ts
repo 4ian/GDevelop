@@ -1408,14 +1408,14 @@ namespace gdjs {
       ).Length();
     }
 
-    getLinearVelocityAngle(): float {
+    getMovementAngle(): float {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
       const body = this._body!;
 
-      // Get the linear velocity angle
+      // Get the movement angle
       return gdjs.toDegrees(
         Math.atan2(
           body.GetLinearVelocity().get_y() * this._sharedData.scaleY,

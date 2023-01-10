@@ -1363,10 +1363,10 @@ module.exports = {
 
       aut
       .addCondition(
-        'LinearVelocityAngle',
-        _('Linear velocity angle'),
-        _('Test an object linear velocity angle.'),
-        _('the linear velocity angle'),
+        'MovementAngle',
+        _('Movement angle'),
+        _('Test an object movement angle.'),
+        _('the movement angle'),
         _('Velocity'),
         'res/physics32.png',
         'res/physics32.png'
@@ -1380,20 +1380,20 @@ module.exports = {
         )
       )
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityAngle');
+      .setFunctionName('getMovementAngle');
 
     aut
       .addExpression(
-        'LinearVelocityAngle',
-        _('Linear velocity angle'),
-        _('Get the linear velocity angle of an object.'),
+        'MovementAngle',
+        _('Movement angle'),
+        _('Get the movement angle of an object.'),
         _('Velocity'),
         'res/physics32.png'
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityAngle');
+      .setFunctionName('getMovementAngle');
 
     aut
       .addCondition(

@@ -3,7 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GDCore/IDE/Project/FunctionParameterBehaviorTypeRenamer.h"
+#include "FunctionParameterBehaviorTypeRenamer.h"
+
 #include "GDCore/Project/EventsFunction.h"
 #include "GDCore/String.h"
 #include <map>

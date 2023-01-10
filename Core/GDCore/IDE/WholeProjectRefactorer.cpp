@@ -28,6 +28,7 @@
 #include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
 #include "GDCore/IDE/Project/ArbitrarySharedDataWorker.h"
 #include "GDCore/IDE/Project/RequiredBehaviorRenamer.h"
+#include "GDCore/IDE/Project/BehaviorObjectTypeRenamer.h"
 #include "GDCore/IDE/Project/SharedDataBehaviorTypeRenamer.h"
 #include "GDCore/IDE/Project/FunctionParameterBehaviorTypeRenamer.h"
 #include "GDCore/IDE/Project/FunctionParameterObjectTypeRenamer.h"
@@ -1336,9 +1337,15 @@ void WholeProjectRefactorer::DoRenameObject(
     const gd::String& newObjectType,
     const gd::ProjectExposer& projectExposer) {
 
+  // Rename object type in objects lists.
   auto customObjectTypeRenamer =
       gd::CustomObjectTypeRenamer(oldObjectType, newObjectType);
   projectExposer.ExposeObjects(project, customObjectTypeRenamer);
+
+  // Rename in behaviors object type.
+  auto behaviorObjectTypeRenamer =
+      gd::BehaviorObjectTypeRenamer(oldObjectType, newObjectType);
+  projectExposer.ExposeEventBasedBehaviors(project, behaviorObjectTypeRenamer);
 
   // Rename in parameters of (free/behavior) events function
   auto objectParameterRenamer =

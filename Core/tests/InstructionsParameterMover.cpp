@@ -15,7 +15,7 @@
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/IDE/ProjectExposer.h"
+#include "GDCore/IDE/ProjectExposerHelper.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/Project/ProjectResourcesAdder.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
@@ -52,7 +52,7 @@ TEST_CASE("InstructionsParameterMover", "[common][events]") {
     gd::InstructionsParameterMover mover(
         project, "MyExtension::DoSomething", 0, 2);
 
-    gd::ProjectExposer::ExposeProjectEvents(project, mover);
+    gd::ProjectExposerHelper::ExposeProjectEvents(project, mover);
     REQUIRE(insertedInstruction.GetParameter(0).GetPlainString() == "Param2");
     REQUIRE(insertedInstruction.GetParameter(1).GetPlainString() == "Param3");
     REQUIRE(insertedInstruction.GetParameter(2).GetPlainString() == "Param1");
@@ -61,7 +61,7 @@ TEST_CASE("InstructionsParameterMover", "[common][events]") {
     gd::InstructionsParameterMover mover(
         project, "MyExtension::DoSomething", 0, 99);
 
-    gd::ProjectExposer::ExposeProjectEvents(project, mover);
+    gd::ProjectExposerHelper::ExposeProjectEvents(project, mover);
     REQUIRE(insertedInstruction.GetParameter(0).GetPlainString() == "Param2");
     REQUIRE(insertedInstruction.GetParameter(1).GetPlainString() == "Param3");
     REQUIRE(insertedInstruction.GetParameter(2).GetPlainString() == "Param1");
@@ -70,7 +70,7 @@ TEST_CASE("InstructionsParameterMover", "[common][events]") {
     gd::InstructionsParameterMover mover(
         project, "MyExtension::DoSomething", 99, 2);
 
-    gd::ProjectExposer::ExposeProjectEvents(project, mover);
+    gd::ProjectExposerHelper::ExposeProjectEvents(project, mover);
     REQUIRE(insertedInstruction.GetParameter(0).GetPlainString() == "Param1");
     REQUIRE(insertedInstruction.GetParameter(1).GetPlainString() == "Param2");
     REQUIRE(insertedInstruction.GetParameter(2).GetPlainString() == "Param3");

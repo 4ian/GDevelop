@@ -51,7 +51,7 @@
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
-#include <GDCore/IDE/ProjectExposer.h>
+#include <GDCore/IDE/ProjectExposerHelper.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/Project/Behavior.h>

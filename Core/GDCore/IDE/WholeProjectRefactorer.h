@@ -59,21 +59,6 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newName);
 
   /**
-   * \brief Refactor the project **before** an events function extension is
-   * renamed.
-   *
-   * \warning Do the renaming of the specified extension after calling this.
-   * This is because the extension is expected to have its old name for the
-   * refactoring.
-   */
-  static void RenameEventsFunctionsExtension(
-      gd::Project& project,
-      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
-      const gd::String& oldName,
-      const gd::String& newName,
-      const gd::ProjectExposer& projectExposer);
-
-  /**
    * \brief Refactor behavior events after the extension was placed in a new
    * extension.
    */
@@ -432,6 +417,21 @@ class GD_CORE_API WholeProjectRefactorer {
                              const gd::String& oldObjectType,
                              const gd::String& newObjectType,
                              const gd::ProjectExposer& projectExposer);
+
+  /**
+   * \brief Refactor the project **before** an events function extension is
+   * renamed.
+   *
+   * \warning Do the renaming of the specified extension after calling this.
+   * This is because the extension is expected to have its old name for the
+   * refactoring.
+   */
+  static void RenameEventsFunctionsExtension(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& oldName,
+      const gd::String& newName,
+      const gd::ProjectExposer& projectExposer);
 
   static void FindDependentBehaviorNames(
       const gd::Project& project,

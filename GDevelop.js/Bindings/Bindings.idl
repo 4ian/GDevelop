@@ -2161,7 +2161,7 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
     [Const, Ref] UnfilledRequiredBehaviorPropertyProblem at(unsigned long index);
 };
 
-interface ProjectExposer {
+interface ProjectExposerHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
 };
 

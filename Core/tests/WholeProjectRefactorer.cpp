@@ -30,6 +30,9 @@
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
 
+// TODO Extract test data in another file to allow to read them side by side
+// with the test cases more easily.
+
 // TODO EBO Add a test where a child is removed form the EventsBasedObject
 // and check the configuration still gives access to other child configuration.
 namespace {
@@ -1637,6 +1640,50 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   eventsList->GetEvent(ObjectExpressionFromExpressionAndCondition)) ==
               "5 + MyCustomObject."
               "MyObjectEventsFunctionExpressionAndCondition(111, 222)");
+    }
+  }
+
+  SECTION("Events extension renamed in instructions scoped to one behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    // A behavior is copied from one extension to another.
+
+    auto &destinationExtension =
+        project.InsertNewEventsFunctionsExtension("DestinationExtension", 0);
+    // Add the function used by the instruction that is checked in this test.
+    // When the function doesn't exist the destination extension, the
+    // instruction keeps pointing to the old extension.
+    destinationExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+
+    auto &copiedBehavior =
+        destinationExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyOtherEventsBasedBehavior", 0);
+    copiedBehavior.SetFullName("My events based behavior");
+    copiedBehavior.SetDescription("An events based behavior for test");
+    copiedBehavior.SetObjectType("MyEventsExtension::MyEventsBasedObject");
+
+    // Add the copied events.
+    auto &behaviorEventsFunctions = copiedBehavior.GetEventsFunctions();
+    auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
+        "MyBehaviorEventsFunction", 0);
+    SetupEvents(behaviorAction.GetEvents());
+
+    gd::WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(
+        project, destinationExtension, copiedBehavior, "MyEventsExtension");
+
+    // Check that events function calls in instructions have been renamed
+    REQUIRE(GetEventFirstActionType(behaviorAction.GetEvents().GetEvent(
+                FreeFunctionAction)) == "DestinationExtension::MyEventsFunction");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check that events function calls in instructions have NOT been renamed
+      // outside of the copied behavior.
+      REQUIRE(
+          GetEventFirstActionType(eventsList->GetEvent(FreeFunctionAction)) ==
+          "MyEventsExtension::MyEventsFunction");
     }
   }
 

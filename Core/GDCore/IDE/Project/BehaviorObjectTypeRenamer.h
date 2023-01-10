@@ -21,8 +21,7 @@ class EventsList;
 namespace gd {
 
 /**
- * \brief Replace in functions all behavior parameter of the specified type
- * by another type.
+ * \brief Rename the object type in event-based behaviors.
  *
  * \ingroup IDE
  */

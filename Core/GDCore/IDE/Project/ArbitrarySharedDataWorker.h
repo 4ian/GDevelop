@@ -21,8 +21,8 @@ class BehaviorsSharedData;
 namespace gd {
 
 /**
- * \brief ArbitraryFunctionsWorker is an abstract class used to browse
- * functions signature and do some work on them. Can be used to implement
+ * \brief ArbitrarySharedDataWorker is an abstract class used to browse
+ * shared data and do some work on them. It can be used to implement
  * refactoring for example.
  *
  * \ingroup IDE

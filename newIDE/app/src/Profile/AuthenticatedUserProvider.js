@@ -36,7 +36,9 @@ import {
   listReceivedAssetShortHeaders,
   listReceivedAssetPacks,
 } from '../Utils/GDevelopServices/Asset';
-import AdditionalUserInfoDialog from './AdditionalUserInfoDialog';
+import AdditionalUserInfoDialog, {
+  shouldAskForAdditionalUserInfo,
+} from './AdditionalUserInfoDialog';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 
@@ -359,13 +361,11 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     // If the user has not filled their additional information, show
     // the dialog to fill it.
-    // use a state value to show the dialog only once.
+    // Use a state value to show the dialog only once.
     if (
       userProfile &&
       !this._hasNotifiedUserAboutAdditionalInfo &&
-      !userProfile.hearFrom &&
-      !userProfile.gdevelopUsage &&
-      !userProfile.creationExperience
+      shouldAskForAdditionalUserInfo(userProfile)
     ) {
       setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
     }
@@ -662,9 +662,12 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
         {
-          hearFrom: form.hearFrom,
           gdevelopUsage: form.gdevelopUsage,
+          teamOrCompanySize: form.teamOrCompanySize,
+          companyName: form.companyName,
           creationExperience: form.creationExperience,
+          creationGoal: form.creationGoal,
+          hearFrom: form.hearFrom,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
@@ -861,15 +864,17 @@ export default class AuthenticatedUserProvider extends React.Component<
                 error={this.state.authError}
               />
             )}
-            {this.state.additionalUserInfoDialogOpen && (
-              <AdditionalUserInfoDialog
-                onClose={() => this.openAdditionalUserInfoDialog(false)}
-                onSaveAdditionalUserInfo={form =>
-                  this._doSaveAdditionalUserInfo(form)
-                }
-                updateInProgress={this.state.editInProgress}
-              />
-            )}
+            {this.state.additionalUserInfoDialogOpen &&
+              this.state.authenticatedUser.profile && (
+                <AdditionalUserInfoDialog
+                  profile={this.state.authenticatedUser.profile}
+                  onClose={() => this.openAdditionalUserInfoDialog(false)}
+                  onSaveAdditionalUserInfo={form =>
+                    this._doSaveAdditionalUserInfo(form)
+                  }
+                  updateInProgress={this.state.editInProgress}
+                />
+              )}
             {this.state.emailVerificationPendingDialogOpen && (
               <EmailVerificationPendingDialog
                 authenticatedUser={this.state.authenticatedUser}

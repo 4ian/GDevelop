@@ -18,58 +18,73 @@ class ArbitraryFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
 class ArbitrarySharedDataWorker;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
 /**
- * \brief Expose events to an events worker.
+ * \brief Expose a subset of the project to workers.
  */
 class GD_CORE_API ProjectExposer {
- public:
-   /**
-    * \brief Call the specified worker on a subset of events (layout,
-    * external events, events functions...)
-    *
-    * This should be the preferred way to traverse events of a project.
-    */
-   virtual void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorker &worker) const = 0;
-   /**
-    * \brief Call the specified worker on a subset of events (layout,
-    * external events, events functions...)
-    *
-    * This should be the preferred way to traverse events of a project.
-    */
-   virtual void ExposeEvents(gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) const = 0;
+public:
+  /**
+   * \brief Call the specified worker on all events of a project subset.
+   *
+   * This should be the preferred way to traverse events of a project.
+   */
+  virtual void ExposeEvents(gd::Project &project,
+                            gd::ArbitraryEventsWorker &worker) const = 0;
+  /**
+   * \brief Call the specified worker on all events of a project subset.
+   *
+   * This should be the preferred way to traverse events of a project.
+   */
+  virtual void
+  ExposeEvents(gd::Project &project,
+               gd::ArbitraryEventsWorkerWithContext &worker) const = 0;
 
   /**
-   * \brief Call the specified worker on all ObjectContainers of the project
-   * (global, layouts...)
+   * \brief Call the specified worker on all ObjectContainer of a project subset
    *
    * This should be the preferred way to traverse all the objects of a project.
    */
-  virtual void ExposeObjects(gd::Project& project,
-                                   gd::ArbitraryObjectsWorker& worker) const = 0;
+  virtual void ExposeObjects(gd::Project &project,
+                             gd::ArbitraryObjectsWorker &worker) const = 0;
 
   /**
-   * \brief Call the specified worker on all FunctionsContainers of the project
-   * (global, layouts...)
+   * \brief Call the specified worker on all FunctionsContainer of a project
+   * subset.
    *
    * This should be the preferred way to traverse all the function signatures
    * of a project.
    */
   virtual void ExposeFunctions(gd::Project &project,
-                                     gd::ArbitraryFunctionsWorker &worker) const = 0;
+                               gd::ArbitraryFunctionsWorker &worker) const = 0;
 
+  /**
+   * \brief Call the specified worker on all EventBasedBehavior of a project
+   * subset.
+   *
+   * This should be the preferred way to traverse all the event-based behavior
+   * of a project.
+   */
   virtual void ExposeEventBasedBehaviors(
-      gd::Project &project, gd::ArbitraryEventBasedBehaviorsWorker &worker) const = 0;
+      gd::Project &project,
+      gd::ArbitraryEventBasedBehaviorsWorker &worker) const = 0;
 
-  virtual void ExposeSharedDatas(
-      gd::Project &project, gd::ArbitrarySharedDataWorker &worker) const = 0;
+  /**
+   * \brief Call the specified worker on all SharedData of a project subset.
+   *
+   * This should be the preferred way to traverse all the shared data
+   * of a project.
+   */
+  virtual void
+  ExposeSharedDatas(gd::Project &project,
+                    gd::ArbitrarySharedDataWorker &worker) const = 0;
 
-   virtual ~ProjectExposer(){};
+  virtual ~ProjectExposer(){};
 };
 
-}  // namespace gd
+} // namespace gd
 
-#endif  // GDCORE_PROJECTEXPOSER_H
+#endif // GDCORE_PROJECTEXPOSER_H

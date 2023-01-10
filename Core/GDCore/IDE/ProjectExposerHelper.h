@@ -23,7 +23,7 @@ class ArbitrarySharedDataWorker;
 namespace gd {
 
 /**
- * \brief Expose events to an events worker.
+ * \brief Expose a subset of the project to workers.
  */
 class GD_CORE_API ProjectExposerHelper {
 public:
@@ -57,21 +57,22 @@ public:
       gd::ArbitraryEventsWorker &worker);
 
   /**
-   * \brief Call the specified worker on all events of the events based
-   * behavior
+   * \brief Call the specified worker on all events of the event-based
+   * behavior.
    *
-   * This should be the preferred way to traverse all the events of an events
-   * based behavior.
+   * This should be the preferred way to traverse all the events of an
+   * event-based behavior.
    */
   static void ExposeEventsBasedBehaviorEvents(
       gd::Project &project, const gd::EventsBasedBehavior &eventsBasedBehavior,
       gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
-   * \brief Call the specified worker on all events of the events based object
+   * \brief Call the specified worker on all events of the event-based
+   * behavior.
    *
-   * This should be the preferred way to traverse all the events of an events
-   * based object.
+   * This should be the preferred way to traverse all the events of an
+   * event-based behavior.
    */
   static void
   ExposeEventsBasedObjectEvents(gd::Project &project,
@@ -97,9 +98,21 @@ public:
   static void ExposeProjectFunctions(gd::Project &project,
                                      gd::ArbitraryFunctionsWorker &worker);
 
+  /**
+   * \brief Call the specified worker on all EventBasedBehavior of a project.
+   *
+   * This should be the preferred way to traverse all the event-based behavior
+   * of a project.
+   */
   static void ExposeProjectEventBasedBehaviors(
       gd::Project &project, gd::ArbitraryEventBasedBehaviorsWorker &worker);
 
+  /**
+   * \brief Call the specified worker on all SharedData of a project.
+   *
+   * This should be the preferred way to traverse all the shared data
+   * of a project.
+   */
   static void ExposeProjectSharedDatas(gd::Project &project,
                                        gd::ArbitrarySharedDataWorker &worker);
 };

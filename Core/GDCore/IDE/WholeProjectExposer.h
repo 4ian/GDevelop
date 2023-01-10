@@ -25,6 +25,9 @@ class ArbitrarySharedDataWorker;
 
 namespace gd {
 
+/**
+ * \brief Expose the whole project to workers.
+ */
 class GD_CORE_API WholeProjectExposer : public ProjectExposer {
 public:
   /**
@@ -65,10 +68,22 @@ public:
   void ExposeFunctions(gd::Project &project,
                        gd::ArbitraryFunctionsWorker &worker) const override;
 
+  /**
+   * \brief Call the specified worker on all EventBasedBehavior of a project.
+   *
+   * This should be the preferred way to traverse all the event-based behavior
+   * of a project.
+   */
   void ExposeEventBasedBehaviors(
       gd::Project &project,
       gd::ArbitraryEventBasedBehaviorsWorker &worker) const override;
 
+  /**
+   * \brief Call the specified worker on all SharedData of a project.
+   *
+   * This should be the preferred way to traverse all the shared data
+   * of a project.
+   */
   void ExposeSharedDatas(gd::Project &project,
                          gd::ArbitrarySharedDataWorker &worker) const override;
 };

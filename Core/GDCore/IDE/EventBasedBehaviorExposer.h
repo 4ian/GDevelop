@@ -25,55 +25,58 @@ class ArbitrarySharedDataWorker;
 
 namespace gd {
 
+/**
+ * \brief Expose event-based behavior contents to workers.
+ */
 class GD_CORE_API EventBasedBehaviorExposer : public ProjectExposer {
 public:
   EventBasedBehaviorExposer(gd::EventsBasedBehavior &eventsBasedBehavior_)
       : eventsBasedBehavior(eventsBasedBehavior_) {}
 
   /**
-   * \brief Call the specified worker on all events of the events based
-   * behavior
+   * \brief Call the specified worker on all events of the event-based
+   * behavior.
    *
-   * This should be the preferred way to traverse all the events of an events
-   * based behavior.
+   * This should be the preferred way to traverse all the events of an event-based behavior.
    */
   void ExposeEvents(gd::Project &project,
                     gd::ArbitraryEventsWorker &worker) const override;
 
   /**
-   * \brief Call the specified worker on all events of the events based
-   * behavior
+   * \brief Call the specified worker on all events of the event-based
+   * behavior.
    *
-   * This should be the preferred way to traverse all the events of an events
-   * based behavior.
+   * This should be the preferred way to traverse all the events of an event-based behavior.
    */
   void
   ExposeEvents(gd::Project &project,
                gd::ArbitraryEventsWorkerWithContext &worker) const override;
 
   /**
-   * \brief Call the specified worker on all FunctionsContainers of the project
-   * (global, layouts...)
+   * \brief Call the specified worker on all functions of the event-based behavior
    *
    * This should be the preferred way to traverse all the function signatures
-   * of a project.
+   * of an event-based behavior.
    */
   void ExposeFunctions(gd::Project &project,
                        gd::ArbitraryFunctionsWorker &worker) const override;
 
+  /**
+   * \brief Do nothing.
+   */
+  void ExposeObjects(gd::Project &project,
+                     gd::ArbitraryObjectsWorker &worker) const override;
+
+  /**
+   * \brief Call the specified worker on the event-based behavior.
+   */
   void ExposeEventBasedBehaviors(
       gd::Project &project,
       gd::ArbitraryEventBasedBehaviorsWorker &worker) const override;
 
   /**
-   * \brief Call the specified worker on all ObjectContainers of the project
-   * (global, layouts...)
-   *
-   * This should be the preferred way to traverse all the objects of a project.
+   * \brief Do nothing.
    */
-  void ExposeObjects(gd::Project &project,
-                     gd::ArbitraryObjectsWorker &worker) const override;
-
   void ExposeSharedDatas(gd::Project &project,
                          gd::ArbitrarySharedDataWorker &worker) const override;
 

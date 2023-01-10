@@ -343,7 +343,7 @@ const MainFrame = (props: Props) => {
     false
   );
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
-  const { showConfirmation } = useAlertDialog();
+  const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
@@ -914,14 +914,11 @@ const MainFrame = (props: Props) => {
       } catch (error) {
         const errorMessage = getOpenErrorMessage
           ? getOpenErrorMessage(error)
-          : t`Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`;
-        showErrorBox({
-          message: [
-            i18n._(t`Unable to open the project.`),
-            i18n._(errorMessage),
-          ].join('\n'),
-          errorId: 'project-open-error',
-          rawError: error,
+          : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
+
+        await showAlert({
+          title: t`Unable to open the project`,
+          message: errorMessage,
         });
         setIsLoadingProject(false);
         setLoaderModalProgress(null, null);
@@ -933,6 +930,7 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       loadFromSerializedProject,
       showConfirmation,
+      showAlert,
     ]
   );
 

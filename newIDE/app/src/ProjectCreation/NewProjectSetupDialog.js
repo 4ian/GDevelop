@@ -30,6 +30,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import Checkbox from '../UI/Checkbox';
 import { MarkdownText } from '../UI/MarkdownText';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
+import { useOnlineStatus } from '../Utils/OnlineStatus';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -89,6 +90,7 @@ const NewProjectSetupDialog = ({
   authenticatedUser,
   isFromExample,
 }: Props): React.Node => {
+  const isOnline = useOnlineStatus();
   const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
     PreferencesContext
   );
@@ -112,8 +114,8 @@ const NewProjectSetupDialog = ({
     false
   );
   const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
-    // Enable player login by default for new games, unless a tutorial is running.
-    !!currentlyRunningInAppTutorial ? false : true
+    // Enable player login by default for new games, unless a tutorial is running or offline.
+    !!currentlyRunningInAppTutorial || !isOnline ? false : true
   );
   const newProjectsDefaultFolder = app
     ? findEmptyPathInWorkspaceFolder(app, values.newProjectsDefaultFolder || '')

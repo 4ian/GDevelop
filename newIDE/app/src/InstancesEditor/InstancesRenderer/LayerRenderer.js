@@ -208,27 +208,13 @@ export default class LayerRenderer {
     let centerX = undefined;
     let centerY = undefined;
 
-    const object = getObjectByName(
-      this.project,
-      this.layout,
-      instance.getObjectName()
-    );
-
-    if (object && object.getType() === 'Sprite') {
-      const spriteConfiguration: gdSpriteObject = gd.asSpriteConfiguration(
-        object.getConfiguration()
-      );
-      const animationIndex = instance.getRawDoubleProperty('animation');
-      const sprite = spriteConfiguration
-        .getAnimation(animationIndex)
-        .getDirection(0)
-        .getSprite(0);
-      if (!sprite.isDefaultCenterPoint()) {
-        const center = sprite.getCenter();
-        centerX = instance.getX() + center.getX();
-        centerY = instance.getY() + center.getY();
-      }
+    if (this.renderedInstances[instance.ptr]) {
+      centerX =
+        instance.getX() + this.renderedInstances[instance.ptr].getCenterX();
+      centerY =
+        instance.getY() + this.renderedInstances[instance.ptr].getCenterY();
     }
+
     if (centerX === undefined || centerY === undefined) {
       centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
       centerY = (rectangle[0][1] + rectangle[2][1]) / 2;

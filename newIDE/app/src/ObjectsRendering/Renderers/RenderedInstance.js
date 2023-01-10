@@ -74,6 +74,14 @@ export default class RenderedInstance {
     return 0;
   }
 
+  getCenterX() {
+    return this.getDefaultWidth() / 2;
+  }
+
+  getCenterY() {
+    return this.getDefaultHeight() / 2;
+  }
+
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */

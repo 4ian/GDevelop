@@ -5,16 +5,18 @@
  */
 #ifndef GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H
 #define GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H
+
+#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/String.h"
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
-#include "GDCore/String.h"
+
 namespace gd {
 class BaseEvent;
 class Project;
 class EventsList;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
@@ -24,20 +26,21 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class GD_CORE_API FunctionParameterBehaviorTypeRenamer : public ArbitraryFunctionsWorker {
- public:
-  FunctionParameterBehaviorTypeRenamer(const gd::String& oldBehaviorType_,
-                                       const gd::String& newBehaviorType_)
+class GD_CORE_API FunctionParameterBehaviorTypeRenamer
+    : public ArbitraryFunctionsWorker {
+public:
+  FunctionParameterBehaviorTypeRenamer(const gd::String &oldBehaviorType_,
+                                       const gd::String &newBehaviorType_)
       : oldBehaviorType(oldBehaviorType_), newBehaviorType(newBehaviorType_){};
   virtual ~FunctionParameterBehaviorTypeRenamer();
 
- private:
-  void DoVisitParameter(gd::ParameterMetadata& parameter) override;
+private:
+  virtual void DoVisitFunction(gd::EventsFunction &eventsFunction) override;
 
   gd::String oldBehaviorType;
   gd::String newBehaviorType;
 };
 
-}  // namespace gd
+} // namespace gd
 
-#endif  // GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H
+#endif // GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H

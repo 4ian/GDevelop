@@ -1305,13 +1305,13 @@ void WholeProjectRefactorer::DoRenameEventsFunction(
 }
 
 void WholeProjectRefactorer::DoRenameBehavior(
-    gd::Project& project,
-    const gd::String& oldBehaviorType,
-    const gd::String& newBehaviorType,
-    const gd::ProjectExposer& projectExposer) {
+    gd::Project &project, const gd::String &oldBehaviorType,
+    const gd::String &newBehaviorType,
+    const gd::ProjectExposer &projectExposer) {
 
   // Rename behavior in required behavior properties
-  auto requiredBehaviorRenamer = gd::RequiredBehaviorRenamer(oldBehaviorType, newBehaviorType);
+  auto requiredBehaviorRenamer =
+      gd::RequiredBehaviorRenamer(oldBehaviorType, newBehaviorType);
   projectExposer.ExposeEventBasedBehaviors(project, requiredBehaviorRenamer);
 
   // Rename behavior in objects lists.
@@ -1320,7 +1320,8 @@ void WholeProjectRefactorer::DoRenameBehavior(
   projectExposer.ExposeObjects(project, behaviorTypeRenamer);
 
   // Rename behavior in layout behavior shared data.
-  auto sharedDataBehaviorTypeRenamer = gd::SharedDataBehaviorTypeRenamer(oldBehaviorType, newBehaviorType);
+  auto sharedDataBehaviorTypeRenamer =
+      gd::SharedDataBehaviorTypeRenamer(oldBehaviorType, newBehaviorType);
   projectExposer.ExposeSharedDatas(project, sharedDataBehaviorTypeRenamer);
 
   // Rename in parameters of (free/behavior) events function

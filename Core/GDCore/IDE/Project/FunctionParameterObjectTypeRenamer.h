@@ -5,16 +5,18 @@
  */
 #ifndef GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H
 #define GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H
+
+#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/String.h"
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
-#include "GDCore/String.h"
+
 namespace gd {
 class BaseEvent;
 class Project;
 class EventsList;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
@@ -24,20 +26,21 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class GD_CORE_API FunctionParameterObjectTypeRenamer : public ArbitraryFunctionsWorker {
- public:
-  FunctionParameterObjectTypeRenamer(const gd::String& oldObjectType_,
-                                     const gd::String& newObjectType_)
+class GD_CORE_API FunctionParameterObjectTypeRenamer
+    : public ArbitraryFunctionsWorker {
+public:
+  FunctionParameterObjectTypeRenamer(const gd::String &oldObjectType_,
+                                     const gd::String &newObjectType_)
       : oldObjectType(oldObjectType_), newObjectType(newObjectType_){};
   virtual ~FunctionParameterObjectTypeRenamer();
 
- private:
-  void DoVisitParameter(gd::ParameterMetadata& parameter) override;
+private:
+  virtual void DoVisitFunction(gd::EventsFunction &eventsFunction) override;
 
   gd::String oldObjectType;
   gd::String newObjectType;
 };
 
-}  // namespace gd
+} // namespace gd
 
-#endif  // GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H
+#endif // GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H

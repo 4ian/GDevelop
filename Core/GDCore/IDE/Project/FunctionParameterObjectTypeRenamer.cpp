@@ -4,24 +4,24 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/IDE/Project/FunctionParameterObjectTypeRenamer.h"
+#include "GDCore/Project/EventsFunction.h"
+#include "GDCore/String.h"
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/Events/Event.h"
-#include "GDCore/Events/EventsList.h"
-#include "GDCore/Project/Layout.h"
-#include "GDCore/Project/Project.h"
-#include "GDCore/String.h"
 
 namespace gd {
 
-void FunctionParameterObjectTypeRenamer::DoVisitParameter(gd::ParameterMetadata& parameter) {
-  if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
-      parameter.GetExtraInfo() == oldObjectType) {
-    parameter.SetExtraInfo(newObjectType);
+void FunctionParameterObjectTypeRenamer::DoVisitFunction(
+    gd::EventsFunction &eventsFunction) {
+  for (auto &&parameter : eventsFunction.GetParameters()) {
+    if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
+        parameter.GetExtraInfo() == oldObjectType) {
+      parameter.SetExtraInfo(newObjectType);
+    }
   }
 }
 
 FunctionParameterObjectTypeRenamer::~FunctionParameterObjectTypeRenamer() {}
 
-}  // namespace gd
+} // namespace gd

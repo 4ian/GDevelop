@@ -40,7 +40,6 @@ class GD_CORE_API ArbitraryFunctionsWorker {
  private:
   void VisitFunctionContainer(gd::EventsFunctionsContainer& functions);
   void VisitFunction(gd::EventsFunction& eventsFunction);
-  void VisitParameter(gd::ParameterMetadata& parameter);
 
   /**
    * Called to do some work on an function container.
@@ -51,11 +50,6 @@ class GD_CORE_API ArbitraryFunctionsWorker {
    * Called to do some work on a function.
    */
   virtual void DoVisitFunction(gd::EventsFunction& eventsFunction){};
-
-  /**
-   * Called to do some work on a parameter.
-   */
-  virtual void DoVisitParameter(gd::ParameterMetadata& parameter){};
 };
 
 }  // namespace gd

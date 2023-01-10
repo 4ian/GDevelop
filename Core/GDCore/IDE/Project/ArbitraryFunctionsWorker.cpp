@@ -32,14 +32,6 @@ void ArbitraryFunctionsWorker::VisitFunctionContainer(
 
 void ArbitraryFunctionsWorker::VisitFunction(gd::EventsFunction& eventsFunction) {
   DoVisitFunction(eventsFunction);
-
-  for (auto&& parameter : eventsFunction.GetParameters()) {
-    VisitParameter(parameter);
-  }
-}
-
-void ArbitraryFunctionsWorker::VisitParameter(gd::ParameterMetadata& parameter) {
-  DoVisitParameter(parameter);
 }
 
 }  // namespace gd

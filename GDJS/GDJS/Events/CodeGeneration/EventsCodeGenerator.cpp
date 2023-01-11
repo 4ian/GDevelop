@@ -1246,7 +1246,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
   if (scope == LAYOUT_VARIABLE) {
-    output = "runtimeScene.getVariables()";
+    output = "runtimeScene.getScene().getVariables()";
 
     if (HasProjectAndLayout()) {
       variables = &GetLayout().GetVariables();

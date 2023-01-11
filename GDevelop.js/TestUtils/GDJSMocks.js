@@ -418,6 +418,10 @@ class RuntimeScene {
   getInitialSharedDataForBehavior(name) {
     return null;
   }
+
+  getScene() {
+    return this;
+  }
 }
 
 /**

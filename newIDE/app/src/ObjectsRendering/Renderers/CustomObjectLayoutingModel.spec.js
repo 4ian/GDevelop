@@ -303,6 +303,46 @@ describe('applyChildLayouts', () => {
     expect(thumb.getCustomWidth()).toBe(50);
     expect(thumb.getCustomHeight()).toBe(60);
   });
+
+  it('can anchor a chid to another child and scale it proportionally.', () => {
+    const parent = new MockedParent(200, 100);
+    parent.addChild(
+      'Border',
+      {
+        isShown: true,
+        horizontalLayout: {},
+        verticalLayout: {},
+      },
+      { defaultWidth: 25, defaultHeight: 50 }
+    );
+    const thumb = parent.addChild(
+      'Thumb',
+      {
+        isShown: true,
+        horizontalLayout: {
+          anchorOrigin: 0.5,
+          anchorTarget: 0.5,
+          anchorTargetObject: 'PanelBar',
+          isScaledProportionally: true,
+        },
+        verticalLayout: {
+          anchorOrigin: 0.5,
+          anchorTarget: 0.5,
+          anchorTargetObject: 'PanelBar',
+          isScaledProportionally: true,
+        },
+      },
+      { defaultWidth: 10, defaultHeight: 15 }
+    );
+
+    applyChildLayouts(parent);
+
+    expect(thumb.hasCustomSize()).toBe(true);
+    expect(thumb.getCustomWidth()).toBe((200 / 25) * 10);
+    expect(thumb.getCustomHeight()).toBe((100 / 50) * 15);
+    expect(thumb.getX()).toBe(((200 / 25) * (25 - 10)) / 2);
+    expect(thumb.getY()).toBe(((100 / 50) * (50 - 15)) / 2);
+  });
 });
 
 type EventBasedObjectProperty = {

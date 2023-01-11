@@ -110,7 +110,7 @@ describe('getLayouts', () => {
     });
   });
 
-  it('can anchor a chid to another child', () => {
+  it('can anchor a child to another child', () => {
     const eventBasedObject = createEventBasedObject([
       // Private properties
       {
@@ -145,7 +145,7 @@ describe('getLayouts', () => {
     });
   });
 
-  it('can anchor a chid to another child and be scaled proportionally', () => {
+  it('can anchor a child to another child and be scaled proportionally', () => {
     const eventBasedObject = createEventBasedObject([
       // Private properties
       {
@@ -304,7 +304,7 @@ describe('applyChildLayouts', () => {
     expect(tiledBar.getCustomHeight()).toBe(40);
   });
 
-  it('can anchor a chid to another child', () => {
+  it('can anchor a child to another child', () => {
     const parent = new MockedParent(200, 100);
     parent.addChild('Background', {
       isShown: true,
@@ -346,7 +346,7 @@ describe('applyChildLayouts', () => {
     expect(thumb.getCustomHeight()).toBe(60);
   });
 
-  it('can anchor a chid to another child and be scaled proportionally', () => {
+  it('can anchor a child to another child and be scaled proportionally', () => {
     const parent = new MockedParent(200, 100);
     parent.addChild(
       'Border',

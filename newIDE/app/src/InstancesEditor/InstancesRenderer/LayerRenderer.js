@@ -205,8 +205,19 @@ export default class LayerRenderer {
     rectangle[3][0] = right;
     rectangle[3][1] = top;
 
-    const centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
-    const centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    let centerX = undefined;
+    let centerY = undefined;
+
+    if (this.renderedInstances[instance.ptr]) {
+      centerX = left + this.renderedInstances[instance.ptr].getCenterX();
+      centerY = top + this.renderedInstances[instance.ptr].getCenterY();
+    }
+
+    if (centerX === undefined || centerY === undefined) {
+      centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
+      centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    }
+
     const angle = (instance.getAngle() * Math.PI) / 180;
     rotatePolygon(rectangle, centerX, centerY, angle);
     return rectangle;

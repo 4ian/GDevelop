@@ -57,12 +57,4 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     this._pixiObject.position.y = this._instance.getY();
     this._pixiObject.rotation = (this._instance.getAngle() * Math.PI) / 180.0;
   }
-
-  getCenterX() {
-    return this._width / 2;
-  }
-
-  getCenterY() {
-    return this._height / 2;
-  }
 }

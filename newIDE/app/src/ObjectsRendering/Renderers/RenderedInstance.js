@@ -75,10 +75,16 @@ export default class RenderedInstance {
   }
 
   getCenterX() {
+    if (this._instance.hasCustomSize())
+      return this._instance.getCustomWidth() / 2;
+
     return this.getDefaultWidth() / 2;
   }
 
   getCenterY() {
+    if (this._instance.hasCustomSize())
+      return this._instance.getCustomHeight() / 2;
+
     return this.getDefaultHeight() / 2;
   }
 

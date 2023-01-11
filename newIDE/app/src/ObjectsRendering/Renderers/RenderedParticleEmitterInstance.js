@@ -114,11 +114,4 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
   getOriginY() {
     return 64;
   }
-
-  getCenterX() {
-    return 0;
-  }
-  getCenterY() {
-    return 0;
-  }
 }

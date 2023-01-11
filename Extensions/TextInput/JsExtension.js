@@ -763,13 +763,6 @@ module.exports = {
       getDefaultHeight() {
         return DEFAULT_HEIGHT;
       }
-
-      getCenterX() {
-        return this._width / 2;
-      }
-      getCenterY() {
-        return this._height / 2;
-      }
     }
 
     objectsRenderingService.registerInstanceRenderer(

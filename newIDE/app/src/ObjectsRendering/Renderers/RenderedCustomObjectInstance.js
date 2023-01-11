@@ -193,13 +193,6 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       : this.getDefaultHeight();
   }
 
-  getCenterX() {
-    return this.getHeight() / 2;
-  }
-  getCenterY() {
-    return this.getWidth() / 2;
-  }
-
   getDefaultWidth() {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()

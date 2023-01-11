@@ -100,13 +100,4 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     );
     return tiledSprite.getHeight();
   }
-
-  getCenterX() {
-    return this._pixiObject.width / 2;
-  }
-
-  getCenterY() {
-    return this._pixiObject.height / 2;
-  }
-
 }

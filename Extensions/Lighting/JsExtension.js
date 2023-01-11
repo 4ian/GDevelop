@@ -420,13 +420,6 @@ module.exports = {
     RenderedLightObjectInstance.prototype.getOriginY = function () {
       return this._radius;
     };
-    RenderedLightObjectInstance.prototype.getCenterX = function () {
-      return 0;
-    };
-
-    RenderedLightObjectInstance.prototype.getCenterY = function () {
-      return 0;
-    };
 
     objectsRenderingService.registerInstanceRenderer(
       'Lighting::LightObject',

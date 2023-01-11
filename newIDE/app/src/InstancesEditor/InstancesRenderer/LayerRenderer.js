@@ -209,10 +209,8 @@ export default class LayerRenderer {
     let centerY = undefined;
 
     if (this.renderedInstances[instance.ptr]) {
-      centerX =
-        instance.getX() + this.renderedInstances[instance.ptr].getCenterX();
-      centerY =
-        instance.getY() + this.renderedInstances[instance.ptr].getCenterY();
+      centerX = left + this.renderedInstances[instance.ptr].getCenterX();
+      centerY = top + this.renderedInstances[instance.ptr].getCenterY();
     }
 
     if (centerX === undefined || centerY === undefined) {

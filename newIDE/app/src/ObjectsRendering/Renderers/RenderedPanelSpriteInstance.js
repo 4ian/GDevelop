@@ -407,14 +407,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     return panelSprite.getHeight();
   }
 
-  getCenterX() {
-    return this._width / 2;
-  }
-
-  getCenterY() {
-    return this._height / 2;
-  }
-
   /**
    * Return a URL for thumbnail of the specified object.
    */

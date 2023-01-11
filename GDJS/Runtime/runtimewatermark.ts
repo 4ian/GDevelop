@@ -21,6 +21,7 @@ namespace gdjs {
 
       // Dom elements
       _watermarkContainerElement: HTMLDivElement | null = null;
+      _watermarkBackgroundElement: HTMLDivElement | null = null;
       _svgElement: SVGElement | null = null;
       _usernameTextElement: HTMLSpanElement | null = null;
       _madeWithTextElement: HTMLSpanElement | null = null;
@@ -28,8 +29,8 @@ namespace gdjs {
       _resizeObserver: ResizeObserver | null = null;
 
       // Durations in seconds
-      _displayDuration: number = 10;
-      _changeTextDelay: number = 5;
+      _displayDuration: number = 20;
+      _changeTextDelay: number = 7;
       _fadeInDelayAfterGameLoaded: number = 1;
       _fadeDuration: number = 0.3;
 
@@ -43,7 +44,8 @@ namespace gdjs {
       _textFontSize: number = 14;
       _logoWidth: number = 56;
       _logoHeight: number = 45;
-      _margin = '10px';
+      _backgroundHeight: number = 150;
+      _margin: number = 10;
 
       constructor(
         game: RuntimeGame,
@@ -75,21 +77,33 @@ namespace gdjs {
               gameContainerRectangle.height,
               gameContainerRectangle.width
             );
-            this.onResizeGameContainer(gameViewportLargestDimension);
+            this.onResizeGameContainer(
+              gameViewportLargestDimension,
+              gameContainerRectangle.height
+            );
           });
           this._resizeObserver.observe(gameContainer);
         }
       }
 
       private updateFontSize(dimension: number) {
-        this._textFontSize = 0.0125 * dimension;
+        this._textFontSize = 0.015 * dimension;
       }
       private updateLogoSize(dimension: number) {
-        this._logoWidth = 0.05 * dimension;
+        this._logoWidth = 0.04 * dimension;
         this._logoHeight = Math.round((45 / 56) * this._logoWidth);
       }
+      private updateBackground(height: number) {
+        this._backgroundHeight = 0.13 * height;
+      }
+      private updateMargin(height: number) {
+        this._margin = 0.025 * height;
+      }
 
-      private onResizeGameContainer(newLargestDimension: number) {
+      private onResizeGameContainer(
+        newLargestDimension: number,
+        height: number
+      ) {
         this.updateFontSize(newLargestDimension);
         if (this._madeWithTextElement) {
           this._madeWithTextElement.style.fontSize = `${this._textFontSize}px`;
@@ -102,6 +116,14 @@ namespace gdjs {
           this._svgElement.setAttribute('height', this._logoHeight.toString());
           this._svgElement.setAttribute('width', this._logoWidth.toString());
         }
+        this.updateBackground(height);
+        if (this._watermarkBackgroundElement) {
+          this._watermarkBackgroundElement.style.height = `${this._backgroundHeight}px`;
+        }
+        this.updateMargin(height);
+        if (this._watermarkContainerElement) {
+          this.updateElementMargins(this._watermarkContainerElement);
+        }
       }
 
       private addWatermarkToGameContainer(container: HTMLElement) {
@@ -111,8 +133,12 @@ namespace gdjs {
           gameContainerRectangle.width
         );
         this.updateFontSize(gameViewportLargestDimension);
+        this.updateLogoSize(gameViewportLargestDimension);
+        this.updateBackground(gameContainerRectangle.height);
 
         this._watermarkContainerElement = this.createDivContainer();
+        this.createBackground();
+        const textContainer = document.createElement('div');
 
         this.generateSVGLogo(gameViewportLargestDimension);
         this.createMadeWithTextElement();
@@ -120,20 +146,39 @@ namespace gdjs {
         if (this._svgElement)
           this._watermarkContainerElement.appendChild(this._svgElement);
         if (this._madeWithTextElement)
-          this._watermarkContainerElement.appendChild(
-            this._madeWithTextElement
-          );
+          textContainer.appendChild(this._madeWithTextElement);
         if (this._usernameTextElement)
-          this._watermarkContainerElement.appendChild(
-            this._usernameTextElement
-          );
+          textContainer.appendChild(this._usernameTextElement);
+        this._watermarkContainerElement.appendChild(textContainer);
         addTouchAndClickEventListeners(
           this._watermarkContainerElement,
           this.openCreatorProfile.bind(this)
         );
+        if (this._watermarkBackgroundElement)
+          container.appendChild(this._watermarkBackgroundElement);
+
         container.appendChild(this._watermarkContainerElement);
 
         this.setupAnimations();
+      }
+
+      private createBackground() {
+        this._watermarkBackgroundElement = document.createElement('div');
+        this._watermarkBackgroundElement.setAttribute(
+          'id',
+          'watermark-background'
+        );
+        this._watermarkBackgroundElement.style.height = `${this._backgroundHeight}px`;
+        this._watermarkBackgroundElement.style.opacity = '0';
+        if (this._placement.startsWith('top')) {
+          this._watermarkBackgroundElement.style.top = '0';
+          this._watermarkBackgroundElement.style.backgroundImage =
+            'linear-gradient(180deg, rgba(38, 38, 38, .6) 0%, rgba(38, 38, 38, 0) 100% )';
+        } else {
+          this._watermarkBackgroundElement.style.bottom = '0';
+          this._watermarkBackgroundElement.style.backgroundImage =
+            'linear-gradient(0deg, rgba(38, 38, 38, .6) 0%, rgba(38, 38, 38, 0) 100% )';
+        }
       }
 
       private setupAnimations() {
@@ -141,8 +186,13 @@ namespace gdjs {
         requestAnimationFrame(() => {
           // Display the watermark
           setTimeout(() => {
-            if (!this._watermarkContainerElement) return;
+            if (
+              !this._watermarkContainerElement ||
+              !this._watermarkBackgroundElement
+            )
+              return;
             this._watermarkContainerElement.style.opacity = '1';
+            this._watermarkBackgroundElement.style.opacity = '1';
             this._watermarkContainerElement.style.pointerEvents = 'all';
             if (this._svgElement) this._svgElement.classList.add('spinning');
           }, this._fadeInDelayAfterGameLoaded * 1000);
@@ -150,13 +200,23 @@ namespace gdjs {
 
         // Hide the watermark
         this._fadeOutTimeout = setTimeout(() => {
-          if (!this._watermarkContainerElement) return;
+          if (
+            !this._watermarkContainerElement ||
+            !this._watermarkBackgroundElement
+          )
+            return;
           this._watermarkContainerElement.style.opacity = '0';
+          this._watermarkBackgroundElement.style.opacity = '0';
           this._hideTimeout = setTimeout(
             () => {
-              if (!this._watermarkContainerElement) return;
+              if (
+                !this._watermarkContainerElement ||
+                !this._watermarkBackgroundElement
+              )
+                return;
               this._watermarkContainerElement.style.pointerEvents = 'none';
               this._watermarkContainerElement.style.display = 'none';
+              this._watermarkBackgroundElement.style.display = 'none';
               if (this._resizeObserver) this._resizeObserver.disconnect();
             },
             // Deactivate all interaction possibilities with watermark at
@@ -203,50 +263,54 @@ namespace gdjs {
         this._usernameTextElement.style.lineHeight = '0';
       }
 
+      private updateElementMargins(element: HTMLElement) {
+        switch (this._placement) {
+          case 'top-left':
+            element.style.top = `${this._margin}px`;
+            element.style.left = `${this._margin}px`;
+            break;
+          case 'top-right':
+            element.style.top = `${this._margin}px`;
+            element.style.right = `${this._margin}px`;
+            break;
+          case 'bottom-left':
+            element.style.bottom = `${this._margin}px`;
+            element.style.left = `${this._margin}px`;
+            break;
+          case 'bottom-right':
+            element.style.bottom = `${this._margin}px`;
+            element.style.right = `${this._margin}px`;
+            break;
+          case 'top':
+            element.style.top = `${this._margin}px`;
+            element.style.left = '50%';
+            element.style.transform = 'translate(-50%, 0)';
+            break;
+          case 'left':
+            element.style.left = `${this._margin}px`;
+            element.style.top = '50%';
+            element.style.transform = 'translate(0, -50%)';
+            break;
+          case 'right':
+            element.style.right = `${this._margin}px`;
+            element.style.top = '50%';
+            element.style.transform = 'translate(0, -50%)';
+            break;
+          case 'bottom':
+          default:
+            element.style.bottom = `${this._margin}px`;
+            element.style.left = '50%';
+            element.style.transform = 'translate(-50%, 0)';
+            break;
+        }
+      }
+
       private createDivContainer() {
         const divContainer = document.createElement('div');
         divContainer.setAttribute('id', 'watermark');
 
         divContainer.style.opacity = '0';
-        switch (this._placement) {
-          case 'top-left':
-            divContainer.style.top = this._margin;
-            divContainer.style.left = this._margin;
-            break;
-          case 'top-right':
-            divContainer.style.top = this._margin;
-            divContainer.style.right = this._margin;
-            break;
-          case 'bottom-left':
-            divContainer.style.bottom = this._margin;
-            divContainer.style.left = this._margin;
-            break;
-          case 'bottom-right':
-            divContainer.style.bottom = this._margin;
-            divContainer.style.right = this._margin;
-            break;
-          case 'top':
-            divContainer.style.top = this._margin;
-            divContainer.style.left = '50%';
-            divContainer.style.transform = 'translate(-50%, 0)';
-            break;
-          case 'left':
-            divContainer.style.left = this._margin;
-            divContainer.style.top = '50%';
-            divContainer.style.transform = 'translate(0, -50%)';
-            break;
-          case 'right':
-            divContainer.style.right = this._margin;
-            divContainer.style.top = '50%';
-            divContainer.style.transform = 'translate(0, -50%)';
-            break;
-          case 'bottom':
-          default:
-            divContainer.style.bottom = this._margin;
-            divContainer.style.left = '50%';
-            divContainer.style.transform = 'translate(-50%, 0)';
-            break;
-        }
+        this.updateElementMargins(divContainer);
         return divContainer;
       }
 
@@ -287,8 +351,6 @@ namespace gdjs {
 
       private addStyle() {
         const styleElement = document.createElement('style');
-        const idleColor = '#7046EC';
-        const hoveredColor = '#4F28CD';
         const hoverTransitionDuration = 0.2;
         styleElement.innerHTML = `
         @keyframes spin {
@@ -316,11 +378,19 @@ namespace gdjs {
           }
         }
 
+        #watermark-background {
+          position: absolute;
+          pointer-events: none;
+          width: 100%;
+          transition-property: opacity;
+          transition-duration: ${this._fadeDuration}s;
+        }
+
         #watermark {
           position: absolute;
           pointer-events: none;
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           cursor: pointer;
           align-items: center;
           transition-property: opacity;
@@ -328,35 +398,37 @@ namespace gdjs {
           transition-timing-function: ease-out;
         }
 
+        #watermark > div {
+          display: flex;
+          flex-direction: column;
+          margin-left: 5px;
+        }
+
         #watermark span {
+          color: white;
           font-family: 'Tahoma', 'Gill sans', 'Helvetica', 'Arial';
           font-size: ${this._textFontSize}px;
-          transition-property: opacity;
-          transition-duration: ${this._fadeDuration}s;
+          transition: opacity ${this._fadeDuration}s, text-decoration ${hoverTransitionDuration}s;
         }
 
         #watermark svg.spinning {
           animation-name: spin;
           animation-direction: normal;
           animation-duration: 5s;
-          animation-iteration-count: 2;
-          animation-delay: 1s;
+          animation-iteration-count: 3;
+          animation-delay: 1.5s;
         }
 
         #watermark svg path {
-          stroke: #FAFAFA;
-          stroke-width: 1px;
-          fill: ${idleColor};
-          stroke-linecap: round;
-          transition-property: fill;
-          transition-duration: ${hoverTransitionDuration}s;
+          fill: white;
         }
 
         @media (hover: hover) {
-          #watermark:hover svg path {
-            fill: ${hoveredColor};
-            transition-property: fill;
-            transition-duration: ${hoverTransitionDuration}s;
+          #watermark span {
+            text-decoration: underline solid transparent;
+          }
+          #watermark:hover span {
+            text-decoration: underline solid white;
           }
         }
         `;

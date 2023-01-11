@@ -28,6 +28,10 @@ type AxisLayout = {
    */
   anchorDelta?: number,
   /**
+   * Scale proportionally to the target when anchored.
+   */
+  isScaledProportionally?: boolean,
+  /**
    * The left or top margin in pixels.
    */
   minSideAbsoluteMargin?: number,
@@ -76,6 +80,9 @@ const layoutFields = [
   'AnchorTarget',
   'AnchorDeltaX',
   'AnchorDeltaY',
+  'IsScaledProportionallyOnX',
+  'IsScaledProportionallyOnY',
+  'IsScaledProportionally',
 ];
 
 const getHorizontalAnchorValue = (
@@ -192,6 +199,7 @@ export const getLayouts = (
     // new types to make the layout configuration easier.
     const name = property.getName();
     const propertyValueString = instanceProperties.get(name).getValue();
+    const propertyValueBoolean = propertyValueString === 'true';
     const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
     const layoutField = layoutFields.find(field => name.includes(field));
 
@@ -268,6 +276,14 @@ export const getLayouts = (
         layout.horizontalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaY') {
         layout.verticalLayout.anchorDelta = propertyValueNumber;
+      } else if (layoutField === 'IsScaledProportionallyOnX') {
+        layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
+      } else if (layoutField === 'IsScaledProportionallyOnY') {
+        layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
+      } else if (layoutField === 'IsScaledProportionally') {
+        console.log(propertyValueString);
+        layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
+        layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else {
         if (
           layoutField === 'HorizontalAnchorOrigin' ||
@@ -505,12 +521,17 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         ? targetInstance.getCustomWidth()
         : targetRenderedInstance.getDefaultWidth();
 
+      const width = childLayout.horizontalLayout.isScaledProportionally
+        ? (targetInstanceWidth * renderedInstance.getDefaultWidth()) /
+          targetRenderedInstance.getDefaultWidth()
+        : renderedInstance.getDefaultWidth();
+
       childInstance.x =
         targetInstance.getX() +
         (childLayout.horizontalLayout.anchorDelta || 0) +
         anchorTarget * targetInstanceWidth -
-        anchorOrigin * renderedInstance.getDefaultWidth();
-      childInstance.setCustomWidth(renderedInstance.getDefaultWidth());
+        anchorOrigin * width;
+      childInstance.setCustomWidth(width);
     }
 
     if (childLayout.verticalLayout.anchorOrigin == null) {
@@ -545,12 +566,17 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         ? targetInstance.getCustomHeight()
         : targetRenderedInstance.getDefaultHeight();
 
+      const height = childLayout.horizontalLayout.isScaledProportionally
+        ? (targetInstanceHeight * renderedInstance.getDefaultHeight()) /
+          targetRenderedInstance.getDefaultHeight()
+        : renderedInstance.getDefaultHeight();
+
       childInstance.y =
         targetInstance.getY() +
         (childLayout.verticalLayout.anchorDelta || 0) +
         anchorTarget * targetInstanceHeight -
-        anchorOrigin * renderedInstance.getDefaultHeight();
-      childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
+        anchorOrigin * height;
+      childInstance.setCustomHeight(height);
     }
     renderedInstance.update();
   }

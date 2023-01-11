@@ -13,9 +13,7 @@ namespace gdjs {
         | 'bottom-left'
         | 'bottom-right'
         | 'bottom'
-        | 'top'
-        | 'right'
-        | 'left';
+        | 'top';
       _showAtStartup: boolean;
       _authorUsername: string | undefined;
 
@@ -285,16 +283,6 @@ namespace gdjs {
             element.style.top = `${this._margin}px`;
             element.style.left = '50%';
             element.style.transform = 'translate(-50%, 0)';
-            break;
-          case 'left':
-            element.style.left = `${this._margin}px`;
-            element.style.top = '50%';
-            element.style.transform = 'translate(0, -50%)';
-            break;
-          case 'right':
-            element.style.right = `${this._margin}px`;
-            element.style.top = '50%';
-            element.style.transform = 'translate(0, -50%)';
             break;
           case 'bottom':
           default:

@@ -36,12 +36,10 @@ type Props = {|
 |};
 
 const watermarkPlacementOptions = [
-  { value: 'left', primaryText: t`Left` },
-  { value: 'right', primaryText: t`Right` },
   { value: 'top', primaryText: t`Top` },
-  { value: 'bottom', primaryText: t`Bottom` },
   { value: 'top-left', primaryText: t`Top left corner` },
   { value: 'top-right', primaryText: t`Top right corner` },
+  { value: 'bottom', primaryText: t`Bottom` },
   { value: 'bottom-left', primaryText: t`Bottom left corner` },
   { value: 'bottom-right', primaryText: t`Bottom right corner` },
 ];

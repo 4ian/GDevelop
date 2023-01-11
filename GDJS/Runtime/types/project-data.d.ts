@@ -211,9 +211,7 @@ declare interface WatermarkData {
     | 'bottom-left'
     | 'bottom-right'
     | 'bottom'
-    | 'top'
-    | 'right'
-    | 'left';
+    | 'top';
 }
 
 declare interface LoadingScreenData {

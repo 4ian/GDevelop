@@ -2,12 +2,11 @@
 import RenderedInstance from './RenderedInstance';
 
 /**
- * RenderedInstance is the base class used for creating renderers of instances,
- * which display on the scene editor, using Pixi.js, the instance of an object (see InstancesEditor).
+ * RenderedInstanceWithCustomizableCenter is a derivative of RenderedInstance
+ * that represents an instance whose center can be custom (not at the center of
+ * the AABB of the object).
  */
 export default class RenderedInstanceWithCustomizableCenter extends RenderedInstance {
-  _isCenterCustomizable = true;
-
   getCenterX() {
     return this.getDefaultWidth() / 2;
   }

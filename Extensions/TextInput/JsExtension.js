@@ -694,17 +694,17 @@ module.exports = {
         }
 
         // Position the object.
-        this._width = DEFAULT_WIDTH;
-        this._height = DEFAULT_HEIGHT;
+        let width = DEFAULT_WIDTH;
+        let height = DEFAULT_HEIGHT;
         if (instance.hasCustomSize()) {
-          this._width = instance.getCustomWidth();
-          this._height = instance.getCustomHeight();
+          width = instance.getCustomWidth();
+          height = instance.getCustomHeight();
         }
 
-        this._pixiObject.pivot.x = this._width / 2;
-        this._pixiObject.pivot.y = this._height / 2;
-        this._pixiObject.position.x = instance.getX() + this._width / 2;
-        this._pixiObject.position.y = instance.getY() + this._height / 2;
+        this._pixiObject.pivot.x = width / 2;
+        this._pixiObject.pivot.y = height / 2;
+        this._pixiObject.position.x = instance.getX() + width / 2;
+        this._pixiObject.position.y = instance.getY() + height / 2;
         this._pixiObject.rotation = RenderedInstance.toRad(
           this._instance.getAngle()
         );
@@ -719,8 +719,8 @@ module.exports = {
         this._pixiTextMask.drawRect(
           textOffset,
           textOffset,
-          this._width - 2 * textOffset,
-          this._height - 2 * textOffset
+          width - 2 * textOffset,
+          height - 2 * textOffset
         );
         this._pixiTextMask.endFill();
 
@@ -730,7 +730,7 @@ module.exports = {
         this._pixiText.position.x = textOffset;
         this._pixiText.position.y = isTextArea
           ? textOffset
-          : this._height / 2 - this._pixiText.height / 2;
+          : height / 2 - this._pixiText.height / 2;
 
         // Draw the background and border.
         const fillColor = properties.get('fillColor').getValue();
@@ -752,7 +752,7 @@ module.exports = {
           objectsRenderingService.rgbOrHexToHexNumber(fillColor),
           fillOpacity / 255
         );
-        this._pixiGraphics.drawRect(0, 0, this._width, this._height);
+        this._pixiGraphics.drawRect(0, 0, width, height);
         this._pixiGraphics.endFill();
       }
 

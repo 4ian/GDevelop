@@ -2,6 +2,7 @@
 import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import RenderedInstance from '../../ObjectsRendering/Renderers/RenderedInstance';
+import RenderedInstanceWithCustomizableCenter from '../../ObjectsRendering/Renderers/RenderedInstanceWithCustomizableCenter';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ViewPosition from '../ViewPosition';
 
@@ -39,7 +40,9 @@ export default class LayerRenderer {
   /** Used for instances culling on rendering */
   viewBottomRight: [number, number];
 
-  renderedInstances: { [number]: RenderedInstance } = {};
+  renderedInstances: {
+    [number]: RenderedInstance | RenderedInstanceWithCustomizableCenter,
+  } = {};
   pixiContainer: PIXI.Container;
 
   /** Functor used to render an instance */
@@ -205,8 +208,21 @@ export default class LayerRenderer {
     rectangle[3][0] = right;
     rectangle[3][1] = top;
 
-    const centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
-    const centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    let centerX = undefined;
+    let centerY = undefined;
+
+    const renderedInstance = this.renderedInstances[instance.ptr];
+    if (
+      renderedInstance &&
+      renderedInstance instanceof RenderedInstanceWithCustomizableCenter
+    ) {
+      centerX = instance.getX() + renderedInstance.getCenterX();
+      centerY = instance.getY() + renderedInstance.getCenterY();
+    } else {
+      centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
+      centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    }
+
     const angle = (instance.getAngle() * Math.PI) / 180;
     rotatePolygon(rectangle, centerX, centerY, angle);
     return rectangle;

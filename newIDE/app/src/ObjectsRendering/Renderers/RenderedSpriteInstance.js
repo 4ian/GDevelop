@@ -1,5 +1,5 @@
 // @flow
-import RenderedInstance from './RenderedInstance';
+import RenderedInstanceWithCustomizableCenter from './RenderedInstanceWithCustomizableCenter';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
@@ -8,7 +8,7 @@ const gd: libGDevelop = global.gd;
 /**
  * Renderer for gd.SpriteObject
  */
-export default class RenderedSpriteInstance extends RenderedInstance {
+export default class RenderedSpriteInstance extends RenderedInstanceWithCustomizableCenter {
   _renderedAnimation: number;
   _renderedDirection: number;
   _centerX: number;
@@ -86,7 +86,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
       this._centerY / this._pixiObject.texture.frame.height;
     this._pixiObject.rotation = this._shouldNotRotate
       ? 0
-      : RenderedInstance.toRad(this._instance.getAngle());
+      : RenderedInstanceWithCustomizableCenter.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
       this._pixiObject.scale.x =
         this._instance.getCustomWidth() / this._pixiObject.texture.frame.width;
@@ -201,5 +201,15 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
   getDefaultHeight(): number {
     return Math.abs(this._pixiObject.texture.frame.height);
+  }
+
+  getCenterX(): number {
+    if (!this._sprite || !this._pixiObject) return 0;
+    return this._centerX * this._pixiObject.scale.x;
+  }
+
+  getCenterY(): number {
+    if (!this._sprite || !this._pixiObject) return 0;
+    return this._centerY * this._pixiObject.scale.y;
   }
 }

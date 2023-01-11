@@ -107,12 +107,11 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * function.
    *
    * \param project Project used.
-   * \param eventsBasedObject The object that contains the function to be compiled.
-   * \param eventsFunction The events function to be compiled.
-   * \param codeNamespace Where to store the context used by the function.
-   * \param fullyQualifiedFunctionName The function name with its namespace.
-   * \param onceTriggersVariable The code to access the variable holding
-   * OnceTriggers.
+   * \param eventsBasedObject The object that contains the function to be
+   * compiled. \param eventsFunction The events function to be compiled. \param
+   * codeNamespace Where to store the context used by the function. \param
+   * fullyQualifiedFunctionName The function name with its namespace. \param
+   * onceTriggersVariable The code to access the variable holding OnceTriggers.
    * \param preludeCode The code to run right before the events
    * generated code.
    * \param endingCode The code to run right after the events
@@ -375,7 +374,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   gd::String GenerateFreeEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters,
-      const gd::String& onceTriggersVariable);
+      const gd::String& onceTriggersVariable,
+      bool isAsync);
 
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a behavior
@@ -386,6 +386,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const std::vector<gd::ParameterMetadata>& parameters,
       const gd::String& onceTriggersVariable,
+      bool isAsync,
       const gd::String& thisObjectName,
       const gd::String& thisBehaviorName);
 
@@ -398,6 +399,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsBasedObject& eventsBasedObject,
       const std::vector<gd::ParameterMetadata>& parameters,
       const gd::String& onceTriggersVariable,
+      bool isAsync,
       const gd::String& thisObjectName);
 
   gd::String GenerateEventsFunctionReturn(
@@ -429,6 +431,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String& objectsGettersMap,
       gd::String& objectArraysMap,
       gd::String& behaviorNamesMap,
+      bool isAsync,
       const gd::String& thisObjectName = "",
       const gd::String& thisBehaviorName = "");
 };

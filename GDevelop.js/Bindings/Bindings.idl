@@ -2392,6 +2392,8 @@ interface EventsFunction {
     [Const, Ref] ValueTypeMetadata GetExpressionType();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    [Ref] EventsFunction SetAsync(boolean isAsync);
+    boolean IsAsync();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

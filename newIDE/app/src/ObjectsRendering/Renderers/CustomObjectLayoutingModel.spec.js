@@ -144,6 +144,48 @@ describe('getLayouts', () => {
       },
     });
   });
+
+  it('can anchor a chid to another child and be scaled proportionally', () => {
+    const eventBasedObject = createEventBasedObject([
+      // Private properties
+      {
+        name: 'ThumbAnchorOrigin',
+        extraInfos: ['Thumb'],
+        value: 'Center-center',
+      },
+      {
+        name: 'ThumbAnchorTarget',
+        extraInfos: ['Border'],
+        value: 'Center-center',
+      },
+      {
+        name: 'ThumbIsScaledProportionally',
+        extraInfos: ['Thumb'],
+        value: 'true',
+      },
+    ]);
+    const customObjectConfiguration = createCustomObjectConfiguration(
+      eventBasedObject,
+      []
+    );
+    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+
+    expect(layouts.get('Thumb')).toStrictEqual({
+      isShown: true,
+      horizontalLayout: {
+        anchorOrigin: 0.5,
+        anchorTarget: 0.5,
+        anchorTargetObject: 'Border',
+        isScaledProportionally: true,
+      },
+      verticalLayout: {
+        anchorOrigin: 0.5,
+        anchorTarget: 0.5,
+        anchorTargetObject: 'Border',
+        isScaledProportionally: true,
+      },
+    });
+  });
 });
 
 describe('applyChildLayouts', () => {
@@ -304,7 +346,7 @@ describe('applyChildLayouts', () => {
     expect(thumb.getCustomHeight()).toBe(60);
   });
 
-  it('can anchor a chid to another child and scale it proportionally.', () => {
+  it('can anchor a chid to another child and be scaled proportionally', () => {
     const parent = new MockedParent(200, 100);
     parent.addChild(
       'Border',
@@ -322,13 +364,13 @@ describe('applyChildLayouts', () => {
         horizontalLayout: {
           anchorOrigin: 0.5,
           anchorTarget: 0.5,
-          anchorTargetObject: 'PanelBar',
+          anchorTargetObject: 'Border',
           isScaledProportionally: true,
         },
         verticalLayout: {
           anchorOrigin: 0.5,
           anchorTarget: 0.5,
-          anchorTargetObject: 'PanelBar',
+          anchorTargetObject: 'Border',
           isScaledProportionally: true,
         },
       },

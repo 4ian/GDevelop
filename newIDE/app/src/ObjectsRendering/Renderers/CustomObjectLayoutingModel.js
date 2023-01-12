@@ -90,7 +90,9 @@ const layoutFields = [
  * also values like 'top-left'.
  * @returns a value between 0 and 1.
  */
-export const getProportionalPositionX = (positionName: string): ?number => {
+export const getProportionalPositionX = (
+  positionName: string
+): number | null => {
   const horizontalPositionName = (positionName.includes('-')
     ? positionName.split('-')[1]
     : positionName
@@ -109,7 +111,9 @@ export const getProportionalPositionX = (positionName: string): ?number => {
  * also values like 'top-left'.
  * @returns a value between 0 and 1.
  */
-export const getProportionalPositionY = (positionName: string): ?number => {
+export const getProportionalPositionY = (
+  positionName: string
+): number | null => {
   const verticalPositionName = (positionName.includes('-')
     ? positionName.split('-')[0]
     : positionName
@@ -126,7 +130,7 @@ export const getProportionalPositionY = (positionName: string): ?number => {
 const getHorizontalAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor
-): ?number => {
+): number | null => {
   const proportionalX = getProportionalPositionX(anchorName);
   return proportionalX != null
     ? proportionalX
@@ -139,7 +143,7 @@ const getHorizontalAnchorValue = (
 const getVerticalAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor
-): ?number => {
+): number | null => {
   const proportionalY = getProportionalPositionY(anchorName);
   return proportionalY != null
     ? proportionalY
@@ -156,15 +160,15 @@ const getVerticalAnchorValue = (
 const getHorizontalOriginAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: ?number
-): ?number => {
+  targetAnchorValue: number | null
+): number | null => {
   const horizontalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[1]
     : anchorName
   ).toLowerCase();
   return horizontalAnchorName === 'same'
     ? targetAnchorValue
-    : horizontalAnchorName === 'opposite' && targetAnchorValue != null
+    : horizontalAnchorName === 'opposite' && targetAnchorValue !== null
     ? 1 - targetAnchorValue
     : getHorizontalAnchorValue(horizontalAnchorName, properties);
 };
@@ -176,15 +180,15 @@ const getHorizontalOriginAnchorValue = (
 const getVerticalOriginAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: ?number
-): ?number => {
+  targetAnchorValue: number | null
+): number | null => {
   const verticalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[0]
     : anchorName
   ).toLowerCase();
   return verticalAnchorName === 'same'
     ? targetAnchorValue
-    : verticalAnchorName === 'opposite' && targetAnchorValue != null
+    : verticalAnchorName === 'opposite' && targetAnchorValue !== null
     ? 1 - targetAnchorValue
     : getVerticalAnchorValue(verticalAnchorName, properties);
 };
@@ -231,8 +235,8 @@ export const getLayouts = (
     // but the child that is the target of the anchor.
     // The extraInfos from the AnchorOrigin is used to get this child-object list
     let targetObjectName = '';
-    let horizontalAnchorTarget: ?number = null;
-    let verticalAnchorTarget: ?number = null;
+    let horizontalAnchorTarget: number | null = null;
+    let verticalAnchorTarget: number | null = null;
     if (
       layoutField === 'HorizontalAnchorOrigin' ||
       layoutField === 'VerticalAnchorOrigin' ||

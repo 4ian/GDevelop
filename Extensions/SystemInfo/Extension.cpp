@@ -27,9 +27,28 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
           _("The device is a mobile device"),
           "",
           "CppPlatform/Extensions/systeminfoicon.png",
-          "CppPlatform/Extensions/systeminfoicon.png")
+          "CppPlatform/Extensions/systeminfoicon.png");
 
-      .SetFunctionName("SystemInfo::IsMobile");
+  extension
+      .AddCondition(
+          "IsNativeMobileApp",
+          _("Is a native mobile app"),
+          _("Check if the game is running as a native mobile app (iOS or Android app)"),
+          _("The game is running as a native mobile app"),
+          "",
+          "CppPlatform/Extensions/systeminfoicon.png",
+          "CppPlatform/Extensions/systeminfoicon.png");
+
+  extension
+      .AddCondition(
+          "IsNativeDesktopApp",
+          _("Is a native desktop app"),
+          _("Check if the game is running as a native desktop app"),
+          _("The game is running as a native desktop app"),
+          "",
+          "CppPlatform/Extensions/systeminfoicon.png",
+          "CppPlatform/Extensions/systeminfoicon.png")
+      .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddCondition("IsWebGLSupported",

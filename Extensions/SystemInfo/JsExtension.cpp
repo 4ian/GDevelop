@@ -28,6 +28,14 @@ class SystemInfoJsExtension : public gd::PlatformExtension {
         .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
+    GetAllConditions()["SystemInfo::IsNativeMobileApp"]
+        .codeExtraInformation
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isNativeMobileApp");
+    GetAllConditions()["SystemInfo::IsNativeDesktopApp"]
+        .codeExtraInformation
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isNativeDesktopApp");
     GetAllConditions()["SystemInfo::IsWebGLSupported"]
         .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")

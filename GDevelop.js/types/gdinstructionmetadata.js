@@ -35,6 +35,7 @@ declare class gdInstructionMetadata {
   markAsComplex(): gdInstructionMetadata;
   getCodeExtraInformation(): gdExtraInformation;
   setFunctionName(functionName: string): gdExtraInformation;
+  setAsyncFunctionName(functionName: string): gdExtraInformation;
   setIncludeFile(includeFile: string): gdInstructionMetadata;
   addIncludeFile(includeFile: string): gdInstructionMetadata;
   getIncludeFiles(): gdVectorString;

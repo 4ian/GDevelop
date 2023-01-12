@@ -18,6 +18,7 @@ import {
 } from './EnumerateEventsFunctions';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import AsyncIcon from '@material-ui/icons/SyncAlt';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
@@ -39,21 +40,45 @@ export type EventsFunctionCreationParameters = {|
   name: ?string,
 |};
 
-const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.isPrivate() ? (
-    <>
-      <Tooltip
-        title={
-          <Trans>This function won't be visible in the events editor.</Trans>
-        }
-      >
-        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
-      </Tooltip>
-      <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
-    </>
-  ) : (
-    eventsFunction.getName()
+const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) => {
+  let label = (
+    <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
   );
+
+  if (eventsFunction.isPrivate())
+    label = (
+      <>
+        <Tooltip
+          title={
+            <Trans>This function won't be visible in the events editor.</Trans>
+          }
+        >
+          <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
+        </Tooltip>
+        {label}
+      </>
+    );
+
+  if (eventsFunction.isAsync())
+    label = (
+      <>
+        <Tooltip
+          title={
+            <Trans>
+              This function is asynchronous - it will only allow subsequent
+              events to run after calling the action "End asynchrounous task"
+              within the function.
+            </Trans>
+          }
+        >
+          <AsyncIcon fontSize="small" style={styles.tooltip} />
+        </Tooltip>
+        {label}
+      </>
+    );
+
+  return label;
+};
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
   eventsFunction.getName();
@@ -107,6 +132,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
   _togglePrivate = (eventsFunction: gdEventsFunction) => {
     eventsFunction.setPrivate(!eventsFunction.isPrivate());
+    this.forceUpdate();
+  };
+
+  _toggleAsync = (eventsFunction: gdEventsFunction) => {
+    eventsFunction.setAsync(!eventsFunction.isAsync());
     this.forceUpdate();
   };
 
@@ -319,8 +349,13 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
-        enabled: this.props.canRename(eventsFunction),
         click: () => this._togglePrivate(eventsFunction),
+      },
+      {
+        label: eventsFunction.isAsync()
+          ? i18n._(t`Make synchronous`)
+          : i18n._(t`Make asynchrounous`),
+        click: () => this._toggleAsync(eventsFunction),
       },
       {
         label: i18n._(t`Delete`),

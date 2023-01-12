@@ -265,9 +265,9 @@ const generateFreeFunction = (
   );
   instructionOrExpression.setIncludeFile(functionFile);
 
-  if (eventsFunction.isAsync())
-    instructionOrExpression.setFunctionName(functionName);
-  else instructionOrExpression.setAsyncFunctionName(functionName);
+  if (eventsFunction.isAsync() && !!instructionOrExpression.setAsyncFunctionName)
+    instructionOrExpression.setAsyncFunctionName(functionName);
+  else instructionOrExpression.setFunctionName(functionName);
 
   if (!options.skipCodeGeneration) {
     const includeFiles = new gd.SetString();
@@ -384,10 +384,9 @@ function generateBehavior(
 
       instructionOrExpression.setIncludeFile(includeFile);
 
-      if (eventsFunction.isAsync())
-        instructionOrExpression.setFunctionName(eventsFunctionMangledName);
-      else
+      if (eventsFunction.isAsync() && !!instructionOrExpression.setAsyncFunctionName)
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
+      else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });
 
     // Generate code for the behavior and its methods
@@ -503,10 +502,9 @@ function generateObject(
 
       instructionOrExpression.setIncludeFile(includeFile);
 
-      if (eventsFunction.isAsync())
-        instructionOrExpression.setFunctionName(eventsFunctionMangledName);
-      else
+      if (eventsFunction.isAsync() && !!instructionOrExpression.setAsyncFunctionName)
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
+      else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });
 
     // Generate code for the object and its methods

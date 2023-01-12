@@ -132,7 +132,7 @@ const getHorizontalAnchorValue = (
   properties: gdMapStringPropertyDescriptor
 ): number | null => {
   const proportionalX = getProportionalPositionX(anchorName);
-  return proportionalX != null
+  return proportionalX !== null
     ? proportionalX
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
@@ -145,7 +145,7 @@ const getVerticalAnchorValue = (
   properties: gdMapStringPropertyDescriptor
 ): number | null => {
   const proportionalY = getProportionalPositionY(anchorName);
-  return proportionalY != null
+  return proportionalY !== null
     ? proportionalY
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)

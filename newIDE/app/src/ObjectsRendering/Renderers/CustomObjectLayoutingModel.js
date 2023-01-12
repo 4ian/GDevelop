@@ -85,43 +85,71 @@ const layoutFields = [
   'IsScaledProportionally',
 ];
 
+/**
+ * @param positionName Accepted values are: 'left', 'center' or 'right', but
+ * also values like 'top-left'.
+ * @returns a value between 0 and 1.
+ */
+export const getProportionalPositionX = (
+  positionName: string
+): number | null => {
+  const horizontalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[1]
+    : positionName
+  ).toLowerCase();
+  return horizontalPositionName === 'left'
+    ? 0
+    : horizontalPositionName === 'right'
+    ? 1
+    : horizontalPositionName === 'center'
+    ? 0.5
+    : null;
+};
+
+/**
+ * @param positionName Accepted values are: 'top', 'center' or 'bottom', but
+ * also values like 'top-left'.
+ * @returns a value between 0 and 1.
+ */
+export const getProportionalPositionY = (
+  positionName: string
+): number | null => {
+  const verticalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[0]
+    : positionName
+  ).toLowerCase();
+  return verticalPositionName === 'top'
+    ? 0
+    : verticalPositionName === 'bottom'
+    ? 1
+    : verticalPositionName === 'center'
+    ? 0.5
+    : null;
+};
+
 const getHorizontalAnchorValue = (
   anchorName: string,
-  properties: ?gdMapStringPropertyDescriptor
-): ?number => {
-  const horizontalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[1]
-    : anchorName
-  ).toLowerCase();
-  return horizontalAnchorName === 'left'
-    ? 0
-    : horizontalAnchorName === 'right'
-    ? 1
-    : horizontalAnchorName === 'center'
-    ? 0.5
+  properties: gdMapStringPropertyDescriptor
+): number | null => {
+  const proportionalX = getProportionalPositionX(anchorName);
+  return proportionalX !== null
+    ? proportionalX
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
-    ? getHorizontalAnchorValue(properties.get(anchorName).getValue(), null)
+    ? getProportionalPositionX(properties.get(anchorName).getValue())
     : null;
 };
 
 const getVerticalAnchorValue = (
   anchorName: string,
-  properties: ?gdMapStringPropertyDescriptor
-): ?number => {
-  const verticalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[0]
-    : anchorName
-  ).toLowerCase();
-  return verticalAnchorName === 'top'
-    ? 0
-    : verticalAnchorName === 'bottom'
-    ? 1
-    : verticalAnchorName === 'center'
-    ? 0.5
+  properties: gdMapStringPropertyDescriptor
+): number | null => {
+  const proportionalY = getProportionalPositionY(anchorName);
+  return proportionalY !== null
+    ? proportionalY
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
-    ? getVerticalAnchorValue(properties.get(anchorName).getValue(), null)
+    ? getProportionalPositionY(properties.get(anchorName).getValue())
     : null;
 };
 
@@ -132,15 +160,15 @@ const getVerticalAnchorValue = (
 const getHorizontalOriginAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: ?number
-): ?number => {
+  targetAnchorValue: number | null
+): number | null => {
   const horizontalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[1]
     : anchorName
   ).toLowerCase();
   return horizontalAnchorName === 'same'
     ? targetAnchorValue
-    : horizontalAnchorName === 'opposite' && targetAnchorValue != null
+    : horizontalAnchorName === 'opposite' && targetAnchorValue !== null
     ? 1 - targetAnchorValue
     : getHorizontalAnchorValue(horizontalAnchorName, properties);
 };
@@ -152,15 +180,15 @@ const getHorizontalOriginAnchorValue = (
 const getVerticalOriginAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: ?number
-): ?number => {
+  targetAnchorValue: number | null
+): number | null => {
   const verticalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[0]
     : anchorName
   ).toLowerCase();
   return verticalAnchorName === 'same'
     ? targetAnchorValue
-    : verticalAnchorName === 'opposite' && targetAnchorValue != null
+    : verticalAnchorName === 'opposite' && targetAnchorValue !== null
     ? 1 - targetAnchorValue
     : getVerticalAnchorValue(verticalAnchorName, properties);
 };
@@ -207,8 +235,8 @@ export const getLayouts = (
     // but the child that is the target of the anchor.
     // The extraInfos from the AnchorOrigin is used to get this child-object list
     let targetObjectName = '';
-    let horizontalAnchorTarget: ?number = null;
-    let verticalAnchorTarget: ?number = null;
+    let horizontalAnchorTarget: number | null = null;
+    let verticalAnchorTarget: number | null = null;
     if (
       layoutField === 'HorizontalAnchorOrigin' ||
       layoutField === 'VerticalAnchorOrigin' ||
@@ -281,7 +309,6 @@ export const getLayouts = (
       } else if (layoutField === 'IsScaledProportionallyOnY') {
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionally') {
-        console.log(propertyValueString);
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else {

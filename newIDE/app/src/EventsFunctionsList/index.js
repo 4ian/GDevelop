@@ -64,7 +64,11 @@ const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) => {
       <>
         <Tooltip
           title={
-            <Trans>This function is asynchronous - it will only allow subsequent events to run after calling the action "End asynchrounous task" within the function.</Trans>
+            <Trans>
+              This function is asynchronous - it will only allow subsequent
+              events to run after calling the action "End asynchrounous task"
+              within the function.
+            </Trans>
           }
         >
           <AsyncIcon fontSize="small" style={styles.tooltip} />

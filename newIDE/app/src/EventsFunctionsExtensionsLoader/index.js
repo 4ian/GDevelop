@@ -265,7 +265,10 @@ const generateFreeFunction = (
   );
   instructionOrExpression.setIncludeFile(functionFile);
 
-  if (eventsFunction.isAsync() && !!instructionOrExpression.setAsyncFunctionName)
+  if (
+    eventsFunction.isAsync() &&
+    !!instructionOrExpression.setAsyncFunctionName
+  )
     instructionOrExpression.setAsyncFunctionName(functionName);
   else instructionOrExpression.setFunctionName(functionName);
 
@@ -384,7 +387,10 @@ function generateBehavior(
 
       instructionOrExpression.setIncludeFile(includeFile);
 
-      if (eventsFunction.isAsync() && !!instructionOrExpression.setAsyncFunctionName)
+      if (
+        eventsFunction.isAsync() &&
+        !!instructionOrExpression.setAsyncFunctionName
+      )
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
       else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });
@@ -502,7 +508,10 @@ function generateObject(
 
       instructionOrExpression.setIncludeFile(includeFile);
 
-      if (eventsFunction.isAsync() && !!instructionOrExpression.setAsyncFunctionName)
+      if (
+        eventsFunction.isAsync() &&
+        !!instructionOrExpression.setAsyncFunctionName
+      )
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
       else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });

@@ -21,7 +21,7 @@ declare type ObjectsLists = Hashtable<gdjs.RuntimeObject[]>;
  * if any. If the JavaScript code is running in a scene, this will be undefined (so you can't use this in a scene).
  */
 declare type EventsFunctionContext = {
-  task?: gdjs.ManuallyResolvableTask,
+  task?: gdjs.ManuallyResolvableTask;
 
   /**  Get the list of instances of the specified object. */
   getObjects: (objectName: string) => Array<gdjs.RuntimeObject>;

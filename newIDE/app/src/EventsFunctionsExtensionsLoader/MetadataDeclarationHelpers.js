@@ -882,12 +882,8 @@ const declarePropertyInstructionAndExpression = (
       entityMetadata.addScopedCondition(
         conditionName,
         propertyLabel,
-        i18n._(
-          t`Check the property value for ${'"' + uncapitalizedLabel + '"'}.`
-        ),
-        i18n._(
-          t`Property ${'"' + uncapitalizedLabel + '"'} of _PARAM0_ is true`
-        ),
+        i18n._(t`Check the property value for "${uncapitalizedLabel}".`),
+        i18n._(t`Property "${uncapitalizedLabel}" of _PARAM0_ is true`),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
         getExtensionIconUrl(extension)
@@ -900,13 +896,9 @@ const declarePropertyInstructionAndExpression = (
       entityMetadata.addScopedAction(
         actionName,
         propertyLabel,
+        i18n._(t`Update the property value for "${uncapitalizedLabel}".`),
         i18n._(
-          t`Update the property value for ${'"' + uncapitalizedLabel + '"'}.`
-        ),
-        i18n._(
-          t`Set the property value for ${'"' +
-            uncapitalizedLabel +
-            '"'} of _PARAM0_ to _PARAM${valueParameterIndex}_`
+          t`Set the property value for "${uncapitalizedLabel}" of _PARAM0_ to _PARAM${valueParameterIndex}_`
         ),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
@@ -921,18 +913,12 @@ const declarePropertyInstructionAndExpression = (
       entityMetadata.addScopedAction(
         toggleActionName,
         i18n._(t`Toggle ${propertyLabel}`),
-        i18n._(
-          t`Toggle the property value for ${'"' + uncapitalizedLabel + '"'}.`
-        ) +
+        i18n._(t`Toggle the property value for "${uncapitalizedLabel}".`) +
           '\n' +
           i18n._(
             `If it was true, it will become false, and if it was false it will become true.`
           ),
-        i18n._(
-          t`Toggle the property value for ${'"' +
-            uncapitalizedLabel +
-            '"'} of _PARAM0_`
-        ),
+        i18n._(t`Toggle property "${uncapitalizedLabel}" of _PARAM0_`),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),
         getExtensionIconUrl(extension)

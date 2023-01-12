@@ -898,7 +898,7 @@ const declarePropertyInstructionAndExpression = (
         propertyLabel,
         i18n._(t`Update the property value for "${uncapitalizedLabel}".`),
         i18n._(
-          t`Set the property value for "${uncapitalizedLabel}" of _PARAM0_ to _PARAM${valueParameterIndex}_`
+          t`Set property value for "${uncapitalizedLabel}" of _PARAM0_ to _PARAM${valueParameterIndex}_`
         ),
         eventsBasedEntity.getFullName() || eventsBasedEntity.getName(),
         getExtensionIconUrl(extension),

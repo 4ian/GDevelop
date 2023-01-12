@@ -85,43 +85,65 @@ const layoutFields = [
   'IsScaledProportionally',
 ];
 
+export const getProportionalPositionX = (positionName: string): ?number => {
+  const horizontalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[1]
+    : positionName
+  ).toLowerCase();
+  return horizontalPositionName === 'left'
+    ? 0
+    : horizontalPositionName === 'right'
+    ? 1
+    : horizontalPositionName === 'center'
+    ? 0.5
+    : null;
+};
+
+export const getProportionalPositionY = (positionName: string): ?number => {
+  const verticalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[0]
+    : positionName
+  ).toLowerCase();
+  return verticalPositionName === 'top'
+    ? 0
+    : verticalPositionName === 'bottom'
+    ? 1
+    : verticalPositionName === 'center'
+    ? 0.5
+    : null;
+};
+
 const getHorizontalAnchorValue = (
   anchorName: string,
-  properties: ?gdMapStringPropertyDescriptor
+  properties: gdMapStringPropertyDescriptor
 ): ?number => {
   const horizontalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[1]
     : anchorName
   ).toLowerCase();
-  return horizontalAnchorName === 'left'
-    ? 0
-    : horizontalAnchorName === 'right'
-    ? 1
-    : horizontalAnchorName === 'center'
-    ? 0.5
+  const proportionalX = getProportionalPositionX(horizontalAnchorName);
+  return proportionalX != null
+    ? proportionalX
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
-    ? getHorizontalAnchorValue(properties.get(anchorName).getValue(), null)
+    ? getProportionalPositionX(properties.get(anchorName).getValue())
     : null;
 };
 
 const getVerticalAnchorValue = (
   anchorName: string,
-  properties: ?gdMapStringPropertyDescriptor
+  properties: gdMapStringPropertyDescriptor
 ): ?number => {
   const verticalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[0]
     : anchorName
   ).toLowerCase();
-  return verticalAnchorName === 'top'
-    ? 0
-    : verticalAnchorName === 'bottom'
-    ? 1
-    : verticalAnchorName === 'center'
-    ? 0.5
+  const proportionalY = getProportionalPositionY(verticalAnchorName);
+  return proportionalY != null
+    ? proportionalY
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
-    ? getVerticalAnchorValue(properties.get(anchorName).getValue(), null)
+    ? getProportionalPositionY(properties.get(anchorName).getValue())
     : null;
 };
 

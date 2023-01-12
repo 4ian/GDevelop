@@ -11,6 +11,8 @@ import {
   ChildInstance,
   type ChildLayout,
   LayoutedParent,
+  getProportionalPositionX,
+  getProportionalPositionY,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
 
@@ -25,6 +27,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
   childrenLayouts: ChildLayout[];
   childrenRenderedInstances: RenderedInstance[];
   childrenRenderedInstanceByNames: Map<string, RenderedInstance>;
+  _proportionalOriginX: number;
+  _proportionalOriginY: number;
 
   constructor(
     project: gdProject,
@@ -50,6 +54,29 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
     );
+
+    const properties = customObjectConfiguration.getProperties();
+    const parentOriginPositionName =
+      properties.has('ParentOrigin') &&
+      properties.get('ParentOrigin').getValue();
+    const parentOriginXPositionName =
+      properties.has('ParentOriginX') &&
+      properties.get('ParentOriginX').getValue();
+    const parentOriginYPositionName =
+      properties.has('ParentOriginY') &&
+      properties.get('ParentOriginY').getValue();
+    this._proportionalOriginX =
+      (parentOriginPositionName &&
+        getProportionalPositionX(parentOriginPositionName)) ||
+      (parentOriginXPositionName &&
+        getProportionalPositionX(parentOriginXPositionName)) ||
+      0;
+    this._proportionalOriginY =
+      (parentOriginPositionName &&
+        getProportionalPositionY(parentOriginPositionName)) ||
+      (parentOriginYPositionName &&
+        getProportionalPositionY(parentOriginYPositionName)) ||
+      0;
 
     const eventBasedObject = project.hasEventsBasedObject(
       customObjectConfiguration.getType()
@@ -161,8 +188,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
 
     const defaultWidth = this.getDefaultWidth();
     const defaultHeight = this.getDefaultHeight();
-    const originX = 0;
-    const originY = 0;
+    const originX = this._proportionalOriginX * defaultWidth;
+    const originY = this._proportionalOriginY * defaultHeight;
     const centerX = defaultWidth / 2;
     const centerY = defaultHeight / 2;
 
@@ -203,5 +230,21 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
+  }
+
+  getOriginX(): number {
+    return (
+      this._proportionalOriginX *
+      this.getDefaultWidth() *
+      this._pixiObject.scale.x
+    );
+  }
+
+  getOriginY(): number {
+    return (
+      this._proportionalOriginY *
+      this.getDefaultHeight() *
+      this._pixiObject.scale.y
+    );
   }
 }

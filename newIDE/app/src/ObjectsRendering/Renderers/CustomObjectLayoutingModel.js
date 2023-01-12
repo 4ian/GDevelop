@@ -85,6 +85,11 @@ const layoutFields = [
   'IsScaledProportionally',
 ];
 
+/**
+ * @param positionName Accepted values are: 'left', 'center' or 'right', but
+ * also values like 'top-left'.
+ * @returns a value between 0 and 1.
+ */
 export const getProportionalPositionX = (positionName: string): ?number => {
   const horizontalPositionName = (positionName.includes('-')
     ? positionName.split('-')[1]
@@ -99,6 +104,11 @@ export const getProportionalPositionX = (positionName: string): ?number => {
     : null;
 };
 
+/**
+ * @param positionName Accepted values are: 'top', 'center' or 'bottom', but
+ * also values like 'top-left'.
+ * @returns a value between 0 and 1.
+ */
 export const getProportionalPositionY = (positionName: string): ?number => {
   const verticalPositionName = (positionName.includes('-')
     ? positionName.split('-')[0]
@@ -117,11 +127,7 @@ const getHorizontalAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor
 ): ?number => {
-  const horizontalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[1]
-    : anchorName
-  ).toLowerCase();
-  const proportionalX = getProportionalPositionX(horizontalAnchorName);
+  const proportionalX = getProportionalPositionX(anchorName);
   return proportionalX != null
     ? proportionalX
     : // Reference to another property to allow to expose a Choice property.
@@ -134,11 +140,7 @@ const getVerticalAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor
 ): ?number => {
-  const verticalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[0]
-    : anchorName
-  ).toLowerCase();
-  const proportionalY = getProportionalPositionY(verticalAnchorName);
+  const proportionalY = getProportionalPositionY(anchorName);
   return proportionalY != null
     ? proportionalY
     : // Reference to another property to allow to expose a Choice property.

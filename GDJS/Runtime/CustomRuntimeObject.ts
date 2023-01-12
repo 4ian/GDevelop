@@ -181,10 +181,10 @@ namespace gdjs {
     _updateUntransformedHitBoxes() {
       this._isUntransformedHitBoxesDirty = false;
 
-      const oldUnscaledCenterX =
-        (this._unrotatedAABB.max[0] + this._unrotatedAABB.min[0]) / 2;
-      const oldUnscaledCenterY =
-        (this._unrotatedAABB.max[1] + this._unrotatedAABB.min[1]) / 2;
+      const oldUnrotatedMinX = this._unrotatedAABB.min[0];
+      const oldUnrotatedMinY = this._unrotatedAABB.min[1];
+      const oldUnrotatedMaxX = this._unrotatedAABB.max[0];
+      const oldUnrotatedMaxY = this._unrotatedAABB.max[1];
 
       this._untransformedHitBoxes.length = 0;
       if (this._instanceContainer.getAdhocListOfAllInstances().length === 0) {
@@ -219,13 +219,17 @@ namespace gdjs {
         this.hitBoxes.length = this._untransformedHitBoxes.length;
       }
 
+      // The default camera center depends on the object dimensions so checking
+      // the AABB center is not enough.
       if (
-        this.getUnscaledCenterX() !== oldUnscaledCenterX ||
-        this.getUnscaledCenterY() !== oldUnscaledCenterY
+        this._unrotatedAABB.min[0] !== oldUnrotatedMinX ||
+        this._unrotatedAABB.min[1] !== oldUnrotatedMinY ||
+        this._unrotatedAABB.max[0] !== oldUnrotatedMaxX ||
+        this._unrotatedAABB.max[1] !== oldUnrotatedMaxY
       ) {
         this._instanceContainer.onObjectUnscaledCenterChanged(
-          oldUnscaledCenterX,
-          oldUnscaledCenterY
+          (oldUnrotatedMinX + oldUnrotatedMaxX) / 2,
+          (oldUnrotatedMinY + oldUnrotatedMaxY) / 2
         );
       }
     }

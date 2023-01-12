@@ -12,6 +12,7 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
+  static getPropertyToggleActionName(propertyName: string): string;
   insertNewObject(project: gdProject, type: string, name: string, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;

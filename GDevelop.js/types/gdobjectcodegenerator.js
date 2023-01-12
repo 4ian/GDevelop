@@ -4,6 +4,7 @@ declare class gdObjectCodeGenerator {
   generateRuntimeObjectCompleteCode(extensionName: string, eventsBasedObject: gdEventsBasedObject, codeNamespace: string, objectMethodMangledNames: gdMapStringString, includes: gdSetString, compilationForRuntime: boolean): string;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
+  static getObjectPropertyToggleFunctionName(propertyName: string): string;
   delete(): void;
   ptr: number;
 };

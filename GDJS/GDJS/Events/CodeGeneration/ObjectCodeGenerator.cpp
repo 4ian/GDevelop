@@ -195,7 +195,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
   }
   SETTER_NAME(newValue) {
     this._objectData.PROPERTY_NAME = newValue;
-  })jscode_template")
+  }TOGGLE_PROPERTY_CODE)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
                       GetObjectPropertyGetterName(property.GetName()))
@@ -203,7 +203,27 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
                       GetObjectPropertySetterName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_OBJECT_CLASSNAME",
-                      eventsBasedObject.GetName());
+                      eventsBasedObject.GetName())
+      .FindAndReplace(
+          "TOGGLE_PROPERTY_CODE",
+          (property.GetType() == "Boolean"
+               ? GenerateToggleBooleanPropertyTemplateCode(
+                     GetObjectPropertyToggleFunctionName(property.GetName()),
+                     GetObjectPropertyGetterName(property.GetName()),
+                     GetObjectPropertySetterName(property.GetName()))
+               : ""));
+}
+
+gd::String ObjectCodeGenerator::GenerateToggleBooleanPropertyTemplateCode(
+    const gd::String &toggleFunctionName, const gd::String &getterName,
+    const gd::String &setterName) {
+  return gd::String(R"jscode_template(
+  TOGGLE_NAME() {
+    this.SETTER_NAME(!this.GETTER_NAME());
+  })jscode_template")
+      .FindAndReplace("TOGGLE_NAME", toggleFunctionName)
+      .FindAndReplace("GETTER_NAME", getterName)
+      .FindAndReplace("SETTER_NAME", setterName);
 }
 
 gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromObjectDataCode(

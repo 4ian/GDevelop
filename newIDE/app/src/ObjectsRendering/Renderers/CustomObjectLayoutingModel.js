@@ -303,7 +303,6 @@ export const getLayouts = (
       } else if (layoutField === 'IsScaledProportionallyOnY') {
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionally') {
-        console.log(propertyValueString);
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else {

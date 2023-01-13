@@ -870,8 +870,6 @@ namespace gdjs {
           if (document.visibilityState === 'visible') {
             // Skip the duration the game was hidden.
             lastSessionResumeTime = Date.now();
-            this._hasJustResumed = true;
-            console.log('visible!!!!');
           } else {
             sendSessionHit();
           }
@@ -884,7 +882,6 @@ namespace gdjs {
           () => {
             // Skip the duration the game was hidden.
             lastSessionResumeTime = Date.now();
-            this._hasJustResumed = true;
           },
           false
         );

@@ -391,7 +391,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                 <Column expand noMargin>
                   <Tabs
                     value={currentTab}
-                    onChange={onChangeTab}
+                    onChange={(e) => {
+                      onChangeTab(e);
+                      this._searchBar.current.focus();}
+                    }
                     options={[
                       {
                         label: <Trans>Objects</Trans>,

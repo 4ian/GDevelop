@@ -179,9 +179,8 @@ namespace gdjs {
 
     movementAngleIsAround(degreeAngle: float, tolerance: float) {
       return (
-        gdjs.evtTools.common.angleDifference(
-          this._movementAngle,
-          degreeAngle
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle)
         ) <= tolerance
       );
     }

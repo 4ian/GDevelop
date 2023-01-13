@@ -69,6 +69,8 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     autConditions["TopDownMovementBehavior::AngleOffset"].SetFunctionName(
         "getAngleOffset");
     autConditions["TopDownMovementBehavior::Angle"].SetFunctionName("getAngle");
+    autConditions["TopDownMovementBehavior::TopDownMovementBehavior::IsMovementAngleAround"]
+        .SetFunctionName("isMovementAngleAround");
     autConditions["TopDownMovementBehavior::XVelocity"].SetFunctionName(
         "getXVelocity");
     autConditions["TopDownMovementBehavior::YVelocity"].SetFunctionName(

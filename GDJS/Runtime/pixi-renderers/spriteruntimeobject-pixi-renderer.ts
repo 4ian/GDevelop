@@ -8,7 +8,7 @@ namespace gdjs {
     _object: gdjs.SpriteRuntimeObject;
     _spriteDirty: boolean = true;
     _textureDirty: boolean = true;
-    _sprite: any;
+    _sprite: PIXI.Sprite;
     _cachedWidth: float = 0;
     _cachedHeight: float = 0;
 
@@ -39,6 +39,7 @@ namespace gdjs {
       this._object = runtimeObject;
       this._spriteDirty = true;
       this._textureDirty = true;
+      this._sprite.tint = 0xffffff;
       const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
@@ -145,13 +146,11 @@ namespace gdjs {
       if (colors.length < 3) {
         return;
       }
-      this._sprite.tint =
-        '0x' +
-        gdjs.rgbToHex(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        );
+      this._sprite.tint = gdjs.rgbToHexNumber(
+        parseInt(colors[0], 10),
+        parseInt(colors[1], 10),
+        parseInt(colors[2], 10)
+      );
     }
 
     getColor() {

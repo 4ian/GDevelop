@@ -122,6 +122,7 @@ export const ExtensionStore = ({
                     id="extension-search-bar"
                     value={searchText}
                     onChange={setSearchText}
+                    autoFocus
                     onRequestSearch={() => {}}
                     tagsHandler={tagsHandler}
                     tags={filters && filters.allTags}

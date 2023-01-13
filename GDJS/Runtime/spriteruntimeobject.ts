@@ -280,11 +280,10 @@ namespace gdjs {
           );
         }
       }
+      // Make sure to delete already existing directions which are not used anymore.
       this.directions.length = i;
     }
   }
-
-  //Make sure to delete already existing directions which are not used anymore.
 
   /**
    * The SpriteRuntimeObject represents an object that can display images.

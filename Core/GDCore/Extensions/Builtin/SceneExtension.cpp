@@ -142,8 +142,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "HasGameJustResumed",
           _("Game resumed"),
           _("Check if the game has just resumed (from being hidden). It "
-            "happens when the game tab is selected, the window unminimized "
-            "or the application is put back on front."),
+            "happens when the game tab is selected, a minimized window is "
+            "restored or the application is put back on front."),
           _("Game has resumed"),
           "",
           "res/actions/window24.png",

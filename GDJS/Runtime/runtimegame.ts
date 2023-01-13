@@ -72,25 +72,42 @@ namespace gdjs {
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
+    /**
+     * Game loop management (see startGameLoop method)
+     */
     _renderer: RuntimeGameRenderer;
     _sessionId: string | null;
     _playerId: string | null;
 
-    //Game loop management (see startGameLoop method)
     _sceneStack: SceneStack;
+    /**
+     * When set to true, the scenes are notified that game resolution size changed.
+     */
     _notifyScenesForGameResolutionResize: boolean = false;
 
-    // When set to true, the scenes are notified that gamre resolution size changed.
+    /**
+     * When paused, the game won't step and will be freezed. Useful for debugging.
+     */
     _paused: boolean = false;
+
+    /**
+     * True during the first frame the game is back from being hidden.
+     * This has nothing to do with `_paused`.
+     */
+    _hasJustResumed: boolean = false;
 
     //Inputs :
     _inputManager: InputManager;
 
-    //Allow to specify an external layout to insert in the first scene:
+    /**
+     * Allow to specify an external layout to insert in the first scene.
+     */
     _injectExternalLayout: any;
     _options: RuntimeGameOptions;
 
-    //The mappings for embedded resources
+    /**
+     * The mappings for embedded resources
+     */
     _embeddedResourcesMappings: Map<string, Record<string, string>>;
 
     /**
@@ -525,6 +542,14 @@ namespace gdjs {
     }
 
     /**
+     * @returns true during the first frame the game is back from being hidden.
+     * This has nothing to do with `_paused`.
+     */
+    hasJustResumed() {
+      return this._hasJustResumed;
+    }
+
+    /**
      * Load all assets, displaying progress in renderer.
      */
     loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
@@ -630,7 +655,7 @@ namespace gdjs {
         }
         this._forceGameResolutionUpdate();
 
-        //Load the first scene
+        // Load the first scene
         const firstSceneName = this._data.firstLayout;
         this._sceneStack.push(
           this.hasScene(firstSceneName)
@@ -652,9 +677,10 @@ namespace gdjs {
         // logger.log("Took", time, "ms");
         // return;
 
-        //The standard game loop
+        // The standard game loop
         const that = this;
         let accumulatedElapsedTime = 0;
+        this._hasJustResumed = false;
         this._renderer.startGameLoop(function (lastCallElapsedTime) {
           if (that._paused) {
             return true;
@@ -675,15 +701,16 @@ namespace gdjs {
           const elapsedTime = accumulatedElapsedTime;
           accumulatedElapsedTime = 0;
 
-          //Manage resize events.
+          // Manage resize events.
           if (that._notifyScenesForGameResolutionResize) {
             that._sceneStack.onGameResolutionResized();
             that._notifyScenesForGameResolutionResize = false;
           }
 
-          //Render and step the scene.
+          // Render and step the scene.
           if (that._sceneStack.step(elapsedTime)) {
             that.getInputManager().onFrameEnded();
+            that._hasJustResumed = false;
             return true;
           }
           return false;
@@ -824,14 +851,20 @@ namespace gdjs {
           if (document.visibilityState === 'visible') {
             // Skip the duration the game was hidden.
             lastSessionResumeTime = Date.now();
+            this._hasJustResumed = true;
           } else {
             sendSessionHit();
           }
         });
+        window.addEventListener('pagehide', sendSessionHit, false);
+        // Cordova events
+        window.addEventListener('pause', sendSessionHit, false);
         window.addEventListener(
-          'pagehide',
+          'resume',
           () => {
-            sendSessionHit();
+            // Skip the duration the game was hidden.
+            lastSessionResumeTime = Date.now();
+            this._hasJustResumed = true;
           },
           false
         );

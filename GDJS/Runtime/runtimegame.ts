@@ -677,6 +677,8 @@ namespace gdjs {
         // logger.log("Took", time, "ms");
         // return;
 
+        this._setupGameVisibilityEvents();
+
         // The standard game loop
         const that = this;
         let accumulatedElapsedTime = 0;
@@ -731,6 +733,23 @@ namespace gdjs {
       this._disableMetrics = !enable;
       if (enable) {
         this._setupSessionMetrics();
+      }
+    }
+
+    _setupGameVisibilityEvents() {
+      if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            this._hasJustResumed = true;
+          }
+        });
+        window.addEventListener(
+          'resume',
+          () => {
+            this._hasJustResumed = true;
+          },
+          false
+        );
       }
     }
 
@@ -852,6 +871,7 @@ namespace gdjs {
             // Skip the duration the game was hidden.
             lastSessionResumeTime = Date.now();
             this._hasJustResumed = true;
+            console.log('visible!!!!');
           } else {
             sendSessionHit();
           }

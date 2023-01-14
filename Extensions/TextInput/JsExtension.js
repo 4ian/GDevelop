@@ -502,7 +502,10 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription('Read-only?')
+      )
       .setFunctionName('setReadOnly')
       .setGetter('isReadOnly');
 

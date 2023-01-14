@@ -267,7 +267,7 @@ const generateFreeFunction = (
 
   if (
     eventsFunction.isAsync() &&
-    typeof instructionOrExpression.setAsyncFunctionName !== 'undefined'
+    typeof instructionOrExpression.setAsyncFunctionName === 'function'
   )
     instructionOrExpression.setAsyncFunctionName(functionName);
   else instructionOrExpression.setFunctionName(functionName);
@@ -389,7 +389,7 @@ function generateBehavior(
 
       if (
         eventsFunction.isAsync() &&
-        typeof instructionOrExpression.setAsyncFunctionName !== 'undefined'
+        typeof instructionOrExpression.setAsyncFunctionName === 'function'
       )
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
       else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
@@ -510,7 +510,7 @@ function generateObject(
 
       if (
         eventsFunction.isAsync() &&
-        typeof instructionOrExpression.setAsyncFunctionName !== 'undefined'
+        typeof instructionOrExpression.setAsyncFunctionName === 'function'
       )
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
       else instructionOrExpression.setFunctionName(eventsFunctionMangledName);

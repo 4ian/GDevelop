@@ -69,7 +69,8 @@ AsyncExtension::AsyncExtension() {
                asyncObjectsListBuilder + asyncActionCode + "}\n" + "}\n";
       });
 
-      GetAllActions()["ResolveAsyncEventsFunction"].SetFunctionName("gdjs.evtTools.common.resolveAsyncEventsFunction");
+  GetAllActions()["BuiltinAsync::ResolveAsyncEventsFunction"].SetFunctionName(
+      "gdjs.evtTools.common.resolveAsyncEventsFunction");
 }
 
 }  // namespace gdjs

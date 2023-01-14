@@ -107,11 +107,12 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * function.
    *
    * \param project Project used.
-   * \param eventsBasedObject The object that contains the function to be
-   * compiled. \param eventsFunction The events function to be compiled. \param
-   * codeNamespace Where to store the context used by the function. \param
-   * fullyQualifiedFunctionName The function name with its namespace. \param
-   * onceTriggersVariable The code to access the variable holding OnceTriggers.
+   * \param eventsBasedObject The object that contains the function to be compiled.
+   * \param eventsFunction The events function to be compiled.
+   * \param codeNamespace Where to store the context used by the function.
+   * \param fullyQualifiedFunctionName The function name with its namespace.
+   * \param onceTriggersVariable The code to access the variable holding
+   * OnceTriggers.
    * \param preludeCode The code to run right before the events
    * generated code.
    * \param endingCode The code to run right after the events

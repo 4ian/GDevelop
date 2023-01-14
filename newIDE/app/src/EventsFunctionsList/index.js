@@ -66,7 +66,7 @@ const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) => {
           title={
             <Trans>
               This function is asynchronous - it will only allow subsequent
-              events to run after calling the action "End asynchrounous task"
+              events to run after calling the action "End asynchronous task"
               within the function.
             </Trans>
           }

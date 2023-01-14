@@ -269,6 +269,7 @@ const generateFreeFunction = (
     eventsFunction.isAsync() &&
     typeof instructionOrExpression.setAsyncFunctionName === 'function'
   )
+    //$FlowFixMe
     instructionOrExpression.setAsyncFunctionName(functionName);
   else instructionOrExpression.setFunctionName(functionName);
 
@@ -391,6 +392,7 @@ function generateBehavior(
         eventsFunction.isAsync() &&
         typeof instructionOrExpression.setAsyncFunctionName === 'function'
       )
+        //$FlowFixMe
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
       else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });
@@ -512,6 +514,7 @@ function generateObject(
         eventsFunction.isAsync() &&
         typeof instructionOrExpression.setAsyncFunctionName === 'function'
       )
+        //$FlowFixMe
         instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
       else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });

@@ -504,7 +504,7 @@ module.exports = {
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters(
         'boolean',
-        gd.ParameterOptions.makeNewOptions().setDescription('Read-only?')
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Read-only?'))
       )
       .setFunctionName('setReadOnly')
       .setGetter('isReadOnly');

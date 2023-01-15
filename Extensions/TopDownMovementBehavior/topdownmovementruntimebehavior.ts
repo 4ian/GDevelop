@@ -246,6 +246,9 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const object = this.owner;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -321,6 +324,40 @@ namespace gdjs {
         ) {
           direction = 0;
         }
+
+        const deltaX = this._xVelocity * timeDelta;
+        const deltaY = this._yVelocity * timeDelta;
+        
+        if (direction === 4 || direction === 0) {
+          if (this._yVelocity < 0) {
+            if (Math.abs(this.ceilToCellY(object.y) - object.y) > deltaY) {
+              direction = 6;
+            } else {
+              object.y = this.ceilToCellY(object.y);
+            }
+          } else {
+            if (Math.abs(this.floorToCellY(object.y) - object.y) > deltaY) {
+              direction = 2;
+            } else {
+              object.y = this.floorToCellY(object.y);
+            }
+          }
+        }
+        if (direction === 6 || direction === 2) {
+          if (this._xVelocity < 0) {
+            if (Math.abs(this.ceilToCellX(object.x) - object.x) > deltaX) {
+              direction = 4;
+            } else {
+              object.x = this.ceilToCellX(object.x);
+            }
+          } else {
+            if (Math.abs(this.floorToCellX(object.x) - object.x) > deltaX) {
+              direction = 0;
+            } else {
+              object.x = this.floorToCellX(object.x);
+            }
+          }
+        }
       } else {
         if (this._upKey && !this._downKey) {
           if (this._leftKey && !this._rightKey) {
@@ -347,8 +384,6 @@ namespace gdjs {
         }
       }
 
-      const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;

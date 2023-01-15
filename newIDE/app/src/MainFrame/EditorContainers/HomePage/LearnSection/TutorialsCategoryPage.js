@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import {
   type Tutorial,
@@ -33,18 +34,24 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
     tutorial => tutorial.category === category
   );
   return (
-    <SectionContainer
-      title={texts.title}
-      subtitleText={texts.description}
-      backAction={onBack}
-    >
-      <SectionRow>
-        <ImageTileGrid
-          items={filteredTutorials.map(formatTutorialToImageTileComponent)}
-          getColumnsFromWidth={getColumnsFromWidth}
-        />
-      </SectionRow>
-    </SectionContainer>
+    <I18n>
+      {({ i18n }) => (
+        <SectionContainer
+          title={texts.title}
+          subtitleText={texts.description}
+          backAction={onBack}
+        >
+          <SectionRow>
+            <ImageTileGrid
+              items={filteredTutorials.map(tutorial =>
+                formatTutorialToImageTileComponent(i18n, tutorial)
+              )}
+              getColumnsFromWidth={getColumnsFromWidth}
+            />
+          </SectionRow>
+        </SectionContainer>
+      )}
+    </I18n>
   );
 };
 

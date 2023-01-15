@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type HomeTab } from '../HomePageMenu';
 import {
@@ -17,6 +18,7 @@ import Window from '../../../../Utils/Window';
 import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 import Paper from '../../../../UI/Paper';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -48,20 +50,25 @@ export const TUTORIAL_CATEGORY_TEXTS = {
 };
 
 export const formatTutorialToImageTileComponent = (
+  i18n: I18nType,
   tutorial: Tutorial
 ): ImageTileComponent => ({
-  title: tutorial.title,
-  description: tutorial.description,
+  title: selectMessageByLocale(i18n, tutorial.titleByLocale) || tutorial.title,
+  description:
+    selectMessageByLocale(i18n, tutorial.descriptionByLocale) ||
+    tutorial.description,
   onClick: () => {
     sendTutorialOpened(tutorial.id);
-    Window.openExternalURL(tutorial.link);
+    Window.openExternalURL(
+      selectMessageByLocale(i18n, tutorial.linkByLocale) || tutorial.link
+    );
   },
-  imageUrl: tutorial.thumbnailUrl,
-  overlayText: tutorial.duration ? (
-    secondsToMinutesAndSeconds(tutorial.duration)
-  ) : (
-    <Trans>Text</Trans>
-  ),
+  imageUrl:
+    selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale) ||
+    tutorial.thumbnailUrl,
+  overlayText: tutorial.duration
+    ? secondsToMinutesAndSeconds(tutorial.duration)
+    : '\u{1F4D8}',
 });
 
 const styles = {

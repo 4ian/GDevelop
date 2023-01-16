@@ -162,7 +162,8 @@ const getExtensionIncludeFiles = (
       eventsFunction,
       codeNamespacePrefix
     );
-    const functionName = codeNamespace + '.func'; // TODO
+     // TODO Use getFreeFunctionCodeName.
+    const functionName = codeNamespace + '.func';
 
     return options.eventsFunctionCodeWriter.getIncludeFileFor(functionName);
   }).filter(Boolean);
@@ -289,6 +290,7 @@ const generateFreeFunction = (
     eventsFunction,
     codeGenerationContext.codeNamespacePrefix
   );
+  // TODO Implement an helper function for free function names.
   const functionName = codeNamespace + '.func';
 
   const functionFile = options.eventsFunctionCodeWriter.getIncludeFileFor(

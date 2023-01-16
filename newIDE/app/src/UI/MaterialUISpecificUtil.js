@@ -57,9 +57,9 @@ export const doesPathContainDialog = (path: Array<Element>): boolean => {
     return isElementADialog(path[path.length - 5], { isVisible: true });
   } catch (error) {
     console.error(
-      `An error occurred when determining if path ${path.join(
-        ' > '
-      )} leads to a dialog`,
+      `An error occurred when determining if path ${
+        path && path.join ? path.join(' > ') : '[not serializable]'
+      } leads to a dialog`,
       error
     );
     return false;

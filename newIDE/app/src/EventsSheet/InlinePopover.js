@@ -59,7 +59,7 @@ export default function InlinePopover(props: Props) {
         // the AlertProvider seem to trigger this click away listener
         // even if they are displayed above the InlinePopover element.
         // To avoid this, we need to check the click is not made on a dialog.
-        if (doesPathContainDialog(event.path)) {
+        if (doesPathContainDialog(event.composedPath())) {
           return;
         }
         // For a popover, clicking/touching away means validating,

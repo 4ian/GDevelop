@@ -349,7 +349,7 @@ namespace gdjs {
         camera: integer
       ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getCursorX
+          gdjs.evtTools.input.getMouseOnlyCursorX
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
@@ -367,7 +367,7 @@ namespace gdjs {
         camera: integer
       ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getCursorY
+          gdjs.evtTools.input.getMouseOnlyCursorY
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)

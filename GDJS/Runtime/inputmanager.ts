@@ -27,9 +27,21 @@ namespace gdjs {
     _lastPressedKey: float = 0;
     _pressedMouseButtons: Array<boolean>;
     _releasedMouseButtons: Array<boolean>;
+    /**
+     * The cursor X position (moved by mouse and touch events).
+     */
     _cursorX: float = 0;
+    /**
+     * The cursor Y position (moved by mouse and touch events).
+     */
     _cursorY: float = 0;
+    /**
+     * The mouse X position (only moved by mouse events).
+     */
     _mouseX: float = 0;
+    /**
+     * The mouse Y position (only moved by mouse events).
+     */
     _mouseY: float = 0;
     _isMouseInsideCanvas: boolean = true;
     _mouseWheelDelta: float = 0;

@@ -171,8 +171,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension.AddDuplicatedExpression("MouseX", "CursorX").SetHidden();
   extension.AddDuplicatedCondition("SourisX", "CursorX").SetHidden();
   extension.AddDuplicatedExpression("SourisX", "CursorX").SetHidden();
-  extension.AddDuplicatedCondition("SourisX", "CursorX").SetHidden();
-  extension.AddDuplicatedExpression("SourisX", "CursorX").SetHidden();
 
   extension
       .AddExpressionAndCondition(
@@ -193,8 +191,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   // Support for deprecated names:
   extension.AddDuplicatedCondition("MouseY", "CursorY").SetHidden();
   extension.AddDuplicatedExpression("MouseY", "CursorY").SetHidden();
-  extension.AddDuplicatedCondition("SourisY", "CursorY").SetHidden();
-  extension.AddDuplicatedExpression("SourisY", "CursorY").SetHidden();
   extension.AddDuplicatedCondition("SourisY", "CursorY").SetHidden();
   extension.AddDuplicatedExpression("SourisY", "CursorY").SetHidden();
 

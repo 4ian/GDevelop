@@ -256,6 +256,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
       resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
 
       this.props.onChange(resources[0].name);
+      this._loadFrom(resourcesManager);
+      this.forceUpdate();
     } catch (error) {
       this.setState({ externalEditorOpened: false });
       console.error(

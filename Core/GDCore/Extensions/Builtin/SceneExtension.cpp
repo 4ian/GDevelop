@@ -140,11 +140,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension
       .AddCondition(
           "HasGameJustResumed",
-          _("Game resumed"),
-          _("Check if the game has just resumed (from being hidden). It "
+          _("Game has just resumed"),
+          _("Check if the game has just resumed from being hidden. It "
             "happens when the game tab is selected, a minimized window is "
             "restored or the application is put back on front."),
-          _("Game has resumed"),
+          _("Game has just resumed"),
           "",
           "res/actions/window24.png",
           "res/actions/window.png")

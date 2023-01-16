@@ -51,9 +51,7 @@ export default class ObjectPointNameField extends Component<
       );
 
       return getAllPointNames(spriteConfiguration)
-        .map(spriteObjectName =>
-          spriteObjectName.length > 0 ? spriteObjectName : null
-        )
+        .map(pointName => (pointName.length > 0 ? pointName : null))
         .filter(Boolean)
         .sort()
         .map(pointName => ({
@@ -82,9 +80,7 @@ export default class ObjectPointNameField extends Component<
           );
 
           return getAllPointNames(spriteConfiguration)
-            .map(spriteObjectName =>
-              spriteObjectName.length > 0 ? spriteObjectName : null
-            )
+            .map(pointName => (pointName.length > 0 ? pointName : null))
             .filter(Boolean);
         }
       );

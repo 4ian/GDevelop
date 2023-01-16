@@ -34,6 +34,8 @@ SceneExtension::SceneExtension() {
       "gdjs.evtTools.runtimeScene.popScene");
   GetAllActions()["Quit"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.stopGame");
+  GetAllConditions()["HasGameJustResumed"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.hasGameJustResumed");
 
   StripUnimplementedInstructionsAndExpressions();
 }

@@ -217,6 +217,14 @@ namespace gdjs {
       return this._angle;
     }
 
+    isMovementAngleAround(degreeAngle: float, tolerance: float) {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(this._angle, degreeAngle)
+        ) <= tolerance
+      );
+    }
+
     setMovementAngleOffset(movementAngleOffset: float): void {
       this._movementAngleOffset = movementAngleOffset;
     }

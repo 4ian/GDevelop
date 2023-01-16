@@ -739,6 +739,7 @@ namespace gdjs {
         newFrame !== this._currentFrame
       ) {
         this._currentFrame = newFrame;
+        this._frameElapsedTime = 0;
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }

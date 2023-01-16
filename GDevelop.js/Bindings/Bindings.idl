@@ -274,9 +274,9 @@ interface ObjectGroup {
 
     [Const, Ref] DOMString GetName();
     void SetName([Const] DOMString name);
-    void AddObject([Const] DOMString obj);
-    void RemoveObject([Const] DOMString obj);
-    boolean Find([Const] DOMString obj);
+    void AddObject([Const] DOMString objectName);
+    void RemoveObject([Const] DOMString objectName);
+    boolean Find([Const] DOMString objectName);
 
     [Const, Ref] VectorString GetAllObjectsNames();
 

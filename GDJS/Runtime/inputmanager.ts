@@ -209,7 +209,7 @@ namespace gdjs {
      * @param y The mouse new Y position
      */
     onMouseMove(x: float, y: float): void {
-      this._setMousePosition(x, y);
+      this._setCursorPosition(x, y);
       this._mouseX = x;
       this._mouseY = y;
       if (this.isMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON)) {
@@ -221,7 +221,7 @@ namespace gdjs {
       }
     }
 
-    _setMousePosition(x: float, y: float): void {
+    _setCursorPosition(x: float, y: float): void {
       this._cursorX = x;
       this._cursorY = y;
     }
@@ -412,7 +412,7 @@ namespace gdjs {
     onTouchStart(rawIdentifier: integer, x: float, y: float): void {
       this._addTouch(this.getPublicTouchIdentifier(rawIdentifier), x, y);
       if (this._touchSimulateMouse) {
-        this._setMousePosition(x, y);
+        this._setCursorPosition(x, y);
         this._setMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON);
       }
     }
@@ -433,7 +433,7 @@ namespace gdjs {
     onTouchMove(rawIdentifier: integer, x: float, y: float): void {
       this._moveTouch(this.getPublicTouchIdentifier(rawIdentifier), x, y);
       if (this._touchSimulateMouse) {
-        this._setMousePosition(x, y);
+        this._setCursorPosition(x, y);
       }
     }
 

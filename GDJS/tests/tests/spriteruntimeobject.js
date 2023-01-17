@@ -1,99 +1,100 @@
 // @ts-check
 
-const createObjectWithAnimationInScene = (runtimeScene) => {
-  const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
-    name: 'obj1',
-    type: '',
-    updateIfNotVisible: false,
-    behaviors: [],
-    variables: [],
-    effects: [],
-    animations: [
-      {
-        name: 'firstAnimation',
-        useMultipleDirections: false,
-        directions: [
-          {
-            timeBetweenFrames: 0.25,
-            looping: false,
-            sprites: [
-              {
-                image: 'base/tests-utils/assets/64x64.jpg',
-                originPoint: { name: 'Origin', x: 0, y: 0 },
-                centerPoint: {
-                  name: 'Center',
-                  x: 32,
-                  y: 32,
-                  automatic: true,
-                },
-                points: [],
-                hasCustomCollisionMask: false,
-                customCollisionMask: [],
-              },
-              {
-                image: 'base/tests-utils/assets/64x64.jpg',
-                originPoint: { name: 'Origin', x: 0, y: 0 },
-                centerPoint: {
-                  name: 'Center',
-                  x: 32,
-                  y: 32,
-                  automatic: true,
-                },
-                points: [],
-                hasCustomCollisionMask: false,
-                customCollisionMask: [],
-              },
-              {
-                image: 'base/tests-utils/assets/64x64.jpg',
-                originPoint: { name: 'Origin', x: 0, y: 0 },
-                centerPoint: {
-                  name: 'Center',
-                  x: 32,
-                  y: 32,
-                  automatic: true,
-                },
-                points: [],
-                hasCustomCollisionMask: false,
-                customCollisionMask: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        name: 'secondAnimation',
-        useMultipleDirections: false,
-        directions: [
-          {
-            timeBetweenFrames: 0.5,
-            looping: false,
-            sprites: [
-              {
-                image: 'base/tests-utils/assets/64x64.jpg',
-                originPoint: { name: 'Origin', x: 0, y: 0 },
-                centerPoint: {
-                  name: 'Center',
-                  x: 32,
-                  y: 32,
-                  automatic: true,
-                },
-                points: [],
-                hasCustomCollisionMask: false,
-                customCollisionMask: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  });
-  return object;
-};
-
 /**
  * Basic tests for gdjs.SpriteRuntimeObject
  */
-describe('gdjs.SpriteRuntimeObject', () => {
+describe.only('gdjs.SpriteRuntimeObject', () => {
+  const firstAnimationTimeBetweenFrames = 0.25;
+  const createObjectWithAnimationInScene = (runtimeScene) => {
+    const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      updateIfNotVisible: false,
+      behaviors: [],
+      variables: [],
+      effects: [],
+      animations: [
+        {
+          name: 'firstAnimation',
+          useMultipleDirections: false,
+          directions: [
+            {
+              timeBetweenFrames: firstAnimationTimeBetweenFrames,
+              looping: false,
+              sprites: [
+                {
+                  image: 'base/tests-utils/assets/64x64.jpg',
+                  originPoint: { name: 'Origin', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Center',
+                    x: 32,
+                    y: 32,
+                    automatic: true,
+                  },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                },
+                {
+                  image: 'base/tests-utils/assets/64x64.jpg',
+                  originPoint: { name: 'Origin', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Center',
+                    x: 32,
+                    y: 32,
+                    automatic: true,
+                  },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                },
+                {
+                  image: 'base/tests-utils/assets/64x64.jpg',
+                  originPoint: { name: 'Origin', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Center',
+                    x: 32,
+                    y: 32,
+                    automatic: true,
+                  },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'secondAnimation',
+          useMultipleDirections: false,
+          directions: [
+            {
+              timeBetweenFrames: 0.5,
+              looping: false,
+              sprites: [
+                {
+                  image: 'base/tests-utils/assets/64x64.jpg',
+                  originPoint: { name: 'Origin', x: 0, y: 0 },
+                  centerPoint: {
+                    name: 'Center',
+                    x: 32,
+                    y: 32,
+                    automatic: true,
+                  },
+                  points: [],
+                  hasCustomCollisionMask: false,
+                  customCollisionMask: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    return object;
+  };
+
   describe('Scaling', () => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
@@ -232,6 +233,15 @@ describe('gdjs.SpriteRuntimeObject', () => {
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       expect(object._frameElapsedTime).to.be(stepDurationInMilliseconds / 1000);
+
+      const minimumStepCountBeforeNextFrame = Math.ceil(
+        firstAnimationTimeBetweenFrames / (stepDurationInMilliseconds / 1000)
+      );
+      new Array(minimumStepCountBeforeNextFrame).fill(0).forEach(() => {
+        runtimeScene.renderAndStep(stepDurationInMilliseconds);
+      });
+
+      expect(object.getAnimationFrame()).to.be(1);
     });
 
     it('should reset the elapsed time on a frame when changing animation', () => {
@@ -283,6 +293,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
       object.setAnimation(1);
 
+      expect(object.getAnimationFrame()).to.be(0);
       expect(object._frameElapsedTime).to.be(0);
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
@@ -339,6 +350,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
       object.setAnimationFrame(2);
 
+      expect(object.getAnimationFrame()).to.be(2);
       expect(object._frameElapsedTime).to.be(0);
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);

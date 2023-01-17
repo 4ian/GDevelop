@@ -3,16 +3,16 @@
 /**
  * Basic tests for gdjs.SpriteRuntimeObject
  */
-describe('gdjs.SpriteRuntimeObject', function() {
+describe('gdjs.SpriteRuntimeObject', () => {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
     properties: { windowWidth: 800, windowHeight: 600 },
-    resources: { resources: [] }
+    resources: { resources: [] },
   });
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
-  it('should handle scaling properly', function() {
+  it('should handle scaling properly', () => {
     var object = new gdjs.SpriteRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
@@ -34,7 +34,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
     expect(object.getScaleX()).to.be(0.42);
   });
 
-  describe('Animations', function() {
+  describe('Animations', () => {
     var object = new gdjs.SpriteRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
@@ -61,7 +61,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
       ],
     });
 
-    it('can change animation using animation name', function() {
+    it('can change animation using animation name', () => {
       expect(object.getAnimationName()).to.be('firstAnimation');
       object.setAnimationName('secondAnimation');
       expect(object.getAnimationName()).to.be('secondAnimation');
@@ -70,14 +70,14 @@ describe('gdjs.SpriteRuntimeObject', function() {
       expect(object.isCurrentAnimationName('firstAnimation')).to.be(false);
     });
 
-    it('keeps the same animation when using an invalid/empty name', function() {
+    it('keeps the same animation when using an invalid/empty name', () => {
       object.setAnimationName('unexisting animation');
       expect(object.getAnimation()).to.be(1);
       object.setAnimationName('');
       expect(object.getAnimation()).to.be(1);
     });
 
-    it('can change animation using animation index', function() {
+    it('can change animation using animation index', () => {
       object.setAnimation(2);
       expect(object.getAnimationName()).to.be('');
       object.setAnimation(0);

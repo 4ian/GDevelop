@@ -155,7 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension
       .AddExpressionAndCondition(
           "number",
-          "MouseX",
+          "CursorX",
           _("Cursor X position"),
           _("the X position of the cursor or of a touch"),
           _("the cursor (or touch) X position"),
@@ -169,13 +169,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetDefaultValue("0");
 
   // Support for deprecated names:
-  extension.AddDuplicatedCondition("SourisX", "MouseX").SetHidden();
-  extension.AddDuplicatedExpression("SourisX", "MouseX").SetHidden();
+  extension.AddDuplicatedCondition("MouseX", "CursorX").SetHidden();
+  extension.AddDuplicatedExpression("MouseX", "CursorX").SetHidden();
+  extension.AddDuplicatedCondition("SourisX", "CursorX").SetHidden();
+  extension.AddDuplicatedExpression("SourisX", "CursorX").SetHidden();
 
   extension
       .AddExpressionAndCondition(
           "number",
-          "MouseY",
+          "CursorY",
           _("Cursor Y position"),
           _("the Y position of the cursor or of a touch"),
           _("the cursor (or touch) Y position"),
@@ -189,8 +191,46 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .SetDefaultValue("0");
 
   // Support for deprecated names:
-  extension.AddDuplicatedCondition("SourisY", "MouseY").SetHidden();
-  extension.AddDuplicatedExpression("SourisY", "MouseY").SetHidden();
+  extension.AddDuplicatedCondition("MouseY", "CursorY").SetHidden();
+  extension.AddDuplicatedExpression("MouseY", "CursorY").SetHidden();
+  extension.AddDuplicatedCondition("SourisY", "CursorY").SetHidden();
+  extension.AddDuplicatedExpression("SourisY", "CursorY").SetHidden();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "MouseOnlyCursorX",
+          _("Mouse cursor X position"),
+          _("the X position of the mouse cursor"),
+          _("the mouse cursor X position"),
+          "",
+          "res/conditions/mouse24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0")
+      // It's only useful for extensions as they can't use TouchSimulateMouse.
+      .SetHidden();
+
+  extension
+      .AddExpressionAndCondition(
+          "number",
+          "MouseOnlyCursorY",
+          _("Mouse cursor Y position"),
+          _("the Y position of the mouse cursor"),
+          _("the mouse cursor Y position"),
+          "",
+          "res/conditions/mouse24.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0")
+      // It's only useful for extensions as they can't use TouchSimulateMouse.
+      .SetHidden();
 
   extension
       .AddCondition("IsMouseInsideCanvas",
@@ -342,7 +382,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           _("Multitouch"),
           "res/conditions/touch24.png",
           "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetHidden();
 
   extension
       .AddExpression(
@@ -352,7 +393,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
             "accessed using StartedTouchId()."),
           _("Multitouch"),
           "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetHidden();
 
   extension
       .AddExpression(
@@ -363,13 +405,50 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           _("Multitouch"),
           "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Touch index"))
+      .SetHidden();
+
+  extension
+      .AddCondition(
+          "HasAnyTouchOrMouseStarted",
+          _("A new touch has started"),
+          _("Check if a touch has just started or the mouse left button has "
+            "been pressed on this frame. The touch identifiers can be "
+            "accessed using StartedTouchOrMouseId() and StartedTouchOrMouseCount()."),
+          _("A new touch has started"),
+          _("Multitouch"),
+          "res/conditions/touch24.png",
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddExpression(
+          "StartedTouchOrMouseCount",
+          _("Started touch count"),
+          _("The number of touches (including the mouse) that have just "
+            "started on this frame. The touch identifiers can be "
+            "accessed using StartedTouchOrMouseCount()."),
+          _("Multitouch"),
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddExpression(
+          "StartedTouchOrMouseId",
+          _("Started touch identifier"),
+          _("The identifier of the touch or mouse that has just started on "
+            "this frame. The touch number of touches can be "
+            "accessed using StartedTouchOrMouseCount()."),
+          _("Multitouch"),
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch index"));
 
   extension
       .AddCondition(
           "HasTouchEnded",
           _("A touch has ended"),
-          _("Check if a touch has ended."),
+          _("Check if a touch has ended or a mouse left button has been released."),
           _("The touch with identifier _PARAM1_ has ended"),
           _("Multitouch"),
           "res/conditions/touch24.png",

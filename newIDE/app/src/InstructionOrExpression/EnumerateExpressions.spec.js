@@ -21,8 +21,8 @@ describe('EnumerateExpressions', () => {
     // Should find abs math function
     expect(filterExpressions(freeExpressions, 'abs')).toHaveLength(1);
 
-    expect(filterExpressions(freeExpressions, 'MouseX')).toHaveLength(1);
-    expect(filterExpressions(freeExpressions, 'MouseY')).toHaveLength(1);
+    expect(filterExpressions(freeExpressions, 'CursorX')).toHaveLength(1);
+    expect(filterExpressions(freeExpressions, 'CursorY')).toHaveLength(1);
   });
 
   it('can enumerate and filter free expressions', () => {
@@ -37,8 +37,8 @@ describe('EnumerateExpressions', () => {
     // Should find abs math function
     expect(filterExpressions(freeExpressions, 'abs')).toHaveLength(1);
 
-    expect(filterExpressions(freeExpressions, 'MouseX')).toHaveLength(1);
-    expect(filterExpressions(freeExpressions, 'MouseY')).toHaveLength(1);
+    expect(filterExpressions(freeExpressions, 'CursorX')).toHaveLength(1);
+    expect(filterExpressions(freeExpressions, 'CursorY')).toHaveLength(1);
   });
 
   it('can enumerate and filter object expressions (number only)', () => {

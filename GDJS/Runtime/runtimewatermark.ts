@@ -71,45 +71,35 @@ namespace gdjs {
           this.addWatermarkToGameContainer(gameContainer);
           this._resizeObserver = new ResizeObserver(() => {
             const gameContainerRectangle = gameContainer.getBoundingClientRect();
-            const gameViewportLargestDimension = Math.max(
-              gameContainerRectangle.height,
-              gameContainerRectangle.width
-            );
-            this.onResizeGameContainer(
-              gameViewportLargestDimension,
-              gameContainerRectangle.height
-            );
+            this.onResizeGameContainer(gameContainerRectangle.height);
           });
           this._resizeObserver.observe(gameContainer);
         }
       }
 
-      private updateFontSize(dimension: number) {
-        this._textFontSize = 0.015 * dimension;
+      private updateFontSize(height: number) {
+        this._textFontSize = 0.025 * height;
       }
-      private updateLogoSize(dimension: number) {
-        this._logoWidth = 0.04 * dimension;
+      private updateLogoSize(height: number) {
+        this._logoWidth = 0.06 * height;
         this._logoHeight = Math.round((45 / 56) * this._logoWidth);
       }
       private updateBackground(height: number) {
         this._backgroundHeight = 0.13 * height;
       }
       private updateMargin(height: number) {
-        this._margin = 0.025 * height;
+        this._margin = Math.max(0.025 * height, 10);
       }
 
-      private onResizeGameContainer(
-        newLargestDimension: number,
-        height: number
-      ) {
-        this.updateFontSize(newLargestDimension);
+      private onResizeGameContainer(height: number) {
+        this.updateFontSize(height);
         if (this._madeWithTextElement) {
           this._madeWithTextElement.style.fontSize = `${this._textFontSize}px`;
         }
         if (this._usernameTextElement) {
           this._usernameTextElement.style.fontSize = `${this._textFontSize}px`;
         }
-        this.updateLogoSize(newLargestDimension);
+        this.updateLogoSize(height);
         if (this._svgElement) {
           this._svgElement.setAttribute('height', this._logoHeight.toString());
           this._svgElement.setAttribute('width', this._logoWidth.toString());
@@ -126,19 +116,15 @@ namespace gdjs {
 
       private addWatermarkToGameContainer(container: HTMLElement) {
         const gameContainerRectangle = container.getBoundingClientRect();
-        const gameViewportLargestDimension = Math.max(
-          gameContainerRectangle.height,
-          gameContainerRectangle.width
-        );
-        this.updateFontSize(gameViewportLargestDimension);
-        this.updateLogoSize(gameViewportLargestDimension);
+        this.updateFontSize(gameContainerRectangle.height);
+        this.updateLogoSize(gameContainerRectangle.height);
         this.updateBackground(gameContainerRectangle.height);
 
         this._watermarkContainerElement = this.createDivContainer();
         this.createBackground();
         const textContainer = document.createElement('div');
 
-        this.generateSVGLogo(gameViewportLargestDimension);
+        this.generateSVGLogo(gameContainerRectangle.height);
         this.createMadeWithTextElement();
         this.createUsernameTextElement();
         if (this._svgElement)
@@ -303,16 +289,16 @@ namespace gdjs {
       }
 
       /**
-       * @param {number} dimension
+       * @param {number} height
        * @returns
        */
-      private generateSVGLogo(dimension) {
+      private generateSVGLogo(height) {
         this._svgElement = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'svg'
         );
 
-        this.updateLogoSize(dimension);
+        this.updateLogoSize(height);
         this._svgElement.setAttribute('height', this._logoHeight.toString());
         this._svgElement.setAttribute('width', this._logoWidth.toString());
         this._svgElement.setAttribute('viewBox', '-2 -2 59 48');

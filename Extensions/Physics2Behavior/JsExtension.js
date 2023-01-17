@@ -426,7 +426,9 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .addIncludeFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.js')
-      .addRequiredFile('Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm')
+      .addRequiredFile(
+        'Extensions/Physics2Behavior/Box2D_v2.3.1_min.wasm.wasm'
+      );
 
     // Global
     aut
@@ -1361,7 +1363,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityLength');
 
-      aut
+    aut
       .addCondition(
         'LinearVelocityAngle',
         _('Linear velocity angle'),
@@ -1532,8 +1534,14 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('X component (in Newton * seconds or kilogram * meter per second)'))
-      .addParameter('expression', _('Y component (in Newton * seconds or kilogram * meter per second)'))
+      .addParameter(
+        'expression',
+        _('X component (in Newton * seconds or kilogram * meter per second)')
+      )
+      .addParameter(
+        'expression',
+        _('Y component (in Newton * seconds or kilogram * meter per second)')
+      )
       .addParameter('expression', _('Applying X position'))
       .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
@@ -1556,7 +1564,10 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
-      .addParameter('expression', _('Length (in Newton * seconds or kilogram * meter per second)'))
+      .addParameter(
+        'expression',
+        _('Length (in Newton * seconds or kilogram * meter per second)')
+      )
       .addParameter('expression', _('Applying X position'))
       .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
@@ -1578,7 +1589,10 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Length (in Newton * seconds or kilogram * meter per second)'))
+      .addParameter(
+        'expression',
+        _('Length (in Newton * seconds or kilogram * meter per second)')
+      )
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
       .addParameter('expression', _('Applying X position'))
@@ -1635,31 +1649,33 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getMass');
 
-      aut
-        .addExpression(
-          'Inertia',
-          _('Inertia'),
-          _('Return the rotational inertia of the object (in kilograms * meters * meters)'),
-          '',
-          'res/physics32.png'
-        )
-        .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-        .getCodeExtraInformation()
-        .setFunctionName('getInertia');
+    aut
+      .addExpression(
+        'Inertia',
+        _('Inertia'),
+        _(
+          'Return the rotational inertia of the object (in kilograms * meters * meters)'
+        ),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getInertia');
 
-      aut
-        .addExpression(
-          'MassCenterX',
-          _('Mass center X'),
-          _('Mass center X'),
-          '',
-          'res/physics32.png'
-        )
-        .addParameter('object', _('Object'), '', false)
-        .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-        .getCodeExtraInformation()
-        .setFunctionName('getMassCenterX');
+    aut
+      .addExpression(
+        'MassCenterX',
+        _('Mass center X'),
+        _('Mass center X'),
+        '',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getMassCenterX');
 
     aut
       .addExpression(

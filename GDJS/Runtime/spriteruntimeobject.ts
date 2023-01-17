@@ -292,6 +292,7 @@ namespace gdjs {
     _currentAnimation: number = 0;
     _currentDirection: number = 0;
     _currentFrame: number = 0;
+    /** In seconds */
     _frameElapsedTime: float = 0;
     _animationSpeedScale: number = 1;
     _animationPaused: boolean = false;
@@ -307,15 +308,14 @@ namespace gdjs {
     _animations: gdjs.SpriteAnimation[] = [];
 
     /**
-     * Reference to the current SpriteAnimationFrame that is displayd.
+     * Reference to the current SpriteAnimationFrame that is displayed.
      * Verify is `this._animationFrameDirty === true` before using it, and if so
      * call `this._updateAnimationFrame()`.
      * Can be null, so ensure that this case is handled properly.
-     *
      */
     _animationFrame: gdjs.SpriteAnimationFrame | null = null;
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
-    _animationFrameDirty: any;
+    _animationFrameDirty: boolean = true;
 
     /**
      * @param instanceContainer The container the object belongs to
@@ -740,6 +740,7 @@ namespace gdjs {
         newFrame !== this._currentFrame
       ) {
         this._currentFrame = newFrame;
+        this._frameElapsedTime = 0;
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }

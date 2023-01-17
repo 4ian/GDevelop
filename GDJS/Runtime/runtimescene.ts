@@ -327,6 +327,7 @@ namespace gdjs {
 
     /**
      * Step and render the scene.
+     * @param elapsedTime In milliseconds
      * @return true if the game loop should continue, false if a scene change/push/pop
      * or a game stop was requested.
      */

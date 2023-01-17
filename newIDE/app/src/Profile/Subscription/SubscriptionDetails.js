@@ -83,6 +83,7 @@ const SubscriptionDetails = ({
               />,
             ]}
             isHighlighted={false}
+            background="medium"
           />
         </>
       ) : (

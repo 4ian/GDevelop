@@ -75,7 +75,7 @@ export type Limits = {
 export type PlanDetails = {
   planId: string | null,
   name: string,
-  monthlyPriceInEuros: number,
+  monthlyPriceInEuros: number | null,
   smallDescription?: MessageDescriptor,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
@@ -138,6 +138,14 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     ],
   },
 ];
+
+export const businessPlan: PlanDetails = {
+  planId: null,
+  monthlyPriceInEuros: null,
+  name: 'GDevelop for businesses, game studios and professionals',
+  smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
+  descriptionBullets: [],
+};
 
 export const getUserUsages = (
   getAuthorizationHeader: () => Promise<string>,

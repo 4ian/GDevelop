@@ -21,6 +21,7 @@ type Props = {|
   isHighlighted: boolean,
   actions?: React.Node,
   isPending?: boolean,
+  background: 'medium' | 'dark',
 |};
 
 const PlanCard = (props: Props) => {
@@ -29,7 +30,7 @@ const PlanCard = (props: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
-        <Card isHighlighted={props.isHighlighted}>
+        <Card isHighlighted={props.isHighlighted} background={props.background}>
           <Line noMargin justifyContent="space-between" alignItems="center">
             <Text size="block-title">
               <span>
@@ -37,10 +38,11 @@ const PlanCard = (props: Props) => {
               </span>
             </Text>
             <Text color="secondary">
-              {props.plan.monthlyPriceInEuros ? (
-                <Trans>{props.plan.monthlyPriceInEuros}€/month</Trans>
-              ) : (
+              {props.plan.monthlyPriceInEuros === null ? null : props.plan
+                  .monthlyPriceInEuros === 0 ? (
                 <Trans>Free</Trans>
+              ) : (
+                <Trans>{props.plan.monthlyPriceInEuros}€/month</Trans>
               )}
             </Text>
           </Line>

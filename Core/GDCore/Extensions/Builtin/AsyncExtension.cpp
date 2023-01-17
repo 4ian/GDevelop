@@ -27,6 +27,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
                      "",
                      "res/eventaddicon.png",
                      std::make_shared<gd::AsyncEvent>());
+
+  extension
+      .AddAction(
+          "ResolveAsyncEventsFunction",
+          _("End asynchronous function"),
+          _("Mark an asynchronous function as finished. This will allow the "
+            "actions and subevents following it to be run."),
+          "Mark asynchronous function as ended",
+          "",
+          "",
+          "")
+      .AddCodeOnlyParameter("eventsFunctionContext", "");
 }
 
 }  // namespace gd

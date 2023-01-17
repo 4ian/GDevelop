@@ -292,6 +292,7 @@ namespace gdjs {
     _currentAnimation: number = 0;
     _currentDirection: number = 0;
     _currentFrame: number = 0;
+    /** In seconds */
     _frameElapsedTime: float = 0;
     _animationSpeedScale: number = 1;
     _animationPaused: boolean = false;

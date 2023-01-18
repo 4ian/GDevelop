@@ -142,7 +142,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
 export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
   {
     planId: 'gdevelop_indie',
-    name: 'GDevelop Indie',
+    name: 'GDevelop Indie (Legacy)',
     monthlyPriceInEuros: 2.0,
     smallDescription: t`Build more and faster.`,
     descriptionBullets: [
@@ -159,7 +159,7 @@ export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
   },
   {
     planId: 'gdevelop_pro',
-    name: 'GDevelop Pro',
+    name: 'GDevelop Pro (Legacy)',
     monthlyPriceInEuros: 7.0,
     smallDescription: t`Experimented creators, ambitious games.`,
     descriptionBullets: [

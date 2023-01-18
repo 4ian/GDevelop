@@ -75,8 +75,7 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
 
 bool ExporterHelper::ExportProjectForPixiPreview(
-    const PreviewExportOptions &options,
-    std::map<gd::String, gd::String> &projectPropertiesFallback) {
+    const PreviewExportOptions &options) {
   double previousTime = GetTimeNow();
   fs.MkDir(options.exportPath);
   fs.ClearDir(options.exportPath);
@@ -91,18 +90,13 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (options.fullLoadingScreen) {
     // Use project properties fallback to set empty properties
     if (exportedProject.GetAuthorIds().empty() &&
-        projectPropertiesFallback.find("authorId") !=
-            projectPropertiesFallback.end()) {
-      exportedProject.GetAuthorIds().push_back(
-          projectPropertiesFallback["authorId"]);
+        !options.fallbackAuthorId.empty()) {
+      exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
     }
     if (exportedProject.GetAuthorUsernames().empty() &&
-        projectPropertiesFallback.find("authorUsername") !=
-            projectPropertiesFallback.end()) {
-      gd::String authorUsername = projectPropertiesFallback["authorUsername"];
-      if (!authorUsername.empty()) {
-        exportedProject.GetAuthorUsernames().push_back(authorUsername);
-      }
+        !options.fallbackAuthorUsername.empty()) {
+      exportedProject.GetAuthorUsernames().push_back(
+          options.fallbackAuthorUsername);
     }
   } else {
     // Most of the time, we skip the logo and minimum duration so that

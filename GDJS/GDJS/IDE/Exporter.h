@@ -19,6 +19,7 @@ class AbstractFileSystem;
 }  // namespace gd
 namespace gdjs {
 struct PreviewExportOptions;
+struct ExportOptions;
 }
 
 namespace gdjs {
@@ -40,20 +41,14 @@ class Exporter {
    *
    * \param options The options to generate the preview.
    */
-  bool ExportProjectForPixiPreview(
-      const PreviewExportOptions& options,
-      std::map<gd::String, gd::String>& projectPropertiesFallback);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions& options);
 
   /**
    * \brief Export the specified project, using Pixi.js.
    *
    * Called by ShowProjectExportDialog if the user clicked on Ok.
    */
-  bool ExportWholePixiProject(
-      gd::Project& project,
-      gd::String exportDir,
-      std::map<gd::String, bool>& exportOptions,
-      std::map<gd::String, gd::String>& projectPropertiesFallback);
+  bool ExportWholePixiProject(const ExportOptions& options);
 
   /**
    * \brief Return the error that occurred during the last export.

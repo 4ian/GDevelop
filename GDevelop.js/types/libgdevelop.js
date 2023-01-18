@@ -225,6 +225,7 @@ declare class libGDevelop {
   ObjectCodeGenerator: Class<gdObjectCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;
+  ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
 };

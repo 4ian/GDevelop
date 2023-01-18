@@ -54,7 +54,8 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the fallback author info (if info not present in project properties).
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
    */
   PreviewExportOptions &SetFallbackAuthor(const gd::String &id,
                                           const gd::String &username) {
@@ -173,24 +174,33 @@ struct ExportOptions {
   /**
    * \param project_ The project to export
    * \param exportPath_ The path in the filesystem where to export the files
-   * \param target_ The platform target
    */
-  ExportOptions(gd::Project &project_,
-                const gd::String &exportPath_,
-                const gd::String &target_)
+  ExportOptions(gd::Project &project_, const gd::String &exportPath_)
       : project(project_),
         exportPath(exportPath_),
-        target(target_),
+        target(""),
         fallbackAuthorId(""),
         fallbackAuthorUsername(""){};
 
   /**
-   * \brief Set the fallback author info (if info not present in project properties).
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
    */
   ExportOptions &SetFallbackAuthor(const gd::String &id,
                                    const gd::String &username) {
     fallbackAuthorId = id;
     fallbackAuthorUsername = username;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) target platform.
+   *
+   * \param target_ The target platform (`cordova`, `facebookInstantGames` or
+   * `electron`)
+   */
+  ExportOptions &SetTarget(const gd::String &target_) {
+    target = target_;
     return *this;
   }
 
@@ -405,9 +415,7 @@ class ExporterHelper {
    *
    * \param options The options to generate the preview.
    */
-  bool ExportProjectForPixiPreview(
-      const PreviewExportOptions &options,
-      std::map<gd::String, gd::String> &projectPropertiesFallback);
+  bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
 
   /**
    * \brief Given an include file, returns the name of the file to reference

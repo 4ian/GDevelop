@@ -45,32 +45,27 @@ Exporter::Exporter(gd::AbstractFileSystem &fileSystem, gd::String gdjsRoot_)
 Exporter::~Exporter() {}
 
 bool Exporter::ExportProjectForPixiPreview(
-    const PreviewExportOptions &options,
-    std::map<gd::String, gd::String> &projectPropertiesFallback) {
+    const PreviewExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportProjectForPixiPreview(options, projectPropertiesFallback);
+  return helper.ExportProjectForPixiPreview(options);
 }
 
-bool Exporter::ExportWholePixiProject(
-    gd::Project &project,
-    gd::String exportDir,
-    std::map<gd::String, bool> &exportOptions,
-    std::map<gd::String, gd::String> &projectPropertiesFallback) {
+bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  gd::Project exportedProject = project;
+  gd::Project exportedProject = options.project;
 
-  auto usedExtensionsResult = gd::UsedExtensionsFinder::ScanProject(project);
+  auto usedExtensionsResult =
+      gd::UsedExtensionsFinder::ScanProject(options.project);
   auto &usedExtensions = usedExtensionsResult.GetUsedExtensions();
 
   auto exportProject = [this,
                         &exportedProject,
-                        &exportOptions,
-                        &projectPropertiesFallback,
+                        &options,
                         &helper,
                         &usedExtensionsResult](gd::String exportDir) {
-    bool exportForCordova = exportOptions["exportForCordova"];
+    bool exportForCordova = options.target == "cordova";
     bool exportForFacebookInstantGames =
-        exportOptions["exportForFacebookInstantGames"];
+        options.target == "facebookInstantGames";
 
     // Always disable GDevelop branding for Facebook Instant Games
     if (exportForFacebookInstantGames) {
@@ -80,18 +75,13 @@ bool Exporter::ExportWholePixiProject(
 
     // Use project properties fallback to set empty properties
     if (exportedProject.GetAuthorIds().empty() &&
-        projectPropertiesFallback.find("authorId") !=
-            projectPropertiesFallback.end()) {
-      exportedProject.GetAuthorIds().push_back(
-          projectPropertiesFallback["authorId"]);
+        !options.fallbackAuthorId.empty()) {
+      exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
     }
     if (exportedProject.GetAuthorUsernames().empty() &&
-        projectPropertiesFallback.find("authorUsername") !=
-            projectPropertiesFallback.end()) {
-      gd::String authorUsername = projectPropertiesFallback["authorUsername"];
-      if (!authorUsername.empty()) {
-        exportedProject.GetAuthorUsernames().push_back(authorUsername);
-      }
+        !options.fallbackAuthorUsername.empty()) {
+      exportedProject.GetAuthorUsernames().push_back(
+          options.fallbackAuthorUsername);
     }
 
     // Prepare the export directory
@@ -185,28 +175,31 @@ bool Exporter::ExportWholePixiProject(
     return true;
   };
 
-  if (exportOptions["exportForCordova"]) {
-    fs.MkDir(exportDir);
-    fs.MkDir(exportDir + "/www");
+  if (options.target == "cordova") {
+    fs.MkDir(options.exportPath);
+    fs.MkDir(options.exportPath + "/www");
 
-    if (!exportProject(exportDir + "/www")) return false;
+    if (!exportProject(options.exportPath + "/www")) return false;
 
-    if (!helper.ExportCordovaFiles(exportedProject, exportDir, usedExtensions))
+    if (!helper.ExportCordovaFiles(
+            exportedProject, options.exportPath, usedExtensions))
       return false;
-  } else if (exportOptions["exportForElectron"]) {
-    fs.MkDir(exportDir);
+  } else if (options.target == "electron") {
+    fs.MkDir(options.exportPath);
 
-    if (!exportProject(exportDir + "/app")) return false;
+    if (!exportProject(options.exportPath + "/app")) return false;
 
-    if (!helper.ExportElectronFiles(exportedProject, exportDir, usedExtensions))
+    if (!helper.ExportElectronFiles(
+            exportedProject, options.exportPath, usedExtensions))
       return false;
-  } else if (exportOptions["exportForFacebookInstantGames"]) {
-    if (!exportProject(exportDir)) return false;
+  } else if (options.target == "facebookInstantGames") {
+    if (!exportProject(options.exportPath)) return false;
 
-    if (!helper.ExportFacebookInstantGamesFiles(exportedProject, exportDir))
+    if (!helper.ExportFacebookInstantGamesFiles(exportedProject,
+                                                options.exportPath))
       return false;
   } else {
-    if (!exportProject(exportDir)) return false;
+    if (!exportProject(options.exportPath)) return false;
   }
 
   return true;

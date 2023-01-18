@@ -3148,8 +3148,9 @@ interface PreviewExportOptions {
 
 [Prefix="gdjs::"]
 interface ExportOptions {
-    void ExportOptions([Ref] Project project, [Const] DOMString outputPath, [Const] DOMString target);
+    void ExportOptions([Ref] Project project, [Const] DOMString outputPath);
     [Ref] ExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
+    [Ref] ExportOptions SetTarget([Const] DOMString target);
 };
 
 [Prefix="gdjs::"]
@@ -3157,8 +3158,8 @@ interface Exporter {
     void Exporter([Ref] AbstractFileSystem fs, [Const] DOMString gdjsRoot);
     void SetCodeOutputDirectory([Const] DOMString path);
 
-    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options, [Ref] MapStringString projectPropertiesFallback);
-    boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions, [Ref] MapStringString projectPropertiesFallback);
+    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
+    boolean ExportWholePixiProject([Const, Ref] ExportOptions options);
 
     [Const, Ref] DOMString GetLastError();
 };

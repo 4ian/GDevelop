@@ -71,6 +71,7 @@ const SubscriptionDetails = ({
                   label={<Trans>Manage online</Trans>}
                   primary
                   onClick={onManageSubscription}
+                  disabled={isManageSubscriptionLoading}
                 />
               </LeftLoader>,
               <RaisedButton
@@ -80,6 +81,7 @@ const SubscriptionDetails = ({
                 onClick={() =>
                   openSubscriptionDialog({ reason: 'Consult profile' })
                 }
+                disabled={isManageSubscriptionLoading}
               />,
             ]}
             isHighlighted={false}

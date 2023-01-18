@@ -117,32 +117,35 @@ var adaptNamingConventions = function (gd) {
     return gd.castObject(evt, gd.Platform);
   };
 
-  gd.asSpriteObject = function (evt) {
+  gd.asSpriteConfiguration = function (evt) {
     return gd.castObject(evt, gd.SpriteObject);
   };
-  gd.asTiledSpriteObject = function (evt) {
+  gd.asTiledSpriteConfiguration = function (evt) {
     return gd.castObject(evt, gd.TiledSpriteObject);
   };
-  gd.asPanelSpriteObject = function (evt) {
+  gd.asPanelSpriteConfiguration = function (evt) {
     return gd.castObject(evt, gd.PanelSpriteObject);
   };
-  gd.asTextObject = function (evt) {
+  gd.asTextObjectConfiguration = function (evt) {
     return gd.castObject(evt, gd.TextObject);
   };
-  gd.asShapePainterObject = function (evt) {
+  gd.asShapePainterConfiguration = function (evt) {
     return gd.castObject(evt, gd.ShapePainterObject);
   };
-  gd.asAdMobObject = function (evt) {
+  gd.asAdMobConfiguration = function (evt) {
     return gd.castObject(evt, gd.AdMobObject);
   };
   gd.asTextEntryObject = function (evt) {
     return gd.castObject(evt, gd.TextEntryObject);
   };
-  gd.asParticleEmitterObject = function (evt) {
+  gd.asParticleEmitterConfiguration = function (evt) {
     return gd.castObject(evt, gd.ParticleEmitterObject);
   };
   gd.asObjectJsImplementation = function (evt) {
     return gd.castObject(evt, gd.ObjectJsImplementation);
+  };
+  gd.asCustomObjectConfiguration = function (evt) {
+    return gd.castObject(evt, gd.CustomObjectConfiguration);
   };
 
   gd.asImageResource = function (evt) {

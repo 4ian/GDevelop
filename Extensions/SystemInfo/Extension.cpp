@@ -9,27 +9,47 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 
 void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "SystemInfo",
-      _("System information"),
-      _("Get information about the system and device running the game."),
-      "Florian Rival",
-      "Open source (MIT License)")
-      .SetCategory("Device");
+  extension
+      .SetExtensionInformation(
+          "SystemInfo",
+          _("System information"),
+          _("Get information about the system and device running the game."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("System information"))
       .SetIcon("CppPlatform/Extensions/systeminfoicon.png");
 
-  extension
-      .AddCondition(
-          "IsMobile",
-          _("Is a mobile device"),
-          _("Check if the device running the game is a mobile device"),
-          _("The device is a mobile device"),
-          "",
-          "CppPlatform/Extensions/systeminfoicon.png",
-          "CppPlatform/Extensions/systeminfoicon.png")
+  extension.AddCondition(
+      "IsMobile",
+      _("Is a mobile device"),
+      _("Check if the device running the game is a mobile device (phone or "
+        "tablet on iOS, Android or other mobile devices). The game itself "
+        "might be a web game or distributed as a native mobile app (to check "
+        "this precisely, use other conditions)."),
+      _("The device is a mobile device"),
+      "",
+      "CppPlatform/Extensions/systeminfoicon.png",
+      "CppPlatform/Extensions/systeminfoicon.png");
 
-      .SetFunctionName("SystemInfo::IsMobile");
+  extension.AddCondition("IsNativeMobileApp",
+                         _("Is a native mobile app"),
+                         _("Check if the game is running as a native mobile "
+                           "app (iOS or Android app)."),
+                         _("The game is running as a native mobile app"),
+                         "",
+                         "CppPlatform/Extensions/systeminfoicon.png",
+                         "CppPlatform/Extensions/systeminfoicon.png");
+
+  extension
+      .AddCondition("IsNativeDesktopApp",
+                    _("Is a native desktop app"),
+                    _("Check if the game is running as a native desktop app."),
+                    _("The game is running as a native desktop app"),
+                    "",
+                    "CppPlatform/Extensions/systeminfoicon.png",
+                    "CppPlatform/Extensions/systeminfoicon.png")
+      .AddCodeOnlyParameter("currentScene", "");
 
   extension
       .AddCondition("IsWebGLSupported",

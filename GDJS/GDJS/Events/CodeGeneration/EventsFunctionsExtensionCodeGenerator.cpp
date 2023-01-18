@@ -11,6 +11,7 @@
 namespace gdjs {
 gd::String
 EventsFunctionsExtensionCodeGenerator::GenerateFreeEventsFunctionCompleteCode(
+    const gd::EventsFunctionsExtension& extension,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -27,6 +28,7 @@ if (typeof CODE_NAMESPACE !== "undefined") {
 
   gd::String eventsFunctionCode =
       EventsCodeGenerator::GenerateEventsFunctionCode(project,
+                                                      extension,
                                                       eventsFunction,
                                                       codeNamespace,
                                                       includeFiles,

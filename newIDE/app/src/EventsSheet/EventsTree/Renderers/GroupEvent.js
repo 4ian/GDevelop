@@ -3,7 +3,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField from '../../../UI/TextField';
+import TextField, { type TextFieldInterface } from '../../../UI/TextField';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -38,7 +38,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     editing: false,
     editingPreviousValue: null,
   };
-  _textField: ?TextField = null;
+  _textField: ?TextFieldInterface = null;
 
   edit = () => {
     const groupEvent = gd.asGroupEvent(this.props.event);
@@ -97,7 +97,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           <TextField
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
-            hintText={t`<Enter group name>`}
+            translatableHintText={t`<Enter group name>`}
             onBlur={this.endEditing}
             onChange={(e, text) => {
               groupEvent.setName(text);

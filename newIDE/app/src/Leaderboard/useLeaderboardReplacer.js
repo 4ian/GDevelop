@@ -5,7 +5,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
 import Text from '../UI/Text';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import LinearProgress from '../UI/LinearProgress';
 import {
   Table,
   TableBody,
@@ -41,6 +41,7 @@ export const ReplacePromptDialog = ({
 
   return (
     <Dialog
+      title={<Trans>Set up new leaderboards for this game</Trans>}
       actions={
         authenticated
           ? [
@@ -72,14 +73,12 @@ export const ReplacePromptDialog = ({
               />,
             ]
       }
-      title={<Trans>Set up new leaderboards for this game</Trans>}
-      noMargin
       open
       maxWidth="sm"
       onRequestClose={onClose}
     >
-      <Line>
-        <ColumnStackLayout>
+      <Line noMargin>
+        <ColumnStackLayout noMargin>
           <Text>
             <Trans>
               This game is using leaderboards. GDevelop will create new
@@ -116,6 +115,7 @@ export const LeaderboardReplacerProgressDialog = ({
 
   return (
     <Dialog
+      title={null} // Specific loading dialog where we don't want a title.
       actions={[
         onRetry ? (
           <DialogPrimaryButton
@@ -135,11 +135,10 @@ export const LeaderboardReplacerProgressDialog = ({
         />,
       ]}
       cannotBeDismissed={!hasErrors}
-      noMargin
       open
       maxWidth="sm"
     >
-      <Line>
+      <Line noMargin>
         <ColumnStackLayout expand>
           <Text>
             {hasErrors && progress === 100 ? (
@@ -151,7 +150,9 @@ export const LeaderboardReplacerProgressDialog = ({
               <Trans>Preparing the leaderboard for your game...</Trans>
             )}
           </Text>
-          <LinearProgress variant="determinate" value={progress} />
+          <Line noMargin expand>
+            <LinearProgress variant="determinate" value={progress} />
+          </Line>
           {hasErrors && progress === 100 ? (
             <Table>
               <TableHeader>

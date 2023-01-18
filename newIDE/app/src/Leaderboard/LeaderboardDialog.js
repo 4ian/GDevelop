@@ -23,8 +23,11 @@ const LeaderboardDialog = ({
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog
+      title={<Trans>Leaderboards</Trans>}
+      id="leaderboard-admin-dialog"
       actions={[
         <FlatButton
+          id="close-button"
           label={<Trans>Close</Trans>}
           disabled={isLoading}
           onClick={onClose}
@@ -40,7 +43,6 @@ const LeaderboardDialog = ({
       open={open}
       cannotBeDismissed={isLoading}
       onRequestClose={onClose}
-      title={<Trans>Leaderboards</Trans>}
       flexBody
       fullHeight
     >

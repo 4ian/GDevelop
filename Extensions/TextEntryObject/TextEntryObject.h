@@ -7,16 +7,16 @@ This project is released under the MIT License.
 
 #ifndef TEXTENTRYOBJECT_H
 #define TEXTENTRYOBJECT_H
-#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 
 /**
  * \brief Simple object which stores user keyboard input.
  */
-class GD_EXTENSION_API TextEntryObject : public gd::Object {
+class GD_EXTENSION_API TextEntryObject : public gd::ObjectConfiguration {
  public:
-  TextEntryObject(gd::String name_);
+  TextEntryObject();
   virtual ~TextEntryObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<TextEntryObject>(*this);
   }
 

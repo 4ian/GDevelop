@@ -28,6 +28,9 @@ type ExtensionStoreState = {|
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
+  allCategories: string[],
+  chosenCategory: string,
+  setChosenCategory: string => void,
   extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
   filtersState: FiltersState,
 |};
@@ -39,6 +42,10 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   error: null,
   searchText: '',
   setSearchText: () => {},
+  allCategories: [],
+  // '' means all categories.
+  chosenCategory: '',
+  setChosenCategory: () => {},
   extensionShortHeadersByName: {},
   filtersState: {
     chosenFilters: new Set(),
@@ -67,6 +74,7 @@ export const ExtensionStoreStateProvider = ({
   const preferences = React.useContext(PreferencesContext);
   const { showCommunityExtensions } = preferences.values;
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [allCategories, setAllCategories] = React.useState<Array<string>>([]);
   const [firstExtensionIds, setFirstExtensionIds] = React.useState<
     Array<string>
   >([]);
@@ -76,6 +84,7 @@ export const ExtensionStoreStateProvider = ({
   const [searchText, setSearchText] = React.useState(
     defaultSearchText || emptySearchText
   );
+  const [chosenCategory, setChosenCategory] = React.useState('');
   const filtersState = useFilters();
 
   const fetchExtensionsAndFilters = React.useCallback(
@@ -91,9 +100,18 @@ export const ExtensionStoreStateProvider = ({
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const { extensionShortHeaders, allTags } = extensionRegistry;
+          const {
+            extensionShortHeaders,
+            allTags,
+            allCategories,
+          } = extensionRegistry;
 
           const sortedTags = allTags
+            .slice()
+            .sort((tag1, tag2) =>
+              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+            );
+          const sortedCategories = allCategories
             .slice()
             .sort((tag1, tag2) =>
               tag1.toLowerCase().localeCompare(tag2.toLowerCase())
@@ -115,6 +133,7 @@ export const ExtensionStoreStateProvider = ({
             defaultTags: sortedTags,
             tagsTree: [],
           });
+          setAllCategories(sortedCategories);
           setFirstExtensionIds(
             extensionRegistry.views
               ? extensionRegistry.views.default.firstExtensionIds
@@ -150,14 +169,14 @@ export const ExtensionStoreStateProvider = ({
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
   );
 
-  const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<{|
     item: ExtensionShortHeader,
     matches: SearchMatch[],
   |}> = useSearchStructuredItem(extensionShortHeadersByName, {
     searchText,
-    chosenCategory,
-    chosenFilters,
+    chosenItemCategory: chosenCategory,
+    chosenCategory: filtersState.chosenCategory,
+    chosenFilters: filtersState.chosenFilters,
     excludedTiers: showCommunityExtensions
       ? noExcludedTiers
       : excludedCommunityTiers,
@@ -169,6 +188,9 @@ export const ExtensionStoreStateProvider = ({
       searchResults,
       fetchExtensionsAndFilters,
       filters,
+      allCategories,
+      chosenCategory,
+      setChosenCategory,
       error,
       searchText,
       setSearchText,
@@ -179,6 +201,9 @@ export const ExtensionStoreStateProvider = ({
       searchResults,
       error,
       filters,
+      allCategories,
+      chosenCategory,
+      setChosenCategory,
       searchText,
       extensionShortHeadersByName,
       filtersState,

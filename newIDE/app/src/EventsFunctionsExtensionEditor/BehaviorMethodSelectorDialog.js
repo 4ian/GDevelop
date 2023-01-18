@@ -73,6 +73,7 @@ export default function BehaviorMethodSelectorDialog({
 
   return (
     <Dialog
+      title={<Trans>Choose a new behavior function ("method")</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"
@@ -88,8 +89,6 @@ export default function BehaviorMethodSelectorDialog({
         />,
       ]}
       open
-      noMargin
-      title={<Trans>Choose a new behavior function ("method")</Trans>}
       onRequestClose={onCancel}
     >
       <List>

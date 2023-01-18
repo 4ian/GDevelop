@@ -23,6 +23,7 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
+import HelpButton from '../../UI/HelpButton';
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
@@ -109,6 +110,8 @@ const ExtensionInstallDialog = ({
 
   return (
     <Dialog
+      title={extensionShortHeader.fullName}
+      id="install-extension-dialog"
       actions={[
         <FlatButton
           key="close"
@@ -119,6 +122,7 @@ const ExtensionInstallDialog = ({
         />,
         <LeftLoader isLoading={isInstalling} key="install">
           <DialogPrimaryButton
+            id="install-extension-button"
             label={
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
@@ -142,17 +146,25 @@ const ExtensionInstallDialog = ({
           />
         </LeftLoader>,
       ]}
-      secondaryActions={
-        onEdit
-          ? [
-              <FlatButton
-                key="edit-extension"
-                label={<Trans>Open in editor</Trans>}
-                onClick={onEdit}
-              />,
-            ]
-          : undefined
-      }
+      secondaryActions={[
+        onEdit ? (
+          <FlatButton
+            key="edit-extension"
+            label={<Trans>Open in editor</Trans>}
+            onClick={onEdit}
+          />
+        ) : (
+          undefined
+        ),
+        extensionHeader && extensionHeader.helpPath ? (
+          <HelpButton
+            key="help-button"
+            helpPagePath={extensionHeader.helpPath}
+          />
+        ) : (
+          undefined
+        ),
+      ].filter(Boolean)}
       open
       cannotBeDismissed={isInstalling}
       onRequestClose={onClose}
@@ -166,9 +178,6 @@ const ExtensionInstallDialog = ({
             size={64}
           />
           <Column expand>
-            <Text noMargin size="block-title">
-              {extensionShortHeader.fullName}
-            </Text>
             <Text noMargin size="body2">
               <Trans>Version {' ' + extensionShortHeader.version}</Trans>
             </Text>

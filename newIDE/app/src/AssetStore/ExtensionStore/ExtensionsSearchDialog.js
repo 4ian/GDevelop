@@ -93,10 +93,12 @@ export default function ExtensionsSearchDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          fullHeight
           title={<Trans>Search for New Extensions</Trans>}
+          id="extension-search-dialog"
+          fullHeight
           actions={[
             <FlatButton
+              id="close-button"
               key="close"
               label={<Trans>Close</Trans>}
               primary
@@ -128,7 +130,6 @@ export default function ExtensionsSearchDialog({
           ]}
           flexBody
           open
-          noMargin
           cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
         >

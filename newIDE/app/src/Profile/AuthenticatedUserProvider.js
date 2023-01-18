@@ -13,10 +13,11 @@ import Authentication, {
   type EditForm,
   type ChangeEmailForm,
   type AuthError,
+  type ForgotPasswordForm,
+  type AdditionalUserInfoForm,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import { sendSignupDone } from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
@@ -29,6 +30,17 @@ import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
+import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
+import {
+  listReceivedAssetShortHeaders,
+  listReceivedAssetPacks,
+} from '../Utils/GDevelopServices/Asset';
+import AdditionalUserInfoDialog, {
+  shouldAskForAdditionalUserInfo,
+} from './AdditionalUserInfoDialog';
+import { Trans } from '@lingui/macro';
+import Snackbar from '@material-ui/core/Snackbar';
 
 type Props = {|
   authentication: Authentication,
@@ -43,12 +55,14 @@ type State = {|
   createAccountInProgress: boolean,
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
+  additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   emailVerificationPendingDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
+  userSnackbarMessage: ?React.Node,
 |};
 
 export default class AuthenticatedUserProvider extends React.Component<
@@ -63,14 +77,17 @@ export default class AuthenticatedUserProvider extends React.Component<
     createAccountInProgress: false,
     editProfileDialogOpen: false,
     editInProgress: false,
+    additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
     emailVerificationPendingDialogOpen: false,
     forgotPasswordInProgress: false,
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
+    userSnackbarMessage: null,
   };
   _automaticallyUpdateUserProfile = true;
+  _hasNotifiedUserAboutAdditionalInfo = false;
 
   componentDidMount() {
     this._resetAuthenticatedUser();
@@ -123,6 +140,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
         onBadgesChanged: this._fetchUserBadges,
+        onCloudProjectsChanged: this._fetchUserCloudProjects,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
         onChangeEmail: () => this.openChangeEmailDialog(true),
@@ -131,12 +149,15 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshFirebaseProfile: async () => {
           await this._reloadFirebaseProfile();
         },
+        onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
+        onPurchaseSuccessful: this._fetchUserAssets,
         onSendEmailVerification: this._doSendEmailVerification,
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
       },
     }));
+    this._hasNotifiedUserAboutAdditionalInfo = false;
   }
 
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
@@ -186,10 +207,37 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserProfile = async () => {
     const { authentication } = this.props;
 
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        loginState: 'loggingIn',
+        cloudProjectsFetchingErrorLabel: null,
+      },
+    }));
+
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
-    const firebaseUser = await this._reloadFirebaseProfile();
-    if (!firebaseUser) return;
+    let firebaseUser;
+    try {
+      firebaseUser = await this._reloadFirebaseProfile();
+      if (!firebaseUser) {
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            loginState: 'done',
+          },
+        }));
+        return;
+      }
+    } catch (error) {
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          loginState: 'done',
+        },
+      }));
+      throw error;
+    }
 
     // Fetching user profile related information, but independently from
     // the user profile itself, to not block in case one of these calls
@@ -233,6 +281,63 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjectsFetchingErrorLabel: (
+              <Trans>
+                We couldn't load your cloud projects. Verify your internet
+                connection or try again later.
+              </Trans>
+            ),
+          },
+        }));
+      }
+    );
+    listReceivedAssetPacks(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetPacks =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetPacks,
+          },
+        })),
+      error => {
+        console.error('Error while loading received asset packs:', error);
+      }
+    );
+    listReceivedAssetShortHeaders(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+    }).then(
+      receivedAssetShortHeaders =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            receivedAssetShortHeaders,
+          },
+        })),
+      error => {
+        console.error(
+          'Error while loading received asset short headers:',
+          error
+        );
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -241,12 +346,170 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader
     );
 
+    if (!userProfile.isCreator) {
+      // If the user is not a creator, then update the profile to say they now are.
+      try {
+        await authentication.editUserProfile(
+          authentication.getAuthorizationHeader,
+          { isCreator: true }
+        );
+      } catch (error) {
+        // Catch the error so that the user profile is still fetched.
+        console.error('Error while updating the user profile:', error);
+      }
+    }
+
+    // If the user has not filled their additional information, show
+    // the dialog to fill it.
+    // Use a state value to show the dialog only once.
+    if (
+      userProfile &&
+      !this._hasNotifiedUserAboutAdditionalInfo &&
+      shouldAskForAdditionalUserInfo(userProfile)
+    ) {
+      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
+    }
+
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
         profile: userProfile,
+        loginState: 'done',
       },
     }));
+  };
+
+  _fetchUserSubscriptionLimitsAndUsages = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const usages = await getUserUsages(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          usages,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user usages:', error);
+    }
+
+    try {
+      const subscription = await getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          subscription,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user subscriptions:', error);
+    }
+
+    try {
+      const limits = await getUserLimits(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          limits,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user limits:', error);
+    }
+  };
+
+  _fetchUserAssets = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const receivedAssetPacks = await listReceivedAssetPacks(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetPacks,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received asset packs:', error);
+    }
+
+    try {
+      const receivedAssetShortHeaders = await listReceivedAssetShortHeaders(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetShortHeaders,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading received asset short headers:', error);
+    }
+  };
+
+  _fetchUserCloudProjects = async () => {
+    const { authentication } = this.props;
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        cloudProjectsFetchingErrorLabel: null,
+      },
+    }));
+
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjectsFetchingErrorLabel: (
+              <Trans>
+                We couldn't load your cloud projects. Verify your internet
+                connection or try again later.
+              </Trans>
+            ),
+          },
+        }));
+      }
+    );
   };
 
   _fetchUserBadges = async () => {
@@ -265,9 +528,15 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _doLogout = () => {
-    if (this.props.authentication) this.props.authentication.logout();
+  _doLogout = async () => {
+    if (this.props.authentication) {
+      await this.props.authentication.logout();
+    }
     this._resetAuthenticatedUser();
+    clearCloudProjectCookies();
+    this.showUserSnackbar({
+      message: <Trans>You're now logged out</Trans>,
+    });
   };
 
   _doLogin = async (form: LoginForm) => {
@@ -276,12 +545,22 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       loginInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false);
+      const profile = this.state.authenticatedUser.profile;
+      const username = profile ? profile.username : null;
+      this.showUserSnackbar({
+        message: username ? (
+          <Trans>👋 Good to see you {username}!</Trans>
+        ) : (
+          <Trans>👋 Good to see you!</Trans>
+        ),
+      });
     } catch (authError) {
       this.setState({ authError });
     }
@@ -297,13 +576,20 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.editUserProfile(
         authentication.getAuthorizationHeader,
-        form,
-        preferences.language
+        {
+          username: form.username,
+          description: form.description,
+          getGameStatsEmail: form.getGameStatsEmail,
+          getNewsletterEmail: form.getNewsletterEmail,
+          appLanguage: preferences.language,
+          donateLink: form.donateLink,
+        }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openEditProfileDialog(false);
@@ -325,6 +611,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       createAccountInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -343,8 +630,17 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
 
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openLoginDialog(false);
+      this.openCreateAccountDialog(false);
       sendSignupDone(form.email);
+      const profile = this.state.authenticatedUser.profile;
+      const username = profile ? profile.username : null;
+      this.showUserSnackbar({
+        message: username ? (
+          <Trans>👋 Welcome to GDevelop {username}!</Trans>
+        ) : (
+          <Trans>👋 Welcome to GDevelop!</Trans>
+        ),
+      });
     } catch (authError) {
       this.setState({ authError });
     }
@@ -354,25 +650,53 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  _doForgotPassword = async (form: LoginForm) => {
+  _doSaveAdditionalUserInfo = async (form: AdditionalUserInfoForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
     this.setState({
-      forgotPasswordInProgress: true,
+      editInProgress: true,
     });
+    this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.forgotPassword(form);
-      this.openResetPassword(true);
-    } catch (authError) {
-      this.setState({ authError });
-      showWarningBox(
-        "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
+      await authentication.editUserProfile(
+        authentication.getAuthorizationHeader,
+        {
+          gdevelopUsage: form.gdevelopUsage,
+          teamOrCompanySize: form.teamOrCompanySize,
+          companyName: form.companyName,
+          creationExperience: form.creationExperience,
+          creationGoal: form.creationGoal,
+          hearFrom: form.hearFrom,
+        }
       );
+      await this._fetchUserProfileWithoutThrowingErrors();
+    } catch (authError) {
+      // Do not throw error, as this is a best effort call.
+      console.error('Error while saving additional user info:', authError);
+    } finally {
+      // Close anyway.
+      this.openAdditionalUserInfoDialog(false);
+      this.showUserSnackbar({
+        message: <Trans>Thank you!</Trans>,
+      });
     }
     this.setState({
-      forgotPasswordInProgress: false,
+      editInProgress: false,
     });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doForgotPassword = async (form: ForgotPasswordForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    try {
+      await authentication.forgotPassword(form);
+    } catch (authError) {
+      // Do not throw error if the email is not found, as we don't want to
+      // give information to the user about which email is registered.
+    }
   };
 
   _doSendEmailVerification = async () => {
@@ -389,6 +713,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       editInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -411,6 +736,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     this.setState({
       changeEmailInProgress: true,
+      authError: null,
     });
     this._automaticallyUpdateUserProfile = false;
     try {
@@ -447,6 +773,21 @@ export default class AuthenticatedUserProvider extends React.Component<
       loginDialogOpen: open,
       createAccountDialogOpen: false,
       authError: null,
+    });
+  };
+
+  openAdditionalUserInfoDialog = (open: boolean = true) => {
+    this._hasNotifiedUserAboutAdditionalInfo = true;
+    this.setState({
+      additionalUserInfoDialogOpen: open,
+      createAccountDialogOpen: false,
+      loginDialogOpen: false,
+    });
+  };
+
+  showUserSnackbar = ({ message }: { message: ?React.Node }) => {
+    this.setState({
+      userSnackbarMessage: message,
     });
   };
 
@@ -490,9 +831,6 @@ export default class AuthenticatedUserProvider extends React.Component<
                 loginInProgress={this.state.loginInProgress}
                 error={this.state.authError}
                 onForgotPassword={this._doForgotPassword}
-                resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
-                onCloseResetPasswordDialog={() => this.openResetPassword(false)}
-                forgotPasswordInProgress={this.state.forgotPasswordInProgress}
               />
             )}
             {this.state.authenticatedUser.profile &&
@@ -501,7 +839,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   profile={this.state.authenticatedUser.profile}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  editInProgress={this.state.editInProgress}
+                  updateProfileInProgress={this.state.editInProgress}
                   error={this.state.authError}
                 />
               )}
@@ -526,6 +864,17 @@ export default class AuthenticatedUserProvider extends React.Component<
                 error={this.state.authError}
               />
             )}
+            {this.state.additionalUserInfoDialogOpen &&
+              this.state.authenticatedUser.profile && (
+                <AdditionalUserInfoDialog
+                  profile={this.state.authenticatedUser.profile}
+                  onClose={() => this.openAdditionalUserInfoDialog(false)}
+                  onSaveAdditionalUserInfo={form =>
+                    this._doSaveAdditionalUserInfo(form)
+                  }
+                  updateInProgress={this.state.editInProgress}
+                />
+              )}
             {this.state.emailVerificationPendingDialogOpen && (
               <EmailVerificationPendingDialog
                 authenticatedUser={this.state.authenticatedUser}
@@ -539,6 +888,19 @@ export default class AuthenticatedUserProvider extends React.Component<
                 }}
               />
             )}
+            <Snackbar
+              open={!!this.state.userSnackbarMessage}
+              autoHideDuration={3000}
+              onClose={() => this.showUserSnackbar({ message: null })}
+              ContentProps={{
+                'aria-describedby': 'snackbar-message',
+              }}
+              message={
+                <span id="snackbar-message">
+                  {this.state.userSnackbarMessage}
+                </span>
+              }
+            />
           </React.Fragment>
         )}
       </PreferencesContext.Consumer>

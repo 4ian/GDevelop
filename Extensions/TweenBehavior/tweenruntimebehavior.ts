@@ -88,23 +88,25 @@ namespace gdjs {
     }
   }
 
+  // TODO EBO Rewrite this behavior to use standard method to step.
+  // This could also fix layer time scale that seems to be ignored.
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens: Record<string, TweenRuntimeBehavior.TweenInstance> = {};
     private _runtimeScene: gdjs.RuntimeScene;
     private _isActive: boolean = true;
 
     /**
-     * @param runtimeScene The runtime scene the behavior belongs to.
+     * @param instanceContainer The instance container the behavior belongs to.
      * @param behaviorData The data to initialize the behavior
      * @param owner The runtime object the behavior belongs to.
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData: BehaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
-      this._runtimeScene = runtimeScene;
+      super(instanceContainer, behaviorData, owner);
+      this._runtimeScene = instanceContainer.getScene();
     }
 
     updateFromBehaviorData(
@@ -210,6 +212,13 @@ namespace gdjs {
 
     /**
      * Add an object variable tween.
+     * @deprecated Use addVariableTween2 instead.
+     * This function is misleading since one could think that the tween starts
+     * right at the moment this function is called whereas the value of the variable
+     * will change at the next frame only. Moreover, the variable will not start from
+     * the start value exactly since time will have passed at the moment the next
+     * frame is rendered.
+     * See https://github.com/4ian/GDevelop/issues/4270
      * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
      * @param fromValue Start value
@@ -244,7 +253,40 @@ namespace gdjs {
     }
 
     /**
-     * Add an object position tween.
+     * Tween an object variable.
+     * @param identifier Unique id to identify the tween
+     * @param variable The object variable to store the tweened value
+     * @param toValue End value
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addVariableTween2(
+      identifier: string,
+      variable: gdjs.Variable,
+      toValue: float,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      this._addTween(
+        identifier,
+        easingValue,
+        {
+          from: { value: variable.getValue() },
+          to: { value: toValue },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => variable.setNumber(state.value),
+        },
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object position.
      * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param toY The target Y position
@@ -280,7 +322,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object X position tween.
+     * Tween an object X position.
      * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param easingValue Type of easing
@@ -311,7 +353,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object Y position tween.
+     * Tween an object Y position.
      * @param identifier Unique id to identify the tween
      * @param toY The target Y position
      * @param easingValue Type of easing
@@ -342,7 +384,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object angle tween.
+     * Tween an object angle.
      * @param identifier Unique id to identify the tween
      * @param toAngle The target angle
      * @param easingValue Type of easing
@@ -375,7 +417,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object scale tween.
+     * Tween an object scale.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param toScaleY The target Y-scale
@@ -433,7 +475,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object X-scale tween.
+     * Tween an object X-scale.
      * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param easingValue Type of easing
@@ -478,7 +520,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object scale y tween.
+     * Tween an object Y-scale.
      * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easingValue Type of easing
@@ -523,7 +565,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object opacity tween.
+     * Tween an object opacity.
      * @param identifier Unique id to identify the tween
      * @param toOpacity The target opacity
      * @param easingValue Type of easing
@@ -559,9 +601,9 @@ namespace gdjs {
     }
 
     /**
-     * Add an object color tween.
+     * Tween an object color.
      * @param identifier Unique id to identify the tween
-     * @param toColorStr The target color
+     * @param toColorStr The target RGB color (format "128;200;255" with values between 0 and 255 for red, green and blue)
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
@@ -662,7 +704,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
+     * Tween an object HSL color, with the "to" color given using HSL (H: any number, S and L: 0-100).
      * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
@@ -742,7 +784,7 @@ namespace gdjs {
     }
 
     /**
-     * Add a text object character size tween.
+     * Tween a text object character size.
      * @param identifier Unique id to identify the tween
      * @param toSize The target character size
      * @param easingValue Type of easing
@@ -778,7 +820,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object width tween.
+     * Tween an object width.
      * @param identifier Unique id to identify the tween
      * @param toWidth The target width
      * @param easingValue Type of easing
@@ -811,7 +853,7 @@ namespace gdjs {
     }
 
     /**
-     * Add an object height tween.
+     * Tween an object height.
      * @param identifier Unique id to identify the tween
      * @param toHeight The target height
      * @param easingValue Type of easing

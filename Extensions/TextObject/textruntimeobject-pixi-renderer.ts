@@ -9,14 +9,14 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._fontManager = runtimeScene.getGame().getFontManager();
+      this._fontManager = instanceContainer.getGame().getFontManager();
       this._text = new PIXI.Text(' ', { align: 'left' });
       this._text.anchor.x = 0.5;
       this._text.anchor.y = 0.5;
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._text, runtimeObject.getZOrder());
@@ -94,7 +94,25 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._text.position.x = this._object.x + this._text.width / 2;
+      if (this._object.isWrapping()) {
+        const alignmentX =
+          this._object._textAlign === 'right'
+            ? 1
+            : this._object._textAlign === 'center'
+            ? 0.5
+            : 0;
+
+        const width = this._object.getWrappingWidth();
+
+        // A vector from the custom size center to the renderer center.
+        const centerToCenterX = (width - this._text.width) * (alignmentX - 0.5);
+
+        this._text.position.x = this._object.x + width / 2;
+        this._text.anchor.x = 0.5 - centerToCenterX / this._text.width;
+      } else {
+        this._text.position.x = this._object.x + this._text.width / 2;
+        this._text.anchor.x = 0.5;
+      }
       this._text.position.y = this._object.y + this._text.height / 2;
     }
 

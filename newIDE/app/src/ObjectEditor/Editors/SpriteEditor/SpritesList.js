@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-
+import { type I18n as I18nType } from '@lingui/core';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
@@ -19,14 +19,17 @@ import {
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
 } from '../../../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import {
+  type ResourceExternalEditor,
+  type EditWithExternalEditorReturn,
+} from '../../../ResourcesList/ResourceExternalEditor';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
-import FlatButton from '../../../UI/FlatButton';
-import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import { ExternalEditorOpenedDialog } from '../../../UI/ExternalEditorOpenedDialog';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
 const gd: libGDevelop = global.gd;
-const path = require('path');
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
 
@@ -45,26 +48,50 @@ const styles = {
   },
 };
 
-const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
-  return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          style={{
-            ...thumbnailContainerStyle,
-            backgroundColor: muiTheme.list.itemsBackgroundColor,
+type AddSpriteButtonProps = {|
+  onAdd: (resourceSource: ResourceSource) => void,
+  resourceManagementProps: ResourceManagementProps,
+|};
+
+const AddSpriteButton = SortableElement(
+  ({ onAdd, resourceManagementProps }: AddSpriteButtonProps) => {
+    const storageProvider = resourceManagementProps.getStorageProvider();
+    const resourceSources = resourceManagementProps.resourceSources
+      .filter(source => source.kind === 'image')
+      .filter(
+        ({ onlyForStorageProvider }) =>
+          !onlyForStorageProvider ||
+          onlyForStorageProvider === storageProvider.internalName
+      );
+
+    return (
+      <div style={thumbnailContainerStyle}>
+        <RaisedButtonWithSplitMenu
+          onClick={() => {
+            onAdd(resourceSources[0]);
           }}
-        >
-          <FlatButton
-            onClick={onAdd}
-            label={<Trans>Add</Trans>}
-            leftIcon={<Add />}
-          />
-        </div>
-      )}
-    </ThemeConsumer>
-  );
-});
+          label={<Trans>Add a sprite</Trans>}
+          icon={<Add />}
+          primary
+          buildMenuTemplate={(i18n: I18nType) => {
+            const storageProvider = resourceManagementProps.getStorageProvider();
+            return resourceManagementProps.resourceSources
+              .filter(source => source.kind === 'image')
+              .filter(
+                ({ onlyForStorageProvider }) =>
+                  !onlyForStorageProvider ||
+                  onlyForStorageProvider === storageProvider.internalName
+              )
+              .map(source => ({
+                label: i18n._(source.displayName),
+                click: () => onAdd(source),
+              }));
+          }}
+        />
+      </div>
+    );
+  }
+);
 
 const SortableSpriteThumbnail = SortableElement(
   ({ sprite, project, resourcesLoader, selected, onSelect, onContextMenu }) => {
@@ -89,6 +116,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
+    resourceManagementProps,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -118,6 +146,7 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
+            resourceManagementProps={resourceManagementProps}
           />,
         ]}
       </div>
@@ -152,9 +181,7 @@ type Props = {|
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
+  resourceManagementProps: ResourceManagementProps,
   onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
   selectedSprites: {
     [number]: boolean,
@@ -166,7 +193,15 @@ type Props = {|
   animationName: string, // This is used for the default name of images created with Piskel.
 |};
 
-export default class SpritesList extends Component<Props, void> {
+type State = {|
+  externalEditorOpened: boolean,
+|};
+
+export default class SpritesList extends Component<Props, State> {
+  state = {
+    externalEditorOpened: false,
+  };
+
   onSortEnd = ({
     oldIndex,
     newIndex,
@@ -178,55 +213,49 @@ export default class SpritesList extends Component<Props, void> {
     this.forceUpdate();
   };
 
-  onAddSprite = () => {
-    const {
-      resourceSources,
-      onChooseResource,
-      project,
-      direction,
-    } = this.props;
-    if (!resourceSources) return;
-    const sources = resourceSources.filter(source => source.kind === 'image');
-    if (!sources.length) return;
+  onAddSprite = async (resourceSource: ResourceSource) => {
+    const { resourceManagementProps, project, direction } = this.props;
 
     const {
       allDirectionSpritesHaveSameCollisionMasks,
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    onChooseResource({
-      // Should be updated once new sources are introduced in the desktop app.
-      // Search for "sources[0]" in the codebase for other places like this.
-      initialSourceName: sources[0].name,
+    const resources = await resourceManagementProps.onChooseResource({
+      initialSourceName: resourceSource.name,
       multiSelection: true,
       resourceKind: 'image',
-    }).then(resources => {
-      resources.forEach(resource => {
-        applyResourceDefaults(project, resource);
-        project.getResourcesManager().addResource(resource);
-
-        const sprite = new gd.Sprite();
-        sprite.setImageName(resource.getName());
-        if (allDirectionSpritesHaveSamePoints) {
-          copySpritePoints(direction.getSprite(0), sprite);
-        }
-        if (allDirectionSpritesHaveSameCollisionMasks) {
-          copySpritePolygons(direction.getSprite(0), sprite);
-        }
-        direction.addSprite(sprite);
-      });
-
-      // Important, we are responsible for deleting the resources that were given to us.
-      // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
-
-      this.forceUpdate();
     });
+
+    resources.forEach(resource => {
+      applyResourceDefaults(project, resource);
+      project.getResourcesManager().addResource(resource);
+
+      const sprite = new gd.Sprite();
+      sprite.setImageName(resource.getName());
+      if (allDirectionSpritesHaveSamePoints) {
+        copySpritePoints(direction.getSprite(0), sprite);
+      }
+      if (allDirectionSpritesHaveSameCollisionMasks) {
+        copySpritePolygons(direction.getSprite(0), sprite);
+      }
+      direction.addSprite(sprite);
+      sprite.delete();
+    });
+
+    // Important, we are responsible for deleting the resources that were given to us.
+    // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+    resources.forEach(resource => resource.delete());
+
+    this.forceUpdate();
+
+    await resourceManagementProps.onFetchNewlyAddedResources();
   };
 
-  editWith = (externalEditor: ResourceExternalEditor) => {
+  editWith = async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
     const {
       project,
+      resourceManagementProps,
       direction,
       resourcesLoader,
       onReplaceByDirection,
@@ -243,87 +272,99 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    let externalEditorData = {};
-    const metadataRaw = direction.getMetadata();
-    if (metadataRaw) {
-      try {
-        externalEditorData = JSON.parse(metadataRaw);
-      } catch (e) {
-        console.error('Malformed metadata', e);
-      }
-    }
+    try {
+      this.setState({ externalEditorOpened: true });
+      const editResult: EditWithExternalEditorReturn | null = await externalEditor.edit(
+        {
+          project,
+          i18n,
+          getStorageProvider: resourceManagementProps.getStorageProvider,
+          resourceManagementProps,
+          resourceNames,
+          extraOptions: {
+            singleFrame: false,
+            fps:
+              direction.getTimeBetweenFrames() > 0
+                ? 1 / direction.getTimeBetweenFrames()
+                : 1,
+            name: animationName || resourceNames[0] || objectName,
+            isLooping: direction.isLooping(),
+            existingMetadata: direction.getMetadata(),
+          },
+        }
+      );
 
-    externalEditor.edit({
-      project,
-      resourcesLoader,
-      singleFrame: false,
-      resourceNames,
-      extraOptions: {
-        fps:
-          direction.getTimeBetweenFrames() > 0
-            ? 1 / direction.getTimeBetweenFrames()
-            : 1,
-        name:
-          animationName ||
-          (resourceNames.length > 0
-            ? path.basename(resourceNames[0], path.extname(resourceNames[0]))
-            : objectName),
-        isLooping: direction.isLooping(),
-        externalEditorData,
-      },
-      onChangesSaved: resources => {
-        const newDirection = new gd.Direction();
-        newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-        newDirection.setLoop(direction.isLooping());
-        resources.forEach(resource => {
-          const sprite = new gd.Sprite();
-          sprite.setImageName(resource.name);
-          // Restore collision masks and points
-          if (
-            resource.originalIndex !== undefined &&
-            resource.originalIndex !== null
-          ) {
-            const originalSprite = direction.getSprite(resource.originalIndex);
-            copySpritePoints(originalSprite, sprite);
-            copySpritePolygons(originalSprite, sprite);
-          } else {
-            if (allDirectionSpritesHaveSamePoints) {
-              copySpritePoints(direction.getSprite(0), sprite);
-            }
-            if (allDirectionSpritesHaveSameCollisionMasks) {
-              copySpritePolygons(direction.getSprite(0), sprite);
-            }
+      this.setState({ externalEditorOpened: false });
+      if (!editResult) return;
+
+      const { resources, newMetadata, newName } = editResult;
+
+      const newDirection = new gd.Direction();
+      newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
+      newDirection.setLoop(direction.isLooping());
+      resources.forEach(resource => {
+        const sprite = new gd.Sprite();
+        sprite.setImageName(resource.name);
+        // Restore collision masks and points
+        if (
+          resource.originalIndex !== undefined &&
+          resource.originalIndex !== null
+        ) {
+          const originalSprite = direction.getSprite(resource.originalIndex);
+          copySpritePoints(originalSprite, sprite);
+          copySpritePolygons(originalSprite, sprite);
+        } else {
+          if (allDirectionSpritesHaveSamePoints) {
+            copySpritePoints(direction.getSprite(0), sprite);
           }
-          newDirection.addSprite(sprite);
-          sprite.delete();
-        });
-
-        // set metadata if there is such on the direction
-        if (resources[0].metadata) {
-          newDirection.setMetadata(JSON.stringify(resources[0].metadata));
+          if (allDirectionSpritesHaveSameCollisionMasks) {
+            copySpritePolygons(direction.getSprite(0), sprite);
+          }
         }
+        newDirection.addSprite(sprite);
+        sprite.delete();
+      });
 
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
-        onReplaceByDirection(newDirection);
-        // Set optional animation name if the user hasn't done so
-        if (resources[0].newAnimationName) {
-          onChangeName(resources[0].newAnimationName);
-        }
-        newDirection.delete();
-      },
-    });
+      // Set metadata on the direction to allow editing again in the future.
+      if (newMetadata) {
+        newDirection.setMetadata(JSON.stringify(newMetadata));
+      }
+
+      // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+      resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
+      onReplaceByDirection(newDirection);
+
+      // If a name was specified in the external editor, use it for the animation.
+      if (newName) {
+        onChangeName(newName);
+      }
+      newDirection.delete();
+    } catch (error) {
+      this.setState({ externalEditorOpened: false });
+      console.error(
+        'An exception was thrown when launching or reading resources from the external editor:',
+        error
+      );
+      showErrorBox({
+        message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
+        rawError: error,
+        errorId: 'external-editor-error',
+      });
+    }
   };
 
   render() {
     return (
       <div>
-        <MiniToolbar justifyContent="flex-end" smallest>
+        <MiniToolbar justifyContent="flex-end">
           <DirectionTools
+            animationName={this.props.animationName}
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceExternalEditors={
+              this.props.resourceManagementProps.resourceExternalEditors
+            }
             onEditWith={this.editWith}
           />
         </MiniToolbar>
@@ -333,6 +374,7 @@ export default class SpritesList extends Component<Props, void> {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          resourceManagementProps={this.props.resourceManagementProps}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}
@@ -340,6 +382,7 @@ export default class SpritesList extends Component<Props, void> {
           lockAxis="x"
           axis="x"
         />
+        {this.state.externalEditorOpened && <ExternalEditorOpenedDialog />}
       </div>
     );
   }

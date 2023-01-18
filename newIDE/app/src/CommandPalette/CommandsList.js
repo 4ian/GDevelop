@@ -37,6 +37,7 @@ export type CommandName =
   | 'TOGGLE_LAYERS_PANEL'
   | 'SCENE_EDITOR_UNDO'
   | 'SCENE_EDITOR_REDO'
+  | 'RENAME_SCENE_OBJECT'
   | 'DELETE_INSTANCES'
   | 'TOGGLE_WINDOW_MASK'
   | 'TOGGLE_GRID'
@@ -53,6 +54,7 @@ export type CommandName =
   | 'ADD_SUBEVENT'
   | 'ADD_COMMENT_EVENT'
   | 'TOGGLE_EVENT_DISABLED'
+  | 'TOGGLE_CONDITION_INVERTED'
   | 'CHOOSE_AND_ADD_EVENT'
   | 'EVENTS_EDITOR_UNDO'
   | 'EVENTS_EDITOR_REDO'
@@ -205,23 +207,23 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   // Scene editor toolbar commands
   OPEN_OBJECTS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the objects editor`,
+    displayText: t`Open Objects Panel`,
   },
   OPEN_OBJECT_GROUPS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the object groups editor`,
+    displayText: t`Open Object Groups Panel`,
   },
   OPEN_PROPERTIES_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the properties panel`,
+    displayText: t`Open Properties Panel`,
   },
   TOGGLE_INSTANCES_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the list of instances`,
+    displayText: t`Open Instances List Panel`,
   },
   TOGGLE_LAYERS_PANEL: {
     area: 'SCENE',
-    displayText: t`Open the layers editor`,
+    displayText: t`Open Layers Panel`,
   },
   SCENE_EDITOR_UNDO: {
     area: 'SCENE',
@@ -232,6 +234,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'SCENE',
     displayText: t`Redo the last changes`,
     noShortcut: true,
+  },
+  RENAME_SCENE_OBJECT: {
+    area: 'SCENE',
+    displayText: t`Rename the selected object`,
   },
   DELETE_INSTANCES: {
     area: 'SCENE',
@@ -283,6 +289,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   TOGGLE_EVENT_DISABLED: {
     area: 'EVENTS',
     displayText: t`Toggle disabled event`,
+  },
+  TOGGLE_CONDITION_INVERTED: {
+    area: 'EVENTS',
+    displayText: t`Toggle inverted condition`,
   },
   CHOOSE_AND_ADD_EVENT: {
     area: 'EVENTS',

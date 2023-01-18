@@ -96,7 +96,7 @@ declare type ZipJs = {|
   HttpReader: (url: string) => ZipJs$Reader,
   ZipReader: () => ZipJs$ZipReader,
 
-  TextWriter: (encoding: string) => ZipJs$Writer,
+  TextWriter: (encoding: ?string) => ZipJs$Writer,
   BlobWriter: (contentType: string) => ZipJs$Writer,
   FileWriter: (fileEntry: FileEntry) => ZipJs$Writer,
   Data64URIWriter: (mimeString?: string) => ZipJs$Writer,

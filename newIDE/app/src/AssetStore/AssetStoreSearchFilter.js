@@ -94,6 +94,10 @@ export class DimensionAssetStoreSearchFilter
   }
 
   getPertinence(searchItem: AssetShortHeader): number {
+    // Assets with no defined dimensions are always pertinent. (ex: particle emitter)
+    if (!searchItem.width || !searchItem.height) {
+      return 1;
+    }
     return ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
       this.dimensionMin <= searchItem.width) &&
       (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||

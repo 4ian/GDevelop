@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Paper from '@material-ui/core/Paper';
+import Paper from './Paper';
 
 type Props = {|
   children: React.Node,
@@ -27,6 +27,7 @@ const PlaceholderMessage = (props: Props) => {
           padding: 10,
           margin: 5,
         }}
+        background="dark"
       >
         {props.children}
       </Paper>

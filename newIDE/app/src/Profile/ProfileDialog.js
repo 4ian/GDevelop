@@ -3,38 +3,95 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import { Tabs, Tab } from '../UI/Tabs';
+import { Tabs } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
-import CreateProfile from './CreateProfile';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
 import HelpButton from '../UI/HelpButton';
-import SubscriptionDetails from './SubscriptionDetails';
+import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
+import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
-import { ColumnStackLayout } from '../UI/Layout';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import CreateProfile from './CreateProfile';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import RouterContext from '../MainFrame/RouterContext';
+import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+
+export type ProfileTab = 'profile' | 'games-dashboard';
 
 type Props = {|
   currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
-  onChangeSubscription: () => void,
-  initialTab: 'profile' | 'games-dashboard',
 |};
 
-const ProfileDialog = ({
-  currentProject,
-  open,
-  onClose,
-  onChangeSubscription,
-  initialTab,
-}: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
+const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
+  const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
+  const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
+
+  const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const isUserLoading = authenticatedUser.loginState !== 'done';
+  const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
+
+  React.useEffect(
+    () => {
+      if (routeArguments['initial-dialog'] === 'games-dashboard') {
+        setCurrentTab('games-dashboard');
+        removeRouteArguments(['initial-dialog']);
+      }
+    },
+    [routeArguments, removeRouteArguments]
+  );
+
+  const markBadgesAsSeen = React.useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
+        // If not connected (or loading), do nothing.
+        return;
+      }
+      if (badgesSeenNotificationSentRef.current) {
+        // If already marked as seen, do nothing.
+        return;
+      }
+      if (
+        !entries[0].isIntersecting &&
+        badgesSeenNotificationTimeoutRef.current
+      ) {
+        // If not visible, clear timeout.
+        clearTimeout(badgesSeenNotificationTimeoutRef.current);
+        badgesSeenNotificationTimeoutRef.current = null;
+        return;
+      }
+      if (entries[0].isIntersecting) {
+        // If visible
+        if (badgesSeenNotificationTimeoutRef.current) {
+          // If timeout already set, do nothing.
+          return;
+        } else {
+          // Set timeout to mark badges as seen in the future.
+          badgesSeenNotificationTimeoutRef.current = setTimeout(() => {
+            doMarkBadgesAsSeen(authenticatedUser);
+            badgesSeenNotificationSentRef.current = true;
+          }, 5000);
+        }
+      }
+    },
+    [authenticatedUser]
+  );
+
+  useIsElementVisibleInScroll(
+    userAchievementsContainerRef.current,
+    markBadgesAsSeen
+  );
 
   const [
     isManageSubscriptionLoading,
@@ -54,7 +111,8 @@ const ProfileDialog = ({
         Window.openExternalURL(url);
       } catch (error) {
         showErrorBox({
-          message: 'Unable to load the portal to manage your subscription.',
+          message:
+            'Unable to load the portal to manage your subscription. Please contact us on billing@gdevelop.io',
           rawError: error,
           errorId: 'subscription-portal-error',
         });
@@ -74,8 +132,20 @@ const ProfileDialog = ({
     [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  const onLogout = React.useCallback(
+    async () => {
+      await authenticatedUser.onLogout();
+      onClose();
+    },
+    [authenticatedUser, onClose]
+  );
+
+  const isConnected =
+    authenticatedUser.authenticated && authenticatedUser.profile;
+
   return (
     <Dialog
+      title={isConnected ? <Trans>My profile</Trans> : null}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -93,75 +163,88 @@ const ProfileDialog = ({
               : '/interface/profile'
           }
         />,
-        authenticatedUser.authenticated && authenticatedUser.profile && (
+        isConnected && (
           <FlatButton
             label={<Trans>Logout</Trans>}
             key="logout"
-            onClick={authenticatedUser.onLogout}
+            onClick={onLogout}
+            disabled={isUserLoading}
           />
         ),
       ]}
       onRequestClose={onClose}
       open={open}
-      noMargin
-      fullHeight
-      noTitleMargin
-      title={
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>My Profile</Trans>} value="profile" />
-          <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
-        </Tabs>
-      }
+      fullHeight={!!isConnected}
+      maxWidth={isConnected ? 'md' : 'sm'}
       flexColumnBody
+      fixedContent={
+        isConnected ? (
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            options={[
+              {
+                value: 'profile',
+                label: <Trans>My Profile</Trans>,
+              },
+              {
+                value: 'games-dashboard',
+                label: <Trans>Games Dashboard</Trans>,
+              },
+            ]}
+          />
+        ) : null
+      }
     >
-      {currentTab === 'profile' &&
-        (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Line>
-            <Column expand>
-              <AuthenticatedUserProfileDetails
-                authenticatedUser={authenticatedUser}
-                onEditProfile={authenticatedUser.onEdit}
-                onChangeEmail={authenticatedUser.onChangeEmail}
-              />
-              <SubscriptionDetails
-                subscription={authenticatedUser.subscription}
-                onChangeSubscription={onChangeSubscription}
-                onManageSubscription={onManageSubscription}
-                isManageSubscriptionLoading={isManageSubscriptionLoading}
-              />
-              <ContributionsDetails userId={authenticatedUser.profile.id} />
-            </Column>
-          </Line>
-        ) : (
-          <Column noMargin expand justifyContent="center">
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-            />
-          </Column>
-        ))}
-      {currentTab === 'games-dashboard' &&
-        (authenticatedUser.authenticated ? (
-          <Line>
-            <ColumnStackLayout expand noOverflowParent>
-              <GamesList project={currentProject} />
-            </ColumnStackLayout>
-          </Line>
-        ) : (
-          <Column noMargin expand justifyContent="center">
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-              message={
-                <Trans>
-                  Create an account to register your games and to get access to
-                  metrics collected anonymously, like the number of daily
-                  players and retention of the players after a few days.
-                </Trans>
-              }
-            />
-          </Column>
-        ))}
+      {authenticatedUser.loginState === 'loggingIn' ? (
+        <PlaceholderLoader />
+      ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
+        <>
+          {currentTab === 'profile' && (
+            <Line>
+              <Column expand noMargin>
+                <AuthenticatedUserProfileDetails
+                  authenticatedUser={authenticatedUser}
+                  onEditProfile={authenticatedUser.onEdit}
+                  onChangeEmail={authenticatedUser.onChangeEmail}
+                />
+                <SubscriptionDetails
+                  subscription={authenticatedUser.subscription}
+                  onManageSubscription={onManageSubscription}
+                  isManageSubscriptionLoading={isManageSubscriptionLoading}
+                />
+                <ContributionsDetails userId={authenticatedUser.profile.id} />
+                {isConnected && (
+                  <div ref={userAchievementsContainerRef}>
+                    <UserAchievements
+                      badges={authenticatedUser.badges}
+                      displayUnclaimedAchievements
+                      displayNotifications
+                    />
+                  </div>
+                )}
+              </Column>
+            </Line>
+          )}
+          {currentTab === 'games-dashboard' && (
+            <GamesList project={currentProject} />
+          )}
+        </>
+      ) : (
+        <Column noMargin expand justifyContent="center">
+          <CreateProfile
+            onLogin={authenticatedUser.onLogin}
+            onCreateAccount={authenticatedUser.onCreateAccount}
+            message={
+              <Trans>
+                Create an account to register your games and to get access to
+                metrics collected anonymously, like the number of daily players
+                and retention of the players after a few days.
+              </Trans>
+            }
+          />
+        </Column>
+      )}
     </Dialog>
   );
 };

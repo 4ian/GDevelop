@@ -5,6 +5,7 @@ import MUITextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
+import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
 
 type ValueProps =
   // Support "text" and "password" type:
@@ -25,7 +26,7 @@ type ValueProps =
   // Support an "uncontrolled" field:
   | {| defaultValue: string |}
   // Support an empty field with just a hint text:
-  | {| hintText?: React.Node |};
+  | {| translatableHintText?: MessageDescriptor, hintText?: string |};
 
 // We support a subset of the props supported by Material-UI v0.x TextField
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -64,12 +65,13 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   name?: string,
-  hintText?: MessageDescriptor,
+  translatableHintText?: MessageDescriptor,
+  hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
 
   // Keyboard focus:
-  autoFocus?: boolean,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
 
   // String text field:
   maxLength?: number,
@@ -94,7 +96,7 @@ type Props = {|
   style?: {|
     fontSize?: 14 | 18 | '1.3em',
     fontStyle?: 'normal' | 'italic',
-    width?: number | '30%' | '60%' | '100%',
+    width?: number | '30%' | '70%' | '100%',
     flex?: 1,
     top?: number,
     padding?: number,
@@ -165,128 +167,159 @@ export const computeTextFieldStyleProps = (props: {
   };
 };
 
+export type TextFieldInterface = {|
+  focus: () => void,
+  blur: () => void,
+  getInputNode: () => ?HTMLInputElement,
+  getFieldWidth: () => ?number,
+|};
+
 /**
  * A text field based on Material-UI text field.
  */
-export default class TextField extends React.Component<Props, {||}> {
-  _input = React.createRef<HTMLInputElement>();
+const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
+  const inputRef = React.useRef<?HTMLInputElement>(null);
+  const muiTextFieldRef = React.useRef<?MUITextField>(null);
 
-  focus() {
-    if (this._input.current) {
-      this._input.current.focus();
+  const focus = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
-  }
+  };
 
-  blur() {
-    if (this._input.current) {
-      this._input.current.blur();
+  const blur = () => {
+    if (inputRef.current) {
+      inputRef.current.blur();
     }
-  }
+  };
 
-  getInputNode(): ?HTMLInputElement {
-    if (this._input.current) {
-      return this._input.current;
+  const getInputNode = (): ?HTMLInputElement => {
+    if (inputRef.current) {
+      return inputRef.current;
     }
 
     return null;
-  }
+  };
 
-  render() {
-    const { props } = this;
-    const onChange = props.onChange || undefined;
+  const getFieldWidth = () => {
+    if (muiTextFieldRef.current) {
+      return muiTextFieldRef.current.clientWidth;
+    }
+    return null;
+  };
 
-    const helperText = props.helperMarkdownText ? (
-      <MarkdownText source={props.helperMarkdownText} />
-    ) : null;
+  React.useImperativeHandle(ref, () => ({
+    focus,
+    blur,
+    getInputNode,
+    getFieldWidth,
+  }));
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <MUITextField
-            color="secondary"
-            // Value and change handling:
-            type={props.type !== undefined ? props.type : undefined}
-            value={props.value !== undefined ? props.value : undefined}
-            defaultValue={
-              props.defaultValue !== undefined ? props.defaultValue : undefined
-            }
-            onChange={
-              onChange
-                ? event => onChange(event, event.target.value)
-                : undefined
-            }
-            // Error handling:
-            error={!!props.errorText}
-            helperText={props.errorText || helperText}
-            disabled={props.disabled}
-            required={props.required}
-            InputLabelProps={{
-              shrink: props.floatingLabelFixed ? true : undefined,
-            }}
-            label={props.floatingLabelText}
-            name={props.name}
-            placeholder={props.hintText ? i18n._(props.hintText) : undefined}
-            id={props.id}
-            // Keyboard focus:
-            autoFocus={props.autoFocus}
-            // Multiline:
-            multiline={props.multiline}
-            rows={props.rows}
-            rowsMax={props.rowsMax}
-            // Styling:
-            {...computeTextFieldStyleProps(props)}
-            fullWidth={props.fullWidth}
-            InputProps={{
-              disableUnderline:
-                props.underlineShow === undefined
-                  ? false
-                  : !props.underlineShow,
-              style: {
-                fontSize: props.style ? props.style.fontSize : undefined,
-                fontStyle: props.style ? props.style.fontStyle : undefined,
-                ...props.inputStyle,
-              },
-              readOnly: props.readOnly,
-              inputProps: {
-                onKeyPress: props.onKeyPress,
-                onKeyUp: props.onKeyUp,
-                onKeyDown: props.onKeyDown,
-                onClick: props.onClick,
-                // String field props:
-                maxLength: props.maxLength,
-                // Number field props:
-                max: props.max,
-                min: props.min,
-                step: props.step,
-              },
-              // Input adornment:
-              endAdornment: props.endAdornment ? (
-                <InputAdornment position="end">
-                  {props.endAdornment}
-                </InputAdornment>
-              ) : (
-                undefined
-              ),
-            }}
-            style={
-              props.style
-                ? {
-                    width: props.style.width || undefined,
-                    flex: props.style.flex || undefined,
-                    top: props.style.top || undefined,
-                  }
-                : undefined
-            }
-            onFocus={props.onFocus}
-            onBlur={props.onBlur}
-            inputRef={this._input}
-            spellCheck="false"
-          />
-        )}
-      </I18n>
-    );
-  }
-}
+  const onChange = props.onChange || undefined;
+
+  const helperText = props.helperMarkdownText ? (
+    <MarkdownText source={props.helperMarkdownText} />
+  ) : null;
+
+  const shouldAutofocusInput = useShouldAutofocusInput();
+  const shouldAutoFocusTextField = !props.autoFocus
+    ? false
+    : props.autoFocus === 'desktopAndMobileDevices'
+    ? true
+    : shouldAutofocusInput;
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <MUITextField
+          ref={muiTextFieldRef}
+          color="secondary"
+          // Value and change handling:
+          type={props.type !== undefined ? props.type : undefined}
+          value={props.value !== undefined ? props.value : undefined}
+          defaultValue={
+            props.defaultValue !== undefined ? props.defaultValue : undefined
+          }
+          onChange={
+            onChange ? event => onChange(event, event.target.value) : undefined
+          }
+          // Error handling:
+          error={!!props.errorText}
+          helperText={props.errorText || helperText}
+          disabled={props.disabled}
+          required={props.required}
+          InputLabelProps={{
+            shrink: props.floatingLabelFixed ? true : undefined,
+          }}
+          label={props.floatingLabelText}
+          name={props.name}
+          placeholder={
+            props.hintText
+              ? props.hintText
+              : props.translatableHintText
+              ? i18n._(props.translatableHintText)
+              : undefined
+          }
+          id={props.id}
+          // Keyboard focus:
+          autoFocus={shouldAutoFocusTextField}
+          // Multiline:
+          multiline={props.multiline}
+          rows={props.rows}
+          rowsMax={props.rowsMax}
+          // Styling:
+          {...computeTextFieldStyleProps(props)}
+          fullWidth={props.fullWidth}
+          InputProps={{
+            disableUnderline:
+              props.underlineShow === undefined ? false : !props.underlineShow,
+            style: {
+              fontSize: props.style ? props.style.fontSize : undefined,
+              fontStyle: props.style ? props.style.fontStyle : undefined,
+            },
+            readOnly: props.readOnly,
+            inputProps: {
+              onKeyPress: props.onKeyPress,
+              onKeyUp: props.onKeyUp,
+              onKeyDown: props.onKeyDown,
+              onClick: props.onClick,
+              // String field props:
+              maxLength: props.maxLength,
+              // Number field props:
+              max: props.max,
+              min: props.min,
+              step: props.step,
+              style: props.inputStyle,
+            },
+            // Input adornment:
+            endAdornment: props.endAdornment ? (
+              <InputAdornment position="end">
+                {props.endAdornment}
+              </InputAdornment>
+            ) : (
+              undefined
+            ),
+          }}
+          style={
+            props.style
+              ? {
+                  width: props.style.width || undefined,
+                  flex: props.style.flex || undefined,
+                  top: props.style.top || undefined,
+                }
+              : undefined
+          }
+          onFocus={props.onFocus}
+          onBlur={props.onBlur}
+          inputRef={inputRef}
+          spellCheck="false"
+        />
+      )}
+    </I18n>
+  );
+});
+
+export default TextField;
 
 // The "top" offset to add to the position of the TextField when
 // it's used inside a ListItem "primaryText"

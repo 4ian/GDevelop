@@ -20,6 +20,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                                  "or other short-lived objects."),
                                "Florian Rival",
                                "Open source (MIT License)")
+      .SetCategory("Game mechanic")
       .SetExtensionHelpPath("/behaviors/destroyoutside");
 
   gd::BehaviorMetadata& aut =
@@ -44,7 +45,8 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "DestroyOutside")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetExtraBorder");
 
@@ -58,7 +60,8 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/destroyoutsideicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "DestroyOutside")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("SetExtraBorder")
       .SetGetter("GetExtraBorder");

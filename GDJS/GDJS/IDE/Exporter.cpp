@@ -32,6 +32,11 @@
 
 namespace gdjs {
 
+static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
+  if (std::find(container.begin(), container.end(), str) == container.end())
+    container.push_back(str);
+}
+
 Exporter::Exporter(gd::AbstractFileSystem &fileSystem, gd::String gdjsRoot_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_) {
   SetCodeOutputDirectory(fs.GetTempDir() + "/GDTemporaries/JSCodeTemp");
@@ -52,10 +57,11 @@ bool Exporter::ExportWholePixiProject(
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   gd::Project exportedProject = project;
 
-  auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(project);
+  auto usedExtensionsResult = gd::UsedExtensionsFinder::ScanProject(project);
+  auto& usedExtensions = usedExtensionsResult.GetUsedExtensions();
 
-  auto exportProject = [this, &exportedProject, &exportOptions, &helper](
-                           gd::String exportDir) {
+  auto exportProject = [this, &exportedProject, &exportOptions, &helper,
+                        &usedExtensionsResult](gd::String exportDir) {
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
         exportOptions["exportForFacebookInstantGames"];
@@ -67,6 +73,7 @@ bool Exporter::ExportWholePixiProject(
     // Prepare the export directory
     fs.MkDir(exportDir);
     std::vector<gd::String> includesFiles;
+    std::vector<gd::String> resourcesFiles;
 
     // Export the resources (before generating events as some resources
     // filenames may be updated)
@@ -87,8 +94,14 @@ bool Exporter::ExportWholePixiProject(
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 
-    // Export files for object and behaviors
-    helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+    // Export files for free function, object and behaviors
+    for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
+      InsertUnique(includesFiles, includeFile);
+    }
+    for (const auto &requiredFile :
+         usedExtensionsResult.GetUsedRequiredFiles()) {
+      InsertUnique(resourcesFiles, requiredFile);
+    }
 
     // Export effects (after engine libraries as they auto-register themselves
     // to the engine)
@@ -127,6 +140,7 @@ bool Exporter::ExportWholePixiProject(
       gd::LogError("Unable to export WebManifest.");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
+    helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)

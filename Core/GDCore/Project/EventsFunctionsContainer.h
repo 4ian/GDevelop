@@ -25,7 +25,24 @@ namespace gd {
  */
 class GD_CORE_API EventsFunctionsContainer
     : private SerializableWithNameList<gd::EventsFunction> {
- public:
+public:
+  enum FunctionOwner {
+      Extension,
+      Object,
+      Behavior};
+
+  EventsFunctionsContainer(FunctionOwner source_) : owner(source_) {}
+
+  /**
+   * \brief Get the source of the function container.
+   * 
+   * \note For instance, it can be useful to handle specific parameters for
+   * behaviors.
+   */
+  FunctionOwner GetOwner() const {
+    return owner;
+  }
+
   /** \name Events Functions management
    */
   ///@{
@@ -139,6 +156,9 @@ class GD_CORE_API EventsFunctionsContainer
   void Init(const gd::EventsFunctionsContainer& other) {
     return SerializableWithNameList<gd::EventsFunction>::Init(other);
   };
+
+private:
+  FunctionOwner owner;
 };
 
 }  // namespace gd

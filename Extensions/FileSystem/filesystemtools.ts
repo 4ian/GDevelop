@@ -48,13 +48,16 @@ namespace gdjs {
 
     /**
      * Get the path to 'Desktop' folder.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to the desktop folder
      */
     export const getDesktopPath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('desktop') || '';
@@ -65,13 +68,16 @@ namespace gdjs {
 
     /**
      * Get the path to 'Documents' folder.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to the documents folder
      */
     export const getDocumentsPath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('documents') || '';
@@ -82,13 +88,16 @@ namespace gdjs {
 
     /**
      * Get the path to 'Pictures' folder.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to the pictures folder
      */
     export const getPicturesPath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('pictures') || '';
@@ -99,13 +108,16 @@ namespace gdjs {
 
     /**
      * Get the path to this application 'Executable' file.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to this applications executable file
      */
     export const getExecutablePath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('exe') || '';
@@ -116,14 +128,16 @@ namespace gdjs {
 
     /**
      * Get the path to this application 'Executable' folder.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to this applications executable folder
      */
     export const getExecutableFolderPath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
       const path = gdjs.fileSystem._getPath();
-      const executablePath = gdjs.fileSystem.getExecutablePath(runtimeScene);
+      const executablePath = gdjs.fileSystem.getExecutablePath(
+        instanceContainer
+      );
       if (!path) {
         return '';
       }
@@ -132,13 +146,16 @@ namespace gdjs {
 
     /**
      * Get the path to 'UserData' folder.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to userdata folder
      */
     export const getUserdataPath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('userData') || '';
@@ -152,9 +169,12 @@ namespace gdjs {
      * @return The path to user's "home" folder
      */
     export const getUserHomePath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('home') || '';
@@ -165,13 +185,16 @@ namespace gdjs {
 
     /**
      * Get the path to 'Temp' folder.
-     * @param runtimeScene The current scene
+     * @param instanceContainer The current container
      * @return The path to temp folder
      */
     export const getTempPath = function (
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): string {
-      const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
+      const remote = instanceContainer
+        .getGame()
+        .getRenderer()
+        .getElectronRemote();
       const app = remote ? remote.app : null;
       if (app) {
         return app.getPath('temp') || '';
@@ -338,11 +361,13 @@ namespace gdjs {
      * @param stringVar Variable where to store the content
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadStringFromFile = function (
       stringVar: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       let result = 'error';
@@ -350,7 +375,9 @@ namespace gdjs {
         try {
           const data = fileSystem.readFileSync(loadPath, 'utf8');
           if (data) {
-            stringVar.setString(data);
+            stringVar.setString(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             result = 'ok';
           }
         } catch (err) {
@@ -368,11 +395,13 @@ namespace gdjs {
      * @param variable Variable to store the variable
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadVariableFromJSONFile = function (
       variable: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       let result = 'error';
@@ -380,7 +409,9 @@ namespace gdjs {
         try {
           const data = fileSystem.readFileSync(loadPath, 'utf8');
           if (data) {
-            variable.fromJSON(data);
+            variable.fromJSON(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             result = 'ok';
           }
         } catch (err) {
@@ -400,17 +431,21 @@ namespace gdjs {
      * @param variable Variable to store the variable
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadVariableFromJSONFileAsync = function (
       variable: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
-            variable.fromJSON(data);
+            variable.fromJSON(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             resultVar.setString('ok');
           }
           if (err) {
@@ -431,17 +466,21 @@ namespace gdjs {
      * @param stringVar Variable where to store the content
      * @param loadPath Path to the file
      * @param resultVar The variable where to store the result of the operation
+     * @param removeCRCharacters If true, will remove \r characters usually added by Windows when editing files
      */
     export const loadStringFromFileAsync = function (
       stringVar: gdjs.Variable,
       loadPath: string,
-      resultVar: gdjs.Variable
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
-            stringVar.setString(data);
+            stringVar.setString(
+              removeCRCharacters ? data.replace(/\r/g, '') : data
+            );
             resultVar.setString('ok');
           }
           if (err) {

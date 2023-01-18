@@ -5,10 +5,9 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree from './EventsTree';
-import { getInstructionMetadata } from './InstructionEditor/NewInstructionEditor';
-import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
+import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
-import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
+import InstructionEditorMenu from './InstructionEditor/InstructionEditorMenu';
 import EventTextDialog, {
   filterEditableWithEventTextDialog,
 } from './InstructionEditor/EventTextDialog';
@@ -57,11 +56,7 @@ import EventsContextAnalyzerDialog, {
   toEventsContextResult,
 } from './EventsContextAnalyzerDialog';
 import SearchPanel, { type SearchPanelInterface } from './SearchPanel';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import EventsSearcher, {
   type ReplaceInEventsInputs,
   type SearchInEventsInputs,
@@ -121,9 +116,7 @@ type Props = {|
   onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -319,9 +312,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
-        canToggleEventDisabled={hasEventSelected(this.state.selection)}
+        canToggleEventDisabled={
+          hasEventSelected(this.state.selection) &&
+          this._selectionCanToggleDisabled()
+        }
+        canToggleInstructionInverted={hasInstructionSelected(
+          this.state.selection
+        )}
         onAddCommentEvent={this._addCommentEvent}
         onAddEvent={this.addNewEvent}
+        onToggleInvertedCondition={this._invertSelectedConditions}
         onToggleDisabledEvent={this.toggleDisabled}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
@@ -544,6 +544,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Invert Condition`),
       click: () => this._invertSelectedConditions(),
       visible: hasSelectedAtLeastOneCondition(this.state.selection),
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_CONDITION_INVERTED'
+        ] || 'KeyJ'
+      ),
     },
     {
       label: i18n._(t`Toggle Wait the Action to End`),
@@ -879,9 +884,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     locatingEvent: gdBaseEvent,
     parameterContext: ParameterContext
   ) => {
-    // Prevent state from changing when clicking on a parameter with inline parameter
-    // editor (it will close the editor).
-    if (this.state.editedParameter.instruction) return;
     const { instruction, parameterIndex } = parameterContext;
 
     this.setState({
@@ -1012,6 +1014,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     const positions = this._getChangedEventRows(eventsWithDeletion);
     eventsRemover.launch(events);
+    eventsRemover.delete();
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
@@ -1516,7 +1519,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  _renderInstructionEditorDialog = (newInstructionEditorDialog: boolean) => {
+  _renderInstructionEditorDialog = () => {
     const {
       project,
       scope,
@@ -1526,9 +1529,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     // Choose the dialog to use
     const Dialog = this.state.inlineInstructionEditorAnchorEl
-      ? NewInstructionEditorMenu
-      : newInstructionEditorDialog
-      ? NewInstructionEditorDialog
+      ? InstructionEditorMenu
       : InstructionEditorDialog;
 
     return this.state.editedInstruction.instruction ? (
@@ -1565,9 +1566,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           ensureSingleOnceInstructions(instrsList);
           if (this._eventsTree) this._eventsTree.forceEventsUpdate();
         }}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
-        resourceExternalEditors={this.props.resourceExternalEditors}
+        resourceManagementProps={this.props.resourceManagementProps}
         openInstructionOrExpression={(extension, type) => {
           this.closeInstructionEditor();
           this.props.openInstructionOrExpression(extension, type);
@@ -1627,6 +1626,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   render() {
     const {
+      isActive,
       project,
       scope,
       events,
@@ -1635,9 +1635,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       globalObjectsContainer,
       objectsContainer,
       preferences,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
       onCreateEventsFunction,
       tutorials,
     } = this.props;
@@ -1667,6 +1665,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               goToNextSearchResult,
             }) => (
               <div
+                id="events-editor"
+                data-active={isActive ? 'true' : undefined}
                 className="gd-events-sheet"
                 style={styles.container}
                 onKeyDown={this._keyboardShortcuts.onKeyDown}
@@ -1794,9 +1794,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     if (this._searchPanel)
                       this._searchPanel.markSearchResultsDirty();
                   }}
-                  resourceSources={resourceSources}
-                  onChooseResource={onChooseResource}
-                  resourceExternalEditors={resourceExternalEditors}
+                  resourceManagementProps={resourceManagementProps}
                 />
                 <ContextMenu
                   ref={eventContextMenu =>
@@ -1810,11 +1808,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   }
                   buildMenuTemplate={this._buildInstructionContextMenu}
                 />
-                {this._renderInstructionEditorDialog(
-                  // Force using the new instruction editor on touch screens.
-                  preferences.values.useNewInstructionEditorDialog ||
-                    screenType === 'touch'
-                )}
+                {this._renderInstructionEditorDialog()}
                 {this.state.analyzedEventsContextResult && (
                   <EventsContextAnalyzerDialog
                     onClose={this._closeEventsContextAnalyzer}

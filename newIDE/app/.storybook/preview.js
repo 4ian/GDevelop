@@ -2,6 +2,7 @@
 import { configure, addDecorator } from '@storybook/react';
 import i18nProviderDecorator from '../src/stories/I18nProviderDecorator';
 import '../src/UI/icomoon-font.css'; // Styles for Icomoon font.
+import './app-level-styling.css';
 
 export const globalTypes = {
   themeName: {

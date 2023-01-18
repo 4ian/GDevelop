@@ -18,8 +18,16 @@ import muiZIndex from '@material-ui/core/styles/zIndex';
 import {
   shouldCloseOrCancel,
   shouldSubmit,
+  shouldValidate,
 } from './KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from './TextEllipsis';
+import Paper from './Paper';
+
+export const AutocompletePaperComponent = (props: any) => (
+  // Use light background so that it's in contrast with background that
+  // is either dark or medium (in dialogs).
+  <Paper {...props} background="light" />
+);
 
 type Option =
   | {|
@@ -29,7 +37,7 @@ type Option =
       text: string, // The text used for filtering. If empty, item is always shown.
       value: string, // The value to show on screen and to be selected
       translatableValue?: MessageDescriptor,
-      onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
+      onClick?: () => void | Promise<void>, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
     |};
 
@@ -65,7 +73,7 @@ export type SemiControlledAutoCompleteInterface = {|
   forceInputValueTo: (newValue: string) => void,
 |};
 
-const styles = {
+export const autocompleteStyles = {
   container: {
     position: 'relative',
     width: '100%',
@@ -110,7 +118,7 @@ const makeRenderItem = (i18n: I18nType) => (
         divider
         disableGutters
         component={'div'}
-        style={styles.listItem}
+        style={autocompleteStyles.listItem}
       />
     );
   }
@@ -119,10 +127,14 @@ const makeRenderItem = (i18n: I18nType) => (
     ? i18n._(option.translatableValue)
     : option.value;
   return (
-    <ListItem dense={true} component={'div'} style={styles.listItem}>
+    <ListItem
+      dense={true}
+      component={'div'}
+      style={autocompleteStyles.listItem}
+    >
       {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
       <ListItemText
-        style={styles.listItemText}
+        style={autocompleteStyles.listItemText}
         primary={
           <div title={value} style={textEllipsisStyle}>
             {value}
@@ -223,6 +235,11 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
 
           if (props.onApply) props.onApply();
           else if (props.onRequestClose) props.onRequestClose();
+        } else if (shouldValidate(event)) {
+          // Make sure the current value is reported to the parent.
+          // Otherwise a parent like an InlineParameterEditor would close when detecting
+          // the validation (Enter key pressed) without having the latest value.
+          props.onChange(event.currentTarget.value);
         }
       },
     },
@@ -287,11 +304,12 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             open={isMenuOpen}
             style={{
               ...props.style,
-              ...styles.container,
+              ...autocompleteStyles.container,
             }}
             inputValue={currentInputValue}
             value={currentInputValue}
             onInputChange={handleInputChange}
+            PaperComponent={AutocompletePaperComponent}
             options={props.dataSource}
             renderOption={makeRenderItem(i18n)}
             getOptionDisabled={isOptionDisabled}

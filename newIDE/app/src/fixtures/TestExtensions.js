@@ -305,4 +305,16 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
+  {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'Button',
+      'Fake event-based object',
+      'Fake event-based object',
+      '',
+      'MIT'
+    );
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
 };

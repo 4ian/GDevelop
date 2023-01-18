@@ -16,15 +16,22 @@ export default class FunctionParameterNameField extends Component<
   }
 
   render() {
-    const parameterNames: Array<ExpressionAutocompletion> = this.props.scope
-      .eventsFunction
-      ? enumerateParametersUsableInExpressions(
-          this.props.scope.eventsFunction
-        ).map(parameterMetadata => ({
-          kind: 'Text',
-          completion: `"${parameterMetadata.getName()}"`,
-        }))
-      : [];
+    const eventsBasedEntity =
+      this.props.scope.eventsBasedBehavior ||
+      this.props.scope.eventsBasedObject;
+    const functionsContainer = eventsBasedEntity
+      ? eventsBasedEntity.getEventsFunctions()
+      : this.props.scope.eventsFunctionsExtension;
+    const parameterNames: Array<ExpressionAutocompletion> =
+      this.props.scope.eventsFunction && functionsContainer
+        ? enumerateParametersUsableInExpressions(
+            functionsContainer,
+            this.props.scope.eventsFunction
+          ).map(parameterMetadata => ({
+            kind: 'Text',
+            completion: `"${parameterMetadata.getName()}"`,
+          }))
+        : [];
 
     return (
       <GenericExpressionField

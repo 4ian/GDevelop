@@ -414,6 +414,14 @@ class RuntimeScene {
 
     return 0;
   }
+  
+  getInitialSharedDataForBehavior(name) {
+    return null;
+  }
+
+  getScene() {
+    return this;
+  }
 }
 
 /**

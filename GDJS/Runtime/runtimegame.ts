@@ -41,6 +41,12 @@ namespace gdjs {
      * `@electron/remote` in the game engine and extensions.
      */
     electronRemoteRequirePath?: string;
+
+    /**
+     * If set, the game should use the specified environment for making calls
+     * to GDevelop APIs ("dev" = development APIs).
+     */
+    environment?: 'dev';
   };
 
   /**
@@ -49,6 +55,7 @@ namespace gdjs {
   export class RuntimeGame {
     _variables: VariablesContainer;
     _data: ProjectData;
+    _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _imageManager: ImageManager;
     _soundManager: SoundManager;
     _fontManager: FontManager;
@@ -65,23 +72,43 @@ namespace gdjs {
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
+    /**
+     * Game loop management (see startGameLoop method)
+     */
     _renderer: RuntimeGameRenderer;
     _sessionId: string | null;
     _playerId: string | null;
 
-    //Game loop management (see startGameLoop method)
     _sceneStack: SceneStack;
+    /**
+     * When set to true, the scenes are notified that game resolution size changed.
+     */
     _notifyScenesForGameResolutionResize: boolean = false;
 
-    // When set to true, the scenes are notified that gamre resolution size changed.
+    /**
+     * When paused, the game won't step and will be freezed. Useful for debugging.
+     */
     _paused: boolean = false;
+
+    /**
+     * True during the first frame the game is back from being hidden.
+     * This has nothing to do with `_paused`.
+     */
+    _hasJustResumed: boolean = false;
 
     //Inputs :
     _inputManager: InputManager;
 
-    //Allow to specify an external layout to insert in the first scene:
+    /**
+     * Allow to specify an external layout to insert in the first scene.
+     */
     _injectExternalLayout: any;
     _options: RuntimeGameOptions;
+
+    /**
+     * The mappings for embedded resources
+     */
+    _embeddedResourcesMappings: Map<string, Record<string, string>>;
 
     /**
      * Optional client to connect to a debugger server.
@@ -135,6 +162,43 @@ namespace gdjs {
       this._isPreview = this._options.isPreview || false;
       this._sessionId = null;
       this._playerId = null;
+
+      this._embeddedResourcesMappings = new Map();
+      for (const resource of this._data.resources.resources) {
+        if (resource.metadata) {
+          try {
+            const metadata = JSON.parse(resource.metadata);
+            if (metadata?.embeddedResourcesMapping) {
+              this._embeddedResourcesMappings.set(
+                resource.name,
+                metadata.embeddedResourcesMapping
+              );
+            }
+          } catch {
+            logger.error(
+              'Some metadata of resources can not be succesfully parsed.'
+            );
+          }
+        }
+      }
+
+      this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
+      if (this._data.eventsFunctionsExtensions) {
+        for (const extension of this._data.eventsFunctionsExtensions) {
+          for (const eventsBasedObject of extension.eventsBasedObjects) {
+            this._eventsBasedObjectDatas.set(
+              extension.name + '::' + eventsBasedObject.name,
+              eventsBasedObject
+            );
+          }
+        }
+      }
+
+      if (this.isUsingGDevelopDevelopmentEnvironment()) {
+        logger.info(
+          'This game will run on the development version of GDevelop APIs.'
+        );
+      }
     }
 
     /**
@@ -237,6 +301,17 @@ namespace gdjs {
      */
     getGameData(): ProjectData {
       return this._data;
+    }
+
+    getEventsBasedObjectData(type: string): EventsBasedObjectData | null {
+      const eventsBasedObjectData = this._eventsBasedObjectDatas.get(type);
+      if (!eventsBasedObjectData) {
+        logger.error(
+          'The game has no events-based object of the type "' + type + '"'
+        );
+        return null;
+      }
+      return eventsBasedObjectData;
     }
 
     /**
@@ -357,8 +432,6 @@ namespace gdjs {
           const windowInnerHeight = gdjs.RuntimeGameRenderer.getWindowInnerHeight();
 
           // Enlarge either the width or the eight to fill the inner window space.
-          let width = this._gameResolutionWidth;
-          let height = this._gameResolutionHeight;
           if (this._resizeMode === 'adaptWidth') {
             this._gameResolutionWidth =
               (this._gameResolutionHeight * windowInnerWidth) /
@@ -459,7 +532,21 @@ namespace gdjs {
      * @param enable true to pause the game, false to unpause
      */
     pause(enable: boolean) {
+      if (this._paused === enable) return;
+
       this._paused = enable;
+      if (this._debuggerClient) {
+        if (this._paused) this._debuggerClient.sendGamePaused();
+        else this._debuggerClient.sendGameResumed();
+      }
+    }
+
+    /**
+     * @returns true during the first frame the game is back from being hidden.
+     * This has nothing to do with `_paused`.
+     */
+    hasJustResumed() {
+      return this._hasJustResumed;
     }
 
     /**
@@ -541,6 +628,9 @@ namespace gdjs {
                           if (progressCallback) progressCallback(percent);
                         })
                         .then(() => loadingScreen.unload())
+                        .then(() =>
+                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                        )
                         .then(() => {
                           callback();
                         });
@@ -565,7 +655,7 @@ namespace gdjs {
         }
         this._forceGameResolutionUpdate();
 
-        //Load the first scene
+        // Load the first scene
         const firstSceneName = this._data.firstLayout;
         this._sceneStack.push(
           this.hasScene(firstSceneName)
@@ -587,9 +677,12 @@ namespace gdjs {
         // logger.log("Took", time, "ms");
         // return;
 
-        //The standard game loop
+        this._setupGameVisibilityEvents();
+
+        // The standard game loop
         const that = this;
         let accumulatedElapsedTime = 0;
+        this._hasJustResumed = false;
         this._renderer.startGameLoop(function (lastCallElapsedTime) {
           if (that._paused) {
             return true;
@@ -610,15 +703,16 @@ namespace gdjs {
           const elapsedTime = accumulatedElapsedTime;
           accumulatedElapsedTime = 0;
 
-          //Manage resize events.
+          // Manage resize events.
           if (that._notifyScenesForGameResolutionResize) {
             that._sceneStack.onGameResolutionResized();
             that._notifyScenesForGameResolutionResize = false;
           }
 
-          //Render and step the scene.
+          // Render and step the scene.
           if (that._sceneStack.step(elapsedTime)) {
             that.getInputManager().onFrameEnded();
+            that._hasJustResumed = false;
             return true;
           }
           return false;
@@ -639,6 +733,23 @@ namespace gdjs {
       this._disableMetrics = !enable;
       if (enable) {
         this._setupSessionMetrics();
+      }
+    }
+
+    _setupGameVisibilityEvents() {
+      if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            this._hasJustResumed = true;
+          }
+        });
+        window.addEventListener(
+          'resume',
+          () => {
+            this._hasJustResumed = true;
+          },
+          false
+        );
       }
     }
 
@@ -763,10 +874,14 @@ namespace gdjs {
             sendSessionHit();
           }
         });
+        window.addEventListener('pagehide', sendSessionHit, false);
+        // Cordova events
+        window.addEventListener('pause', sendSessionHit, false);
         window.addEventListener(
-          'pagehide',
+          'resume',
           () => {
-            sendSessionHit();
+            // Skip the duration the game was hidden.
+            lastSessionResumeTime = Date.now();
           },
           false
         );
@@ -882,6 +997,15 @@ namespace gdjs {
     }
 
     /**
+     * Check if the game should call GDevelop development APIs or not.
+     *
+     * Unless you are contributing to GDevelop, avoid using this.
+     */
+    isUsingGDevelopDevelopmentEnvironment(): boolean {
+      return this._options.environment === 'dev';
+    }
+
+    /**
      * Gets an extension property from the project data.
      * @param extensionName The extension name.
      * @param propertyName The property name.
@@ -900,6 +1024,22 @@ namespace gdjs {
         }
       }
       return null;
+    }
+
+    /**
+     * Resolves the name of an embedded resource.
+     * @param mainResourceName The name of the resource containing the embedded resource.
+     * @param embeddedResourceName The name of the embedded resource.
+     * @return The resource name.
+     */
+    resolveEmbeddedResource(
+      mainResourceName: string,
+      embeddedResourceName: string
+    ): string {
+      const mapping = this._embeddedResourcesMappings.get(mainResourceName);
+      return mapping && mapping[embeddedResourceName]
+        ? mapping[embeddedResourceName]
+        : embeddedResourceName;
     }
   }
 }

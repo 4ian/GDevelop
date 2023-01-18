@@ -4,6 +4,7 @@ declare class gdHighestZOrderFinder extends gdInitialInstanceFunctor {
   restrictSearchToLayer(layer: string): void;
   getHighestZOrder(): number;
   getLowestZOrder(): number;
+  reset(): void;
   getInstancesCount(): number;
   delete(): void;
   ptr: number;

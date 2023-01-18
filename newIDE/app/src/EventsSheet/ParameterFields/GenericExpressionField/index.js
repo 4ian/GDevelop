@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import Functions from '@material-ui/icons/Functions';
 import RaisedButton from '../../../UI/RaisedButton';
-import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../../../UI/SemiControlledTextField';
 import { mapVector } from '../../../Utils/MapFor';
 import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import ExpressionParametersEditorDialog, {
@@ -20,7 +21,6 @@ import BackgroundHighlighting, {
 } from './BackgroundHighlighting';
 import debounce from 'lodash/debounce';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Paper from '@material-ui/core/Paper';
 import { TextFieldWithButtonLayout } from '../../../UI/Layout';
 import {
   type ExpressionAutocompletion,
@@ -41,7 +41,9 @@ import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindow
 import {
   shouldCloseOrCancel,
   shouldSubmit,
+  shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import Paper from '../../../UI/Paper';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -164,8 +166,8 @@ const extractErrors = (
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
-  _field: ?SemiControlledTextField = null;
-  _fieldElement: ?Element = null;
+  _field: ?SemiControlledTextFieldInterface = null;
+  _fieldElementWidth: ?number = null;
   _inputElement: ?HTMLInputElement = null;
 
   state = {
@@ -181,10 +183,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this._field) {
-      const node = ReactDOM.findDOMNode(this._field);
-      if (node instanceof Element) {
-        this._fieldElement = node;
-      }
+      this._fieldElementWidth = this._field.getFieldWidth();
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
   }
@@ -309,6 +308,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       shouldConvertToString,
     });
 
+    parser.delete();
+
     // Generate the expression with the function call
     const newValue =
       value.substr(0, cursorPosition) +
@@ -359,27 +360,34 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const expression = this.state.validatedValue;
 
-    const {
-      expression: newExpression,
-      caretLocation: newCaretLocation,
-    } = insertAutocompletionInExpression(
-      { expression, caretLocation },
-      {
-        completion: expressionAutocompletion.completion,
-        replacementStartPosition:
-          expressionAutocompletion.replacementStartPosition,
-        replacementEndPosition: expressionAutocompletion.replacementEndPosition,
-        addParenthesis: expressionAutocompletion.addParenthesis,
-        addDot: expressionAutocompletion.addDot,
-        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
-        addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
-        shouldConvertToString:
-          expressionAutocompletion.kind === 'Expression'
-            ? expressionAutocompletion.shouldConvertToString
-            : null,
-      }
-    );
+    const { expression: newExpression, caretLocation: newCaretLocation } =
+      expressionAutocompletion.kind === 'FullExpression'
+        ? {
+            expression: expressionAutocompletion.completion,
+            caretLocation: expressionAutocompletion.completion.length,
+          }
+        : insertAutocompletionInExpression(
+            { expression, caretLocation },
+            {
+              completion: expressionAutocompletion.completion,
+              replacementStartPosition:
+                expressionAutocompletion.replacementStartPosition,
+              replacementEndPosition:
+                expressionAutocompletion.replacementEndPosition,
+              addParenthesis: expressionAutocompletion.addParenthesis,
+              addDot: expressionAutocompletion.addDot,
+              addParameterSeparator:
+                expressionAutocompletion.addParameterSeparator,
+              addNamespaceSeparator:
+                expressionAutocompletion.addNamespaceSeparator,
+              hasVisibleParameters:
+                expressionAutocompletion.hasVisibleParameters,
+              shouldConvertToString:
+                expressionAutocompletion.kind === 'Expression'
+                  ? expressionAutocompletion.shouldConvertToString
+                  : null,
+            }
+          );
 
     if (this._field) {
       this._field.forceSetValue(newExpression);
@@ -509,7 +517,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       : undefined;
 
     const popoverStyle = {
-      width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
+      width: this._fieldElementWidth || 'auto',
       marginLeft: -5, // Remove the offset that the Popper has for some reason with disablePortal={true}
       // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
       // There will be only one ExpressionSelector opened at a time, so it's fair to put the
@@ -543,6 +551,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   highlights={this.state.errorHighlights}
                 />
                 <SemiControlledTextField
+                  id={this.props.id}
                   margin={this.props.isInline ? 'none' : 'dense'}
                   value={value}
                   floatingLabelText={description}
@@ -572,7 +581,11 @@ export default class ExpressionField extends React.Component<Props, State> {
                     // Apply the changes now as otherwise the onBlur handler
                     // has a risk not to be called (as the component will be
                     // unmounted).
-                    if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
+                    if (
+                      shouldCloseOrCancel(event) ||
+                      shouldSubmit(event) ||
+                      shouldValidate(event)
+                    ) {
                       const value = event.currentTarget.value;
                       if (this.props.onChange) this.props.onChange(value);
                     }
@@ -600,6 +613,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                               ? styles.expressionSelectorPopoverContentSmall
                               : styles.expressionSelectorPopoverContent
                           }
+                          background="light"
                         >
                           <ExpressionSelector
                             selectedType=""
@@ -654,6 +668,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                 })}
               {!this.props.isInline && (
                 <RaisedButton
+                  id={`open-${expressionType}-expression-popover-button`}
                   icon={<Functions />}
                   label={
                     expressionType === 'string'

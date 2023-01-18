@@ -137,6 +137,15 @@ namespace gdjs {
         tween.stop().dispose();
       };
 
+      /**
+       * @deprecated Use tweenVariableNumber2 instead.
+       * This function is misleading since one could think that the tween starts
+       * right at the moment this function is called whereas the value of the variable
+       * will change at the next frame only. Moreover, the variable will not start from
+       * the start value exactly since time will have passed at the moment the next
+       * frame is rendered.
+       * See https://github.com/4ian/GDevelop/issues/4270
+       */
       export const tweenVariableNumber = (
         runtimeScene: RuntimeScene,
         identifier: string,
@@ -148,6 +157,26 @@ namespace gdjs {
       ) => {
         const tween = shifty.tween({
           from: { value: from },
+          to: { value: to },
+          easing,
+          duration,
+          render: ({ value }) => variable.setNumber(value),
+        });
+
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
+      };
+
+      export const tweenVariableNumber2 = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        variable: Variable,
+        to: number,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const tween = shifty.tween({
+          from: { value: variable.getValue() },
           to: { value: to },
           easing,
           duration,
@@ -176,6 +205,52 @@ namespace gdjs {
           render: ({ x, y }) => {
             layer.setCameraX(x);
             layer.setCameraY(y);
+          },
+        });
+
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
+      };
+
+      export const tweenCameraZoom = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toZoom: number,
+        layerName: string,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const tween = shifty.tween({
+          from: { zoom: layer.getCameraZoom() },
+          to: { zoom: toZoom },
+          easing,
+          duration,
+          render: ({ zoom }) => {
+            layer.setCameraZoom(zoom);
+          },
+        });
+
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
+      };
+
+      export const tweenCameraRotation = (
+        runtimeScene: RuntimeScene,
+        identifier: string,
+        toRotation: number,
+        layerName: string,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const tween = shifty.tween({
+          from: { rotation: layer.getCameraRotation() },
+          to: { rotation: toRotation },
+          easing,
+          duration,
+          render: ({ rotation }) => {
+            layer.setCameraRotation(rotation);
           },
         });
 

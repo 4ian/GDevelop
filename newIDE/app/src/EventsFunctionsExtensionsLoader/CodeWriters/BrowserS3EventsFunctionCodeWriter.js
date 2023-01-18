@@ -48,5 +48,18 @@ export const makeBrowserS3EventsFunctionCodeWriter = ({
         ContentType: 'text/javascript',
       });
     },
+    writeObjectCode: (
+      objectCodeNamespace: string,
+      code: string
+    ): Promise<void> => {
+      const key = getPathFor(objectCodeNamespace);
+      onWriteFile({ includeFile: key, content: code });
+      console.log(`Uploading object generated code to ${key}...`);
+      return uploadObject({
+        Key: getPathFor(objectCodeNamespace),
+        Body: code,
+        ContentType: 'text/javascript',
+      });
+    },
   };
 };

@@ -106,6 +106,7 @@ type AccordionProps = {|
   // Use accordion in controlled mode
   expanded?: boolean,
   onChange?: (open: boolean) => void,
+  id?: string,
 |};
 
 /**
@@ -115,14 +116,18 @@ type AccordionProps = {|
  */
 export const Accordion = (props: AccordionProps) => {
   const { costlyBody, ...otherProps } = props;
-  const theme = React.useContext(GDevelopThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
     <MUIAccordion
       {...otherProps}
       square
       elevation={0}
-      style={{ border: `1px solid ${theme.toolbar.separatorColor}` }}
+      style={{
+        border: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+        marginLeft: 0,
+      }}
       TransitionProps={{ unmountOnExit: !!costlyBody }}
     />
   );

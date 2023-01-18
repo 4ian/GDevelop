@@ -11,6 +11,13 @@ import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
+import LeftTextAlignment from '../../UI/CustomSvgIcons/LeftTextAlignment';
+import CenterTextAlignment from '../../UI/CustomSvgIcons/CenterTextAlignment';
+import RightTextAlignment from '../../UI/CustomSvgIcons/RightTextAlignment';
+
 const gd = global.gd;
 
 const toolbarItemStyle = {
@@ -30,13 +37,15 @@ const styles = {
 export default class TextEditor extends React.Component<EditorProps, void> {
   render() {
     const {
-      object,
+      objectConfiguration,
       project,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
+      resourceManagementProps,
     } = this.props;
-    const textObject = gd.asTextObject(object);
+    const textObjectConfiguration = gd.asTextObjectConfiguration(
+      objectConfiguration
+    );
+
+    const textAlignment = textObjectConfiguration.getTextAlignment();
 
     return (
       <Column noMargin>
@@ -46,12 +55,15 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           </MiniToolbarText>
           <SemiControlledTextField
             commitOnBlur
+            id="text-object-font-size"
             type="number"
             margin="none"
             style={styles.sizeTextField}
-            value={textObject.getCharacterSize()}
+            value={textObjectConfiguration.getCharacterSize()}
             onChange={value => {
-              textObject.setCharacterSize(parseInt(value, 10) || 0);
+              textObjectConfiguration.setCharacterSize(
+                parseInt(value, 10) || 0
+              );
               this.forceUpdate();
             }}
           />
@@ -62,71 +74,112 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             style={styles.toolbarItem}
             disableAlpha
             color={{
-              r: textObject.getColorR(),
-              g: textObject.getColorG(),
-              b: textObject.getColorB(),
+              r: textObjectConfiguration.getColorR(),
+              g: textObjectConfiguration.getColorG(),
+              b: textObjectConfiguration.getColorB(),
               a: 255,
             }}
             onChangeComplete={color => {
-              textObject.setColor(color.rgb.r, color.rgb.g, color.rgb.b);
+              textObjectConfiguration.setColor(
+                color.rgb.r,
+                color.rgb.g,
+                color.rgb.b
+              );
               this.forceUpdate();
             }}
           />
           <Checkbox
             label={<Trans>Bold</Trans>}
-            checked={textObject.isBold()}
+            checked={textObjectConfiguration.isBold()}
             onCheck={(e, checked) => {
-              textObject.setBold(checked);
+              textObjectConfiguration.setBold(checked);
               this.forceUpdate();
             }}
             style={styles.checkbox}
           />
           <Checkbox
             label={<Trans>Italic</Trans>}
-            checked={textObject.isItalic()}
+            checked={textObjectConfiguration.isItalic()}
             onCheck={(e, checked) => {
-              textObject.setItalic(checked);
+              textObjectConfiguration.setItalic(checked);
               this.forceUpdate();
             }}
             style={styles.checkbox}
           />
-          <MiniToolbarText>
-            <Trans>Font:</Trans>
-          </MiniToolbarText>
-          <ResourceSelector
-            margin="none"
-            project={project}
-            resourceSources={resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
-            resourcesLoader={ResourcesLoader}
-            resourceKind="font"
-            fullWidth
-            canBeReset
-            initialResourceName={textObject.getFontName()}
-            onChange={resourceName => {
-              textObject.setFontName(resourceName);
-              this.forceUpdate();
-            }}
-            hintText={<Trans>Choose a font</Trans>}
-            style={styles.resourcesSelector}
-          />
+          <ButtonGroup>
+            <Tooltip title={<Trans>Align text on the left</Trans>}>
+              <Button
+                variant={textAlignment === 'left' ? 'contained' : 'outlined'}
+                color={textAlignment === 'left' ? 'secondary' : 'default'}
+                onClick={() => {
+                  textObjectConfiguration.setTextAlignment('left');
+                  this.forceUpdate();
+                }}
+              >
+                <LeftTextAlignment />
+              </Button>
+            </Tooltip>
+            <Tooltip title={<Trans>Align text on the center</Trans>}>
+              <Button
+                variant={textAlignment === 'center' ? 'contained' : 'outlined'}
+                color={textAlignment === 'center' ? 'secondary' : 'default'}
+                onClick={() => {
+                  textObjectConfiguration.setTextAlignment('center');
+                  this.forceUpdate();
+                }}
+              >
+                <CenterTextAlignment />
+              </Button>
+            </Tooltip>
+            <Tooltip title={<Trans>Align text on the right</Trans>}>
+              <Button
+                variant={textAlignment === 'right' ? 'contained' : 'outlined'}
+                color={textAlignment === 'right' ? 'secondary' : 'default'}
+                onClick={() => {
+                  textObjectConfiguration.setTextAlignment('right');
+                  this.forceUpdate();
+                }}
+              >
+                <RightTextAlignment />
+              </Button>
+            </Tooltip>
+          </ButtonGroup>
         </MiniToolbar>
+        <Line>
+          <Column expand>
+            <ResourceSelector
+              project={project}
+              resourceManagementProps={resourceManagementProps}
+              resourcesLoader={ResourcesLoader}
+              resourceKind="font"
+              fullWidth
+              canBeReset
+              initialResourceName={textObjectConfiguration.getFontName()}
+              onChange={resourceName => {
+                textObjectConfiguration.setFontName(resourceName);
+                this.forceUpdate();
+              }}
+              floatingLabelText={<Trans>Choose a font</Trans>}
+              hintText={<Trans>Choose a font</Trans>}
+            />
+          </Column>
+        </Line>
         <Line noMargin>
           <Column expand>
             <Line>
               <SemiControlledTextField
                 floatingLabelText={<Trans>Initial text to display</Trans>}
                 floatingLabelFixed
+                id="text-object-initial-text"
                 commitOnBlur
-                hintText={t`Enter the text to be displayed by the object`}
+                translatableHintText={t`Enter the text to be displayed by the object`}
                 fullWidth
                 multiline
                 rows={8}
                 rowsMax={8}
-                value={textObject.getString()}
+                value={textObjectConfiguration.getString()}
                 onChange={value => {
-                  textObject.setString(value);
+                  textObjectConfiguration.setString(value);
                   this.forceUpdate();
                   this.props.onSizeUpdated();
                 }}

@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 export type TutorialCategory =
   | 'game-mechanic'
@@ -11,13 +12,21 @@ export type TutorialCategory =
 
 export type Tutorial = {|
   id: string,
+  /** Deprecated - see `titleByLocale`. */
   title: string,
+  titleByLocale: MessageByLocale,
+  /** Deprecated - see `descriptionByLocale`. */
   description: string,
+  descriptionByLocale: MessageByLocale,
   type: 'video' | 'text',
   category: TutorialCategory,
   duration?: number,
+  /** Deprecated - see `linkByLocale`. */
   link: string,
+  linkByLocale: MessageByLocale,
+  /** Deprecated - see `thumbnailUrlByLocale`. */
   thumbnailUrl: string,
+  thumbnailUrlByLocale: MessageByLocale,
 |};
 
 export const listAllTutorials = (): Promise<Array<Tutorial>> => {

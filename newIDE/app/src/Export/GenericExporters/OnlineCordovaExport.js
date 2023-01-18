@@ -52,7 +52,7 @@ export const SetupExportHeader = ({
       >
         <FormControlLabel
           value={'androidApk'}
-          control={<Radio color="primary" />}
+          control={<Radio color="secondary" />}
           label={
             <Trans>
               APK (for testing on device or sharing outside Google Play)
@@ -61,7 +61,7 @@ export const SetupExportHeader = ({
         />
         <FormControlLabel
           value={'androidAppBundle'}
-          control={<Radio color="primary" />}
+          control={<Radio color="secondary" />}
           label={
             <Trans>Android App Bundle (for publishing on Google Play)</Trans>
           }
@@ -81,6 +81,7 @@ export const SetupExportHeader = ({
       </Line>
       {exportState.signingDialogOpen && (
         <Dialog
+          title={<Trans>Signing options</Trans>}
           actions={[
             <FlatButton
               key="close"
@@ -102,7 +103,6 @@ export const SetupExportHeader = ({
             />,
           ]}
           open
-          title={<Trans>Signing options</Trans>}
           onRequestClose={() => {
             updateExportState(prevExportState => ({
               ...prevExportState,
@@ -133,15 +133,15 @@ export const SetupExportHeader = ({
             <FormControlLabel
               value={'new'}
               control={<Radio color="primary" />}
-              label={<Trans>New upload key (recommended)</Trans>}
+              label={<Trans>Default upload key (recommended)</Trans>}
             />
             <FormControlLabel
               value={'old'}
               control={<Radio color="primary" />}
               label={
                 <Trans>
-                  Old upload key (only if you used to publish your game as an
-                  APK and already activated Play App Signing)
+                  Old, legacy upload key (only if you used to publish your game
+                  as an APK and already activated Play App Signing)
                 </Trans>
               }
             />

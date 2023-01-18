@@ -2,11 +2,14 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import ToolbarIcon from '../../UI/ToolbarIcon';
-import TextButton from '../../UI/TextButton';
-import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import { LineStackLayout } from '../../UI/Layout';
+import RaisedButton from '../../UI/RaisedButton';
 import { type PreviewState } from '../PreviewState';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
+import UpdateIcon from '../../UI/CustomSvgIcons/Update';
+import PublishIcon from '../../UI/CustomSvgIcons/Publish';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -23,7 +26,6 @@ export type PreviewAndPublishButtonsProps = {|
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
   exportProject: () => void,
-  hasProject: boolean,
 |};
 
 export default function PreviewAndPublishButtons({
@@ -37,26 +39,20 @@ export default function PreviewAndPublishButtons({
   previewState,
   setPreviewOverride,
   exportProject,
-  hasProject,
 }: PreviewAndPublishButtonsProps) {
-  const theme = React.useContext(GDevelopThemeContext);
-  const debugBuildMenuTemplate = React.useCallback(
+  const windowWidth = useResponsiveWindowWidth();
+
+  const previewBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
       {
         label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
         click: onNetworkPreview,
         enabled: canDoNetworkPreview,
       },
-      { type: 'separator' },
       {
-        label: i18n._(t`Start Preview with Debugger and Performance Profiler`),
+        label: i18n._(t`Start Preview and Debugger`),
         click: onOpenDebugger,
       },
-    ],
-    [onNetworkPreview, onOpenDebugger, canDoNetworkPreview]
-  );
-  const previewBuildMenuTemplate = React.useCallback(
-    (i18n: I18nType) => [
       {
         label: i18n._(t`Launch another preview in a new window`),
         click: onPreviewWithoutHotReload,
@@ -117,102 +113,38 @@ export default function PreviewAndPublishButtons({
       hasPreviewsRunning,
       setPreviewOverride,
       previewState,
+      onNetworkPreview,
+      onOpenDebugger,
+      canDoNetworkPreview,
     ]
   );
 
-  const onClickPreview = event => {
-    if (event.target) event.target.blur();
-    onHotReloadPreview();
-  };
-
   return (
-    <React.Fragment>
-      <ElementWithMenu
-        element={
-          <ToolbarIcon
-            disabled={!isPreviewEnabled}
-            src="res/ribbon_default/bug32.png"
-            tooltip={t`Advanced preview options (debugger, network preview...)`}
-          />
+    <LineStackLayout noMargin>
+      <FlatButtonWithSplitMenu
+        primary
+        onClick={onHotReloadPreview}
+        disabled={!isPreviewEnabled}
+        icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
+        label={
+          windowWidth !== 'small' ? (
+            hasPreviewsRunning ? (
+              <Trans>Update</Trans>
+            ) : (
+              <Trans>Preview</Trans>
+            )
+          ) : null
         }
-        buildMenuTemplate={debugBuildMenuTemplate}
-      />
-      <ElementWithMenu
-        element={
-          <TextButton
-            onClick={onClickPreview}
-            disabled={!isPreviewEnabled}
-            icon={
-              <img
-                alt="Preview"
-                src={
-                  hasPreviewsRunning
-                    ? 'res/ribbon_default/hotReload64.png'
-                    : previewState.isPreviewOverriden
-                    ? 'res/ribbon_default/previewOverride32.png'
-                    : 'res/ribbon_default/preview64.png'
-                }
-                width={32}
-                height={32}
-                style={{
-                  filter: !isPreviewEnabled
-                    ? 'grayscale(100%)'
-                    : theme.gdevelopIconsCSSFilter,
-                }}
-              />
-            }
-            label={
-              hasPreviewsRunning ? (
-                <Trans>Update</Trans>
-              ) : (
-                <Trans>Preview</Trans>
-              )
-            }
-            id={'toolbar-preview-button'}
-            exceptionalTooltipForToolbar={
-              hasPreviewsRunning ? (
-                <Trans>
-                  Apply changes to the running preview, right click for more
-                </Trans>
-              ) : previewState.isPreviewOverriden ? (
-                <Trans>Preview is overridden, right click for more</Trans>
-              ) : previewState.previewExternalLayoutName ? (
-                <Trans>
-                  Launch a preview of the external layout inside the scene,
-                  right click for more
-                </Trans>
-              ) : (
-                <Trans>
-                  Launch a preview of the scene, right click for more
-                </Trans>
-              )
-            }
-          />
-        }
-        openMenuWithSecondaryClick
+        id={'toolbar-preview-button'}
         buildMenuTemplate={previewBuildMenuTemplate}
       />
-      <TextButton
+      <RaisedButton
+        primary
         onClick={exportProject}
-        disabled={!hasProject}
-        icon={
-          <img
-            alt="Publish"
-            src={'res/ribbon_default/networkicon32.png'}
-            width={32}
-            height={32}
-            style={{
-              filter: !hasProject
-                ? 'grayscale(100%)'
-                : theme.gdevelopIconsCSSFilter,
-            }}
-          />
-        }
-        label={<Trans>Publish</Trans>}
-        exceptionalTooltipForToolbar={
-          <Trans>Export the game (Web, Android, iOS...)</Trans>
-        }
+        icon={<PublishIcon />}
+        label={windowWidth !== 'small' ? <Trans>Publish</Trans> : null}
+        id={'toolbar-publish-button'}
       />
-    </React.Fragment>
+    </LineStackLayout>
   );
 }

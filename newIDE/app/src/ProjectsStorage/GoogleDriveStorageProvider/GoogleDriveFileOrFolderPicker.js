@@ -39,7 +39,7 @@ const GoogleDriveFileOrFolderPicker = (props: Props) => {
         floatingLabelText={props.floatingLabelText}
         floatingLabelFixed
         type="text"
-        hintText={t`Choose a file or folder`}
+        translatableHintText={t`Choose a file or folder`}
         value={props.value ? props.value.name : ''}
         onChange={() => {}}
       />

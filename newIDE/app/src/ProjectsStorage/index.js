@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -11,6 +12,32 @@ export type FileMetadata = {|
   /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
   lastModifiedDate?: number,
+  name?: string,
+  gameId?: string,
+|};
+
+/**
+ * The data containing the file/url/name of a new location to be saved
+ * by a storage provider.
+ */
+export type SaveAsLocation = {|
+  /**
+   * The file id, path or local path according to the provider. Might be null if not known
+   * or unused (for example, a cloud project uses only a name to identify a new project).
+   */
+  fileIdentifier?: string,
+  /**
+   * The name of the file. Might be null if unused
+   * (for example, a local file path is stored only in `fileIdentifier`).
+   */
+  name?: string,
+  /**
+   * The id of the game. Might be null if no game is published.
+   */
+  gameId?: string,
+
+  // New fields can be added if a storage provider needs other things to identify
+  // a new location where to save a project to.
 |};
 
 export type FileMetadataAndStorageProviderName = {
@@ -25,15 +52,22 @@ export type StorageProviderOperations = {|
   // Project opening:
   onOpenWithPicker?: () => Promise<?FileMetadata>,
   onOpen?: (
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    onProgress?: (progress: number, message: MessageDescriptor) => void
   ) => Promise<{|
     content: Object,
   |}>,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
+  getWriteErrorMessage?: (error: Error) => MessageDescriptor,
 
   // If set to true, opening a project at startup with this storage provider
   // will trigger a confirmation modal (so that a user interaction happen).
   doesInitialOpenRequireUserInteraction?: boolean,
+
+  onEnsureCanAccessResources?: (
+    project: gdProject,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
 
   // Project saving:
   onSaveProject?: (
@@ -43,13 +77,33 @@ export type StorageProviderOperations = {|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
   |}>,
+  onChooseSaveProjectAsLocation?: ({|
+    project: gdProject,
+    fileMetadata: ?FileMetadata, // This is the current location.
+  |}) => Promise<{|
+    saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
+  |}>,
   onSaveProjectAs?: (
     project: gdProject,
-    fileMetadata: ?FileMetadata
+    saveAsLocation: ?SaveAsLocation, // This is the new location to save to.
+    options: {|
+      onStartSaving: () => void,
+      onMoveResources: ({|
+        newFileMetadata: FileMetadata,
+      |}) => Promise<void>,
+    |}
   ) => Promise<{|
     wasSaved: boolean,
+    /** This is the location where the project was saved, or null if not persisted. */
     fileMetadata: ?FileMetadata,
   |}>,
+
+  // Project properties saving:
+  onChangeProjectProperty?: (
+    project: gdProject,
+    fileMetadata: FileMetadata,
+    properties: {| name?: string, gameId?: string |} // In order to synchronize project and cloud project names.
+  ) => Promise<boolean>,
 
   // Project auto saving:
   onAutoSaveProject?: (
@@ -69,15 +123,23 @@ export type StorageProviderOperations = {|
 export type StorageProvider = {|
   internalName: string,
   name: MessageDescriptor,
+  needUserAuthentication?: boolean,
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
-  renderIcon?: () => React.Node,
+  renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
   getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
+  onRenderNewProjectSaveAsLocationChooser?: (props: {|
+    projectName: string,
+    saveAsLocation: ?SaveAsLocation,
+    setSaveAsLocation: (?SaveAsLocation) => void,
+    newProjectsDefaultFolder?: string,
+  |}) => React.Node,
   createOperations: ({
     /** Open a dialog (a render function) */
     setDialog: (() => React.Node) => void,
     /** Close the dialog */
     closeDialog: () => void,
+    authenticatedUser: AuthenticatedUser,
   }) => StorageProviderOperations,
 |};

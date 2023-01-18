@@ -19,9 +19,8 @@ This project is released under the MIT License.
 
 using namespace std;
 
-PanelSpriteObject::PanelSpriteObject(gd::String name_)
-    : Object(name_),
-      textureName(""),
+PanelSpriteObject::PanelSpriteObject()
+    : textureName(""),
       width(32),
       height(32),
       leftMargin(0),
@@ -55,7 +54,8 @@ void PanelSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("tiled", tiled);
 }
 
-void PanelSpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void PanelSpriteObject::ExposeResources(
+    gd::ArbitraryResourceWorker& worker) {
   worker.ExposeImage(textureName);
 }
 #endif

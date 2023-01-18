@@ -24,6 +24,7 @@ const styles = {
 };
 
 type Props = {|
+  id?: string,
   project: gdProject,
   extensionShortHeader: ExtensionShortHeader,
   matches: ?Array<SearchMatch>,
@@ -32,6 +33,7 @@ type Props = {|
 |};
 
 export const ExtensionListItem = ({
+  id,
   project,
   extensionShortHeader,
   matches,
@@ -65,9 +67,9 @@ export const ExtensionListItem = ({
   };
 
   return (
-    <ButtonBase onClick={onChoose} focusRipple style={styles.button}>
+    <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
       <div style={styles.container} ref={containerRef}>
-        <Line>
+        <LineStackLayout>
           <IconContainer
             alt={extensionShortHeader.fullName}
             src={extensionShortHeader.previewIconUrl}
@@ -103,7 +105,7 @@ export const ExtensionListItem = ({
               {renderExtensionField('shortDescription')}
             </Text>
           </Column>
-        </Line>
+        </LineStackLayout>
       </div>
     </ButtonBase>
   );

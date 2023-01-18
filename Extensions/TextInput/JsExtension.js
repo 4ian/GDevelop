@@ -25,13 +25,18 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'TextInput',
-      _('Text Input'),
-      _('A text field the player can type text into.'),
-      'Florian Rival',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'TextInput',
+        _('Text Input'),
+        _('A text field the player can type text into.'),
+        'Florian Rival',
+        'MIT'
+      )
+      .setCategory('User interface');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Text Input'))
+      .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -272,12 +277,12 @@ module.exports = {
     const object = extension
       .addObject(
         'TextInputObject',
-        _('Text input (experimental)'),
+        _('Text input'),
         _('A text field the player can type text into.'),
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
-      .setCategoryFullName(_('Form control'))
+      .setCategoryFullName(_('User interface'))
       .addUnsupportedBaseObjectCapability('effect')
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
@@ -293,10 +298,13 @@ module.exports = {
         _('the text'),
         _('the text'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
+      )
       .setFunctionName('setString')
       .setGetter('getString');
 
@@ -308,10 +316,13 @@ module.exports = {
         _('the placeholder'),
         _('the placeholder'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
+      )
       .setFunctionName('setPlaceholder')
       .setGetter('getPlaceholder');
 
@@ -326,7 +337,7 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setFontSize')
       .setGetter('getFontSize');
 
@@ -341,7 +352,7 @@ module.exports = {
         'res/conditions/font24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontResourceName');
 
     // TODO: could this be merged with the previous expression and condition?
@@ -368,10 +379,13 @@ module.exports = {
         _('the input type'),
         _('the input type'),
         _('Type'),
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string') // TODO: stringWithSelector?
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Input type'))
+      ) // TODO: stringWithSelector?
       .setFunctionName('setInputType')
       .setGetter('getInputType');
 
@@ -416,7 +430,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setFillOpacity')
       .setGetter('getFillOpacity');
 
@@ -446,7 +465,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setBorderOpacity')
       .setGetter('getBorderOpacity');
 
@@ -458,10 +482,10 @@ module.exports = {
         _('the border width'),
         _('the border width'),
         _('Field appearance'),
-        'res/conditions/outlineSize24.png'
+        'res/conditions/outlineSize24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setBorderWidth')
       .setGetter('getBorderWidth');
 
@@ -475,10 +499,13 @@ module.exports = {
         _('the text input is read-only'),
         _('read-only'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean')
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Read-only?'))
+      )
       .setFunctionName('setReadOnly')
       .setGetter('isReadOnly');
 
@@ -490,10 +517,10 @@ module.exports = {
         _('the text input is disabled'),
         _('disabled'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean')
+      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDisabled')
       .setGetter('isDisabled');
 
@@ -509,7 +536,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
 
@@ -582,7 +614,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       ) {
@@ -590,7 +622,7 @@ module.exports = {
           project,
           layout,
           instance,
-          associatedObject,
+          associatedObjectConfiguration,
           pixiContainer,
           pixiResourcesLoader
         );
@@ -612,13 +644,13 @@ module.exports = {
         this.update();
       }
 
-      static getThumbnail(project, resourcesLoader, object) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/text_input.svg';
       }
 
       update() {
         const instance = this._instance;
-        const properties = this._associatedObject.getProperties();
+        const properties = this._associatedObjectConfiguration.getProperties();
 
         const placeholder =
           instance.getRawStringProperty('placeholder') ||

@@ -10,9 +10,9 @@ export default class RenderedInstance {
   _project: gdProject;
   _layout: gdLayout;
   _instance: gdInitialInstance;
-  _associatedObject: gdObject;
+  _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
-  _pixiResourcesLoader: PixiResourcesLoader;
+  _pixiResourcesLoader: Class<PixiResourcesLoader>;
   _pixiObject: any;
   wasUsed: boolean;
 
@@ -20,13 +20,13 @@ export default class RenderedInstance {
     project: gdProject,
     layout: gdLayout,
     instance: gdInitialInstance,
-    associatedObject: gdObject,
+    associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    pixiResourcesLoader: PixiResourcesLoader
+    pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     this._pixiObject = null;
     this._instance = instance;
-    this._associatedObject = associatedObject;
+    this._associatedObjectConfiguration = associatedObjectConfiguration;
     this._pixiContainer = pixiContainer;
     this._project = project;
     this._layout = layout;
@@ -72,6 +72,20 @@ export default class RenderedInstance {
 
   getOriginY() {
     return 0;
+  }
+
+  getCenterX() {
+    if (this._instance.hasCustomSize())
+      return this._instance.getCustomWidth() / 2;
+
+    return this.getDefaultWidth() / 2;
+  }
+
+  getCenterY() {
+    if (this._instance.hasCustomSize())
+      return this._instance.getCustomHeight() / 2;
+
+    return this.getDefaultHeight() / 2;
   }
 
   /**

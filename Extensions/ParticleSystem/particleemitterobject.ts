@@ -6,8 +6,14 @@
 
 namespace gdjs {
   export type ParticleEmitterObjectDataType = {
+    /**
+     * @deprecated Data not used
+     */
     emitterAngleA: number;
     emitterForceMin: number;
+    /**
+     * Cone spray angle (degrees)
+     */
     emitterAngleB: number;
     zoneRadius: number;
     emitterForceMax: number;
@@ -23,7 +29,13 @@ namespace gdjs {
     particleBlue1: number;
     particleSize2: number;
     particleSize1: number;
+    /**
+     * Particle max rotation speed (degrees/second)
+     */
     particleAngle2: number;
+    /**
+     * Particle min rotation speed (degrees/second)
+     */
     particleAngle1: number;
     particleAlpha1: number;
     rendererType: string;
@@ -49,6 +61,9 @@ namespace gdjs {
    * Displays particles.
    */
   export class ParticleEmitterObject extends gdjs.RuntimeObject {
+    /**
+     * @deprecated Data not used
+     */
     angleA: number;
     angleB: number;
     forceMin: number;
@@ -75,6 +90,10 @@ namespace gdjs {
     flow: number;
     tank: number;
     destroyWhenNoParticles: boolean;
+    particleRotationMinSpeed: number;
+    particleRotationMaxSpeed: number;
+    maxParticlesCount: number;
+    additiveRendering: boolean;
     _posDirty: boolean = true;
     _angleDirty: boolean = true;
     _forceDirty: boolean = true;
@@ -86,6 +105,9 @@ namespace gdjs {
     _alphaDirty: boolean = true;
     _flowDirty: boolean = true;
     _tankDirty: boolean = true;
+    _particleRotationSpeedDirty: boolean = true;
+    _maxParticlesCountDirty: boolean = true;
+    _additiveRenderingDirty: boolean = true;
     // Don't mark texture as dirty if not using one.
     _textureDirty: boolean;
 
@@ -93,16 +115,16 @@ namespace gdjs {
     _renderer: gdjs.ParticleEmitterObjectRenderer;
 
     /**
-     * @param the object belongs to
+     * @param instanceContainer the container the object belongs to
      * @param particleObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       particleObjectData: ParticleEmitterObjectData
     ) {
-      super(runtimeScene, particleObjectData);
+      super(instanceContainer, particleObjectData);
       this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-        runtimeScene,
+        instanceContainer,
         this,
         particleObjectData
       );
@@ -132,6 +154,10 @@ namespace gdjs {
       this.flow = particleObjectData.flow;
       this.tank = particleObjectData.tank;
       this.destroyWhenNoParticles = particleObjectData.destroyWhenNoParticles;
+      this.particleRotationMinSpeed = particleObjectData.particleAngle1;
+      this.particleRotationMaxSpeed = particleObjectData.particleAngle2;
+      this.maxParticlesCount = particleObjectData.maxParticleNb;
+      this.additiveRendering = particleObjectData.additive;
       this._textureDirty = this.texture !== '';
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -175,6 +201,18 @@ namespace gdjs {
       }
       if (oldObjectData.emitterForceMin !== newObjectData.emitterForceMin) {
         this.setEmitterForceMin(newObjectData.emitterForceMin);
+      }
+      if (oldObjectData.particleAngle1 !== newObjectData.particleAngle1) {
+        this.setParticleRotationMinSpeed(newObjectData.particleAngle1);
+      }
+      if (oldObjectData.particleAngle2 !== newObjectData.particleAngle2) {
+        this.setParticleRotationMaxSpeed(newObjectData.particleAngle2);
+      }
+      if (oldObjectData.maxParticleNb !== newObjectData.maxParticleNb) {
+        this.setMaxParticlesCount(newObjectData.maxParticleNb);
+      }
+      if (oldObjectData.additive !== newObjectData.additive) {
+        this.setAdditiveRendering(newObjectData.additive);
       }
       if (oldObjectData.emitterForceMax !== newObjectData.emitterForceMax) {
         this.setEmitterForceMax(newObjectData.emitterForceMax);
@@ -231,7 +269,10 @@ namespace gdjs {
       if (
         oldObjectData.textureParticleName !== newObjectData.textureParticleName
       ) {
-        this.setTexture(newObjectData.textureParticleName, this._runtimeScene);
+        this.setTexture(
+          newObjectData.textureParticleName,
+          this.getRuntimeScene()
+        );
       }
       if (oldObjectData.flow !== newObjectData.flow) {
         this.setFlow(newObjectData.flow);
@@ -259,7 +300,7 @@ namespace gdjs {
         oldObjectData.rendererParam2 !== newObjectData.rendererParam2
       ) {
         // Destroy the renderer, ensure it's removed from the layer.
-        const layer = this._runtimeScene.getLayer(this.layer);
+        const layer = this.getInstanceContainer().getLayer(this.layer);
         layer
           .getRenderer()
           .removeRendererObject(this._renderer.getRendererObject());
@@ -267,7 +308,7 @@ namespace gdjs {
 
         // and recreate the renderer, which will add itself to the layer.
         this._renderer = new gdjs.ParticleEmitterObjectRenderer(
-          this._runtimeScene,
+          this.getInstanceContainer(),
           this,
           newObjectData
         );
@@ -281,15 +322,27 @@ namespace gdjs {
       return true;
     }
 
-    update(runtimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._posDirty) {
         this._renderer.setPosition(this.getX(), this.getY());
+      }
+      if (this._particleRotationSpeedDirty) {
+        this._renderer.setParticleRotationSpeed(
+          this.particleRotationMinSpeed,
+          this.particleRotationMaxSpeed
+        );
+      }
+      if (this._maxParticlesCountDirty) {
+        this._renderer.setMaxParticlesCount(this.maxParticlesCount);
+      }
+      if (this._additiveRenderingDirty) {
+        this._renderer.setAdditiveRendering(this.additiveRendering);
       }
       if (this._angleDirty) {
         const angle = this.getAngle();
         this._renderer.setAngle(
-          this.angle - this.angleB / 2.0,
-          this.angle + this.angleB / 2.0
+          angle - this.angleB / 2.0,
+          angle + this.angleB / 2.0
         );
       }
       if (this._forceDirty) {
@@ -324,24 +377,25 @@ namespace gdjs {
         this._renderer.resetEmission(this.flow, this.tank);
       }
       if (this._textureDirty) {
-        this._renderer.setTextureName(this.texture, runtimeScene);
+        this._renderer.setTextureName(this.texture, instanceContainer);
       }
       this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
-      this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
+      this._additiveRenderingDirty = this._maxParticlesCountDirty = this._particleRotationSpeedDirty = false;
+      this._renderer.update(this.getElapsedTime() / 1000.0);
       if (
         this._renderer.hasStarted() &&
         this.getParticleCount() === 0 &&
         this.destroyWhenNoParticles
       ) {
-        this.deleteFromScene(runtimeScene);
+        this.deleteFromScene(instanceContainer);
       }
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
+    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.destroy();
-      super.onDestroyFromScene(runtimeScene);
+      super.onDestroyFromScene(instanceContainer);
     }
 
     getEmitterForceMin(): number {
@@ -372,10 +426,60 @@ namespace gdjs {
       }
     }
 
+    setParticleRotationMinSpeed(speed: number): void {
+      if (this.particleRotationMinSpeed !== speed) {
+        this._particleRotationSpeedDirty = true;
+        this.particleRotationMinSpeed = speed;
+      }
+    }
+
+    getParticleRotationMinSpeed(): number {
+      return this.particleRotationMinSpeed;
+    }
+
+    setParticleRotationMaxSpeed(speed: number): void {
+      if (this.particleRotationMaxSpeed !== speed) {
+        this._particleRotationSpeedDirty = true;
+        this.particleRotationMaxSpeed = speed;
+      }
+    }
+
+    getParticleRotationMaxSpeed(): number {
+      return this.particleRotationMaxSpeed;
+    }
+
+    setMaxParticlesCount(count: number): void {
+      if (this.maxParticlesCount !== count) {
+        this._maxParticlesCountDirty = true;
+        this.maxParticlesCount = count;
+      }
+    }
+
+    getMaxParticlesCount(): number {
+      return this.maxParticlesCount;
+    }
+
+    setAdditiveRendering(enabled: boolean) {
+      if (this.additiveRendering !== enabled) {
+        this._additiveRenderingDirty = true;
+        this.additiveRendering = enabled;
+      }
+    }
+
+    getAdditiveRendering(): boolean {
+      return this.additiveRendering;
+    }
+
+    /**
+     * @deprecated Prefer using getAngle
+     */
     getEmitterAngle(): float {
       return (this.angleA + this.angleB) / 2.0;
     }
 
+    /**
+     * @deprecated Prefer using setAngle
+     */
     setEmitterAngle(angle: float): void {
       const oldAngle = this.getEmitterAngle();
       if (angle !== oldAngle) {
@@ -385,10 +489,16 @@ namespace gdjs {
       }
     }
 
+    /**
+     * @deprecated This function returns data that is not used.
+     */
     getEmitterAngleA(): float {
       return this.angleA;
     }
 
+    /**
+     * @deprecated This function sets data that is not used.
+     */
     setEmitterAngleA(angle: float): void {
       if (this.angleA !== angle) {
         this._angleDirty = true;
@@ -408,17 +518,11 @@ namespace gdjs {
     }
 
     getConeSprayAngle(): float {
-      return Math.abs(this.angleB - this.angleA);
+      return this.getEmitterAngleB();
     }
 
     setConeSprayAngle(angle: float): void {
-      const oldCone = this.getConeSprayAngle();
-      if (oldCone !== angle) {
-        this._angleDirty = true;
-        const midAngle = this.getEmitterAngle();
-        this.angleA = midAngle - angle / 2.0;
-        this.angleB = midAngle + angle / 2.0;
-      }
+      this.setEmitterAngleB(angle);
     }
 
     getZoneRadius(): float {
@@ -734,9 +838,12 @@ namespace gdjs {
       return this.texture;
     }
 
-    setTexture(texture: string, runtimeScene: gdjs.RuntimeScene): void {
+    setTexture(
+      texture: string,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       if (this.texture !== texture) {
-        if (this._renderer.isTextureNameValid(texture, runtimeScene)) {
+        if (this._renderer.isTextureNameValid(texture, instanceContainer)) {
           this.texture = texture;
           this._textureDirty = true;
         }

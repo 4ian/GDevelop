@@ -19,6 +19,8 @@
 import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
 */
 
+const stringifyOptions = (options) => '["' + options.join('","') + '"]';
+
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -33,7 +35,11 @@ module.exports = {
         'Todor Imreorov',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bbtext');
+      .setExtensionHelpPath('/objects/bbtext')
+      .setCategory('User interface');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('BBCode Text Object'))
+      .setIcon('JsPlatform/Extensions/bbcode32.png');
 
     var objectBBText = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -168,7 +174,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Texts'));
+      .setCategoryFullName(_('User interface'));
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -192,7 +198,10 @@ module.exports = {
             .addParameter('object', objectName, objectName, false)
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
-        } else if (parameterType === 'string') {
+        } else if (
+          parameterType === 'string' ||
+          parameterType === 'stringWithSelector'
+        ) {
           gdObject
             .addStrExpression(
               `Get${property.functionName}`,
@@ -207,13 +216,24 @@ module.exports = {
         }
 
         // Add the action
-        if (parameterType === 'number' || parameterType === 'string') {
-          const expressionType =
-            parameterType === 'number' ? 'expression' : 'string';
+        if (
+          parameterType === 'number' ||
+          parameterType === 'string' ||
+          parameterType === 'stringWithSelector'
+        ) {
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
+          if (property.options) {
+            parameterOptions.setTypeExtraInfo(
+              stringifyOptions(property.options)
+            );
+          }
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.actionDescription,
               property.actionSentence,
               '',
@@ -221,7 +241,7 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .useStandardOperatorParameters(parameterType)
+            .useStandardOperatorParameters(parameterType, parameterOptions)
             .getCodeExtraInformation()
             .setFunctionName(`set${property.functionName}`)
             .setGetter(`get${property.functionName}`);
@@ -229,7 +249,7 @@ module.exports = {
           gdObject
             .addAction(
               `Set${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.actionDescription,
               property.actionSentence,
               '',
@@ -240,9 +260,7 @@ module.exports = {
             .addParameter(
               parameterType,
               property.paramLabel,
-              property.options
-                ? '["' + property.options.join('", "') + '"]'
-                : '',
+              '', // There should not be options for the property if it's not a stringWithSelector
               false
             )
             .getCodeExtraInformation()
@@ -251,13 +269,24 @@ module.exports = {
         }
 
         // Add condition
-        if (parameterType === 'string' || parameterType === 'number') {
-          const propExpressionType =
-            parameterType === 'string' ? 'string' : 'expression';
+        if (
+          parameterType === 'string' ||
+          parameterType === 'number' ||
+          parameterType === 'stringWithSelector'
+        ) {
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
+          if (property.options) {
+            parameterOptions.setTypeExtraInfo(
+              stringifyOptions(property.options)
+            );
+          }
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.conditionDescription,
               property.conditionSentence,
               '',
@@ -265,14 +294,17 @@ module.exports = {
               property.iconPath
             )
             .addParameter('object', objectName, objectName, false)
-            .useStandardRelationalOperatorParameters(parameterType)
+            .useStandardRelationalOperatorParameters(
+              parameterType,
+              parameterOptions
+            )
             .getCodeExtraInformation()
             .setFunctionName(`get${property.functionName}`);
         } else if (parameterType === 'yesorno') {
           gdObject
             .addCondition(
               `Is${property.functionName}`,
-              property.paramLabel,
+              property.instructionLabel,
               property.conditionDescription,
               property.conditionSentence,
               '',
@@ -289,9 +321,10 @@ module.exports = {
     const setterAndGetterProperties = [
       {
         functionName: 'BBText',
-        iconPath: 'res/actions/text24.png',
+        iconPath: 'res/actions/text24_black.png',
         type: 'string',
-        paramLabel: _('BBCode text'),
+        instructionLabel: _('BBCode text'),
+        paramLabel: _('Text'),
         conditionDescription: _('Compare the value of the BBCode text.'),
         conditionSentence: _('the BBCode text'),
         actionDescription: _('Set BBCode text'),
@@ -303,7 +336,8 @@ module.exports = {
         functionName: 'Color',
         iconPath: 'res/actions/color24.png',
         type: 'color',
-        paramLabel: _('Color'),
+        instructionLabel: _('Color'),
+        paramLabel: _('Color (R;G;B)'),
         conditionDescription: '', // No conditions for a "color" property
         conditionSentence: '', // No conditions for a "color" property
         actionDescription: _('Set base color'),
@@ -315,7 +349,8 @@ module.exports = {
         functionName: 'Opacity',
         iconPath: 'res/actions/opacity24.png',
         type: 'number',
-        paramLabel: _('Opacity'),
+        instructionLabel: _('Opacity'),
+        paramLabel: _('Opacity (0-255)'),
         conditionDescription: _(
           'Compare the value of the base opacity of the text.'
         ),
@@ -329,6 +364,7 @@ module.exports = {
         functionName: 'FontSize',
         iconPath: 'res/actions/characterSize24.png',
         type: 'number',
+        instructionLabel: _('Font size'),
         paramLabel: _('Font size'),
         conditionDescription: _('Compare the base font size of the text.'),
         conditionSentence: _('the base font size'),
@@ -341,6 +377,7 @@ module.exports = {
         functionName: 'FontFamily',
         iconPath: 'res/actions/font24.png',
         type: 'string',
+        instructionLabel: _('Font family'),
         paramLabel: _('Font family'),
         conditionDescription: _('Compare the value of font family'),
         conditionSentence: _('the base font family'),
@@ -353,6 +390,7 @@ module.exports = {
         functionName: 'Alignment',
         iconPath: 'res/actions/textAlign24.png',
         type: 'stringWithSelector',
+        instructionLabel: _('Alignment'),
         paramLabel: _('Alignment'),
         options: ['left', 'right', 'center'],
         conditionDescription: _('Check the current text alignment.'),
@@ -364,8 +402,9 @@ module.exports = {
       },
       {
         functionName: 'WordWrap',
-        iconPath: 'res/actions/scaleWidth24.png',
+        iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'boolean',
+        instructionLabel: _('Word wrap'),
         paramLabel: _('Word wrap'),
         conditionDescription: _('Check if word wrap is enabled.'),
         conditionSentence: _('Word wrap is enabled'),
@@ -376,8 +415,9 @@ module.exports = {
       },
       {
         functionName: 'WrappingWidth',
-        iconPath: 'res/actions/scaleWidth24.png',
+        iconPath: 'res/actions/scaleWidth24_black.png',
         type: 'number',
+        instructionLabel: _('Wrapping width'),
         paramLabel: _('Wrapping width'),
         conditionDescription: _(
           'Compare the width, in pixels, after which the text is wrapped on next line.'
@@ -454,7 +494,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -463,7 +503,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -498,7 +538,7 @@ module.exports = {
     RenderedBBTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/bbcode24.png';
     };
@@ -507,7 +547,7 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedBBTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObjectConfiguration.getProperties();
 
       const rawText = properties.get('text').getValue();
       if (rawText !== this._pixiObject.text) {

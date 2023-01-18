@@ -1,29 +1,23 @@
 // https://github.com/pixijs/tilemap
 
 import {
-    CanvasTileRenderer,
-    CompositeRectTileLayer,
-    GraphicsLayer,
-    IMultiTextureOptions,
-    MultiTextureResource,
-    RectTileGeom,
-    RectTileLayer,
-    RectTileShader,
-    TileRenderer,
-    ZLayer,
+  CanvasTileRenderer,
+  CompositeTilemap,
+  Tilemap,
+  TilemapGeometry,
+  TilemapShader,
+  TileRenderer,
+  settings,
   } from './pixi-tilemap';
   
 declare module 'pixi.js' {
   export namespace tilemap {
-      export { CanvasTileRenderer };
-      export { CompositeRectTileLayer };
-      export { GraphicsLayer };
-      export { IMultiTextureOptions };
-      export { MultiTextureResource };
-      export { RectTileGeom };
-      export { RectTileLayer };
-      export { RectTileShader };
-      export { TileRenderer };
-      export { ZLayer };
+    export { CanvasTileRenderer };
+    export { CompositeTilemap };
+    export { Tilemap };
+    export { TilemapGeometry };
+    export { TilemapShader };
+    export { TileRenderer };
+    export { settings };
   }
 }

@@ -41,7 +41,10 @@ const VariablesEditorDialog = ({
   onComputeAllVariableNames,
   helpPagePath,
 }: Props) => {
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,
     onCancel,
   });
@@ -51,7 +54,7 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
-      noMargin
+      title={title}
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -87,7 +90,6 @@ const VariablesEditorDialog = ({
       onRequestClose={onCancelChanges}
       onApply={onApply}
       open={open}
-      title={title}
       flexBody
       fullHeight
     >
@@ -105,6 +107,7 @@ const VariablesEditorDialog = ({
           emptyPlaceholderDescription={emptyPlaceholderDescription}
           onComputeAllVariableNames={onComputeAllVariableNames}
           helpPagePath={helpPagePath}
+          onVariablesUpdated={notifyOfChange}
         />
       </Column>
     </Dialog>

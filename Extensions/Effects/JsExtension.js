@@ -31,7 +31,9 @@ module.exports = {
       'Lots of different effects to be used in your game.',
       'Various contributors from PixiJS, PixiJS filters and GDevelop',
       'MIT'
-    ).setExtensionHelpPath('/interface/scene-editor/layer-effects');
+    )
+    .setCategory('Visual effect')
+    .setExtensionHelpPath('/interface/scene-editor/layer-effects');
 
     // ℹ️ You can declare an effect here. Please order the effects by alphabetical order.
     // This file is for common effects that are well-known/"battle-tested". If you have an

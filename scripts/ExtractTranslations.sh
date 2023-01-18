@@ -8,7 +8,7 @@ find ../GDJS/GDJS/ -name '*.cpp' | grep -v '/Dialogs/' > /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
 find ../Extensions/ -name '*.cpp' >> /tmp/listfile.txt
 find ../Extensions/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
-find ../Extensions/ -name '*.js' | grep -v 'box2d.js' | grep -v '/bondage.js' | grep -v '/ExampleJsExtension' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.js' | grep -v '.umd.js' | grep -v '.min.js' | grep -v '.benchmark.js' | grep -v '.spec.js' | grep -v 'box2d.js'  | grep -v '/node_modules' | grep -v '/bondage.js' | grep -v '/ExampleJsExtension' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
 

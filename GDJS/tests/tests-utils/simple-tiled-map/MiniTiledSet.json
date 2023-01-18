@@ -6,10 +6,11 @@
  "name":"new tileset",
  "spacing":0,
  "tilecount":6,
- "tiledversion":"1.7.2",
+ "tiledversion":"1.9.0",
  "tileheight":8,
  "tiles":[
         {
+         "class":"obstacle",
          "id":0,
          "objectgroup":
             {
@@ -17,11 +18,11 @@
              "name":"",
              "objects":[
                     {
+                     "class":"",
                      "height":8,
                      "id":1,
                      "name":"",
                      "rotation":0,
-                     "class":"",
                      "visible":true,
                      "width":8,
                      "x":0,
@@ -32,50 +33,11 @@
              "visible":true,
              "x":0,
              "y":0
-            },
-         "class":"obstacle"
+            }
         }, 
         {
+         "class":"obstacle",
          "id":2,
-         "objectgroup":
-            {
-             "draworder":"index",
-             "name":"",
-             "objects":[
-                    {
-                     "height":0,
-                     "id":1,
-                     "name":"",
-                     "polygon":[
-                            {
-                             "x":0,
-                             "y":0
-                            }, 
-                            {
-                             "x":8,
-                             "y":-8
-                            }, 
-                            {
-                             "x":0,
-                             "y":-8
-                            }],
-                     "rotation":0,
-                     "class":"",
-                     "visible":true,
-                     "width":0,
-                     "x":0,
-                     "y":8
-                    }],
-             "opacity":1,
-             "type":"objectgroup",
-             "visible":true,
-             "x":0,
-             "y":0
-            },
-         "class":"obstacle"
-        }, 
-        {
-         "id":3,
          "objectgroup":
             {
              "draworder":"index",
@@ -83,6 +45,50 @@
              "name":"",
              "objects":[
                     {
+                     "class":"",
+                     "height":0,
+                     "id":9,
+                     "name":"",
+                     "polygon":[
+                            {
+                             "x":2,
+                             "y":0
+                            }, 
+                            {
+                             "x":4,
+                             "y":0
+                            }, 
+                            {
+                             "x":4,
+                             "y":2
+                            }, 
+                            {
+                             "x":2,
+                             "y":2
+                            }],
+                     "rotation":0,
+                     "visible":true,
+                     "width":0,
+                     "x":0,
+                     "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "class":"obstacle",
+         "id":3,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "class":"",
                      "height":0,
                      "id":1,
                      "name":"",
@@ -100,13 +106,13 @@
                              "y":0
                             }],
                      "rotation":0,
-                     "class":"",
                      "visible":true,
                      "width":0,
                      "x":0,
                      "y":0
                     }, 
                     {
+                     "class":"",
                      "height":0,
                      "id":3,
                      "name":"",
@@ -124,7 +130,6 @@
                              "y":0
                             }],
                      "rotation":180,
-                     "class":"",
                      "visible":true,
                      "width":0,
                      "x":8,
@@ -135,18 +140,17 @@
              "visible":true,
              "x":0,
              "y":0
-            },
-         "class":"obstacle"
+            }
         }, 
         {
          "id":4,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
+                     "class":"obstacle",
                      "height":0,
                      "id":1,
                      "name":"",
@@ -164,13 +168,13 @@
                              "y":0
                             }],
                      "rotation":0,
-                     "class":"obstacle",
                      "visible":true,
                      "width":0,
                      "x":0,
                      "y":0
                     }, 
                     {
+                     "class":"lava",
                      "height":0,
                      "id":2,
                      "name":"",
@@ -188,7 +192,6 @@
                              "y":0
                             }],
                      "rotation":180,
-                     "class":"lava",
                      "visible":true,
                      "width":0,
                      "x":8,
@@ -202,19 +205,19 @@
             }
         }, 
         {
+         "class":"lava",
          "id":5,
          "objectgroup":
             {
              "draworder":"index",
-             "id":2,
              "name":"",
              "objects":[
                     {
+                     "class":"",
                      "height":8,
                      "id":1,
                      "name":"",
                      "rotation":0,
-                     "class":"",
                      "visible":true,
                      "width":8,
                      "x":0,
@@ -225,10 +228,9 @@
              "visible":true,
              "x":0,
              "y":0
-            },
-         "class":"lava"
+            }
         }],
  "tilewidth":8,
  "type":"tileset",
- "version":"1.6"
+ "version":"1.8"
 }

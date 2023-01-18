@@ -57,6 +57,7 @@ declare class gdProject extends gdObjectsContainer {
   hasLayoutNamed(name: string): boolean;
   getLayout(name: string): gdLayout;
   getLayoutAt(index: number): gdLayout;
+  moveLayout(oldIndex: number, newIndex: number): void;
   swapLayouts(first: number, second: number): void;
   getLayoutsCount(): number;
   insertNewLayout(name: string, position: number): gdLayout;
@@ -66,6 +67,7 @@ declare class gdProject extends gdObjectsContainer {
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): gdExternalEvents;
   getExternalEventsAt(index: number): gdExternalEvents;
+  moveExternalEvents(oldIndex: number, newIndex: number): void;
   swapExternalEvents(first: number, second: number): void;
   getExternalEventsCount(): number;
   insertNewExternalEvents(name: string, position: number): gdExternalEvents;
@@ -73,6 +75,7 @@ declare class gdProject extends gdObjectsContainer {
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): gdExternalLayout;
   getExternalLayoutAt(index: number): gdExternalLayout;
+  moveExternalLayout(oldIndex: number, newIndex: number): void;
   swapExternalLayouts(first: number, second: number): void;
   getExternalLayoutsCount(): number;
   insertNewExternalLayout(name: string, position: number): gdExternalLayout;
@@ -80,11 +83,14 @@ declare class gdProject extends gdObjectsContainer {
   hasEventsFunctionsExtensionNamed(name: string): boolean;
   getEventsFunctionsExtension(name: string): gdEventsFunctionsExtension;
   getEventsFunctionsExtensionAt(index: number): gdEventsFunctionsExtension;
+  moveEventsFunctionsExtension(oldIndex: number, newIndex: number): void;
   swapEventsFunctionsExtensions(first: number, second: number): void;
   getEventsFunctionsExtensionsCount(): number;
   insertNewEventsFunctionsExtension(name: string, position: number): gdEventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: gdEventsFunctionsExtension, position: number): gdEventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  hasEventsBasedObject(type: string): boolean;
+  getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
   getResourcesManager(): gdResourcesManager;
   exposeResources(worker: gdArbitraryResourceWorker): void;

@@ -3,7 +3,6 @@ import React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
-import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
@@ -27,11 +26,10 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
-import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
-import {
-  onCreateFromExampleShortHeader,
-  onCreateBlank,
-} from './ProjectCreation/services/LocalCreation';
+import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
+import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
+import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
+import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -48,15 +46,15 @@ export const create = (authentication: Authentication) => {
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
-      resourceFetcher={LocalResourceFetcher}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
-          storageProviders={
-            // Add Url provider
-            [LocalFileStorageProvider]
-          }
+          storageProviders={[
+            LocalFileStorageProvider,
+            UrlStorageProvider,
+            CloudStorageProvider,
+          ]}
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({
@@ -67,7 +65,9 @@ export const create = (authentication: Authentication) => {
           }) => (
             <MainFrame
               i18n={i18n}
-              renderMainMenu={props => <ElectronMainMenu {...props} />}
+              renderMainMenu={(props, callbacks) => (
+                <ElectronMainMenu props={props} callbacks={callbacks} />
+              )}
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
@@ -82,23 +82,12 @@ export const create = (authentication: Authentication) => {
                   onlineWebExporter={localOnlineWebExporter}
                 />
               )}
-              renderCreateDialog={props => (
-                <CreateProjectDialog
-                  open={props.open}
-                  onClose={props.onClose}
-                  onOpen={props.onOpen}
-                  onCreateBlank={onCreateBlank}
-                  onCreateFromExampleShortHeader={
-                    onCreateFromExampleShortHeader
-                  }
-                />
-              )}
               renderGDJSDevelopmentWatcher={
                 isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }
-              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
-              onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
+              resourceMover={LocalResourceMover}
+              resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}

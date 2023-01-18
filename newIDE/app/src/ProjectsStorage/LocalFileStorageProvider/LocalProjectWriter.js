@@ -1,16 +1,16 @@
 // @flow
+import { t } from '@lingui/macro';
+import * as React from 'react';
 import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
-import { type FileMetadata } from '../index';
+import { type FileMetadata, type SaveAsLocation } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
   split,
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
-import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
-import assignIn from 'lodash/assignIn';
-
-const gd: libGDevelop = global.gd;
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import LocalFolderPicker from '../../UI/LocalFolderPicker';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -130,8 +130,11 @@ export const onSaveProject = (
       'Project file is empty, "Save as" should have been called?'
     );
   }
+  // Ensure we always pick the latest name and gameId.
   const newFileMetadata = {
     ...fileMetadata,
+    name: project.getName(),
+    gameId: project.getProjectUuid(),
     lastModifiedDate: now,
   };
 
@@ -141,53 +144,77 @@ export const onSaveProject = (
   });
 };
 
-export const onSaveProjectAs = (
+export const onChooseSaveProjectAsLocation = async ({
+  project,
+  fileMetadata,
+}: {|
   project: gdProject,
-  fileMetadata: ?FileMetadata
-): Promise<{|
-  wasSaved: boolean,
-  fileMetadata: ?FileMetadata,
+  fileMetadata: ?FileMetadata, // This is the current location.
+|}): Promise<{|
+  saveAsLocation: ?SaveAsLocation, // This is the newly chosen location (or null if cancelled).
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
-  const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const browserWindow = remote.getCurrentWindow();
-  const options = {
+  const saveDialogOptions = {
     defaultPath,
     filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
   };
 
   if (!dialog) {
-    return Promise.reject('Unsupported');
+    throw new Error('Unsupported');
   }
-  const filePath = dialog.showSaveDialogSync(browserWindow, options);
+  const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
-    return Promise.resolve({ wasSaved: false, fileMetadata });
+    return { saveAsLocation: null };
   }
+
+  return {
+    saveAsLocation: {
+      fileIdentifier: filePath,
+    },
+  };
+};
+
+export const onSaveProjectAs = async (
+  project: gdProject,
+  saveAsLocation: ?SaveAsLocation,
+  options: {|
+    onStartSaving: () => void,
+    onMoveResources: ({|
+      newFileMetadata: FileMetadata,
+    |}) => Promise<void>,
+  |}
+): Promise<{|
+  wasSaved: boolean,
+  fileMetadata: ?FileMetadata,
+|}> => {
+  if (!saveAsLocation)
+    throw new Error('A location was not chosen before saving as.');
+  const filePath = saveAsLocation.fileIdentifier;
+  if (!filePath)
+    throw new Error('A file path was not chosen before saving as.');
+
+  options.onStartSaving();
+  // Ensure we always pick the latest name and gameId.
+  const newFileMetadata = {
+    fileIdentifier: filePath,
+    name: project.getName(),
+    gameId: project.getProjectUuid(),
+    lastModifiedDate: Date.now(),
+  };
+
+  // Move (copy or download, etc...) the resources first.
+  await options.onMoveResources({ newFileMetadata });
+
+  // Save the project when resources have been copied.
   const projectPath = path.dirname(filePath);
-
-  // TODO: Ideally, errors while copying resources should be reported.
-  gd.ProjectResourcesCopier.copyAllResourcesTo(
-    project,
-    fileSystem,
-    projectPath,
-    true, // Update the project with the new resource paths
-    false, // Don't move absolute files
-    true // Keep relative files folders structure.
-  );
-
-  // Update the project with the new file path (resources have already been updated)
   project.setProjectFile(filePath);
 
-  return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return {
-      wasSaved: true,
-      fileMetadata: {
-        ...fileMetadata,
-        fileIdentifier: filePath,
-        lastModifiedDate: Date.now(),
-      },
-    }; // Save was properly done
-  });
+  await writeProjectFiles(project, filePath, projectPath);
+  return {
+    wasSaved: true,
+    fileMetadata: newFileMetadata,
+  };
 };
 
 export const onAutoSaveProject = (
@@ -200,5 +227,42 @@ export const onAutoSaveProject = (
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;
     }
+  );
+};
+
+export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
+  t`An error occurred when saving the project. Please try again by choosing another location.`;
+
+export const onRenderNewProjectSaveAsLocationChooser = ({
+  saveAsLocation,
+  setSaveAsLocation,
+  newProjectsDefaultFolder,
+}: {
+  saveAsLocation: ?SaveAsLocation,
+  setSaveAsLocation: (?SaveAsLocation) => void,
+  newProjectsDefaultFolder?: string,
+}) => {
+  const outputPath = saveAsLocation
+    ? path.dirname(saveAsLocation.fileIdentifier)
+    : newProjectsDefaultFolder
+    ? newProjectsDefaultFolder
+    : '';
+  if (!saveAsLocation) {
+    setSaveAsLocation({
+      fileIdentifier: path.join(outputPath, 'game.json'),
+    });
+  }
+
+  return (
+    <LocalFolderPicker
+      fullWidth
+      value={outputPath}
+      onChange={newOutputPath =>
+        setSaveAsLocation({
+          fileIdentifier: path.join(newOutputPath, 'game.json'),
+        })
+      }
+      type="create-game"
+    />
   );
 };

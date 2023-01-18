@@ -21,7 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/storage")
-      .SetCategory("Device");
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Storage"))
       .SetIcon("res/conditions/fichier24.png");
 

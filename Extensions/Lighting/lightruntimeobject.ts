@@ -27,7 +27,7 @@ namespace gdjs {
     _texture: string;
     _obstaclesManager: gdjs.LightObstaclesManager;
     _renderer: gdjs.LightRuntimeObjectRenderer;
-    _runtimeScene: gdjs.RuntimeScene;
+    _instanceContainer: gdjs.RuntimeScene;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -43,7 +43,7 @@ namespace gdjs {
         runtimeScene
       );
       this._renderer = new gdjs.LightRuntimeObjectRenderer(this, runtimeScene);
-      this._runtimeScene = runtimeScene;
+      this._instanceContainer = runtimeScene;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();

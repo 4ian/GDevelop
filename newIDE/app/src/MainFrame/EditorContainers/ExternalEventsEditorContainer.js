@@ -143,9 +143,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             ref={editor => (this.editor = editor)}
             setToolbar={this.props.setToolbar}
             onOpenLayout={this.props.onOpenLayout}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceManagementProps={this.props.resourceManagementProps}
             openInstructionOrExpression={this.props.openInstructionOrExpression}
             onCreateEventsFunction={this.onCreateEventsFunction}
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
@@ -168,7 +166,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             <Text>
               <Trans>
                 To edit the external events, choose the scene in which it will
-                be included:
+                be included
               </Trans>
             </Text>
             <Line justifyContent="center">

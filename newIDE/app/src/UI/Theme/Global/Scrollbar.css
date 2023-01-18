@@ -1,27 +1,106 @@
-/* Width */
+/* The default scrollbar for the app */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-thumb {
-    border: 1px solid transparent;
-    background-clip: padding-box;
-    border-radius: 4px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  border-radius: 4px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
-    background-color: rgba(0, 0, 0, 0.07);
+  background-color: rgba(0, 0, 0, 0.07);
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-    background-color: #8d8d8dcc;
+  background-color: #8d8d8dcc;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #8d8d8d;
+  background-color: #8d8d8d;
+}
+
+/** The scrollbar for tabs or toolbars: either invisible or very thing */
+.almost-invisible-scrollbar {
+  /** For browsers not supporting -webkit-scrollbar, hide it because even the `thin` option is too large. */
+  scrollbar-width: none;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-track,
+.almost-invisible-scrollbar::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  border-radius: 4px;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #8d8d8dcc;
+}
+
+.almost-invisible-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #8d8d8d;
+}
+
+/* Manually handled scrollbar for canvas */
+body {
+  --canvas-scrollbar-border-radius: 4px;
+  --canvas-scrollbar-width: 8px;
+  --canvas-scrollbar-length: 200px;
+  --canvas-horizontal-scrollbar-padding: 3px;
+  --canvas-vertical-scrollbar-padding: 1px;
+}
+
+.canvas-scrollbar-thumb {
+  position: relative;
+  background-color: #8d8d8dcc;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  background-clip: content-box;
+  border-radius: var(--canvas-scrollbar-border-radius);
+  pointer-events: all;
+}
+.canvas-scrollbar-thumb:hover,
+.canvas-scrollbar-thumb:active {
+  background-color: #8d8d8d;
+}
+
+.canvas-horizontal-scrollbar-track {
+  position: absolute;
+  left: 0px;
+  right: calc(
+    var(--canvas-scrollbar-width) - var(--canvas-vertical-scrollbar-padding)
+  );
+  bottom: 0px;
+  padding-bottom: var(--canvas-horizontal-scrollbar-padding);
+  pointer-events: none;
+}
+.canvas-horizontal-scrollbar-thumb {
+  width: var(--canvas-scrollbar-length);
+  height: var(--canvas-scrollbar-width);
+}
+.canvas-vertical-scrollbar-track {
+  position: absolute;
+  top: 0px;
+  bottom: calc(
+    var(--canvas-scrollbar-width) - var(--canvas-horizontal-scrollbar-padding)
+  );
+  right: 0px;
+  padding-right: var(--canvas-vertical-scrollbar-padding);
+  pointer-events: none;
+}
+.canvas-vertical-scrollbar-thumb {
+  height: var(--canvas-scrollbar-length);
+  width: var(--canvas-scrollbar-width);
 }

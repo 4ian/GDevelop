@@ -1,13 +1,25 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
-import ToolbarIcon from '../UI/ToolbarIcon';
+import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import ObjectIcon from '../UI/CustomSvgIcons/Object';
+import ObjectGroupIcon from '../UI/CustomSvgIcons/ObjectGroup';
+import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
+import InstancesListIcon from '../UI/CustomSvgIcons/InstancesList';
+import LayersIcon from '../UI/CustomSvgIcons/Layers';
+import UndoIcon from '../UI/CustomSvgIcons/Undo';
+import RedoIcon from '../UI/CustomSvgIcons/Redo';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import GridIcon from '../UI/CustomSvgIcons/Grid';
+import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
+import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
   openObjectsList: () => void,
@@ -26,156 +38,177 @@ type Props = {|
   isGridShown: () => boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
-  zoomIn: () => void,
-  zoomOut: () => void,
-  centerView: () => void,
+  getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
+  canRenameObject: boolean,
+  onRenameObject: () => void,
 |};
 
-export class Toolbar extends PureComponent<Props> {
-  render() {
-    return (
-      <>
-        <ToolbarCommands
-          openObjectsList={this.props.openObjectsList}
-          openObjectGroupsList={this.props.openObjectGroupsList}
-          openPropertiesPanel={this.props.openProperties}
-          toggleInstancesList={this.props.toggleInstancesList}
-          toggleLayersList={this.props.toggleLayersList}
-          undo={this.props.undo}
-          canUndo={this.props.canUndo}
-          redo={this.props.redo}
-          canRedo={this.props.canRedo}
-          deleteSelection={this.props.deleteSelection}
-          toggleWindowMask={this.props.toggleWindowMask}
-          toggleGrid={this.props.toggleGrid}
-          setupGrid={this.props.openSetupGrid}
-          canDeleteSelection={
-            this.props.instancesSelection.getSelectedInstances().length !== 0
+const Toolbar = (props: Props) => {
+  return (
+    <>
+      <ToolbarCommands
+        openObjectsList={props.openObjectsList}
+        openObjectGroupsList={props.openObjectGroupsList}
+        openPropertiesPanel={props.openProperties}
+        toggleInstancesList={props.toggleInstancesList}
+        toggleLayersList={props.toggleLayersList}
+        undo={props.undo}
+        canUndo={props.canUndo}
+        redo={props.redo}
+        canRedo={props.canRedo}
+        deleteSelection={props.deleteSelection}
+        toggleWindowMask={props.toggleWindowMask}
+        toggleGrid={props.toggleGrid}
+        setupGrid={props.openSetupGrid}
+        canDeleteSelection={
+          props.instancesSelection.getSelectedInstances().length !== 0
+        }
+        canRenameObject={props.canRenameObject}
+        onRenameObject={props.onRenameObject}
+      />
+      <ToolbarGroup lastChild>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-open-objects-panel-button"
+          onClick={props.openObjectsList}
+          tooltip={t`Open Objects Panel`}
+        >
+          <ObjectIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-open-object-groups-panel-button"
+          onClick={props.openObjectGroupsList}
+          tooltip={t`Open Object Groups Panel`}
+        >
+          <ObjectGroupIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-open-properties-panel-button"
+          onClick={props.openProperties}
+          tooltip={t`Open Properties Panel`}
+        >
+          <PropertiesPanelIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-open-instances-list-panel-button"
+          onClick={props.toggleInstancesList}
+          tooltip={t`Open Instances List Panel`}
+        >
+          <InstancesListIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-open-layers-panel-button"
+          onClick={props.toggleLayersList}
+          tooltip={t`Open Layers Panel`}
+        >
+          <LayersIcon />
+        </IconButton>
+        <ElementWithMenu
+          element={
+            <IconButton
+              size="small"
+              color="default"
+              tooltip={t`Toggle/edit grid`}
+            >
+              <GridIcon />
+            </IconButton>
           }
+          buildMenuTemplate={(i18n: I18nType) => [
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show Mask`),
+              checked: props.isWindowMaskShown(),
+              click: () => props.toggleWindowMask(),
+            },
+            {
+              type: 'checkbox',
+              label: i18n._(t`Show grid`),
+              checked: props.isGridShown(),
+              click: () => props.toggleGrid(),
+            },
+            { type: 'separator' },
+            {
+              label: i18n._(t`Setup grid`),
+              click: () => props.openSetupGrid(),
+            },
+          ]}
         />
-        <ToolbarGroup lastChild>
-          <ToolbarIcon
-            onClick={this.props.openObjectsList}
-            src="res/ribbon_default/objects64.png"
-            tooltip={t`Open the objects editor`}
-          />
-          <ToolbarIcon
-            onClick={this.props.openObjectGroupsList}
-            src={'res/ribbon_default/objectsgroups64.png'}
-            tooltip={t`Open the objects groups editor`}
-          />
-          <ToolbarIcon
-            onClick={this.props.openProperties}
-            src="res/ribbon_default/editprop32.png"
-            tooltip={t`Open the properties panel`}
-          />
-          <ToolbarIcon
-            onClick={this.props.toggleInstancesList}
-            src="res/ribbon_default/ObjectsPositionsList32.png"
-            tooltip={t`Open the list of instances`}
-          />
-          <ToolbarIcon
-            onClick={this.props.toggleLayersList}
-            src="res/ribbon_default/layers32.png"
-            tooltip={t`Open the layers editor`}
-          />
-          <ToolbarSeparator />
-          <ToolbarIcon
-            onClick={this.props.undo}
-            src="res/ribbon_default/undo32.png"
-            disabled={!this.props.canUndo}
-            tooltip={t`Undo the last changes`}
-          />
-          <ToolbarIcon
-            onClick={this.props.redo}
-            src="res/ribbon_default/redo32.png"
-            disabled={!this.props.canRedo}
-            tooltip={t`Redo the last changes`}
-          />
-          <ToolbarSeparator />
-          <ToolbarIcon
-            onClick={this.props.deleteSelection}
-            src="res/ribbon_default/deleteselected32.png"
-            disabled={
-              !this.props.instancesSelection.getSelectedInstances().length
-            }
-            tooltip={t`Delete the selected instances from the scene`}
-          />
-          <ToolbarSeparator />
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                src="res/ribbon_default/grid32.png"
-                tooltip={t`Toggle/edit grid`}
-              />
-            }
-            buildMenuTemplate={(i18n: I18nType) => [
-              {
-                type: 'checkbox',
-                label: i18n._(t`Show Mask`),
-                checked: this.props.isWindowMaskShown(),
-                click: () => this.props.toggleWindowMask(),
-              },
-              {
-                type: 'checkbox',
-                label: i18n._(t`Show grid`),
-                checked: this.props.isGridShown(),
-                click: () => this.props.toggleGrid(),
-              },
-              { type: 'separator' },
-              {
-                label: i18n._(t`Setup grid`),
-                click: () => this.props.openSetupGrid(),
-              },
-            ]}
-          />
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                src="res/ribbon_default/zoom32.png"
-                tooltip={t`Change editor zoom`}
-              />
-            }
-            buildMenuTemplate={(i18n: I18nType) => [
-              {
-                label: i18n._(t`Zoom in`),
-                click: this.props.zoomIn,
-                accelerator: 'CmdOrCtrl+numadd',
-              },
-              {
-                label: i18n._(t`Zoom out`),
-                click: this.props.zoomOut,
-                accelerator: 'CmdOrCtrl+numsub',
-              },
-              {
-                label: i18n._(t`Center View`),
-                click: () => this.props.centerView(),
-              },
-              { type: 'separator' },
-              { label: '5%', click: () => this.props.setZoomFactor(0.05) },
-              { label: '10%', click: () => this.props.setZoomFactor(0.1) },
-              { label: '25%', click: () => this.props.setZoomFactor(0.25) },
-              { label: '50%', click: () => this.props.setZoomFactor(0.5) },
-              { label: '100%', click: () => this.props.setZoomFactor(1.0) },
-              { label: '150%', click: () => this.props.setZoomFactor(1.5) },
-              { label: '200%', click: () => this.props.setZoomFactor(2.0) },
-              { label: '400%', click: () => this.props.setZoomFactor(4.0) },
-            ]}
-          />
-          {this.props.onOpenSettings && <ToolbarSeparator />}
-          {this.props.onOpenSettings && (
-            <ToolbarIcon
-              onClick={this.props.onOpenSettings}
-              src="res/ribbon_default/pref32.png"
-              tooltip={t`Open settings`}
-            />
-          )}
-        </ToolbarGroup>
-      </>
-    );
-  }
-}
+        <ToolbarSeparator />
+        <IconButton
+          size="small"
+          color="default"
+          onClick={props.undo}
+          disabled={!props.canUndo}
+          tooltip={t`Undo the last changes`}
+        >
+          <UndoIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={props.redo}
+          disabled={!props.canRedo}
+          tooltip={t`Redo the last changes`}
+        >
+          <RedoIcon />
+        </IconButton>
+        <ElementWithMenu
+          element={
+            <IconButton
+              size="small"
+              color="default"
+              tooltip={t`Change editor zoom`}
+            >
+              <ZoomInIcon />
+            </IconButton>
+          }
+          buildMenuTemplate={(i18n: I18nType) => [
+            ...props.getContextMenuZoomItems(i18n),
+            { type: 'separator' },
+            { label: '5%', click: () => props.setZoomFactor(0.05) },
+            { label: '10%', click: () => props.setZoomFactor(0.1) },
+            { label: '25%', click: () => props.setZoomFactor(0.25) },
+            { label: '50%', click: () => props.setZoomFactor(0.5) },
+            { label: '100%', click: () => props.setZoomFactor(1.0) },
+            { label: '150%', click: () => props.setZoomFactor(1.5) },
+            { label: '200%', click: () => props.setZoomFactor(2.0) },
+            { label: '400%', click: () => props.setZoomFactor(4.0) },
+          ]}
+        />
+        <IconButton
+          size="small"
+          color="default"
+          onClick={props.deleteSelection}
+          disabled={!props.instancesSelection.getSelectedInstances().length}
+          tooltip={t`Delete the selected instances from the scene`}
+        >
+          <TrashIcon />
+        </IconButton>
+        {props.onOpenSettings && <ToolbarSeparator />}
+        {props.onOpenSettings && (
+          <IconButton
+            size="small"
+            color="default"
+            onClick={props.onOpenSettings}
+            tooltip={t`Open settings`}
+          >
+            <EditSceneIcon />
+          </IconButton>
+        )}
+      </ToolbarGroup>
+    </>
+  );
+};
 
 export default Toolbar;

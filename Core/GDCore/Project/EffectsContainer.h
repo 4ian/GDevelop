@@ -110,6 +110,11 @@ class GD_CORE_API EffectsContainer {
    */
   void UnserializeFrom(const SerializerElement& element);
 
+  /**
+   * \brief Clear all effects of the container.
+   */
+  inline void Clear() { effects.clear(); }
+
  private:
   std::vector<std::shared_ptr<gd::Effect>> effects;
   static Effect badEffect;

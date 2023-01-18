@@ -1,14 +1,17 @@
 // @flow
 import * as React from 'react';
 import withMock from 'storybook-addon-mock';
-import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import { testProject } from '../../../GDevelopJsInitializerDecorator';
+import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
-import { fakeAssetPacks } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAssetPacks,
+  fakeIndieAuthenticatedUser,
+} from '../../../../fixtures/GDevelopServicesTestData';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'AssetStore/AssetStore',
@@ -39,37 +42,25 @@ const apiDataFakePacks = {
 };
 
 export const Default = () => (
-  <AssetStoreStateProvider>
-    <AssetStore
-      onOpenDetails={action('onOpenDetails')}
-      events={testProject.testLayout.getEvents()}
-      project={testProject.project}
-      layout={testProject.testLayout}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceSources={[]}
-      onObjectAddedFromAsset={() => {}}
-      resourceExternalEditors={[]}
-      objectsContainer={testProject.testLayout}
-    />
-  </AssetStoreStateProvider>
+  <FixedHeightFlexContainer height={500}>
+    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+      <AssetStoreStateProvider>
+        <AssetStore />
+      </AssetStoreStateProvider>
+    </AuthenticatedUserContext.Provider>
+  </FixedHeightFlexContainer>
 );
 Default.decorators = [withMock];
 Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
-  <AssetStoreStateProvider>
-    <AssetStore
-      onOpenDetails={action('onOpenDetails')}
-      events={testProject.testLayout.getEvents()}
-      project={testProject.project}
-      layout={testProject.testLayout}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceSources={[]}
-      onObjectAddedFromAsset={() => {}}
-      resourceExternalEditors={[]}
-      objectsContainer={testProject.testLayout}
-    />
-  </AssetStoreStateProvider>
+  <FixedHeightFlexContainer height={500}>
+    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+      <AssetStoreStateProvider>
+        <AssetStore />
+      </AssetStoreStateProvider>
+    </AuthenticatedUserContext.Provider>
+  </FixedHeightFlexContainer>
 );
 LoadingError.decorators = [withMock];
 LoadingError.parameters = apiDataServerSideError;

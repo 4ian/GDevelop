@@ -61,6 +61,10 @@ export type ExpressionAutocompletion =
   | {|
       ...BaseExpressionAutocompletion,
       kind: 'Behavior',
+    |}
+  | {|
+      ...BaseExpressionAutocompletion,
+      kind: 'FullExpression',
     |};
 
 type ExpressionAutocompletionContext = {|
@@ -311,9 +315,11 @@ const getAutocompletionsForText = function(
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        object.getConfiguration()
+      );
 
-      autocompletionTexts = getAllPointNames(spriteObject)
+      autocompletionTexts = getAllPointNames(spriteConfiguration)
         .map(spriteObjectName =>
           spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
         )
@@ -333,13 +339,17 @@ const getAutocompletionsForText = function(
     }
 
     if (object.getType() === 'Sprite') {
-      const spriteObject = gd.asSpriteObject(object);
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        object.getConfiguration()
+      );
 
       autocompletionTexts = mapFor(
         0,
-        spriteObject.getAnimationsCount(),
+        spriteConfiguration.getAnimationsCount(),
         index => {
-          const animationName = spriteObject.getAnimation(index).getName();
+          const animationName = spriteConfiguration
+            .getAnimation(index)
+            .getName();
           return animationName.length > 0 ? `"${animationName}"` : null;
         }
       ).filter(Boolean);
@@ -347,8 +357,14 @@ const getAutocompletionsForText = function(
       return [];
     }
   } else if (type === 'functionParameterName') {
-    if (scope.eventsFunction) {
+    const eventsBasedEntity =
+      scope.eventsBasedBehavior || scope.eventsBasedObject;
+    const functionsContainer = eventsBasedEntity
+      ? eventsBasedEntity.getEventsFunctions()
+      : scope.eventsFunctionsExtension;
+    if (scope.eventsFunction && functionsContainer) {
       autocompletionTexts = enumerateParametersUsableInExpressions(
+        functionsContainer,
         scope.eventsFunction
       ).map(parameterMetadata => `"${parameterMetadata.getName()}"`);
     }

@@ -9,81 +9,88 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 #include "TextEntryObject.h"
 
+// Deprecated extension - so no translation markers and the object is hidden in the editor.
 void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation(
           "TextEntryObject",
-          _("Text entry object"),
-          _("An object that can be used to capture the text "
-            "entered with a keyboard by a player."),
+          "Text entry object",
+          "Deprecated object that can be used to capture the text "
+            "entered with a keyboard by a player.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("User interface")
       .SetExtensionHelpPath("/objects/text_entry");
 
   gd::ObjectMetadata& obj =
       extension
           .AddObject<TextEntryObject>("TextEntry",
-                                      _("Text entry"),
-                                      _("Invisible object used to get the text "
-                                        "entered with the keyboard."),
+                                      "Text entry",
+                                      "Invisible object used to get the text "
+                                        "entered with the keyboard.",
                                       "CppPlatform/Extensions/textentry.png")
-          .SetCategoryFullName(_("Advanced"));
+          .SetCategoryFullName("User interface")
+          .SetHidden(); // Deprecated
 
   obj.AddAction("String",
-                _("Text in memory"),
-                _("Modify text in memory of the object"),
-                _("the text in memory"),
+                "Text in memory",
+                "Modify text in memory of the object",
+                "the text in memory",
                 "",
                 "CppPlatform/Extensions/textentry24.png",
                 "CppPlatform/Extensions/textentryicon.png")
 
-      .AddParameter("object", _("Object"), "TextEntry")
-      .UseStandardOperatorParameters("string")
+      .AddParameter("object", "Object", "TextEntry")
+      .UseStandardOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription("Text"))
       .SetFunctionName("SetString")
       .SetGetter("GetString");
 
   obj.AddCondition("String",
-                   _("Text in memory"),
-                   _("Test the text of a Text Entry object."),
-                   _("the text"),
+                   "Text in memory",
+                   "Test the text of a Text Entry object.",
+                   "the text",
                    "",
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
-      .AddParameter("object", _("Object"), "TextEntry")
-      .UseStandardRelationalOperatorParameters("string")
+      .AddParameter("object", "Object", "TextEntry")
+      .UseStandardRelationalOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription("Text to compare to"))
       .SetFunctionName("GetString");
 
   obj.AddAction(
          "Activate",
-         _("De/activate capturing text input"),
-         _("Activate or deactivate the capture of text entered with keyboard."),
-         _("Activate capture by _PARAM0_ of the text entered with keyboard: "
-           "_PARAM1_"),
-         _("Setup"),
+         "De/activate capturing text input",
+         "Activate or deactivate the capture of text entered with keyboard.",
+         "Activate capture by _PARAM0_ of the text entered with keyboard: "
+           "_PARAM1_",
+         "Setup",
          "CppPlatform/Extensions/textentry24.png",
          "CppPlatform/Extensions/textentryicon.png")
 
-      .AddParameter("object", _("Object"), "TextEntry")
-      .AddParameter("yesorno", _("Activate"))
+      .AddParameter("object", "Object", "TextEntry")
+      .AddParameter("yesorno", "Activate")
       .SetFunctionName("Activate");
 
   obj.AddCondition("Activated",
-                   _("Text input"),
-                   _("Test if the object captured text entered with keyboard."),
-                   _("_PARAM0_ capture the text entered with keyboard"),
-                   _("Setup"),
+                   "Text input",
+                   "Test if the object captured text entered with keyboard.",
+                   "_PARAM0_ capture the text entered with keyboard",
+                   "Setup",
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
-      .AddParameter("object", _("Object"), "TextEntry")
+      .AddParameter("object", "Object", "TextEntry")
       .SetFunctionName("IsActivated");
 
   obj.AddStrExpression("String",
-                       _("Text entered with keyboard"),
-                       _("Text entered with keyboard"),
-                       _("Text entered with keyboard"),
+                       "Text entered with keyboard",
+                       "Text entered with keyboard",
+                       "Text entered with keyboard",
                        "res/texteicon.png")
-      .AddParameter("object", _("Object"), "TextEntry")
+      .AddParameter("object", "Object", "TextEntry")
       .SetFunctionName("GetString");
 }

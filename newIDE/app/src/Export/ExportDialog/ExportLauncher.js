@@ -10,12 +10,12 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import CreateProfile from '../../Profile/CreateProfile';
-import LimitDisplayer from '../../Profile/LimitDisplayer';
+import CurrentUsageDisplayer from '../../Profile/CurrentUsageDisplayer';
 import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
 } from '../../Utils/ProjectErrorsChecker';
-import { type Limit } from '../../Utils/GDevelopServices/Usage';
+import { type CurrentUsage } from '../../Utils/GDevelopServices/Usage';
 import BuildsWatcher from '../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
@@ -57,7 +57,7 @@ type Props = {|
 |};
 
 /**
- * A generic UI to launch, monitor the progres and get the result
+ * A generic UI to launch, monitor the progress and get the result
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {
@@ -273,6 +273,8 @@ export default class ExportLauncher extends Component<Props, State> {
         preparedExporter
       );
       setStep('resources-download');
+      // TODO: use a GenericRetryableProcessWithProgressDialog to show errors
+      // and allow to try again?
       const resourcesDownloadOutput = await exportPipeline.launchResourcesDownload(
         exportPipelineContext,
         exportOutput
@@ -294,7 +296,11 @@ export default class ExportLauncher extends Component<Props, State> {
           this.state.exportState,
           authenticatedUser,
           uploadBucketKey,
-          this.props.project.getProjectUuid()
+          project.getProjectUuid(),
+          {
+            gameName: project.getName(),
+            gameVersion: project.getVersion(),
+          }
         );
         setStep('build');
         this.setState({ build }, () => {
@@ -342,14 +348,18 @@ export default class ExportLauncher extends Component<Props, State> {
       onSaveProject,
     } = this.props;
     if (!project) return null;
-    const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
+    const getBuildCurrentUsage = (
+      authenticatedUser: AuthenticatedUser
+    ): ?CurrentUsage =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
-        ? authenticatedUser.limits[exportPipeline.onlineBuildType]
+        ? authenticatedUser.limits.limits[exportPipeline.onlineBuildType]
         : null;
 
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      const limit: ?Limit = getBuildLimit(authenticatedUser);
-      if (limit && limit.limitReached) return false;
+      const currentUsage: ?CurrentUsage = getBuildCurrentUsage(
+        authenticatedUser
+      );
+      if (currentUsage && currentUsage.limitReached) return false;
 
       return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
@@ -388,6 +398,7 @@ export default class ExportLauncher extends Component<Props, State> {
             <RaisedButton
               label={exportPipeline.renderLaunchButtonLabel()}
               primary
+              id={`launch-export-${exportPipeline.name}-button`}
               onClick={this.launchWholeExport}
               disabled={!canLaunchBuild(authenticatedUser)}
             />
@@ -429,9 +440,9 @@ export default class ExportLauncher extends Component<Props, State> {
             </Line>
           ))}
         {!!exportPipeline.limitedBuilds && authenticatedUser.authenticated && (
-          <LimitDisplayer
+          <CurrentUsageDisplayer
             subscription={authenticatedUser.subscription}
-            limit={getBuildLimit(authenticatedUser)}
+            currentUsage={getBuildCurrentUsage(authenticatedUser)}
             onChangeSubscription={this.props.onChangeSubscription}
           />
         )}
@@ -444,7 +455,11 @@ export default class ExportLauncher extends Component<Props, State> {
           })}
         {doneFooterOpen && (
           <Line justifyContent="center">
-            <GameRegistration project={project} hideIfSubscribed hideLoader />
+            <GameRegistration
+              project={project}
+              hideLoader
+              suggestGameStatsEmail
+            />
           </Line>
         )}
       </Column>

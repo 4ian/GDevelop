@@ -36,7 +36,7 @@ size_t GetMinimumParametersNumber(
     size_t initialParameterIndex) {
   size_t nb = 0;
   for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].optional && !parameters[i].codeOnly) nb++;
+    if (!parameters[i].IsOptional() && !parameters[i].codeOnly) nb++;
   }
 
   return nb;

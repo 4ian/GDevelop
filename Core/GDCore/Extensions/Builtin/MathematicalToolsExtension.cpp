@@ -485,6 +485,23 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
+  extension
+      .AddExpression("Pi",
+                     _("Number Pi (3.1415...)"),
+                     _("The number Pi (3.1415...)"),
+                     "",
+                     "res/mathfunction.png")
+      .SetHelpPath("/all-features/expressions");
+
+  extension
+      .AddExpression("lerpAngle",
+                     _("Lerp (Linear interpolation) between two angles"),
+                     _("Linearly interpolates between two angles (in degrees) by taking the shortest direction around the circle."),
+                     "",
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Starting angle, in degrees"))
+      .AddParameter("expression", _("Destination angle, in degrees"))
+      .AddParameter("expression", _("Interpolation value between 0 and 1."));
 }
 
 }  // namespace gd

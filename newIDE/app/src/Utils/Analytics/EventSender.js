@@ -11,7 +11,6 @@ import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
-import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
 const electron = optionalRequire('electron');
@@ -23,8 +22,12 @@ let startupTimesSummary = null;
 let posthogLoaded = false;
 const posthogAliasMade = [];
 let posthogLastPropertiesSent = '';
+let currentlyRunningInAppTutorial = null;
 
 let keenClient = null;
+
+export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
+  (currentlyRunningInAppTutorial = tutorial);
 
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
   if (isDev || !keenClient) return;
@@ -44,7 +47,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   keenClient.recordEvent(name, metadata);
   posthog.capture(name, {
     ...metadata,
-    isInAppTutorialRunning: isUserflowRunning,
+    isInAppTutorialRunning: currentlyRunningInAppTutorial,
     isInDesktopApp: isElectronApp,
     isInWebApp: !isElectronApp,
   });
@@ -90,23 +93,33 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     };
 
+    // If the user is logged in, alias the user with its firebase id.
     if (firebaseUser) {
       const aliasKey = firebaseUser.uid + '#' + getUserUUID();
       if (!posthogAliasMade.includes(aliasKey)) {
-        // Alias the random UUID to the signed in user id
-        // so we avoid to consider this as a different user in stats.
-        posthog.alias(firebaseUser.uid, getUserUUID());
+        // Try to Alias the random UUID to the Firebase ID.
+        // 2 cases:
+        // - Either it's the first time the user logs in and posthog does not know
+        //   about the Firebase ID, in which case we specify the firebaseId as 2nd parameter
+        //   of the alias method.
+        // - Or the user has already logged in and posthog knows about the Firebase ID,
+        //   in which case PostHog will reject the merging of the 2 users.
+        //   We then need to ensure we identify the user by its Firebase ID.
+        posthog.alias(getUserUUID(), firebaseUser.uid);
         posthogAliasMade.push(aliasKey);
       }
     }
 
-    // Send user information, after de-duplicating the call to avoid useless
-    // calls.
+    // Identify which user is using the app, after de-duplicating the call to
+    // avoid useless calls.
     // This is so we can build stats on the used version, languages and usage
     // of GDevelop features.
     const stringifiedUserProperties = JSON.stringify(userProperties);
     if (stringifiedUserProperties !== posthogLastPropertiesSent) {
-      posthog.identify(getUserUUID(), userProperties);
+      // If the user is not logged in, identify the user by its random UUID.
+      // If the user is logged in, identify the user by its Firebase ID.
+      const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
+      posthog.identify(userId, userProperties);
       posthogLastPropertiesSent = stringifiedUserProperties;
     }
   };
@@ -168,7 +181,8 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       },
       tutorials: {
         // Useful to differentiate if an event is part of a tutorial or not.
-        isInAppTutorialRunning: isUserflowRunning,
+        isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
+        tutorial: currentlyRunningInAppTutorial,
       },
       language: {
         appLanguage,
@@ -274,14 +288,38 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
-export const sendOnboardingManuallyOpened = () => {
-  recordEvent('onboarding_manually_opened');
+export const sendInAppTutorialStarted = (metadata: {|
+  tutorialId: string,
+  scenario: 'startOver' | 'resume' | 'start',
+|}) => {
+  recordEvent('in-app-tutorial-started', metadata);
 };
 
-export const sendAssetPackOpened = (assetPackTag: string) => {
-  recordEvent('asset_pack_opened', {
-    assetPackTag,
-  });
+export const sendAssetPackOpened = (options: {|
+  assetPackName: string,
+  assetPackTag: string | null,
+  assetPackId: string | null,
+  assetPackKind: 'public' | 'private' | 'unknown',
+  source: 'store-home' | 'author-profile',
+|}) => {
+  recordEvent('asset_pack_opened', options);
+};
+
+export const sendAssetPackBuyClicked = (options: {|
+  assetPackId: string,
+  assetPackName: string,
+  assetPackTag: string,
+  assetPackKind: 'public' | 'private' | 'unknown',
+|}) => {
+  recordEvent('asset_pack_buy_clicked', options);
+};
+
+export const sendAssetPackInformationOpened = (options: {|
+  assetPackId: string,
+  assetPackName: string,
+  assetPackKind: 'public' | 'private' | 'unknown',
+|}) => {
+  recordEvent('asset_pack_information_opened', options);
 };
 
 export const sendHelpFinderOpened = () => {
@@ -331,28 +369,45 @@ export const sendSubscriptionCheckDismiss = () => {
   recordEvent('subscription-check-dialog-dismiss');
 };
 
-export const sendSubscriptionDialogShown = () => {
-  recordEvent('subscription-dialog-shown', {});
+export type SubscriptionDialogDisplayReason =
+  | 'Disable GDevelop splash at startup'
+  | 'Debugger'
+  | 'Hot reloading'
+  | 'Preview over wifi'
+  | 'Landing dialog at opening'
+  | 'Leaderboard count per game limit reached'
+  | 'Cloud Project limit reached'
+  | 'Consult profile'
+  | 'Build limit reached'
+  | 'Leaderboard customization';
+
+export const sendSubscriptionDialogShown = (metadata: {|
+  reason: SubscriptionDialogDisplayReason,
+  preStep?: 'subscriptionChecker',
+|}) => {
+  recordEvent('subscription-dialog-shown', metadata);
 };
 
-export const sendAssetOpened = ({
-  id,
-  name,
-}: {|
+export const sendAssetOpened = (options: {|
   id: string,
   name: string,
+  assetPackName: string | null,
+  assetPackTag: string | null,
+  assetPackId: string | null,
+  assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-opened', { id, name });
+  recordEvent('asset-opened', options);
 };
 
-export const sendAssetAddedToProject = ({
-  id,
-  name,
-}: {|
+export const sendAssetAddedToProject = (options: {|
   id: string,
   name: string,
+  assetPackName: string | null,
+  assetPackTag: string | null,
+  assetPackId: string | null,
+  assetPackKind: 'public' | 'private' | 'unknown',
 |}) => {
-  recordEvent('asset-added-to-project', { id, name });
+  recordEvent('asset-added-to-project', options);
 };
 
 export const sendExtensionDetailsOpened = (name: string) => {
@@ -379,47 +434,39 @@ export const sendExternalEditorOpened = (editorName: string) => {
   recordEvent('open_external_editor', { editorName });
 };
 
-export const sendBehaviorsEditorShown = ({
-  parentEditor,
-}: {|
+export const sendBehaviorsEditorShown = (metadata: {|
   parentEditor: 'object-editor-dialog',
 |}) => {
-  recordEvent('behaviors-editor-shown', { parentEditor });
+  recordEvent('behaviors-editor-shown', metadata);
 };
 
-export const sendBehaviorAdded = ({
-  behaviorType,
-  parentEditor,
-}: {|
+export const sendBehaviorAdded = (metadata: {|
   behaviorType: string,
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
-  recordEvent('behavior-added', { behaviorType, parentEditor });
+  recordEvent('behavior-added', metadata);
 };
 
-export const sendEventsExtractedAsFunction = ({
-  step,
-  parentEditor,
-}: {|
+export const sendEventsExtractedAsFunction = (metadata: {|
   step: 'begin' | 'end',
   parentEditor:
     | 'scene-events-editor'
     | 'extension-events-editor'
     | 'external-events-editor',
 |}) => {
-  recordEvent('events-extracted-as-function', {
-    step,
-    parentEditor,
-  });
+  recordEvent('events-extracted-as-function', metadata);
 };
 
-const trackInAppTutorialProgress = (
-  stepIndex: number,
-  isCompleted: boolean = false
-) => {
-  recordEvent('user-flow-onboarding', { stepIndex, isCompleted });
+export const sendInAppTutorialProgress = (metadata: {|
+  tutorialId: string,
+  step: number,
+  isCompleted: boolean,
+|}) => {
+  const builtInTutorialIds = ['onboarding'];
+  recordEvent(
+    builtInTutorialIds.includes(metadata.tutorialId)
+      ? 'in-app-tutorial-built-in'
+      : 'in-app-tutorial-external',
+    metadata
+  );
 };
-
-// Make this function global so it can be accessed from userflow's
-// step "Evaluate JS" actions
-global.trackInAppTutorialProgress = trackInAppTutorialProgress;

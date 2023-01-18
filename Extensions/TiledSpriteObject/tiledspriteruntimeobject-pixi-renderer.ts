@@ -7,17 +7,17 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TiledSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textureName: string
     ) {
       this._object = runtimeObject;
-      const texture = runtimeScene
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(textureName);
       this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
 
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._tiledSprite, runtimeObject.getZOrder());
@@ -42,8 +42,11 @@ namespace gdjs {
         this._object.y + this._tiledSprite.height / 2;
     }
 
-    setTexture(textureName, runtimeScene): void {
-      const texture = runtimeScene
+    setTexture(
+      textureName: string,
+      instanceContainer: RuntimeInstanceContainer
+    ): void {
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(textureName);
@@ -63,13 +66,13 @@ namespace gdjs {
       return this._tiledSprite.height;
     }
 
-    setWidth(width): void {
+    setWidth(width: float): void {
       this._tiledSprite.width = width;
       this._tiledSprite.pivot.x = width / 2;
       this.updatePosition();
     }
 
-    setHeight(height): void {
+    setHeight(height: float): void {
       this._tiledSprite.height = height;
       this._tiledSprite.pivot.y = height / 2;
       this.updatePosition();
@@ -91,7 +94,7 @@ namespace gdjs {
         -this._object._yOffset % this._tiledSprite.texture.height;
     }
 
-    setColor(rgbColor): void {
+    setColor(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;

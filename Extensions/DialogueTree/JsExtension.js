@@ -28,15 +28,15 @@ module.exports = {
     extension
       .setExtensionInformation(
         'DialogueTree',
-        _('Dialogue Tree (experimental)'),
+        _('Dialogue Tree'),
         'Handle dialogue trees, made using Yarn Spinner. Useful to make complex dialogues with multiple choices. The Yarn Spinner editor is embedded in GDevelop so you can edit your dialogues without leaving GDevelop.',
         'Todor Imreorov',
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/dialogue-tree')
-      .setCategory('Advanced');
+      .setCategory('Game mechanic');
     extension
-      .addInstructionOrExpressionGroupMetadata(_('Dialogue Tree (experimental)'))
+      .addInstructionOrExpressionGroupMetadata(_('Dialogue Tree'))
       .setIcon('JsPlatform/Extensions/yarn32.png');
 
     extension

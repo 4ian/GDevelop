@@ -46,7 +46,7 @@ type CommandHandlers = {|
   onHotReloadPreview: () => void,
   allowNetworkPreview: boolean,
   onOpenHomePage: () => void,
-  onCreateProject: () => void,
+  onCreateBlank: () => void,
   onOpenProject: () => void,
   onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
@@ -108,7 +108,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   useCommand('CREATE_NEW_PROJECT', true, {
-    handler: handlers.onCreateProject,
+    handler: handlers.onCreateBlank,
   });
 
   useCommand('OPEN_PROJECT', true, {

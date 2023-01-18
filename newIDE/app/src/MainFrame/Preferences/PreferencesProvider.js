@@ -32,12 +32,12 @@ type Props = {|
 
 type State = Preferences;
 
-const LocalStorageItem = 'gd-preferences';
+const localStorageItem = 'gd-preferences';
 const MAX_RECENT_FILES_COUNT = 20;
 
 export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
   try {
-    const persistedState = localStorage.getItem(LocalStorageItem);
+    const persistedState = localStorage.getItem(localStorageItem);
     if (!persistedState) return null;
 
     const values = JSON.parse(persistedState);
@@ -99,14 +99,13 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showAllAlertMessages: this._showAllAlertMessages.bind(this),
     showTutorialHint: this._showTutorialHint.bind(this),
     showAllTutorialHints: this._showAllTutorialHints.bind(this),
+    showAnnouncement: this._showAnnouncement.bind(this),
+    showAllAnnouncements: this._showAllAnnouncements.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(
-      this
-    ),
     setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
       this
     ),
@@ -143,6 +142,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
     setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
+    setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
+      this
+    ),
+    getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
+      this
+    ),
+    saveTutorialProgress: this._saveTutorialProgress.bind(this),
+    getTutorialProgress: this._getTutorialProgress.bind(this),
+    setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
+    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -188,16 +199,51 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setUseNewInstructionEditorDialog(useNewInstructionEditorDialog: boolean) {
+  _saveTutorialProgress({
+    tutorialId,
+    userId,
+    ...tutorialProgress
+  }: {|
+    tutorialId: string,
+    userId: ?string,
+    step: number,
+    progress: number,
+    fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+    projectData: {| [key: string]: string |},
+  |}) {
+    const userIdKey: string = userId || 'anonymous';
     this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          useNewInstructionEditorDialog,
-        },
-      }),
+      ({ values }) => {
+        return {
+          values: {
+            ...values,
+            inAppTutorialsProgress: {
+              ...values.inAppTutorialsProgress,
+              [tutorialId]: {
+                ...values.inAppTutorialsProgress[tutorialId],
+                [userIdKey]: tutorialProgress,
+              },
+            },
+          },
+        };
+      },
       () => this._persistValuesToLocalStorage(this.state)
     );
+  }
+
+  _getTutorialProgress({
+    tutorialId,
+    userId,
+  }: {|
+    tutorialId: string,
+    userId: ?string,
+  |}) {
+    const userIdKey: string = userId || 'anonymous';
+    const tutorialProgresses = this.state.values.inAppTutorialsProgress[
+      tutorialId
+    ];
+    if (!tutorialProgresses) return undefined;
+    return tutorialProgresses[userIdKey];
   }
 
   _setUseUndefinedVariablesInAutocompletion(
@@ -350,6 +396,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowEventBasedObjectsEditor(showEventBasedObjectsEditor: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showEventBasedObjectsEditor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowEventBasedObjectsEditor() {
+    return this.state.values.showEventBasedObjectsEditor;
+  }
+
   _checkUpdates(forceDownload?: boolean) {
     // Checking for updates is only done on Electron.
     // Note: This could be abstracted away later if other updates mechanisms
@@ -447,10 +509,37 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _showAnnouncement(identifier: string, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {
+            ...state.values.hiddenAnnouncements,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _showAllAnnouncements() {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAnnouncements: {},
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _persistValuesToLocalStorage(preferences: Preferences) {
     try {
       localStorage.setItem(
-        LocalStorageItem,
+        localStorageItem,
         JSON.stringify(preferences.values)
       );
     } catch (e) {
@@ -529,6 +618,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    // Do not store recent project in preferences as they will be accessible only from user account.
+    if (newRecentFile.storageProviderName === 'Cloud') return;
+
     let recentProjectFiles = this._getRecentProjectFiles();
     const isNotNewRecentFile = recentFile =>
       recentFile.fileMetadata.fileIdentifier !==
@@ -662,6 +754,30 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           isAlwaysOnTopInPreview: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultFolder(newProjectsDefaultFolder: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultFolder,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewProjectsDefaultStorageProviderName(newStorageProviderName: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newProjectsDefaultStorageProviderName: newStorageProviderName,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

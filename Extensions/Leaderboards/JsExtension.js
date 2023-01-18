@@ -28,14 +28,14 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Leaderboards',
-        _('Leaderboards (experimental)'),
+        _('Leaderboards'),
         _('Allow your game to send scores to your leaderboards.'),
         'Florian Rival',
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/leaderboards')
-      .setCategory('Leaderboards')
-      .addInstructionOrExpressionGroupMetadata(_('Leaderboards (experimental)'))
+      .setCategory('Players')
+      .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
     extension
@@ -44,7 +44,7 @@ module.exports = {
         _('Save player score'),
         _("Save the player's score to the given leaderboard."),
         _(
-          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_.'
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_'
         ),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
@@ -64,6 +64,32 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
+
+    extension
+      .addAction(
+        'SaveConnectedPlayerScore',
+        _('Save connected player score'),
+        _("Save the connected player's score to the given leaderboard."),
+        _(
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ for the connected player'
+        ),
+        _('Save score'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('leaderboardId', _('Leaderboard'), '', false)
+      .addParameter(
+        'expression',
+        _('Score to register for the player'),
+        '',
+        false
+      )
+      .setHelpPath('/all-features/leaderboards')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/sha256.js')
+      .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore');
 
     extension
       .addCondition(

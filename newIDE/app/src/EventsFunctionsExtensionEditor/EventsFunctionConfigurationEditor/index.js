@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
-import { Tabs, Tab } from '../../UI/Tabs';
+import { Tabs } from '../../UI/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
@@ -21,6 +21,8 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
+  eventsBasedObject: ?gdEventsBasedObject,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: (whatChanged?: 'type') => void,
@@ -35,6 +37,13 @@ type Props = {|
   ) => void,
   onMoveBehaviorEventsParameter?: (
     eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
+  onMoveObjectEventsParameter?: (
+    eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -154,6 +163,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       objectsContainer,
       eventsFunction,
       eventsBasedBehavior,
+      eventsBasedObject,
       freezeEventsFunctionType,
       onConfigurationUpdated,
       onParametersOrGroupsUpdated,
@@ -162,31 +172,44 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
+      onMoveObjectEventsParameter,
       getFunctionGroupNames,
+      eventsFunctionsContainer,
     } = this.props;
 
     return (
-      <Column expand noMargin useFullHeight>
-        <Tabs value={this.state.currentTab} onChange={this._chooseTab}>
-          <Tab
-            label={<Trans>Configuration</Trans>}
-            value={('config': TabNames)}
-          />
-          <Tab
-            label={<Trans>Parameters</Trans>}
-            value={('parameters': TabNames)}
-          />
-          <Tab
-            label={<Trans>Object groups</Trans>}
-            value={('groups': TabNames)}
-          />
-        </Tabs>
+      <Column expand useFullHeight>
+        <Line>
+          <Column noMargin expand>
+            <Tabs
+              value={this.state.currentTab}
+              onChange={this._chooseTab}
+              options={[
+                {
+                  value: ('config': TabNames),
+                  label: <Trans>Configuration</Trans>,
+                },
+                {
+                  value: ('parameters': TabNames),
+                  label: <Trans>Parameters</Trans>,
+                },
+                {
+                  value: ('groups': TabNames),
+                  label: <Trans>Object groups</Trans>,
+                },
+              ]}
+            />
+          </Column>
+        </Line>
         {this.state.currentTab === 'config' ? (
           <ScrollView>
             <Line>
               <EventsFunctionPropertiesEditor
+                project={project}
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
+                eventsFunctionsContainer={eventsFunctionsContainer}
                 helpPagePath={helpPagePath}
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
@@ -203,11 +226,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 project={project}
                 eventsFunction={eventsFunction}
                 eventsBasedBehavior={eventsBasedBehavior}
+                eventsBasedObject={eventsBasedObject}
+                eventsFunctionsContainer={eventsFunctionsContainer}
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}
                 onMoveFreeEventsParameter={onMoveFreeEventsParameter}
                 onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+                onMoveObjectEventsParameter={onMoveObjectEventsParameter}
                 key={eventsFunction ? eventsFunction.ptr : null}
               />
             </Line>

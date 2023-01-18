@@ -3,25 +3,27 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
-import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
+import SearchBar from '../UI/SearchBar';
 import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
-import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
 import {
-  sendAssetAddedToProject,
   sendAssetOpened,
+  sendAssetPackInformationOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
-import RaisedButton from '../UI/RaisedButton';
 import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+  type AssetShortHeader,
+  type PublicAssetPack,
+  type PublicAssetPacks,
+  type PrivateAssetPack,
+} from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  BoxSearchResults,
+  type BoxSearchResultsInterface,
+} from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
   AssetStoreFilterPanel,
@@ -31,419 +33,597 @@ import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
-import { AssetsHome } from './AssetsHome';
+import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
-import { AssetDetails } from './AssetDetails';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installAsset } from './InstallAsset';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import { showErrorBox } from '../UI/Messages/MessageBox';
+import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
-import { AssetPackDialog } from './AssetPackDialog';
 import Home from '@material-ui/icons/Home';
+import PrivateAssetPackInformationPage from './PrivateAssets/PrivateAssetPackInformationPage';
+import PlaceholderError from '../UI/PlaceholderError';
+import AlertMessage from '../UI/AlertMessage';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
+import { LineStackLayout } from '../UI/Layout';
+import Paper from '../UI/Paper';
+import { isHomePage, isSearchResultPage } from './AssetStoreNavigator';
 
-type Props = {
-  project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
-  focusOnMount?: boolean,
-  onObjectAddedFromAsset: (object: gdObject) => void,
-  layout: ?gdLayout,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
+type Props = {||};
+
+export type AssetStoreInterface = {|
+  onClose: () => void,
+|};
+
+const identifyAssetPackKind = ({
+  privateAssetPacks,
+  publicAssetPacks,
+  assetPack,
+}: {|
+  privateAssetPacks: ?Array<PrivateAssetPackListingData>,
+  publicAssetPacks: ?PublicAssetPacks,
+  assetPack: PrivateAssetPack | PublicAssetPack | null,
+|}) => {
+  if (!assetPack) return 'unknown';
+
+  // We could simplify this if the asset packs have a "kind" or "type" in the future.
+  // For now, we check their presence in the lists to ensure adding fields in the backend
+  // won't break this detection in the future (for example, if public asset packs get an `id`,
+  // this won't break).
+  return assetPack.id &&
+    privateAssetPacks &&
+    !!privateAssetPacks.find(({ id }) => id === assetPack.id)
+    ? 'private'
+    : publicAssetPacks &&
+      publicAssetPacks.starterPacks.find(({ tag }) => tag === assetPack.tag)
+    ? 'public'
+    : 'unknown';
 };
 
-export const AssetStore = ({
-  project,
-  objectsContainer,
-  events,
-  focusOnMount,
-  onObjectAddedFromAsset,
-  layout,
-  resourceSources,
-  resourceExternalEditors,
-  onChooseResource,
-}: Props) => {
-  const {
-    assetPacks,
-    searchResults,
-    error,
-    fetchAssetsAndFilters,
-    navigationState,
-    searchText,
-    setSearchText,
-    assetFiltersState,
-  } = React.useContext(AssetStoreContext);
-  const {
-    isOnHomePage,
-    openedAssetPack,
-    openedAssetShortHeader,
-    filtersState,
-  } = navigationState.getCurrentPage();
+export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
+  (props: Props, ref) => {
+    const {
+      publicAssetPacks,
+      privateAssetPacks,
+      searchResults,
+      error,
+      fetchAssetsAndFilters,
+      navigationState,
+      searchText,
+      setSearchText,
+      assetFiltersState,
+      assetPackRandomOrdering,
+    } = React.useContext(AssetStoreContext);
+    const {
+      openedAssetPack,
+      openedAssetShortHeader,
+      openedPrivateAssetPackListingData,
+      filtersState,
+    } = navigationState.getCurrentPage();
+    const isOnHomePage = isHomePage(navigationState.getCurrentPage());
+    const isOnSearchResultPage = isSearchResultPage(
+      navigationState.getCurrentPage()
+    );
+    const searchBar = React.useRef<?SearchBarInterface>(null);
 
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
+    const shouldAutofocusSearchbar = useShouldAutofocusInput();
+    const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
+      !isOnHomePage && !openedAssetShortHeader
+    );
+    const [
+      purchasingPrivateAssetPackListingData,
+      setPurchasingPrivateAssetPackListingData,
+    ] = React.useState<?PrivateAssetPackListingData>(null);
+    const { onPurchaseSuccessful, receivedAssetPacks } = React.useContext(
+      AuthenticatedUserContext
+    );
 
-  const searchBar = React.useRef<?SearchBarInterface>(null);
-  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
-  const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
-  const [
-    isAssetBeingInstalled,
-    setIsAssetBeingInstalled,
-  ] = React.useState<boolean>(false);
+    // The saved scroll position must not be reset by a scroll event until it
+    // has been applied.
+    const hasAppliedSavedScrollPosition = React.useRef<boolean>(false);
+    const isAssetDetailLoading = React.useRef<boolean>(
+      openedAssetShortHeader != null
+    );
+    const setScrollUpdateIsNeeded = React.useCallback(
+      () => {
+        hasAppliedSavedScrollPosition.current = false;
+        isAssetDetailLoading.current =
+          navigationState.getCurrentPage().openedAssetShortHeader != null;
+      },
+      [navigationState]
+    );
 
-  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
-  const addedAssetIds = containerObjectsList
-    .map(({ object }) => object.getAssetStoreId())
-    .filter(Boolean);
+    const assetsHome = React.useRef<?AssetsHomeInterface>(null);
+    const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
+    const assetDetails = React.useRef<?AssetDetailsInterface>(null);
+    const getScrollView = React.useCallback(() => {
+      return (
+        assetsHome.current || boxSearchResults.current || assetDetails.current
+      );
+    }, []);
+    const saveScrollPosition = React.useCallback(
+      () => {
+        const scrollView = getScrollView();
+        if (!scrollView) {
+          return;
+        }
+        navigationState.getCurrentPage().scrollPosition = scrollView.getScrollPosition();
+      },
+      [getScrollView, navigationState]
+    );
+    // This is also called when the asset detail page has loaded.
+    const applyBackScrollPosition = React.useCallback(
+      () => {
+        if (hasAppliedSavedScrollPosition.current) {
+          return;
+        }
+        const scrollView = getScrollView();
+        if (!scrollView) {
+          return;
+        }
+        const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+        scrollPosition && scrollView.scrollToPosition(scrollPosition);
+        hasAppliedSavedScrollPosition.current = true;
+      },
+      [getScrollView, navigationState]
+    );
 
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
+    React.useImperativeHandle(ref, () => ({
+      onClose: saveScrollPosition,
+    }));
 
-  const resourcesFetcher = useResourceFetcher();
+    React.useLayoutEffect(
+      () => {
+        if (!isAssetDetailLoading.current) {
+          applyBackScrollPosition();
+        }
+      },
+      [applyBackScrollPosition]
+    );
 
-  const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
-    sendAssetOpened({
-      id: assetShortHeader.id,
-      name: assetShortHeader.name,
-    });
-    navigationState.openDetailPage(assetShortHeader);
-  };
+    const onOpenDetails = React.useCallback(
+      (assetShortHeader: AssetShortHeader) => {
+        const assetPackName = openedAssetPack ? openedAssetPack.name : null;
+        const assetPackTag = openedAssetPack ? openedAssetPack.tag : null;
+        const assetPackId =
+          openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null;
+        const assetPackKind = identifyAssetPackKind({
+          assetPack: openedAssetPack,
+          publicAssetPacks,
+          privateAssetPacks,
+        });
+        sendAssetOpened({
+          id: assetShortHeader.id,
+          name: assetShortHeader.name,
+          assetPackName,
+          assetPackTag,
+          assetPackId,
+          assetPackKind,
+        });
+        saveScrollPosition();
+        navigationState.openDetailPage(assetShortHeader);
+      },
+      [
+        openedAssetPack,
+        publicAssetPacks,
+        privateAssetPacks,
+        saveScrollPosition,
+        navigationState,
+      ]
+    );
 
-  const onInstallAsset = React.useCallback(
-    (assetShortHeader: AssetShortHeader) => {
-      setIsAssetBeingInstalled(true);
-      (async () => {
-        try {
-          const installOutput = await installAsset({
-            assetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
+    // When a pack is selected from the home page,
+    // we set it as the chosen category and open the filters panel.
+    const selectPublicAssetPack = React.useCallback(
+      (assetPack: PublicAssetPack) => {
+        sendAssetPackOpened({
+          assetPackTag: assetPack.tag,
+          assetPackId: null,
+          assetPackName: assetPack.name,
+          assetPackKind: 'public',
+          source: 'store-home',
+        });
+
+        if (assetPack.externalWebLink) {
+          Window.openExternalURL(assetPack.externalWebLink);
+        } else {
+          saveScrollPosition();
+          setSearchText('');
+          navigationState.openPackPage(assetPack);
+          setIsFiltersPanelOpen(true);
+        }
+      },
+      [navigationState, saveScrollPosition, setSearchText]
+    );
+
+    // When a private pack is selected from the home page,
+    // if the user owns it, we set it as the chosen category,
+    // otherwise we open the dialog to buy it.
+    const selectPrivateAssetPack = React.useCallback(
+      (assetPackListingData: PrivateAssetPackListingData) => {
+        const receivedAssetPack = receivedAssetPacks
+          ? receivedAssetPacks.find(pack => pack.id === assetPackListingData.id)
+          : null;
+
+        if (!receivedAssetPack) {
+          // The user has not received the pack, open the page to buy it.
+          sendAssetPackInformationOpened({
+            assetPackName: assetPackListingData.name,
+            assetPackId: assetPackListingData.id,
+            assetPackKind: 'private',
           });
-          sendAssetAddedToProject({
-            id: assetShortHeader.id,
-            name: assetShortHeader.name,
-          });
-          console.log('Asset successfully installed.');
 
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-
-          await resourcesFetcher.ensureResourcesAreFetched(project);
-        } catch (error) {
-          console.error('Error while installing the asset:', error);
-          showErrorBox({
-            message: `There was an error while installing the asset "${
-              assetShortHeader.name
-            }". Verify your internet connection or try again later.`,
-            rawError: error,
-            errorId: 'install-asset-error',
-          });
+          setSearchText('');
+          navigationState.openPrivateAssetPackInformationPage(
+            assetPackListingData
+          );
+          return;
         }
 
-        setIsAssetBeingInstalled(false);
-      })();
-    },
-    [
-      resourcesFetcher,
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      events,
-      onObjectAddedFromAsset,
-    ]
-  );
+        // The user has received the pack, open it.
+        setSearchText('');
+        sendAssetPackOpened({
+          assetPackName: assetPackListingData.name,
+          assetPackId: assetPackListingData.id,
+          assetPackTag: null,
+          assetPackKind: 'private',
+          source: 'store-home',
+        });
+        saveScrollPosition();
+        navigationState.openPackPage(receivedAssetPack);
+        setIsFiltersPanelOpen(true);
+      },
+      [receivedAssetPacks, saveScrollPosition, navigationState, setSearchText]
+    );
 
-  // When a pack is selected from the home page,
-  // we set it as the chosen category and open the filters panel.
-  const selectPack = (tag: string) => {
-    if (!assetPacks) return;
+    // If the user has received the pack they are currently viewing,
+    // we update the window to show it if they are not already on the pack page.
+    React.useEffect(
+      () => {
+        if (!purchasingPrivateAssetPackListingData) return;
+        // Ensure the user is not already on the pack page, to trigger the effect only once.
+        const currentPage = navigationState.getCurrentPage();
+        const isOnPrivatePackPage =
+          currentPage.openedAssetPack &&
+          currentPage.openedAssetPack.id &&
+          currentPage.openedAssetPack.id ===
+            purchasingPrivateAssetPackListingData.id;
+        if (receivedAssetPacks && !isOnPrivatePackPage) {
+          const receivedAssetPack = receivedAssetPacks.find(
+            pack => pack.id === purchasingPrivateAssetPackListingData.id
+          );
+          if (receivedAssetPack) {
+            // The user has received the pack, close the pack information dialog, and open the pack in the search.
+            setSearchText('');
+            setIsFiltersPanelOpen(true);
+            saveScrollPosition();
+            navigationState.openPackPage(receivedAssetPack);
+          }
+        }
+      },
+      [
+        receivedAssetPacks,
+        purchasingPrivateAssetPackListingData,
+        navigationState,
+        saveScrollPosition,
+        setSearchText,
+      ]
+    );
 
-    sendAssetPackOpened(tag);
+    // When a tag is selected from the asset details page,
+    // first determine if it's a public or private pack,
+    // then set it as the chosen category, clear old filters and open the filters panel.
+    const selectTag = React.useCallback(
+      (tag: string) => {
+        const privateAssetPack =
+          receivedAssetPacks &&
+          receivedAssetPacks.find(pack => pack.tag === tag);
+        const publicAssetPack =
+          publicAssetPacks &&
+          publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
+        saveScrollPosition();
+        setSearchText('');
+        if (privateAssetPack) {
+          navigationState.openPackPage(privateAssetPack);
+        } else if (publicAssetPack) {
+          navigationState.openPackPage(publicAssetPack);
+        } else {
+          navigationState.openTagPage(tag);
+        }
+        clearAllFilters(assetFiltersState);
+        setIsFiltersPanelOpen(true);
+      },
+      [
+        setSearchText,
+        receivedAssetPacks,
+        publicAssetPacks,
+        saveScrollPosition,
+        assetFiltersState,
+        navigationState,
+      ]
+    );
 
-    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (!assetPack) {
-      // This can't actually happen.
-      return;
-    }
+    const capitalize = (str: string) => {
+      return str ? str[0].toUpperCase() + str.substr(1) : '';
+    };
 
-    if (assetPack.externalWebLink) {
-      Window.openExternalURL(assetPack.externalWebLink);
-    } else {
-      navigationState.openPackPage(assetPack);
-      setIsFiltersPanelOpen(true);
-    }
-  };
+    React.useEffect(
+      () => {
+        if (shouldAutofocusSearchbar && searchBar.current) {
+          searchBar.current.focus();
+        }
+      },
+      [shouldAutofocusSearchbar]
+    );
 
-  // When a tag is selected from the asset details page,
-  // we set it as the chosen category, clear old filters and open the filters panel.
-  const selectTag = (tag: string) => {
-    const assetPack =
-      assetPacks && assetPacks.starterPacks.find(pack => pack.tag === tag);
-    if (assetPack) {
-      navigationState.openPackPage(assetPack);
-    } else {
-      navigationState.openTagPage(tag);
-    }
-    clearAllFilters(assetFiltersState);
-    setIsFiltersPanelOpen(true);
-  };
+    React.useLayoutEffect(
+      () => {
+        if (isOnHomePage) {
+          clearAllFilters(assetFiltersState);
+          setIsFiltersPanelOpen(false);
+        }
+      },
+      // assetFiltersState is not stable, so don't list it.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [isOnHomePage]
+    );
 
-  const capitalize = (str: string) => {
-    return str ? str[0].toUpperCase() + str.substr(1) : '';
-  };
-
-  React.useEffect(
-    () => {
-      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
-        searchBar.current.focus();
-      }
-    },
-    [shouldAutofocusSearchbar, focusOnMount]
-  );
-
-  return (
-    <>
-      <ResponsiveWindowMeasurer>
-        {windowWidth => (
-          <>
-            <Column expand noMargin useFullHeight>
-              <Line>
-                <Spacer />
-                <IconButton
-                  key="back-discover"
-                  tooltip={t`Back to discover`}
-                  onClick={() => {
-                    navigationState.openHome();
-                    clearAllFilters(assetFiltersState);
-                    setIsFiltersPanelOpen(false);
-                  }}
-                  size="small"
-                >
-                  <Home />
-                </IconButton>
-                <Column expand useFullHeight>
-                  <SearchBar
-                    placeholder={t`Search assets`}
-                    value={searchText}
-                    onChange={setSearchText}
-                    onRequestSearch={() => {
-                      // Clear the history
-                      navigationState.activateTextualSearch();
-                      navigationState.clearHistory();
-                      setIsFiltersPanelOpen(true);
+    return (
+      <>
+        <ResponsiveWindowMeasurer>
+          {windowWidth => (
+            <>
+              <Column
+                expand
+                noMargin
+                useFullHeight
+                noOverflowParent
+                id="asset-store"
+              >
+                <LineStackLayout>
+                  <IconButton
+                    key="back-discover"
+                    tooltip={t`Back to discover`}
+                    onClick={() => {
+                      setSearchText('');
+                      navigationState.openHome();
+                      setScrollUpdateIsNeeded();
+                      clearAllFilters(assetFiltersState);
+                      setIsFiltersPanelOpen(false);
                     }}
-                    ref={searchBar}
-                    id="asset-store-search-bar"
-                  />
-                </Column>
-              </Line>
-              {!isOnHomePage && <Spacer />}
-              <Column>
-                <Line
-                  justifyContent="space-between"
-                  noMargin
-                  alignItems="center"
-                >
-                  {isOnHomePage ? (
-                    <Text size="block-title">
-                      <Trans>Discover</Trans>
-                    </Text>
-                  ) : (
-                    <>
-                      <Column expand alignItems="flex-start" noMargin>
-                        <TextButton
-                          icon={<ArrowBack />}
-                          label={<Trans>Back</Trans>}
-                          primary={false}
-                          onClick={() => {
-                            navigationState.backToPreviousPage();
-                            if (navigationState.getCurrentPage().isOnHomePage) {
-                              clearAllFilters(assetFiltersState);
-                              setIsFiltersPanelOpen(false);
+                    size="small"
+                  >
+                    <Home />
+                  </IconButton>
+                  <Column expand useFullHeight noMargin>
+                    <SearchBar
+                      placeholder={t`Search assets`}
+                      value={searchText}
+                      onChange={
+                        isOnSearchResultPage
+                          ? // An existing search is already being done: just update the
+                            // search text and the asset store will update the search results.
+                            setSearchText
+                          : (newValue: string) => {
+                              setSearchText(newValue);
+
+                              // A new search is being initiated: navigate to the search page,
+                              // and clear the history as a new search was launched.
+                              if (!!newValue) {
+                                navigationState.clearHistory();
+                                navigationState.openSearchResultPage();
+                                setIsFiltersPanelOpen(true);
+                              }
                             }
-                          }}
-                        />
+                      }
+                      onRequestSearch={() => {}}
+                      ref={searchBar}
+                      id="asset-store-search-bar"
+                    />
+                  </Column>
+                </LineStackLayout>
+                {!isOnHomePage && <Spacer />}
+                <Column noMargin>
+                  <Line
+                    justifyContent="space-between"
+                    noMargin
+                    alignItems="center"
+                  >
+                    {isOnHomePage ? (
+                      <Text size="block-title">
+                        <Trans>Discover</Trans>
+                      </Text>
+                    ) : (
+                      <>
+                        <Column expand alignItems="flex-start" noMargin>
+                          <TextButton
+                            icon={<ArrowBack />}
+                            label={<Trans>Back</Trans>}
+                            primary={false}
+                            onClick={() => {
+                              navigationState.backToPreviousPage();
+                              setScrollUpdateIsNeeded();
+                            }}
+                          />
+                        </Column>
+                        {(openedAssetPack ||
+                          openedPrivateAssetPackListingData ||
+                          filtersState.chosenCategory) && (
+                          <>
+                            <Column expand alignItems="center">
+                              <Text size="block-title" noMargin>
+                                {openedAssetPack
+                                  ? openedAssetPack.name
+                                  : openedPrivateAssetPackListingData
+                                  ? openedPrivateAssetPackListingData.name
+                                  : filtersState.chosenCategory
+                                  ? capitalize(
+                                      filtersState.chosenCategory.node.name
+                                    )
+                                  : ''}
+                              </Text>
+                            </Column>
+                            {/* to center the title */}
+                            <Column expand alignItems="flex-end" noMargin />
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Line>
+                </Column>
+                <Line
+                  expand
+                  noMargin
+                  overflow={
+                    'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+                  }
+                >
+                  {!openedAssetShortHeader &&
+                  !openedPrivateAssetPackListingData && ( // Don't show filters on asset page.
+                      <Column noMargin>
+                        <ScrollView>
+                          <Paper
+                            style={{
+                              width: !isFiltersPanelOpen
+                                ? 50
+                                : windowWidth === 'small'
+                                ? 205
+                                : 250,
+                            }}
+                            background="medium"
+                          >
+                            {!isFiltersPanelOpen ? (
+                              <Line justifyContent="center">
+                                <IconButton
+                                  onClick={() => setIsFiltersPanelOpen(true)}
+                                >
+                                  <Tune />
+                                </IconButton>
+                              </Line>
+                            ) : (
+                              <>
+                                <Line
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                >
+                                  <Column noMargin>
+                                    <Line alignItems="center">
+                                      <Tune />
+                                      <Subheader>
+                                        <Trans>Object filters</Trans>
+                                      </Subheader>
+                                    </Line>
+                                  </Column>
+                                  <IconButton
+                                    onClick={() => setIsFiltersPanelOpen(false)}
+                                  >
+                                    <DoubleChevronArrowLeft />
+                                  </IconButton>
+                                </Line>
+                                <Line
+                                  justifyContent="space-between"
+                                  alignItems="center"
+                                >
+                                  <AssetStoreFilterPanel
+                                    assetFiltersState={assetFiltersState}
+                                    onChoiceChange={() => {
+                                      navigationState.openSearchResultPage();
+                                    }}
+                                  />
+                                </Line>
+                              </>
+                            )}
+                          </Paper>
+                        </ScrollView>
                       </Column>
-                      {!openedAssetPack && filtersState.chosenCategory && (
-                        <>
-                          <Column expand alignItems="center">
-                            <Text size="block-title" noMargin>
-                              {capitalize(
-                                filtersState.chosenCategory.node.name
-                              )}
-                            </Text>
-                          </Column>
-                          {/* to center the title */}
-                          <Column expand alignItems="flex-end" noMargin />
-                        </>
+                    )}
+                  {isOnHomePage ? (
+                    error ? (
+                      <PlaceholderError onRetry={fetchAssetsAndFilters}>
+                        <AlertMessage kind="error">
+                          <Trans>
+                            An error occurred when fetching the asset store
+                            content. Please try again later.
+                          </Trans>
+                        </AlertMessage>
+                      </PlaceholderError>
+                    ) : publicAssetPacks &&
+                      privateAssetPacks &&
+                      assetPackRandomOrdering ? (
+                      <AssetsHome
+                        ref={assetsHome}
+                        publicAssetPacks={publicAssetPacks}
+                        privateAssetPacksListingData={privateAssetPacks}
+                        assetPackRandomOrdering={assetPackRandomOrdering}
+                        onPublicAssetPackSelection={selectPublicAssetPack}
+                        onPrivateAssetPackSelection={selectPrivateAssetPack}
+                      />
+                    ) : (
+                      <PlaceholderLoader />
+                    )
+                  ) : isOnSearchResultPage ? (
+                    <BoxSearchResults
+                      ref={boxSearchResults}
+                      baseSize={128}
+                      onRetry={fetchAssetsAndFilters}
+                      error={error}
+                      searchItems={searchResults}
+                      renderSearchItem={(assetShortHeader, size) => (
+                        <AssetCard
+                          size={size}
+                          onOpenDetails={() => onOpenDetails(assetShortHeader)}
+                          assetShortHeader={assetShortHeader}
+                        />
                       )}
-                      {openedAssetPack && (
-                        <>
-                          <Column expand alignItems="center">
-                            <Text size="block-title" noMargin>
-                              {openedAssetPack.name}
-                            </Text>
-                          </Column>
-                          <Column expand alignItems="flex-end" noMargin>
-                            <RaisedButton
-                              primary
-                              label={<Trans>Add all assets to my scene</Trans>}
-                              onClick={() =>
-                                setIsAssetPackDialogInstallOpen(true)
-                              }
-                              disabled={
-                                !searchResults || searchResults.length === 0
-                              }
-                            />
-                          </Column>
-                        </>
-                      )}
-                    </>
+                      noResultPlaceholder={
+                        <NoResultPlaceholder
+                          onClear={() => clearAllFilters(assetFiltersState)}
+                        />
+                      }
+                    />
+                  ) : openedAssetShortHeader ? (
+                    <AssetDetails
+                      ref={assetDetails}
+                      onTagSelection={selectTag}
+                      assetShortHeader={openedAssetShortHeader}
+                      onOpenDetails={onOpenDetails}
+                      onAssetLoaded={applyBackScrollPosition}
+                    />
+                  ) : !!openedPrivateAssetPackListingData ? (
+                    <PrivateAssetPackInformationPage
+                      privateAssetPackListingData={
+                        openedPrivateAssetPackListingData
+                      }
+                      onOpenPurchaseDialog={() =>
+                        setPurchasingPrivateAssetPackListingData(
+                          openedPrivateAssetPackListingData
+                        )
+                      }
+                      isPurchaseDialogOpen={
+                        !!purchasingPrivateAssetPackListingData
+                      }
+                      onAssetPackOpen={selectPrivateAssetPack}
+                    />
+                  ) : null}
+                  {!!purchasingPrivateAssetPackListingData && (
+                    <PrivateAssetPackPurchaseDialog
+                      privateAssetPackListingData={
+                        purchasingPrivateAssetPackListingData
+                      }
+                      onClose={() =>
+                        setPurchasingPrivateAssetPackListingData(null)
+                      }
+                      onSuccessfulPurchase={onPurchaseSuccessful}
+                    />
                   )}
                 </Line>
               </Column>
-              <Line
-                expand
-                overflow={
-                  'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
-                }
-              >
-                {!openedAssetShortHeader && ( // Don't show filters on asset page.
-                  <Background
-                    noFullHeight
-                    noExpand
-                    width={
-                      !isFiltersPanelOpen
-                        ? 50
-                        : windowWidth === 'small'
-                        ? 205
-                        : 250
-                    }
-                  >
-                    {!isFiltersPanelOpen ? (
-                      <Line justifyContent="center">
-                        <IconButton onClick={() => setIsFiltersPanelOpen(true)}>
-                          <Tune />
-                        </IconButton>
-                      </Line>
-                    ) : (
-                      <ScrollView>
-                        <Line
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Column>
-                            <Line alignItems="center">
-                              <Tune />
-                              <Subheader>
-                                <Trans>Object filters</Trans>
-                              </Subheader>
-                            </Line>
-                          </Column>
-                          <IconButton
-                            onClick={() => setIsFiltersPanelOpen(false)}
-                          >
-                            <DoubleChevronArrowLeft />
-                          </IconButton>
-                        </Line>
-                        <Line
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <AssetStoreFilterPanel
-                            assetFiltersState={assetFiltersState}
-                            onChoiceChange={() => {
-                              navigationState.openSearchIfNeeded();
-                            }}
-                          />
-                        </Line>
-                      </ScrollView>
-                    )}
-                  </Background>
-                )}
-                {isOnHomePage && !assetPacks && <PlaceholderLoader />}
-                {isOnHomePage && assetPacks && (
-                  <AssetsHome
-                    assetPacks={assetPacks}
-                    onPackSelection={selectPack}
-                  />
-                )}
-                {!isOnHomePage && !openedAssetShortHeader && (
-                  <BoxSearchResults
-                    baseSize={128}
-                    onRetry={fetchAssetsAndFilters}
-                    error={error}
-                    searchItems={searchResults}
-                    renderSearchItem={(assetShortHeader, size) => (
-                      <AssetCard
-                        size={size}
-                        onOpenDetails={() => onOpenDetails(assetShortHeader)}
-                        assetShortHeader={assetShortHeader}
-                      />
-                    )}
-                    noResultPlaceholder={
-                      <NoResultPlaceholder
-                        onClear={() => clearAllFilters(assetFiltersState)}
-                      />
-                    }
-                  />
-                )}
-                {openedAssetShortHeader && (
-                  <AssetDetails
-                    project={project}
-                    objectsContainer={objectsContainer}
-                    resourceSources={resourceSources}
-                    resourceExternalEditors={resourceExternalEditors}
-                    onTagSelection={selectTag}
-                    assetShortHeader={openedAssetShortHeader}
-                    onAdd={() => onInstallAsset(openedAssetShortHeader)}
-                    onClose={() => navigationState.backToPreviousPage()}
-                    isAddedToScene={addedAssetIds.includes(
-                      openedAssetShortHeader.id
-                    )}
-                    isBeingAddedToScene={isAssetBeingInstalled}
-                    onOpenDetails={onOpenDetails}
-                  />
-                )}
-              </Line>
-            </Column>
-            {resourcesFetcher.renderResourceFetcherDialog()}
-            {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-              <AssetPackDialog
-                assetPack={openedAssetPack}
-                assetShortHeaders={searchResults}
-                addedAssetIds={addedAssetIds}
-                onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetsAdded={() => {
-                  setIsAssetPackDialogInstallOpen(false);
-                }}
-                project={project}
-                objectsContainer={objectsContainer}
-                events={events}
-                onObjectAddedFromAsset={onObjectAddedFromAsset}
-              />
-            )}
-          </>
-        )}
-      </ResponsiveWindowMeasurer>
-    </>
-  );
-};
+            </>
+          )}
+        </ResponsiveWindowMeasurer>
+      </>
+    );
+  }
+);

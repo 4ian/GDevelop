@@ -37,11 +37,11 @@ export const ExplanationHeader = () => {
         </Text>
       </Line>
       <Line justifyContent="center">
-        <ItchIo color="primary" style={iconStyle} />
-        <GameJolt color="primary" style={iconStyle} />
-        <Poki color="primary" style={iconStyle} />
-        <CrazyGames color="primary" style={iconStyle} />
-        <NewsGround color="primary" style={iconStyle} />
+        <ItchIo color="secondary" style={iconStyle} />
+        <GameJolt color="secondary" style={iconStyle} />
+        <Poki color="secondary" style={iconStyle} />
+        <CrazyGames color="secondary" style={iconStyle} />
+        <NewsGround color="secondary" style={iconStyle} />
       </Line>
     </Column>
   );

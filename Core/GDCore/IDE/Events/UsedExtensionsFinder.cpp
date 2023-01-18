@@ -2,39 +2,46 @@
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
-#include "GDCore/Project/BehaviorContent.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 
 namespace gd {
 
-std::set<gd::String> UsedExtensionsFinder::ScanProject(gd::Project& project) {
+const UsedExtensionsResult UsedExtensionsFinder::ScanProject(gd::Project& project) {
   UsedExtensionsFinder worker(project);
   gd::WholeProjectRefactorer::ExposeProjectObjects(project, worker);
   gd::WholeProjectRefactorer::ExposeProjectEvents(project, worker);
-  return worker.usedExtensions;
+  return worker.result;
 };
 
 // Objects scanner
 
-void UsedExtensionsFinder::DoVisitObject(gd::Object& object) {
-  usedExtensions.insert(gd::MetadataProvider::GetExtensionAndObjectMetadata(
-                            project.GetCurrentPlatform(), object.GetType())
-                            .GetExtension()
-                            .GetName());
+void UsedExtensionsFinder::DoVisitObject(gd::Object &object) {
+  auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
+      project.GetCurrentPlatform(), object.GetType());
+  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+    result.GetUsedIncludeFiles().insert(includeFile);
+  }
 };
 
 // Behaviors scanner
 
-void UsedExtensionsFinder::DoVisitBehavior(gd::BehaviorContent& behavior) {
-  usedExtensions.insert(
-      gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
-          project.GetCurrentPlatform(), behavior.GetTypeName())
-          .GetExtension()
-          .GetName());
+void UsedExtensionsFinder::DoVisitBehavior(gd::Behavior &behavior) {
+  auto metadata = gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
+      project.GetCurrentPlatform(), behavior.GetTypeName());
+  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+    result.GetUsedIncludeFiles().insert(includeFile);
+  }
+  for (auto &&includeFile : metadata.GetMetadata().requiredFiles) {
+    result.GetUsedRequiredFiles().insert(includeFile);
+  }
 };
 
 // Instructions scanner
@@ -46,23 +53,29 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
                         project.GetCurrentPlatform(), instruction.GetType())
                   : gd::MetadataProvider::GetExtensionAndActionMetadata(
                         project.GetCurrentPlatform(), instruction.GetType());
-  usedExtensions.insert(metadata.GetExtension().GetName());
+  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  for (auto&& includeFile : metadata.GetMetadata().GetIncludeFiles()) {
+    result.GetUsedIncludeFiles().insert(includeFile);
+  }
 
-  size_t i = 0;
-  for (auto expression : instruction.GetParameters()) {
-    const gd::String& parameterType =
-        metadata.GetMetadata().GetParameter(i).GetType();
-    i++;
+  gd::ParameterMetadataTools::IterateOverParameters(
+      instruction.GetParameters(),
+      metadata.GetMetadata().GetParameters(),
+      [this](const gd::ParameterMetadata& parameterMetadata,
+          const gd::Expression& parameterValue,
+          const gd::String& lastObjectName) {
+    const gd::String& parameterType = parameterMetadata.GetType();
 
     if (gd::ParameterMetadata::IsExpression("string", parameterType)) {
       rootType = "string";
-      expression.GetRootNode()->Visit(*this);
+      parameterValue.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("number", parameterType)) {
       rootType = "number";
-      expression.GetRootNode()->Visit(*this);
+      parameterValue.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
-      usedExtensions.insert("BuiltinVariables");
-  }
+      result.GetUsedExtensions().insert("BuiltinVariables");
+  });
+
   return false;
 }
 
@@ -93,31 +106,35 @@ void UsedExtensionsFinder::OnVisitUnaryOperatorNode(UnaryOperatorNode& node) {
 
 // Add variable extension and visit sub-expressions on variable nodes
 void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
-  usedExtensions.insert("BuiltinVariables");
+  result.GetUsedExtensions().insert("BuiltinVariables");
   if (node.child) node.child->Visit(*this);
 };
 
 void UsedExtensionsFinder::OnVisitVariableAccessorNode(
     VariableAccessorNode& node) {
-  usedExtensions.insert("BuiltinVariables");
+  result.GetUsedExtensions().insert("BuiltinVariables");
   if (node.child) node.child->Visit(*this);
 };
 
 void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
     VariableBracketAccessorNode& node) {
-  usedExtensions.insert("BuiltinVariables");
+  result.GetUsedExtensions().insert("BuiltinVariables");
   node.expression->Visit(*this);
   if (node.child) node.child->Visit(*this);
 };
 
 // Add extensions bound to Objects/Behaviors/Functions
-void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode& node) {
-  auto type = gd::ExpressionTypeFinder::GetType(project.GetCurrentPlatform(), GetGlobalObjectsContainer(), GetObjectsContainer(), rootType, node);
+void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode &node) {
+  auto type = gd::ExpressionTypeFinder::GetType(
+      project.GetCurrentPlatform(), GetGlobalObjectsContainer(),
+      GetObjectsContainer(), rootType, node);
   if (gd::ParameterMetadata::IsObject(type)) {
-    usedExtensions.insert(gd::MetadataProvider::GetExtensionAndObjectMetadata(
-                              project.GetCurrentPlatform(), node.identifierName)
-                              .GetExtension()
-                              .GetName());
+    auto metadata = gd::MetadataProvider::GetExtensionAndObjectMetadata(
+        project.GetCurrentPlatform(), node.identifierName);
+    result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+    for (auto &&includeFile : metadata.GetMetadata().includeFiles) {
+      result.GetUsedIncludeFiles().insert(includeFile);
+    }
   }
 };
 
@@ -138,7 +155,10 @@ void UsedExtensionsFinder::OnVisitFunctionCallNode(FunctionCallNode& node) {
       return;
   }
 
-  usedExtensions.insert(metadata.GetExtension().GetName());
+  result.GetUsedExtensions().insert(metadata.GetExtension().GetName());
+  for (auto&& includeFile : metadata.GetMetadata().GetIncludeFiles()) {
+    result.GetUsedIncludeFiles().insert(includeFile);
+  }
 };
 
 }  // namespace gd

@@ -81,6 +81,30 @@ TEST_CASE("SerializerElement", "[common]") {
     REQUIRE(element.GetChild(2).GetDoubleValue() == 45.6);
   }
 
+  SECTION("Multiline strings") {
+    SerializerElement element;
+
+    // A single line is saved as a string.
+    element.SetMultilineStringValue("test");
+    REQUIRE(element.GetMultilineStringValue() == "test");
+    REQUIRE(element.GetStringValue() == "test");
+
+    // A string can be read.
+    element.SetStringValue("test of\nsomething\nsaved as a string");
+    REQUIRE(element.GetMultilineStringValue() == "test of\nsomething\nsaved as a string");
+
+    // A multi lines string is saved as an array.
+    element.SetMultilineStringValue("test\nwith\nmultiple lines.");
+    REQUIRE(element.ConsideredAsArray() == true);
+    REQUIRE(element.GetChildrenCount() == 3);
+    REQUIRE(element.GetMultilineStringValue() == "test\nwith\nmultiple lines.");
+
+    element.SetMultilineStringValue("test\n\nwith\n\nmultiple lines.\n");
+    REQUIRE(element.ConsideredAsArray() == true);
+    REQUIRE(element.GetChildrenCount() == 6);
+    REQUIRE(element.GetMultilineStringValue() == "test\n\nwith\n\nmultiple lines.\n");
+  }
+
   SECTION("(Deprecated) attributes") {
     SerializerElement element;
     element.AddChild("child1").SetStringValue("value123");

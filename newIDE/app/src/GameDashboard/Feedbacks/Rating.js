@@ -5,6 +5,7 @@ import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import LinearProgress from '../../UI/LinearProgress';
+import { roundTo } from '../../Utils/Mathematics';
 
 type Props = {
   value: number,
@@ -15,7 +16,10 @@ type Props = {
 const Rating = ({ value, label }: Props) => {
   return (
     <Column expand noMargin>
-      <Text size="body2">{label}</Text>
+      <Line justifyContent="space-between">
+        <Text size="body2">{label}</Text>
+        <Text size="body2">{roundTo(value, 1)}</Text>
+      </Line>
       <Line noMargin expand>
         <LinearProgress
           variant="determinate"

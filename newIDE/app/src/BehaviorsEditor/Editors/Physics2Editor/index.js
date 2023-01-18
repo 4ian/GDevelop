@@ -13,6 +13,8 @@ import ImagePreview, {
 } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
+import { getMeasurementUnitShortLabel } from '../../../PropertiesEditor/PropertiesMapToSchema';
+import MeasurementUnitDocumentation from '../../../PropertiesEditor/MeasurementUnitDocumentation';
 import ShapePreview from './ShapePreview';
 import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
@@ -23,27 +25,53 @@ import EmptyMessage from '../../../UI/EmptyMessage';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Tooltip from '@material-ui/core/Tooltip';
 
 type Props = BehaviorEditorProps;
 
 const NumericProperty = (props: {|
+  id?: string,
   properties: gdMapStringPropertyDescriptor,
   propertyName: string,
   step: number,
   onUpdate: (newValue: string) => void,
 |}) => {
-  const { properties, propertyName, step, onUpdate } = props;
+  const { properties, propertyName, step, onUpdate, id } = props;
+  const property = properties.get(propertyName);
 
   return (
     <SemiControlledTextField
+      id={id}
       fullWidth
-      value={properties.get(propertyName).getValue()}
+      value={property.getValue()}
       key={propertyName}
-      floatingLabelText={properties.get(propertyName).getLabel()}
+      floatingLabelText={property.getLabel()}
       step={step}
       onChange={onUpdate}
       type="number"
+      endAdornment={<UnitAdornment property={property} />}
     />
+  );
+};
+
+const UnitAdornment = (props: {| property: gdPropertyDescriptor |}) => {
+  const { property } = props;
+  const measurementUnit = property.getMeasurementUnit();
+  return (
+    <Tooltip
+      title={
+        <MeasurementUnitDocumentation
+          label={measurementUnit.getLabel()}
+          description={measurementUnit.getDescription()}
+          elementsWithWords={measurementUnit.getElementsWithWords()}
+        />
+      }
+    >
+      <InputAdornment position="end">
+        {getMeasurementUnitShortLabel(measurementUnit)}
+      </InputAdornment>
+    </Tooltip>
   );
 };
 
@@ -72,7 +100,7 @@ const BitGroupEditor = (props: {|
 const Physics2Editor = (props: Props) => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
-  const { behavior, behaviorContent } = props;
+  const { behavior } = props;
   const forceUpdate = useForceUpdate();
 
   const isBitEnabled = (bitsValue: number, pos: number) => {
@@ -85,7 +113,7 @@ const Physics2Editor = (props: Props) => {
     return bitsValue;
   };
 
-  const properties = behavior.getProperties(behaviorContent.getContent());
+  const properties = behavior.getProperties();
   const bits = Array(16).fill(null);
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
@@ -99,16 +127,13 @@ const Physics2Editor = (props: Props) => {
     >
       <Line>
         <SelectField
+          id="physics2-parameter-body-type"
           key={'bodyType'}
           fullWidth
           floatingLabelText={properties.get('bodyType').getLabel()}
           value={properties.get('bodyType').getValue()}
           onChange={(e, i, newValue: string) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'bodyType',
-              newValue
-            );
+            behavior.updateProperty('bodyType', newValue);
             forceUpdate();
           }}
         >
@@ -136,11 +161,7 @@ const Physics2Editor = (props: Props) => {
           label={properties.get('bullet').getLabel()}
           checked={properties.get('bullet').getValue() === 'true'}
           onCheck={(e, checked) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'bullet',
-              checked ? '1' : '0'
-            );
+            behavior.updateProperty('bullet', checked ? '1' : '0');
             forceUpdate();
           }}
         />
@@ -148,11 +169,7 @@ const Physics2Editor = (props: Props) => {
           label={properties.get('fixedRotation').getLabel()}
           checked={properties.get('fixedRotation').getValue() === 'true'}
           onCheck={(e, checked) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'fixedRotation',
-              checked ? '1' : '0'
-            );
+            behavior.updateProperty('fixedRotation', checked ? '1' : '0');
             forceUpdate();
           }}
         />
@@ -160,11 +177,7 @@ const Physics2Editor = (props: Props) => {
           label={properties.get('canSleep').getLabel()}
           checked={properties.get('canSleep').getValue() === 'true'}
           onCheck={(e, checked) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'canSleep',
-              checked ? '1' : '0'
-            );
+            behavior.updateProperty('canSleep', checked ? '1' : '0');
             forceUpdate();
           }}
         />
@@ -185,15 +198,12 @@ const Physics2Editor = (props: Props) => {
       </Line>
       <Line>
         <SelectField
+          id="physics2-parameter-shape"
           fullWidth
           floatingLabelText={properties.get('shape').getLabel()}
           value={properties.get('shape').getValue()}
           onChange={(e, i, newValue: string) => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'shape',
-              newValue
-            );
+            behavior.updateProperty('shape', newValue);
             forceUpdate();
           }}
         >
@@ -215,9 +225,7 @@ const Physics2Editor = (props: Props) => {
         {shape !== 'Polygon' && (
           <SemiControlledTextField
             fullWidth
-            value={properties
-              .get(shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA')
-              .getValue()}
+            value={properties.get('shapeDimensionA').getValue()}
             key={'shapeDimensionA'}
             floatingLabelText={
               shape === 'Circle'
@@ -228,34 +236,30 @@ const Physics2Editor = (props: Props) => {
             }
             min={0}
             onChange={newValue => {
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
-                newValue
-              );
+              behavior.updateProperty('shapeDimensionA', newValue);
               forceUpdate();
             }}
             type="number"
+            endAdornment={
+              <UnitAdornment property={properties.get('shapeDimensionA')} />
+            }
           />
         )}
         {shape !== 'Polygon' && shape !== 'Circle' && (
           <SemiControlledTextField
             fullWidth
-            value={properties
-              .get(shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB')
-              .getValue()}
+            value={properties.get('shapeDimensionB').getValue()}
             key={'shapeDimensionB'}
             floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue => {
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
-                newValue
-              );
+              behavior.updateProperty('shapeDimensionB', newValue);
               forceUpdate();
             }}
             type="number"
+            endAdornment={
+              <UnitAdornment property={properties.get('shapeDimensionB')} />
+            }
           />
         )}
         {shape === 'Polygon' && (
@@ -264,11 +268,7 @@ const Physics2Editor = (props: Props) => {
             floatingLabelText={properties.get('polygonOrigin').getLabel()}
             value={properties.get('polygonOrigin').getValue()}
             onChange={(e, i, newValue: string) => {
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'polygonOrigin',
-                newValue
-              );
+              behavior.updateProperty('polygonOrigin', newValue);
               forceUpdate();
             }}
           >
@@ -296,11 +296,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'shapeOffsetX'}
           step={1}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'shapeOffsetX',
-              newValue
-            );
+            behavior.updateProperty('shapeOffsetX', newValue);
             forceUpdate();
           }}
         />
@@ -309,11 +305,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'shapeOffsetY'}
           step={1}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'shapeOffsetY',
-              newValue
-            );
+            behavior.updateProperty('shapeOffsetY', newValue);
             forceUpdate();
           }}
         />
@@ -326,9 +318,7 @@ const Physics2Editor = (props: Props) => {
             </Trans>
           }
           project={props.project}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
+          resourceManagementProps={props.resourceManagementProps}
           resourcesLoader={resourcesLoader}
           resourceKind={'image'}
           initialResourceName={''}
@@ -359,7 +349,6 @@ const Physics2Editor = (props: Props) => {
           >
             <ImagePreview
               resourceName={image}
-              project={props.project}
               imageResourceSource={resourcesLoader.getResourceFullUrl(
                 props.project,
                 image,
@@ -373,9 +362,7 @@ const Physics2Editor = (props: Props) => {
               renderOverlay={overlayProps => {
                 // The result from `getProperties` is temporary, and because this renderOverlay
                 // function can be called outside of the render, we must get the properties again.
-                const properties = behavior.getProperties(
-                  behaviorContent.getContent()
-                );
+                const properties = behavior.getProperties();
 
                 return (
                   <ShapePreview
@@ -406,7 +393,6 @@ const Physics2Editor = (props: Props) => {
                       vertices[index].x = newX;
                       vertices[index].y = newY;
                       behavior.updateProperty(
-                        behaviorContent.getContent(),
                         'vertices',
                         JSON.stringify(vertices)
                       );
@@ -426,42 +412,26 @@ const Physics2Editor = (props: Props) => {
             onChangeVertexX={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].x = newValue;
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
             onChangeVertexY={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].y = newValue;
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
             onAdd={() => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               if (vertices.length >= 8) return;
               vertices.push({ x: 0, y: 0 });
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
             onRemove={index => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices.splice(index, 1);
-              behavior.updateProperty(
-                behaviorContent.getContent(),
-                'vertices',
-                JSON.stringify(vertices)
-              );
+              behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
             }}
           />
@@ -469,12 +439,12 @@ const Physics2Editor = (props: Props) => {
       )}
       <ResponsiveLineStackLayout>
         <NumericProperty
+          id="physics2-parameter-density"
           properties={properties}
           propertyName={'density'}
           step={0.1}
           onUpdate={newValue => {
             behavior.updateProperty(
-              behaviorContent.getContent(),
               'density',
               parseFloat(newValue) > 0 ? newValue : '0'
             );
@@ -486,11 +456,7 @@ const Physics2Editor = (props: Props) => {
           propertyName={'gravityScale'}
           step={0.1}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'gravityScale',
-              newValue
-            );
+            behavior.updateProperty('gravityScale', newValue);
             forceUpdate();
           }}
         />
@@ -502,7 +468,6 @@ const Physics2Editor = (props: Props) => {
           step={0.1}
           onUpdate={newValue => {
             behavior.updateProperty(
-              behaviorContent.getContent(),
               'friction',
               parseFloat(newValue) > 0 ? newValue : '0'
             );
@@ -515,7 +480,6 @@ const Physics2Editor = (props: Props) => {
           step={0.1}
           onUpdate={newValue => {
             behavior.updateProperty(
-              behaviorContent.getContent(),
               'restitution',
               parseFloat(newValue) > 0 ? newValue : '0'
             );
@@ -529,24 +493,17 @@ const Physics2Editor = (props: Props) => {
           propertyName={'linearDamping'}
           step={0.05}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'linearDamping',
-              newValue
-            );
+            behavior.updateProperty('linearDamping', newValue);
             forceUpdate();
           }}
         />
         <NumericProperty
+          id="physics2-parameter-angular-damping"
           properties={properties}
           propertyName={'angularDamping'}
           step={0.05}
           onUpdate={newValue => {
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'angularDamping',
-              newValue
-            );
+            behavior.updateProperty('angularDamping', newValue);
             forceUpdate();
           }}
         />
@@ -559,11 +516,7 @@ const Physics2Editor = (props: Props) => {
           bits={bits.map((_, idx) => isBitEnabled(layersValues, idx))}
           onChange={(index, value) => {
             const newValue = enableBit(layersValues, index, value);
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'layers',
-              newValue.toString(10)
-            );
+            behavior.updateProperty('layers', newValue.toString(10));
             forceUpdate();
           }}
         />
@@ -576,11 +529,7 @@ const Physics2Editor = (props: Props) => {
           bits={bits.map((_, idx) => isBitEnabled(masksValues, idx))}
           onChange={(index, value) => {
             const newValue = enableBit(masksValues, index, value);
-            behavior.updateProperty(
-              behaviorContent.getContent(),
-              'masks',
-              newValue.toString(10)
-            );
+            behavior.updateProperty('masks', newValue.toString(10));
             forceUpdate();
           }}
         />

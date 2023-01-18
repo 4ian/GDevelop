@@ -10,4 +10,4 @@ This project is released under the MIT License.
 
 using namespace std;
 
-TextEntryObject::TextEntryObject(gd::String name_) : Object(name_) {}
+TextEntryObject::TextEntryObject() {}

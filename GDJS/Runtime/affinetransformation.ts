@@ -348,27 +348,6 @@ namespace gdjs {
     }
 
     /**
-     * Concatenate a flip between X and Y.
-     */
-    flipDiagonally() {
-      const matrix = this.matrix;
-
-      const m0 = matrix[0];
-      const m1 = matrix[1];
-      const m2 = matrix[2];
-      const m3 = matrix[3];
-      const m4 = matrix[4];
-      const m5 = matrix[5];
-
-      matrix[0] = m1;
-      matrix[1] = m0;
-      matrix[2] = m3;
-      matrix[3] = m2;
-      matrix[4] = m5;
-      matrix[5] = m4;
-    }
-
-    /**
      * Concatenate a transformation after this one.
      * @param other The transformation to concatenate.
      */

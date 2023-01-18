@@ -46,6 +46,13 @@ export const Default = () => {
           checkedIcon={<Visibility />}
           uncheckedIcon={<VisibilityOff />}
         />
+        <LargeSpacer />
+        <Checkbox
+          checked={true}
+          onCheck={(e, value) => {}}
+          label="With some helper text"
+          tooltipOrHelperText="This is some helper text"
+        />
       </Column>
       <Column alignItems="flex-start" expand>
         <Text size="block-title">Inline checkboxes</Text>
@@ -60,6 +67,13 @@ export const Default = () => {
           onCheck={(e, value) => {}}
           label="This is a disabled checkbox"
           disabled
+        />
+        <LargeSpacer />
+        <InlineCheckbox
+          checked={true}
+          onCheck={(e, value) => {}}
+          label="With some helper text"
+          tooltipOrHelperText="This is some helper text"
         />
         <LargeSpacer />
         <Text>Without label</Text>

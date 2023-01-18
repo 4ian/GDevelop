@@ -1,182 +1,171 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
+import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Column } from '../UI/Grid';
 import TextField from '../UI/TextField';
 import {
   type LoginForm,
+  type ForgotPasswordForm,
   type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
-import RightLoader from '../UI/RightLoader';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
 import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
-import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
+import HelpButton from '../UI/HelpButton';
+import Link from '../UI/Link';
+import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
+import ForgotPasswordDialog from './ForgotPasswordDialog';
+
+const styles = {
+  formContainer: {
+    width: '60%',
+    marginTop: 20,
+  },
+};
 
 type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
   onLogin: (form: LoginForm) => Promise<void>,
-  onForgotPassword: (form: LoginForm) => Promise<void>,
+  onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
-  resetPasswordDialogOpen: boolean,
-  onCloseResetPasswordDialog: () => void,
-  forgotPasswordInProgress: boolean,
 |};
 
-type State = {|
-  form: LoginForm,
-|};
+const LoginDialog = ({
+  onClose,
+  onGoToCreateAccount,
+  onLogin,
+  onForgotPassword,
+  loginInProgress,
+  error,
+}: Props) => {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [
+    isForgotPasswordDialogOpen,
+    setIsForgotPasswordDialogOpen,
+  ] = React.useState(false);
 
-export default class LoginDialog extends Component<Props, State> {
-  state = {
-    form: {
-      email: '',
-      password: '',
-    },
+  const doLogin = () => {
+    if (loginInProgress) return;
+
+    onLogin({
+      email,
+      password,
+    });
   };
 
-  _canLogin = () => {
-    return !(this.props.loginInProgress || this.props.forgotPasswordInProgress);
-  };
+  const actions = [
+    <FlatButton
+      label={<Trans>Cancel</Trans>}
+      disabled={loginInProgress}
+      key="cancel"
+      primary={false}
+      onClick={onClose}
+    />,
+    <LeftLoader isLoading={loginInProgress} key="login">
+      <DialogPrimaryButton
+        id="login-button"
+        label={<Trans>Login</Trans>}
+        primary
+        onClick={doLogin}
+        disabled={loginInProgress}
+      />
+    </LeftLoader>,
+  ];
 
-  _onLogin = () => {
-    if (!this._canLogin()) return;
-
-    const { form } = this.state;
-    this.props.onLogin(form);
-  };
-
-  _onForgotPassword = () => {
-    const { form } = this.state;
-    this.props.onForgotPassword(form);
-  };
-
-  render() {
-    const {
-      onClose,
-      onGoToCreateAccount,
-      loginInProgress,
-      error,
-      resetPasswordDialogOpen,
-      onCloseResetPasswordDialog,
-      forgotPasswordInProgress,
-    } = this.props;
-    const actions = [
-      <FlatButton
-        label={<Trans>Back</Trans>}
-        disabled={!this._canLogin()}
-        key="back"
-        primary={false}
-        onClick={onClose}
-      />,
-      <LeftLoader isLoading={loginInProgress} key="login">
-        <DialogPrimaryButton
-          label={<Trans>Login</Trans>}
-          primary
-          onClick={this._onLogin}
-          disabled={!this._canLogin()}
-        />
-      </LeftLoader>,
-    ];
-
-    return (
-      <Dialog
-        title={<Trans>Login to your GDevelop account</Trans>}
-        actions={actions}
-        secondaryActions={[
-          <RightLoader
-            isLoading={forgotPasswordInProgress}
-            key="forgot-password"
-          >
-            <FlatButton
-              label={<Trans>I forgot my password</Trans>}
-              primary={false}
-              disabled={loginInProgress || forgotPasswordInProgress}
-              onClick={this._onForgotPassword}
-            />
-          </RightLoader>,
-        ]}
-        cannotBeDismissed={loginInProgress || forgotPasswordInProgress}
-        onRequestClose={onClose}
-        onApply={this._onLogin}
-        maxWidth="sm"
-        open
+  return (
+    <Dialog
+      title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
+      id="login-dialog"
+      actions={actions}
+      secondaryActions={[
+        <HelpButton key="help" helpPagePath={'/interface/profile'} />,
+      ]}
+      cannotBeDismissed={loginInProgress}
+      onRequestClose={onClose}
+      onApply={() => {
+        // This is a hack to avoid submitting the login form
+        // when submitting the forgot password form.
+        if (isForgotPasswordDialogOpen) return;
+        doLogin();
+      }}
+      maxWidth="sm"
+      open
+    >
+      <ColumnStackLayout
+        noMargin
+        expand
+        justifyContent="center"
+        alignItems="center"
       >
-        <ColumnStackLayout noMargin>
-          <AlertMessage
-            kind="info"
-            renderRightButton={() => (
-              <FlatButton
-                label={<Trans>Create my account</Trans>}
-                disabled={loginInProgress || forgotPasswordInProgress}
-                primary
-                onClick={onGoToCreateAccount}
-              />
-            )}
-          >
+        <GDevelopGLogo fontSize="large" />
+        <Text size="title">
+          <Trans>Log in to your account</Trans>
+        </Text>
+        <Column noMargin alignItems="center">
+          <Text size="body2" noMargin>
             <Trans>Don't have an account yet?</Trans>
-          </AlertMessage>
-          <TextField
-            autoFocus
-            value={this.state.form.email}
-            floatingLabelText={<Trans>Email</Trans>}
-            errorText={getEmailErrorText(error)}
-            fullWidth
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  email: value,
-                },
-              });
-            }}
-          />
-          <TextField
-            value={this.state.form.password}
-            floatingLabelText={<Trans>Password</Trans>}
-            errorText={getPasswordErrorText(error)}
-            type="password"
-            fullWidth
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  password: value,
-                },
-              });
-            }}
-          />
-        </ColumnStackLayout>
-        <Dialog
-          open={resetPasswordDialogOpen}
-          title={<Trans>Reset your password</Trans>}
-          actions={[
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              key="close"
-              onClick={onCloseResetPasswordDialog}
-            />,
-          ]}
-          cannotBeDismissed={forgotPasswordInProgress}
-          onRequestClose={onCloseResetPasswordDialog}
-        >
-          <Column noMargin>
-            <Text>
-              <Trans>
-                You should have received an email containing instructions to
-                reset and set a new password. Once it's done, you can use your
-                new password in GDevelop.
-              </Trans>
+          </Text>
+          <Link
+            href=""
+            onClick={onGoToCreateAccount}
+            disabled={loginInProgress}
+          >
+            <Text size="body2" noMargin color="inherit">
+              <Trans>Create an account</Trans>
             </Text>
-          </Column>
-        </Dialog>
-      </Dialog>
-    );
-  }
-}
+          </Link>
+        </Column>
+        <div style={styles.formContainer}>
+          <ColumnStackLayout noMargin>
+            <TextField
+              autoFocus="desktop"
+              value={email}
+              floatingLabelText={<Trans>Email</Trans>}
+              errorText={getEmailErrorText(error)}
+              onChange={(e, value) => {
+                setEmail(value);
+              }}
+              fullWidth
+              disabled={loginInProgress}
+            />
+            <TextField
+              value={password}
+              floatingLabelText={<Trans>Password</Trans>}
+              errorText={getPasswordErrorText(error)}
+              type="password"
+              onChange={(e, value) => {
+                setPassword(value);
+              }}
+              fullWidth
+              disabled={loginInProgress}
+            />
+          </ColumnStackLayout>
+        </div>
+        <Link
+          href=""
+          onClick={() => setIsForgotPasswordDialogOpen(true)}
+          disabled={loginInProgress}
+        >
+          <Text size="body2" noMargin color="inherit">
+            <Trans>Did you forget your password?</Trans>
+          </Text>
+        </Link>
+      </ColumnStackLayout>
+      {isForgotPasswordDialogOpen && (
+        <ForgotPasswordDialog
+          onClose={() => setIsForgotPasswordDialogOpen(false)}
+          onForgotPassword={onForgotPassword}
+        />
+      )}
+    </Dialog>
+  );
+};
+
+export default LoginDialog;

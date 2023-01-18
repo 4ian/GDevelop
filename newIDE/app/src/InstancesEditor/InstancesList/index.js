@@ -10,13 +10,11 @@ import {
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import SearchBar, {
-  useShouldAutofocusSearchbar,
-  type SearchBarInterface,
-} from '../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import Lock from '@material-ui/icons/Lock';
 import LockOpen from '@material-ui/icons/LockOpen';
-const gd /*TODO: add flow in this file */ = global.gd;
+import NotInterested from '@material-ui/icons/NotInterested';
+const gd = global.gd;
 
 type State = {|
   searchText: string,
@@ -74,12 +72,6 @@ export default class InstancesList extends Component<Props, State> {
     shortcutCallbacks: {},
   });
 
-  componentDidMount() {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    if (useShouldAutofocusSearchbar() && this._searchBar.current)
-      this._searchBar.current.focus();
-  }
-
   // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
   UNSAFE_componentWillMount() {
     // Functor used to display an instance row
@@ -136,15 +128,34 @@ export default class InstancesList extends Component<Props, State> {
     }
   };
 
-  _renderLockCell = ({ rowData }: { rowData: RenderedRowInfo }) => {
+  _renderLockCell = ({
+    rowData: { instance },
+  }: {
+    rowData: RenderedRowInfo,
+  }) => {
     return (
       <IconButton
         size="small"
         onClick={() => {
-          rowData.instance.setLocked(!rowData.instance.isLocked());
+          if (instance.isSealed()) {
+            instance.setSealed(false);
+            instance.setLocked(false);
+            return;
+          }
+          if (instance.isLocked()) {
+            instance.setSealed(true);
+            return;
+          }
+          instance.setLocked(true);
         }}
       >
-        {rowData.instance.isLocked() ? <Lock /> : <LockOpen />}
+        {instance.isLocked() && instance.isSealed() ? (
+          <NotInterested />
+        ) : instance.isLocked() ? (
+          <Lock />
+        ) : (
+          <LockOpen />
+        )}
       </IconButton>
     );
   };
@@ -295,6 +306,7 @@ export default class InstancesList extends Component<Props, State> {
               ref={this._searchBar}
               placeholder={t`Search instances`}
               aspect="integrated-search-bar"
+              autoFocus="desktop"
             />
           </div>
         )}

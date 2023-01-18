@@ -4,22 +4,27 @@ import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../UI/Grid';
 import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../../ProjectCreation/CreateProjectDialog';
-import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+  type FileMetadataAndStorageProviderName,
+  type StorageProvider,
+} from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
-import BuildSection from './BuildSection';
+import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
+import StoreSection from './StoreSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
-import { GamesShowcaseContext } from '../../../GamesShowcase/GamesShowcaseContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
+import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
+import RouterContext from '../../RouterContext';
+import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 
 type Props = {|
   project: ?gdProject,
@@ -28,24 +33,29 @@ type Props = {|
   projectItemName: ?string,
   project: ?gdProject,
   setToolbar: (?React.Node) => void,
+  storageProviders: Array<StorageProvider>,
+  initialTab?: ?string,
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onCreateProject: () => void,
+  onCreateProject: (ExampleShortHeader | null) => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
-  onOpenOnboardingDialog: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+
+  resourceManagementProps: ResourceManagementProps,
+  canInstallPrivateAsset: () => boolean,
 |};
 
 type HomePageEditorInterface = {|
@@ -60,52 +70,98 @@ export const HomePage = React.memo<Props>(
       {
         project,
         canOpen,
-        onOpen,
+        onChooseProject,
         onOpenRecentFile,
-        onCreateFromExampleShortHeader,
-        onCreateBlank,
-        onOpenProjectAfterCreation,
+        onOpenNewProjectSetupDialog,
         onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
         onOpenLanguageDialog,
         onOpenProfile,
         setToolbar,
-        onOpenOnboardingDialog,
+        selectInAppTutorial,
+        onOpenPreferences,
+        onOpenAbout,
+        isActive,
+        storageProviders,
+        initialTab,
+        resourceManagementProps,
+        canInstallPrivateAsset,
       }: Props,
       ref
     ) => {
-      const { fetchTutorials } = React.useContext(TutorialContext);
-      const { fetchShowcasedGamesAndFilters } = React.useContext(
-        GamesShowcaseContext
+      const { authenticated, onCloudProjectsChanged } = React.useContext(
+        AuthenticatedUserContext
       );
+      const { announcements } = React.useContext(AnnouncementsFeedContext);
+      const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
         values: { showGetStartedSection },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
+      const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
         () => {
-          fetchShowcasedGamesAndFilters();
           fetchExamplesAndFilters();
           fetchTutorials();
         },
-        [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters, fetchTutorials]
+        [fetchExamplesAndFilters, fetchTutorials]
       );
 
-      const getProject = () => {
+      // Fetch user cloud projects when home page becomes active
+      React.useEffect(
+        () => {
+          if (isActive && authenticated) {
+            onCloudProjectsChanged();
+          }
+        },
+        [isActive, authenticated, onCloudProjectsChanged]
+      );
+
+      // Refresh build section when homepage becomes active
+      React.useEffect(
+        () => {
+          if (isActive && activeTab === 'build' && buildSectionRef.current) {
+            buildSectionRef.current.forceUpdate();
+          }
+        },
+        // Active tab is excluded from the dependencies because switching tab
+        // mounts and unmounts section, so the data is already up to date.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [isActive]
+      );
+
+      const getProject = React.useCallback(() => {
         return undefined;
-      };
+      }, []);
 
-      const updateToolbar = () => {
-        if (setToolbar) setToolbar(null);
-      };
+      const updateToolbar = React.useCallback(
+        () => {
+          if (setToolbar)
+            setToolbar(
+              <HomePageHeader
+                hasProject={!!project}
+                onOpenLanguageDialog={onOpenLanguageDialog}
+                onOpenProfile={onOpenProfile}
+                onOpenProjectManager={onOpenProjectManager}
+              />
+            );
+        },
+        [
+          setToolbar,
+          onOpenLanguageDialog,
+          onOpenProfile,
+          onOpenProjectManager,
+          project,
+        ]
+      );
 
-      const forceUpdateEditor = () => {
+      const forceUpdateEditor = React.useCallback(() => {
         // No updates to be done
-      };
+      }, []);
 
       React.useImperativeHandle(ref, () => ({
         getProject,
@@ -113,54 +169,95 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const initialTab = showGetStartedSection ? 'get-started' : 'build';
+      const { routeArguments, removeRouteArguments } = React.useContext(
+        RouterContext
+      );
+      const { setInitialPackUserFriendlySlug } = React.useContext(
+        AssetStoreContext
+      );
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+      // Open the asset store and a pack if asked to do so.
+      React.useEffect(
+        () => {
+          if (routeArguments['initial-dialog'] === 'asset-store') {
+            setActiveTab('shop');
+            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            // Remove the arguments so that the asset store is not opened again.
+            removeRouteArguments(['initial-dialog', 'asset-pack']);
+          }
+        },
+        [routeArguments, removeRouteArguments, setInitialPackUserFriendlySlug]
+      );
+
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(
+        showGetStartedSection ? 'get-started' : 'build'
+      );
 
       return (
         <I18n>
           {({ i18n }) => (
             <>
-              <Column expand noMargin>
-                <HomePageHeader
-                  project={project}
-                  onOpenLanguageDialog={onOpenLanguageDialog}
-                  onOpenProfile={onOpenProfile}
-                  onOpenProjectManager={onOpenProjectManager}
-                />
+              <Column expand noMargin noOverflowParent>
                 <Line expand noMargin useFullHeight>
                   <HomePageMenu
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
+                    onOpenPreferences={onOpenPreferences}
+                    onOpenAbout={onOpenAbout}
                   />
-                  {activeTab === 'get-started' && (
-                    <GetStartedSection
-                      onTabChange={setActiveTab}
-                      onCreateProject={onCreateProject}
-                      onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      showGetStartedSection={showGetStartedSection}
-                      setShowGetStartedSection={setShowGetStartedSection}
-                    />
-                  )}
-                  {activeTab === 'build' && (
-                    <BuildSection
-                      project={project}
-                      canOpen={canOpen}
-                      onOpen={onOpen}
-                      onCreateProject={onCreateProject}
-                      onOpenRecentFile={onOpenRecentFile}
-                    />
-                  )}
-                  {activeTab === 'learn' && (
-                    <LearnSection
-                      onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onCreateProject={onCreateProject}
-                      onTabChange={setActiveTab}
-                      onOpenHelpFinder={onOpenHelpFinder}
-                    />
-                  )}
-                  {activeTab === 'play' && <PlaySection />}
-                  {activeTab === 'community' && <CommunitySection />}
+                  <Column noMargin expand noOverflowParent>
+                    {activeTab !== 'community' && !!announcements && (
+                      <AnnouncementsFeed canClose level="urgent" addMargins />
+                    )}
+                    {activeTab === 'get-started' && (
+                      <GetStartedSection
+                        onTabChange={setActiveTab}
+                        onCreateProject={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        selectInAppTutorial={selectInAppTutorial}
+                        showGetStartedSection={showGetStartedSection}
+                        setShowGetStartedSection={setShowGetStartedSection}
+                      />
+                    )}
+                    {activeTab === 'build' && (
+                      <BuildSection
+                        ref={buildSectionRef}
+                        project={project}
+                        canOpen={canOpen}
+                        onChooseProject={onChooseProject}
+                        onOpenNewProjectSetupDialog={
+                          onOpenNewProjectSetupDialog
+                        }
+                        onShowAllExamples={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onSelectExample={exampleShortHeader =>
+                          onCreateProject(exampleShortHeader)
+                        }
+                        onOpenRecentFile={onOpenRecentFile}
+                        storageProviders={storageProviders}
+                      />
+                    )}
+                    {activeTab === 'learn' && (
+                      <LearnSection
+                        onCreateProject={() =>
+                          onCreateProject(/*exampleShortHeader=*/ null)
+                        }
+                        onTabChange={setActiveTab}
+                        onOpenHelpFinder={onOpenHelpFinder}
+                      />
+                    )}
+                    {activeTab === 'play' && <PlaySection />}
+                    {activeTab === 'community' && <CommunitySection />}
+                    {activeTab === 'shop' && (
+                      <StoreSection
+                        project={project}
+                        resourceManagementProps={resourceManagementProps}
+                        canInstallPrivateAsset={canInstallPrivateAsset}
+                      />
+                    )}
+                  </Column>
                 </Line>
               </Column>
             </>
@@ -184,16 +281,24 @@ export const renderHomePageContainer = (
     projectItemName={props.projectItemName}
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
-    onOpen={props.onOpen}
+    onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onCreateProject={props.onCreateProject}
-    onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
-    onCreateBlank={props.onCreateBlank}
-    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
+    onOpenNewProjectSetupDialog={props.onOpenNewProjectSetupDialog}
     onOpenProjectManager={props.onOpenProjectManager}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
-    onOpenOnboardingDialog={props.onOpenOnboardingDialog}
+    selectInAppTutorial={props.selectInAppTutorial}
+    onOpenPreferences={props.onOpenPreferences}
+    onOpenAbout={props.onOpenAbout}
+    storageProviders={
+      (props.extraEditorProps && props.extraEditorProps.storageProviders) || []
+    }
+    initialTab={
+      (props.extraEditorProps && props.extraEditorProps.initialTab) || null
+    }
+    resourceManagementProps={props.resourceManagementProps}
+    canInstallPrivateAsset={props.canInstallPrivateAsset}
   />
 );

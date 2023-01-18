@@ -35,7 +35,6 @@ import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 // Import default style of react-sortable-tree and the override made for EventsSheet.
 import 'react-sortable-tree/style.css';
 import './style.css';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -48,6 +47,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -120,6 +120,7 @@ type EventsContainerProps = {|
   eventsSheetHeight: number,
 
   connectDragSource: ConnectDragSource,
+  windowWidth: WidthType,
 |};
 
 /**
@@ -158,7 +159,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
       >
-        {EventComponent && (
+        {!!EventComponent && (
           <div style={styles.eventComponentContainer}>
             {this.props.connectDragSource(<div className={handle} />)}
             <div style={styles.container}>
@@ -192,6 +193,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
                 renderObjectThumbnail={this.props.renderObjectThumbnail}
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
+                windowWidth={this.props.windowWidth}
               />
             </div>
           </div>
@@ -201,18 +203,17 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
   }
 }
 
-const SortableTree = ({ className, ...otherProps }) => (
-  <ThemeConsumer>
-    {muiTheme => (
-      <SortableTreeWithoutDndContext
-        className={`${eventsTree} ${
-          muiTheme.eventsSheetRootClassName
-        } ${className}`}
-        {...otherProps}
-      />
-    )}
-  </ThemeConsumer>
-);
+const SortableTree = ({ className, ...otherProps }) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <SortableTreeWithoutDndContext
+      className={`${eventsTree} ${
+        gdevelopTheme.eventsSheetRootClassName
+      } ${className}`}
+      {...otherProps}
+    />
+  );
+};
 
 const noop = () => {};
 
@@ -555,6 +556,7 @@ export default class ThemableEventsTree extends Component<
                 actionLabel={<Trans>Add an event</Trans>}
                 helpPagePath="/events"
                 tutorialId="intro-event-system"
+                actionButtonId="add-event-button"
                 onAction={() =>
                   this.props.onAddNewEvent(
                     'BuiltinCommonInstructions::Standard',
@@ -630,7 +632,7 @@ export default class ThemableEventsTree extends Component<
           [icon]: true,
         })}
         alt=""
-        src={getThumbnail(project, object)}
+        src={getThumbnail(project, object.getConfiguration())}
       />
     );
   };
@@ -772,7 +774,9 @@ export default class ThemableEventsTree extends Component<
                   this.props.onAddInstructionContextMenu(event, ...args)
                 }
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
-                onOpenLayout={this.props.onOpenLayout}
+                onOpenLayout={(name: string) => {
+                  this.props.onOpenLayout(name);
+                }}
                 disabled={
                   disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
                 }
@@ -780,6 +784,7 @@ export default class ThemableEventsTree extends Component<
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
+                windowWidth={this.props.windowWidth}
               />
               {this.state.draggedNode && (
                 <DropContainer

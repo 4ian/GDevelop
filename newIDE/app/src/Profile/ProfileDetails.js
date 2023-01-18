@@ -5,7 +5,11 @@ import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import { Line, Spacer } from '../UI/Grid';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
@@ -13,15 +17,21 @@ import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
-import UserAchievements from './Achievement/UserAchievements';
-import { type Badge } from '../Utils/GDevelopServices/Badge';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import Window from '../Utils/Window';
 import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
+import FlatButton from '../UI/FlatButton';
+import Coffee from '../UI/CustomSvgIcons/Coffee';
+import { GridList } from '@material-ui/core';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
+import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 
 type DisplayedProfile = {
   id: string,
   +email?: string,
   description: ?string,
+  donateLink: ?string,
   username: ?string,
 };
 
@@ -32,7 +42,8 @@ type Props = {|
   onRetry?: () => void,
   onChangeEmail?: () => void,
   onEditProfile?: () => void,
-  badges: ?Array<Badge>,
+  assetPacksListingData?: ?Array<PrivateAssetPackListingData>,
+  onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
 const ProfileDetails = ({
@@ -42,9 +53,27 @@ const ProfileDetails = ({
   onRetry,
   onChangeEmail,
   onEditProfile,
-  badges,
+  assetPacksListingData,
+  onAssetPackOpen,
 }: Props) => {
-  return profile ? (
+  const donateLink = profile ? profile.donateLink : null;
+  const windowWidth = useResponsiveWindowWidth();
+
+  if (error)
+    return (
+      <PlaceholderError onRetry={onRetry}>
+        <Trans>
+          Unable to load the profile, please verify your internet connection or
+          try again later.
+        </Trans>
+      </PlaceholderError>
+    );
+
+  if (!profile || (!isAuthenticatedUserProfile && !assetPacksListingData)) {
+    return <PlaceholderLoader />;
+  }
+
+  return (
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
@@ -53,11 +82,12 @@ const ProfileDetails = ({
             justifyContent="space-between"
             noMargin
           >
-            <Line>
+            <Line noMargin alignItems="center">
               <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
               <Spacer />
               <Text
                 size="block-title"
+                allowBrowserAutoTranslate={!profile.username}
                 style={{
                   opacity: profile.username ? 1.0 : 0.5,
                 }}
@@ -69,18 +99,29 @@ const ProfileDetails = ({
               </Text>
             </Line>
             {profile.id && (
-              <RaisedButton
-                label={i18n._(t`Access public profile`)}
-                onClick={() =>
-                  Window.openExternalURL(
-                    GDevelopGamesPlatform.getUserPublicProfileUrl(
-                      profile.id,
-                      profile.username
+              <LineStackLayout justifyContent="space-between">
+                {!isAuthenticatedUserProfile && // Only show on Public Profile.
+                  !!donateLink && (
+                    <RaisedButton
+                      label={<Trans>Buy me a coffee</Trans>}
+                      primary
+                      onClick={() => Window.openExternalURL(donateLink)}
+                      icon={<Coffee />}
+                    />
+                  )}
+                <FlatButton
+                  label={<Trans>Access public profile</Trans>}
+                  onClick={() =>
+                    Window.openExternalURL(
+                      GDevelopGamesPlatform.getUserPublicProfileUrl(
+                        profile.id,
+                        profile.username
+                      )
                     )
-                  )
-                }
-                icon={<OpenInNew />}
-              />
+                  }
+                  leftIcon={<OpenInNew />}
+                />
+              </LineStackLayout>
             )}
           </ResponsiveLineStackLayout>
           {isAuthenticatedUserProfile && profile.email && (
@@ -90,7 +131,7 @@ const ProfileDetails = ({
                 readOnly
                 fullWidth
                 floatingLabelText={<Trans>Email</Trans>}
-                floatingLabelFixed={true}
+                floatingLabelFixed
               />
             </Line>
           )}
@@ -101,8 +142,8 @@ const ProfileDetails = ({
               fullWidth
               multiline
               floatingLabelText={<Trans>Bio</Trans>}
-              floatingLabelFixed={true}
-              hintText={
+              floatingLabelFixed
+              translatableHintText={
                 isAuthenticatedUserProfile
                   ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
                   : t`No bio defined.`
@@ -112,8 +153,20 @@ const ProfileDetails = ({
             />
           </Line>
           {isAuthenticatedUserProfile && (
+            <Line noMargin>
+              <TextField
+                value={profile.donateLink || ''}
+                readOnly
+                fullWidth
+                floatingLabelText={<Trans>Donate link</Trans>}
+                floatingLabelFixed
+                translatableHintText={t`No link defined.`}
+              />
+            </Line>
+          )}
+          {isAuthenticatedUserProfile && (
             <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
-              <RaisedButton
+              <FlatButton
                 label={<Trans>Change my email</Trans>}
                 onClick={onChangeEmail}
               />
@@ -124,23 +177,46 @@ const ProfileDetails = ({
               />
             </ResponsiveLineStackLayout>
           )}
-          <UserAchievements
-            badges={badges}
-            displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
-            displayNotifications={!!isAuthenticatedUserProfile}
-          />
+          {!isAuthenticatedUserProfile &&
+            onAssetPackOpen &&
+            assetPacksListingData &&
+            assetPacksListingData.length > 0 && (
+              <ColumnStackLayout expand noMargin>
+                <Line noMargin>
+                  <Text size="block-title">
+                    <Trans>Asset packs</Trans>
+                  </Text>
+                </Line>
+                <Line expand noMargin justifyContent="center">
+                  <GridList
+                    cols={windowWidth === 'small' ? 1 : 3}
+                    cellHeight="auto"
+                    spacing={2}
+                  >
+                    {assetPacksListingData.map(assetPackListingData => (
+                      <PrivateAssetPackTile
+                        assetPackListingData={assetPackListingData}
+                        onSelect={() => {
+                          sendAssetPackOpened({
+                            assetPackName: assetPackListingData.name,
+                            assetPackId: assetPackListingData.id,
+                            assetPackTag: null,
+                            assetPackKind: 'private',
+                            source: 'author-profile',
+                          });
+                          onAssetPackOpen(assetPackListingData);
+                        }}
+                        owned={false}
+                        key={assetPackListingData.id}
+                      />
+                    ))}
+                  </GridList>
+                </Line>
+              </ColumnStackLayout>
+            )}
         </ColumnStackLayout>
       )}
     </I18n>
-  ) : error ? (
-    <PlaceholderError onRetry={onRetry}>
-      <Trans>
-        Unable to load the profile, please verify your internet connection or
-        try again later.
-      </Trans>
-    </PlaceholderError>
-  ) : (
-    <PlaceholderLoader />
   );
 };
 

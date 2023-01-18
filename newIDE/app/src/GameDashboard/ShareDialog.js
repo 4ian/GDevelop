@@ -19,6 +19,7 @@ import {
 import AlertMessage from '../UI/AlertMessage';
 import ShareButton from '../UI/ShareDialog/ShareButton';
 import CircularProgress from '../UI/CircularProgress';
+import Text from '../UI/Text';
 
 type Props = {| game: Game, onClose: () => void |};
 
@@ -62,7 +63,9 @@ const ShareDialog = ({ game, onClose }: Props) => {
   if (!gameUrl) return null;
   return (
     <Dialog
+      title={<Trans>Share your game</Trans>}
       open
+      id="game-card-share-dialog"
       actions={[
         <FlatButton
           key="close"
@@ -70,7 +73,6 @@ const ShareDialog = ({ game, onClose }: Props) => {
           onClick={onClose}
         />,
       ]}
-      title={<Trans>Share your game</Trans>}
       onRequestClose={onClose}
     >
       {!isFetchingGameSlug ? (
@@ -87,6 +89,9 @@ const ShareDialog = ({ game, onClose }: Props) => {
           <Line>
             <CircularProgress />
           </Line>
+          <Text>
+            <Trans>Just a few seconds while we generate the link...</Trans>
+          </Text>
         </Column>
       )}
 

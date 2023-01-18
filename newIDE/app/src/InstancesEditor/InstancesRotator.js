@@ -1,8 +1,9 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesRotator {
-  _instanceMeasurer: any;
+  _instanceMeasurer: InstanceMeasurer;
 
   // Initial state of the instances
   // from which the rotation is calculated.
@@ -24,7 +25,7 @@ export default class InstancesRotator {
    */
   _fixedPoint: [number, number] = [0, 0];
 
-  constructor(instanceMeasurer: any) {
+  constructor(instanceMeasurer: InstanceMeasurer) {
     this._instanceMeasurer = instanceMeasurer;
   }
 
@@ -109,25 +110,32 @@ export default class InstancesRotator {
       );
 
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
-      selectedInstance.setAngle(((degreeAngle % 360) + 360) % 360);
+      // We round the angle to the nearest degree when an instance is rotated in the editor.
+      // This is to avoid having a lot of decimals in the angle of instances.
+      // It does not prevent the user from having decimals, when editing the angle manually.
+      const newAngle = Math.round(((degreeAngle % 360) + 360) % 360);
+      selectedInstance.setAngle(newAngle);
 
       const rotationAngle = ((degreeAngle - initialAngle) * Math.PI) / 180;
       const cosa = Math.cos(-rotationAngle);
       const sina = Math.sin(-rotationAngle);
       const deltaX = initialAABB.centerX() - this._fixedPoint[0];
       const deltaY = initialAABB.centerY() - this._fixedPoint[1];
-      selectedInstance.setX(
+      // We also round the position to the nearest pixel after rotation.
+      const newX = Math.round(
         this._fixedPoint[0] +
           (initialInstanceOriginPosition.x - initialAABB.centerX()) +
           cosa * deltaX +
           sina * deltaY
       );
-      selectedInstance.setY(
+      const newY = Math.round(
         this._fixedPoint[1] +
           (initialInstanceOriginPosition.y - initialAABB.centerY()) -
           sina * deltaX +
           cosa * deltaY
       );
+      selectedInstance.setX(newX);
+      selectedInstance.setY(newY);
     }
   }
 

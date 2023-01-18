@@ -35,6 +35,7 @@ import {
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -126,6 +127,10 @@ const Instruction = (props: Props) => {
     []
   );
   const preferences = React.useContext(PreferencesContext);
+  const {
+    palette: { type },
+  } = React.useContext(GDevelopThemeContext);
+
   const useAssignmentOperators =
     preferences.values.eventsSheetUseAssignmentOperators;
 
@@ -147,6 +152,10 @@ const Instruction = (props: Props) => {
         className={classNames({
           [disabledText]: disabled,
         })}
+        data-instruction={instruction.getType()}
+        data-instruction-inverted={
+          instruction.isInverted() ? 'true' : undefined
+        }
       >
         {mapFor(0, formattedTexts.size(), i => {
           const formatting = formattedTexts.getTextFormatting(i);
@@ -183,15 +192,25 @@ const Instruction = (props: Props) => {
             );
             expressionNode.visit(expressionValidator);
             expressionIsValid = expressionValidator.getErrors().size() === 0;
+            expressionValidator.delete();
           } else if (gd.ParameterMetadata.isObject(parameterType)) {
             const objectOrGroupName = instruction
               .getParameter(parameterIndex)
               .getPlainString();
             expressionIsValid =
-              globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
-              objectsContainer.hasObjectNamed(objectOrGroupName) ||
-              globalObjectsContainer.getObjectGroups().has(objectOrGroupName) ||
-              objectsContainer.getObjectGroups().has(objectOrGroupName);
+              (globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
+                objectsContainer.hasObjectNamed(objectOrGroupName) ||
+                globalObjectsContainer
+                  .getObjectGroups()
+                  .has(objectOrGroupName) ||
+                objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
+              (!parameterMetadata.getExtraInfo() ||
+                gd.getTypeOfObject(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectOrGroupName,
+                  /*searchInGroups=*/ true
+                ) === parameterMetadata.getExtraInfo());
           }
 
           return (
@@ -284,11 +303,16 @@ const Instruction = (props: Props) => {
               instruction.getType()
             );
 
+        const smallIconFilename = metadata.getSmallIconFilename();
         // The instruction itself can be dragged and is a target for
         // another instruction to be dropped. It's IMPORTANT NOT to have
         // the subinstructions list inside the connectDropTarget/connectDragSource
         // as otherwise this can confuse react-dnd ("Expected to find a valid target")
         // (surely due to components re-mounting/rerendering ?).
+        const isBlackIcon =
+          smallIconFilename.startsWith('data:image/svg+xml') ||
+          smallIconFilename.includes('_black');
+
         const instructionDragSourceElement = connectDragSource(
           <div
             style={styles.container}
@@ -359,8 +383,14 @@ const Instruction = (props: Props) => {
               className={classNames({
                 [icon]: true,
               })}
-              src={metadata.getSmallIconFilename()}
+              src={smallIconFilename}
               alt=""
+              style={{
+                filter:
+                  type === 'dark' && isBlackIcon
+                    ? 'grayscale(1) invert(1)'
+                    : undefined,
+              }}
             />
             {renderInstructionText(metadata)}
           </div>
@@ -395,6 +425,7 @@ const Instruction = (props: Props) => {
                 }
                 onParameterClick={props.onSubParameterClick}
                 addButtonLabel={<Trans>Add a sub-condition</Trans>}
+                addButtonId="add-sub-condition-button"
                 disabled={props.disabled}
                 renderObjectThumbnail={props.renderObjectThumbnail}
                 screenType={props.screenType}

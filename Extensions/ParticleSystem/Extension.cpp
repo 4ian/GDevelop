@@ -25,7 +25,10 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
           "explosions, magical effects, etc...",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Visual effect")
       .SetExtensionHelpPath("/objects/particles_emitter");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Particle system"))
+      .SetIcon("CppPlatform/Extensions/particleSystemicon.png");
 
   // Declaration of all objects available
   {
@@ -37,7 +40,7 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
                 _("Displays a large number of small particles to create visual "
                   "effects."),
                 "CppPlatform/Extensions/particleSystemicon.png")
-            .SetCategoryFullName(_("General"));
+            .SetCategoryFullName(_("Visual effect"));
 
     // Declaration is too big to be compiled by GCC in one file, unless you have
     // 4GB+ ram. :/

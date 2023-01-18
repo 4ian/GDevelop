@@ -7,13 +7,14 @@
 #ifndef GDCORE_INITIALINSTANCE_H
 #define GDCORE_INITIALINSTANCE_H
 #include <map>
+
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class PropertyDescriptor;
 class Project;
 class Layout;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -127,18 +128,31 @@ class GD_CORE_API InitialInstance {
   void SetCustomHeight(double height_) { height = height_; }
 
   /**
-   * \brief Return true if the instance is locked and cannot be selected by
-   * clicking on it in the IDE.
+   * \brief Return true if the instance is locked and cannot be moved in the
+   * IDE.
    */
   bool IsLocked() const { return locked; };
 
   /**
    * \brief (Un)lock the initial instance.
    *
-   * An instance which is locked cannot be selected by clicking on it in a
-   * layout editor canvas.
+   * An instance which is locked cannot be moved with actions in the IDE.
    */
   void SetLocked(bool enable = true) { locked = enable; }
+
+  /**
+   * \brief Return true if the instance cannot be selected by clicking on it
+   * in the IDE (only applies if instance is also locked).
+   */
+  bool IsSealed() const { return sealed; };
+
+  /**
+   * \brief (Un)seal the initial instance.
+   *
+   * An instance which is sealed cannot be selected by clicking on it in a
+   * layout editor canvas.
+   */
+  void SetSealed(bool enable = true) { sealed = enable; }
 
   ///@}
 
@@ -228,7 +242,7 @@ class GD_CORE_API InitialInstance {
    * \brief Set the value of a string property stored in the instance.
    */
   void SetRawStringProperty(const gd::String& name, const gd::String& value);
-///@}
+  ///@}
 
   /** \name Saving and loading
    * Members functions related to serialization.
@@ -260,17 +274,19 @@ class GD_CORE_API InitialInstance {
       stringProperties;  ///< More data which can be used by the object
 
   gd::String objectName;  ///< Object name
-  double x;                ///< Object initial X position
-  double y;                ///< Object initial Y position
-  double angle;            ///< Object initial angle
+  double x;               ///< Object initial X position
+  double y;               ///< Object initial Y position
+  double angle;           ///< Object initial angle
   int zOrder;             ///< Object initial Z order
   gd::String layer;       ///< Object initial layer
   bool personalizedSize;  ///< True if object has a custom size
-  double width;            ///< Object custom width
-  double height;           ///< Object custom height
+  double width;           ///< Object custom width
+  double height;          ///< Object custom height
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
-  mutable gd::String persistentUuid; ///< A persistent random version 4 UUID, useful for hot reloading.
+  bool sealed;                              ///< True if the instance is sealed
+  mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
+                                      ///< useful for hot reloading.
 
   static gd::String*
       badStringProperyValue;  ///< Empty string returned by GetRawStringProperty

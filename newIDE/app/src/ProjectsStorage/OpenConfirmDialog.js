@@ -40,7 +40,7 @@ export const OpenConfirmDialog = ({
       maxWidth="sm"
     >
       <Line>
-        <Column>
+        <Column noMargin>
           <Text>
             <Trans>
               You're about to open (or re-open) a project. Click on "Open the
@@ -50,7 +50,7 @@ export const OpenConfirmDialog = ({
         </Column>
       </Line>
       <Line>
-        <Column>
+        <Column noMargin>
           <BackgroundText>
             <Trans>
               If you have a popup blocker interrupting the opening, allow the

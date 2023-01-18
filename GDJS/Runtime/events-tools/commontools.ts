@@ -360,6 +360,31 @@ namespace gdjs {
           Math.pow(10, decimalPlace)
         );
       };
+
+      /**
+       * Pi 3.1415...
+       * @returns the Pi number
+       */
+      export const pi = function (): number {
+        return Math.PI;
+      };
+
+      /**
+       * Linearly interpolates between two angles (in degrees) by taking the shortest direction around the circle.
+       * @param angle1 Starting angle, in degrees.
+       * @param angle2 Destination angle, in degrees.
+       * @param x The interpolation value between 0 and 1.
+       * @returns Return the interpolated angle, in degrees.
+       */
+      export const lerpAngle = function (
+        angle1: float,
+        angle2: float,
+        x: float
+      ): float {
+        return (
+          angle1 + gdjs.evtTools.common.angleDifference(angle2, angle1) * x
+        );
+      };
     }
   }
 }

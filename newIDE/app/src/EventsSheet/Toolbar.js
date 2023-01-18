@@ -3,10 +3,19 @@ import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
-import ToolbarIcon from '../UI/ToolbarIcon';
+import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import { type EventMetadata } from './EnumerateEventsMetadata';
+import AddEventIcon from '../UI/CustomSvgIcons/AddEvent';
+import AddSubEventIcon from '../UI/CustomSvgIcons/AddSubEvent';
+import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
+import CircledAddIcon from '../UI/CustomSvgIcons/CircledAdd';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import UndoIcon from '../UI/CustomSvgIcons/Undo';
+import RedoIcon from '../UI/CustomSvgIcons/Redo';
+import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
+import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -15,8 +24,10 @@ type Props = {|
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
   onAddEvent: (eventType: string) => Array<gdBaseEvent>,
+  onToggleInvertedCondition: () => void,
   onToggleDisabledEvent: () => void,
   canToggleEventDisabled: boolean,
+  canToggleInstructionInverted: boolean,
   onRemove: () => void,
   canRemove: boolean,
   undo: () => void,
@@ -33,28 +44,45 @@ export class Toolbar extends PureComponent<Props> {
       <>
         <ToolbarCommands {...this.props} />
         <ToolbarGroup lastChild>
-          <ToolbarIcon
+          <IconButton
+            size="small"
+            color="default"
             onClick={this.props.onAddStandardEvent}
-            src="res/ribbon_default/eventadd32.png"
+            id="toolbar-add-event-button"
             tooltip={t`Add a new empty event`}
-          />
-          <ToolbarIcon
+          >
+            <AddEventIcon />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            color="default"
             onClick={this.props.onAddSubEvent}
-            src="res/ribbon_default/subeventadd32.png"
             disabled={!this.props.canAddSubEvent}
+            id="toolbar-add-sub-event-button"
             tooltip={t`Add a sub-event to the selected event`}
-          />
-          <ToolbarIcon
+          >
+            <AddSubEventIcon />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            color="default"
             onClick={this.props.onAddCommentEvent}
-            src="res/ribbon_default/commentaireadd32.png"
+            id="toolbar-add-comment-button"
             tooltip={t`Add a comment`}
-          />
+          >
+            <AddCommentIcon />
+          </IconButton>
           <ElementWithMenu
             element={
-              <ToolbarIcon
-                src="res/ribbon_default/add32.png"
+              <IconButton
+                size="small"
+                color="default"
                 tooltip={t`Choose and add an event`}
-              />
+              >
+                <CircledAddIcon />
+              </IconButton>
             }
             buildMenuTemplate={() =>
               this.props.allEventsMetadata.map(metadata => {
@@ -68,38 +96,57 @@ export class Toolbar extends PureComponent<Props> {
             }
           />
           <ToolbarSeparator />
-          <ToolbarIcon
+
+          <IconButton
+            size="small"
+            color="default"
             onClick={this.props.onRemove}
-            src="res/ribbon_default/deleteselected32.png"
             disabled={!this.props.canRemove}
             tooltip={t`Delete the selected event(s)`}
-          />
-          <ToolbarIcon
+          >
+            <TrashIcon />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            color="default"
             onClick={this.props.undo}
-            src="res/ribbon_default/undo32.png"
             disabled={!this.props.canUndo}
             tooltip={t`Undo the last changes`}
-          />
-          <ToolbarIcon
+          >
+            <UndoIcon />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            color="default"
             onClick={this.props.redo}
-            src="res/ribbon_default/redo32.png"
             disabled={!this.props.canRedo}
             tooltip={t`Redo the last changes`}
-          />
+          >
+            <RedoIcon />
+          </IconButton>
           <ToolbarSeparator />
-          <ToolbarIcon
+
+          <IconButton
+            size="small"
+            color="default"
             onClick={() => this.props.onToggleSearchPanel()}
-            src="res/ribbon_default/search32.png"
             tooltip={t`Search in events`}
             acceleratorString={'CmdOrCtrl+F'}
-          />
+          >
+            <ToolbarSearchIcon />
+          </IconButton>
           {this.props.onOpenSettings && <ToolbarSeparator />}
           {this.props.onOpenSettings && (
-            <ToolbarIcon
+            <IconButton
+              size="small"
+              color="default"
               onClick={this.props.onOpenSettings}
-              src="res/ribbon_default/pref32.png"
               tooltip={t`Open settings`}
-            />
+            >
+              <EditSceneIcon />
+            </IconButton>
           )}
         </ToolbarGroup>
       </>

@@ -29,7 +29,7 @@ class GD_CORE_API BehaviorMetadata {
  public:
   BehaviorMetadata(
       const gd::String& extensionNamespace,
-      const gd::String& name_,
+      const gd::String& nameWithNamespace,
       const gd::String& fullname_,
       const gd::String& defaultName_,
       const gd::String& description_,
@@ -38,6 +38,21 @@ class GD_CORE_API BehaviorMetadata {
       const gd::String& className_,
       std::shared_ptr<gd::Behavior> instance,
       std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance);
+      
+  /**
+   * \brief Construct a behavior metadata, without "blueprint" behavior.
+   * 
+   * \note This is used by events based behaviors.
+   */
+  BehaviorMetadata(
+      const gd::String& extensionNamespace,
+      const gd::String& nameWithNamespace,
+      const gd::String& fullname_,
+      const gd::String& defaultName_,
+      const gd::String& description_,
+      const gd::String& group_,
+      const gd::String& icon24x24_);
+
   BehaviorMetadata(){};
   virtual ~BehaviorMetadata(){};
 
@@ -196,6 +211,13 @@ class GD_CORE_API BehaviorMetadata {
   BehaviorMetadata& AddIncludeFile(const gd::String& includeFile);
 
   /**
+   * \brief Add a file to the already existing required files.
+   * \note These files are required for the behavior to work,
+   * but they are not executable.
+   */
+  BehaviorMetadata& AddRequiredFile(const gd::String& requiredFile);
+
+  /**
    * Get the help path of the behavior, relative to the GDevelop documentation
    * root.
    */
@@ -214,7 +236,6 @@ class GD_CORE_API BehaviorMetadata {
   }
 
   const gd::String& GetName() const;
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDefaultName() const { return defaultName; }
   const gd::String& GetDescription() const { return description; }
@@ -235,20 +256,38 @@ class GD_CORE_API BehaviorMetadata {
    * \note An empty string means the base object, so any object.
    */
   const gd::String& GetObjectType() const { return objectType; }
-#endif
+
+  /**
+   * Check if the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  bool IsPrivate() const { return isPrivate; }
+
+  /**
+   * Set that the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  BehaviorMetadata &SetPrivate() {
+    isPrivate = true;
+    return *this;
+  }
 
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
+   * 
+   * \note Returns a dumb Behavior for events based behaviors as CustomBehavior
+   * are using EventBasedBehavior.
    */
   gd::Behavior& Get() const;
 
   /**
    * \brief Return the associated gd::BehaviorsSharedData, handling behavior
    * shared data, if any (nullptr if none).
+   * 
+   * \note Returns nullptr for events based behaviors as they don't declare
+   * shared data yet.
    */
-  gd::BehaviorsSharedData* GetSharedDataInstance() const {
-    return sharedDatasInstance.get();
-  }
+  gd::BehaviorsSharedData* GetSharedDataInstance() const;
 
   /**
    * \brief Return a reference to a map containing the names of the actions
@@ -271,30 +310,30 @@ class GD_CORE_API BehaviorMetadata {
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
 
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
 
   std::vector<gd::String> includeFiles;
+  std::vector<gd::String> requiredFiles;
   gd::String className;
-#endif
+
  private:
   gd::String extensionNamespace;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String fullname;
   gd::String defaultName;
   gd::String description;
   gd::String group;
   gd::String iconFilename;
   gd::String objectType;
-#endif
+  bool isPrivate = false;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;
   std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance;
+  bool isEventBased;
 };
 
 }  // namespace gd

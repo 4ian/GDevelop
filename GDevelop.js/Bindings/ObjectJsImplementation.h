@@ -1,4 +1,5 @@
 #include <GDCore/Project/Object.h>
+#include <GDCore/Project/ObjectConfiguration.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Serialization/Serializer.h>
@@ -14,14 +15,10 @@ using namespace gd;
  * It also implements "ExposeResources" to expose the properties of type
  * "resource".
  */
-class ObjectJsImplementation : public gd::Object {
+class ObjectJsImplementation : public gd::ObjectConfiguration {
  public:
-  ObjectJsImplementation()
-      :  // Name is not important as this object is just a "blueprint"
-         // that is copied (see calls to AddObject).
-        Object("ObjectJsImplementation"),
-        jsonContent("{}") {}
-  std::unique_ptr<gd::Object> Clone() const override;
+  ObjectJsImplementation() : jsonContent("{}") {}
+  std::unique_ptr<gd::ObjectConfiguration> Clone() const override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;

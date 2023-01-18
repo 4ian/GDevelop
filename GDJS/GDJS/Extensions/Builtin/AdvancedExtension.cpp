@@ -121,6 +121,62 @@ AdvancedExtension::AdvancedExtension() {
                "eventsFunctionContext.getArgument(" +
                parameterNameCode + ") : \"\")";
       });
+
+  GetAllConditions()["CompareArgumentAsNumber"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        gd::String parameterNameCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string",
+                instruction.GetParameter(0).GetPlainString());
+
+        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
+            instruction.GetParameter(1).GetPlainString());
+
+        gd::String operandCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "number",
+                instruction.GetParameter(2).GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val";
+
+        return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
+               "Number(eventsFunctionContext.getArgument(" +
+               parameterNameCode + ")) || 0 : 0) " + operatorCode + " " +
+               operandCode + ");\n";
+      });
+
+  GetAllConditions()["CompareArgumentAsString"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        gd::String parameterNameCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string",
+                instruction.GetParameter(0).GetPlainString());
+
+        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
+            instruction.GetParameter(1).GetPlainString());
+
+        gd::String operandCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "string",
+                instruction.GetParameter(2).GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val";
+
+        return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
+               "\"\" + eventsFunctionContext.getArgument(" +
+               parameterNameCode + ") : \"\") " + operatorCode + " " +
+               operandCode + ");\n";
+      });
 }
 
-}  // namespace gdjs
+} // namespace gdjs

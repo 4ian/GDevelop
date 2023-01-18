@@ -6,8 +6,6 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace network {
-      const logger = new gdjs.Logger('Network requests');
-
       /**
        * Send an asynchronous request to the specified URL, with the specified (text)
        * body, method and contentType (defaults to `application/x-www-form-urlencoded`).
@@ -147,10 +145,10 @@ namespace gdjs {
       };
 
       export const enableMetrics = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         enable: boolean
       ) {
-        runtimeScene.getGame().enableMetrics(enable);
+        instanceContainer.getGame().enableMetrics(enable);
       };
 
       /**

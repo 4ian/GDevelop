@@ -55,7 +55,6 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
       case 'image':
         return (
           <ImagePreview
-            project={this.props.project}
             resourceName={this.props.resourceName}
             imageResourceSource={this.props.resourcesLoader.getResourceFullUrl(
               this.props.project,
@@ -74,6 +73,8 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
           <GenericIconPreview renderIcon={props => <Audiotrack {...props} />} />
         );
       case 'json':
+      case 'tilemap':
+      case 'tileset':
         return (
           <GenericIconPreview
             renderIcon={props => <InsertDriveFile {...props} />}

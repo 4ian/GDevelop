@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "GDCore/Serialization/SerializerValue.h"
 #include "GDCore/String.h"
 
@@ -22,7 +23,7 @@ namespace gd {
  * properties).
  *
  * It is used for serialization (to JSON or XML), or as a generic
- * container for properties of objects (see for example gd::BehaviorContent).
+ * container for properties of objects (see for example gd::Behavior).
  *
  * It also has specialized methods in GDevelop.js (see postjs.js) to be
  * converted to a JavaScript object.
@@ -177,6 +178,18 @@ class GD_CORE_API SerializerElement {
    * \brief Return true if no value was set for the element.
    */
   bool IsValueUndefined() const { return valueUndefined; }
+
+  /**
+   * \brief Save the value either as a string or as an array of strings if it
+   * has line breaks.
+   */
+  void SetMultilineStringValue(const gd::String &value);
+
+  /**
+   * \brief Read the value, either represented as a string or as an array of strings,
+   * into a string.
+   */
+  gd::String GetMultilineStringValue();
   ///@}
 
   /** \name Attributes
@@ -440,7 +453,7 @@ class GD_CORE_API SerializerElement {
    * Initialize element using another element. Used by copy-ctor and assign-op.
    * Don't forget to update me if members were changed!
    */
-  void Init(const gd::SerializerElement& other);
+  void Init(const gd::SerializerElement &other);
 
   bool valueUndefined;  ///< If true, the element does not have a value.
   SerializerValue elementValue;

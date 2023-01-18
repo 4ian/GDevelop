@@ -15,8 +15,10 @@ export const Line = (props: {|
   expand?: boolean,
   overflow?: string,
   useFullHeight?: boolean,
+  id?: string,
 |}) => (
   <div
+    id={props.id}
     style={{
       display: 'flex',
       marginTop: props.noMargin ? 0 : marginsSize,
@@ -48,8 +50,10 @@ export const Column = (props: {|
   expand?: boolean,
   useFullHeight?: boolean,
   noOverflowParent?: boolean,
+  id?: string,
 |}) => (
   <div
+    id={props.id}
     style={{
       display: 'flex',
       marginLeft: props.noMargin ? 0 : marginsSize,

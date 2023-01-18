@@ -22,6 +22,17 @@ export type Profile = {|
   username: ?string,
   description: ?string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
+  isCreator: boolean,
+  isPlayer: boolean,
+  donateLink: ?string,
+
+  gdevelopUsage?: string,
+  teamOrCompanySize?: string,
+  companyName?: string,
+  creationExperience?: string,
+  creationGoal?: string,
+  hearFrom?: string,
 |};
 
 export type LoginForm = {|
@@ -29,16 +40,32 @@ export type LoginForm = {|
   password: string,
 |};
 
+export type ForgotPasswordForm = {|
+  email: string,
+|};
+
 export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
+  getNewsletterEmail: boolean,
+|};
+
+export type AdditionalUserInfoForm = {|
+  gdevelopUsage?: string,
+  teamOrCompanySize?: string,
+  companyName?: string,
+  creationExperience?: string,
+  creationGoal?: string,
+  hearFrom?: string,
 |};
 
 export type EditForm = {|
   username: string,
   description: string,
+  donateLink: string,
   getGameStatsEmail: boolean,
+  getNewsletterEmail: boolean,
 |};
 
 export type ChangeEmailForm = {|
@@ -131,6 +158,8 @@ export default class Authentication {
             email: form.email,
             username: form.username,
             appLanguage: appLanguage,
+            getNewsletterEmail: form.getNewsletterEmail,
+            isCreator: true,
           },
           {
             params: {
@@ -162,7 +191,7 @@ export default class Authentication {
       });
   };
 
-  forgotPassword = (form: LoginForm): Promise<void> => {
+  forgotPassword = (form: ForgotPasswordForm): Promise<void> => {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
@@ -267,8 +296,35 @@ export default class Authentication {
 
   editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
-    form: EditForm,
-    appLanguage: string
+    {
+      username,
+      description,
+      getGameStatsEmail,
+      getNewsletterEmail,
+      appLanguage,
+      isCreator,
+      donateLink,
+      gdevelopUsage,
+      teamOrCompanySize,
+      companyName,
+      creationExperience,
+      creationGoal,
+      hearFrom,
+    }: {
+      username?: string,
+      description?: string,
+      getGameStatsEmail?: boolean,
+      getNewsletterEmail?: boolean,
+      appLanguage?: string,
+      isCreator?: boolean,
+      donateLink?: string,
+      gdevelopUsage?: string,
+      teamOrCompanySize?: string,
+      companyName?: string,
+      creationExperience?: string,
+      creationGoal?: string,
+      hearFrom?: string,
+    }
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -276,14 +332,22 @@ export default class Authentication {
 
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        const { username, description, getGameStatsEmail } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
             username,
             description,
             getGameStatsEmail,
+            getNewsletterEmail,
             appLanguage,
+            isCreator,
+            donateLink,
+            gdevelopUsage,
+            teamOrCompanySize,
+            companyName,
+            creationExperience,
+            creationGoal,
+            hearFrom,
           },
           {
             params: {
@@ -333,15 +397,14 @@ export default class Authentication {
     return this.auth.currentUser || null;
   };
 
-  logout = () => {
-    signOut(this.auth)
-      .then(() => {
-        console.log('Logout successful.');
-      })
-      .catch(error => {
-        console.error('An error happened during logout.', error);
-        throw error;
-      });
+  logout = async () => {
+    try {
+      await signOut(this.auth);
+      console.log('Logout successful.');
+    } catch (error) {
+      console.error('An error happened during logout.', error);
+      throw error;
+    }
   };
 
   getAuthorizationHeader = async (): Promise<string> => {

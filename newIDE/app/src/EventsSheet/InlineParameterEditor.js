@@ -2,11 +2,7 @@
 import * as React from 'react';
 import InlinePopover from './InlinePopover';
 import ParameterRenderingService from './ParameterRenderingService';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
 import { getObjectParameterIndex } from '../InstructionOrExpression/EnumerateInstructions';
@@ -29,9 +25,7 @@ type Props = {|
 
   anchorEl: ?any,
 
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 type State = {|
@@ -164,9 +158,7 @@ export default class InlineParameterEditor extends React.Component<
           ref={field => (this._field = field)}
           parameterRenderingService={ParameterRenderingService}
           isInline
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this.props.onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
+          resourceManagementProps={this.props.resourceManagementProps}
         />
       </InlinePopover>
     );

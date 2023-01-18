@@ -1,16 +1,17 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
 import Rectangle from '../Utils/Rectangle';
+import { type InstanceMeasurer } from './InstancesRenderer';
 const gd: libGDevelop = global.gd;
 
 export default class SelectionRectangle {
   instances: gdInitialInstancesContainer;
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
   toSceneCoordinates: (x: number, y: number) => [number, number];
 
   pixiRectangle: PIXI.Graphics;
-  selectionRectangleStart: any;
-  selectionRectangleEnd: any;
+  selectionRectangleStart: { x: number, y: number } | null;
+  selectionRectangleEnd: { x: number, y: number } | null;
   _instancesInSelectionRectangle: gdInitialInstance[];
 
   selector: gdInitialInstanceJSFunctor;
@@ -25,7 +26,7 @@ export default class SelectionRectangle {
     toSceneCoordinates,
   }: {
     instances: gdInitialInstancesContainer,
-    instanceMeasurer: any,
+    instanceMeasurer: InstanceMeasurer,
     toSceneCoordinates: (x: number, y: number) => [number, number],
   }) {
     this.instances = instances;
@@ -49,15 +50,16 @@ export default class SelectionRectangle {
         this._temporaryAABB
       );
 
-      if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return;
+      const { selectionRectangleEnd, selectionRectangleStart } = this;
+      if (!selectionRectangleStart || !selectionRectangleEnd) return;
 
       const selectionSceneStart = toSceneCoordinates(
-        this.selectionRectangleStart.x,
-        this.selectionRectangleStart.y
+        selectionRectangleStart.x,
+        selectionRectangleStart.y
       );
       const selectionSceneEnd = toSceneCoordinates(
-        this.selectionRectangleEnd.x,
-        this.selectionRectangleEnd.y
+        selectionRectangleEnd.x,
+        selectionRectangleEnd.y
       );
 
       if (
@@ -88,7 +90,7 @@ export default class SelectionRectangle {
   };
 
   endSelectionRectangle = () => {
-    if (!this.selectionRectangleStart) return [];
+    if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return [];
 
     this._instancesInSelectionRectangle.length = 0;
     if (this.selectionRectangleStart.x > this.selectionRectangleEnd.x) {
@@ -116,7 +118,7 @@ export default class SelectionRectangle {
   }
 
   render() {
-    if (!this.selectionRectangleStart) {
+    if (!this.selectionRectangleStart || !this.selectionRectangleEnd) {
       this.pixiRectangle.visible = false;
       return;
     }

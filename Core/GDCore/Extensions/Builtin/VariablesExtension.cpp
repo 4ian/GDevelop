@@ -34,7 +34,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions());
 
   extension
       .AddCondition("VarSceneTxt",
@@ -45,7 +46,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .UseStandardRelationalOperatorParameters("string");
+      .UseStandardRelationalOperatorParameters(
+          "string", ParameterOptions::MakeNewOptions());
 
   extension
       .AddCondition(
@@ -107,7 +109,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -119,7 +122,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .UseStandardRelationalOperatorParameters("string")
+      .UseStandardRelationalOperatorParameters(
+          "string", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -157,7 +161,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions());
 
   extension
       .AddAction("ModVarSceneTxt",
@@ -168,7 +173,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .UseStandardOperatorParameters("string");
+      .UseStandardOperatorParameters("string",
+                                     ParameterOptions::MakeNewOptions());
 
   extension
       .AddAction(
@@ -203,7 +209,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
@@ -215,7 +222,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .UseStandardOperatorParameters("string")
+      .UseStandardOperatorParameters("string",
+                                     ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension

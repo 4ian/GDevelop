@@ -15,7 +15,7 @@ declare class gdLayout extends gdObjectsContainer {
   updateBehaviorsSharedData(project: gdProject): void;
   getAllBehaviorSharedDataNames(): gdVectorString;
   hasBehaviorSharedData(behaviorName: string): boolean;
-  getBehaviorSharedData(behaviorName: string): gdBehaviorContent;
+  getBehaviorSharedData(behaviorName: string): gdBehaviorsSharedData;
   insertNewLayer(name: string, position: number): void;
   insertLayer(layer: gdLayer, position: number): void;
   getLayer(name: string): gdLayer;

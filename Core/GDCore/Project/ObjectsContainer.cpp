@@ -83,7 +83,7 @@ gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
   gd::Object& newlyCreatedObject = *(*(initialObjects.insert(
       position < initialObjects.size() ? initialObjects.begin() + position
                                        : initialObjects.end(),
-      project.GetCurrentPlatform().CreateObject(objectType, name))));
+      project.CreateObject(objectType, name))));
 
   return newlyCreatedObject;
 }

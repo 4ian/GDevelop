@@ -10,7 +10,7 @@ import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
 
 export default {
-  title: 'Link',
+  title: 'UI Building Blocks/Link',
   component: Link,
   decorators: [paperDecorator, muiDecorator],
 };

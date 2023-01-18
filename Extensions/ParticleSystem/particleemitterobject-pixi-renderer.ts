@@ -12,7 +12,7 @@ namespace gdjs {
     started: boolean = false;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       runtimeObject: gdjs.RuntimeObject,
       objectData: any
     ) {
@@ -24,7 +24,7 @@ namespace gdjs {
         graphics.drawCircle(0, 0, objectData.rendererParam1);
       } else if (objectData.rendererType === 'Line') {
         graphics.drawRect(
-          objectData.rendererParam1,
+          0,
           0,
           objectData.rendererParam1,
           objectData.rendererParam2
@@ -40,7 +40,7 @@ namespace gdjs {
         );
       } else if (objectData.textureParticleName) {
         const sprite = new PIXI.Sprite(
-          (runtimeScene
+          (instanceContainer
             .getGame()
             .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
             objectData.textureParticleName
@@ -62,7 +62,7 @@ namespace gdjs {
       // Render the texture from graphics using the PIXI Renderer.
       // TODO: could be optimized by generating the texture only once per object type,
       // instead of at each object creation.
-      const pixiRenderer = runtimeScene
+      const pixiRenderer = instanceContainer
         .getGame()
         .getRenderer()
         .getPIXIRenderer();
@@ -149,25 +149,28 @@ namespace gdjs {
         minimumScaleMultiplier: m,
         isStepped: false,
       };
+      // Angle of the spray cone
       // @ts-ignore
       config.startRotation = {
         min: -objectData.emitterAngleB / 2.0,
         max: objectData.emitterAngleB / 2.0,
       };
-      const mediumLifetime =
-        (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax) / 2.0;
+      // Rotation speed of the particles
       // @ts-ignore
       config.rotationSpeed = {
-        min: objectData.particleAngle1 / mediumLifetime,
-        max: objectData.particleAngle2 / mediumLifetime,
+        min: objectData.particleAngle1,
+        max: objectData.particleAngle2,
       };
       // @ts-ignore
       config.blendMode = objectData.additive ? 'ADD' : 'NORMAL';
       this.renderer = new PIXI.Container();
+      // The embedded particle emitter is supposed to be the last minor version
+      // of the version 4 of the particle emitter object
+      // See source https://github.com/pixijs/particle-emitter/blob/v4.3.1/src/Emitter.ts
       // @ts-ignore
       this.emitter = new PIXI.particles.Emitter(this.renderer, texture, config);
       this.start();
-      const layer = runtimeScene.getLayer(runtimeObject.getLayer());
+      const layer = instanceContainer.getLayer(runtimeObject.getLayer());
       if (layer) {
         layer
           .getRenderer()
@@ -197,8 +200,12 @@ namespace gdjs {
     }
 
     setForce(min: float, max: float): void {
-      this.emitter.startSpeed.value = max;
-      this.emitter.minimumSpeedMultiplier = max !== 0 ? min / max : 1;
+      // If max force is zero, PIXI seems to not be able to compute correctly
+      // the angle of the emitter, resulting in it staying at 0° or 180°.
+      // See https://github.com/4ian/GDevelop/issues/4312.
+      const _max = max || 0.000001;
+      this.emitter.startSpeed.value = _max;
+      this.emitter.minimumSpeedMultiplier = min / _max;
     }
 
     setZoneRadius(radius: float): void {
@@ -242,6 +249,21 @@ namespace gdjs {
       }
     }
 
+    setParticleRotationSpeed(min: float, max: float): void {
+      this.emitter.minRotationSpeed = min;
+      this.emitter.maxRotationSpeed = max;
+    }
+
+    setMaxParticlesCount(count: float): void {
+      this.emitter.maxParticles = count;
+    }
+
+    setAdditiveRendering(enabled: boolean): void {
+      this.emitter.particleBlendMode = enabled
+        ? PIXI.BLEND_MODES.ADD
+        : PIXI.BLEND_MODES.NORMAL;
+    }
+
     setAlpha(alpha1: number, alpha2: number): void {
       this.emitter.startAlpha.value = alpha1 / 255.0;
       if (this.emitter.startAlpha.next) {
@@ -267,25 +289,28 @@ namespace gdjs {
 
     isTextureNameValid(
       texture: string,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ): boolean {
-      const invalidPixiTexture = runtimeScene
+      const invalidPixiTexture = instanceContainer
         .getGame()
         .getImageManager()
         .getInvalidPIXITexture();
-      const pixiTexture = runtimeScene
+      const pixiTexture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(texture);
       return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
     }
 
-    setTextureName(texture: string, runtimeScene: gdjs.RuntimeScene): void {
-      const invalidPixiTexture = runtimeScene
+    setTextureName(
+      texture: string,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
+      const invalidPixiTexture = instanceContainer
         .getGame()
         .getImageManager()
         .getInvalidPIXITexture();
-      const pixiTexture = runtimeScene
+      const pixiTexture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(texture);

@@ -15,11 +15,13 @@ type PropsType = {|
     transform?: string,
     transition?: string,
     opacity?: number,
+    cursor?: 'pointer',
     margin?: number,
     marginRight?: number,
     marginLeft?: number,
     marginTop?: number,
     marginBottom?: number,
+    visibility?: 'visible' | 'hidden',
   |},
   size?: 'small',
 |};

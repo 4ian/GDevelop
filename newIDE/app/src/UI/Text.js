@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 
-type textSize =
+type TextSize =
   | 'bold-title'
   | 'title'
   | 'section-title'
@@ -11,15 +11,15 @@ type textSize =
   | 'body'
   | 'body2';
 
-type textColor = 'error' | 'primary' | 'secondary';
+type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
 type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: textSize,
+  size?: TextSize,
   /** Color of the text */
-  color?: textColor,
+  color?: TextColor,
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
@@ -28,8 +28,12 @@ type Props = {|
   noMargin?: boolean,
   /** Allow user to select content */
   allowSelection?: boolean,
+  /** When false, prevents browser auto translate features to translate the content (useful for user input, like a username) */
+  allowBrowserAutoTranslate?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
+  /** To use list item */
+  displayAsListItem?: boolean,
   /** A limited set of styling is supported. */
   style?: {|
     // Margins
@@ -38,21 +42,21 @@ type Props = {|
 
     // Allow to specify that the text should break words
     overflow?: 'hidden',
-    overflowWrap?: 'break-word',
+    overflowWrap?: 'break-word' | 'anywhere',
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 
     // Allow to expand the text
     flex?: 1,
 
-    // Allow to change color
+    // Allow to change color to easily simulate disabled text
     opacity?: number,
   |},
 |};
 
 type Interface = {||};
 
-const getVariantFromSize = (size: ?textSize) => {
+const getVariantFromSize = (size: ?TextSize) => {
   switch (size) {
     case 'bold-title':
       return 'h1';
@@ -72,7 +76,7 @@ const getVariantFromSize = (size: ?textSize) => {
   }
 };
 
-const getTextColorFromColor = (color: ?textColor) => {
+const getTextColorFromColor = (color: ?TextColor) => {
   switch (color) {
     case 'error':
       return 'error';
@@ -80,6 +84,8 @@ const getTextColorFromColor = (color: ?textColor) => {
       return 'textPrimary';
     case 'secondary':
       return 'textSecondary';
+    case 'inherit':
+      return 'inherit';
     default:
       return 'textPrimary';
   }
@@ -99,7 +105,9 @@ const Text = React.forwardRef<Props, Interface>(
       noShrink,
       noMargin,
       allowSelection,
+      allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
+      displayAsListItem,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
@@ -107,11 +115,18 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={getVariantFromSize(size)}
       ref={ref}
+      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
       color={getTextColorFromColor(color)}
-      component={displayInlineAsSpan ? 'span' : undefined}
+      component={
+        displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined
+      }
       style={{
         ...style,
-        display: displayInlineAsSpan ? 'inline-block' : undefined,
+        display: displayInlineAsSpan
+          ? 'inline-block'
+          : displayAsListItem
+          ? 'list-item'
+          : undefined,
         flexShrink: noShrink ? 0 : undefined,
         marginTop: noMargin ? 0 : 6,
         marginBottom: noMargin ? 0 : 6,

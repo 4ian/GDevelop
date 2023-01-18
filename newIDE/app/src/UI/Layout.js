@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Spacer, Line, Column } from './Grid';
+import { Spacer, Line, Column, LargeSpacer } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
@@ -77,27 +77,35 @@ export const TextFieldWithButtonLayout = ({
 };
 
 type LineStackLayoutProps = {|
+  id?: string,
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
   noMargin?: boolean,
   children: React.Node,
+  useLargeSpacer?: boolean,
+  overflow?: 'hidden', // allows children Text components to use text ellipsis when they are too long
 |};
 
 export const LineStackLayout = ({
+  id,
   alignItems,
   justifyContent,
   expand,
   noMargin,
   children,
+  useLargeSpacer,
+  overflow,
 }: LineStackLayoutProps) => {
   let isFirstChild = true;
   return (
     <Line
+      id={id}
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}
       noMargin={noMargin}
+      overflow={overflow}
     >
       {React.Children.map(children, (child, index) => {
         if (!child) return null;
@@ -107,7 +115,7 @@ export const LineStackLayout = ({
 
         return (
           <React.Fragment>
-            {addSpacers && <Spacer />}
+            {addSpacers && (useLargeSpacer ? <LargeSpacer /> : <Spacer />)}
             {child}
           </React.Fragment>
         );
@@ -117,6 +125,7 @@ export const LineStackLayout = ({
 };
 
 type ResponsiveLineStackLayoutProps = {|
+  id?: string,
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
@@ -126,30 +135,40 @@ type ResponsiveLineStackLayoutProps = {|
   noColumnMargin?: boolean,
   /** Do not measure window width in case parent component is in smaller component */
   width?: 'small',
+  useLargeSpacer?: boolean,
   children: React.Node,
 |};
 
 export const ResponsiveLineStackLayout = ({
+  id,
   alignItems,
   justifyContent,
   expand,
   noMargin,
   noColumnMargin,
   width,
+  useLargeSpacer,
   children,
 }: ResponsiveLineStackLayoutProps) => {
   const windowWidth = useResponsiveWindowWidth();
 
   return (width || windowWidth) === 'small' ? (
-    <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
+    <ColumnStackLayout
+      id={id}
+      noMargin={noMargin || noColumnMargin}
+      expand
+      useLargeSpacer={useLargeSpacer}
+    >
       {children}
     </ColumnStackLayout>
   ) : (
     <LineStackLayout
+      id={id}
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}
       noMargin={noMargin}
+      useLargeSpacer={useLargeSpacer}
     >
       {children}
     </LineStackLayout>
@@ -157,6 +176,7 @@ export const ResponsiveLineStackLayout = ({
 };
 
 type ColumnStackLayoutProps = {|
+  id?: string,
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
@@ -164,9 +184,11 @@ type ColumnStackLayoutProps = {|
   children: React.Node,
   noOverflowParent?: boolean,
   useFullHeight?: boolean,
+  useLargeSpacer?: boolean,
 |};
 
 export const ColumnStackLayout = ({
+  id,
   alignItems,
   justifyContent,
   expand,
@@ -174,10 +196,12 @@ export const ColumnStackLayout = ({
   children,
   noOverflowParent,
   useFullHeight,
+  useLargeSpacer,
 }: ColumnStackLayoutProps) => {
   let isFirstChild = true;
   return (
     <Column
+      id={id}
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}
@@ -193,7 +217,7 @@ export const ColumnStackLayout = ({
 
         return (
           <React.Fragment>
-            {addSpacers && <Spacer />}
+            {addSpacers && (useLargeSpacer ? <LargeSpacer /> : <Spacer />)}
             {child}
           </React.Fragment>
         );

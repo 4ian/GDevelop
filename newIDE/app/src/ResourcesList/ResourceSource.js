@@ -3,6 +3,9 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { type ResourceExternalEditor } from './ResourceExternalEditor';
+import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -14,6 +17,8 @@ export type ResourceKind =
   | 'font'
   | 'video'
   | 'json'
+  | 'tilemap'
+  | 'tileset'
   | 'bitmapFont';
 
 export const allResourceKindsAndMetadata = [
@@ -48,12 +53,33 @@ export const allResourceKindsAndMetadata = [
     createNewResource: () => new gd.JsonResource(),
   },
   {
+    kind: 'tilemap',
+    displayName: t`Tile Map`,
+    fileExtensions: ['json', 'ldtk', 'tmj'],
+    createNewResource: () => new gd.TilemapResource(),
+  },
+  {
+    kind: 'tileset',
+    displayName: t`Tile Set`,
+    fileExtensions: ['json', 'tsj'],
+    createNewResource: () => new gd.TilesetResource(),
+  },
+  {
     kind: 'bitmapFont',
     displayName: t`Bitmap Font`,
     fileExtensions: ['fnt', 'xml'],
     createNewResource: () => new gd.BitmapFontResource(),
   },
 ];
+
+const constructors = {};
+for (const { kind, createNewResource } of allResourceKindsAndMetadata) {
+  constructors[kind] = createNewResource;
+}
+
+export function createNewResource(kind: string): ?gdResource {
+  return constructors[kind] ? constructors[kind]() : null;
+}
 
 export type ChooseResourceOptions = {|
   initialSourceName: string,
@@ -64,6 +90,8 @@ export type ChooseResourceOptions = {|
 export type ChooseResourceProps = {|
   i18n: I18nType,
   project: gdProject,
+  fileMetadata: ?FileMetadata,
+  getStorageProvider: () => StorageProvider,
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
   setLastUsedPath: (
     project: gdProject,
@@ -81,7 +109,8 @@ export type ResourceSourceComponentProps = {|
 export type ResourceSource = {
   name: string,
   displayName: MessageDescriptor,
-  displayTab: 'standalone' | 'import',
+  displayTab: 'standalone' | 'import' | 'import-advanced',
+  onlyForStorageProvider?: ?string,
   kind: ResourceKind,
   selectResourcesHeadless?: ?(
     ChooseResourceProps
@@ -92,3 +121,11 @@ export type ResourceSource = {
 export type ChooseResourceFunction = (
   options: ChooseResourceOptions
 ) => Promise<Array<gdResource>>;
+
+export type ResourceManagementProps = {|
+  resourceSources: Array<ResourceSource>,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  onChooseResource: ChooseResourceFunction,
+  getStorageProvider: () => StorageProvider,
+  onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+|};

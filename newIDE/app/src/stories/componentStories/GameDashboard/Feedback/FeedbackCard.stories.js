@@ -8,8 +8,12 @@ import paperDecorator from '../../../PaperDecorator';
 
 import FeedbackCard from '../../../../GameDashboard/Feedbacks/FeedbackCard';
 
-import { fakeIndieAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
-import { commentUnsolved } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  commentProcessed,
+  commentUnprocessed,
+  fakeIndieAuthenticatedUser,
+  indieUserProfile,
+} from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'GameDashboard/Feedback/FeedbackCard',
@@ -17,17 +21,36 @@ export default {
   decorators: [muiDecorator, paperDecorator],
 };
 
-export const DefaultFeedbackCard = () => (
+export const Default = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
 
-export const FeedbackCardWithNamedBuild = () => (
+export const Processed = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentProcessed}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithContact = () => (
+  <FeedbackCard
+    comment={{
+      ...commentUnprocessed,
+      contact: 'Clem#1234',
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithNamedBuild = () => (
+  <FeedbackCard
+    comment={commentUnprocessed}
     buildProperties={{
       id: 'build-id',
       name: 'My magnificient build',
@@ -38,9 +61,32 @@ export const FeedbackCardWithNamedBuild = () => (
   />
 );
 
+export const WithAuthenticatedPlayer = () => (
+  <FeedbackCard
+    comment={{
+      ...commentUnprocessed,
+      playerId: indieUserProfile.id,
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const WithAuthenticatedPlayerAndContact = () => (
+  <FeedbackCard
+    comment={{
+      ...commentUnprocessed,
+      playerId: indieUserProfile.id,
+      contact: 'Clem#1234',
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
 export const FeedbackCardWithUnnamedBuild = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: false }}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
@@ -49,7 +95,7 @@ export const FeedbackCardWithUnnamedBuild = () => (
 
 export const FeedbackCardWithDeletedBuild = () => (
   <FeedbackCard
-    comment={commentUnsolved}
+    comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: true }}
     authenticatedUser={fakeIndieAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}

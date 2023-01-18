@@ -2,10 +2,10 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
-import RaisedButton from '../RaisedButton';
+import FlatButton from '../FlatButton';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
@@ -37,45 +37,50 @@ type Props = {|
   }>,
 |};
 
-export default class LocalFilePicker extends PureComponent<Props, *> {
-  onChooseFolder = () => {
+const LocalFilePicker = ({
+  value,
+  onChange,
+  title,
+  message,
+  defaultPath,
+  fullWidth,
+  filters,
+}: Props) => {
+  const onChooseFolder = async () => {
     if (!dialog || !electron) return;
 
     const browserWindow = remote.getCurrentWindow();
-    return dialog
-      .showSaveDialog(browserWindow, {
-        title: this.props.title,
-        filters: this.props.filters,
-        message: this.props.message,
-        defaultPath: this.props.defaultPath,
-      })
-      .then(({ filePath }) => {
-        this.props.onChange(filePath || '');
-      });
+    const { filePath } = await dialog.showSaveDialog(browserWindow, {
+      title: title,
+      filters: filters,
+      message: message,
+      defaultPath: defaultPath,
+    });
+    onChange(filePath || '');
   };
 
-  render() {
-    return (
-      <div
-        style={{
-          ...styles.container,
-          width: this.props.fullWidth ? '100%' : undefined,
-        }}
-      >
-        <TextField
-          margin="dense"
-          style={styles.textField}
-          type="text"
-          hintText={t`Choose a file`}
-          value={this.props.value}
-          onChange={(event, value) => this.props.onChange(value)}
-        />
-        <RaisedButton
-          label={<Trans>Choose</Trans>}
-          style={styles.button}
-          onClick={this.onChooseFolder}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      style={{
+        ...styles.container,
+        width: fullWidth ? '100%' : undefined,
+      }}
+    >
+      <TextField
+        margin="dense"
+        style={styles.textField}
+        type="text"
+        translatableHintText={t`Choose a file`}
+        value={value}
+        onChange={(event, value) => onChange(value)}
+      />
+      <FlatButton
+        label={<Trans>Choose</Trans>}
+        style={styles.button}
+        onClick={onChooseFolder}
+      />
+    </div>
+  );
+};
+
+export default LocalFilePicker;

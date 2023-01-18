@@ -33,7 +33,7 @@
     this._customHeight = customHeight;
     super._scaleX = this._customWidth / this._unscaledWidth;
     super._scaleY = this._customHeight / this._unscaledHeight;
-    this.hitBoxesDirty = true;
+    this.invalidateHitboxes();
   }
 
   setUnscaledWidthAndHeight(unscaledWidth, unscaledHeight) {
@@ -41,17 +41,17 @@
     this._unscaledHeight = unscaledHeight;
     super._scaleX = this._customWidth / this._unscaledWidth;
     super._scaleY = this._customHeight / this._unscaledHeight;
-    this.hitBoxesDirty = true;
+    this.invalidateHitboxes();
   }
 
   setCustomCenter(customCenterX, customCenterY) {
     this._customCenterX = customCenterX;
     this._customCenterY = customCenterY;
-    this.hitBoxesDirty = true;
+    this.invalidateHitboxes();
   }
 
   getRendererObject() {
-    return {};
+    return null;
   }
 
   getWidth() {

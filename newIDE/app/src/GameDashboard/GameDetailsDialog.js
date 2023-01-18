@@ -16,7 +16,7 @@ import {
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
-import { Tab, Tabs } from '../UI/Tabs';
+import { Tabs, type TabOptions } from '../UI/Tabs';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -44,19 +44,47 @@ import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { GameMonetization } from './Monetization/GameMonetization';
+import RouterContext from '../MainFrame/RouterContext';
 
-export type GamesDetailsTab =
+export type GameDetailsTab =
   | 'details'
   | 'builds'
   | 'feedback'
   | 'analytics'
-  | 'leaderboards';
+  | 'leaderboards'
+  | 'monetization';
+
+export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
+  {
+    value: 'details',
+    label: <Trans>Details</Trans>,
+  },
+  {
+    value: 'builds',
+    label: <Trans>Builds</Trans>,
+  },
+  {
+    value: 'feedback',
+    label: <Trans>Feedback</Trans>,
+  },
+  {
+    value: 'analytics',
+    label: <Trans>Analytics</Trans>,
+  },
+  {
+    value: 'leaderboards',
+    label: <Trans>Leaderboards</Trans>,
+  },
+  {
+    value: 'monetization',
+    label: <Trans>Monetization</Trans>,
+  },
+];
 
 type Props = {|
   game: Game,
   project: ?gdProject,
-  initialTab: GamesDetailsTab,
   onClose: () => void,
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
@@ -65,15 +93,17 @@ type Props = {|
 export const GameDetailsDialog = ({
   game,
   project,
-  initialTab,
   onClose,
   onGameUpdated,
   onGameDeleted,
 }: Props) => {
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [currentTab, setCurrentTab] = React.useState(initialTab);
+  const [currentTab, setCurrentTab] = React.useState<GameDetailsTab>('details');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [
     gameUnregisterErrorText,
@@ -89,7 +119,22 @@ export const GameDetailsDialog = ({
     setIsPublicGamePropertiesDialogOpen,
   ] = React.useState(false);
 
-  const windowWidth = useResponsiveWindowWidth();
+  // If a game dashboard tab is specified, switch to it.
+  React.useEffect(
+    () => {
+      if (routeArguments['games-dashboard-tab']) {
+        // Ensure that the tab is valid.
+        const gameDetailsTab = gameDetailsTabs.find(
+          gameDetailsTab =>
+            gameDetailsTab.value === routeArguments['games-dashboard-tab']
+        );
+        if (gameDetailsTab) setCurrentTab(gameDetailsTab.value);
+        // Cleanup once open, to ensure it is not opened again.
+        removeRouteArguments(['games-dashboard-tab']);
+      }
+    },
+    [routeArguments, removeRouteArguments]
+  );
 
   const loadPublicGame = React.useCallback(
     async () => {
@@ -303,18 +348,11 @@ export const GameDetailsDialog = ({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          title={
-            <span>
-              {game.gameName}
-              {' - '}
-              <Trans>Dashboard</Trans>
-            </span>
-          }
+          title={<Trans>{game.gameName} Dashboard</Trans>}
           open
-          noMargin
           flexColumnBody
-          fullHeight={currentTab === 'leaderboards'}
-          maxWidth="md"
+          fullHeight
+          maxWidth="lg"
           actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
@@ -335,19 +373,15 @@ export const GameDetailsDialog = ({
           ]}
           onRequestClose={onClose}
           cannotBeDismissed={isLoading}
+          fixedContent={
+            <Tabs
+              value={currentTab}
+              onChange={setCurrentTab}
+              options={gameDetailsTabs}
+            />
+          }
         >
-          <Tabs
-            value={currentTab}
-            onChange={setCurrentTab}
-            variant={windowWidth !== 'large' ? 'scrollable' : undefined}
-          >
-            <Tab label={<Trans>Details</Trans>} value="details" />
-            <Tab label={<Trans>Builds</Trans>} value="builds" />
-            <Tab label={<Trans>Feedback</Trans>} value="feedback" />
-            <Tab label={<Trans>Analytics</Trans>} value="analytics" />
-            <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
-          </Tabs>
-          <Line expand>
+          <Line expand noMargin>
             {currentTab === 'leaderboards' ? (
               <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
             ) : null}
@@ -362,7 +396,7 @@ export const GameDetailsDialog = ({
               ) : !publicGame ? (
                 <PlaceholderLoader />
               ) : (
-                <ColumnStackLayout expand>
+                <ColumnStackLayout expand noMargin>
                   {!isGameOpenedAsProject && (
                     <AlertMessage kind="info">
                       <Trans>
@@ -470,7 +504,7 @@ export const GameDetailsDialog = ({
                     fullWidth
                     floatingLabelText={<Trans>Game description</Trans>}
                     floatingLabelFixed={true}
-                    hintText={t`No description set.`}
+                    translatableHintText={t`No description set.`}
                     multiline
                     rows={5}
                   />
@@ -562,6 +596,14 @@ export const GameDetailsDialog = ({
                 authenticatedUser={authenticatedUser}
                 game={game}
               />
+            ) : null}
+            {currentTab === 'monetization' ? (
+              <ColumnStackLayout noMargin>
+                <GameMonetization
+                  game={game}
+                  onGameUpdated={handleGameUpdated}
+                />
+              </ColumnStackLayout>
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

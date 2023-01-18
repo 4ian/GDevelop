@@ -1,23 +1,21 @@
 // @flow
 import * as React from 'react';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../ProjectCreation/CreateProjectDialog';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 
 export type EditorContainerExtraProps = {|
+  // Events function extension editor
   initiallyFocusedFunctionName?: ?string,
   initiallyFocusedBehaviorName?: ?string,
+
+  // Homepage
+  storageProviders?: Array<StorageProvider>,
+  initialTab?: ?string,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -30,9 +28,7 @@ export type RenderEditorContainerProps = {|
   extraEditorProps: ?EditorContainerExtraProps,
 
   // Resources:
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 
   unsavedChanges: ?UnsavedChanges,
 
@@ -66,18 +62,19 @@ export type RenderEditorContainerProps = {|
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
+  onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
-  onCloseProject: () => Promise<void>,
+  onCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
-  onCreateProject: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
-  onOpenOnboardingDialog: () => void,
-  onChangeSubscription: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
@@ -86,11 +83,10 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
+  onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

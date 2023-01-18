@@ -16,6 +16,11 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
+import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
+import {
+  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  isPublicAssetResourceUrl,
+} from '../Utils/GDevelopServices/Asset';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -34,7 +39,12 @@ const ResourceStoreChooser = ({
         const chosenResourceUrl = resource.url;
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
-        newResource.setName(path.basename(chosenResourceUrl));
+        const resourceCleanedName = isPublicAssetResourceUrl(chosenResourceUrl)
+          ? extractFilenameWithExtensionFromPublicAssetResourceUrl(
+              chosenResourceUrl
+            )
+          : path.basename(chosenResourceUrl);
+        newResource.setName(resourceCleanedName);
         newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
 
         onChooseResources([newResource]);
@@ -170,6 +180,9 @@ export const UrlChooser = ({
 };
 
 const browserResourceSources: Array<ResourceSource> = [
+  // Have the "asset store" source before the "file(s) from your device" source,
+  // for cloud projects, so that the asset store is opened by default when clicking
+  // on a button without opening a menu showing all sources.
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `resource-store-${kind}`,
     displayName: t`Choose from asset store`,
@@ -185,9 +198,25 @@ const browserResourceSources: Array<ResourceSource> = [
     ),
   })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `url-chooser-${kind}`,
-    displayName: t`Use an URL`,
+    name: `upload-${kind}`,
+    displayName: t`File(s) from your device`,
     displayTab: 'import',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <FileToCloudProjectResourceUploader
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        fileMetadata={props.fileMetadata}
+        getStorageProvider={props.getStorageProvider}
+        key={`url-chooser-${kind}`}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `url-chooser-${kind}`,
+    displayName: t`Use a public URL`,
+    displayTab: 'import-advanced',
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <UrlChooser

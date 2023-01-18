@@ -1,22 +1,29 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { IconContainer } from '../UI/IconContainer';
 import { ListItem } from '../UI/List';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import TextField, {
+  type TextFieldInterface,
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../UI/KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import Text from '../UI/Text';
+import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 
 const styles = {
   noIndentNestedList: {
@@ -25,13 +32,12 @@ const styles = {
   itemTextField: {
     top: noMarginTextFieldInListItemTopOffset,
   },
+  dragAndDropItemContainer: { display: 'flex', flexDirection: 'column' },
 };
 
 type ProjectStructureItemProps = {|
+  id?: string,
   autoGenerateNestedIndicator?: boolean,
-  initiallyOpen?: boolean,
-  leftIcon?: React$Element<any>,
-  indentNestedItems?: boolean,
   renderNestedItems: () => Array<React$Element<any> | null>,
   primaryText: React.Node,
   error?: ?Error,
@@ -39,45 +45,42 @@ type ProjectStructureItemProps = {|
   open?: boolean,
 |};
 
-export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
-  <ThemeConsumer>
-    {muiTheme => {
-      const {
-        error,
-        leftIcon,
-        onRefresh,
-        indentNestedItems,
-        autoGenerateNestedIndicator,
-        initiallyOpen,
-        open,
-        primaryText,
-        renderNestedItems,
-      } = props;
-      return (
-        <ListItem
-          open={open}
-          autoGenerateNestedIndicator={autoGenerateNestedIndicator}
-          initiallyOpen={initiallyOpen}
-          primaryText={primaryText}
-          renderNestedItems={renderNestedItems}
-          onReload={onRefresh}
-          style={{
-            backgroundColor: muiTheme.listItem.groupBackgroundColor,
-            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-          }}
-          nestedListStyle={
-            indentNestedItems ? undefined : styles.noIndentNestedList
-          }
-          leftIcon={error ? <WarningIcon /> : leftIcon}
-          displayReloadButton={!!error}
-          reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
-        />
-      );
-    }}
-  </ThemeConsumer>
-);
+export const ProjectStructureItem = ({
+  id,
+  error,
+  onRefresh,
+  autoGenerateNestedIndicator,
+  open,
+  primaryText,
+  renderNestedItems,
+}: ProjectStructureItemProps) => {
+  return (
+    <ListItem
+      id={id}
+      open={open}
+      primaryText={
+        <Text size="sub-title" noMargin>
+          {primaryText}
+        </Text>
+      }
+      initiallyOpen
+      autoGenerateNestedIndicator
+      renderNestedItems={renderNestedItems}
+      onReload={onRefresh}
+      noPadding
+      nestedListStyle={styles.noIndentNestedList}
+      leftIcon={error ? <WarningIcon /> : undefined}
+      displayReloadButton={!!error}
+      reloadButtonTooltip={
+        <Trans>An error has occurred in functions. Click to reload them.</Trans>
+      }
+    />
+  );
+};
 
 type ItemProps = {|
+  id?: string,
+  data?: HTMLDataset,
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
@@ -98,10 +101,17 @@ type ItemProps = {|
   canMoveDown: boolean,
   onMoveDown: () => void,
   buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  style?: ?Object,
+  isLastItem: boolean,
+  dragAndDropProps: {|
+    DragSourceAndDropTarget: any => React.Node,
+    onBeginDrag: () => void,
+    onDrop: () => void,
+  |},
 |};
 
 export const Item = ({
+  id,
+  data,
   primaryText,
   textEndAdornment,
   editingName,
@@ -122,16 +132,22 @@ export const Item = ({
   canMoveDown,
   onMoveDown,
   buildExtraMenuTemplate,
-  style,
+  isLastItem,
+  dragAndDropProps: { DragSourceAndDropTarget, onBeginDrag, onDrop },
 }: ItemProps) => {
-  const textField = React.useRef<?TextField>(null);
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
+  const shouldDiscardChanges = React.useRef<boolean>(false);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   React.useEffect(
     () => {
-      if (editingName)
-        setTimeout(() => {
-          if (textField.current) textField.current.focus();
+      if (editingName) {
+        shouldDiscardChanges.current = false;
+        const timeoutId = setTimeout(() => {
+          if (textFieldRef.current) textFieldRef.current.focus();
         }, 100);
+        return () => clearTimeout(timeoutId);
+      }
     },
     [editingName]
   );
@@ -140,12 +156,33 @@ export const Item = ({
     <TextField
       id="rename-item-field"
       margin="none"
-      ref={textField}
+      ref={textFieldRef}
       defaultValue={primaryText}
-      onBlur={e => onRename(e.currentTarget.value)}
+      onBlur={e =>
+        onRename(
+          shouldDiscardChanges.current ? primaryText : e.currentTarget.value
+        )
+      }
       onKeyPress={event => {
         if (shouldValidate(event)) {
-          if (textField.current) textField.current.blur();
+          if (textFieldRef.current) textFieldRef.current.blur();
+        }
+      }}
+      onKeyUp={event => {
+        if (shouldCloseOrCancel(event)) {
+          const { current: currentTextField } = textFieldRef;
+          if (currentTextField) {
+            shouldDiscardChanges.current = true;
+            currentTextField.blur();
+          }
+        }
+      }}
+      onKeyDown={event => {
+        // Prevent project manager to be closed when pressing escape
+        // to cancel name change.
+        if (shouldCloseOrCancel(event)) {
+          event.preventDefault();
+          event.stopPropagation();
         }
       }}
       fullWidth
@@ -172,80 +209,107 @@ export const Item = ({
   );
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <I18n>
-          {({ i18n }) => (
-            <ListItem
-              style={{
-                borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-                ...style,
-              }}
-              primaryText={label}
-              leftIcon={leftIcon}
-              displayMenuButton
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Edit`),
-                  click: onEdit,
-                },
-                ...(buildExtraMenuTemplate ? buildExtraMenuTemplate(i18n) : []),
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Rename`),
-                  click: onEditName,
-                },
-                {
-                  label: i18n._(t`Delete`),
-                  click: onDelete,
-                },
-                {
-                  label: i18n._(addLabel),
-                  visible: !!onAdd,
-                  click: onAdd,
-                },
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Copy`),
-                  click: onCopy,
-                },
-                {
-                  label: i18n._(t`Cut`),
-                  click: onCut,
-                },
-                {
-                  label: i18n._(t`Paste`),
-                  enabled: canPaste(),
-                  click: onPaste,
-                },
-                {
-                  label: i18n._(t`Duplicate`),
-                  click: onDuplicate,
-                },
-                { type: 'separator' },
-                {
-                  label: i18n._(t`Move up`),
-                  enabled: canMoveUp,
-                  click: onMoveUp,
-                },
-                {
-                  label: i18n._(t`Move down`),
-                  enabled: canMoveDown,
-                  click: onMoveDown,
-                },
-              ]}
-              onClick={() => {
-                // It's essential to discard clicks when editing the name,
-                // to avoid weird opening of an editor (accompanied with a
-                // closing of the project manager) when clicking on the text
-                // field.
-                if (!editingName) onEdit();
-              }}
-            />
-          )}
-        </I18n>
+    <I18n>
+      {({ i18n }) => (
+        <DragSourceAndDropTarget
+          beginDrag={() => {
+            onBeginDrag();
+            return {};
+          }}
+          canDrag={() => !editingName}
+          canDrop={() => true}
+          drop={onDrop}
+        >
+          {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+            connectDropTarget(
+              <div style={styles.dragAndDropItemContainer}>
+                {isOver && <DropIndicator canDrop={canDrop} zIndex={1} />}
+                {connectDragSource(
+                  <div style={styles.dragAndDropItemContainer}>
+                    <ListItem
+                      id={id}
+                      data={data}
+                      style={
+                        isLastItem
+                          ? undefined
+                          : {
+                              borderBottom: `1px solid ${
+                                gdevelopTheme.listItem.separatorColor
+                              }`,
+                            }
+                      }
+                      noPadding
+                      primaryText={label}
+                      leftIcon={leftIcon}
+                      displayMenuButton
+                      buildMenuTemplate={(i18n: I18nType) => [
+                        {
+                          label: i18n._(t`Edit`),
+                          click: onEdit,
+                        },
+                        ...(buildExtraMenuTemplate
+                          ? buildExtraMenuTemplate(i18n)
+                          : []),
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Rename`),
+                          click: onEditName,
+                        },
+                        {
+                          label: i18n._(t`Delete`),
+                          click: onDelete,
+                        },
+                        {
+                          label: i18n._(addLabel),
+                          visible: !!onAdd,
+                          click: onAdd,
+                        },
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Copy`),
+                          click: onCopy,
+                        },
+                        {
+                          label: i18n._(t`Cut`),
+                          click: onCut,
+                        },
+                        {
+                          label: i18n._(t`Paste`),
+                          enabled: canPaste(),
+                          click: onPaste,
+                        },
+                        {
+                          label: i18n._(t`Duplicate`),
+                          click: onDuplicate,
+                        },
+                        { type: 'separator' },
+                        {
+                          label: i18n._(t`Move up`),
+                          enabled: canMoveUp,
+                          click: onMoveUp,
+                        },
+                        {
+                          label: i18n._(t`Move down`),
+                          enabled: canMoveDown,
+                          click: onMoveDown,
+                        },
+                      ]}
+                      onClick={() => {
+                        // It's essential to discard clicks when editing the name,
+                        // to avoid weird opening of an editor (accompanied with a
+                        // closing of the project manager) when clicking on the text
+                        // field.
+                        if (!editingName) onEdit();
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )
+          }
+        </DragSourceAndDropTarget>
       )}
-    </ThemeConsumer>
+    </I18n>
   );
 };
 
@@ -266,6 +330,12 @@ type EventFunctionExtensionItemProps = {|
   onMoveUp: () => void,
   canMoveDown: boolean,
   onMoveDown: () => void,
+  isLastItem: boolean,
+  dragAndDropProps: {|
+    DragSourceAndDropTarget: any => React.Node,
+    onBeginDrag: () => void,
+    onDrop: () => void,
+  |},
 |};
 
 export const EventFunctionExtensionItem = ({
@@ -285,6 +355,8 @@ export const EventFunctionExtensionItem = ({
   onMoveUp,
   canMoveDown,
   onMoveDown,
+  isLastItem,
+  dragAndDropProps,
 }: EventFunctionExtensionItemProps) => {
   const name = eventsFunctionsExtension.getName();
   const iconUrl = eventsFunctionsExtension.getIconUrl();
@@ -321,6 +393,8 @@ export const EventFunctionExtensionItem = ({
       onMoveUp={onMoveUp}
       canMoveDown={canMoveDown}
       onMoveDown={onMoveDown}
+      isLastItem={isLastItem}
+      dragAndDropProps={dragAndDropProps}
     />
   );
 };

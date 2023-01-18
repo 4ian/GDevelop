@@ -17,7 +17,11 @@ export default {
 export const Default = () => (
   <FixedHeightFlexContainer height={400}>
     <ExampleStoreStateProvider>
-      <ExampleStore onOpen={action('onOpen')} isOpening={false} />
+      <ExampleStore
+        onOpen={action('onOpen')}
+        isOpening={false}
+        initialExampleShortHeader={null}
+      />
     </ExampleStoreStateProvider>
   </FixedHeightFlexContainer>
 );

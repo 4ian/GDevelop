@@ -1,0 +1,33 @@
+{ "compressionlevel":-1,
+ "height":2,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[3, 2684354563, 536870915, 2147483651,
+            1610612739, 3221225475, 1073741827, 3758096387],
+         "height":2,
+         "id":1,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":4,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":2,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.9.0",
+ "tileheight":8,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "source":"MiniTiledSet.json"
+        }],
+ "tilewidth":8,
+ "type":"map",
+ "version":"1.9",
+ "width":4
+}

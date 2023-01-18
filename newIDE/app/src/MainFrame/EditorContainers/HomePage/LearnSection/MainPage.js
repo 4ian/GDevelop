@@ -1,20 +1,20 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import PublishIcon from '@material-ui/icons/Publish';
-import { LineStackLayout } from '../../../../UI/Layout';
+import TranslateIcon from '@material-ui/icons/Translate';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
 import {
   type TutorialCategory,
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
-import { isUserflowRunning } from '../../../Onboarding/OnboardingDialog';
+import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { isMobile } from '../../../../Utils/Platform';
-import optionalRequire from '../../../../Utils/OptionalRequire';
-import { sendOnboardingManuallyOpened } from '../../../../Utils/Analytics/EventSender';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -25,8 +25,10 @@ import { CardWidget, SMALL_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
-import TutorialsLine from './TutorialsLine';
-const electron = optionalRequire('electron');
+import ImageTileRow from '../../../../UI/ImageTileRow';
+import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
+import ArrowRight from '@material-ui/icons/ArrowRight';
+import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 
 const useStyles = makeStyles({
   tile: {
@@ -34,21 +36,10 @@ const useStyles = makeStyles({
   },
 });
 
-const styles = {
-  grid: {
-    textAlign: 'center',
-    maxWidth: SMALL_WIDGET_SIZE * 4 + 100, // Avoid tiles taking too much space on large screens.
-  },
-  gridListTile: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
-  helpItem: {
-    padding: 10,
-  },
-};
-
-const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
+const getHelpItemsColumnsFromWidth = (
+  width: WidthType,
+  showTourHelpItem: boolean
+) => {
   switch (width) {
     case 'small':
       return 1;
@@ -60,9 +51,34 @@ const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
   }
 };
 
+const getTutorialsColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+    default:
+      return 5;
+  }
+};
+
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large', true);
+const styles = {
+  grid: {
+    textAlign: 'center',
+    maxWidth: (SMALL_WIDGET_SIZE + 2 * 5) * HELP_ITEMS_MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
+  },
+  helpItem: {
+    padding: 10,
+    flex: 1,
+    display: 'flex',
+  },
+};
+
 type Props = {|
-  onOpenOnboardingDialog: () => void,
-  onCreateProject: () => void,
+  onStartTutorial: () => void,
+  onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
@@ -70,7 +86,7 @@ type Props = {|
 |};
 
 const MainPage = ({
-  onOpenOnboardingDialog,
+  onStartTutorial,
   onCreateProject,
   onTabChange,
   onOpenHelpFinder,
@@ -78,25 +94,29 @@ const MainPage = ({
   tutorials,
 }: Props) => {
   const classes = useStyles();
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowOnboardingButton = !electron && !isMobile();
+  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
   const helpItems: {
     title: React.Node,
     description: React.Node,
     action: () => void,
     disabled?: boolean,
   }[] = [
-    shouldShowOnboardingButton
+    shouldShowInAppTutorialButtons
       ? {
           title: <Trans>Guided Tour</Trans>,
           description: (
-            <Trans>Learn the fundamentals of the editor in 5 minutes</Trans>
+            <Trans>
+              Learn the fundamentals of the editor with our assisted tutorial.
+            </Trans>
           ),
           action: () => {
-            sendOnboardingManuallyOpened();
-            onOpenOnboardingDialog();
+            onStartTutorial();
           },
-          disabled: isUserflowRunning,
+          disabled: !!currentlyRunningInAppTutorial,
         }
       : undefined,
     {
@@ -116,35 +136,61 @@ const MainPage = ({
     },
   ].filter(Boolean);
 
+  const renderTutorialsRow = (category: TutorialCategory) => (
+    <I18n>
+      {({ i18n }) => (
+        <ImageTileRow
+          title={TUTORIAL_CATEGORY_TEXTS[category].title}
+          description={TUTORIAL_CATEGORY_TEXTS[category].description}
+          items={tutorials
+            .filter(tutorial => tutorial.category === category)
+            .map(tutorial =>
+              formatTutorialToImageTileComponent(i18n, tutorial)
+            )}
+          onShowAll={() => onSelectCategory(category)}
+          showAllIcon={<ArrowRight fontSize="small" />}
+          getColumnsFromWidth={getTutorialsColumnsFromWidth}
+          getLimitFromWidth={getTutorialsColumnsFromWidth}
+        />
+      )}
+    </I18n>
+  );
+
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getColumnsFromWidth(windowWidth, shouldShowOnboardingButton)}
+            cols={getHelpItemsColumnsFromWidth(
+              windowWidth,
+              shouldShowInAppTutorialButtons
+            )}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
           >
             {helpItems.map((helpItem, index) => (
-              <GridListTile
-                key={index}
-                style={styles.gridListTile}
-                classes={{ tile: classes.tile }}
-              >
+              <GridListTile key={index} classes={{ tile: classes.tile }}>
                 <CardWidget
                   onClick={helpItem.action}
                   key={index}
-                  size="small"
+                  size="large"
                   disabled={helpItem.disabled}
+                  useDefaultDisabledStyle
                 >
                   <div style={styles.helpItem}>
-                    <Column alignItems="center">
-                      <Text size="block-title">{helpItem.title}</Text>
-                      <Text size="body" color="secondary">
+                    <ColumnStackLayout
+                      expand
+                      justifyContent="center"
+                      useFullHeight
+                    >
+                      <Text noMargin size="block-title">
+                        {helpItem.title}
+                      </Text>
+                      <Text noMargin size="body" color="secondary">
                         {helpItem.description}
                       </Text>
-                    </Column>
+                    </ColumnStackLayout>
                   </div>
                 </CardWidget>
               </GridListTile>
@@ -153,54 +199,6 @@ const MainPage = ({
         </Line>
       </SectionRow>
       <>
-        <SectionRow>
-          <LineStackLayout
-            justifyContent="space-between"
-            alignItems="center"
-            noMargin
-            expand
-          >
-            <Column noMargin>
-              <Text size="title">
-                <Trans>Guides and tutorials</Trans>
-              </Text>
-            </Column>
-            <Column noMargin>
-              {windowWidth === 'large' && (
-                <FlatButton
-                  key="submit-example"
-                  onClick={() => {
-                    Window.openExternalURL(
-                      'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-                    );
-                  }}
-                  primary
-                  leftIcon={<PublishIcon />}
-                  label={<Trans>Submit your project as an example</Trans>}
-                />
-              )}
-            </Column>
-          </LineStackLayout>
-          <Line noMargin>
-            <Text noMargin>
-              <Trans>Learn by doing</Trans>
-            </Text>
-          </Line>
-        </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="full-game"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="game-mechanic"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
         <SectionRow>
           <Line noMargin>
             <Text size="title">
@@ -213,27 +211,58 @@ const MainPage = ({
             </Text>
           </Line>
         </SectionRow>
+        <SectionRow>{renderTutorialsRow('official-beginner')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-intermediate')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('official-advanced')}</SectionRow>
         <SectionRow>
-          <TutorialsLine
-            category="official-beginner"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
+          <LineStackLayout
+            justifyContent="space-between"
+            alignItems="center"
+            noMargin
+            expand
+          >
+            <Column noMargin>
+              <Text size="title">
+                <Trans>Guides and tutorials</Trans>
+              </Text>
+            </Column>
+            <LineStackLayout noMargin>
+              {windowWidth === 'large' && (
+                <FlatButton
+                  onClick={() => {
+                    Window.openExternalURL(
+                      'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+                    );
+                  }}
+                  primary
+                  leftIcon={<PublishIcon />}
+                  label={<Trans>Submit your project as an example</Trans>}
+                />
+              )}
+              {windowWidth === 'large' && (
+                <FlatButton
+                  onClick={() => {
+                    Window.openExternalURL(
+                      'https://airtable.com/shrv295oHlsuS69el'
+                    );
+                  }}
+                  primary
+                  leftIcon={<TranslateIcon />}
+                  label={
+                    <Trans>Submit a tutorial translated in your language</Trans>
+                  }
+                />
+              )}
+            </LineStackLayout>
+          </LineStackLayout>
+          <Line noMargin>
+            <Text noMargin>
+              <Trans>Learn by doing</Trans>
+            </Text>
+          </Line>
         </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="official-intermediate"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
-        <SectionRow>
-          <TutorialsLine
-            category="official-advanced"
-            tutorials={tutorials}
-            onSelectCategory={onSelectCategory}
-          />
-        </SectionRow>
+        <SectionRow>{renderTutorialsRow('full-game')}</SectionRow>
+        <SectionRow>{renderTutorialsRow('game-mechanic')}</SectionRow>
       </>
     </SectionContainer>
   );

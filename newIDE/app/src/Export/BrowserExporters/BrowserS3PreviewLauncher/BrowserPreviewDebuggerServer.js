@@ -10,17 +10,17 @@ const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 
 let nextDebuggerId = 0;
 
-const previewWindowAndTargetIds: {
-  [DebuggerId]: { previewWindow: any, targetId: string },
+const existingPreviewWindows: {
+  [DebuggerId]: WindowProxy,
 } = {};
 
 const getExistingDebuggerIds = () =>
-  Object.keys(previewWindowAndTargetIds).map(key => Number(key));
+  Object.keys(existingPreviewWindows).map(key => Number(key));
 
 const getDebuggerIdForPreviewWindow = (previewWindow: any) => {
-  for (const key in previewWindowAndTargetIds) {
+  for (const key in existingPreviewWindows) {
     const id = Number(key);
-    if (previewWindowAndTargetIds[id].previewWindow === previewWindow) {
+    if (existingPreviewWindows[id] === previewWindow) {
       return id;
     }
   }
@@ -38,19 +38,19 @@ const setupWindowClosedPolling = () => {
   if (windowClosedPollingIntervalId !== null) return;
 
   windowClosedPollingIntervalId = setInterval(() => {
-    for (const key in previewWindowAndTargetIds) {
+    for (const key in existingPreviewWindows) {
       const id = Number(key);
-      const { previewWindow } = previewWindowAndTargetIds[id];
+      const previewWindow = existingPreviewWindows[id];
       if (previewWindow.closed) {
         console.info('A preview window was closed, with debugger id:', id);
-        delete previewWindowAndTargetIds[id];
+        delete existingPreviewWindows[id];
         callbacksList.forEach(({ onConnectionClosed }) =>
           onConnectionClosed({
             id,
             debuggerIds: getExistingDebuggerIds(),
           })
         );
-        if (!Object.keys(previewWindowAndTargetIds).length) {
+        if (!Object.keys(existingPreviewWindows).length) {
           clearInterval(windowClosedPollingIntervalId);
           windowClosedPollingIntervalId = null;
         }
@@ -59,7 +59,7 @@ const setupWindowClosedPolling = () => {
   }, 1000);
 };
 
-const PREVIEWS_ORIGIN = 'https://game-previews.gdevelop-app.com';
+const PREVIEWS_ORIGIN = 'https://game-previews.gdevelop.io';
 
 /**
  * A debugger server implemented using the ability to send/receive messages
@@ -94,7 +94,7 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
     callbacksList.forEach(({ onServerStateChanged }) => onServerStateChanged());
   },
   sendMessage: (id: DebuggerId, message: Object) => {
-    const { previewWindow } = previewWindowAndTargetIds[id];
+    const previewWindow = existingPreviewWindows[id];
     if (!previewWindow) return;
 
     try {
@@ -115,26 +115,14 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
   },
 };
 
-export const registerPreviewWindow = ({
-  previewWindow,
-  targetId,
-}: {|
-  previewWindow: any,
-  targetId: string,
-|}) => {
+export const registerNewPreviewWindow = (previewWindow: WindowProxy) => {
+  // Associate this window with a new debugger id.
   const id = nextDebuggerId++;
-  const sameWindowExistingId = getDebuggerIdForPreviewWindow(previewWindow);
-  if (sameWindowExistingId !== null) {
-    // This window is already associated to a debugger id. This is surely
-    // because a new preview was launched in an existing window, replacing the old one.
-    // So we replace the existing debugger id.
-    delete previewWindowAndTargetIds[sameWindowExistingId];
-  }
-
-  previewWindowAndTargetIds[id] = { previewWindow, targetId };
+  existingPreviewWindows[id] = previewWindow;
 
   setupWindowClosedPolling();
 
+  // Notify the debuggers that a new preview was opened.
   callbacksList.forEach(({ onConnectionOpened }) =>
     onConnectionOpened({
       id,
@@ -143,11 +131,10 @@ export const registerPreviewWindow = ({
   );
 };
 
-export const getExistingTargetIdForDebuggerId = (id: ?DebuggerId): ?string => {
+export const getExistingPreviewWindowForDebuggerId = (
+  id: ?DebuggerId
+): ?WindowProxy => {
   if (id == null) return null;
 
-  const previewWindowAndTargetId = previewWindowAndTargetIds[id];
-  if (previewWindowAndTargetId) return previewWindowAndTargetId.targetId;
-
-  return null;
+  return existingPreviewWindows[id] || null;
 };

@@ -13,13 +13,19 @@ const log = require('electron-log');
 const { uploadLocalFile } = require('./LocalFileUploader');
 const { serveFolder, stopServer } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
-const { buildMainMenuFor, buildPlaceholderMainMenu } = require('./MainMenu');
-const { loadModalWindow } = require('./ModalWindow');
+const {
+  buildElectronMenuFromDeclarativeTemplate,
+  buildPlaceholderMainMenu,
+} = require('./MainMenu');
+const { loadExternalEditorWindow } = require('./LocalExternalEditorWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
-const { downloadLocalFile } = require('./LocalFileDownloader');
+const {
+  downloadLocalFile,
+  saveLocalFileFromArrayBuffer,
+} = require('./LocalFileDownloader');
 const { openPreviewWindow } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -83,6 +89,12 @@ app.on('ready', function() {
     height: args.height || 600,
     x: args.x,
     y: args.y,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#000000',
+      symbolColor: '#ffffff',
+    },
+    trafficLightPosition: { x: 12, y: 12 },
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
       // Allow Node.js API access in renderer process, as long
@@ -139,7 +151,9 @@ app.on('ready', function() {
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
-    Menu.setApplicationMenu(buildMainMenuFor(mainWindow, mainMenuTemplate));
+    Menu.setApplicationMenu(
+      buildElectronMenuFromDeclarativeTemplate(mainWindow, mainMenuTemplate)
+    );
   });
 
   //Prevent any navigation inside the main window.
@@ -168,79 +182,34 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {
-    loadModalWindow({
+  // Piskel image editor
+  ipcMain.handle('piskel-load', (event, externalEditorInput) => {
+    return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: 'piskel-ready',
-      indexSubPath: 'piskel/piskel-index.html',
-      backgroundColor: '#000000',
-      onReady: piskelWindow => {
-        piskelWindow.webContents.send(
-          'piskel-load-animation',
-          externalEditorData
-        ),
-          piskelWindow.show();
-      },
+      indexSubPath: 'piskel/piskel-electron-index.html',
+      externalEditorInput,
     });
   });
-
-  ipcMain.on(
-    'piskel-changes-saved',
-    (event, imageResources, newAnimationName, externalEditorData) => {
-      mainWindow.webContents.send(
-        'piskel-changes-saved',
-        imageResources,
-        newAnimationName,
-        externalEditorData
-      );
-    }
-  );
 
   // JFXR sound effect generator
-  ipcMain.on('jfxr-create-wav', (event, externalEditorData) => {
-    loadModalWindow({
+  ipcMain.handle('jfxr-load', (event, externalEditorInput) => {
+    return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: 'jfxr-ready',
-      indexSubPath: 'jfxr/jfxr-index.html',
-      relativeWidth: 0.55,
-      relativeHeight: 0.8,
-      backgroundColor: '#000000',
-      onReady: jfxrWindow => {
-        jfxrWindow.webContents.send('jfxr-open', externalEditorData);
-        jfxrWindow.show();
-      },
+      indexSubPath: 'jfxr/jfxr-electron-index.html',
+      externalEditorInput,
     });
-  });
-
-  ipcMain.on('jfxr-changes-saved', (event, newFilePath, externalEditorData) => {
-    mainWindow.webContents.send(
-      'jfxr-changes-saved',
-      newFilePath,
-      externalEditorData
-    );
   });
 
   // Yarn Dialogue Tree Editor
-  ipcMain.on('yarn-create-json', (event, externalEditorData) => {
-    loadModalWindow({
+  ipcMain.handle('yarn-load', (event, externalEditorInput) => {
+    return loadExternalEditorWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: 'yarn-ready',
-      indexSubPath: 'yarn/yarn-index.html',
-      relativeWidth: 0.8,
-      relativeHeight: 0.9,
-      backgroundColor: '#000000',
-      onReady: yarnWindow => {
-        yarnWindow.webContents.send('yarn-open', externalEditorData);
-        yarnWindow.show();
-      },
+      indexSubPath: 'yarn/yarn-electron-index.html',
+      externalEditorInput,
     });
-  });
-
-  ipcMain.on('yarn-changes-saved', (event, newFilePath) => {
-    mainWindow.webContents.send('yarn-changes-saved', newFilePath);
   });
 
   // LocalFileUploader events:
@@ -268,11 +237,33 @@ app.on('ready', function() {
     );
   });
 
+  // Titlebar handling:
+  ipcMain.handle(
+    'titlebar-set-overlay-options',
+    async (event, overlayOptions) => {
+      if (!mainWindow) return;
+
+      // setTitleBarOverlay seems not defined on macOS.
+      if (mainWindow.setTitleBarOverlay)
+        mainWindow.setTitleBarOverlay(overlayOptions);
+    }
+  );
+
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {
     const result = await downloadLocalFile(url, outputPath);
     return result;
   });
+  ipcMain.handle(
+    'local-file-save-from-arraybuffer',
+    async (event, arrayBuffer, outputPath) => {
+      const result = await saveLocalFileFromArrayBuffer(
+        arrayBuffer,
+        outputPath
+      );
+      return result;
+    }
+  );
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {

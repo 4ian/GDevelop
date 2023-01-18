@@ -140,7 +140,7 @@ export const PublicGamePropertiesDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Game info</Trans>}
+      title={publicGame.gameName}
       actions={actions}
       cannotBeDismissed={isLoading}
       onRequestClose={onClose}

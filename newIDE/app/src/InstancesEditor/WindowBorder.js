@@ -2,6 +2,7 @@
 import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
 import { rgbToHexNumber } from '../Utils/ColorTransformer';
+import Rectangle from '../Utils/Rectangle';
 
 type Props = {|
   project: gdProject,
@@ -14,7 +15,7 @@ export default class WindowBorder {
   layout: gdLayout;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   pixiRectangle = new PIXI.Graphics();
-  windowRectangle: { x: number, y: number, width: number, height: number };
+  windowRectangle: Rectangle = new Rectangle();
 
   constructor({ project, layout, toCanvasCoordinates }: Props) {
     this.project = project;
@@ -22,12 +23,6 @@ export default class WindowBorder {
     this.toCanvasCoordinates = toCanvasCoordinates;
 
     this.pixiRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
-    this.windowRectangle = {
-      x: 0,
-      y: 0,
-      width: this.project.getGameResolutionWidth(),
-      height: this.project.getGameResolutionHeight(),
-    };
   }
 
   getPixiObject() {
@@ -35,9 +30,12 @@ export default class WindowBorder {
   }
 
   render() {
-    this.windowRectangle.width = this.project.getGameResolutionWidth();
-    this.windowRectangle.height = this.project.getGameResolutionHeight();
-
+    this.windowRectangle.set({
+      left: 0,
+      top: 0,
+      right: this.project.getGameResolutionWidth(),
+      bottom: this.project.getGameResolutionHeight(),
+    });
     const displayedRectangle = transformRect(
       this.toCanvasCoordinates,
       this.windowRectangle
@@ -57,10 +55,10 @@ export default class WindowBorder {
     this.pixiRectangle.alpha = 1;
     this.pixiRectangle.fill.alpha = 0;
     this.pixiRectangle.drawRect(
-      displayedRectangle.x,
-      displayedRectangle.y,
-      displayedRectangle.width,
-      displayedRectangle.height
+      displayedRectangle.left,
+      displayedRectangle.top,
+      displayedRectangle.width(),
+      displayedRectangle.height()
     );
     this.pixiRectangle.endFill();
   }

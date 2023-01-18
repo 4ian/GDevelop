@@ -165,9 +165,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
         {layout && (
           <SceneEditor
             setToolbar={this.props.setToolbar}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
@@ -178,12 +176,17 @@ export class ExternalLayoutEditorContainer extends React.Component<
               prepareInstancesEditorSettings(
                 serializeToJSObject(
                   externalLayout.getAssociatedEditorSettings()
+                ),
+                Math.max(
+                  project.getGameResolutionWidth(),
+                  project.getGameResolutionHeight()
                 )
               )
             }
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
+            canInstallPrivateAsset={this.props.canInstallPrivateAsset}
           />
         )}
         {!layout && (
@@ -191,7 +194,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             <Text>
               <Trans>
                 To edit the external layout, choose the scene in which it will
-                be included:
+                be included
               </Trans>
             </Text>
             <Line justifyContent="center">

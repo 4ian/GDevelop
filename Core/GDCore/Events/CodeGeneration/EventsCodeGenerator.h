@@ -481,6 +481,9 @@ class GD_CORE_API EventsCodeGenerator {
    */
   size_t GenerateSingleUsageUniqueIdForEventsList();
 
+  virtual const gd::String GenerateRelationalOperatorCodes(
+      const gd::String& operatorString);
+
  protected:
   /**
    * \brief Generate the code for a single parameter.

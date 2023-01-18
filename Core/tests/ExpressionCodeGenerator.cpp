@@ -217,7 +217,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "getMouseX(\"\", \"layer1\", 2 + 2)");
+              "getCursorX(\"\", \"layer1\", 2 + 2)");
       // (first argument is the currentScene)
     }
     SECTION("with last optional parameter omit") {
@@ -231,7 +231,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "getMouseX(\"\", \"layer1\", 0)");
+              "getCursorX(\"\", \"layer1\", 0)");
       // (first argument is the currentScene)
     }
     SECTION("with last optional parameter omit (deprecated way)") {
@@ -245,7 +245,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "getMouseX(\"\", \"layer1\", 0)");
+              "getCursorX(\"\", \"layer1\", 0)");
       // (first argument is the currentScene)
     }
     SECTION("with explicit comma (deprecated way)") {
@@ -258,7 +258,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "getMouseX(\"\", \"\", 0)");
+              "getCursorX(\"\", \"\", 0)");
       // (first argument is the currentScene)
     }
   }
@@ -624,7 +624,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "-(+(-(getMouseX(\"\", \"\", 0))))");
+              "-(+(-(getCursorX(\"\", \"\", 0))))");
       // (first argument is the currentScene)
     }
   }

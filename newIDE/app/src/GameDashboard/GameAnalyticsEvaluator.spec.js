@@ -6,11 +6,11 @@ import {
 import { formatISO, subDays } from 'date-fns';
 
 describe('GameAnalyticsEvaluator', () => {
-  const generateGameRollingMetrics1 = count => {
+  const generateGameRollingMetrics1 = (count, todayDate) => {
     const metrics = [];
     for (let index = 0; index < count; index++) {
       metrics.push({
-        date: formatISO(subDays(new Date(2022, 6, 24, 1, 0), index)),
+        date: formatISO(subDays(todayDate, index)),
 
         sessions: {
           d0Sessions: 1,
@@ -50,8 +50,10 @@ describe('GameAnalyticsEvaluator', () => {
   it('give the same overview statistics on year and month', () => {
     // Easy to understand data for debugging
     {
+      const todayDate = new Date(2022, 6, 24, 1, 0);
       const { yearChartData, monthChartData } = buildChartData(
-        generateGameRollingMetrics1(19)
+        generateGameRollingMetrics1(19, todayDate),
+        todayDate
       );
       expect(yearChartData.overview).toStrictEqual(monthChartData.overview);
     }

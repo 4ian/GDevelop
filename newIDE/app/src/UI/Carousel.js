@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
-import { GridListTile } from '@material-ui/core';
+import GridListTile from '@material-ui/core/GridListTile';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ListOutlined from '@material-ui/icons/ListOutlined';
-import { Skeleton } from '@material-ui/lab';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 import Window from '../Utils/Window';
 import Text from './Text';

@@ -244,6 +244,15 @@ class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor {
    */
   size_t GetInstancesCount() const { return instancesCount; }
 
+  void Reset() {
+    highestZOrder = 0;
+    lowestZOrder = 0;
+    instancesCount = 0;
+    firstCall = true;
+    layerRestricted = false;
+    layerName.clear();
+  }
+
  private:
   int highestZOrder;
   int lowestZOrder;

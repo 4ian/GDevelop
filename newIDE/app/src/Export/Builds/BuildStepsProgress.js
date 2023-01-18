@@ -16,6 +16,7 @@ import LinearProgress from '../../UI/LinearProgress';
 import CircularProgress from '../../UI/CircularProgress';
 import { makeStyles } from '@material-ui/styles';
 import { StepIcon } from '@material-ui/core';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 const styles = {
   stepper: { flex: 1 },
@@ -81,6 +82,7 @@ const BuildStepsProgress = ({
   hasBuildStep,
   showSeeAllMyBuildsExplanation,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const getActiveStep = React.useCallback(
     () =>
       exportStep === 'register' ||
@@ -103,7 +105,10 @@ const BuildStepsProgress = ({
     <Stepper
       activeStep={getActiveStep()}
       orientation="vertical"
-      style={styles.stepper}
+      style={{
+        ...styles.stepper,
+        backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+      }}
     >
       <Step>
         <CustomStepLabel>

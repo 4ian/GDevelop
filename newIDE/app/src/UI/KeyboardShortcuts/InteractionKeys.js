@@ -16,7 +16,7 @@ export const shouldCloseOrCancel = (event: SupportedEvent) => {
  * Check if the user asked to validate what is being edited.
  */
 export const shouldValidate = (event: SupportedEvent) => {
-  return event.key === 'Enter';
+  return event.key === 'Enter' && !event.shiftKey;
 };
 
 /**

@@ -20,7 +20,7 @@ export type ObjectsRenderingService = {
   RenderedInstance: any,
   registerInstanceRenderer: (objectType: string, renderer: any) => void,
   requireModule: (dirname: string, moduleName: string) => any,
-  getThumbnail: (project: gdProject, object: gdObject) => string,
+  getThumbnail: (project: gdProject, objectConfiguration: gdObjectConfiguration) => string,
   rgbOrHexToHexNumber: (value: string) => number,
 };
 export type ObjectsEditorService = {

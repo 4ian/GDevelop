@@ -14,6 +14,7 @@ import TikTok from '../../../UI/CustomSvgIcons/TikTok';
 import SectionContainer, { SectionRow } from './SectionContainer';
 import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 
 const styles = {
   list: {
@@ -65,7 +66,11 @@ const CommunitySection = () => {
   return (
     <SectionContainer title={<Trans>Community</Trans>}>
       <SectionRow>
-        <ColumnStackLayout alignItems="start" noMargin expand>
+        <ColumnStackLayout noMargin expand>
+          <Text size="title">
+            <Trans>News and announcements</Trans>
+          </Text>
+          <AnnouncementsFeed canClose={false} />
           <Text size="title">
             <Trans>Join the conversation</Trans>
           </Text>

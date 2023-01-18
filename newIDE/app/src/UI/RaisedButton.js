@@ -20,7 +20,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
     margin?: number,
     flexShrink?: 0,
   |},
-  id?: string,
+  id?: ?string,
 |};
 
 type Props = {|
@@ -32,7 +32,7 @@ type Props = {|
  * A raised button based on Material-UI button.
  */
 const RaisedButton = React.forwardRef<Props, ButtonInterface>(
-  ({ label, primary, icon, ...otherProps }: Props, ref) => {
+  ({ label, primary, icon, disabled, style, ...otherProps }: Props, ref) => {
     // In theory, focus ripple is only shown after a keyboard interaction
     // (see https://github.com/mui-org/material-ui/issues/12067). However, as
     // it's important to get focus right in the whole app, make the ripple
@@ -46,6 +46,17 @@ const RaisedButton = React.forwardRef<Props, ButtonInterface>(
         disableElevation
         color={primary ? 'primary' : 'default'}
         focusRipple={focusRipple}
+        disabled={disabled}
+        style={
+          style || !label
+            ? {
+                // If no label is specified, reduce the min width so that the button
+                // is just around the icon.
+                minWidth: !label ? 0 : undefined,
+                ...style,
+              }
+            : undefined
+        }
         {...otherProps}
         ref={ref}
       >

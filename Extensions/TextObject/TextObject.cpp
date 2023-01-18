@@ -19,9 +19,8 @@ This project is released under the MIT License.
 
 using namespace std;
 
-TextObject::TextObject(gd::String name_)
-    : Object(name_),
-      text("Text"),
+TextObject::TextObject()
+    : text("Text"),
       characterSize(20),
       fontName(""),
       smoothed(true),
@@ -30,7 +29,8 @@ TextObject::TextObject(gd::String name_)
       underlined(false),
       colorR(0),
       colorG(0),
-      colorB(0)
+      colorB(0),
+      textAlignment("left")
 {
 }
 
@@ -40,6 +40,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
                                    const gd::SerializerElement& element) {
   SetString(element.GetChild("string", 0, "String").GetValue().GetString());
   SetFontName(element.GetChild("font", 0, "Font").GetValue().GetString());
+  SetTextAlignment(element.GetChild("textAlignment").GetValue().GetString());
   SetCharacterSize(element.GetChild("characterSize", 0, "CharacterSize")
                        .GetValue()
                        .GetInt());
@@ -57,6 +58,7 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
 void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.AddChild("string").SetValue(GetString());
   element.AddChild("font").SetValue(GetFontName());
+  element.AddChild("textAlignment").SetValue(GetTextAlignment());
   element.AddChild("characterSize").SetValue(GetCharacterSize());
   element.AddChild("color")
       .SetAttribute("r", (int)GetColorR())
@@ -69,7 +71,8 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("underlined", underlined);
 }
 
-void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+void TextObject::ExposeResources(
+    gd::ArbitraryResourceWorker& worker) {
   worker.ExposeFont(fontName);
 }
 #endif

@@ -15,6 +15,7 @@
         <allow-intent href="market:*" />
 
         <!-- GDJS_ICONS_ANDROID -->
+        <preference name="AndroidWindowSplashScreenBackground" value="#000000" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />

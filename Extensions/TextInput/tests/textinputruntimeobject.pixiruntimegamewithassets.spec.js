@@ -111,7 +111,6 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
     const {
       runtimeScene,
       gameDomElementContainer,
-      object,
     } = await setupObjectAndGetDomElementContainer();
 
     expect(gameDomElementContainer.querySelector('input')).not.to.be(null);

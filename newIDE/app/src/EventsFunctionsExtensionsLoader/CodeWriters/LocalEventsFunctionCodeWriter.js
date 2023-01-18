@@ -67,5 +67,19 @@ export const makeLocalEventsFunctionCodeWriter = ({
         });
       });
     },
+    writeObjectCode: (
+      objectCodeNamespace: string,
+      code: string
+    ): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const includeFile = getPathFor(objectCodeNamespace);
+        onWriteFile({ includeFile, content: code });
+        fs.writeFile(includeFile, code, err => {
+          if (err) return reject(err);
+
+          resolve();
+        });
+      });
+    },
   };
 };

@@ -5,21 +5,11 @@
  */
 
 #include "GDCore/Project/BehaviorsSharedData.h"
-#if defined(GD_IDE_ONLY)
 #include <map>
 #include "GDCore/Project/PropertyDescriptor.h"
-#endif
 
 namespace gd {
 
 BehaviorsSharedData::~BehaviorsSharedData(){};
-
-#if defined(GD_IDE_ONLY)
-std::map<gd::String, gd::PropertyDescriptor> BehaviorsSharedData::GetProperties(
-    const gd::SerializerElement& behaviorSharedDataContent) const {
-  std::map<gd::String, gd::PropertyDescriptor> nothing;
-  return nothing;
-}
-#endif
 
 }  // namespace gd

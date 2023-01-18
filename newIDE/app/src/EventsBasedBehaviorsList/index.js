@@ -22,6 +22,8 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import Tooltip from '@material-ui/core/Tooltip';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -29,7 +31,28 @@ const styles = {
   listContainer: {
     flex: 1,
   },
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
 };
+
+const renderEventsBehaviorLabel = (
+  eventsBasedBehavior: gdEventsBasedBehavior
+) =>
+  eventsBasedBehavior.isPrivate() ? (
+    <>
+      <Tooltip
+        title={
+          <Trans>This behavior won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+      <span title={eventsBasedBehavior.getName()}>
+        {eventsBasedBehavior.getName()}
+      </span>
+    </>
+  ) : (
+    eventsBasedBehavior.getName()
+  );
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -153,12 +176,24 @@ export default class EventsBasedBehaviorsList extends React.Component<
     } = this.props;
     if (!selectedEventsBasedBehavior) return;
 
+    const originIndex = eventsBasedBehaviorsList.getPosition(
+      selectedEventsBasedBehavior
+    );
+    const destinationIndex = eventsBasedBehaviorsList.getPosition(
+      destinationEventsBasedBehavior
+    );
     eventsBasedBehaviorsList.move(
-      eventsBasedBehaviorsList.getPosition(selectedEventsBasedBehavior),
-      eventsBasedBehaviorsList.getPosition(destinationEventsBasedBehavior)
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
 
     this.forceUpdateList();
+  };
+
+  _togglePrivate = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+    eventsBasedBehavior.setPrivate(!eventsBasedBehavior.isPrivate());
+    this.forceUpdate();
   };
 
   forceUpdateList = () => {
@@ -241,6 +276,12 @@ export default class EventsBasedBehaviorsList extends React.Component<
           }),
       },
       {
+        label: eventsBasedBehavior.isPrivate()
+          ? i18n._(t`Make public`)
+          : i18n._(t`Make private`),
+        click: () => this._togglePrivate(eventsBasedBehavior),
+      },
+      {
         type: 'separator',
       },
       {
@@ -315,6 +356,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
                     height={height}
                     onAddNewItem={this._addNewEventsBasedBehavior}
                     addNewItemLabel={<Trans>Add a new behavior</Trans>}
+                    renderItemLabel={renderEventsBehaviorLabel}
                     getItemName={getEventsBasedBehaviorName}
                     selectedItems={
                       selectedEventsBasedBehavior

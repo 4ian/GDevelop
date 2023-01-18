@@ -10,11 +10,11 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param runtimeScene The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The gdjs.RuntimeInstanceContainer in which the object is
      */
     constructor(
       runtimeObject: gdjs.BBTextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 
@@ -22,7 +22,7 @@ namespace gdjs {
       if (this._pixiObject === undefined) {
         this._pixiObject = new MultiStyleText(runtimeObject._text, {
           default: {
-            fontFamily: runtimeScene
+            fontFamily: instanceContainer
               .getGame()
               .getFontManager()
               .getFontFamily(runtimeObject._fontFamily),
@@ -44,7 +44,7 @@ namespace gdjs {
         this.updateFontFamily();
         this.updateFontSize();
       }
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
@@ -95,7 +95,8 @@ namespace gdjs {
     }
 
     updateFontFamily(): void {
-      this._pixiObject.textStyles.default.fontFamily = this._object._runtimeScene
+      this._pixiObject.textStyles.default.fontFamily = this._object
+        .getInstanceContainer()
         .getGame()
         .getFontManager()
         .getFontFamily(this._object._fontFamily);

@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include "GDCore/Project/BehaviorContent.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/String.h"
@@ -36,7 +36,7 @@ void ArbitraryObjectsWorker::VisitObject(gd::Object& object) {
     VisitBehavior(object.GetBehavior(behaviorName));
 }
 
-void ArbitraryObjectsWorker::VisitBehavior(gd::BehaviorContent& behavior) {
+void ArbitraryObjectsWorker::VisitBehavior(gd::Behavior& behavior) {
   DoVisitBehavior(behavior);
 }
 

@@ -3,7 +3,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Popper from '@material-ui/core/Popper';
-import Paper from '@material-ui/core/Paper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { type ExpressionAutocompletion } from '../../../ExpressionAutocompletion';
@@ -14,6 +13,8 @@ import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
+import Paper from '../../../UI/Paper';
+import { mapVector } from '../../../Utils/MapFor';
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -157,7 +158,7 @@ const DisplayedObjectAutocompletion = React.forwardRef(
       project && expressionAutocompletion.object
         ? ObjectsRenderingService.getThumbnail(
             project,
-            expressionAutocompletion.object
+            expressionAutocompletion.object.getConfiguration()
           )
         : 'res/types/object.png';
 
@@ -224,6 +225,58 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
     );
   }
 );
+
+const isParameterVisible = (
+  expressionMetadata: gdExpressionMetadata,
+  parameterIndex: number
+): boolean => {
+  const parameter = expressionMetadata.getParameter(parameterIndex);
+  return (
+    !parameter.isCodeOnly() &&
+    // This filters parameters that are implicit because of the context
+    // (MyObject.MyBehavior::).
+    // Free functions have an instanceContainer as first parameter,
+    // their first object parameter are kept.
+    (parameterIndex !== 0 || parameter.getType() !== 'object') &&
+    (parameterIndex !== 1 || parameter.getType() !== 'behavior')
+  );
+};
+
+type ExpressionDocumentationProps = {|
+  expressionMetadata: gdExpressionMetadata,
+  i18n: I18nType,
+  parameterRenderingService: ParameterRenderingServiceType,
+|};
+
+const ExpressionDocumentation = ({
+  expressionMetadata,
+  i18n,
+  parameterRenderingService,
+}: ExpressionDocumentationProps) => {
+  return (
+    <Column noMargin>
+      <Text style={defaultTextStyle} size="body2">
+        {expressionMetadata.getDescription()}
+      </Text>
+      {mapVector(
+        expressionMetadata.getParameters(),
+        (parameter, parameterIndex) =>
+          isParameterVisible(expressionMetadata, parameterIndex) && (
+            <Text style={defaultTextStyle} size="body2" key={parameterIndex}>
+              <i>
+                {i18n._(
+                  parameterRenderingService.getUserFriendlyTypeName(
+                    parameter.getType()
+                  )
+                )}
+              </i>
+              {' － ' + parameter.getDescription()}
+            </Text>
+          )
+      )}
+    </Column>
+  );
+};
 
 type Props = {|
   project: ?gdProject,
@@ -303,7 +356,12 @@ export default function ExpressionAutocompletionsDisplayer({
             false
           }
         >
-          <Paper variant="outlined" square style={styles.container}>
+          <Paper
+            variant="outlined"
+            square
+            style={styles.container}
+            background="light"
+          >
             <ScrollView ref={scrollView} onScroll={onScroll}>
               {expressionAutocompletions.map(
                 (expressionAutocompletion, index) => {
@@ -313,6 +371,7 @@ export default function ExpressionAutocompletionsDisplayer({
                     : undefined;
 
                   return expressionAutocompletion.kind === 'Text' ||
+                    expressionAutocompletion.kind === 'FullExpression' ||
                     expressionAutocompletion.kind === 'Variable' ? (
                     <DisplayedTextAutocompletion
                       key={index}
@@ -364,15 +423,23 @@ export default function ExpressionAutocompletionsDisplayer({
             expressionAutocompletions[selectedCompletionIndex].kind ===
               'Expression' &&
             !expressionAutocompletions[selectedCompletionIndex].isExact && (
-              <Paper variant="outlined" square style={styles.container}>
+              <Paper
+                variant="outlined"
+                square
+                style={styles.container}
+                background="light"
+              >
                 <ScrollView autoHideScrollbar>
                   <Column>
                     <Line noMargin expand alignItems="center">
-                      <Text style={defaultTextStyle} size="body2">
-                        {expressionAutocompletions[
-                          selectedCompletionIndex
-                        ].enumeratedExpressionMetadata.metadata.getDescription()}
-                      </Text>
+                      <ExpressionDocumentation
+                        expressionMetadata={
+                          expressionAutocompletions[selectedCompletionIndex]
+                            .enumeratedExpressionMetadata.metadata
+                        }
+                        i18n={i18n}
+                        parameterRenderingService={parameterRenderingService}
+                      />
                     </Line>
                   </Column>
                 </ScrollView>

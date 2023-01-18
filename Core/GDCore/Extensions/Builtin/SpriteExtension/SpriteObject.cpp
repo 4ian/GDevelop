@@ -25,8 +25,7 @@ namespace gd {
 
 Animation SpriteObject::badAnimation;
 
-SpriteObject::SpriteObject(gd::String name_)
-    : Object(name_), updateIfNotVisible(false) {}
+SpriteObject::SpriteObject() : updateIfNotVisible(false) {}
 
 SpriteObject::~SpriteObject(){};
 

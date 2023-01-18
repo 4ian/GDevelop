@@ -23,6 +23,7 @@ type Props = {|
   children: React.Node,
   cardCornerAction?: React.Node,
   header?: React.Node,
+  background?: 'medium' | 'dark',
 
   disabled?: boolean,
   isHighlighted?: boolean,
@@ -31,6 +32,7 @@ type Props = {|
 const Card = ({
   children,
   header,
+  background,
   cardCornerAction,
   isHighlighted,
   disabled,
@@ -41,6 +43,10 @@ const Card = ({
     <MUICard
       style={{
         opacity: disabled ? 0.5 : 1,
+        backgroundColor:
+          background === 'dark'
+            ? gdevelopTheme.paper.backgroundColor.dark
+            : gdevelopTheme.paper.backgroundColor.medium,
         ...(isHighlighted
           ? {
               borderLeftWidth: 4,

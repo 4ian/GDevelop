@@ -3,7 +3,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import classNames from 'classnames';
-import TextField from '../../../UI/TextField';
+import TextField, { type TextFieldInterface } from '../../../UI/TextField';
 import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
@@ -57,7 +57,7 @@ export default class CommentEvent extends React.Component<
   };
 
   _selectable: ?HTMLSpanElement;
-  _textField: ?TextField;
+  _textField: ?TextFieldInterface;
 
   edit = () => {
     const commentEvent = gd.asCommentEvent(this.props.event);
@@ -145,7 +145,7 @@ export default class CommentEvent extends React.Component<
             margin="none"
             ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}
-            hintText={t`<Enter comment>`}
+            translatableHintText={t`<Enter comment>`}
             onBlur={this.endEditing}
             onChange={this.onEvent}
             style={styles.commentTextField}

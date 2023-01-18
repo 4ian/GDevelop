@@ -42,6 +42,9 @@ const styles = {
     color: '#d4d4d4',
     overflowX: 'hidden',
     maxWidth: '100%',
+    whiteSpace: 'normal',
+    wordBreak: 'normal',
+    overflowWrap: 'anywhere',
   },
   comment: {
     color: '#777',

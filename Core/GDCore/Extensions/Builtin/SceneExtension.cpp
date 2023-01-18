@@ -112,7 +112,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
 
   extension
       .AddAction("SceneBackground",
-                 _("Change background color"),
+                 _("Background color"),
                  _("Change the background color of the scene."),
                  _("Set background color to _PARAM1_"),
                  "",
@@ -136,6 +136,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno", _("Deactivate input when focus is lost"))
       .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "HasGameJustResumed",
+          _("Game has just resumed"),
+          _("Check if the game has just resumed from being hidden. It "
+            "happens when the game tab is selected, a minimized window is "
+            "restored or the application is put back on front."),
+          _("Game has just resumed"),
+          "",
+          "res/actions/window24.png",
+          "res/actions/window.png")
+      .SetHelpPath("/interface/scene-editor/events")
+      .AddCodeOnlyParameter("currentScene", "");
 }
 
 }  // namespace gd

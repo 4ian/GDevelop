@@ -55,40 +55,24 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 codeGenerator,
                 context,
                 "number",
-                instruction.GetParameters()[0].GetPlainString());
+                instruction.GetParameter(0).GetPlainString());
+
+        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
+            instruction.GetParameter(1).GetPlainString());
 
         gd::String value2Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
                 "number",
-                instruction.GetParameters()[2].GetPlainString());
+                instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
             codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
             ".val";
 
-        if (instruction.GetParameters()[1].GetPlainString() == "=" ||
-            instruction.GetParameters()[1].GetPlainString().empty())
-          return resultingBoolean + " = (" + value1Code + " == " + value2Code +
-                 ");\n";
-        else if (instruction.GetParameters()[1].GetPlainString() == ">")
-          return resultingBoolean + " = (" + value1Code + " > " + value2Code +
-                 ");\n";
-        else if (instruction.GetParameters()[1].GetPlainString() == "<")
-          return resultingBoolean + " = (" + value1Code + " < " + value2Code +
-                 ");\n";
-        else if (instruction.GetParameters()[1].GetPlainString() == "<=")
-          return resultingBoolean + " = (" + value1Code + " <= " + value2Code +
-                 ");\n";
-        else if (instruction.GetParameters()[1].GetPlainString() == ">=")
-          return resultingBoolean + " = (" + value1Code + " >= " + value2Code +
-                 ");\n";
-        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
-          return resultingBoolean + " = (" + value1Code + " != " + value2Code +
-                 ");\n";
-
-        return gd::String("");
+        return resultingBoolean + " = (" + value1Code + " " + operatorCode +
+               " " + value2Code + ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
       .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
@@ -102,27 +86,24 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 codeGenerator,
                 context,
                 "string",
-                instruction.GetParameters()[0].GetPlainString());
+                instruction.GetParameter(0).GetPlainString());
+
+        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
+            instruction.GetParameter(1).GetPlainString());
 
         gd::String value2Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
                 context,
                 "string",
-                instruction.GetParameters()[2].GetPlainString());
+                instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
             codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
             ".val";
 
-        if (instruction.GetParameters()[1].GetPlainString() == "=")
-          return resultingBoolean + " = (" + value1Code + " == " + value2Code +
-                 ");\n";
-        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
-          return resultingBoolean + " = (" + value1Code + " != " + value2Code +
-                 ");\n";
-
-        return gd::String("");
+        return resultingBoolean + " = (" + value1Code + " " + operatorCode +
+               " " + value2Code + ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareStrings"]
       .codeExtraInformation =

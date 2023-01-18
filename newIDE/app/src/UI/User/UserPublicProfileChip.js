@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Chip from '../../UI/Chip';
 import FaceIcon from '@material-ui/icons/Face';
-import { type UserPublicProfileSearch } from '../../Utils/GDevelopServices/User';
+import { type UserPublicProfile } from '../../Utils/GDevelopServices/User';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
 
 const styles = {
@@ -12,7 +12,7 @@ const styles = {
 };
 
 type Props = {|
-  user: UserPublicProfileSearch,
+  user: UserPublicProfile,
   isClickable?: boolean,
 |};
 

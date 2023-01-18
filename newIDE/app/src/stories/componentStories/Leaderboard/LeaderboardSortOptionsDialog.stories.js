@@ -7,7 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import LeaderboardSortOptionsDialog from '../../../GameDashboard/LeaderboardAdmin/LeaderboardSortOptionsDialog';
 
 export default {
-  title: 'LeaderboardSortOptionsDialog ',
+  title: 'Leaderboard/LeaderboardSortOptionsDialog',
   component: LeaderboardSortOptionsDialog,
   decorators: [paperDecorator, muiDecorator],
 };

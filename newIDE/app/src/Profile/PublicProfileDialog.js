@@ -6,20 +6,26 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import {
   getUserPublicProfile,
-  getUserBadges,
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
-import { type Badge } from '../Utils/GDevelopServices/Badge';
+import {
+  type PrivateAssetPackListingData,
+  listSellerProducts,
+} from '../Utils/GDevelopServices/Shop';
 import ProfileDetails from './ProfileDetails';
 
 type Props = {|
   userId: string,
   onClose: () => void,
+  onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
-const PublicProfileDialog = ({ userId, onClose }: Props) => {
+const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
   const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
-  const [badges, setBadges] = React.useState<?(Badge[])>(null);
+  const [
+    assetPacksListingData,
+    setAssetPacksListingData,
+  ] = React.useState<?(PrivateAssetPackListingData[])>(null);
   const [error, setError] = React.useState<?Error>(null);
 
   const fetchProfile = React.useCallback(
@@ -36,13 +42,17 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
     [userId]
   );
 
-  const fetchUserBadges = React.useCallback(
+  const fetchUserPacks = React.useCallback(
     async () => {
       if (!userId) return;
-      setBadges(null);
+      setAssetPacksListingData(null);
       try {
-        const badges = await getUserBadges(userId);
-        setBadges(badges);
+        // Will return an empty array if the user is not a seller.
+        const packs = await listSellerProducts({
+          sellerId: userId,
+          productType: 'asset-pack',
+        });
+        setAssetPacksListingData(packs);
       } catch (error) {
         setError(error);
       }
@@ -53,19 +63,19 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
   React.useEffect(
     () => {
       fetchProfile();
-      fetchUserBadges();
+      fetchUserPacks();
     },
-    [userId, fetchProfile, fetchUserBadges]
+    [userId, fetchProfile, fetchUserPacks]
   );
 
   const onRetry = () => {
     setError(null);
     fetchProfile();
-    fetchUserBadges();
   };
 
   return (
     <Dialog
+      title={null} // Specific case where the title is handled by the content.
       open={true}
       maxWidth="sm"
       actions={[
@@ -82,7 +92,8 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
         profile={profile}
         error={error}
         onRetry={onRetry}
-        badges={badges}
+        assetPacksListingData={assetPacksListingData}
+        onAssetPackOpen={onAssetPackOpen}
       />
     </Dialog>
   );

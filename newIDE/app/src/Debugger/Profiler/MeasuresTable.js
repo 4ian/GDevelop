@@ -3,12 +3,12 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { AutoSizer, Table, Column } from 'react-virtualized';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
 import IconButton from '../../UI/IconButton';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ChevronRight from '@material-ui/icons/ChevronRight';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 const styles = {
   indent: {
@@ -32,23 +32,18 @@ type ProfilerRowData = {|
   isCollapsed: boolean,
 |};
 
-type State = {|
-  collapsedPaths: { [string]: boolean },
-|};
+const MeasuresTable = (props: Props) => {
+  const [collapsedPaths, setCollapsedPaths] = React.useState({});
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-export default class MeasuresTable extends React.Component<Props, State> {
-  state = {
-    collapsedPaths: {},
-  };
-
-  _convertToDataRows = (
+  const convertToDataRows = (
     name: string,
     parentSection: ?ProfilerMeasuresSection,
     section: ProfilerMeasuresSection,
     depth: number = 0,
     path: string = ''
   ): Array<ProfilerRowData> => {
-    const { profilerMeasures } = this.props;
+    const { profilerMeasures } = props;
 
     const parentPercent =
       parentSection && section.time && parentSection.time !== 0
@@ -58,7 +53,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
       profilerMeasures && section.time && profilerMeasures.time !== 0
         ? (section.time / profilerMeasures.time) * 100
         : 100;
-    const isCollapsed = this._isSectionCollapsed(path);
+    const isCollapsed = isSectionCollapsed(path);
 
     return [
       {
@@ -74,7 +69,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
       ...(isCollapsed
         ? []
         : flatMap(section.subsections, (subsection, subsectionName) =>
-            this._convertToDataRows(
+            convertToDataRows(
               subsectionName,
               section,
               subsection,
@@ -85,20 +80,18 @@ export default class MeasuresTable extends React.Component<Props, State> {
     ];
   };
 
-  _isSectionCollapsed = (path: string) => {
-    return this.state.collapsedPaths[path];
+  const isSectionCollapsed = (path: string) => {
+    return collapsedPaths[path];
   };
 
-  _toggleSection = (path: string) => {
-    this.setState(state => ({
-      collapsedPaths: {
-        ...state.collapsedPaths,
-        [path]: !state.collapsedPaths[path],
-      },
-    }));
+  const toggleSection = (path: string) => {
+    setCollapsedPaths({
+      ...collapsedPaths,
+      [path]: !collapsedPaths[path],
+    });
   };
 
-  _rowClassName = ({ index }: { index: number }) => {
+  const rowClassName = ({ index }: { index: number }) => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {
@@ -106,12 +99,12 @@ export default class MeasuresTable extends React.Component<Props, State> {
     }
   };
 
-  _renderSectionNameCell = ({ rowData }: { rowData: ProfilerRowData }) => {
+  const renderSectionNameCell = ({ rowData }: { rowData: ProfilerRowData }) => {
     return (
       <div style={styles.indent}>
         <div style={{ width: rowData.depth * 8 }} />
         {rowData.hasSubsections ? (
-          <IconButton onClick={() => this._toggleSection(rowData.path)}>
+          <IconButton onClick={() => toggleSection(rowData.path)}>
             {rowData.isCollapsed ? <ChevronRight /> : <ExpandMore />}
           </IconButton>
         ) : (
@@ -122,59 +115,55 @@ export default class MeasuresTable extends React.Component<Props, State> {
     );
   };
 
-  render() {
-    const { profilerMeasures } = this.props;
-    if (!profilerMeasures) return null;
+  const { profilerMeasures } = props;
+  if (!profilerMeasures) return null;
 
-    const dataRows = this._convertToDataRows('All', null, profilerMeasures);
+  const dataRows = convertToDataRows('All', null, profilerMeasures);
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <AutoSizer>
-            {({ height, width }) => (
-              <Table
-                headerHeight={30}
-                height={height}
-                className={`gd-table ${muiTheme.tableRootClassName}`}
-                headerClassName={'tableHeaderColumn'}
-                rowCount={dataRows.length}
-                rowGetter={({ index }) => dataRows[index]}
-                rowHeight={35}
-                onRowClick={() => {}}
-                rowClassName={this._rowClassName}
-                width={width}
-              >
-                <Column
-                  label={<Trans>Section name</Trans>}
-                  dataKey="name"
-                  width={width * 0.4}
-                  className={'tableColumn'}
-                  cellRenderer={this._renderSectionNameCell}
-                />
-                <Column
-                  label={<Trans>Time (ms)</Trans>}
-                  dataKey="time"
-                  width={width * 0.2}
-                  className={'tableColumn'}
-                />
-                <Column
-                  label={<Trans>% of parent</Trans>}
-                  dataKey="parentPercent"
-                  width={width * 0.2}
-                  className={'tableColumn'}
-                />
-                <Column
-                  label={<Trans>% of total</Trans>}
-                  dataKey="totalPercent"
-                  width={width * 0.2}
-                  className={'tableColumn'}
-                />
-              </Table>
-            )}
-          </AutoSizer>
-        )}
-      </ThemeConsumer>
-    );
-  }
-}
+  return (
+    <AutoSizer>
+      {({ height, width }) => (
+        <Table
+          headerHeight={30}
+          height={height}
+          className={`gd-table ${gdevelopTheme.tableRootClassName}`}
+          headerClassName={'tableHeaderColumn'}
+          rowCount={dataRows.length}
+          rowGetter={({ index }) => dataRows[index]}
+          rowHeight={35}
+          onRowClick={() => {}}
+          rowClassName={rowClassName}
+          width={width}
+        >
+          <Column
+            label={<Trans>Section name</Trans>}
+            dataKey="name"
+            width={width * 0.4}
+            className={'tableColumn'}
+            cellRenderer={renderSectionNameCell}
+          />
+          <Column
+            label={<Trans>Time (ms)</Trans>}
+            dataKey="time"
+            width={width * 0.2}
+            className={'tableColumn'}
+          />
+          <Column
+            label={<Trans>% of parent</Trans>}
+            dataKey="parentPercent"
+            width={width * 0.2}
+            className={'tableColumn'}
+          />
+          <Column
+            label={<Trans>% of total</Trans>}
+            dataKey="totalPercent"
+            width={width * 0.2}
+            className={'tableColumn'}
+          />
+        </Table>
+      )}
+    </AutoSizer>
+  );
+};
+
+export default MeasuresTable;

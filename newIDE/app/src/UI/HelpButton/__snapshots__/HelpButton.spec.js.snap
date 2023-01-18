@@ -22,6 +22,7 @@ exports[`HelpButton renders the button linking to a GDevelop documentation help 
   onTouchStart={[Function]}
   tabIndex={0}
   target="_blank"
+  translate="yes"
   type="button"
 >
   <span

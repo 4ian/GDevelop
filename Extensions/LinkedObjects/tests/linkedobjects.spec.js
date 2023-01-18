@@ -239,14 +239,14 @@ describe('gdjs.LinksManager', function () {
       manager.removeAllLinksOf(object1A);
       manager.removeAllLinksOf(object1A);
       {
-        const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
+        const { pickedSomething } = pickObjectsLinkedTo(
           object1A,
           Hashtable.newFrom({ obj2: [object2A, object2B, object2C] })
         );
         expect(pickedSomething).to.be(false);
       }
       {
-        const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
+        const { pickedSomething } = pickObjectsLinkedTo(
           object2A,
           Hashtable.newFrom({ obj1: [object1A, object1B, object1C] })
         );

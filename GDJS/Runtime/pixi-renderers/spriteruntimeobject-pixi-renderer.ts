@@ -8,25 +8,23 @@ namespace gdjs {
     _object: gdjs.SpriteRuntimeObject;
     _spriteDirty: boolean = true;
     _textureDirty: boolean = true;
-    _sprite: any;
+    _sprite: PIXI.Sprite;
     _cachedWidth: float = 0;
     _cachedHeight: float = 0;
 
     /**
      * @param runtimeObject The object
-     * @param runtimeScene The scene
+     * @param instanceContainer The scene
      */
     constructor(
       runtimeObject: gdjs.SpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      if (this._sprite === undefined) {
-        this._sprite = new PIXI.Sprite(
-          runtimeScene.getGame().getImageManager().getInvalidPIXITexture()
-        );
-      }
-      const layer = runtimeScene.getLayer('');
+      this._sprite = new PIXI.Sprite(
+        instanceContainer.getGame().getImageManager().getInvalidPIXITexture()
+      );
+      const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
           .getRenderer()
@@ -34,11 +32,15 @@ namespace gdjs {
       }
     }
 
-    reinitialize(runtimeObject, runtimeScene) {
+    reinitialize(
+      runtimeObject: gdjs.SpriteRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       this._object = runtimeObject;
       this._spriteDirty = true;
       this._textureDirty = true;
-      const layer = runtimeScene.getLayer('');
+      this._sprite.tint = 0xffffff;
+      const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
           .getRenderer()
@@ -144,13 +146,11 @@ namespace gdjs {
       if (colors.length < 3) {
         return;
       }
-      this._sprite.tint =
-        '0x' +
-        gdjs.rgbToHex(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        );
+      this._sprite.tint = gdjs.rgbToHexNumber(
+        parseInt(colors[0], 10),
+        parseInt(colors[1], 10),
+        parseInt(colors[2], 10)
+      );
     }
 
     getColor() {

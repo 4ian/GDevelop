@@ -13,8 +13,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
-  type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
 import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
@@ -47,8 +46,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
+  resourceManagementProps: ResourceManagementProps,
 |};
 
 const initialMosaicEditorNodes = {
@@ -207,12 +205,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   render() {
-    const {
-      project,
-      onRenameResource,
-      onChooseResource,
-      resourceSources,
-    } = this.props;
+    const { project, onRenameResource, resourceManagementProps } = this.props;
     const { selectedResource } = this.state;
 
     const editors = {
@@ -233,8 +226,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
                 this._resourcesList.checkMissingPaths();
               }
             }}
-            onChooseResource={onChooseResource}
-            resourceSources={resourceSources}
+            resourceManagementProps={resourceManagementProps}
           />
         ),
       },

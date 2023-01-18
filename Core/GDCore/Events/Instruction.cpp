@@ -55,6 +55,10 @@ void Instruction::SetParameter(std::size_t nb, const gd::Expression& val) {
   parameters[nb] = val;
 }
 
+void Instruction::AddParameter(const gd::Expression& val) {
+  parameters.push_back(val);
+}
+
 std::shared_ptr<Instruction> GD_CORE_API
 CloneRememberingOriginalElement(std::shared_ptr<Instruction> instruction) {
   std::shared_ptr<Instruction> copy =

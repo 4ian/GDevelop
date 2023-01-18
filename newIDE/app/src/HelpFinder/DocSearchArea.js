@@ -149,7 +149,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
         <TextField
           id={'help-finder-search-bar'}
           fullWidth
-          hintText={t`Search on the documentation.`}
+          translatableHintText={t`Search on the documentation.`}
           value={this.props.value}
           onChange={(e, text) => this.props.onChange(text)}
         />

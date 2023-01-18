@@ -27,34 +27,52 @@ export default class InstancesSelection {
     this.selection.length = 0;
   }
 
-  selectInstance(
+  selectInstance({
+    instance,
+    multiSelect,
+    layersVisibility = null,
+    ignoreSeal = false,
+  }: {|
     instance: gdInitialInstance,
-    multiselect: boolean,
-    layersVisibility: ?{ [string]: boolean } = null
-  ) {
+    multiSelect: boolean,
+    layersVisibility: ?{ [string]: boolean },
+    ignoreSeal?: boolean,
+  |}) {
+    if (!ignoreSeal && instance.isSealed()) return;
     if (this.isInstanceSelected(instance)) {
-      if (multiselect) this.unselectInstance(instance);
+      if (multiSelect) this.unselectInstance(instance);
 
       return;
     }
 
-    if (!multiselect) this.clearSelection();
+    if (!multiSelect) this.clearSelection();
 
     if (!layersVisibility || layersVisibility[instance.getLayer()]) {
       this.selection.push(instance);
     }
   }
 
-  selectInstances(
+  selectInstances({
+    instances,
+    multiSelect,
+    layersVisibility = null,
+    ignoreSeal = false,
+  }: {|
     instances: Array<gdInitialInstance>,
-    multiselect: boolean,
-    layersVisibility: ?{ [string]: boolean } = null
-  ) {
-    if (!multiselect) this.clearSelection();
+    multiSelect: boolean,
+    layersVisibility: ?{ [string]: boolean },
+    ignoreSeal?: boolean,
+  |}) {
+    if (!multiSelect) this.clearSelection();
 
-    instances.forEach(instance =>
-      this.selectInstance(instance, true, layersVisibility)
-    );
+    instances.forEach(instance => {
+      this.selectInstance({
+        instance,
+        multiSelect: true,
+        layersVisibility,
+        ignoreSeal,
+      });
+    });
   }
 
   unselectInstance(instance: gdInitialInstance) {

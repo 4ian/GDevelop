@@ -639,7 +639,7 @@ namespace gdjs {
       newObjects.forEach((newObjectData) => {
         const objectName = newObjectData.name;
         const newBehaviors = newObjectData.behaviors;
-        const runtimeObjects = runtimeScene.getObjects(objectName);
+        const runtimeObjects = runtimeScene.getObjects(objectName)!;
         changedRuntimeBehaviors.forEach((changedRuntimeBehavior) => {
           const behaviorTypeName = changedRuntimeBehavior.behaviorTypeName;
 
@@ -784,7 +784,7 @@ namespace gdjs {
         runtimeScene.updateObject(newObjectData);
 
         // Update existing instances
-        const runtimeObjects = runtimeScene.getObjects(newObjectData.name);
+        const runtimeObjects = runtimeScene.getObjects(newObjectData.name)!;
 
         // Update instances state
         runtimeObjects.forEach((runtimeObject) => {

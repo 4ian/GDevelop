@@ -24,15 +24,26 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Background from '../../../../UI/Background';
 import ScrollView from '../../../../UI/ScrollView';
+import Paper from '../../../../UI/Paper';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  leftContainer: {
+    display: 'flex',
+    overflow: 'hidden', // Ensure large images are not overflowing the other panel.
+    flexDirection: 'column', // Ensure the panel provides a scroll bar if needed.
+  },
+  rightContainer: {
+    display: 'flex',
+  },
+};
 
 const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
   first: 'preview',
   second: 'properties',
-  splitPercentage: 50,
+  splitPercentage: 66.67,
 };
 
 const verticalMosaicNodes: EditorMosaicNode = {
@@ -43,12 +54,18 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
+  onPointsUpdated?: () => void,
 |};
 
-const PointsEditor = (props: Props) => {
+const PointsEditor = ({
+  objectConfiguration,
+  resourcesLoader,
+  project,
+  onPointsUpdated,
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -70,9 +87,9 @@ const PointsEditor = (props: Props) => {
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -82,8 +99,8 @@ const PointsEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
         } else if (samePointsForSprites) {
@@ -92,14 +109,16 @@ const PointsEditor = (props: Props) => {
       }
 
       forceUpdate(); // Refresh the preview
+      if (onPointsUpdated) onPointsUpdated();
     },
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       samePointsForAnimations,
       samePointsForSprites,
       forceUpdate,
+      onPointsUpdated,
     ]
   );
 
@@ -123,8 +142,8 @@ const PointsEditor = (props: Props) => {
 
     setSamePointsForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
       )
@@ -172,53 +191,54 @@ const PointsEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
-  const resourceName = hasValidSprite ? sprite.getImageName() : '';
+  if (!objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
-          <ImagePreview
-            resourceName={resourceName}
-            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
-              props.project,
-              resourceName,
-              {}
-            )}
-            isImageResourceSmooth={isProjectImageResourceSmooth(
-              props.project,
-              resourceName
-            )}
-            project={props.project}
-            renderOverlay={overlayProps =>
-              hasValidSprite && (
-                <PointsPreview
-                  {...overlayProps}
-                  pointsContainer={sprite}
-                  onPointsUpdated={updatePoints}
-                  selectedPointName={selectedPointName}
-                  highlightedPointName={highlightedPointName}
-                  onClickPoint={setSelectedPointName}
-                />
-              )
-            }
-          />
-        </Background>
+        <Paper background="medium" style={styles.leftContainer} square>
+          <Column noMargin expand useFullHeight>
+            <ImagePreview
+              resourceName={resourceName}
+              imageResourceSource={resourcesLoader.getResourceFullUrl(
+                project,
+                resourceName,
+                {}
+              )}
+              isImageResourceSmooth={isProjectImageResourceSmooth(
+                project,
+                resourceName
+              )}
+              renderOverlay={overlayProps =>
+                sprite && (
+                  <PointsPreview
+                    {...overlayProps}
+                    pointsContainer={sprite}
+                    onPointsUpdated={updatePoints}
+                    selectedPointName={selectedPointName}
+                    highlightedPointName={highlightedPointName}
+                    onClickPoint={setSelectedPointName}
+                  />
+                )
+              }
+            />
+          </Column>
+        </Paper>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
-          <ScrollView>
+        <Paper background="medium" style={styles.rightContainer} square>
+          <Column noMargin expand>
             <Line>
               <Column expand>
                 <SpriteSelector
-                  spriteObject={spriteObject}
+                  spriteConfiguration={spriteConfiguration}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}
@@ -240,22 +260,26 @@ const PointsEditor = (props: Props) => {
                 />
               </Column>
             </Line>
-            {!!sprite && (
-              <PointsList
-                pointsContainer={sprite}
-                onPointsUpdated={updatePoints}
-                selectedPointName={selectedPointName}
-                onHoverPoint={setHighlightedPointName}
-                onSelectPoint={setSelectedPointName}
-              />
-            )}
-            {!sprite && (
-              <EmptyMessage>
-                <Trans>Choose an animation and frame to edit the points</Trans>
-              </EmptyMessage>
-            )}
-          </ScrollView>
-        </Background>
+            <ScrollView>
+              {!!sprite && (
+                <PointsList
+                  pointsContainer={sprite}
+                  onPointsUpdated={updatePoints}
+                  selectedPointName={selectedPointName}
+                  onHoverPoint={setHighlightedPointName}
+                  onSelectPoint={setSelectedPointName}
+                />
+              )}
+              {!sprite && (
+                <EmptyMessage>
+                  <Trans>
+                    Choose an animation and frame to edit the points
+                  </Trans>
+                </EmptyMessage>
+              )}
+            </ScrollView>
+          </Column>
+        </Paper>
       ),
     },
   };

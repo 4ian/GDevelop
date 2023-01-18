@@ -42,7 +42,7 @@ JsCodeEvent::GetAllExpressionsWithMetadata() const {
 }
 
 void JsCodeEvent::SerializeTo(gd::SerializerElement& element) const {
-  element.AddChild("inlineCode").SetValue(inlineCode);
+  element.AddChild("inlineCode").SetMultilineStringValue(inlineCode);
   element.AddChild("parameterObjects")
       .SetValue(parameterObjects.GetPlainString());
   element.AddChild("useStrict").SetValue(useStrict);
@@ -51,7 +51,7 @@ void JsCodeEvent::SerializeTo(gd::SerializerElement& element) const {
 
 void JsCodeEvent::UnserializeFrom(gd::Project& project,
                                   const gd::SerializerElement& element) {
-  inlineCode = element.GetChild("inlineCode").GetValue().GetString();
+  inlineCode = element.GetChild("inlineCode").GetMultilineStringValue();
   parameterObjects = gd::Expression(
       element.GetChild("parameterObjects").GetValue().GetString());
 

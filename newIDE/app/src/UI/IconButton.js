@@ -26,28 +26,35 @@ type IconProps =
 type Props = {|
   ...IconProps,
   onClick?: (ev: any) => void | Promise<void>,
+  target?: string,
   onContextMenu?: () => void,
   disabled?: boolean,
   edge?: 'start' | 'end' | false,
+  id?: string,
 
   style?: {|
     padding?: number,
     width?: number,
     height?: number,
+    cursor?: 'pointer',
     transform?: string,
     transition?: string,
     opacity?: number,
+    +borderRadius?: number,
     margin?: number,
     marginRight?: number,
     marginLeft?: number,
     marginTop?: number,
     marginBottom?: number,
+    visibility?: 'visible' | 'hidden',
   |},
   size?: 'small',
 
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
   'aria-label'?: string,
+
+  color?: 'default',
 |};
 
 /**
@@ -56,8 +63,20 @@ type Props = {|
  */
 export default class IconButton extends React.Component<Props, {||}> {
   render() {
-    const { tooltip, acceleratorString, ...otherProps } = this.props;
-    const iconButton = <MUIIconButton {...otherProps} color="secondary" />;
+    const {
+      tooltip,
+      acceleratorString,
+      color,
+      style,
+      ...otherProps
+    } = this.props;
+    const iconButton = (
+      <MUIIconButton
+        {...otherProps}
+        style={style}
+        color={color || 'secondary'}
+      />
+    );
 
     return tooltip && !this.props.disabled ? (
       <I18n>

@@ -7,7 +7,6 @@ import { differenceInCalendarDays, format } from 'date-fns';
 
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
-import MoreVert from '@material-ui/icons/MoreVert';
 
 import { Line, LargeSpacer, Spacer, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -18,7 +17,7 @@ import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
-import TextField from '../../UI/TextField';
+import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import BackgroundText from '../../UI/BackgroundText';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
@@ -34,10 +33,10 @@ import {
   type Build,
 } from '../../Utils/GDevelopServices/Build';
 import { type Game } from '../../Utils/GDevelopServices/Game';
-import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
+import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const styles = {
   icon: {
@@ -48,7 +47,7 @@ const styles = {
   buildButtonIcon: { height: 16, width: 16, opacity: 0.6 },
   openForFeedbackIndicator: { height: 4, width: 4, borderRadius: 4 },
   cardContent: { flex: 1 },
-  textField: { width: '60%' },
+  textField: { width: '70%' },
   circularProgress: { height: 20, width: 20 },
 };
 
@@ -119,7 +118,10 @@ export const BuildCard = ({
   authenticatedUser,
 }: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
-  const buildName = build.name ? build.name : shortenUuidForDisplay(build.id);
+  const defaultBuildName = `${game.gameName
+    .toLowerCase()
+    .replace(/ /g, '-')}-${format(build.updatedAt, 'yyyy-MM-dd-HH-mm-ss')}`;
+  const buildName = build.name ? build.name : defaultBuildName;
   const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
     build &&
@@ -127,7 +129,7 @@ export const BuildCard = ({
     differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const nameInput = React.useRef<?TextField>(null);
+  const nameInput = React.useRef<?TextFieldInterface>(null);
   const windowWidth = useResponsiveWindowWidth();
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
@@ -215,7 +217,7 @@ export const BuildCard = ({
               <ElementWithMenu
                 element={
                   <IconButton size="small" disabled={gameUpdating}>
-                    <MoreVert />
+                    <ThreeDotsMenu />
                   </IconButton>
                 }
                 buildMenuTemplate={(i18n: I18nType) => [

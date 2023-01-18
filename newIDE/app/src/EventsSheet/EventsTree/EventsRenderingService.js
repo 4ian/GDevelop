@@ -1,3 +1,5 @@
+// @flow
+import { type ComponentType } from 'react';
 import UnknownEvent from './Renderers/UnknownEvent';
 import StandardEvent from './Renderers/StandardEvent';
 import GroupEvent from './Renderers/GroupEvent';
@@ -8,6 +10,7 @@ import RepeatEvent from './Renderers/RepeatEvent';
 import WhileEvent from './Renderers/WhileEvent';
 import LinkEvent from './Renderers/LinkEvent';
 import JsCodeEvent from './Renderers/JsCodeEvent';
+import { type EventRendererProps } from './Renderers/EventRenderer';
 
 const EventsRenderingService = {
   components: {
@@ -22,12 +25,17 @@ const EventsRenderingService = {
     'BuiltinCommonInstructions::Link': LinkEvent,
     'BuiltinCommonInstructions::JsCode': JsCodeEvent,
   },
-  getEventComponent: function(event) {
+  getEventComponent: function(
+    event: gdBaseEvent
+  ): ComponentType<EventRendererProps> {
     if (this.components.hasOwnProperty(event.getType()))
       return this.components[event.getType()];
     else return this.components.unknownEvent;
   },
-  registerEvent: function(eventType, renderFunction) {
+  registerEvent: function(
+    eventType: string,
+    renderFunction: ComponentType<EventRendererProps>
+  ) {
     if (!this.components.hasOwnProperty(eventType)) {
       console.warn(
         'Tried to register renderer for events "' +

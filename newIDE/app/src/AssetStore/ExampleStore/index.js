@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react';
-import SearchBar, {
-  type SearchBarInterface,
-  useShouldAutofocusSearchbar,
-} from '../../UI/SearchBar';
+import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { ExampleStoreContext } from './ExampleStoreContext';
@@ -14,14 +11,21 @@ import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 // When showing examples, always put the starters first.
-const prepareExamples = (examples: Array<ExampleShortHeader>) =>
-  examples.sort((example1, example2) =>
-    example1.tags.includes('Starter') && !example2.tags.includes('Starter')
+export const prepareExamples = (
+  examples: Array<ExampleShortHeader>
+): Array<ExampleShortHeader> =>
+  examples.sort((example1, example2) => {
+    const isExample1Starter = example1.tags.includes('Starter');
+    const isExample2Starter = example2.tags.includes('Starter');
+    return isExample1Starter && !isExample2Starter
+      ? -1
+      : !isExample1Starter && isExample2Starter
       ? 1
-      : 0
-  );
+      : 0;
+  });
 
 const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
   exampleShortHeader.name;
@@ -30,13 +34,19 @@ type Props = {|
   isOpening: boolean,
   onOpen: ExampleShortHeader => Promise<void>,
   focusOnMount?: boolean,
+  initialExampleShortHeader: ?ExampleShortHeader,
 |};
 
-export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
+export const ExampleStore = ({
+  isOpening,
+  onOpen,
+  focusOnMount,
+  initialExampleShortHeader,
+}: Props) => {
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
+  ] = React.useState<?ExampleShortHeader>(initialExampleShortHeader);
   const {
     filters,
     searchResults,
@@ -47,7 +57,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
     setSearchText,
   } = React.useContext(ExampleStoreContext);
 
-  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+  const shouldAutofocusSearchbar = useShouldAutofocusInput();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
 
   React.useEffect(
@@ -90,7 +100,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
         {windowWidth => (
           <Column expand noMargin useFullHeight>
             <Line>
-              <Column expand>
+              <Column expand noMargin>
                 <SearchBar
                   value={searchText}
                   onChange={setSearchText}

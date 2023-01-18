@@ -25,14 +25,26 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Background from '../../../../UI/Background';
+import Paper from '../../../../UI/Paper';
+import ScrollView from '../../../../UI/ScrollView';
 const gd: libGDevelop = global.gd;
+
+const styles = {
+  leftContainer: {
+    display: 'flex',
+    overflow: 'hidden', // Ensure large images are not overflowing the other panel.
+    flexDirection: 'column', // Ensure the panel provides a scroll bar if needed.
+  },
+  rightContainer: {
+    display: 'flex',
+  },
+};
 
 const horizontalMosaicNodes: EditorMosaicNode = {
   direction: 'row',
   first: 'preview',
   second: 'properties',
-  splitPercentage: 50,
+  splitPercentage: 66.67,
 };
 
 const verticalMosaicNodes: EditorMosaicNode = {
@@ -43,12 +55,18 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: gdSpriteObject,
+  objectConfiguration: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
+  onMasksUpdated?: () => void,
 |};
 
-const CollisionMasksEditor = (props: Props) => {
+const CollisionMasksEditor = ({
+  objectConfiguration,
+  resourcesLoader,
+  project,
+  onMasksUpdated,
+}: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
@@ -75,9 +93,9 @@ const CollisionMasksEditor = (props: Props) => {
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();
 
-  const spriteObject = gd.asSpriteObject(props.object);
-  const { animation, sprite, hasValidSprite } = getCurrentElements(
-    spriteObject,
+  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const { animation, sprite } = getCurrentElements(
+    spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -87,8 +105,8 @@ const CollisionMasksEditor = (props: Props) => {
     () => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
             copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
           });
         } else if (sameCollisionMasksForSprites) {
@@ -97,14 +115,16 @@ const CollisionMasksEditor = (props: Props) => {
       }
 
       forceUpdate(); // Refresh the preview and the list
+      if (onMasksUpdated) onMasksUpdated();
     },
     [
       animation,
       sprite,
-      spriteObject,
+      spriteConfiguration,
       sameCollisionMasksForAnimations,
       sameCollisionMasksForSprites,
       forceUpdate,
+      onMasksUpdated,
     ]
   );
 
@@ -128,8 +148,8 @@ const CollisionMasksEditor = (props: Props) => {
 
     setSameCollisionMasksForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
+        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const otherAnimation = spriteConfiguration.getAnimation(i);
           return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
         })
       )
@@ -195,114 +215,124 @@ const CollisionMasksEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!props.object.getAnimationsCount()) return null;
-  const resourceName = hasValidSprite ? sprite.getImageName() : '';
+  if (!objectConfiguration.getAnimationsCount()) return null;
+  const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
-          <ImagePreview
-            resourceName={resourceName}
-            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
-              props.project,
-              resourceName,
-              {}
-            )}
-            isImageResourceSmooth={isProjectImageResourceSmooth(
-              props.project,
-              resourceName
-            )}
-            project={props.project}
-            onSize={setCurrentSpriteSize}
-            renderOverlay={overlayProps =>
-              hasValidSprite && (
-                <CollisionMasksPreview
-                  {...overlayProps}
-                  isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
-                  polygons={sprite.getCustomCollisionMask()}
-                  onPolygonsUpdated={updateCollisionMasks}
-                  highlightedVerticePtr={highlightedVerticePtr}
-                  selectedVerticePtr={selectedVerticePtr}
-                  onClickVertice={setSelectedVerticePtr}
-                />
-              )
-            }
-          />
-        </Background>
+        <Paper background="medium" style={styles.leftContainer} square>
+          <Column expand noMargin useFullHeight>
+            <ImagePreview
+              resourceName={resourceName}
+              imageResourceSource={resourcesLoader.getResourceFullUrl(
+                project,
+                resourceName,
+                {}
+              )}
+              isImageResourceSmooth={isProjectImageResourceSmooth(
+                project,
+                resourceName
+              )}
+              onSize={setCurrentSpriteSize}
+              renderOverlay={overlayProps =>
+                sprite && (
+                  <CollisionMasksPreview
+                    {...overlayProps}
+                    isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+                    polygons={sprite.getCustomCollisionMask()}
+                    onPolygonsUpdated={updateCollisionMasks}
+                    highlightedVerticePtr={highlightedVerticePtr}
+                    selectedVerticePtr={selectedVerticePtr}
+                    onClickVertice={setSelectedVerticePtr}
+                  />
+                )
+              }
+            />
+          </Column>
+        </Paper>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <Background>
-          <Line>
-            <Column expand>
-              <SpriteSelector
-                spriteObject={spriteObject}
-                animationIndex={animationIndex}
-                directionIndex={directionIndex}
-                spriteIndex={spriteIndex}
-                chooseAnimation={chooseAnimation}
-                chooseDirection={chooseDirection}
-                chooseSprite={chooseSprite}
-                sameForAllAnimations={sameCollisionMasksForAnimations}
-                sameForAllSprites={sameCollisionMasksForSprites}
-                setSameForAllAnimations={setSameCollisionMasksForAllAnimations}
-                setSameForAllSprites={setSameCollisionMasksForAllSprites}
-                setSameForAllAnimationsLabel={
-                  <Trans>Share same collision masks for all animations</Trans>
-                }
-                setSameForAllSpritesLabel={
-                  <Trans>
-                    Share same collision masks for all sprites of this animation
-                  </Trans>
-                }
-              />
-            </Column>
-          </Line>
-          {!!sprite && !sprite.isCollisionMaskAutomatic() && (
-            <React.Fragment>
-              <PolygonsList
-                polygons={sprite.getCustomCollisionMask()}
-                onPolygonsUpdated={updateCollisionMasks}
-                restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
-                onHoverVertice={setHighlightedVerticePtr}
-                onClickVertice={setSelectedVerticePtr}
-                selectedVerticePtr={selectedVerticePtr}
-                spriteWidth={spriteWidth}
-                spriteHeight={spriteHeight}
-              />
-            </React.Fragment>
-          )}
-          {!!sprite && sprite.isCollisionMaskAutomatic() && (
-            <React.Fragment>
-              <EmptyMessage>
-                <Trans>
-                  This sprite uses the default collision mask, a rectangle that
-                  is as large as the sprite.
-                </Trans>
-              </EmptyMessage>
-              <Line justifyContent="center">
-                <FlatButton
-                  label={<Trans>Use a custom collision mask</Trans>}
-                  primary={false}
-                  onClick={() => onSetCollisionMaskAutomatic(false)}
+        <Paper background="medium" style={styles.rightContainer} square>
+          <Column expand noMargin>
+            <Line>
+              <Column expand>
+                <SpriteSelector
+                  spriteConfiguration={spriteConfiguration}
+                  animationIndex={animationIndex}
+                  directionIndex={directionIndex}
+                  spriteIndex={spriteIndex}
+                  chooseAnimation={chooseAnimation}
+                  chooseDirection={chooseDirection}
+                  chooseSprite={chooseSprite}
+                  sameForAllAnimations={sameCollisionMasksForAnimations}
+                  sameForAllSprites={sameCollisionMasksForSprites}
+                  setSameForAllAnimations={
+                    setSameCollisionMasksForAllAnimations
+                  }
+                  setSameForAllSprites={setSameCollisionMasksForAllSprites}
+                  setSameForAllAnimationsLabel={
+                    <Trans>Share same collision masks for all animations</Trans>
+                  }
+                  setSameForAllSpritesLabel={
+                    <Trans>
+                      Share same collision masks for all sprites of this
+                      animation
+                    </Trans>
+                  }
                 />
-              </Line>
-            </React.Fragment>
-          )}
-          {!sprite && (
-            <EmptyMessage>
-              <Trans>
-                Choose an animation and frame to edit the collision masks
-              </Trans>
-            </EmptyMessage>
-          )}
-        </Background>
+              </Column>
+            </Line>
+            <ScrollView>
+              {!!sprite && !sprite.isCollisionMaskAutomatic() && (
+                <React.Fragment>
+                  <PolygonsList
+                    polygons={sprite.getCustomCollisionMask()}
+                    onPolygonsUpdated={updateCollisionMasks}
+                    restoreCollisionMask={() =>
+                      onSetCollisionMaskAutomatic(true)
+                    }
+                    onHoverVertice={setHighlightedVerticePtr}
+                    onClickVertice={setSelectedVerticePtr}
+                    selectedVerticePtr={selectedVerticePtr}
+                    spriteWidth={spriteWidth}
+                    spriteHeight={spriteHeight}
+                  />
+                </React.Fragment>
+              )}
+              {!!sprite && sprite.isCollisionMaskAutomatic() && (
+                <React.Fragment>
+                  <EmptyMessage>
+                    <Trans>
+                      This sprite uses the default collision mask, a rectangle
+                      that is as large as the sprite.
+                    </Trans>
+                  </EmptyMessage>
+                  <Line justifyContent="center">
+                    <FlatButton
+                      label={<Trans>Use a custom collision mask</Trans>}
+                      primary={false}
+                      onClick={() => onSetCollisionMaskAutomatic(false)}
+                    />
+                  </Line>
+                </React.Fragment>
+              )}
+              {!sprite && (
+                <EmptyMessage>
+                  <Trans>
+                    Choose an animation and frame to edit the collision masks
+                  </Trans>
+                </EmptyMessage>
+              )}
+            </ScrollView>
+          </Column>
+        </Paper>
       ),
     },
   };

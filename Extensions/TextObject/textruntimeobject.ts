@@ -26,6 +26,7 @@ namespace gdjs {
     };
     /** The text of the object */
     string: string;
+    textAlignment: string;
   };
 
   export type TextObjectData = ObjectData & TextObjectDataType;
@@ -63,14 +64,14 @@ namespace gdjs {
     _scaleY: number = 1;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param textObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textObjectData: TextObjectData
     ) {
-      super(runtimeScene, textObjectData);
+      super(instanceContainer, textObjectData);
       this._characterSize = Math.max(1, textObjectData.characterSize);
       this._fontName = textObjectData.font;
       this._bold = textObjectData.bold;
@@ -82,7 +83,11 @@ namespace gdjs {
         textObjectData.color.b,
       ];
       this._str = textObjectData.string;
-      this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
+      this._textAlign = textObjectData.textAlignment;
+      this._renderer = new gdjs.TextRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -124,6 +129,9 @@ namespace gdjs {
       if (oldObjectData.underlined !== newObjectData.underlined) {
         return false;
       }
+      if (oldObjectData.textAlignment !== newObjectData.textAlignment) {
+        this.setTextAlignment(newObjectData.textAlignment);
+      }
       return true;
     }
 
@@ -131,7 +139,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -151,7 +159,7 @@ namespace gdjs {
      * Update the rendered object position.
      */
     private _updateTextPosition() {
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       this._renderer.updatePosition();
     }
 
@@ -285,7 +293,7 @@ namespace gdjs {
      * Get width of the text.
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
     }
 
     /**
@@ -326,7 +334,7 @@ namespace gdjs {
       this._scaleX = newScale;
       this._scaleY = newScale;
       this._renderer.setScale(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -338,7 +346,7 @@ namespace gdjs {
 
       this._scaleX = newScale;
       this._renderer.setScaleX(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -350,7 +358,7 @@ namespace gdjs {
 
       this._scaleY = newScale;
       this._renderer.setScaleY(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -410,7 +418,7 @@ namespace gdjs {
 
       this._wrapping = enable;
       this._renderer.updateStyle();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -432,7 +440,7 @@ namespace gdjs {
 
       this._wrappingWidth = width;
       this._renderer.updateStyle();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**

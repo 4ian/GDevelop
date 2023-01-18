@@ -40,6 +40,7 @@ type Props = {|
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
 
+  id?: string,
   style?: {
     flex?: 1,
     width?: 'auto',
@@ -54,7 +55,7 @@ type Props = {|
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
-  hintText?: MessageDescriptor,
+  translatableHintText?: MessageDescriptor,
 |};
 
 /**
@@ -102,6 +103,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
       <I18n>
         {({ i18n }) => (
           <TextField
+            id={props.id}
             select
             color="secondary"
             {...computeTextFieldStyleProps(props)}
@@ -134,8 +136,8 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
           >
             {!hasValidValue ? (
               <option value={INVALID_VALUE} disabled>
-                {props.hintText
-                  ? i18n._(props.hintText)
+                {props.translatableHintText
+                  ? i18n._(props.translatableHintText)
                   : i18n._(t`Choose an option`)}
               </option>
             ) : null}

@@ -7,14 +7,20 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/ObjectConfiguration.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Events/Builtin/StandardEvent.h"
 #include "catch.hpp"
 
+// TODO Remove these 2 classes and write the test with events based behaviors.
 class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
  public:
-  BehaviorWithRequiredBehaviorProperty(){};
+  BehaviorWithRequiredBehaviorProperty(
+      const gd::String& name, const gd::String& type)
+      : Behavior(name, type) {};
   virtual ~BehaviorWithRequiredBehaviorProperty(){};
   virtual Behavior* Clone() const override {
     return new BehaviorWithRequiredBehaviorProperty(*this);
@@ -49,7 +55,9 @@ class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
 class BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior
     : public gd::Behavior {
  public:
-  BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(){};
+  BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(
+      const gd::String& name, const gd::String& type)
+      : Behavior(name, type) {};
   virtual ~BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(){};
   virtual Behavior* Clone() const override {
     return new BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(
@@ -87,13 +95,20 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   // Don't show extension loading logs for tests (too verbose).
   platform.EnableExtensionLoadingLogs(false);
 
+  // Required for tests on event generation.
+  std::shared_ptr<gd::PlatformExtension> commonInstructionsExtension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  commonInstructionsExtension->SetExtensionInformation(
+      "BuiltinCommonInstructions", "instruction extension", "", "", "");
+  commonInstructionsExtension->AddEvent("Standard", "Standard event", "", "", "", std::make_shared<gd::StandardEvent>());
+
   std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
 
   // Create the base object. All objects "inherits" from it.
   baseObjectExtension->SetExtensionInformation(
       "BuiltinObject", "Base Object dummy extension", "", "", "");
-  auto& baseObject = baseObjectExtension->AddObject<gd::Object>(
+  auto& baseObject = baseObjectExtension->AddObject<gd::ObjectConfiguration>(
       "", "Dummy Base Object", "Dummy Base Object", "");
 
   // Add this expression for all objects. But it requires a "capability".
@@ -124,6 +139,18 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                   "")
       .AddParameter("expression", "Parameter 1 (a number)")
       .SetFunctionName("doSomething");
+
+  extension
+      ->AddAction("DoSomethingWithObjects",
+                  "Do something",
+                  "This does something",
+                  "Do something please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("object", _("Object 1 parameter"))
+      .AddParameter("object", _("Object 2 parameter"))
+      .SetFunctionName("doSomethingWithObjects");
 
   extension
       ->AddAction("DoSomethingWithResources",
@@ -160,7 +187,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetDefaultValue("\"\"")
       .AddParameter("camera", _("Camera"), "", true)
       .SetDefaultValue("0")
-      .SetFunctionName("getMouseX");
+      .SetFunctionName("getCursorX");
   extension
       ->AddExpression("GetGlobalVariableAsNumber",
                       "Get me a global variable value",
@@ -209,7 +236,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("objectvar", _("Variable for object 2"))
       .SetFunctionName("getStringWith1ObjectParamAnd2ObjectVarParam");
 
-  auto& object = extension->AddObject<gd::Object>(
+  auto& object = extension->AddObject<gd::SpriteObject>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");
   object
       .AddExpression("GetObjectVariableAsNumber",
@@ -260,10 +287,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                                "Dummy behavior",
                                "MyBehavior",
                                "A dummy behavior for tests",
-                               "",
-                               "",
-                               "",
-                               gd::make_unique<gd::Behavior>(),
+                               "Group",
+                               "Icon.png",
+                               "MyBehavior",
+                               gd::make_unique<gd::Behavior>(
+                                  "Behavior", "MyExtension::MyBehavior"),
                                gd::make_unique<gd::BehaviorsSharedData>());
     behavior
         .AddAction("BehaviorDoSomething",
@@ -304,10 +332,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                                "Another Dummy behavior",
                                "MyOtherBehavior",
                                "Another dummy behavior for tests",
-                               "",
-                               "",
-                               "",
-                               gd::make_unique<gd::Behavior>(),
+                               "Group",
+                               "Icon.png",
+                               "MyOtherBehavior",
+                               gd::make_unique<gd::Behavior>(
+                                  "Behavior", "MyExtension::MyOtherBehavior"),
                                gd::make_unique<gd::BehaviorsSharedData>());
   }
 
@@ -317,10 +346,11 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         "BehaviorWithRequiredBehaviorProperty",
         "BehaviorWithRequiredBehaviorProperty",
         "A dummy behavior requiring another behavior (MyBehavior)",
-        "",
-        "",
-        "",
-        gd::make_unique<BehaviorWithRequiredBehaviorProperty>(),
+        "Group",
+        "Icon.png",
+        "BehaviorWithRequiredBehaviorProperty",
+        gd::make_unique<BehaviorWithRequiredBehaviorProperty>(
+            "Behavior", "MyExtension::BehaviorWithRequiredBehaviorProperty"),
         gd::make_unique<gd::BehaviorsSharedData>());
   }
   {
@@ -331,17 +361,19 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         "A dummy behavior requiring another behavior "
         "(BehaviorWithRequiredBehaviorProperty) that itself requires another "
         "behavior (MyBehavior)",
-        "",
-        "",
-        "",
+        "Group",
+        "Icon.png",
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
         gd::make_unique<
-            BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior>(),
+            BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior>(
+                "Behavior",
+                "MyExtension::BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior"),
         gd::make_unique<gd::BehaviorsSharedData>());
   }
 
   {
     auto& object = extension
-                       ->AddObject<gd::Object>(
+                       ->AddObject<gd::ObjectConfiguration>(
                            "FakeObjectWithUnsupportedCapability",
                            "FakeObjectWithUnsupportedCapability",
                            "This is FakeObjectWithUnsupportedCapability",
@@ -349,6 +381,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                        .AddUnsupportedBaseObjectCapability("effect");
   }
 
+  platform.AddExtension(commonInstructionsExtension);
   platform.AddExtension(baseObjectExtension);
   platform.AddExtension(extension);
   project.AddPlatform(platform);

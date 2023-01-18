@@ -8,6 +8,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type Release } from '../../Utils/GDevelopServices/Release';
 import { type Build } from '../../Utils/GDevelopServices/Build';
+import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 import {
   type ExtensionShortHeader,
   type ExtensionHeader,
@@ -22,10 +23,11 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
-  type AssetPacks,
+  type PublicAssetPacks,
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
+import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -41,12 +43,94 @@ export const indieVerifiedFirebaseUser: FirebaseUser = {
   emailVerified: true,
 };
 
+export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = [
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
+    name: 'Worms 2D',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d35c',
+    name: 'Crash Bandicoot',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+];
+
+const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372141',
+    name: 'Worms 2D 1',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d352',
+    name: 'Crash Bandicoot 2',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
+    name: 'Worms 2D 3',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d354',
+    name: 'Crash Bandicoot 4',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372145',
+    name: 'Worms 2D 5',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d356',
+    name: 'Crash Bandicoot 6',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372147',
+    name: 'Worms 2D 7',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d358',
+    name: 'Crash Bandicoot 8',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372149',
+    name: 'Worms 2D 9',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d350',
+    name: 'Crash Bandicoot 10',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+];
+
 export const indieUserProfile: Profile = {
   id: 'indie-user',
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
   getGameStatsEmail: false,
+  getNewsletterEmail: true,
+  isCreator: true,
+  isPlayer: false,
+  donateLink: 'https://www.paypal.me/indie-user',
 };
 
 export const usagesForIndieUser: Usages = [
@@ -77,6 +161,13 @@ export const subscriptionForIndieUser: Subscription = {
   userId: 'indie-user',
 };
 
+export const subscriptionForSilverUser: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+};
+
 export const noSubscription: Subscription = {
   planId: null,
   createdAt: 1515084011000,
@@ -84,38 +175,151 @@ export const noSubscription: Subscription = {
   userId: 'no-subscription-user',
 };
 
-export const limitsForIndieUser: Limits = {
-  'cordova-build': {
-    current: 2,
-    max: 10,
-    limitReached: false,
+export const limitsForNoSubscriptionUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: false,
+      retention: false,
+      sessionsTimeStats: false,
+      platforms: false,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: true,
+    },
+    leaderboards: {
+      maximumCountPerGame: 3,
+      canMaximumCountPerGameBeIncreased: true,
+      themeCustomizationCapabilities: 'NONE',
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 0,
+      max: 2,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForIndieUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 50,
+      canMaximumCountBeIncreased: true,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'BASIC',
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 10,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForProUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 100,
+      canMaximumCountBeIncreased: false,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 70,
+      limitReached: false,
+    },
+  },
+  message: undefined,
 };
 
 export const limitsReached: Limits = {
-  'cordova-build': {
-    current: 10,
-    max: 10,
-    limitReached: true,
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: true,
+    },
+    leaderboards: {
+      maximumCountPerGame: 3,
+      canMaximumCountPerGameBeIncreased: true,
+      themeCustomizationCapabilities: 'BASIC',
+    },
   },
+  limits: {
+    'cordova-build': {
+      current: 10,
+      max: 10,
+      limitReached: true,
+    },
+  },
+  message: undefined,
 };
 
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  loginState: 'done',
   badges: null,
+  cloudProjects: null,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
-  subscription: subscriptionForIndieUser,
+  subscription: subscriptionForSilverUser,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
-  onLogout: () => {},
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
@@ -132,19 +336,74 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
 export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  loginState: 'done',
   badges: null,
+  cloudProjects: tenCloudProjects,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
-  onLogout: () => {},
+  limits: limitsForNoSubscriptionUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  loginState: 'done',
+  badges: null,
+  cloudProjects: tenCloudProjects,
+  cloudProjectsFetchingErrorLabel: null,
+  firebaseUser: indieFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsReached,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
+  onLogin: () => {},
+  onForgotPassword: async () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
@@ -161,19 +420,32 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
 export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  loginState: 'done',
   badges: null,
+  cloudProjects: cloudProjectsForIndieUser,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
-  onLogout: () => {},
+  limits: limitsForNoSubscriptionUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
@@ -190,19 +462,81 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
 export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  loginState: 'loggingIn',
   badges: null,
+  cloudProjects: null,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
   limits: null,
-  onLogout: () => {},
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  loginState: 'done',
+  badges: [
+    {
+      seen: false,
+      unlockedAt: '123',
+      userId: indieUserProfile.id,
+      achievementId: 'badge1',
+    },
+  ],
+  cloudProjects: cloudProjectsForIndieUser,
+  cloudProjectsFetchingErrorLabel: null,
+  firebaseUser: indieVerifiedFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForNoSubscriptionUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
+  onLogin: () => {},
+  onForgotPassword: async () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
@@ -219,19 +553,32 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
 export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  loginState: 'done',
   badges: null,
+  cloudProjects: null,
+  cloudProjectsFetchingErrorLabel: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
   limits: null,
-  onLogout: () => {},
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
   onLogin: () => {},
+  onForgotPassword: async () => {},
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
   onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
   },
   onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
@@ -435,7 +782,9 @@ export const fakeAsset1: Asset = {
   shortDescription:
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
+  previewImageUrls: [
+    'https://asset-resources.gdevelop.io/public-resources/Simple Space/spaceships/b0e7ae371773ea6cf1e18a7db1d32ea1b4b9dd388f1f31aed5b7c1501437292c_Complex Spaceship_Type A.png',
+  ],
   animationsCount: 6,
   maxFramesCount: 6,
   height: 36,
@@ -451,7 +800,7 @@ export const fakeAsset1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      customization: [],
+      requiredExtensions: [],
     },
   ],
 };
@@ -461,7 +810,137 @@ export const fakePixelArtAsset1: Asset = {
   tags: ['space shooter', 'tag2', 'pixel art'],
 };
 
-export const fakeAssetWithBehaviorCustomizations1: Asset = {
+export const fakeAssetWithCustomObject: Asset = {
+  id: '123',
+  name: 'YellowButton',
+  authors: ['Kenney'],
+  license: 'CC0 (public domain)',
+  shortDescription: 'button',
+  description: 'A button that can be clicked.',
+  tags: ['custom objects', 'button'],
+  objectAssets: [
+    {
+      object: {
+        name: 'YellowButton',
+        type: 'Button::PanelSpriteButton',
+        content: {
+          LeftPadding: 16,
+          RightPadding: 16,
+          PressedLabelOffsetY: 10,
+          IdleLabelOffsetY: -8,
+          BottomPadding: 32,
+          TopPadding: 16,
+          MinimalWidth: 300,
+        },
+        childrenContent: {
+          Label: {
+            bold: false,
+            italic: false,
+            smoothed: true,
+            underlined: false,
+            string: 'Start',
+            font: '',
+            characterSize: 60,
+            color: { b: 42, g: 87, r: 139 },
+          },
+          Idle: {
+            bottomMargin: 32,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Idle.png',
+            tiled: true,
+            topMargin: 16,
+            width: 256,
+          },
+          Hovered: {
+            bottomMargin: 32,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Hovered.png',
+            tiled: true,
+            topMargin: 16,
+            width: 256,
+          },
+          Pressed: {
+            bottomMargin: 16,
+            height: 106,
+            leftMargin: 16,
+            rightMargin: 16,
+            texture: 'object_YellowButton_Pressed.png',
+            tiled: true,
+            topMargin: 32,
+            width: 256,
+          },
+        },
+      },
+      resources: [
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Hovered.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          },
+        },
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Idle.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          },
+        },
+        {
+          alwaysLoaded: false,
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          kind: 'image',
+          metadata: '',
+          name: 'object_YellowButton_Pressed.png',
+          userAdded: false,
+          origin: {
+            name: 'gdevelop-asset-store',
+            identifier:
+              'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          },
+        },
+      ],
+      requiredExtensions: [
+        {
+          extensionName: 'Button',
+          extensionVersion: '1.0.0',
+        },
+      ],
+    },
+  ],
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  objectType: 'object',
+  animationsCount: 1,
+  maxFramesCount: 1,
+  previewImageUrls: [
+    'https://asset-resources.gdevelop.io/public-resources/Menu buttons/3e1b2da0279f60b6a6d1cfe4c79875b70a81b0bec7aa45ff18bff03eb26326eb_Yellow Button.preview.png',
+  ],
+  width: 256,
+  height: 106,
+  dominantColors: [16304136],
+};
+
+export const fakeAssetWithUnknownExtension1: Asset = {
   id: '123',
   name: 'My spaceship',
   shortDescription:
@@ -483,32 +962,17 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      customization: [
+      requiredExtensions: [
         {
-          behaviorName: 'MyBehavior',
-          behaviorType: 'FakeBehavior::FakeBehavior',
-          required: true,
-          extensionName: 'FakeBehavior',
+          extensionName: 'UnknownExtension',
           extensionVersion: '1.0.0',
-          properties: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'property1',
-              defaultValue: 'Overriden value',
-            },
-          ],
         },
       ],
     },
   ],
 };
 
-export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
+export const fakeAssetWithFlashExtensionDependency1: Asset = {
   id: '123',
   name: 'My spaceship',
   shortDescription:
@@ -530,188 +994,10 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
     {
       object: spaceshipSerializedObject,
       resources: spaceshipSerializedResources,
-      customization: [
+      requiredExtensions: [
         {
-          behaviorName: 'MyUnknownBehavior',
-          behaviorType: 'UnknownBehavior::UnknownBehavior',
-          required: true,
-          extensionName: 'UnknownBehavior',
-          extensionVersion: '1.0.0',
-          properties: [],
-        },
-      ],
-    },
-  ],
-};
-
-export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  version: '1.0.0',
-  authors: ['test author'],
-  license: 'MIT',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          behaviorName: 'MyFlashBehavior',
-          behaviorType: 'Flash::Flash',
-          required: true,
           extensionName: 'Flash',
           extensionVersion: '1.0.0',
-          properties: [],
-        },
-      ],
-    },
-  ],
-};
-
-export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  authors: ['test author'],
-  license: 'MIT',
-  version: '1.0.0',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          required: true,
-          extensions: [
-            {
-              extensionName: 'Flash', // Not really used in events, just for tests.
-              extensionVersion: '1.0.0',
-            },
-          ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [
-                {
-                  type: { inverted: false, value: 'VarScene' },
-                  parameters: [
-                    'Counter',
-                    '<',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              actions: [
-                {
-                  type: { inverted: false, value: 'ModVarScene' },
-                  parameters: [
-                    'Counter',
-                    '=',
-                    'TEXT_TO_REPLACE + PlayerSpaceship.Variable(test2)',
-                  ],
-                  subInstructions: [],
-                },
-              ],
-              events: [],
-            },
-          ],
-          parameters: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'TEXT_TO_REPLACE',
-              defaultValue: '3',
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
-export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  description: "A very nice way to start a shoot'em up.",
-  previewImageUrls: ['res/GD-logo.png'],
-  animationsCount: 6,
-  maxFramesCount: 6,
-  height: 36,
-  width: 36,
-  objectType: 'sprite',
-  gdevelopVersion: '5.0.0-beta100',
-  authors: ['test author'],
-  license: 'MIT',
-  version: '1.0.0',
-  tags: ['space shooter', 'tag2'],
-  dominantColors: [255],
-  objectAssets: [
-    {
-      object: spaceshipSerializedObject,
-      resources: spaceshipSerializedResources,
-      customization: [
-        {
-          required: true,
-          extensions: [
-            {
-              extensionName: 'UnknownExtension', // Not really used in events, just for tests.
-              extensionVersion: '1.0.0',
-            },
-          ],
-          events: [
-            {
-              disabled: false,
-              folded: false,
-              type: 'BuiltinCommonInstructions::Standard',
-              conditions: [],
-              actions: [],
-              events: [],
-            },
-          ],
-          parameters: [
-            {
-              codeOnly: false,
-              description: 'Example of a parameter',
-              longDescription: '',
-              supplementaryInformation: '',
-              optional: false,
-              type: 'string',
-              name: 'EXAMPLE_PARAMETER',
-              defaultValue: 'Hello World',
-            },
-          ],
         },
       ],
     },
@@ -743,8 +1029,57 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
   dominantColors: [255],
 };
 
+export const fakeAssetShortHeader2: AssetShortHeader = {
+  id: 'faaa5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee6',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Dino Doux 2',
+  objectType: 'sprite',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
+  ],
+  shortDescription: 'with 5 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
+};
+
+export const fakePrivateAssetShortHeader1: AssetShortHeader = {
+  id: 'bcdef460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Premium Dino Doux',
+  objectType: 'sprite',
+  previewImageUrls: ['https://private-assets.gdevelop.io/fake-preview.png'],
+  shortDescription: 'with 10 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
+};
+
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
   extensionNamespace: '',
@@ -755,6 +1090,7 @@ export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FireBullet-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  category: 'Movement',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -786,6 +1122,7 @@ export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader
 
 export const flashExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
+  authorIds: [],
   shortDescription:
     'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
   extensionNamespace: '',
@@ -795,13 +1132,37 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: ['flash', 'blink', 'visible', 'invisible', 'hit', 'damage'],
+  category: 'Visual effect',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
 };
 
+export const buttonV1ExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'reviewed',
+  authorIds: [],
+  shortDescription: 'An extension that is already installed in the project.',
+  extensionNamespace: '',
+  fullName: 'Button',
+  name: 'Button',
+  version: '1.0.0',
+  url: 'Extensions/Button.json',
+  headerUrl: '',
+  tags: [],
+  category: '',
+  previewIconUrl: '',
+  eventsBasedBehaviorsCount: 1,
+  eventsFunctionsCount: 0,
+};
+
+export const buttonV2ExtensionShortHeader: ExtensionShortHeader = {
+  ...buttonV1ExtensionShortHeader,
+  version: '2.0.0',
+};
+
 export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   tier: 'community',
+  authorIds: [],
   shortDescription:
     'This is an example of an extension that is a community extension (not reviewed).',
   extensionNamespace: '',
@@ -813,6 +1174,7 @@ export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  category: '',
   previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
@@ -832,6 +1194,7 @@ export const game1: Game = {
   gameName: 'My Great Game',
   createdAt: 1606065498,
   publicWebBuildId: 'fake-publicwebbuild-id',
+  displayAdsOnGamePage: true,
 };
 
 export const game2: Game = {
@@ -839,6 +1202,16 @@ export const game2: Game = {
   authorName: 'My company',
   gameName: 'My Other Game',
   createdAt: 1607065498,
+};
+
+export const gameWithDisplayAdsOnGamePageEnabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: true,
+};
+
+export const gameWithDisplayAdsOnGamePageDisabled: Game = {
+  ...game1,
+  displayAdsOnGamePage: false,
 };
 
 /**
@@ -1082,7 +1455,7 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   gdevelopVersion: '',
 };
 
-export const fakeAssetPacks: AssetPacks = {
+export const fakeAssetPacks: PublicAssetPacks = {
   starterPacks: [
     {
       name: 'GDevelop Platformer',
@@ -1180,11 +1553,11 @@ export const fakeAssetPacks: AssetPacks = {
   ],
 };
 
-export const commentUnsolved: Comment = {
-  id: 'comment-unsolved-id',
+export const commentUnprocessed: Comment = {
+  id: 'comment-unprocessed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
@@ -1199,11 +1572,11 @@ export const commentUnsolved: Comment = {
   updatedAt: 1515084393000,
 };
 
-export const commentSolved: Comment = {
-  id: 'comment-solved-id',
+export const commentProcessed: Comment = {
+  id: 'comment-processed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
@@ -1218,3 +1591,59 @@ export const commentSolved: Comment = {
   updatedAt: 1515084393000,
   processedAt: 1515084393000,
 };
+
+export const fakeAnnouncements: Announcement[] = [
+  {
+    id: '123',
+    type: 'info',
+    level: 'normal',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en:
+        'Something to announce which is really really cool [with a link](https://gdevelop.io) and *other* **markdown** ~~formatting~~!',
+    },
+  },
+  {
+    id: '124',
+    type: 'info',
+    level: 'urgent',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en:
+        'Something nothing important but urgent to announce, with a button and [with a link](https://gdevelop.io) too.',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '125',
+    type: 'warning',
+    level: 'urgent',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en: 'Something important and urgent to announce.\n\n- With\n- a list',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '126',
+    type: 'warning',
+    level: 'normal',
+    titleByLocale: {
+      en: 'Some title',
+    },
+    markdownMessageByLocale: {
+      en:
+        'Something important but not urgent to announce, with a big image.\n\n![some image](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png)',
+    },
+    buttonLabelByLocale: { en: 'View' },
+    buttonUrl: 'https://gdevelop.io',
+  },
+];

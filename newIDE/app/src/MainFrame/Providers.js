@@ -30,12 +30,13 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import {
-  type ResourceFetcher,
-  ResourceFetcherContext,
-} from '../ProjectsStorage/ResourceFetcher';
-import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
+import AlertProvider from '../UI/Alert/AlertProvider';
+import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
+import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
+import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
+import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { RouterContextProvider } from './RouterContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -48,7 +49,6 @@ type Props = {|
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
-  resourceFetcher: ResourceFetcher,
   children: ({|
     i18n: I18nType,
   |}) => React.Node,
@@ -58,20 +58,18 @@ type Props = {|
  * Wrap the children with Drag and Drop, Material UI theme and i18n React providers,
  * so that these modules can be used in the children.
  */
-export default class Providers extends React.Component<Props, {||}> {
-  render() {
-    const {
-      disableCheckForUpdates,
-      authentication,
-      children,
-      makeEventsFunctionCodeWriter,
-      eventsFunctionsExtensionWriter,
-      eventsFunctionsExtensionOpener,
-      resourceFetcher,
-    } = this.props;
-    return (
-      <DragAndDropContextProvider>
-        <UnsavedChangesContextProvider>
+const Providers = ({
+  disableCheckForUpdates,
+  authentication,
+  children,
+  makeEventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener,
+}: Props) => {
+  return (
+    <DragAndDropContextProvider>
+      <UnsavedChangesContextProvider>
+        <RouterContextProvider>
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
               {({ values }) => {
@@ -84,48 +82,52 @@ export default class Providers extends React.Component<Props, {||}> {
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
-                          <AuthenticatedUserProvider
-                            authentication={authentication}
-                          >
-                            <PublicProfileProvider>
-                              <I18n update>
-                                {({ i18n }) => (
-                                  <EventsFunctionsExtensionsProvider
-                                    i18n={i18n}
-                                    makeEventsFunctionCodeWriter={
-                                      makeEventsFunctionCodeWriter
-                                    }
-                                    eventsFunctionsExtensionWriter={
-                                      eventsFunctionsExtensionWriter
-                                    }
-                                    eventsFunctionsExtensionOpener={
-                                      eventsFunctionsExtensionOpener
-                                    }
-                                  >
-                                    <CommandsContextProvider>
-                                      <AssetStoreStateProvider>
-                                        <ResourceStoreStateProvider>
-                                          <ExampleStoreStateProvider>
-                                            <ExtensionStoreStateProvider>
-                                              <GamesShowcaseStateProvider>
-                                                <TutorialStateProvider>
-                                                  <ResourceFetcherContext.Provider
-                                                    value={resourceFetcher}
-                                                  >
-                                                    {children({ i18n })}
-                                                  </ResourceFetcherContext.Provider>
-                                                </TutorialStateProvider>
-                                              </GamesShowcaseStateProvider>
-                                            </ExtensionStoreStateProvider>
-                                          </ExampleStoreStateProvider>
-                                        </ResourceStoreStateProvider>
-                                      </AssetStoreStateProvider>
-                                    </CommandsContextProvider>
-                                  </EventsFunctionsExtensionsProvider>
-                                )}
-                              </I18n>
-                            </PublicProfileProvider>
-                          </AuthenticatedUserProvider>
+                          <InAppTutorialProvider>
+                            <AuthenticatedUserProvider
+                              authentication={authentication}
+                            >
+                              <PublicProfileProvider>
+                                <I18n update>
+                                  {({ i18n }) => (
+                                    <EventsFunctionsExtensionsProvider
+                                      i18n={i18n}
+                                      makeEventsFunctionCodeWriter={
+                                        makeEventsFunctionCodeWriter
+                                      }
+                                      eventsFunctionsExtensionWriter={
+                                        eventsFunctionsExtensionWriter
+                                      }
+                                      eventsFunctionsExtensionOpener={
+                                        eventsFunctionsExtensionOpener
+                                      }
+                                    >
+                                      <AlertProvider>
+                                        <SubscriptionSuggestionProvider>
+                                          <CommandsContextProvider>
+                                            <AssetStoreStateProvider>
+                                              <ResourceStoreStateProvider>
+                                                <ExampleStoreStateProvider>
+                                                  <ExtensionStoreStateProvider>
+                                                    <TutorialStateProvider>
+                                                      <AnnouncementsFeedStateProvider>
+                                                        <PrivateAssetsAuthorizationProvider>
+                                                          {children({ i18n })}
+                                                        </PrivateAssetsAuthorizationProvider>
+                                                      </AnnouncementsFeedStateProvider>
+                                                    </TutorialStateProvider>
+                                                  </ExtensionStoreStateProvider>
+                                                </ExampleStoreStateProvider>
+                                              </ResourceStoreStateProvider>
+                                            </AssetStoreStateProvider>
+                                          </CommandsContextProvider>
+                                        </SubscriptionSuggestionProvider>
+                                      </AlertProvider>
+                                    </EventsFunctionsExtensionsProvider>
+                                  )}
+                                </I18n>
+                              </PublicProfileProvider>
+                            </AuthenticatedUserProvider>
+                          </InAppTutorialProvider>
                         </ThemeProvider>
                       </StylesProvider>
                     </GDevelopThemeContext.Provider>
@@ -134,8 +136,10 @@ export default class Providers extends React.Component<Props, {||}> {
               }}
             </PreferencesContext.Consumer>
           </PreferencesProvider>
-        </UnsavedChangesContextProvider>
-      </DragAndDropContextProvider>
-    );
-  }
-}
+        </RouterContextProvider>
+      </UnsavedChangesContextProvider>
+    </DragAndDropContextProvider>
+  );
+};
+
+export default Providers;

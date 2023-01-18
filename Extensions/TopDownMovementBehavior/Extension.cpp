@@ -5,10 +5,10 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
-#include "GDCore/Tools/Localization.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 #include "TopDownMovementBehavior.h"
 
 void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
@@ -20,7 +20,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
             "keyboard or using events."),
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Movement")
       .SetExtensionHelpPath("/behaviors/topdown");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Top-down movement"))
+      .SetIcon("CppPlatform/Extensions/topdownmovementicon16.png");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "TopDownMovementBehavior",
@@ -169,7 +172,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Acceleration (in pixels per second per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("SetAcceleration")
       .SetGetter("GetAcceleration");
@@ -183,7 +189,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_(
+              "Acceleration to compare to (in pixels per second per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetAcceleration");
 
@@ -196,7 +205,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Deceleration (in pixels per second per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("SetDeceleration")
       .SetGetter("GetDeceleration");
@@ -210,7 +222,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_(
+              "Deceleration to compare to (in pixels per second per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetDeceleration");
 
@@ -223,7 +238,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Max speed (in pixels per second)")))
       .SetFunctionName("SetMaxSpeed")
       .SetGetter("GetMaxSpeed");
 
@@ -236,7 +254,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Max speed to compare to (in pixels per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetMaxSpeed");
 
@@ -249,7 +270,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Speed to compare to (in pixels per second)")))
       .SetFunctionName("GetSpeed");
 
   aut.AddAction("AngularMaxSpeed",
@@ -261,7 +285,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Max angular speed (in degrees per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("SetAngularMaxSpeed")
       .SetGetter("GetAngularMaxSpeed");
@@ -275,7 +302,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Max angular speed to compare to (in degrees per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetAngularMaxSpeed");
 
@@ -288,7 +318,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")))
       .MarkAsAdvanced()
       .SetFunctionName("SetAngleOffset")
       .SetGetter("GetAngleOffset");
@@ -303,7 +336,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle to compare to (in degrees)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetAngleOffset");
 
@@ -317,9 +353,27 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle to compare to (in degrees)")))
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("GetAngle");
+    
+    aut.AddScopedCondition(
+           "IsMovementAngleAround",
+           _("Angle of movement"),
+           _("Compare the angle of the top-down movement of the object."),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
+             ": _PARAM3_ degrees)"),
+         _("Movement"),
+         "CppPlatform/Extensions/topdownmovementicon24.png",
+         "CppPlatform/Extensions/topdownmovementicon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+        .AddParameter("expression", _("Angle (in degrees)"))
+        .AddParameter("expression", _("Tolerance (in degrees)"));
 
   aut.AddCondition("XVelocity",
                    _("Speed on X axis"),
@@ -331,9 +385,27 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Speed to compare to (in pixels per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetXVelocity");
+
+  aut.AddScopedAction("SetVelocityX",
+                      _("Speed on the X axis"),
+                      _("Change the speed on the X axis of the movement"),
+                      _("the speed on the X axis of the movement"),
+                      _("Movement"),
+                      "CppPlatform/Extensions/topdownmovementicon24.png",
+                      "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Speed (in pixels per second)")))
+      .MarkAsAdvanced();
 
   aut.AddCondition("YVelocity",
                    _("Speed on Y axis"),
@@ -345,9 +417,27 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Speed to compare to (in pixels per second)")))
       .MarkAsAdvanced()
       .SetFunctionName("GetYVelocity");
+
+  aut.AddScopedAction("SetVelocityY",
+                      _("Speed on the Y axis"),
+                      _("Change the speed on the Y axis of the movement"),
+                      _("the speed on the Y axis of the movement"),
+                      _("Movement"),
+                      "CppPlatform/Extensions/topdownmovementicon24.png",
+                      "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Speed (in pixels per second)")))
+      .MarkAsAdvanced();
 
   aut.AddAction("AllowDiagonals",
                 _("Diagonal movement"),
@@ -480,39 +570,19 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetYVelocity");
 
-  aut.AddScopedAction("SetVelocityX",
-                _("Speed on the X axis"),
-                _("Change the speed on the X axis of the movement"),
-                _("the speed on the X axis of the movement"),
-                _("Movement"),
-                "CppPlatform/Extensions/topdownmovementicon24.png",
-                "CppPlatform/Extensions/topdownmovementicon16.png")
+  aut.AddExpressionAndConditionAndAction(
+         "number",
+         "MovementAngleOffset",
+         _("Movement angle offset"),
+         _("the movement angle offset"),
+         _("the movement angle offset"),
+         _("Movement"),
+         "CppPlatform/Extensions/topdownmovementicon24.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
-      .MarkAsAdvanced();
-
-  aut.AddScopedAction("SetVelocityY",
-                _("Speed on the Y axis"),
-                _("Change the speed on the Y axis of the movement"),
-                _("the speed on the Y axis of the movement"),
-                _("Movement"),
-                "CppPlatform/Extensions/topdownmovementicon24.png",
-                "CppPlatform/Extensions/topdownmovementicon16.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardOperatorParameters("number")
-      .MarkAsAdvanced();
-
-  aut.AddExpressionAndConditionAndAction("number",
-                    "MovementAngleOffset",
-                    _("Movement angle offset"),
-                    _("the movement angle offset"),
-                    _("the movement angle offset"),
-                    _("Movement"),
-                    "CppPlatform/Extensions/topdownmovementicon24.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .UseStandardParameters("number");
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")));
 #endif
 }

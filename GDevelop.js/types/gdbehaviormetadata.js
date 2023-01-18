@@ -25,8 +25,11 @@ declare class gdBehaviorMetadata {
   getAllStrExpressions(): gdMapStringExpressionMetadata;
   setIncludeFile(includeFile: string): gdBehaviorMetadata;
   addIncludeFile(includeFile: string): gdBehaviorMetadata;
+  addRequiredFile(resourceFile: string): gdBehaviorMetadata;
   setObjectType(objectType: string): gdBehaviorMetadata;
   getObjectType(): string;
+  isPrivate(): boolean;
+  setPrivate(): gdBehaviorMetadata;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
   delete(): void;

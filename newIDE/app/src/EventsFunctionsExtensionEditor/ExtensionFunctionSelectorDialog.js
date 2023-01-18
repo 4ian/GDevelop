@@ -67,9 +67,7 @@ export default function BehaviorMethodSelectorDialog({
 
   return (
     <Dialog
-      secondaryActions={[
-        <HelpButton key="help" helpPagePath="/events/functions" />,
-      ]}
+      title={<Trans>Choose a new extension function</Trans>}
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
@@ -78,9 +76,10 @@ export default function BehaviorMethodSelectorDialog({
           key={'close'}
         />,
       ]}
+      secondaryActions={[
+        <HelpButton key="help" helpPagePath="/events/functions" />,
+      ]}
       open
-      noMargin
-      title={<Trans>Choose a new extension function</Trans>}
       onRequestClose={onCancel}
     >
       <List>

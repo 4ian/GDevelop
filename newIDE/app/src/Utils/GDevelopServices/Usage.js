@@ -19,78 +19,173 @@ export type Subscription = {|
   updatedAt: number,
   stripeSubscriptionId?: string,
   stripeCustomerId?: string,
+  paypalSubscriptionId?: string,
+  paypalPayerId?: string,
 |};
 
-export type Limit = {|
+/**
+ * The current usage values made by a user of something.
+ * Typically: the number of remaining builds for a user.
+ */
+export type CurrentUsage = {|
   limitReached: boolean,
   current: number,
   max: number,
 |};
 
+/**
+ * This describes what a user can do on our online services.
+ */
+export type Capabilities = {
+  analytics: {
+    sessions: boolean,
+    players: boolean,
+    retention: boolean,
+    sessionsTimeStats: boolean,
+    platforms: boolean,
+  },
+  cloudProjects: {
+    maximumCount: number,
+    canMaximumCountBeIncreased: boolean,
+  },
+  /**
+   * leaderboards is marked as optional to prevent bugs at the moment
+   * the limit is enforced (endpoint deployed after the new version is released)
+   */
+  leaderboards?: {
+    maximumCountPerGame: number,
+    canMaximumCountPerGameBeIncreased: boolean,
+    themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
+  },
+};
+
+export type CurrentUsages = {
+  [string]: CurrentUsage,
+};
+
+/**
+ * The limits communicated by the API for a user.
+ */
 export type Limits = {
-  [string]: Limit,
+  limits: CurrentUsages,
+  capabilities: Capabilities,
+  message: string | typeof undefined,
 };
 
 export type PlanDetails = {
   planId: string | null,
   name: string,
-  monthlyPriceInEuros: number,
+  monthlyPriceInEuros: number | null,
   smallDescription?: MessageDescriptor,
   descriptionBullets: Array<{|
-    isLocalAppOnly?: boolean,
     message: MessageDescriptor,
   |}>,
-  extraDescription?: MessageDescriptor,
 };
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
   {
-    planId: 'gdevelop_pro',
-    name: 'GDevelop Pro',
-    monthlyPriceInEuros: 7,
-    smallDescription: t`Ideal for advanced game makers`,
+    planId: null,
+    name: 'GDevelop Free & Open-source',
+    monthlyPriceInEuros: 0,
+    smallDescription: t`Use GDevelop for free, forever. We also give you access to these additional online services for free.`,
     descriptionBullets: [
       {
-        message: t`Package your game for Android up to 70 times a day (every 24 hours).`,
+        message: t`10 cloud projects with 50MB of resources per project and 2-days version history.`,
       },
       {
-        message: t`One-click packaging for Windows, macOS and Linux up to 70 times a day (every 24 hours).`,
+        message: t`2 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`3 leaderboards per game and 10 player feedback responses per game.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_silver',
+    name: 'GDevelop Silver',
+    monthlyPriceInEuros: 4.99,
+    smallDescription: t`Build more and faster.`,
+    descriptionBullets: [
+      {
+        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
+      },
+      {
+        message: t`10 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_gold',
+    name: 'GDevelop Gold',
+    monthlyPriceInEuros: 9.99,
+    smallDescription: t`Experimented creators, ambitious games.`,
+    descriptionBullets: [
+      {
+        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
+      },
+      {
+        message: t`100 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
       {
         message: t`Immerse your players by removing GDevelop logo when the game loads.`,
       },
     ],
-    extraDescription: t`You'll also have access to online packaging for iOS or other services when they are released.`,
   },
+];
+
+export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
   {
     planId: 'gdevelop_indie',
-    name: 'GDevelop Indie',
-    monthlyPriceInEuros: 2,
-    smallDescription: t`Ideal for beginners`,
+    name: 'GDevelop Indie (Legacy)',
+    monthlyPriceInEuros: 2.0,
+    smallDescription: t`Build more and faster.`,
     descriptionBullets: [
       {
-        message: t`Package your game for Android up to 10 times a day (every 24 hours).`,
+        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
       },
       {
-        message: t`One-click packaging for Windows, macOS and Linux up to 10 times a day (every 24 hours).`,
+        message: t`10 packagings per day for Android and for desktop.`,
       },
       {
-        message: t`Immerse your players by removing GDevelop logo when the game loads`,
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
     ],
-    extraDescription: t`You'll also have access to online packaging for iOS or other services when they are released.`,
   },
   {
-    planId: null,
-    name: 'No subscription',
-    monthlyPriceInEuros: 0,
+    planId: 'gdevelop_pro',
+    name: 'GDevelop Pro (Legacy)',
+    monthlyPriceInEuros: 7.0,
+    smallDescription: t`Experimented creators, ambitious games.`,
     descriptionBullets: [
       {
-        message: t`You can use GDevelop for free! Online packaging for Android, Windows, macOS and Linux is limited to twice a day (every 24 hours) to avoid overloading the services.`,
+        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
+      },
+      {
+        message: t`70 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+      {
+        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
       },
     ],
   },
 ];
+
+export const businessPlan: PlanDetails = {
+  planId: null,
+  monthlyPriceInEuros: null,
+  name: 'GDevelop for businesses, game studios and professionals',
+  smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
+  descriptionBullets: [],
+};
 
 export const getUserUsages = (
   getAuthorizationHeader: () => Promise<string>,
@@ -125,7 +220,7 @@ export const getUserLimits = (
         },
       })
     )
-    .then(response => response.data.limits);
+    .then(response => response.data);
 };
 
 export const getUserSubscription = (
@@ -167,6 +262,12 @@ export const changeUserSubscription = (
       )
     )
     .then(response => response.data);
+};
+
+export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
+  // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
+  // Otherwise (Paypal), it needs to be cancelled first.
+  return !!subscription.stripeSubscriptionId;
 };
 
 type UploadType = 'build' | 'preview';
@@ -213,14 +314,37 @@ export const getRedirectToSubscriptionPortalUrl = (
 
 export const getRedirectToCheckoutUrl = (
   planId: string,
-  uid: string,
-  email: string
+  userId: string,
+  userEmail: string
 ): string => {
   return `${
     GDevelopUsageApi.baseUrl
-  }/subscription-v2/redirect-to-checkout?planId=${encodeURIComponent(
+  }/subscription-v2/action/redirect-to-checkout?planId=${encodeURIComponent(
     planId
-  )}&clientReferenceId=${encodeURIComponent(
-    uid
-  )}&customerEmail=${encodeURIComponent(email)}`;
+  )}&userId=${encodeURIComponent(userId)}&customerEmail=${encodeURIComponent(
+    userEmail
+  )}`;
+};
+
+export const redeemCode = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  code: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  await axios.post(
+    `${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`,
+    {
+      code,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
 };

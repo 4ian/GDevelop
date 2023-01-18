@@ -1,5 +1,5 @@
 // @flow
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import optionalRequire from './OptionalRequire';
 const electron = optionalRequire('electron');
 const ipc = electron ? electron.ipcRenderer : null;
@@ -21,15 +21,10 @@ const updateDiscordRichPresence = (project: ?gdProject) => {
 };
 
 export const useDiscordRichPresence = (project: ?gdProject) => {
-  const [lastCallTime, setLastCallTime] = useState(0);
-  useEffect(() => updateDiscordRichPresence(project));
   useEffect(
     () => {
-      if (performance.now() - lastCallTime > 60000) {
-        setLastCallTime(performance.now());
-        updateDiscordRichPresence(project);
-      }
+      updateDiscordRichPresence(project);
     },
-    [project, lastCallTime]
+    [project]
   );
 };

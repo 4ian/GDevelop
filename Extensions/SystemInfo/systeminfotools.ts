@@ -59,6 +59,32 @@ namespace gdjs {
         }
         return (cachedIsMobile = checkIsMobile());
       };
+
+      /**
+       * Check if the game is running as a native mobile app - which in the case
+       * of an exported GDevelop game means: running packaged inside Cordova/Capacitor.js.
+       *
+       * Note: this could be improved to also detect running inside an embedded webview.
+       *
+       * @returns true if running inside Cordova (or Capacitor.js).
+       */
+      export const isNativeMobileApp = (): boolean => {
+        return typeof window !== 'undefined' && (window as any).cordova;
+      };
+
+      /**
+       * Check if the game is running as a native desktop app - which in the case
+       * of an exported GDevelop game means: running packaged inside Electron.
+       *
+       * @param instanceContainer The current scene.
+       * @returns true if running inside Electron.
+       */
+      export const isNativeDesktopApp = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        return !!instanceContainer.getGame().getRenderer().getElectron();
+      };
+
       const checkHasTouchScreen = (): boolean => {
         // First check if the device is mobile, as all mobile devices have a touchscreen
         // and some older browsers don't have support for `navigator.maxTouchPoints`
@@ -83,18 +109,20 @@ namespace gdjs {
        * @returns true if WebGL is supported
        */
       export const isWebGLSupported = (
-        runtimeScene: gdjs.RuntimeScene
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ): boolean => {
-        return runtimeScene.getGame().getRenderer().isWebGLSupported();
+        return instanceContainer.getGame().getRenderer().isWebGLSupported();
       };
 
       /**
        * Check if the game is running as a preview, launched from an editor.
-       * @param runtimeScene The current scene.
+       * @param instanceContainer The current container.
        * @returns true if the game is running as a preview.
        */
-      export const isPreview = (runtimeScene: gdjs.RuntimeScene): boolean => {
-        return runtimeScene.getGame().isPreview();
+      export const isPreview = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        return instanceContainer.getGame().isPreview();
       };
     }
   }

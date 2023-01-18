@@ -7,7 +7,11 @@ import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 export type AlertMessageIdentifier =
   | 'default-additional-work'
@@ -21,6 +25,8 @@ export type AlertMessageIdentifier =
   | 'function-extractor-explanation'
   | 'events-based-behavior-explanation'
   | 'empty-events-based-behavior-explanation'
+  | 'events-based-object-explanation'
+  | 'empty-events-based-object-explanation'
   | 'too-much-effects'
   | 'effects-usage'
   | 'lighting-layer-usage'
@@ -45,6 +51,20 @@ export type EditorMosaicName =
   | 'debugger'
   | 'resources-editor'
   | 'events-functions-extension-editor';
+
+export type InAppTutorialUserProgress = {|
+  step: number,
+  /** Rounded progress in percentage */
+  progress: Array<number>,
+  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+  projectData: {| [key: string]: string |},
+|};
+
+export type InAppTutorialProgressDatabase = {
+  [tutorialId: string]: {
+    [userId: string]: InAppTutorialUserProgress,
+  },
+};
 
 export const allAlertMessages: Array<{
   key: AlertMessageIdentifier,
@@ -81,6 +101,14 @@ export const allAlertMessages: Array<{
   {
     key: 'empty-events-based-behavior-explanation',
     label: <Trans>Using empty events based behavior</Trans>,
+  },
+  {
+    key: 'events-based-object-explanation',
+    label: <Trans>Using events based object</Trans>,
+  },
+  {
+    key: 'empty-events-based-object-explanation',
+    label: <Trans>Using empty events based object</Trans>,
   },
   {
     key: 'too-much-effects',
@@ -172,11 +200,11 @@ export type PreferencesValues = {|
   codeEditorThemeName: string,
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   hiddenTutorialHints: { [string]: boolean },
+  hiddenAnnouncements: { [string]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
-  useNewInstructionEditorDialog: boolean,
   useUndefinedVariablesInAutocompletion: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
@@ -195,6 +223,10 @@ export type PreferencesValues = {|
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
+  showEventBasedObjectsEditor: boolean,
+  inAppTutorialsProgress: InAppTutorialProgressDatabase,
+  newProjectsDefaultFolder: string,
+  newProjectsDefaultStorageProviderName: string,
 |};
 
 /**
@@ -212,10 +244,11 @@ export type Preferences = {|
   showAllAlertMessages: () => void,
   showTutorialHint: (identifier: string, show: boolean) => void,
   showAllTutorialHints: () => void,
+  showAnnouncement: (identifier: string, show: boolean) => void,
+  showAllAnnouncements: () => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
-  setUseNewInstructionEditorDialog: (enabled: boolean) => void,
   setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
@@ -255,6 +288,19 @@ export type Preferences = {|
   setEventsSheetCancelInlineParameter: (value: string) => void,
   setShowCommunityExtensions: (enabled: boolean) => void,
   setShowGetStartedSection: (enabled: boolean) => void,
+  setShowEventBasedObjectsEditor: (enabled: boolean) => void,
+  getShowEventBasedObjectsEditor: () => boolean,
+  setNewProjectsDefaultStorageProviderName: (name: string) => void,
+  saveTutorialProgress: ({|
+    tutorialId: string,
+    userId: ?string,
+    ...InAppTutorialUserProgress,
+  |}) => void,
+  getTutorialProgress: ({|
+    tutorialId: string,
+    userId: ?string,
+  |}) => ?InAppTutorialUserProgress,
+  setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
 |};
 
 export const initialPreferences = {
@@ -270,12 +316,12 @@ export const initialPreferences = {
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},
+    hiddenAnnouncements: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useNewInstructionEditorDialog: true,
-    useUndefinedVariablesInAutocompletion: false,
+    useUndefinedVariablesInAutocompletion: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     eventsSheetZoomLevel: 14,
@@ -293,6 +339,10 @@ export const initialPreferences = {
     eventsSheetCancelInlineParameter: 'apply',
     showCommunityExtensions: false,
     showGetStartedSection: true,
+    showEventBasedObjectsEditor: false,
+    inAppTutorialsProgress: {},
+    newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
+    newProjectsDefaultStorageProviderName: 'Cloud',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -304,10 +354,11 @@ export const initialPreferences = {
   showAllAlertMessages: () => {},
   showTutorialHint: (identifier: string, show: boolean) => {},
   showAllTutorialHints: () => {},
+  showAnnouncement: (identifier: string, show: boolean) => {},
+  showAllAnnouncements: () => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
-  setUseNewInstructionEditorDialog: (enabled: boolean) => {},
   setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
@@ -321,12 +372,8 @@ export const initialPreferences = {
     node: ?EditorMosaicNode
   ) => {},
   getRecentProjectFiles: () => [],
-  insertRecentProjectFile: (
-    fileMetadata: FileMetadataAndStorageProviderName
-  ) => {},
-  removeRecentProjectFile: (
-    fileMetadata: FileMetadataAndStorageProviderName
-  ) => {},
+  insertRecentProjectFile: () => {},
+  removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: () => true,
   setAutoOpenMostRecentProject: () => {},
   hadProjectOpenedDuringLastSession: () => false,
@@ -343,6 +390,12 @@ export const initialPreferences = {
   setEventsSheetCancelInlineParameter: () => {},
   setShowCommunityExtensions: () => {},
   setShowGetStartedSection: (enabled: boolean) => {},
+  setShowEventBasedObjectsEditor: (enabled: boolean) => {},
+  getShowEventBasedObjectsEditor: () => false,
+  saveTutorialProgress: () => {},
+  getTutorialProgress: () => {},
+  setNewProjectsDefaultFolder: () => {},
+  setNewProjectsDefaultStorageProviderName: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

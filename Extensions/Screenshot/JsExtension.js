@@ -34,7 +34,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/screenshot')
-      .setCategory('Device');
+      .setCategory('Advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Screenshot'))
       .setIcon('JsPlatform/Extensions/take_screenshot32.png');

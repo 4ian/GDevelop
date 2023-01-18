@@ -7,8 +7,15 @@ import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
 import enumerateLayers from './EnumerateLayers';
 
-export default class VariablesEditorDialog extends Component {
-  constructor(props) {
+type Props = {|
+  open: boolean,
+  layersContainer: any,
+  layerRemoved: string,
+  onClose: boolean => void,
+|};
+
+export default class LayerRemoveDialog extends Component {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -53,8 +60,13 @@ export default class VariablesEditorDialog extends Component {
       .filter(({ value }) => {
         return value !== this.props.layerRemoved;
       })
-      .map(({ value, label }) => (
-        <SelectOption key={value} value={value} primaryText={label} />
+      .map(({ value, label, labelIsUserDefined }) => (
+        <SelectOption
+          key={value}
+          value={value}
+          primaryText={label}
+          primaryTextIsUserDefined={labelIsUserDefined}
+        />
       ));
 
     return (

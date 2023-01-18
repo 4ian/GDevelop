@@ -13,12 +13,14 @@
 #include "GDCore/IDE/Project/ProjectResourcesAdder.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Tools/SystemStats.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "DummyPlatform.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "catch.hpp"
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker {
@@ -63,14 +65,15 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
                       "path/to/file4.png") != worker.files.end());
 
     SECTION("Object using a resource") {
-      gd::SpriteObject obj("myObject");
-
+      gd::SpriteObject spriteConfiguration;
       gd::Animation anim;
       gd::Sprite sprite;
       sprite.SetImageName("res1");
       anim.SetDirectionsCount(1);
       anim.GetDirection(0).AddSprite(sprite);
-      obj.AddAnimation(anim);
+      spriteConfiguration.AddAnimation(anim);
+
+      gd::Object obj("myObject", "", spriteConfiguration.Clone());
       project.InsertObject(obj, 0);
 
       worker.files.clear();

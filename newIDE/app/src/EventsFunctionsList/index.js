@@ -31,6 +31,7 @@ const styles = {
   listContainer: {
     flex: 1,
   },
+  tooltip: { marginRight: 5, verticalAlign: 'bottom' },
 };
 
 export type EventsFunctionCreationParameters = {|
@@ -41,11 +42,12 @@ export type EventsFunctionCreationParameters = {|
 const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) =>
   eventsFunction.isPrivate() ? (
     <>
-      <Tooltip title="This function won't be visible in the events editor">
-        <VisibilityOffIcon
-          fontSize="small"
-          style={{ marginRight: 5, verticalAlign: 'bottom' }}
-        />
+      <Tooltip
+        title={
+          <Trans>This function won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
       </Tooltip>
       <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
     </>
@@ -145,6 +147,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       default:
         return 'res/functions/function.svg';
       case gd.EventsFunction.Action:
+      case gd.EventsFunction.ActionWithOperator:
         switch (eventsFunction.getName()) {
           default:
             return 'res/functions/action.svg';
@@ -171,12 +174,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           case 'onFirstSceneLoaded':
           case 'onCreated':
             return 'res/functions/create.svg';
+
+          case 'onHotReloading':
+            return 'res/functions/reload.svg';
         }
       case gd.EventsFunction.Condition:
         return 'res/functions/condition.svg';
       case gd.EventsFunction.Expression:
-        return 'res/functions/expression.svg';
-      case gd.EventsFunction.StringExpression:
+      case gd.EventsFunction.ExpressionAndCondition:
         return 'res/functions/expression.svg';
     }
   };
@@ -206,13 +211,16 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     const { eventsFunctionsContainer, selectedEventsFunction } = this.props;
     if (!selectedEventsFunction) return;
 
+    const originIndex = eventsFunctionsContainer.getEventsFunctionPosition(
+      selectedEventsFunction
+    );
+    const destinationIndex = eventsFunctionsContainer.getEventsFunctionPosition(
+      destinationEventsFunction
+    );
     eventsFunctionsContainer.moveEventsFunction(
-      eventsFunctionsContainer.getEventsFunctionPosition(
-        selectedEventsFunction
-      ),
-      eventsFunctionsContainer.getEventsFunctionPosition(
-        destinationEventsFunction
-      )
+      originIndex,
+      // When moving the item down, it must not be counted.
+      destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
     );
 
     this.forceUpdateList();
@@ -345,7 +353,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _addNewEventsFunction = () => {
-    const { eventsFunctionsContainer } = this.props;
+    const { eventsFunctionsContainer, project } = this.props;
 
     this.props.onAddEventsFunction(
       (parameters: ?EventsFunctionCreationParameters) => {
@@ -364,6 +372,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           eventsFunctionsContainer.getEventsFunctionsCount()
         );
         eventsFunction.setFunctionType(parameters.functionType);
+
+        if (eventsFunction.isCondition() && !eventsFunction.isExpression()) {
+          gd.PropertyFunctionGenerator.generateConditionSkeleton(
+            project,
+            eventsFunction
+          );
+        }
+
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();
 

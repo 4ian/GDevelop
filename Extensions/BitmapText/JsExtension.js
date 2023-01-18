@@ -35,7 +35,10 @@ module.exports = {
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bitmap_text');
+      .setExtensionHelpPath('/objects/bitmap_text')
+      .setCategory('User interface');
+    extension.addInstructionOrExpressionGroupMetadata(_("Bitmap Text"))
+        .setIcon("JsPlatform/Extensions/bitmapfont32.png");
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -171,7 +174,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Texts'));
+      .setCategoryFullName(_('User interface'));
 
     object
       .addExpressionAndConditionAndAction(
@@ -181,10 +184,10 @@ module.exports = {
         _('the text'),
         _('the text'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setText')
       .setGetter('getText');
 
@@ -199,7 +202,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
 
@@ -214,7 +222,7 @@ module.exports = {
         'res/conditions/characterSize24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontSize');
 
     object
@@ -225,10 +233,15 @@ module.exports = {
         _('the scale (1 by default)'),
         _('the scale'),
         '',
-        'res/actions/scale24.png'
+        'res/actions/scale24_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
       .setFunctionName('setScale')
       .setGetter('getScale');
 
@@ -243,7 +256,7 @@ module.exports = {
         'res/conditions/font24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontName');
 
     object
@@ -301,7 +314,12 @@ module.exports = {
         'res/actions/textAlign24.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Alignment ("left", "right" or "center")')
+        )
+      )
       .setFunctionName('getAlignment');
 
     object
@@ -331,8 +349,8 @@ module.exports = {
         _('Check if word wrap is enabled.'),
         _('_PARAM0_ word wrap is enabled'),
         '',
-        'res/conditions/wordWrap24.png',
-        'res/conditions/wordWrap.png'
+        'res/conditions/wordWrap24_black.png',
+        'res/conditions/wordWrap_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .getCodeExtraInformation()
@@ -345,8 +363,8 @@ module.exports = {
         _('De/activate word wrapping.'),
         _('Activate word wrap of _PARAM0_: _PARAM1_'),
         '',
-        'res/actions/wordWrap24.png',
-        'res/actions/wordWrap.png'
+        'res/actions/wordWrap24_black.png',
+        'res/actions/wordWrap_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
       .addParameter('yesorno', _('Activate word wrap'), '', false)
@@ -361,10 +379,10 @@ module.exports = {
         _('the width, in pixels, after which the text is wrapped on next line'),
         _('the wrapping width'),
         '',
-        'res/actions/scaleWidth24.png'
+        'res/actions/scaleWidth24_black.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setWrappingWidth')
       .setGetter('getWrappingWidth');
 
@@ -589,7 +607,7 @@ module.exports = {
       project,
       layout,
       instance,
-      associatedObject,
+      associatedObjectConfiguration,
       pixiContainer,
       pixiResourcesLoader
     ) {
@@ -598,7 +616,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       );
@@ -627,14 +645,15 @@ module.exports = {
     RenderedBitmapTextInstance.getThumbnail = function (
       project,
       resourcesLoader,
-      object
+      objectConfiguration
     ) {
       return 'JsPlatform/Extensions/bitmapfont24.png';
     };
 
     // This is called to update the PIXI object on the scene editor
     RenderedBitmapTextInstance.prototype.update = function () {
-      const properties = this._associatedObject.getProperties();
+      const properties = this._associatedObjectConfiguration
+        .getProperties();
 
       // Update the rendered text properties (note: Pixi is only
       // applying changes if there were changed).

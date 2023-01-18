@@ -28,7 +28,7 @@ import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 type Props = {|
   entries: ?Array<LeaderboardDisplayData>,
   customizationSettings: ?LeaderboardCustomizationSettings,
-  onDeleteEntry: (entryId: string) => Promise<void>,
+  onDeleteEntry: (entry: LeaderboardDisplayData) => Promise<void>,
   isLoading: boolean,
   erroredEntry?: {| entryId: string, message: React.Node |},
   navigation: {|
@@ -108,7 +108,7 @@ const LeaderboardEntriesTable = ({
                     <Line>
                       <IconButton
                         size="small"
-                        onClick={() => onDeleteEntry(entry.id)}
+                        onClick={() => onDeleteEntry(entry)}
                         disabled={isLoading}
                         tooltip={t`Remove entry`}
                       >

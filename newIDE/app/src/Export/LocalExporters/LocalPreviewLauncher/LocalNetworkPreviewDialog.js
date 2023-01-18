@@ -32,6 +32,7 @@ export default class LocalNetworkDialog extends React.Component<Props, {}> {
 
     return (
       <Dialog
+        title={<Trans>Preview</Trans>}
         actions={[
           <FlatButton
             key="close"

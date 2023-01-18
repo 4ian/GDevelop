@@ -109,7 +109,10 @@ export default class LayerRenderer {
     // $FlowFixMe - invoke is not writable
     this.instancesRenderer.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
-      const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
+      const instance: gdInitialInstance = gd.wrapPointer(
+        instancePtr,
+        gd.InitialInstance
+      );
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
       var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
@@ -122,7 +125,10 @@ export default class LayerRenderer {
 
       // "Culling" improves rendering performance of large levels
       const isVisible = this._isInstanceVisible(instance);
-      if (pixiObject) pixiObject.visible = isVisible;
+      if (pixiObject) {
+        pixiObject.visible = isVisible;
+        pixiObject.interactive = !(instance.isLocked() && instance.isSealed());
+      }
       if (isVisible) renderedInstance.update();
 
       renderedInstance.wasUsed = true;
@@ -175,11 +181,7 @@ export default class LayerRenderer {
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);
     const bottom = top + this.getUnrotatedInstanceHeight(instance);
-
-    bounds.left = left;
-    bounds.right = right;
-    bounds.top = top;
-    bounds.bottom = bottom;
+    bounds.set({ left, top, right, bottom });
     return bounds;
   }
 
@@ -203,8 +205,19 @@ export default class LayerRenderer {
     rectangle[3][0] = right;
     rectangle[3][1] = top;
 
-    const centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
-    const centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    let centerX = undefined;
+    let centerY = undefined;
+
+    if (this.renderedInstances[instance.ptr]) {
+      centerX = left + this.renderedInstances[instance.ptr].getCenterX();
+      centerY = top + this.renderedInstances[instance.ptr].getCenterY();
+    }
+
+    if (centerX === undefined || centerY === undefined) {
+      centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
+      centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    }
+
     const angle = (instance.getAngle() * Math.PI) / 180;
     rotatePolygon(rectangle, centerX, centerY, angle);
     return rectangle;
@@ -228,10 +241,7 @@ export default class LayerRenderer {
       top = Math.min(top, rotatedRectangle[i][1]);
       bottom = Math.max(bottom, rotatedRectangle[i][1]);
     }
-    bounds.left = left;
-    bounds.right = right;
-    bounds.top = top;
-    bounds.bottom = bottom;
+    bounds.set({ left, top, right, bottom });
     return bounds;
   }
 
@@ -254,7 +264,7 @@ export default class LayerRenderer {
         this.project,
         this.layout,
         instance,
-        associatedObject,
+        associatedObject.getConfiguration(),
         this.pixiContainer
       );
 

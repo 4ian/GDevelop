@@ -9,8 +9,9 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Spacer } from './Grid';
 
 type Props = {|
+  id?: string,
   label?: React.Node,
-  primary?: boolean,
+  primary: true, // Force making only primary raised split buttons.
   disabled?: boolean,
   icon?: React.Node,
   onClick: ?() => void,
@@ -33,6 +34,13 @@ const shouldNeverBeCalled = () => {
 
 const styles = {
   mainButton: { flex: 1 },
+  arrowDropDownButton: {
+    // Reduce the size forced by Material UI to avoid making the arrow
+    // too big.
+    minWidth: 30,
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
 };
 
 /**
@@ -40,7 +48,7 @@ const styles = {
  * when the dropdown arrow is clicked.
  */
 const RaisedButtonWithSplitMenu = (props: Props) => {
-  const { buildMenuTemplate, onClick, label, primary, icon, disabled } = props;
+  const { id, buildMenuTemplate, onClick, label, icon, disabled } = props;
 
   // In theory, focus ripple is only shown after a keyboard interaction
   // (see https://github.com/mui-org/material-ui/issues/12067). However, as
@@ -50,14 +58,15 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
 
   return (
     <ButtonGroup
-      variant={primary ? 'contained' : 'outlined'}
+      variant={'contained'}
       disableElevation
-      color={primary ? 'primary' : 'secondary'}
+      color={'primary'}
       disabled={disabled}
       size="small"
       style={props.style}
     >
       <Button
+        id={id}
         focusRipple={focusRipple}
         onClick={onClick}
         style={styles.mainButton}
@@ -71,7 +80,11 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
           true /* ButtonGroup is passing props to Button: disabled, color, variant, size */
         }
         element={
-          <Button onClick={shouldNeverBeCalled} focusRipple={focusRipple}>
+          <Button
+            onClick={shouldNeverBeCalled}
+            focusRipple={focusRipple}
+            style={styles.arrowDropDownButton}
+          >
             <ArrowDropDownIcon />
           </Button>
         }

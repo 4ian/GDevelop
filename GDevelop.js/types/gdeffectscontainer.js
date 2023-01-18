@@ -11,6 +11,7 @@ declare class gdEffectsContainer {
   removeEffect(name: string): void;
   swapEffects(firstEffectIndex: number, secondEffectIndex: number): void;
   moveEffect(oldIndex: number, newIndex: number): void;
+  clear(): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

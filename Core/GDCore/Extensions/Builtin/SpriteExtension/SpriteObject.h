@@ -36,11 +36,11 @@ namespace gd {
  * \see gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension
  * \ingroup SpriteObjectExtension
  */
-class GD_CORE_API SpriteObject : public gd::Object {
+class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
  public:
-  SpriteObject(gd::String name_);
+  SpriteObject();
   virtual ~SpriteObject();
-  std::unique_ptr<gd::Object> Clone() const override {
+  std::unique_ptr<gd::ObjectConfiguration> Clone() const override {
     return gd::make_unique<SpriteObject>(*this);
   }
 

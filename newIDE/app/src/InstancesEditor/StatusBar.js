@@ -41,22 +41,41 @@ export default class StatusBar {
   }
 
   render() {
-    const padding = 5;
-    const borderRadius = 4;
+    const textPadding = 5;
+    const statusBarPadding = 15;
+    const borderRadius = 6;
+    const textXPosition = Math.round(
+      this._width - statusBarPadding - textPadding - this._statusBarText.width
+    );
+    const textYPosition = Math.round(
+      this._height - textPadding - statusBarPadding - this._statusBarText.height
+    );
+
     const [x, y] = this._getLastCursorSceneCoordinates();
     this._statusBarText.text = `${x.toFixed(0)};${y.toFixed(0)}`;
-    this._statusBarText.position.x = 0 + padding;
-    this._statusBarText.position.y = Math.round(
-      this._height - padding - this._statusBarText.height
-    );
+    this._statusBarText.position.x = textXPosition;
+    this._statusBarText.position.y = textYPosition;
+
+    const statusBarXPosition =
+      this._width -
+      statusBarPadding -
+      textPadding * 2 -
+      this._statusBarText.width;
+    const statusBarYPosition =
+      this._height -
+      statusBarPadding -
+      textPadding * 2 -
+      this._statusBarText.height;
+    const statusBarWidth = this._statusBarText.width + textPadding * 2;
+    const statusBarHeight = this._statusBarText.height + textPadding * 2;
 
     this._statusBarBackground.clear();
     this._statusBarBackground.beginFill(0x000000, 0.8);
     this._statusBarBackground.drawRoundedRect(
-      0 - borderRadius,
-      this._height - padding * 2 - this._statusBarText.height,
-      this._statusBarText.width + padding * 2 + borderRadius,
-      this._statusBarText.height + padding * 2 + borderRadius,
+      statusBarXPosition,
+      statusBarYPosition,
+      statusBarWidth,
+      statusBarHeight,
       borderRadius
     );
     this._statusBarBackground.endFill();

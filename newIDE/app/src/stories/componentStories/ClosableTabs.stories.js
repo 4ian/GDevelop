@@ -18,6 +18,7 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
+import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
@@ -264,11 +265,15 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  events={testProject.testLayout.getEvents()}
-                  resourceSources={[]}
-                  onChooseResource={() => Promise.reject('unimplemented')}
-                  resourceExternalEditors={fakeResourceExternalEditors}
+                  resourceManagementProps={{
+                    getStorageProvider: () => emptyStorageProvider,
+                    onFetchNewlyAddedResources: async () => {},
+                    resourceSources: [],
+                    onChooseResource: () => Promise.reject('Unimplemented'),
+                    resourceExternalEditors: fakeResourceExternalEditors,
+                  }}
                   onEditObject={action('On edit object')}
+                  onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectNames={[]}
                   selectedObjectTags={[]}
@@ -276,10 +281,15 @@ export const WithObjectsList = () => (
                   getAllObjectTags={() => []}
                   canRenameObject={() => true}
                   onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObject={(objectWithContext, newName, cb) => cb(true)}
+                  onRenameObjectStart={() => {}}
+                  onRenameObjectFinish={(objectWithContext, newName, cb) =>
+                    cb(true)
+                  }
                   onObjectCreated={() => {}}
                   onObjectSelected={() => {}}
+                  renamedObjectWithContext={null}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+                  canInstallPrivateAsset={() => false}
                 />
               </TabContentContainer>
             }

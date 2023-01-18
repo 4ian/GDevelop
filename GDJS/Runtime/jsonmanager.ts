@@ -17,6 +17,20 @@ namespace gdjs {
     content: Object | null
   ) => void;
 
+  const checkIfCredentialsRequired = (url: string) => {
+    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+    // i.e: its gdevelop.io cookie, to be passed.
+    // Note that this is only useful during previews.
+    if (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    )
+      return true;
+
+    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+    return false;
+  };
+
   /**
    * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
    * registered in the game resources.
@@ -62,7 +76,12 @@ namespace gdjs {
     ): void {
       const resources = this._resources;
       const jsonResources = resources.filter(function (resource) {
-        return resource.kind === 'json' && !resource.disablePreload;
+        return (
+          (resource.kind === 'json' ||
+            resource.kind === 'tilemap' ||
+            resource.kind === 'tileset') &&
+          !resource.disablePreload
+        );
       });
       if (jsonResources.length === 0) {
         return onComplete(jsonResources.length);
@@ -95,7 +114,12 @@ namespace gdjs {
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.find(function (resource) {
-        return resource.kind === 'json' && resource.name === resourceName;
+        return (
+          (resource.kind === 'json' ||
+            resource.kind === 'tilemap' ||
+            resource.kind === 'tileset') &&
+          resource.name === resourceName
+        );
       });
       if (!resource) {
         callback(
@@ -127,6 +151,7 @@ namespace gdjs {
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
+      xhr.withCredentials = checkIfCredentialsRequired(resource.file);
       xhr.open('GET', resource.file);
       xhr.onload = function () {
         const callbacks = that._callbacks[resourceName];

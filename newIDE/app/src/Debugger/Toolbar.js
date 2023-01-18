@@ -1,9 +1,14 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
-import ToolbarIcon from '../UI/ToolbarIcon';
-import ToolbarSeparator from '../UI/ToolbarSeparator';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import ProfilerIcon from '../UI/CustomSvgIcons/Profiler';
+import ConsoleIcon from '../UI/CustomSvgIcons/Console';
+import PlayIcon from '../UI/CustomSvgIcons/Preview';
+import PauseIcon from '../UI/CustomSvgIcons/Pause';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   onPlay: () => void,
@@ -31,31 +36,41 @@ export class Toolbar extends React.PureComponent<Props> {
 
     return (
       <ToolbarGroup lastChild>
-        <ToolbarIcon
-          onClick={onPlay}
-          src="res/ribbon_default/preview64.png"
-          disabled={!canPlay}
-          tooltip={t`Play the game`}
-        />
-        <ToolbarIcon
-          onClick={onPause}
-          src="res/ribbon_default/pause64.png"
-          disabled={!canPause}
-          tooltip={t`Pause the game`}
-        />
-        <ToolbarSeparator />
-        <ToolbarIcon
+        <IconButton
+          size="small"
+          color="default"
           onClick={onOpenProfiler}
-          src="res/ribbon_default/profiler32.png"
           disabled={!canOpenProfiler}
           tooltip={t`Open the performance profiler`}
-        />
-        <ToolbarIcon
+        >
+          <ProfilerIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
           onClick={onOpenConsole}
-          src="res/ribbon_default/source_cpp32.png"
           disabled={!canOpenConsole}
           tooltip={t`Open the console`}
-        />
+        >
+          <ConsoleIcon />
+        </IconButton>
+
+        {canPause ? (
+          <FlatButton
+            primary
+            onClick={onPause}
+            leftIcon={<PauseIcon />}
+            label={<Trans>Pause</Trans>}
+          />
+        ) : (
+          <RaisedButton
+            primary
+            onClick={onPlay}
+            icon={<PlayIcon />}
+            label={<Trans>Play</Trans>}
+            disabled={!canPlay}
+          />
+        )}
       </ToolbarGroup>
     );
   }

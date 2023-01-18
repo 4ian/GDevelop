@@ -33,6 +33,7 @@ type Props = {|
   getIcon: (color: string) => React.Node,
   isActive: boolean,
   hideLabel?: boolean,
+  id?: string,
 |};
 
 const VerticalTabButton = ({
@@ -41,6 +42,7 @@ const VerticalTabButton = ({
   onClick,
   isActive,
   hideLabel,
+  id,
 }: Props) => {
   return (
     <Button
@@ -53,6 +55,8 @@ const VerticalTabButton = ({
       fullWidth
       onClick={onClick}
       color={isActive ? 'primary' : 'default'}
+      id={id}
+      disableElevation
     >
       <div
         style={
@@ -66,7 +70,8 @@ const VerticalTabButton = ({
       {!hideLabel && (
         <>
           <Spacer />
-          {label}
+          {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+          <span>{label}</span>
         </>
       )}
     </Button>

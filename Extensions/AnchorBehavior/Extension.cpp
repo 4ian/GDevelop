@@ -17,6 +17,7 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
                                _("Anchor objects to the window's bounds."),
                                "Victor Levasseur",
                                "Open source (MIT License)")
+      .SetCategory("User interface")
       .SetExtensionHelpPath("/behaviors/anchor");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(

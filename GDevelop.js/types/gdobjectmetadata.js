@@ -24,6 +24,8 @@ declare class gdObjectMetadata {
   getUnsupportedBaseObjectCapabilities(): gdSetString;
   addUnsupportedBaseObjectCapability(capability: string): gdObjectMetadata;
   isUnsupportedBaseObjectCapability(capability: string): boolean;
+  setHidden(): gdObjectMetadata;
+  isHidden(): boolean;
   delete(): void;
   ptr: number;
 };

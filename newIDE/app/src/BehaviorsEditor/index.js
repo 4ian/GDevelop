@@ -14,11 +14,7 @@ import BehaviorsEditorService from './BehaviorsEditorService';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -38,12 +34,12 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension?: gdEventsFunctionsExtension,
   object: gdObject,
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
+  onBehaviorsUpdated?: () => void,
 |};
 
 const BehaviorsEditor = (props: Props) => {
@@ -51,7 +47,7 @@ const BehaviorsEditor = (props: Props) => {
     false
   );
 
-  const { object, project } = props;
+  const { object, project, eventsFunctionsExtension } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
   const forceUpdate = useForceUpdate();
 
@@ -76,12 +72,10 @@ const BehaviorsEditor = (props: Props) => {
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();
     props.onUpdateBehaviorsSharedData();
+    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
   };
 
-  const onChangeBehaviorName = (
-    behaviorContent: gdBehaviorContent,
-    newName: string
-  ) => {
+  const onChangeBehaviorName = (behavior: gdBehavior, newName: string) => {
     // TODO: This is disabled for now as there is no proper refactoring
     // of events after a behavior renaming. Once refactoring is available,
     // the text field can be enabled again and refactoring calls added here
@@ -89,8 +83,9 @@ const BehaviorsEditor = (props: Props) => {
     // Renaming a behavior is something that is really rare anyway! :)
 
     if (object.hasBehaviorNamed(newName)) return;
-    object.renameBehavior(behaviorContent.getName(), newName);
+    object.renameBehavior(behavior.getName(), newName);
     forceUpdate();
+    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
   };
 
   const onRemoveBehavior = (behaviorName: string) => {
@@ -113,6 +108,7 @@ const BehaviorsEditor = (props: Props) => {
       dependentBehaviors.forEach(name => object.removeBehavior(name));
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
+    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
   };
 
   return (
@@ -137,8 +133,8 @@ const BehaviorsEditor = (props: Props) => {
         <React.Fragment>
           <ScrollView>
             {allBehaviorNames.map((behaviorName, index) => {
-              const behaviorContent = object.getBehavior(behaviorName);
-              const behaviorTypeName = behaviorContent.getTypeName();
+              const behavior = object.getBehavior(behaviorName);
+              const behaviorTypeName = behavior.getTypeName();
 
               const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                 gd.JsPlatform.get(),
@@ -146,7 +142,11 @@ const BehaviorsEditor = (props: Props) => {
               );
               if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
                 return (
-                  <Accordion key={behaviorName} defaultExpanded>
+                  <Accordion
+                    key={behaviorName}
+                    defaultExpanded
+                    id={`behavior-parameters-${behaviorName}`}
+                  >
                     <AccordionHeader
                       actions={[
                         <IconButton
@@ -184,7 +184,6 @@ const BehaviorsEditor = (props: Props) => {
                 );
               }
 
-              const behavior = behaviorMetadata.get();
               const BehaviorComponent = BehaviorsEditorService.getEditor(
                 behaviorTypeName
               );
@@ -195,7 +194,11 @@ const BehaviorsEditor = (props: Props) => {
               const iconUrl = behaviorMetadata.getIconFilename();
 
               return (
-                <Accordion key={behaviorName} defaultExpanded>
+                <Accordion
+                  key={behaviorName}
+                  defaultExpanded
+                  id={`behavior-parameters-${behaviorName}`}
+                >
                   <AccordionHeader
                     actions={[
                       <HelpIcon
@@ -225,12 +228,12 @@ const BehaviorsEditor = (props: Props) => {
                     <Column expand>
                       <TextField
                         value={behaviorName}
-                        hintText={t`Behavior name`}
+                        translatableHintText={t`Behavior name`}
                         margin="none"
                         fullWidth
                         disabled
                         onChange={(e, text) =>
-                          onChangeBehaviorName(behaviorContent, text)
+                          onChangeBehaviorName(behavior, text)
                         }
                         id={`behavior-${behaviorName}-name-text-field`}
                       />
@@ -258,13 +261,10 @@ const BehaviorsEditor = (props: Props) => {
                       <Line>
                         <BehaviorComponent
                           behavior={behavior}
-                          behaviorContent={behaviorContent}
                           project={project}
                           object={object}
-                          resourceSources={props.resourceSources}
-                          onChooseResource={props.onChooseResource}
-                          resourceExternalEditors={
-                            props.resourceExternalEditors
+                          resourceManagementProps={
+                            props.resourceManagementProps
                           }
                         />
                       </Line>
@@ -297,6 +297,7 @@ const BehaviorsEditor = (props: Props) => {
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           project={project}
+          eventsFunctionsExtension={eventsFunctionsExtension}
         />
       )}
     </Column>

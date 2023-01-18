@@ -25,6 +25,7 @@
   ],
   "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "theme_color": "#252525",
   "background_color": "#f0f0f0"
 }

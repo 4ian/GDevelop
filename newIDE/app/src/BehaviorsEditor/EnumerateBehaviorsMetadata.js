@@ -15,7 +15,8 @@ export type EnumeratedBehaviorMetadata = {|
 
 export const enumerateBehaviorsMetadata = (
   platform: gdPlatform,
-  project: gdProject
+  project: gdProject,
+  eventsFunctionsExtension?: gdEventsFunctionsExtension
 ): Array<EnumeratedBehaviorMetadata> => {
   const extensionsList = platform.getAllPlatformExtensions();
 
@@ -30,6 +31,12 @@ export const enumerateBehaviorsMetadata = (
           behaviorType,
           behaviorMetadata: extension.getBehaviorMetadata(behaviorType),
         }))
+        .filter(
+          ({ behaviorMetadata }) =>
+            !behaviorMetadata.isPrivate() ||
+            (eventsFunctionsExtension &&
+              extension.getName() === eventsFunctionsExtension.getName())
+        )
         .map(({ behaviorType, behaviorMetadata }) => ({
           extension,
           behaviorMetadata,

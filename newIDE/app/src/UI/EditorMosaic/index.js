@@ -32,6 +32,20 @@ export type EditorMosaicNode =
     |}
   | string;
 
+export const mosaicContainsNode = (
+  mosaic: ?EditorMosaicNode,
+  node: string
+): boolean => {
+  return (
+    !!mosaic &&
+    (mosaic === node ||
+      // $FlowFixMe
+      ((!!mosaic.first && mosaicContainsNode(mosaic.first, node)) ||
+        // $FlowFixMe
+        (!!mosaic.second && mosaicContainsNode(mosaic.second, node))))
+  );
+};
+
 // Add a node (an editor) in the mosaic.
 const addNode = (
   currentNode: ?EditorMosaicNode,

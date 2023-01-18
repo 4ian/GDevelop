@@ -19,7 +19,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       "Florian Rival",
       "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/inventory")
-      .SetCategory("Advanced");
+      .SetCategory("Game mechanic");
     extension
       .AddInstructionOrExpressionGroupMetadata(_("Inventories"))
       .SetIcon("CppPlatform/Extensions/Inventoryicon.png");
@@ -64,7 +64,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("InventoryTools::Count");
 
   extension

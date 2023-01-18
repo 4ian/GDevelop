@@ -161,6 +161,13 @@ export const subscriptionForIndieUser: Subscription = {
   userId: 'indie-user',
 };
 
+export const subscriptionForSilverUser: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+};
+
 export const noSubscription: Subscription = {
   planId: null,
   createdAt: 1515084011000,

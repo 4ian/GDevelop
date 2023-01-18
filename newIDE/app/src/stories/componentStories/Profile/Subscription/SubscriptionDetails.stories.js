@@ -7,6 +7,7 @@ import paperDecorator from '../../../PaperDecorator';
 import {
   noSubscription,
   subscriptionForIndieUser,
+  subscriptionForSilverUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
@@ -17,7 +18,14 @@ export default {
   decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
 };
 
-export const Default = () => (
+export const WithSilverSubscription = () => (
+  <SubscriptionDetails
+    subscription={subscriptionForSilverUser}
+    onManageSubscription={action('manage subscription')}
+    isManageSubscriptionLoading={false}
+  />
+);
+export const WithFormerSubscription = () => (
   <SubscriptionDetails
     subscription={subscriptionForIndieUser}
     onManageSubscription={action('manage subscription')}
@@ -33,7 +41,7 @@ export const NoSubscription = () => (
 );
 export const LoadingManageSubscription = () => (
   <SubscriptionDetails
-    subscription={subscriptionForIndieUser}
+    subscription={subscriptionForSilverUser}
     onManageSubscription={action('manage subscription')}
     isManageSubscriptionLoading={true}
   />

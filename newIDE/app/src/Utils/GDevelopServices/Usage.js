@@ -110,7 +110,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
       },
       {
-        message: t`20 packagings per day for Android and for desktop.`,
+        message: t`10 packagings per day for Android and for desktop.`,
       },
       {
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,

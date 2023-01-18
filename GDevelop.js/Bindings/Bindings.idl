@@ -1537,6 +1537,9 @@ interface ObjectMetadata {
     [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
     [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
     boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
+
+    [Ref] ObjectMetadata SetHidden();
+    boolean IsHidden();
 };
 
 interface BehaviorMetadata {

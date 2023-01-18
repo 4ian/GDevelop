@@ -138,6 +138,7 @@ export const enumerateObjectTypes = (
         .getExtensionObjectsTypes()
         .toJSArray()
         .map(objectType => extension.getObjectMetadata(objectType))
+        .filter(objectMetadata => !objectMetadata.isHidden())
         .map(objectMetadata => ({
           extension,
           objectMetadata,

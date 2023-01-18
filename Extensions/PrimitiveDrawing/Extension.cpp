@@ -28,9 +28,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           .AddObject<ShapePainterObject>(
               "Drawer",  //"Drawer" is kept for compatibility with GD<=3.6.76
               _("Shape painter"),
-              _("Allows you to draw simple shapes on the screen"),
+              _("Allows you to draw simple shapes on the screen using the events."),
               "CppPlatform/Extensions/primitivedrawingicon.png")
-          .SetCategoryFullName(_("General"));
+          .SetCategoryFullName(_("Advanced"));
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction(

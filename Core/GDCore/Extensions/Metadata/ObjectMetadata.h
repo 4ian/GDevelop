@@ -46,7 +46,7 @@ class GD_CORE_API ObjectMetadata {
                  std::shared_ptr<gd::ObjectConfiguration> blueprintObject_);
   /**
    * \brief Construct an object metadata, without "blueprint" object
-   * 
+   *
    * \note This is used by events based objects.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
@@ -295,6 +295,22 @@ class GD_CORE_API ObjectMetadata {
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
 
+  /**
+   * \brief Set the object to be hidden in the IDE.
+   *
+   * Used mainly when an object is deprecated.
+   */
+  ObjectMetadata &SetHidden() {
+    hidden = true;
+    return *this;
+  }
+
+
+  /**
+   * \brief Return true if the instruction must be hidden in the IDE.
+   */
+  bool IsHidden() const { return hidden; }
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -314,6 +330,7 @@ class GD_CORE_API ObjectMetadata {
   gd::String iconFilename;
   gd::String categoryFullName;
   std::set<gd::String> unsupportedBaseObjectCapabilities;
+  bool hidden = false;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

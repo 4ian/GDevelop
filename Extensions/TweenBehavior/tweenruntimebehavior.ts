@@ -24,22 +24,22 @@ namespace gdjs {
 
   function isScaleable(o: RuntimeObject): o is IScaleable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY;
+    return !!(o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY);
   }
 
   function isOpaque(o: RuntimeObject): o is IOpaque {
     //@ts-ignore We are checking if the methods are present.
-    return o.setOpacity && o.getOpacity;
+    return !!(o.setOpacity && o.getOpacity);
   }
 
   function isColorable(o: RuntimeObject): o is IColorable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setColor && o.getColor;
+    return !!(o.setColor && o.getColor);
   }
 
   function isCharacterScaleable(o: RuntimeObject): o is ICharacterScaleable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setCharacterSize && o.getCharacterSize;
+    return !!(o.setCharacterSize && o.getCharacterSize);
   }
 
   function rgbToHsl(r: number, g: number, b: number): number[] {
@@ -76,15 +76,24 @@ namespace gdjs {
     ];
   }
 
-  class TweenAwaiterTask extends gdjs.AsyncTask {
+  class TweenAwaiterTask extends gdjs.ObjectBoundTask {
     tween: TweenRuntimeBehavior.TweenInstance;
-    constructor(tween: TweenRuntimeBehavior.TweenInstance) {
-      super();
+
+    constructor(
+      objectInstance: gdjs.RuntimeObject,
+      tween: TweenRuntimeBehavior.TweenInstance
+    ) {
+      super(objectInstance);
       this.tween = tween;
     }
 
-    update(runtimeScene: RuntimeScene) {
+    shouldResolve() {
       return this.tween.hasFinished;
+    }
+
+    onObjectDeleted(): void {
+      //@ts-ignore - We are destoying the task to avoid leaking memory.
+      this.tween = null;
     }
   }
 
@@ -971,7 +980,7 @@ namespace gdjs {
 
     awaitTween(identifier: string) {
       return this._tweenExists(identifier)
-        ? new TweenAwaiterTask(this._tweens[identifier])
+        ? new TweenAwaiterTask(this.owner, this._tweens[identifier])
         : new gdjs.ResolveTask();
     }
 

@@ -50,9 +50,7 @@ import {
   limitsForIndieUser,
   limitsReached,
   noSubscription,
-  fakeNoSubscriptionAuthenticatedUser,
   fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
   fakeAuthenticatedButLoadingAuthenticatedUser,
   fakeAuthenticatedAndEmailVerifiedUser,
   release,
@@ -65,9 +63,6 @@ import {
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
-import SubscriptionDetails from '../Profile/Subscription/SubscriptionDetails';
-import SubscriptionDialog from '../Profile/Subscription/SubscriptionDialog';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
@@ -78,7 +73,6 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import ProjectManager from '../ProjectManager';
 import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
@@ -94,7 +88,6 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import SubscriptionPendingDialog from '../Profile/Subscription/SubscriptionPendingDialog';
 import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
@@ -113,7 +106,6 @@ import IconButton from '../UI/IconButton';
 import Brush from '@material-ui/icons/Brush';
 import Delete from '@material-ui/icons/Delete';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
-import fakeHotReloadPreviewButtonProps from './FakeHotReloadPreviewButtonProps';
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
@@ -2713,94 +2705,6 @@ storiesOf('AuthenticatedUserProfileDetails', module)
       authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
-    />
-  ));
-
-storiesOf('Subscription/SubscriptionDetails', module)
-  .addDecorator(subscriptionSuggestionDecorator)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SubscriptionDetails
-      subscription={subscriptionForIndieUser}
-      onManageSubscription={action('manage subscription')}
-      isManageSubscriptionLoading={false}
-    />
-  ))
-  .add('no subscription', () => (
-    <SubscriptionDetails
-      subscription={noSubscription}
-      onManageSubscription={action('manage subscription')}
-      isManageSubscriptionLoading={false}
-    />
-  ))
-  .add('loading manage subscription', () => (
-    <SubscriptionDetails
-      subscription={subscriptionForIndieUser}
-      onManageSubscription={action('manage subscription')}
-      isManageSubscriptionLoading={true}
-    />
-  ));
-
-storiesOf('Subscription/SubscriptionDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('not authenticated', () => (
-    <AuthenticatedUserContext.Provider
-      value={fakeNotAuthenticatedAuthenticatedUser}
-    >
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ))
-  .add('authenticated but loading', () => (
-    <AuthenticatedUserContext.Provider
-      value={fakeAuthenticatedButLoadingAuthenticatedUser}
-    >
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ))
-  .add('authenticated user with subscription', () => (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ))
-  .add('authenticated user with no subscription', () => (
-    <AuthenticatedUserContext.Provider
-      value={fakeNoSubscriptionAuthenticatedUser}
-    >
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ));
-
-storiesOf('Subscription/SubscriptionPendingDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default (no subscription)', () => (
-    <SubscriptionPendingDialog
-      authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-      onClose={action('on close')}
-    />
-  ))
-  .add('authenticated user with subscription', () => (
-    <SubscriptionPendingDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
-      onClose={action('on close')}
     />
   ));
 

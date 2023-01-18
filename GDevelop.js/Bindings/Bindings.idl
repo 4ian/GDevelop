@@ -3136,6 +3136,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions UseWebsocketDebuggerClientWithServerAddress([Const] DOMString address, [Const] DOMString port);
     [Ref] PreviewExportOptions UseWindowMessageDebuggerClient();
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
+    [Ref] PreviewExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
@@ -3143,6 +3144,12 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
+};
+
+[Prefix="gdjs::"]
+interface ExportOptions {
+    void ExportOptions([Ref] Project project, [Const] DOMString outputPath, [Const] DOMString target);
+    [Ref] ExportOptions SetFallbackAuthor([Const] DOMString id, [Const] DOMString username);
 };
 
 [Prefix="gdjs::"]

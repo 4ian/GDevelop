@@ -2,8 +2,10 @@
 import * as React from 'react';
 import { Column, Line } from '../../UI/Grid';
 import {
+  getFormerSubscriptionPlans,
   getSubscriptionPlans,
   type Subscription,
+  type PlanDetails,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -46,9 +48,10 @@ const SubscriptionDetails = ({
   const userPlan = React.useMemo(
     () => {
       if (!subscription) return null;
-      return getSubscriptionPlans().find(
-        plan => plan.planId === subscription.planId
+      const possiblePlans: Array<PlanDetails> = getSubscriptionPlans().concat(
+        getFormerSubscriptionPlans()
       );
+      return possiblePlans.find(plan => plan.planId === subscription.planId);
     },
     [subscription]
   );

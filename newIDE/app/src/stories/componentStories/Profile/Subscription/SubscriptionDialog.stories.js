@@ -10,6 +10,7 @@ import {
   fakeIndieAuthenticatedUser,
   fakeNoSubscriptionAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
+  subscriptionForIndieUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 
@@ -17,6 +18,11 @@ export default {
   title: 'Subscription/SubscriptionDialog',
   component: SubscriptionDialog,
   decorators: [paperDecorator, muiDecorator],
+};
+
+const fakeIndieAuthenticatedUserWithFormerSubscription = {
+  ...fakeIndieAuthenticatedUser,
+  subscription: subscriptionForIndieUser,
 };
 
 export const NotAuthenticated = () => (
@@ -43,6 +49,17 @@ export const AuthenticatedButLoading = () => (
 );
 export const AuthenticatedUserWithSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <SubscriptionDialog
+      open
+      onClose={action('on close')}
+      analyticsMetadata={{ reason: 'Debugger' }}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+export const AuthenticatedUserWithFormerSubscription = () => (
+  <AuthenticatedUserContext.Provider
+    value={fakeIndieAuthenticatedUserWithFormerSubscription}
+  >
     <SubscriptionDialog
       open
       onClose={action('on close')}

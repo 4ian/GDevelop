@@ -139,6 +139,46 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
   },
 ];
 
+export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
+  {
+    planId: 'gdevelop_indie',
+    name: 'GDevelop Indie',
+    monthlyPriceInEuros: 2.0,
+    smallDescription: t`Build more and faster.`,
+    descriptionBullets: [
+      {
+        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
+      },
+      {
+        message: t`10 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_pro',
+    name: 'GDevelop Pro',
+    monthlyPriceInEuros: 7.0,
+    smallDescription: t`Experimented creators, ambitious games.`,
+    descriptionBullets: [
+      {
+        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
+      },
+      {
+        message: t`70 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+      {
+        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+];
+
 export const businessPlan: PlanDetails = {
   planId: null,
   monthlyPriceInEuros: null,

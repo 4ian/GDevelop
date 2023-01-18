@@ -63,16 +63,6 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
                         &options,
                         &helper,
                         &usedExtensionsResult](gd::String exportDir) {
-    bool exportForCordova = options.target == "cordova";
-    bool exportForFacebookInstantGames =
-        options.target == "facebookInstantGames";
-
-    // Always disable GDevelop branding for Facebook Instant Games
-    if (exportForFacebookInstantGames) {
-      exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
-      exportedProject.GetWatermark().ShowGDevelopWatermark(false);
-    }
-
     // Use project properties fallback to set empty properties
     if (exportedProject.GetAuthorIds().empty() &&
         !options.fallbackAuthorId.empty()) {
@@ -157,9 +147,9 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
-    if (exportForCordova)
+    if (options.target == "cordova")
       source = gdjsRoot + "/Runtime/Cordova/www/index.html";
-    else if (exportForFacebookInstantGames)
+    else if (options.target == "facebookInstantGames")
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
     if (!helper.ExportPixiIndexFile(exportedProject,

@@ -24,22 +24,22 @@ namespace gdjs {
 
   function isScaleable(o: RuntimeObject): o is IScaleable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY;
+    return !!(o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY);
   }
 
   function isOpaque(o: RuntimeObject): o is IOpaque {
     //@ts-ignore We are checking if the methods are present.
-    return o.setOpacity && o.getOpacity;
+    return !!(o.setOpacity && o.getOpacity);
   }
 
   function isColorable(o: RuntimeObject): o is IColorable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setColor && o.getColor;
+    return !!(o.setColor && o.getColor);
   }
 
   function isCharacterScaleable(o: RuntimeObject): o is ICharacterScaleable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setCharacterSize && o.getCharacterSize;
+    return !!(o.setCharacterSize && o.getCharacterSize);
   }
 
   function rgbToHsl(r: number, g: number, b: number): number[] {
@@ -76,6 +76,27 @@ namespace gdjs {
     ];
   }
 
+  class TweenAwaiterTask extends gdjs.ObjectBoundTask {
+    tween: TweenRuntimeBehavior.TweenInstance;
+
+    constructor(
+      objectInstance: gdjs.RuntimeObject,
+      tween: TweenRuntimeBehavior.TweenInstance
+    ) {
+      super(objectInstance);
+      this.tween = tween;
+    }
+
+    shouldResolve() {
+      return this.tween.hasFinished;
+    }
+
+    onObjectDeleted(): void {
+      //@ts-ignore - We are destoying the task to avoid leaking memory.
+      this.tween = null;
+    }
+  }
+
   // TODO EBO Rewrite this behavior to use standard method to step.
   // This could also fix layer time scale that seems to be ignored.
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
@@ -106,16 +127,10 @@ namespace gdjs {
     }
 
     onDestroy() {
-      const shiftyJsScene = this._runtimeScene.shiftyJsScene;
-      if (!shiftyJsScene) return;
-
       // Stop and delete all tweens of the behavior - otherwise they could:
       // - continue to point to the behavior, and so to the object (memory leak),
       // - affect the object in case it's recycled (wrong/hard to debug behavior).
-      for (const identifier in this._tweens) {
-        this._tweens[identifier].instance.stop();
-        shiftyJsScene.remove(this._tweens[identifier].instance);
-      }
+      for (const identifier in this._tweens) this.removeTween(identifier);
     }
 
     private _addTween(
@@ -954,11 +969,19 @@ namespace gdjs {
       if (!this._tweenExists(identifier)) return;
 
       this._tweens[identifier].instance.stop();
+      // Since once removed it cannot play again, consider it has finished playing (for {this.awaitTween})
+      this._tweens[identifier].hasFinished = true;
       if (this._runtimeScene.shiftyJsScene)
         this._runtimeScene.shiftyJsScene.remove(
           this._tweens[identifier].instance
         );
       delete this._tweens[identifier];
+    }
+
+    awaitTween(identifier: string) {
+      return this._tweenExists(identifier)
+        ? new TweenAwaiterTask(this.owner, this._tweens[identifier])
+        : new gdjs.ResolveTask();
     }
 
     /**

@@ -1365,6 +1365,13 @@ const MainFrame = (props: Props) => {
       // from the user.
       findAndLogProjectPreviewErrors(currentProject);
 
+      const projectPropertiesFallback = authenticatedUser.profile
+        ? {
+            authorUsername: authenticatedUser.profile.username || '',
+            authorId: authenticatedUser.profile.id,
+          }
+        : {};
+
       eventsFunctionsExtensionsState
         .ensureLoadFinished()
         .then(() =>
@@ -1376,6 +1383,7 @@ const MainFrame = (props: Props) => {
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
             fullLoadingScreen: !!fullLoadingScreen,
+            projectPropertiesFallback,
             getIsMenuBarHiddenInPreview:
               preferences.getIsMenuBarHiddenInPreview,
             getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
@@ -1402,6 +1410,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
+      authenticatedUser.profile,
     ]
   );
 

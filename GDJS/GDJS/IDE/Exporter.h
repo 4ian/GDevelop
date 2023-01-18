@@ -40,7 +40,9 @@ class Exporter {
    *
    * \param options The options to generate the preview.
    */
-  bool ExportProjectForPixiPreview(const PreviewExportOptions& options);
+  bool ExportProjectForPixiPreview(
+      const PreviewExportOptions& options,
+      std::map<gd::String, gd::String>& projectPropertiesFallback);
 
   /**
    * \brief Export the specified project, using Pixi.js.

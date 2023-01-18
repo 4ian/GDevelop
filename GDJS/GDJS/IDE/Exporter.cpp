@@ -45,9 +45,10 @@ Exporter::Exporter(gd::AbstractFileSystem &fileSystem, gd::String gdjsRoot_)
 Exporter::~Exporter() {}
 
 bool Exporter::ExportProjectForPixiPreview(
-    const PreviewExportOptions &options) {
+    const PreviewExportOptions &options,
+    std::map<gd::String, gd::String> &projectPropertiesFallback) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  return helper.ExportProjectForPixiPreview(options);
+  return helper.ExportProjectForPixiPreview(options, projectPropertiesFallback);
 }
 
 bool Exporter::ExportWholePixiProject(

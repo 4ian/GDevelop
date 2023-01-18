@@ -3150,7 +3150,7 @@ interface Exporter {
     void Exporter([Ref] AbstractFileSystem fs, [Const] DOMString gdjsRoot);
     void SetCodeOutputDirectory([Const] DOMString path);
 
-    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
+    boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options, [Ref] MapStringString projectPropertiesFallback);
     boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions, [Ref] MapStringString projectPropertiesFallback);
 
     [Const, Ref] DOMString GetLastError();

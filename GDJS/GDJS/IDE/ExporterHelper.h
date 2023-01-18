@@ -356,7 +356,9 @@ class ExporterHelper {
    *
    * \param options The options to generate the preview.
    */
-  bool ExportProjectForPixiPreview(const PreviewExportOptions &options);
+  bool ExportProjectForPixiPreview(
+      const PreviewExportOptions &options,
+      std::map<gd::String, gd::String> &projectPropertiesFallback);
 
   /**
    * \brief Given an include file, returns the name of the file to reference

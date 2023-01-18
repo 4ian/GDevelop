@@ -2,7 +2,7 @@
 declare class gdjsExporter {
   constructor(fs: gdAbstractFileSystem, gdjsRoot: string): void;
   setCodeOutputDirectory(path: string): void;
-  exportProjectForPixiPreview(options: gdPreviewExportOptions): boolean;
+  exportProjectForPixiPreview(options: gdPreviewExportOptions, projectPropertiesFallback: gdMapStringString): boolean;
   exportWholePixiProject(project: gdProject, exportDir: string, exportOptions: gdMapStringBoolean, projectPropertiesFallback: gdMapStringString): boolean;
   getLastError(): string;
   delete(): void;

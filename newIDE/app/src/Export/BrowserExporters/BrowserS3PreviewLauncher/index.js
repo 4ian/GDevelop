@@ -14,6 +14,7 @@ import {
 } from './BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { displayBlackLoadingScreen } from '../../../Utils/BrowserExternalWindowUtils';
+import { toNewGdMapStringString } from '../../../Utils/MapStringString';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -63,7 +64,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     error: null,
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter = (): Promise<{|
+    outputDir: string,
+    exporter: gdjsExporter,
+    browserS3FileSystem: BrowserS3FileSystem,
+  |}> => {
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -151,7 +156,15 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         previewOptions.fullLoadingScreen
       );
 
-      exporter.exportProjectForPixiPreview(previewExportOptions);
+      const projectPropertiesFallbackMap = toNewGdMapStringString(
+        previewOptions.projectPropertiesFallback
+      );
+
+      exporter.exportProjectForPixiPreview(
+        previewExportOptions,
+        projectPropertiesFallbackMap
+      );
+      projectPropertiesFallbackMap.delete();
       previewExportOptions.delete();
       exporter.delete();
 

@@ -75,7 +75,8 @@ ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
 
 bool ExporterHelper::ExportProjectForPixiPreview(
-    const PreviewExportOptions &options) {
+    const PreviewExportOptions &options,
+    std::map<gd::String, gd::String> &projectPropertiesFallback) {
   double previousTime = GetTimeNow();
   fs.MkDir(options.exportPath);
   fs.ClearDir(options.exportPath);
@@ -87,7 +88,23 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   gd::Project exportedProject = options.project;
   const gd::Project &immutableProject = exportedProject;
 
-  if (!options.fullLoadingScreen) {
+  if (options.fullLoadingScreen) {
+    // Use project properties fallback to set empty properties
+    if (exportedProject.GetAuthorIds().empty() &&
+        projectPropertiesFallback.find("authorId") !=
+            projectPropertiesFallback.end()) {
+      exportedProject.GetAuthorIds().push_back(
+          projectPropertiesFallback["authorId"]);
+    }
+    if (exportedProject.GetAuthorUsernames().empty() &&
+        projectPropertiesFallback.find("authorUsername") !=
+            projectPropertiesFallback.end()) {
+      gd::String authorUsername = projectPropertiesFallback["authorUsername"];
+      if (!authorUsername.empty()) {
+        exportedProject.GetAuthorUsernames().push_back(authorUsername);
+      }
+    }
+  } else {
     // Most of the time, we skip the logo and minimum duration so that
     // the preview start as soon as possible.
     exportedProject.GetLoadingScreen().ShowGDevelopSplash(false).SetMinDuration(

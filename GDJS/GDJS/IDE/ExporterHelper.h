@@ -38,7 +38,9 @@ struct PreviewExportOptions {
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
-        nonRuntimeScriptsCacheBurst(0){};
+        nonRuntimeScriptsCacheBurst(0),
+        fallbackAuthorId(""),
+        fallbackAuthorUsername(""){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -48,6 +50,16 @@ struct PreviewExportOptions {
       const gd::String &address, const gd::String &port) {
     websocketDebuggerServerAddress = address;
     websocketDebuggerServerPort = port;
+    return *this;
+  }
+
+  /**
+   * \brief Set the fallback author info (if info not present in project properties).
+   */
+  PreviewExportOptions &SetFallbackAuthor(const gd::String &id,
+                                          const gd::String &username) {
+    fallbackAuthorId = id;
+    fallbackAuthorUsername = username;
     return *this;
   }
 
@@ -144,6 +156,8 @@ struct PreviewExportOptions {
   bool useWindowMessageDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
+  gd::String fallbackAuthorUsername;
+  gd::String fallbackAuthorId;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
   bool fullLoadingScreen;

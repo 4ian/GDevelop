@@ -299,7 +299,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
-  subscription: subscriptionForIndieUser,
+  subscription: subscriptionForSilverUser,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
   receivedAssetPacks: [],

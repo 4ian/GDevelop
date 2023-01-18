@@ -60,7 +60,7 @@ export type ExportPipeline<
   launchExport: (
     context: ExportPipelineContext<ExportState>,
     preparedExporter: PreparedExporter,
-    projectPropertiesFallback: { [key: string]: string }
+    fallbackAuthor: ?{ id: string, username: string }
   ) => Promise<ExportOutput>,
 
   launchResourcesDownload: (

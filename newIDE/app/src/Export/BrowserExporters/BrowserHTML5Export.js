@@ -21,7 +21,6 @@ import {
   openBlobDownloadUrl,
 } from '../../Utils/BlobDownloadUrlHolder';
 import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
-import { toNewGdMapStringString } from '../../Utils/MapStringString';
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -91,21 +90,17 @@ export const browserHTML5ExportPipeline: ExportPipeline<
   launchExport: (
     context: ExportPipelineContext<ExportState>,
     { exporter, outputDir, abstractFileSystem }: PreparedExporter,
-    projectPropertiesFallback: { [key: string]: string }
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
     const { project } = context;
-    const projectPropertiesFallbackMap = toNewGdMapStringString(
-      projectPropertiesFallback
-    );
-
-    const exportOptions = new gd.MapStringBoolean();
-    exporter.exportWholePixiProject(
-      project,
-      outputDir,
-      exportOptions,
-      projectPropertiesFallbackMap
-    );
-    projectPropertiesFallbackMap.delete();
+    const exportOptions = new gd.ExportOptions(project, outputDir);
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

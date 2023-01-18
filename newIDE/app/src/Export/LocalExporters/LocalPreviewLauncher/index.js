@@ -17,7 +17,6 @@ import {
   localPreviewDebuggerServer,
 } from './LocalPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
-import { toNewGdMapStringString } from '../../../Utils/MapStringString';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -242,15 +241,14 @@ export default class LocalPreviewLauncher extends React.Component<
               previewOptions.fullLoadingScreen
             );
 
-            const projectPropertiesFallbackMap = toNewGdMapStringString(
-              previewOptions.projectPropertiesFallback
-            );
+            if (previewOptions.fallbackAuthor) {
+              previewExportOptions.setFallbackAuthor(
+                previewOptions.fallbackAuthor.id,
+                previewOptions.fallbackAuthor.username
+              );
+            }
 
-            exporter.exportProjectForPixiPreview(
-              previewExportOptions,
-              projectPropertiesFallbackMap
-            );
-            projectPropertiesFallbackMap.delete();
+            exporter.exportProjectForPixiPreview(previewExportOptions);
             previewExportOptions.delete();
             exporter.delete();
 

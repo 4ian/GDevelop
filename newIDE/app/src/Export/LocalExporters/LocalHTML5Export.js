@@ -15,7 +15,6 @@ import {
 import optionalRequire from '../../Utils/OptionalRequire';
 import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
-import { toNewGdMapStringString } from '../../Utils/MapStringString';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -103,20 +102,19 @@ export const localHTML5ExportPipeline: ExportPipeline<
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
     { exporter, localFileSystem }: PreparedExporter,
-    projectPropertiesFallback: { [key: string]: string }
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
-    const projectPropertiesFallbackMap = toNewGdMapStringString(
-      projectPropertiesFallback
-    );
-
-    const exportOptions = new gd.MapStringBoolean();
-    exporter.exportWholePixiProject(
+    const exportOptions = new gd.ExportOptions(
       context.project,
-      context.exportState.outputDir,
-      exportOptions,
-      projectPropertiesFallbackMap
+      context.exportState.outputDir
     );
-    projectPropertiesFallbackMap.delete();
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

@@ -19,7 +19,6 @@ import {
   DoneFooter,
 } from '../GenericExporters/FacebookInstantGamesExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
-import { toNewGdMapStringString } from '../../Utils/MapStringString';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -131,21 +130,20 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
     { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter,
-    projectPropertiesFallback: { [key: string]: string }
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
-    const projectPropertiesFallbackMap = toNewGdMapStringString(
-      projectPropertiesFallback
-    );
-
-    const exportOptions = new gd.MapStringBoolean();
-    exportOptions.set('exportForFacebookInstantGames', true);
-    exporter.exportWholePixiProject(
+    const exportOptions = new gd.ExportOptions(
       context.project,
-      temporaryOutputDir,
-      exportOptions,
-      projectPropertiesFallbackMap
+      temporaryOutputDir
     );
-    projectPropertiesFallbackMap.delete();
+    exportOptions.setTarget('facebookInstantGames');
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

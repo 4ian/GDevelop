@@ -9,7 +9,7 @@ export type PreviewOptions = {|
   hotReload: boolean,
   projectDataOnlyExport: boolean,
   fullLoadingScreen: boolean,
-  projectPropertiesFallback: { [key: string]: string },
+  fallbackAuthor: ?{ id: string, username: string },
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
 |};

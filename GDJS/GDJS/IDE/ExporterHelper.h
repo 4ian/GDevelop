@@ -153,6 +153,41 @@ struct PreviewExportOptions {
 };
 
 /**
+ * \brief The options used to export a project.
+ */
+struct ExportOptions {
+  /**
+   * \param project_ The project to export
+   * \param exportPath_ The path in the filesystem where to export the files
+   * \param target_ The platform target
+   */
+  ExportOptions(gd::Project &project_,
+                const gd::String &exportPath_,
+                const gd::String &target_)
+      : project(project_),
+        exportPath(exportPath_),
+        target(target_),
+        fallbackAuthorId(""),
+        fallbackAuthorUsername(""){};
+
+  /**
+   * \brief Set the fallback author info (if info not present in project properties).
+   */
+  ExportOptions &SetFallbackAuthor(const gd::String &id,
+                                   const gd::String &username) {
+    fallbackAuthorId = id;
+    fallbackAuthorUsername = username;
+    return *this;
+  }
+
+  gd::Project &project;
+  gd::String exportPath;
+  gd::String target;
+  gd::String fallbackAuthorUsername;
+  gd::String fallbackAuthorId;
+};
+
+/**
  * \brief Export a project or a layout to a playable HTML5/Javascript based
  * game.
  */

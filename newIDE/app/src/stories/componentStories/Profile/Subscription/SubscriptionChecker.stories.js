@@ -2,15 +2,15 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-import paperDecorator from '../PaperDecorator';
+import muiDecorator from '../../../ThemeDecorator';
+import paperDecorator from '../../../PaperDecorator';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
-} from '../../Profile/Subscription/SubscriptionChecker';
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { fakeNotAuthenticatedAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
-import RaisedButton from '../../UI/RaisedButton';
-import subscriptionSuggestionDecorator from '../SubscriptionSuggestionDecorator';
+} from '../../../../Profile/Subscription/SubscriptionChecker';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { fakeNotAuthenticatedAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
+import RaisedButton from '../../../../UI/RaisedButton';
+import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 
 export default {
   title: 'Subscription/SubscriptionChecker',

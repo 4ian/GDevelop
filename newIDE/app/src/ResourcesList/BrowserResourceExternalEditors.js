@@ -20,6 +20,7 @@ import {
   type ItemResult,
 } from '../Utils/BlobDownloader';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { displayBlackLoadingScreen } from '../Utils/BrowserExternalWindowUtils';
 let nextExternalEditorWindowId = 0;
 
 const externalEditorIndexHtml: { ['piskel' | 'yarn' | 'jfxr']: string } = {
@@ -332,27 +333,7 @@ const immediatelyOpenLoadingWindowForExternalEditor = () => {
     );
   }
 
-  externalEditorWindow.document.write(`<html>
-  <head>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #000000;
-        overflow: hidden;
-        height: 100vh;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-      }
-    </style>
-  </head>
-  <body>
-      Loading...
-  </body>
-</html>`);
+  displayBlackLoadingScreen(externalEditorWindow);
 
   return externalEditorWindow;
 };

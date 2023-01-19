@@ -86,7 +86,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={this.edit}
-        onKeyPress={event => {
+        onKeyUp={event => {
           if (shouldActivate(event)) {
             this.edit();
           }

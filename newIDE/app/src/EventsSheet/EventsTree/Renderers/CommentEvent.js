@@ -132,7 +132,7 @@ export default class CommentEvent extends React.Component<
           backgroundColor: `#${backgroundColor}`,
         }}
         onClick={this.edit}
-        onKeyPress={event => {
+        onKeyUp={event => {
           if (shouldActivate(event)) {
             this.edit();
           }

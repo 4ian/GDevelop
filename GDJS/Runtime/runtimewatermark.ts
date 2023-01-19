@@ -78,17 +78,17 @@ namespace gdjs {
       }
 
       private updateFontSize(height: number) {
-        this._textFontSize = 0.025 * height;
+        this._textFontSize = Math.max(0.025 * height, 12);
       }
       private updateLogoSize(height: number) {
-        this._logoWidth = 0.06 * height;
+        this._logoWidth = Math.max(0.06 * height, 25);
         this._logoHeight = Math.round((45 / 56) * this._logoWidth);
       }
       private updateBackground(height: number) {
-        this._backgroundHeight = 0.13 * height;
+        this._backgroundHeight = Math.max(0.13 * height, 45);
       }
       private updateMargin(height: number) {
-        this._margin = Math.max(0.025 * height, 10);
+        this._margin = Math.max(0.025 * height, 8);
       }
 
       private onResizeGameContainer(height: number) {

@@ -30,6 +30,8 @@
       "showGDevelopSplash": true
     },
     "extensionProperties": [],
+    "authorIds": [],
+    "authorUsernames": [],
     "extensions": [
       {
         "name": "BuiltinObject"

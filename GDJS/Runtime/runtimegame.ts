@@ -156,7 +156,7 @@ namespace gdjs {
       );
       this._watermark = new gdjs.watermark.RuntimeWatermark(
         this,
-        data.properties.authorUsernames[0], // Only display the first author username
+        data.properties.authorUsernames,
         this._data.properties.watermark
       );
       this._sceneStack = new gdjs.SceneStack(this);

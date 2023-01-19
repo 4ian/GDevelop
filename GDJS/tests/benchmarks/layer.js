@@ -12,12 +12,12 @@ describe('gdjs.Layer', function() {
   it('benchmark convertCoords and convertInverseCoords', function() {
     this.timeout(30000);
     var layer = new gdjs.RuntimeSceneLayer(
-      { name: 'My layer', 
-        visibility: true, 
-        effects: [], 
-        cameras: [], 
-        isLightingLayer: false, 
-        followBaseLayerCamera: false,  
+      { name: 'My layer',
+        visibility: true,
+        effects: [],
+        cameras: [],
+        isLightingLayer: false,
+        followBaseLayerCamera: false,
         ambientLightColorR: 128,
         ambientLightColorG: 128,
         ambientLightColorB: 128,

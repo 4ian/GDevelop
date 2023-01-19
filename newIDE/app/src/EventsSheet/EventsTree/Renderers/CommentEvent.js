@@ -62,6 +62,7 @@ export default class CommentEvent extends React.Component<
   _textField: ?TextFieldInterface;
 
   edit = () => {
+    if (this.state.editing) return;
     const commentEvent = gd.asCommentEvent(this.props.event);
     this.setState(
       {
@@ -135,6 +136,7 @@ export default class CommentEvent extends React.Component<
           ...styles.container,
           backgroundColor: `#${backgroundColor}`,
         }}
+        onClick={this.edit}
         onKeyUp={event => {
           if (!this.state.editing && shouldActivate(event)) {
             this.edit();
@@ -182,7 +184,6 @@ export default class CommentEvent extends React.Component<
             dangerouslySetInnerHTML={{
               __html: this._getCommentHTML(),
             }}
-            onClick={this.edit}
             {...dataObjectToProps({ editableText: 'true' })}
           />
         )}

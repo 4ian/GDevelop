@@ -43,6 +43,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
   _textField: ?TextFieldInterface = null;
 
   edit = () => {
+    if (this.state.editing) return;
     const groupEvent = gd.asGroupEvent(this.props.event);
     if (!this.state.editingPreviousValue) {
       this.setState({ editingPreviousValue: groupEvent.getName() });

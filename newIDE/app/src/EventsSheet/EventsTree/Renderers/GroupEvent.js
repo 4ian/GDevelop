@@ -97,6 +97,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
       >
         {this.state.editing ? (
           <TextField
+            margin="none"
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
             translatableHintText={t`<Enter group name>`}

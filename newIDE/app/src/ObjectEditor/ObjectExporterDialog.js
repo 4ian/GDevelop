@@ -12,11 +12,40 @@ import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
+import { mapFor } from '../Utils/MapFor';
 import Upload from '../UI/CustomSvgIcons/Upload';
 
-const exportCustomObject = async (
+const exportObjectAsset = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject,
   customObject: gdObject
+) => {
+  await exportObjectsAssets(
+    eventsFunctionsExtensionsState,
+    project,
+    [customObject],
+    customObject.getName()
+  );
+};
+
+const exportLayoutObjectAssets = async (
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject,
+  layout: gdLayout
+) => {
+  await exportObjectsAssets(
+    eventsFunctionsExtensionsState,
+    project,
+    mapFor(0, layout.getObjectsCount(), i => layout.getObjectAt(i)),
+    layout.getName()
+  );
+};
+
+const exportObjectsAssets = async (
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject,
+  objects: gdObject[],
+  defaultName: string
 ) => {
   const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter) {
@@ -25,14 +54,15 @@ const exportCustomObject = async (
       "The object can't be exported because it's not supported by the web-app."
     );
   }
-  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseCustomObjectFile(
-    customObject.getName()
+  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseObjectAssetFile(
+    defaultName
   );
 
   if (!pathOrUrl) return;
 
-  await eventsFunctionsExtensionWriter.writeCustomObject(
-    customObject,
+  await eventsFunctionsExtensionWriter.writeObjectsAssets(
+    project,
+    objects,
     pathOrUrl
   );
 };
@@ -44,6 +74,8 @@ const openGitHubIssue = () => {
 };
 
 type Props = {|
+  project: gdProject,
+  layout: gdLayout,
   object: gdObject,
   onClose: () => void,
 |};
@@ -92,13 +124,27 @@ const ObjectExporterDialog = (props: Props) => {
             icon={<Upload />}
             primary
             label={<Trans>Export to a file</Trans>}
-            onClick={() => {
-              exportCustomObject(eventsFunctionsExtensionsState, props.object);
-            }}
+            onClick={() =>
+              exportObjectAsset(
+                eventsFunctionsExtensionsState,
+                props.project,
+                props.object
+              )
+            }
           />
           <FlatButton
             label={<Trans>Submit objects to the community</Trans>}
             onClick={openGitHubIssue}
+          />
+          <FlatButton
+            label={<Trans>Export all scene objects</Trans>}
+            onClick={() =>
+              exportLayoutObjectAssets(
+                eventsFunctionsExtensionsState,
+                props.project,
+                props.layout
+              )
+            }
           />
         </ResponsiveLineStackLayout>
       </Column>

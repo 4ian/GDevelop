@@ -1,10 +1,18 @@
 // @flow
-import { serializeToJSObject } from '../../Utils/Serializer';
+import assignIn from 'lodash/assignIn';
+import {
+  serializeToJSObject,
+  serializeToObjectAsset,
+} from '../../Utils/Serializer';
 import optionalRequire from '../../Utils/OptionalRequire';
+import LocalFileSystem from '../../ExportAndShare/LocalExporters/LocalFileSystem';
+import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
+
+const gd: libGDevelop = global.gd;
 
 const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
@@ -26,6 +34,12 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   } catch (stringifyException) {
     return Promise.reject(stringifyException);
   }
+};
+
+const addSpacesToPascalCase = (pascalCaseName: string): string => {
+  let name = pascalCaseName.replace(/([A-Z]+[a-z]|\d+)/g, ' $1');
+  name = name.charAt(0) === ' ' ? name.substring(1) : name;
+  return name;
 };
 
 export default class LocalEventsFunctionsExtensionWriter {
@@ -63,7 +77,7 @@ export default class LocalEventsFunctionsExtensionWriter {
     });
   };
 
-  static chooseCustomObjectFile = (objectName?: string): Promise<?string> => {
+  static chooseObjectAssetFile = (objectName?: string): Promise<?string> => {
     if (!dialog) return Promise.reject('Not supported');
     const browserWindow = remote.getCurrentWindow();
 
@@ -72,11 +86,12 @@ export default class LocalEventsFunctionsExtensionWriter {
         title: 'Export an object of the project',
         filters: [
           {
-            name: 'GDevelop 5 object configuration',
+            name: 'GDevelop 5 object pack',
             extensions: ['gdo'],
           },
         ],
-        defaultPath: objectName || 'Object',
+        defaultPath:
+          (objectName && addSpacesToPascalCase(objectName)) || 'Object',
       })
       .then(({ filePath }) => {
         if (!filePath) return null;
@@ -84,21 +99,59 @@ export default class LocalEventsFunctionsExtensionWriter {
       });
   };
 
-  static writeCustomObject = (
-    customObject: gdObject,
+  static writeObjectsAssets = (
+    project: gdProject,
+    exportedObjects: gdObject[],
     filepath: string
   ): Promise<void> => {
-    const exportedObject = customObject.clone().get();
-    exportedObject.getVariables().clear();
-    exportedObject.getEffects().clear();
-    exportedObject
-      .getAllBehaviorNames()
-      .toJSArray()
-      .forEach(name => exportedObject.removeBehavior(name));
-    const serializedObject = serializeToJSObject(exportedObject);
-    return writeJSONFile(serializedObject, filepath).catch(err => {
-      console.error('Unable to write the object:', err);
-      throw err;
+    const localFileSystem = new LocalFileSystem({
+      downloadUrlsToLocalFiles: true,
+    });
+    const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
+    const temporaryOutputDir = path.join(
+      fileSystem.getTempDir(),
+      'AssetExport'
+    );
+    fileSystem.mkDir(temporaryOutputDir);
+    fileSystem.clearDir(temporaryOutputDir);
+
+    return Promise.all(
+      exportedObjects.map(exportedObject => {
+        const clonedObject = exportedObject.clone().get();
+
+        gd.ProjectResourcesCopier.copyObjectResourcesTo(
+          project,
+          clonedObject,
+          fileSystem,
+          temporaryOutputDir,
+          addSpacesToPascalCase(clonedObject.getName())
+        );
+
+        const serializedObject = serializeToObjectAsset(project, clonedObject);
+        // Resource names are changed by copyObjectResourcesTo so they don't
+        // match any project resource.
+        serializedObject.objectAssets.forEach(asset =>
+          asset.resources.forEach(resource => {
+            resource.file = resource.name;
+          })
+        );
+
+        return writeJSONFile(
+          serializedObject,
+          path.join(
+            temporaryOutputDir,
+            addSpacesToPascalCase(exportedObject.getName()) + '.asset.json'
+          )
+        ).catch(err => {
+          console.error('Unable to write the object:', err);
+          throw err;
+        });
+      })
+    ).then(() => {
+      archiveLocalFolder({
+        path: temporaryOutputDir,
+        outputFilename: filepath,
+      });
     });
   };
 }

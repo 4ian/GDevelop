@@ -86,6 +86,7 @@
 #include <GDCore/Project/VariablesContainersList.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
+#include <GDCore/IDE/ObjectAssetSerializer.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
@@ -539,6 +540,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetSafeName GetSafeName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
+#define STATIC_SerializeTo SerializeTo
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
 #define STATIC_IsExpression IsExpression
@@ -754,6 +756,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
+#define STATIC_CopyObjectResourcesTo CopyObjectResourcesTo
 
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction

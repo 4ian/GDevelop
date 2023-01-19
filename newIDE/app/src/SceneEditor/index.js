@@ -1839,6 +1839,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               </I18n>
               {this.state.exportedObject && (
                 <ObjectExporterDialog
+                  project={project}
+                  layout={layout}
                   object={this.state.exportedObject}
                   onClose={() => {
                     this.openObjectExporterDialog(null);

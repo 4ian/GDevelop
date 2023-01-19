@@ -307,6 +307,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'declare class gdGroupEvent extends gdBaseEvent {',
       'types/gdgroupevent.js'
     );
+    shell.sed(
+      '-i',
+      'declare class gdAbstractFileSystemJS {',
+      'declare class gdAbstractFileSystemJS extends gdAbstractFileSystem {',
+      'types/gdabstractfilesystemjs.js'
+    );
     [
       'BaseEvent',
       'StandardEvent',

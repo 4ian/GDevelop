@@ -1297,6 +1297,10 @@ interface Serializer {
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
 };
 
+interface ObjectAssetSerializer {
+    void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj, [Ref] SerializerElement element);
+};
+
 interface InstructionsList {
     void InstructionsList();
 
@@ -3015,6 +3019,11 @@ interface ProjectResourcesCopier {
                                  boolean updateOriginalProject,
                                  boolean preserveAbsoluteFilenames,
                                  boolean preserveDirectoryStructure);
+    boolean STATIC_CopyObjectResourcesTo([Ref] Project project,
+                                 [Ref] gdObject originalObject,
+                                 [Ref] AbstractFileSystem fs,
+                                 [Const] DOMString destinationDirectory,
+                                 [Const] DOMString objectFullName);
 };
 
 interface ObjectsUsingResourceCollector {

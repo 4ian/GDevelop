@@ -3,11 +3,14 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef PROJECTRESOURCESCOPIER_H
-#define PROJECTRESOURCESCOPIER_H
+#pragma once
+
 #include "GDCore/String.h"
+#include <map>
+
 namespace gd {
 class Project;
+class Object;
 class AbstractFileSystem;
 }  // namespace gd
 
@@ -47,6 +50,24 @@ class GD_CORE_API ProjectResourcesCopier {
                                  bool updateOriginalProject,
                                  bool preserveAbsoluteFilenames = true,
                                  bool preserveDirectoryStructure = true);
+
+  /**
+   * \brief Copy all resources files of an object to the specified
+   * `destinationDirectory` to prepare asset archive export.
+   *
+   * \param project The object project
+   * \param object The object to be used
+   * \param fs The abstract file system to be used
+   * \param destinationDirectory The directory where resources must be copied to
+   * \param objectFullName The name to use in file names of sprite resources
+   *
+   * \return true if no error happened
+   */
+  static bool CopyObjectResourcesTo(gd::Project &project, gd::Object &object,
+                                    gd::AbstractFileSystem &fs,
+                                    const gd::String &destinationDirectory,
+                                    const gd::String &objectFullName);
+
 private:
   static bool CopyAllResourcesTo(gd::Project& originalProject,
                                  gd::Project& clonedProject,
@@ -54,8 +75,16 @@ private:
                                  gd::String destinationDirectory,
                                  bool preserveAbsoluteFilenames = true,
                                  bool preserveDirectoryStructure = true);
+
+  static void
+  CopyResourcesTo(std::map<gd::String, gd::String> &resourcesNewFileNames,
+                  AbstractFileSystem &fs,
+                  const gd::String &destinationDirectory);
+
+  static void NormalizeResourceNames(
+      gd::Object &object,
+      std::map<gd::String, gd::String> &resourcesNewFileNames,
+      const gd::String &objectFullName);
 };
 
 }  // namespace gd
-
-#endif  // PROJECTRESOURCESCOPIER_H

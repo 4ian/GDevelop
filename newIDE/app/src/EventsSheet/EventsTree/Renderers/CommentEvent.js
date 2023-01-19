@@ -32,7 +32,7 @@ const styles = {
     overflow: 'hidden',
     minHeight: '2.1em',
   },
-  commentTextField: commentTextStyle,
+  commentTextField: { ...commentTextStyle, fontSize: 'inherit' },
   commentSpan: {
     ...commentTextStyle,
     boxSizing: 'border-box',
@@ -155,7 +155,6 @@ export default class CommentEvent extends React.Component<
               color: `#${textColor}`,
               padding: 0,
               lineHeight: 1.5,
-              fontSize: '1em',
             }}
             underlineFocusStyle={{
               borderColor: `#${textColor}`,

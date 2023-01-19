@@ -80,6 +80,10 @@
     font-weight: normal;
 }
 
+.gd-events-sheet .rst__rowTitle .MuiInputBase-root {
+    font-family: unset;
+}
+
 /**
  * Expand/collapse buttons
  */

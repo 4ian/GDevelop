@@ -69,12 +69,14 @@ export default class CommentEvent extends React.Component<
         editingPreviousValue: commentEvent.getComment(),
       },
       () => {
-        if (this._textField) this._textField.focus();
+        if (this._textField) {
+          this._textField.focus({ caretPosition: 'end' });
+        }
       }
     );
   };
 
-  onEvent = (e: any, text: string) => {
+  onChange = (e: any, text: string) => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(text);
 
@@ -133,9 +135,8 @@ export default class CommentEvent extends React.Component<
           ...styles.container,
           backgroundColor: `#${backgroundColor}`,
         }}
-        onClick={this.edit}
         onKeyUp={event => {
-          if (shouldActivate(event)) {
+          if (!this.state.editing && shouldActivate(event)) {
             this.edit();
           }
         }}
@@ -149,7 +150,7 @@ export default class CommentEvent extends React.Component<
             value={commentEvent.getComment()}
             translatableHintText={t`<Enter comment>`}
             onBlur={this.endEditing}
-            onChange={this.onEvent}
+            onChange={this.onChange}
             style={styles.commentTextField}
             inputStyle={{
               color: `#${textColor}`,
@@ -181,6 +182,7 @@ export default class CommentEvent extends React.Component<
             dangerouslySetInnerHTML={{
               __html: this._getCommentHTML(),
             }}
+            onClick={this.edit}
             {...dataObjectToProps({ editableText: 'true' })}
           />
         )}

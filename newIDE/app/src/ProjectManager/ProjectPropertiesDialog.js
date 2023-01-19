@@ -278,7 +278,7 @@ function ProjectPropertiesDialog(props: Props) {
                 <FlatButton
                   key="hot-reload-preview-button"
                   leftIcon={<NewPreviewIcon />}
-                  label={<Trans>Run a preview (with loading screen)</Trans>}
+                  label={<Trans>Run a preview (with loading & branding)</Trans>}
                   onClick={
                     hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
                   }

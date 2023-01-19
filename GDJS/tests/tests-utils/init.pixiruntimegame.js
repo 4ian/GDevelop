@@ -3,7 +3,7 @@
 /**
  * Create and return a minimum working game.
  * @internal
- * @param {{layouts?: LayoutData[], resources?: ResourcesData, propertiesOverrides?: ProjectPropertiesData} | undefined} settings
+ * @param {{layouts?: LayoutData[], resources?: ResourcesData, propertiesOverrides?: Partial<ProjectPropertiesData>}=} settings
  * @returns {gdjs.RuntimeGame}
  */
 gdjs.getPixiRuntimeGame = (settings) => {

@@ -17,6 +17,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { Trans } from '@lingui/macro';
+import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -131,6 +132,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               [disabledText]: this.props.disabled,
             })}
             style={{ ...styles.title, color: textColor }}
+            {...dataObjectToProps({ editableText: 'true' })}
           >
             {groupEvent.getName() ? (
               groupEvent.getName()

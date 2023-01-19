@@ -423,6 +423,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const hasEventsSelected = hasEventSelected(this.state.selection);
     let insertTopOfSelection = false;
 
+    // This is not a real hook.
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const screenType = useScreenType();
+
     let insertions: Array<EventInsertionContext> = [];
     if (context) {
       insertions = [context];
@@ -473,6 +477,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }
           }
         );
+        if (
+          screenType !== 'touch' &&
+          (type === 'BuiltinCommonInstructions::Comment' ||
+            type === 'BuiltinCommonInstructions::Group')
+        ) {
+          const rowIndex = currentTree.getEventRow(newEvents[0]);
+          const clickableElement = document.querySelector(
+            `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
+          );
+          if (clickableElement) clickableElement.click();
+        }
       });
     }
 

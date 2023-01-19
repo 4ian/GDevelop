@@ -16,6 +16,7 @@ import {
   shouldActivate,
   shouldCloseOrCancel,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
@@ -180,6 +181,7 @@ export default class CommentEvent extends React.Component<
             dangerouslySetInnerHTML={{
               __html: this._getCommentHTML(),
             }}
+            {...dataObjectToProps({ editableText: 'true' })}
           />
         )}
       </div>

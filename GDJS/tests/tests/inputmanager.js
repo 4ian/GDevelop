@@ -2,7 +2,7 @@
  * Tests for gdjs.InputManager and related.
  */
 
-describe.only('gdjs.InputManager', () => {
+describe('gdjs.InputManager', () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: {
@@ -217,7 +217,7 @@ describe.only('gdjs.InputManager', () => {
     expect(inputManager.getCursorY()).to.be(600);
     expect(inputManager.getMouseX()).to.be(500);
     expect(inputManager.getMouseY()).to.be(600);
-    
+
     // Touch events only move the cursor.
     inputManager.onTouchStart(46, 510, 610);
     inputManager.onTouchMove(46, 520, 620);

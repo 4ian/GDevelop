@@ -3,7 +3,7 @@
 /**
  * Basic tests for gdjs.SpriteRuntimeObject
  */
-describe.only('gdjs.SpriteRuntimeObject', () => {
+describe('gdjs.SpriteRuntimeObject', () => {
   const firstAnimationTimeBetweenFrames = 0.25;
   const createObjectWithAnimationInScene = (runtimeScene) => {
     const object = new gdjs.SpriteRuntimeObject(runtimeScene, {

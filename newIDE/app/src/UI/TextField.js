@@ -168,7 +168,7 @@ export const computeTextFieldStyleProps = (props: {
 };
 
 export type TextFieldInterface = {|
-  focus: () => void,
+  focus: (?{ caretPosition: 'end' }) => void,
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
@@ -181,9 +181,17 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
 
-  const focus = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+  const focus = (options: ?{ caretPosition: 'end' }) => {
+    const { current: input } = inputRef;
+    if (input) {
+      input.focus();
+
+      if (options && options.caretPosition === 'end' && props.value) {
+        input.setSelectionRange(
+          props.value.toString().length,
+          props.value.toString().length
+        );
+      }
     }
   };
 

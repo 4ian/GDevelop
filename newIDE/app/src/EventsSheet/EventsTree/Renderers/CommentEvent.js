@@ -15,6 +15,7 @@ import { type EventRendererProps } from './EventRenderer';
 import {
   shouldActivate,
   shouldCloseOrCancel,
+  shouldSubmit,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
@@ -161,8 +162,8 @@ export default class CommentEvent extends React.Component<
             }}
             fullWidth
             id="comment-title"
-            onKeyUp={event => {
-              if (shouldCloseOrCancel(event)) {
+            onKeyDown={event => {
+              if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
                 this.endEditing();
               }
             }}

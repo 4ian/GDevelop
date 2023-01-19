@@ -14,6 +14,7 @@ import { type EventRendererProps } from './EventRenderer';
 import {
   shouldActivate,
   shouldCloseOrCancel,
+  shouldSubmit,
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { Trans } from '@lingui/macro';
@@ -119,8 +120,8 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
                 this.endEditing();
               }
             }}
-            onKeyPress={event => {
-              if (shouldValidate(event)) {
+            onKeyDown={event => {
+              if (shouldValidate(event) || shouldSubmit(event)) {
                 this.endEditing();
               }
             }}

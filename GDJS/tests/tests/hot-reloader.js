@@ -36,12 +36,7 @@ describe('gdjs.HotReloader.deepEqual', () => {
   });
 
   it('hot-reloads variables', () => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      resources: { resources: [] },
-      // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-      properties: { windowWidth: 800, windowHeight: 600 },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const hotReloader = new gdjs.HotReloader(runtimeGame);
     const variablesContainer = new gdjs.VariablesContainer([]);
 

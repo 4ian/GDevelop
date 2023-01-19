@@ -1,10 +1,7 @@
 // @ts-check
 describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
   const createScene = (framePerSecond = 60) => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore - missing properties.
-      properties: { windowWidth: 800, windowHeight: 600 },
+    const runtimeGame = gdjs.getPixiRuntimeGame({
       resources: {
         resources: [
           {

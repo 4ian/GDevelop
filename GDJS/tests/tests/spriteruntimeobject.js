@@ -96,12 +96,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
   };
 
   describe('Scaling', () => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
     it('should handle scaling properly', () => {
@@ -128,12 +123,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
   });
 
   describe('Animations', () => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
     const object = new gdjs.SpriteRuntimeObject(runtimeScene, {
@@ -188,12 +178,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
   describe('Animation frames', () => {
     it('should increment time elapsed frame when animation is playing', () => {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
+      const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [
@@ -245,12 +230,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
     });
 
     it('should reset the elapsed time on a frame when changing animation', () => {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
+      const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [
@@ -302,12 +282,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
     });
 
     it('should reset the elapsed time on a frame when changing animation frame', () => {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
+      const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [

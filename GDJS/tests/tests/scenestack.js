@@ -4,10 +4,7 @@
  * Tests for gdjs.SceneStack.
  */
 describe('gdjs.SceneStack', function () {
-  var runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-    properties: { windowWidth: 800, windowHeight: 600 },
+  const runtimeGame = gdjs.getPixiRuntimeGame({
     layouts: [
       {
         r: 0,
@@ -38,7 +35,6 @@ describe('gdjs.SceneStack', function () {
         variables: [],
       },
     ],
-    resources: { resources: [] },
   });
   var sceneStack = runtimeGame._sceneStack;
 

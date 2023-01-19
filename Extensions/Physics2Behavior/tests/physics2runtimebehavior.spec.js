@@ -59,11 +59,7 @@ describe('Physics2RuntimeBehavior', () => {
   }
 
   function createGameWithSceneWithPhysics2SharedData() {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      resources: { resources: [] },
-      properties: { windowWidth: 1000, windowHeight: 1000 },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [

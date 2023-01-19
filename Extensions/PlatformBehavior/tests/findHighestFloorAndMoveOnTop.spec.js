@@ -1,12 +1,6 @@
 describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, function () {
   const makeTestRuntimeScene = () => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      resources: {
-        resources: [],
-      },
-      properties: { windowWidth: 800, windowHeight: 600 },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [{ name: '', visibility: true, effects: [] }],

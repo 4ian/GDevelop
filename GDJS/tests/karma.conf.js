@@ -132,6 +132,7 @@ module.exports = function (config) {
       // Other test initialization files:
       './GDJS/tests/tests-utils/init.js',
       './GDJS/tests/tests-utils/init.pixiruntimegamewithassets.js',
+      './GDJS/tests/tests-utils/init.pixiruntimegame.js',
 
       // Test helpers
       './Extensions/PlatformBehavior/tests/PlatformerTestHelper.js',

@@ -3,13 +3,7 @@
  */
 
 describe('gdjs.InputManager', () => {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: {
-      resources: [],
-    },
-    properties: { windowWidth: 800, windowHeight: 600 },
-  });
+  const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [{ name: '', visibility: true, effects: [] }],
@@ -355,11 +349,7 @@ describe('gdjs.InputManager', () => {
 });
 
 describe('gdjs.RuntimeObject.cursorOnObject', () => {
-  var runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    properties: { windowWidth: 800, windowHeight: 600 },
-    resources: { resources: [] },
-  });
+  const runtimeGame = gdjs.getPixiRuntimeGame();
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [{ name: '', visibility: true, effects: [] }],

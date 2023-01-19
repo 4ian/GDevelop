@@ -4,12 +4,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
   const topDownName = 'auto1';
 
   const createScene = (timeDelta = 1000 / 60) => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore - missing properties.
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [

@@ -51,16 +51,9 @@ namespace gdjs {
         watermarkData: WatermarkData
       ) {
         this._gameRenderer = game.getRenderer();
-        this._authorUsername = authorUsernames // authorUsernames can be undefined when running tests
-          ? // Only display the first author username
-            authorUsernames[0]
-          : undefined;
-        this._placement = watermarkData // watermark can be undefined when running tests
-          ? watermarkData.placement
-          : 'bottom-left';
-        this._showAtStartup = watermarkData // watermark can be undefined when running tests
-          ? watermarkData.showWatermark
-          : false;
+        this._authorUsername = authorUsernames[0];
+        this._placement = watermarkData.placement;
+        this._showAtStartup = watermarkData.showWatermark;
         this._isDevEnvironment = game.isUsingGDevelopDevelopmentEnvironment();
         this.addStyle();
       }

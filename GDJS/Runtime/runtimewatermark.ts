@@ -1,6 +1,4 @@
 namespace gdjs {
-  const logger = new gdjs.Logger('Watermark');
-
   export namespace watermark {
     export class RuntimeWatermark {
       _gameRenderer: RuntimeGameRenderer;
@@ -65,7 +63,6 @@ namespace gdjs {
       }
 
       display() {
-        logger.info('display');
         const gameContainer = this._gameRenderer.getDomElementContainer();
         if (gameContainer) {
           this.addWatermarkToGameContainer(gameContainer);
@@ -279,7 +276,7 @@ namespace gdjs {
         }
       }
 
-      private createDivContainer() {
+      private createDivContainer(): HTMLDivElement {
         const divContainer = document.createElement('div');
         divContainer.setAttribute('id', 'watermark');
 
@@ -288,11 +285,7 @@ namespace gdjs {
         return divContainer;
       }
 
-      /**
-       * @param {number} height
-       * @returns
-       */
-      private generateSVGLogo(height) {
+      private generateSVGLogo(height: number) {
         this._svgElement = document.createElementNS(
           'http://www.w3.org/2000/svg',
           'svg'

@@ -80,6 +80,10 @@
     font-weight: normal;
 }
 
+/**
+ * Unset font family of Material UI textfields (for comment and group events)
+ * so that they get the same font family as the rest of the event sheet.
+ */
 .gd-events-sheet .rst__rowTitle .MuiInputBase-root {
     font-family: unset;
 }

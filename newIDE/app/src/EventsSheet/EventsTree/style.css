@@ -89,6 +89,14 @@
 }
 
 /**
+ * Remove default style of multiline textfield (for comment events) to remove
+ * the height change occurring when starting to edit the comment.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInput-multiline {
+    padding-bottom: 0;
+}
+
+/**
  * Expand/collapse buttons
  */
 .gd-events-sheet .rst__collapseButton, .rst__expandButton {

@@ -27,6 +27,7 @@ type Props<Item> = {|
   getItemData?: (Item, index: number) => HTMLDataset,
   isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
+  itemEqualityTest?: (Item, Item) => boolean,
   onEditItem?: Item => void,
   renamedItem: ?Item,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
@@ -67,6 +68,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       getItemData,
       renderItemLabel,
       scaleUpItemIconWhenSelected,
+      itemEqualityTest,
     } = this.props;
 
     const nameBeingEdited = renamedItem === item;
@@ -87,7 +89,13 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         getThumbnail={
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
         }
-        selected={selectedItems.indexOf(item) !== -1}
+        selected={
+          itemEqualityTest
+            ? selectedItems.some(selectedItem =>
+                itemEqualityTest(selectedItem, item)
+              )
+            : selectedItems.indexOf(item) !== -1
+        }
         onItemSelected={this.props.onItemSelected}
         errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}

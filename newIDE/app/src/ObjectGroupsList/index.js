@@ -63,7 +63,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
 |};
 
-export default class GroupsListContainer extends React.Component<Props, State> {
+export default class ObjectGroupsList extends React.Component<Props, State> {
   static defaultProps = {
     onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) =>
       cb(true),
@@ -422,12 +422,19 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     onAddNewItem={this.addGroup}
                     addNewItemLabel={<Trans>Add a new group</Trans>}
                     addNewItemId="add-new-group-button"
-                    selectedItems={[]}
+                    selectedItems={
+                      this.state.selectedGroupWithContext
+                        ? [this.state.selectedGroupWithContext]
+                        : []
+                    }
                     onItemSelected={groupWithContext => {
                       this.setState({
                         selectedGroupWithContext: groupWithContext,
                       });
                     }}
+                    itemEqualityTest={(a, b) =>
+                      a.group.ptr === b.group.ptr && a.global === b.global
+                    }
                     renamedItem={renamedGroupWithContext}
                     onRename={this._onRename}
                     buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}

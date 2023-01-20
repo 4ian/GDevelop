@@ -25,6 +25,11 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
+import PreferencesContext, {
+  type PreferencesValues,
+} from '../MainFrame/Preferences/PreferencesContext';
+import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -329,7 +334,7 @@ export default class ObjectGroupsList extends React.Component<Props, State> {
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _renderGroupMenuTemplate = (i18n: I18nType) => (
+  _renderGroupMenuTemplate = (i18n: I18nType, values: PreferencesValues) => (
     groupWithContext: GroupWithContext,
     index: number
   ) => [
@@ -346,6 +351,10 @@ export default class ObjectGroupsList extends React.Component<Props, State> {
     {
       label: i18n._(t`Rename`),
       click: () => this._onEditName(groupWithContext),
+      accelerator: getShortcutDisplayName(
+        values.userShortcutMap['RENAME_SCENE_OBJECT'] ||
+          defaultShortcuts.RENAME_SCENE_OBJECT
+      ),
     },
     {
       label: i18n._(t`Set as global group`),
@@ -406,66 +415,73 @@ export default class ObjectGroupsList extends React.Component<Props, State> {
       : null;
 
     return (
-      <Background onClick={this.props.onEditorActive}>
-        <div style={styles.listContainer}>
-          <AutoSizer>
-            {({ height, width }) => (
-              <I18n>
-                {({ i18n }) => (
-                  <SortableVirtualizedItemList
-                    key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
-                    fullList={fullList}
-                    width={width}
-                    height={height}
-                    getItemName={getGroupWithContextName}
-                    getItemId={(groupWithContext, index) => {
-                      return 'group-item-' + index;
-                    }}
-                    isItemBold={isGroupWithContextGlobal}
-                    onEditItem={groupWithContext =>
-                      this.props.onEditGroup(groupWithContext.group)
-                    }
-                    onAddNewItem={this.addGroup}
-                    addNewItemLabel={<Trans>Add a new group</Trans>}
-                    addNewItemId="add-new-group-button"
-                    selectedItems={
-                      this.state.selectedGroupWithContext
-                        ? [this.state.selectedGroupWithContext]
-                        : []
-                    }
-                    onItemSelected={groupWithContext => {
-                      this.setState({
-                        selectedGroupWithContext: groupWithContext,
-                      });
-                    }}
-                    itemEqualityTest={(a, b) =>
-                      a.group.ptr === b.group.ptr && a.global === b.global
-                    }
-                    renamedItem={renamedGroupWithContext}
-                    onRename={this._onRename}
-                    buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
-                    onMoveSelectionToItem={this._moveSelectionTo}
-                    canMoveSelectionToItem={this._canMoveSelectionTo}
-                    reactDndType={groupWithContextReactDndType}
-                  />
+      <PreferencesContext.Consumer>
+        {({ values }) => (
+          <Background onClick={this.props.onEditorActive}>
+            <div style={styles.listContainer}>
+              <AutoSizer>
+                {({ height, width }) => (
+                  <I18n>
+                    {({ i18n }) => (
+                      <SortableVirtualizedItemList
+                        key={listKey}
+                        ref={sortableList => (this.sortableList = sortableList)}
+                        fullList={fullList}
+                        width={width}
+                        height={height}
+                        getItemName={getGroupWithContextName}
+                        getItemId={(groupWithContext, index) => {
+                          return 'group-item-' + index;
+                        }}
+                        isItemBold={isGroupWithContextGlobal}
+                        onEditItem={groupWithContext =>
+                          this.props.onEditGroup(groupWithContext.group)
+                        }
+                        onAddNewItem={this.addGroup}
+                        addNewItemLabel={<Trans>Add a new group</Trans>}
+                        addNewItemId="add-new-group-button"
+                        selectedItems={
+                          this.state.selectedGroupWithContext
+                            ? [this.state.selectedGroupWithContext]
+                            : []
+                        }
+                        onItemSelected={groupWithContext => {
+                          this.setState({
+                            selectedGroupWithContext: groupWithContext,
+                          });
+                        }}
+                        itemEqualityTest={(a, b) =>
+                          a.group.ptr === b.group.ptr && a.global === b.global
+                        }
+                        renamedItem={renamedGroupWithContext}
+                        onRename={this._onRename}
+                        buildMenuTemplate={this._renderGroupMenuTemplate(
+                          i18n,
+                          values
+                        )}
+                        onMoveSelectionToItem={this._moveSelectionTo}
+                        canMoveSelectionToItem={this._canMoveSelectionTo}
+                        reactDndType={groupWithContextReactDndType}
+                      />
+                    )}
+                  </I18n>
                 )}
-              </I18n>
-            )}
-          </AutoSizer>
-        </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search object groups`}
-        />
-      </Background>
+              </AutoSizer>
+            </div>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              aspect="integrated-search-bar"
+              placeholder={t`Search object groups`}
+            />
+          </Background>
+        )}
+      </PreferencesContext.Consumer>
     );
   }
 }

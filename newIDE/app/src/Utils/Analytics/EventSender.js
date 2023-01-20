@@ -437,7 +437,12 @@ export const sendExternalEditorOpened = (editorName: string) => {
 export const sendBehaviorsEditorShown = (metadata: {|
   parentEditor: 'object-editor-dialog',
 |}) => {
-  recordEvent('behaviors-editor-shown', metadata);
+  // It would be costly to send an event for each opening of the behaviors editor.
+  // We would rather have this aggregated by the app and sent as a property for the user.
+  // TODO: investigate a more generic way of collecting some useful counters to understand
+  // which editors are used (and how much/how long),
+  // and send these as properties in the `identify` event (or in a debounced event?).
+  // recordEvent('behaviors-editor-shown', metadata);
 };
 
 export const sendBehaviorAdded = (metadata: {|

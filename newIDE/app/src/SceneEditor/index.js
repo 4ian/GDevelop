@@ -125,7 +125,10 @@ type State = {|
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
-  onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string | null) => void,
+  onCloseLayerRemoveDialog: ?(
+    doRemove: boolean,
+    newLayer: string | null
+  ) => void,
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',

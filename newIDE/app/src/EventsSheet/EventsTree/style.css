@@ -92,7 +92,8 @@
  * Remove default style of multiline textfield (for comment events) to remove
  * the height change occurring when starting to edit the comment.
  */
-.gd-events-sheet .rst__rowTitle .MuiInput-multiline {
+.gd-events-sheet .rst__rowTitle .MuiInput-multiline,
+.gd-events-sheet .rst__rowTitle .MuiInputBase-input {
     padding-bottom: 0;
 }
 
@@ -164,7 +165,7 @@
  */
 .gd-events-sheet .selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
+    border: 1px solid transparent;
 }
 
 /**
@@ -172,7 +173,7 @@
  */
 .gd-events-sheet .large-selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
+    border: 1px solid transparent;
 }
 
 /**

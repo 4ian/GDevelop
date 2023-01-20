@@ -56,10 +56,10 @@ describe('libGD.js', function () {
     });
 
     it('can store loading screen setup', function () {
-      project.getLoadingScreen().showGDevelopSplash(true);
-      expect(project.getLoadingScreen().isGDevelopSplashShown()).toBe(true);
-      project.getLoadingScreen().showGDevelopSplash(false);
-      expect(project.getLoadingScreen().isGDevelopSplashShown()).toBe(false);
+      project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(true);
+      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(true);
+      project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(false);
+      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(false);
     });
 
     it('handles layouts', function () {

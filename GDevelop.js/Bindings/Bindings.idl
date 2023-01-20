@@ -320,8 +320,8 @@ interface PlatformSpecificAssets {
 interface LoadingScreen {
     void LoadingScreen();
 
-    boolean IsGDevelopSplashShown();
-    [Ref] LoadingScreen ShowGDevelopSplash(boolean show);
+    boolean IsGDevelopLogoShownDuringLoadingScreen();
+    [Ref] LoadingScreen ShowGDevelopLogoDuringLoadingScreen(boolean show);
     [Const, Ref] DOMString GetGDevelopLogoStyle();
     [Ref] LoadingScreen SetGDevelopLogoStyle([Const] DOMString value);
     [Const, Ref] DOMString GetBackgroundImageResourceName();

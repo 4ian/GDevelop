@@ -79,7 +79,7 @@ export const LoadingScreenEditor = ({
                       Display GDevelop logo at startup (in exported game)
                     </Trans>
                   }
-                  checked={loadingScreen.isGDevelopSplashShown()}
+                  checked={loadingScreen.isGDevelopLogoShownDuringLoadingScreen()}
                   onCheck={(e, checked) => {
                     if (
                       !checked &&
@@ -91,7 +91,7 @@ export const LoadingScreenEditor = ({
                       // watermark is hidden, we don't allow it if they have no subscription.
                       return;
                     }
-                    loadingScreen.showGDevelopSplash(checked);
+                    loadingScreen.showGDevelopLogoDuringLoadingScreen(checked);
                     onUpdate();
                   }}
                 />
@@ -108,7 +108,9 @@ export const LoadingScreenEditor = ({
                     loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
                     onUpdate();
                   }}
-                  disabled={!loadingScreen.isGDevelopSplashShown()}
+                  disabled={
+                    !loadingScreen.isGDevelopLogoShownDuringLoadingScreen()
+                  }
                 >
                   <SelectOption value="light" primaryText={t`Light (plain)`} />
                   <SelectOption
@@ -137,7 +139,7 @@ export const LoadingScreenEditor = ({
                   onCheck={(e, checked) => {
                     if (
                       !checked &&
-                      !loadingScreen.isGDevelopSplashShown() &&
+                      !loadingScreen.isGDevelopLogoShownDuringLoadingScreen() &&
                       subscriptionChecker.current &&
                       !subscriptionChecker.current.checkUserHasSubscription()
                     ) {
@@ -356,7 +358,7 @@ export const LoadingScreenEditor = ({
           <ResponsiveLineStackLayout noMargin>
             <SemiControlledTextField
               floatingLabelText={
-                loadingScreen.isGDevelopSplashShown() ? (
+                loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (
                   <Trans>Logo and progress fade in delay (in seconds)</Trans>
                 ) : (
                   <Trans>Progress fade in delay (in seconds)</Trans>
@@ -385,7 +387,7 @@ export const LoadingScreenEditor = ({
             />
             <SemiControlledTextField
               floatingLabelText={
-                loadingScreen.isGDevelopSplashShown() ? (
+                loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (
                   <Trans>Logo and progress fade in duration (in seconds)</Trans>
                 ) : (
                   <Trans>Progress fade in duration (in seconds)</Trans>
@@ -413,7 +415,7 @@ export const LoadingScreenEditor = ({
               }}
             />
           </ResponsiveLineStackLayout>
-          {loadingScreen.isGDevelopSplashShown() ? (
+          {loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (
             <AlertMessage kind="info">
               <Trans>
                 Progress bar fade in delay and duration will be applied to

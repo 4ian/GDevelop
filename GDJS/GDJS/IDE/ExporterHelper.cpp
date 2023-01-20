@@ -101,7 +101,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   } else {
     // Most of the time, we skip the logo and minimum duration so that
     // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false).SetMinDuration(
+    exportedProject.GetLoadingScreen().ShowGDevelopLogoDuringLoadingScreen(false).SetMinDuration(
         0);
     exportedProject.GetWatermark().ShowGDevelopWatermark(false);
   }

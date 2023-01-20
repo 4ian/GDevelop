@@ -112,7 +112,6 @@ type Props = {|
     lineHeight?: 1.4 | 1.5,
     padding?: 0,
   |},
-  underlineFocusStyle?: {| borderColor: string |}, // TODO
   underlineShow?: boolean,
 |};
 

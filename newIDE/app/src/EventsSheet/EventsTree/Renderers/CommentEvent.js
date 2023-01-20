@@ -157,9 +157,6 @@ export default class CommentEvent extends React.Component<
               padding: 0,
               lineHeight: 1.5,
             }}
-            underlineFocusStyle={{
-              borderColor: `#${textColor}`,
-            }}
             fullWidth
             id="comment-title"
             onKeyDown={event => {

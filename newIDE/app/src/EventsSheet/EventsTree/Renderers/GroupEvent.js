@@ -112,9 +112,6 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               color: textColor,
               WebkitTextFillColor: textColor,
             }}
-            underlineFocusStyle={{
-              borderColor: textColor,
-            }}
             fullWidth
             id="group-title"
             onKeyUp={event => {

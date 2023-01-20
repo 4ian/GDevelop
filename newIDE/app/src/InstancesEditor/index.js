@@ -68,7 +68,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   layout: gdLayout,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
-  onChangeInstancesEditorSettings: (
+  onInstancesEditorSettingsMutated: (
     instancesEditorSettings: InstancesEditorSettings
   ) => void,
   instancesSelection: InstancesSelection,
@@ -542,10 +542,13 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   setZoomFactor = (zoomFactor: number) => {
-    this.props.onChangeInstancesEditorSettings({
-      ...this.props.instancesEditorSettings,
-      zoomFactor: clampInstancesEditorZoom(zoomFactor),
-    });
+    this.props.instancesEditorSettings.zoomFactor = clampInstancesEditorZoom(
+      zoomFactor
+    );
+
+    this.props.onInstancesEditorSettingsMutated(
+      this.props.instancesEditorSettings
+    );
   };
 
   /**

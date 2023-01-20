@@ -41,7 +41,7 @@ export const Default = () => (
         layout={testProject.testLayout}
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}
-        onChangeInstancesEditorSettings={() => {}}
+        onInstancesEditorSettingsMutated={() => {}}
         instancesSelection={instancesSelection}
         onInstancesAdded={() => {}}
         onInstancesSelected={() => {}}

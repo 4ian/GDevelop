@@ -48,6 +48,7 @@ import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import { dataObjectToProps } from '../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -304,6 +305,7 @@ export type SortableTreeNode = {
   depth: number,
   disabled: boolean,
   indexInList: number,
+  rowIndex: number,
   nodePath: Array<number>,
   // Key is event pointer or an identification string.
   key: number | string,
@@ -486,6 +488,7 @@ export default class ThemableEventsTree extends Component<
           event,
           eventsList,
           indexInList: i,
+          rowIndex: flatData.length - 1,
           expanded: !event.isFolded(),
           disabled,
           depth,
@@ -720,6 +723,7 @@ export default class ThemableEventsTree extends Component<
                 opacity: isDragged ? 0.5 : 1,
                 ...getEventContainerStyle(this.props.windowWidth),
               }}
+              {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
             >
               <EventContainer
                 project={this.props.project}
@@ -854,6 +858,12 @@ export default class ThemableEventsTree extends Component<
           ...styles.container,
           fontSize: `${zoomLevel}px`,
           '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
+          '--instruction-missing-parameter-min-height': `${Math.round(
+            zoomLevel * 1.1
+          )}px`,
+          '--instruction-missing-parameter-min-width': `${Math.round(
+            zoomLevel * 3
+          )}px`,
         }}
       >
         {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}

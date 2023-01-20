@@ -81,6 +81,33 @@
 }
 
 /**
+ * Unset font family of Material UI textfields (for comment and group events)
+ * so that they get the same font family as the rest of the event sheet.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInputBase-root {
+    font-family: unset;
+}
+
+/**
+ * Remove default style of multiline textfield (for comment events) to remove
+ * the height change occurring when starting to edit the comment.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInput-multiline,
+.gd-events-sheet .rst__rowTitle .MuiInputBase-input {
+    padding-bottom: 0;
+}
+
+/**
+ * Add transparent border around Material UI textfields (for comment and group events)
+ * to avoid a slight shift due to the border added by the class "selectable" applied
+ * to those events.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInputBase-root{
+    box-sizing: border-box;
+    border: 1px solid transparent;
+}
+
+/**
  * Expand/collapse buttons
  */
 .gd-events-sheet .rst__collapseButton, .rst__expandButton {
@@ -148,7 +175,7 @@
  */
 .gd-events-sheet .selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
+    border: 1px solid transparent;
 }
 
 /**
@@ -156,7 +183,7 @@
  */
 .gd-events-sheet .large-selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
+    border: 1px solid transparent;
 }
 
 /**

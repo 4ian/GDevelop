@@ -19,6 +19,7 @@ type Props = {|
   /** Sometimes required on Safari */
   noFullHeight?: boolean,
   noExpand?: boolean,
+  onClick?: () => void,
 |};
 
 /**
@@ -36,6 +37,7 @@ const Background = (props: Props) => (
       ...(props.maxWidth ? styles.maxWidth : undefined),
     }}
     background="dark"
+    onClick={props.onClick}
   >
     {props.children}
   </Paper>

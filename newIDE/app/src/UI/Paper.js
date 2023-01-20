@@ -13,6 +13,7 @@ type Props = {|
   background: 'light' | 'medium' | 'dark',
   style?: Object,
   square?: boolean,
+  onClick?: () => void,
 |};
 
 const Paper = ({
@@ -22,6 +23,7 @@ const Paper = ({
   variant,
   style,
   square,
+  onClick,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor =
@@ -39,6 +41,7 @@ const Paper = ({
         ...style,
       }}
       square={!!square}
+      onClick={onClick}
     >
       {children}
     </MuiPaper>

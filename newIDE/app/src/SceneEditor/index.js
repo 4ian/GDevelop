@@ -70,6 +70,7 @@ import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
+import debounce from 'lodash/debounce';
 
 const gd: libGDevelop = global.gd;
 
@@ -417,6 +418,22 @@ export default class SceneEditor extends React.Component<Props, State> {
       instancesEditorSettings,
     });
   };
+
+  /**
+   * Debounced version of `setInstancesEditorSettings` to be called when the
+   * settings have been mutated. The `InstancesEditor` can mutate these settings
+   * very quickly (the zoom factor changes 60 times per second when the user does a
+   * "pinch to zoom"). In this case, we don't want to have the React updates to be a
+   * bottleneck. We let the mutations be done and trigger an update only when the user
+   * is done.
+   */
+  _onInstancesEditorSettingsMutated = debounce(
+    (instancesEditorSettings: InstancesEditorSettings) => {
+      this.setInstancesEditorSettings(instancesEditorSettings);
+    },
+    1000,
+    { leading: false, trailing: true }
+  );
 
   undo = () => {
     // TODO: Do not clear selection so that the user can actually see
@@ -1421,7 +1438,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             layout={layout}
             initialInstances={initialInstances}
             instancesEditorSettings={this.state.instancesEditorSettings}
-            onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
+            onInstancesEditorSettingsMutated={
+              this._onInstancesEditorSettingsMutated
+            }
             instancesSelection={this.instancesSelection}
             onInstancesAdded={this._onInstancesAdded}
             onInstancesSelected={this._onInstancesSelected}

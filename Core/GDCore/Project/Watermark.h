@@ -26,13 +26,14 @@ class GD_CORE_API Watermark {
   virtual ~Watermark(){};
 
   /**
-   * \brief Return true if the GDevelop logo should be shown while loading
-   * assets.
+   * \brief Return true if the GDevelop watermark should be shown after
+   * the game has loaded its assets.
    */
   bool IsGDevelopWatermarkShown() const { return showWatermark; };
 
   /**
-   * \brief Set if the GDevelop logo should be shown while loading assets.
+   * \brief Set if the GDevelop watermark should be shown after the game
+   * has loaded its assets.
    */
   Watermark& ShowGDevelopWatermark(bool show) {
     showWatermark = show;
@@ -50,12 +51,12 @@ class GD_CORE_API Watermark {
    */
   ///@{
   /**
-   * \brief Serialize the loading screen setup.
+   * \brief Serialize the watermark setup.
    */
   void SerializeTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the loading screen setup.
+   * \brief Unserialize the watermark setup.
    */
   void UnserializeFrom(const SerializerElement& element);
   ///@}

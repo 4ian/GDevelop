@@ -45,18 +45,6 @@ const styles = {
     cursor: 'pointer',
     marginBottom: 1,
   },
-  input: {
-    fontFamily: '"Lucida Console", Monaco, monospace',
-    lineHeight: 1.4,
-  },
-  backgroundHighlightingInline: {
-    marginTop: 0, //Properly align with the text field
-    paddingLeft: 0,
-    paddingRight: 0,
-  },
-  textFieldAndHightlightContainer: {
-    position: 'relative',
-  },
 };
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';

@@ -109,7 +109,6 @@ type Props = {|
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
-    lineHeight?: 1.4 | 1.5,
     padding?: 0,
   |},
   underlineShow?: boolean,

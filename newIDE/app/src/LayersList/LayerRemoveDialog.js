@@ -7,10 +7,11 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
 import enumerateLayers from './EnumerateLayers';
+import { getInstanceCountInLayoutForLayer } from '../Utils/Layout';
 
 type Props = {|
   open: boolean,
-  layersContainer: any,
+  layersContainer: gdLayout,
   layerRemoved: string,
   onClose: (doRemove: boolean, newLayer: string | null) => void,
 |};
@@ -40,25 +41,44 @@ export default class LayerRemoveDialog extends Component<Props, State> {
   render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
-    const actions = [
+    const instancesCountInLayout = getInstanceCountInLayoutForLayer(
+      this.props.layersContainer,
+      this.props.layerRemoved
+    );
+
+    let actions = [
       <FlatButton
         key="cancel"
         label={<Trans>Cancel</Trans>}
         keyboardFocused={true}
         onClick={() => this.props.onClose(false, null)}
       />,
-      <FlatButton
-        key="remove"
-        label={<Trans>Remove objects</Trans>}
-        onClick={() => this.props.onClose(true, null)}
-      />,
-      <DialogPrimaryButton
-        key="move"
-        label={<Trans>Move objects</Trans>}
-        primary={true}
-        onClick={() => this.props.onClose(true, this.state.selectedLayer)}
-      />,
     ];
+
+    if (instancesCountInLayout > 0) {
+      actions = actions.concat([
+        <FlatButton
+          key="remove"
+          label={<Trans>Remove objects</Trans>}
+          onClick={() => this.props.onClose(true, null)}
+        />,
+        <DialogPrimaryButton
+          key="move"
+          label={<Trans>Move objects</Trans>}
+          primary={true}
+          onClick={() => this.props.onClose(true, this.state.selectedLayer)}
+        />,
+      ]);
+    } else {
+      actions.push(
+        <DialogPrimaryButton
+          key="continue"
+          label={<Trans>Continue</Trans>}
+          primary={true}
+          onClick={() => this.props.onClose(true, null)}
+        />
+      );
+    }
 
     const layers = enumerateLayers(this.props.layersContainer);
     const choices = layers
@@ -80,19 +100,42 @@ export default class LayerRemoveDialog extends Component<Props, State> {
         actions={actions}
         open={this.props.open}
         onRequestClose={() => this.props.onClose(false, null)}
-        onApply={() => this.props.onClose(true, this.state.selectedLayer)}
+        onApply={
+          instancesCountInLayout > 0
+            ? () => this.props.onClose(true, this.state.selectedLayer)
+            : () => this.props.onClose(true, null)
+        }
+        flexColumnBody
+        maxWidth="sm"
       >
         <Text>
-          <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
+          {instancesCountInLayout === 0 ? (
+            <Trans>
+              The layer {this.props.layerRemoved} does not contain any object
+              instances. Continue?
+            </Trans>
+          ) : (
+            <Trans>
+              There are {instancesCountInLayout} object instances on this
+              layout. What do you want to do?
+            </Trans>
+          )}
         </Text>
-        <SelectField
-          value={this.state.selectedLayer}
-          onChange={(event, index, newValue) => {
-            this.setState({ selectedLayer: newValue });
-          }}
-        >
-          {choices}
-        </SelectField>
+        {instancesCountInLayout > 0 && (
+          <>
+            <Text>
+              <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
+            </Text>
+            <SelectField
+              value={this.state.selectedLayer}
+              onChange={(event, index, newValue) => {
+                this.setState({ selectedLayer: newValue });
+              }}
+            >
+              {choices}
+            </SelectField>
+          </>
+        )}
       </Dialog>
     );
   }

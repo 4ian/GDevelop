@@ -1,3 +1,4 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -11,10 +12,14 @@ type Props = {|
   open: boolean,
   layersContainer: any,
   layerRemoved: string,
-  onClose: boolean => void,
+  onClose: (doRemove: boolean, newLayer: string | null) => void,
 |};
 
-export default class LayerRemoveDialog extends Component {
+type State = {|
+  selectedLayer: string,
+|};
+
+export default class LayerRemoveDialog extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -24,7 +29,7 @@ export default class LayerRemoveDialog extends Component {
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
-  UNSAFE_componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (!this.props.open && newProps.open) {
       this.setState({
         selectedLayer: '',
@@ -40,7 +45,7 @@ export default class LayerRemoveDialog extends Component {
         key="cancel"
         label={<Trans>Cancel</Trans>}
         keyboardFocused={true}
-        onClick={() => this.props.onClose(false)}
+        onClick={() => this.props.onClose(false, null)}
       />,
       <FlatButton
         key="remove"
@@ -74,7 +79,7 @@ export default class LayerRemoveDialog extends Component {
         title={<Trans>Objects on {this.props.layerRemoved}</Trans>}
         actions={actions}
         open={this.props.open}
-        onRequestClose={this.props.onCancel}
+        onRequestClose={() => this.props.onClose(false, null)}
         onApply={() => this.props.onClose(true, this.state.selectedLayer)}
       >
         <Text>

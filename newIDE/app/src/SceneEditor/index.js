@@ -172,6 +172,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   contextMenu: ?ContextMenuInterface;
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsListInterface;
+  _objectGroupsList: ?ObjectGroupsList;
   _layersList: ?LayersListInterface;
   _propertiesEditor: ?InstancePropertiesEditor;
   _instancesList: ?InstancesList;
@@ -257,8 +258,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.openSceneProperties}
-        canRenameObject={this.state.selectedObjectsWithContext.length === 1}
-        onRenameObject={this._startRenamingSelectedObject}
+        onRenameObjectOrGroup={this._startRenamingSelectedObjectOrGroup}
       />
     );
   }
@@ -721,8 +721,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  _startRenamingSelectedObject = () => {
-    this._onRenameObjectStart(this.state.selectedObjectsWithContext[0]);
+  _startRenamingSelectedObjectOrGroup = () => {
+    if (this.state.activeEditor === 'objects-list') {
+      this._onRenameObjectStart(this.state.selectedObjectsWithContext[0]);
+    } else if (
+      this.state.activeEditor === 'object-groups-list' &&
+      this._objectGroupsList
+    ) {
+      this._objectGroupsList.startEditingSelectedGroup();
+    }
   };
 
   _onRenameLayer = (
@@ -1552,6 +1559,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this._canObjectOrGroupUseNewName(newName, i18n)
                 }
                 unsavedChanges={this.props.unsavedChanges}
+                ref={objectGroupsList =>
+                  (this._objectGroupsList = objectGroupsList)
+                }
               />
             )}
           </I18n>

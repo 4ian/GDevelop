@@ -364,6 +364,12 @@ export default class ObjectGroupsList extends React.Component<Props, State> {
     },
   ];
 
+  startEditingSelectedGroup = () => {
+    if (this.state.selectedGroupWithContext) {
+      this._onEditName(this.state.selectedGroupWithContext);
+    }
+  };
+
   render() {
     const { globalObjectGroups, objectGroups } = this.props;
     const { searchText } = this.state;

@@ -237,7 +237,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   },
   RENAME_SCENE_OBJECT: {
     area: 'SCENE',
-    displayText: t`Rename the selected object`,
+    displayText: t`Rename the selected object or group`,
   },
   DELETE_INSTANCES: {
     area: 'SCENE',

@@ -55,9 +55,8 @@ export const LoadingScreenEditor = ({
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();
-  const shouldDisplayGetSubscriptionCard = authenticatedUser.subscription
-    ? !authenticatedUser.subscription.planId
-    : true;
+  const shouldDisplayGetSubscriptionCard =
+    !authenticatedUser.subscription || !authenticatedUser.subscription.planId;
 
   const onUpdate = () => {
     forceUpdate();
@@ -82,12 +81,15 @@ export const LoadingScreenEditor = ({
                   }
                   checked={loadingScreen.isGDevelopSplashShown()}
                   onCheck={(e, checked) => {
-                    if (!checked && !watermark.isGDevelopWatermarkShown()) {
-                      if (
-                        subscriptionChecker.current &&
-                        !subscriptionChecker.current.checkUserHasSubscription()
-                      )
-                        return;
+                    if (
+                      !checked &&
+                      !watermark.isGDevelopWatermarkShown() &&
+                      subscriptionChecker.current &&
+                      !subscriptionChecker.current.checkUserHasSubscription()
+                    ) {
+                      // If user wants to deactivate GDevelop splash screen although
+                      // watermark is hidden, we don't allow it if they have no subscription.
+                      return;
                     }
                     loadingScreen.showGDevelopSplash(checked);
                     onUpdate();
@@ -133,12 +135,15 @@ export const LoadingScreenEditor = ({
                   }
                   checked={watermark.isGDevelopWatermarkShown()}
                   onCheck={(e, checked) => {
-                    if (!checked && !loadingScreen.isGDevelopSplashShown()) {
-                      if (
-                        subscriptionChecker.current &&
-                        !subscriptionChecker.current.checkUserHasSubscription()
-                      )
-                        return;
+                    if (
+                      !checked &&
+                      !loadingScreen.isGDevelopSplashShown() &&
+                      subscriptionChecker.current &&
+                      !subscriptionChecker.current.checkUserHasSubscription()
+                    ) {
+                      // If user wants to deactivate watermark although GDevelop splash
+                      // screen is hidden, we don't allow it if they have no subscription.
+                      return;
                     }
                     watermark.showGDevelopWatermark(checked);
                     onUpdate();

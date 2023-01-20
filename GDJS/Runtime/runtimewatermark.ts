@@ -81,7 +81,7 @@ namespace gdjs {
         this._logoWidth = Math.max(0.06 * height, 25);
         this._logoHeight = Math.round((45 / 56) * this._logoWidth);
       }
-      private updateBackground(height: number) {
+      private updateBackgroundHeight(height: number) {
         this._backgroundHeight = Math.max(0.13 * height, 45);
       }
       private updateMargin(height: number) {
@@ -101,7 +101,7 @@ namespace gdjs {
           this._svgElement.setAttribute('height', this._logoHeight.toString());
           this._svgElement.setAttribute('width', this._logoWidth.toString());
         }
-        this.updateBackground(height);
+        this.updateBackgroundHeight(height);
         if (this._watermarkBackgroundElement) {
           this._watermarkBackgroundElement.style.height = `${this._backgroundHeight}px`;
         }
@@ -115,7 +115,7 @@ namespace gdjs {
         const gameContainerRectangle = container.getBoundingClientRect();
         this.updateFontSize(gameContainerRectangle.height);
         this.updateLogoSize(gameContainerRectangle.height);
-        this.updateBackground(gameContainerRectangle.height);
+        this.updateBackgroundHeight(gameContainerRectangle.height);
 
         this._watermarkContainerElement = this.createDivContainer();
         this.createBackground();
@@ -184,10 +184,13 @@ namespace gdjs {
           if (
             !this._watermarkContainerElement ||
             !this._watermarkBackgroundElement
-          )
+          ) {
             return;
+          }
           this._watermarkContainerElement.style.opacity = '0';
           this._watermarkBackgroundElement.style.opacity = '0';
+
+          // Completely remove the watermark once the fade out duration has ended.
           this._hideTimeout = setTimeout(
             () => {
               if (

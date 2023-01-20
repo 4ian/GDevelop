@@ -279,9 +279,17 @@ export function PublicGameProperties({
           )}
           <UsersAutocomplete
             userIds={authorIds}
-            onChange={userData => {
-              setAuthorIds(userData.map(data => data.userId));
-              setAuthorUsernames(userData.map(data => data.username));
+            onChange={userIdAndUsernames => {
+              setAuthorIds(
+                userIdAndUsernames.map(
+                  userIdAndUsername => userIdAndUsername.userId
+                )
+              );
+              setAuthorUsernames(
+                userIdAndUsernames.map(
+                  userIdAndUsername => userIdAndUsername.username
+                )
+              );
             }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={

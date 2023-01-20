@@ -26,7 +26,7 @@ const variable = new gdjs.Variable().fromJSObject({
 
 // The tests require an internet connection, as a real Firebase instance is used.
 const describeIfOnline = navigator.onLine ? describe : describe.skip;
-describeIfOnline.only('Firebase extension end-to-end tests', function () {
+describeIfOnline('Firebase extension end-to-end tests', function () {
   /**
    * A firebase configuration of a project made only for those tests.
    */

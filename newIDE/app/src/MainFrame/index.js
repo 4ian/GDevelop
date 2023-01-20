@@ -1370,7 +1370,7 @@ const MainFrame = (props: Props) => {
             username: authenticatedUser.profile.username || '',
             id: authenticatedUser.profile.id,
           }
-        : undefined;
+        : null;
 
       eventsFunctionsExtensionsState
         .ensureLoadFinished()

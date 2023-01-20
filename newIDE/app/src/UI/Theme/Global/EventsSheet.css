@@ -162,8 +162,8 @@
   display: inline-flex;
   background-color: var(--event-sheet-instruction-parameter-error-background-color);
   border-bottom: 1px dashed  var(--event-sheet-instruction-parameter-error-color);
-  min-width: 25px;
-  min-height: 14px;
+  min-width: var(--instruction-missing-parameter-min-width);
+  min-height: var(--instruction-missing-parameter-min-height);
 }
 
 /**

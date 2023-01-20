@@ -858,6 +858,8 @@ export default class ThemableEventsTree extends Component<
           ...styles.container,
           fontSize: `${zoomLevel}px`,
           '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
+          '--instruction-missing-parameter-min-height': `${Math.round(zoomLevel * 1.1)}px`,
+          '--instruction-missing-parameter-min-width': `${Math.round(zoomLevel * 3)}px`,
         }}
       >
         {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}

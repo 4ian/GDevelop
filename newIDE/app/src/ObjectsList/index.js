@@ -170,7 +170,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       getThumbnail,
       unsavedChanges,
       hotReloadPreviewButtonProps,
-      onEditorActive
+      onEditorActive,
     }: Props,
     ref
   ) => {

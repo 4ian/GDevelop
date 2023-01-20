@@ -127,6 +127,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
                 this.endEditing();
               }
             }}
+            underlineShow={false}
           />
         ) : (
           <span

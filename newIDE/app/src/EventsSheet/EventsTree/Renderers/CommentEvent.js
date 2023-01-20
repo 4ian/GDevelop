@@ -169,6 +169,7 @@ export default class CommentEvent extends React.Component<
                 this.endEditing();
               }
             }}
+            underlineShow={false}
           />
         ) : (
           <span

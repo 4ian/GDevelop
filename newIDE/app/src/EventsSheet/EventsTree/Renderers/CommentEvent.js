@@ -35,12 +35,10 @@ const styles = {
   commentTextField: { ...commentTextStyle, fontSize: 'inherit' },
   commentSpan: {
     ...commentTextStyle,
-    boxSizing: 'border-box',
     alignItems: 'center',
     height: '100%',
     whiteSpace: 'pre-wrap',
     lineHeight: 1.5,
-    border: 1,
   },
 };
 

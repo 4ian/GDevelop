@@ -112,17 +112,17 @@ export default class CommentEvent extends React.Component<
   render() {
     const commentEvent = gd.asCommentEvent(this.props.event);
 
-    const backgroundColor = rgbToHex(
+    const backgroundColor = `#${rgbToHex(
       commentEvent.getBackgroundColorRed(),
       commentEvent.getBackgroundColorGreen(),
       commentEvent.getBackgroundColorBlue()
-    );
+    )}`;
 
-    const textColor = rgbToHex(
+    const textColor = `#${rgbToHex(
       commentEvent.getTextColorRed(),
       commentEvent.getTextColorGreen(),
       commentEvent.getTextColorBlue()
-    );
+    )}`;
 
     return (
       <div
@@ -132,7 +132,7 @@ export default class CommentEvent extends React.Component<
         })}
         style={{
           ...styles.container,
-          backgroundColor: `#${backgroundColor}`,
+          backgroundColor,
         }}
         onClick={this.edit}
         onKeyUp={event => {
@@ -153,7 +153,7 @@ export default class CommentEvent extends React.Component<
             onChange={this.onChange}
             style={styles.commentTextField}
             inputStyle={{
-              color: `#${textColor}`,
+              color: textColor,
               padding: 0,
               lineHeight: 1.5,
             }}
@@ -175,7 +175,7 @@ export default class CommentEvent extends React.Component<
             })}
             style={{
               ...styles.commentSpan,
-              color: `#${textColor}`,
+              color: textColor,
             }}
             dangerouslySetInnerHTML={{
               __html: this._getCommentHTML(),

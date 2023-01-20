@@ -38,7 +38,6 @@ const styles = {
     alignItems: 'center',
     height: '100%',
     whiteSpace: 'pre-wrap',
-    lineHeight: 1.5,
   },
 };
 
@@ -155,7 +154,6 @@ export default class CommentEvent extends React.Component<
             inputStyle={{
               color: textColor,
               padding: 0,
-              lineHeight: 1.5,
             }}
             fullWidth
             id="comment-title"

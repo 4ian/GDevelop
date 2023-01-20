@@ -32,6 +32,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
+  onEditorActive?: () => void,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
@@ -238,7 +239,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
     const { instances } = this.props;
 
     return (
-      <Background>
+      <Background onClick={this.props.onEditorActive}>
         {!instances || !instances.length
           ? this._renderEmpty()
           : this._renderInstancesProperties()}

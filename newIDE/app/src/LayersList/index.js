@@ -175,6 +175,7 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onEditorActive?: () => void,
 |};
 
 export type LayersListInterface = {
@@ -234,7 +235,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
     const isLightingLayerPresent = hasLightingLayer(props.layersContainer);
 
     return (
-      <Background>
+      <Background onClick={props.onEditorActive}>
         <ScrollView autoHideScrollbar>
           <FullSizeMeasurer>
             {({ width }) => (

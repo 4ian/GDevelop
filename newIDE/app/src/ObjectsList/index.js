@@ -137,6 +137,7 @@ type Props = {|
   ) => string,
   unsavedChanges?: ?UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  onEditorActive?: () => void,
 |};
 
 const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
@@ -169,6 +170,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       getThumbnail,
       unsavedChanges,
       hotReloadPreviewButtonProps,
+      onEditorActive
     }: Props,
     ref
   ) => {
@@ -798,7 +800,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const screenType = useScreenType();
 
     return (
-      <Background maxWidth>
+      <Background maxWidth onClick={onEditorActive}>
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}

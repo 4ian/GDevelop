@@ -27,12 +27,13 @@ const styles = {
 type Props = {|
   ...InstancesEditorPropsWithoutSizeAndScroll,
   wrappedEditorRef: ?(?InstancesEditor) => void,
+  onEditorActive?: () => void,
 |};
 
 const noop = () => {};
 
 const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
-  const { wrappedEditorRef, ...otherProps } = props;
+  const { wrappedEditorRef, onEditorActive, ...otherProps } = props;
 
   const editorRef = React.useRef<?InstancesEditor>(null);
   const xScrollbarTrack = React.useRef<?HTMLDivElement>(null);
@@ -361,7 +362,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   return (
     <FullSizeMeasurer>
       {({ width, height }) => (
-        <div style={styles.container}>
+        <div style={styles.container} onClick={onEditorActive}>
           {width !== undefined && height !== undefined && (
             <InstancesEditor
               onViewPositionChanged={

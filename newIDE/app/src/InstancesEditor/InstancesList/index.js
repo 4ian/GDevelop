@@ -26,6 +26,7 @@ type Props = {|
   instances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
   onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
+  onEditorActive?: () => void,
 |};
 
 type RenderedRowInfo = {
@@ -223,7 +224,7 @@ export default class InstancesList extends Component<Props, State> {
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <div style={styles.container}>
+          <div style={styles.container} onClick={this.props.onEditorActive}>
             <div
               style={{ flex: 1 }}
               onKeyDown={this._keyboardShortcuts.onKeyDown}

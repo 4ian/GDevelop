@@ -154,6 +154,7 @@ type State = {|
 
   renamedObjectWithContext: ?ObjectWithContext,
   selectedObjectsWithContext: Array<ObjectWithContext>,
+  activeEditor: string | null,
 |};
 
 type CopyCutPasteOptions = {|
@@ -217,6 +218,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
+
+      activeEditor: null,
     };
   }
 
@@ -1354,6 +1357,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 i18n={i18n}
                 project={project}
                 layout={layout}
+                onEditorActive={() =>
+                  this.setState({ activeEditor: 'instance-properties-editor' })
+                }
                 instances={selectedInstances}
                 editInstanceVariables={this.editInstanceVariables}
                 onEditObjectByName={this.editObjectByName}
@@ -1388,6 +1394,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <LayersList
             project={project}
+            onEditorActive={() =>
+              this.setState({ activeEditor: 'layers-list' })
+            }
             onEditLayerEffects={this.editLayerEffects}
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}
@@ -1405,6 +1414,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         title: t`Instances List`,
         renderEditor: () => (
           <InstancesList
+            onEditorActive={() =>
+              this.setState({ activeEditor: 'instances-list' })
+            }
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
@@ -1419,6 +1431,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           <FullSizeInstancesEditorWithScrollbars
             project={project}
             layout={layout}
+            onEditorActive={() =>
+              this.setState({ activeEditor: 'instances-editor' })
+            }
             initialInstances={initialInstances}
             instancesEditorSettings={this.state.instancesEditorSettings}
             onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
@@ -1474,6 +1489,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                   ObjectsRenderingService
                 )}
                 project={project}
+                onEditorActive={() =>
+                  this.setState({ activeEditor: 'objects-list' })
+                }
                 objectsContainer={layout}
                 layout={layout}
                 onSelectAllInstancesOfObjectInLayout={
@@ -1522,6 +1540,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           <I18n>
             {({ i18n }) => (
               <ObjectGroupsList
+                onEditorActive={() =>
+                  this.setState({ activeEditor: 'object-groups-list' })
+                }
                 globalObjectGroups={project.getObjectGroups()}
                 objectGroups={layout.getObjectGroups()}
                 onEditGroup={this.editGroup}

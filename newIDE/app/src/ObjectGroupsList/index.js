@@ -61,6 +61,7 @@ type Props = {|
   onGroupRenamed?: () => void,
   canSetAsGlobalGroup?: boolean,
   unsavedChanges?: ?UnsavedChanges,
+  onEditorActive?: () => void,
 |};
 
 export default class ObjectGroupsList extends React.Component<Props, State> {
@@ -399,7 +400,7 @@ export default class ObjectGroupsList extends React.Component<Props, State> {
       : null;
 
     return (
-      <Background>
+      <Background onClick={this.props.onEditorActive}>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (

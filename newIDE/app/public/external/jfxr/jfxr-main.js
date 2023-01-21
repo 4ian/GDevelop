@@ -48,10 +48,10 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
       sendMessageToParentEditor('save-external-editor-output', {
         resources: [
           {
-            name: externalEditorHeader.state.isExistingResource
+            name: externalEditorHeader.state.isOverwritingExistingResource
               ? externalEditorHeader.state.name
               : undefined,
-            localFilePath: externalEditorHeader.state.isExistingResource
+            localFilePath: externalEditorHeader.state.isOverwritingExistingResource
               ? resource.localFilePath
               : undefined,
             extension: '.wav',
@@ -80,8 +80,8 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     'GDevelop Sound Effects Editor (Jfxr) - ' + externalEditorInput.name
   );
 
-  const isExistingResource = resource && resource.name && resource.dataUrl;
-  if (isExistingResource) externalEditorHeader.setIsExistingResource();
+  const isOverwritingExistingResource = resource && resource.name && resource.dataUrl;
+  if (isOverwritingExistingResource) externalEditorHeader.setOverwriteExistingResource();
 
   // Disable google analytics from collecting personal information.
   editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);

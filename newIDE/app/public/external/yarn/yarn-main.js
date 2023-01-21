@@ -36,8 +36,8 @@ onMessageFromParentEditor(
       sendMessageToParentEditor('save-external-editor-output', {
         resources: [
           {
-            name: state.isExistingResource ? state.name : undefined,
-            localFilePath: state.isExistingResource
+            name: state.isOverwritingExistingResource ? state.name : undefined,
+            localFilePath: state.isOverwritingExistingResource
               ? resource.localFilePath
               : undefined,
             extension: '.json',
@@ -79,13 +79,14 @@ onMessageFromParentEditor(
     yarn.data.editingPath('');
     yarn.data.editingType('json');
 
-    const isExistingResource = resource && resource.name && resource.dataUrl;
-    if (isExistingResource) {
+    const isOverwritingExistingResource =
+      resource && resource.name && resource.dataUrl;
+    if (isOverwritingExistingResource) {
       try {
         const response = await fetch(resource.dataUrl);
         const resourceData = await response.json();
         yarn.data.loadData(JSON.stringify(resourceData), 'json', true);
-        externalEditorHeader.setIsExistingResource();
+        externalEditorHeader.setOverwriteExistingResource();
       } catch (error) {
         console.error('Error while loading the resource - ignoring it.', error);
       }

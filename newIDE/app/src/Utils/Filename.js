@@ -6,6 +6,8 @@ const controlRe = /[\x00-\x1f\x80-\x9f]/g;
 const reservedRe = /^\.+$/;
 const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
 const windowsTrailingRe = /[. ]+$/;
+const urlReservedRe = /[&$+/=?@#]/g; // We still allow comma, colon and semi-colon.
+const urlUnsafeRe = /[|^%]/g;
 
 const replacement = '_';
 
@@ -13,6 +15,8 @@ const replacement = '_';
 export function sanitizeFilename(input: string) {
   return input
     .replace(illegalRe, replacement)
+    .replace(urlReservedRe, replacement)
+    .replace(urlUnsafeRe, replacement)
     .replace(controlRe, replacement)
     .replace(reservedRe, replacement)
     .replace(windowsReservedRe, replacement)

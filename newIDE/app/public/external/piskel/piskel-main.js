@@ -27,21 +27,27 @@ const saveToGDevelop = async externalEditorHeader => {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   const layer = pskl.app.piskelController.getLayerAt(0);
-  const {state} = externalEditorHeader;
+  const { state } = externalEditorHeader;
 
-  // In all cases, save the images to resource using data URLs to
+  // Save the images to resource using data URLs to
   // send them back to GDevelop.
   const resources = [];
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
     const frame = layer.getFrameAt(i);
-    const name = state.isExistingResource ? frame.originalResourceName : undefined;
-    const localFilePath = state.isExistingResource ? frame.originalLocalFilePath : undefined;
+
+    // If a frame was made in piskel, `name` and `localFilePath` will be undefined.
+    // If the user chose to create a new resource, they will also be undefined.
+    const name = state.isOverwritingExistingResource
+      ? frame.originalResourceName
+      : undefined;
+    const localFilePath = state.isOverwritingExistingResource
+      ? frame.originalLocalFilePath
+      : undefined;
     const originalIndex = frame.originalIndex;
 
     const canvas = pskl.app.piskelController.renderFrameAt(i, true);
     const dataUrl = canvas.toDataURL('image/png');
 
-    // If a frame was made in piskel, "name" will be undefined.
     resources.push({
       name,
       dataUrl,
@@ -390,12 +396,12 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     // Note that metadata will be saved only if the user has more than one layers
     loadPiskelDataFromGd(externalEditorInput);
 
-    externalEditorHeader.setIsExistingResource();
+    externalEditorHeader.setOverwriteExistingResource();
   } else {
     // If there are resources, but no metadata, load the images that were received from GD
     loadImagesIntoPiskel(externalEditorInput);
 
-    externalEditorHeader.setIsExistingResource();
+    externalEditorHeader.setOverwriteExistingResource();
   }
 
   // Remove the list of frames in case we're editing a single frame and not an animation.

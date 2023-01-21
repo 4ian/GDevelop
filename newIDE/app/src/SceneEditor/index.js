@@ -126,8 +126,10 @@ type State = {|
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
-  layerRemoveDialogOpen: boolean,
-  onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
+  onCloseLayerRemoveDialog: ?(
+    doRemove: boolean,
+    newLayer: string | null
+  ) => void,
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
@@ -184,7 +186,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
-      layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
       editedLayer: null,
@@ -679,12 +680,14 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     this.setState({
-      layerRemoveDialogOpen: true,
       layerRemoved: layerName,
-      onCloseLayerRemoveDialog: (doRemove, newLayer) => {
+      onCloseLayerRemoveDialog: (
+        doRemove: boolean,
+        newLayer: string | null
+      ) => {
         this.setState(
           {
-            layerRemoveDialogOpen: false,
+            layerRemoved: null,
           },
           () => {
             if (doRemove) {
@@ -1797,7 +1800,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               }}
             />
           )}
-        {!!this.state.layerRemoveDialogOpen && (
+        {!!this.state.layerRemoved && this.state.onCloseLayerRemoveDialog && (
           <LayerRemoveDialog
             open
             layersContainer={layout}

@@ -1,7 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import { type ChooseResourceOptions } from './ResourceSource';
+import {
+  allResourceKindsAndMetadata,
+  type ChooseResourceOptions,
+  type ResourceKind,
+} from './ResourceSource';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -26,15 +30,29 @@ type FileToCloudProjectResourceUploaderProps = {
   createNewResource: () => gdResource,
 };
 
-const resourceKindToInputAcceptedFiles = {
-  audio: 'audio/aac,audio/x-wav,audio/mpeg,audio/mp3,audio/ogg',
-  image: 'image/jpeg,image/png,image/webp',
-  font: 'font/ttf,font/otf',
-  video: 'video/mp4,video/webm',
-  json: 'application/json',
-  tilemap: 'application/json',
-  tileset: 'application/json',
-  bitmapFont: '.fnt,.xml',
+const resourceKindToInputAcceptedMimes = {
+  audio: ['audio/aac', 'audio/x-wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg'],
+  image: ['image/jpeg', 'image/png', 'image/webp'],
+  font: ['font/ttf', 'font/otf'],
+  video: ['video/mp4', 'video/webm'],
+  json: ['application/json'],
+  tilemap: ['application/json'],
+  tileset: ['application/json'],
+  bitmapFont: [],
+};
+
+export const getInputAcceptedMimesAndExtensions = (
+  resourceKind: ResourceKind
+) => {
+  const resourceKindMetadata =
+    allResourceKindsAndMetadata.find(({ kind }) => kind === resourceKind) ||
+    null;
+  const acceptedExtensions = resourceKindMetadata
+    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
+    : [];
+  const acceptedMimes = resourceKindToInputAcceptedMimes[resourceKind] || [];
+
+  return [...acceptedMimes, ...acceptedExtensions].join(',');
 };
 
 export const FileToCloudProjectResourceUploader = ({
@@ -153,7 +171,7 @@ export const FileToCloudProjectResourceUploader = ({
         <Line expand>
           <Column expand>
             <input
-              accept={resourceKindToInputAcceptedFiles[options.resourceKind]}
+              accept={getInputAcceptedMimesAndExtensions(options.resourceKind)}
               style={{
                 color: gdevelopTheme.text.color.primary,
               }}

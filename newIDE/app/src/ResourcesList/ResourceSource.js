@@ -99,6 +99,7 @@ export type ChooseResourceProps = {|
     path: string
   ) => void,
   options: ChooseResourceOptions,
+  automaticallyOpenIfPossible?: boolean,
 |};
 
 export type ResourceSourceComponentProps = {|

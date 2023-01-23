@@ -11,7 +11,7 @@ module.exports = function (config) {
   ];
 
   config.set({
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'sinon'],
     browserNoActivityTimeout: 400000,
     browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
     plugins: [
@@ -19,6 +19,7 @@ module.exports = function (config) {
       require('@chiragrupani/karma-chromium-edge-launcher'),
       require('karma-firefox-launcher'),
       require('karma-mocha'),
+      require('karma-sinon'),
     ],
     client: {
       mocha: {

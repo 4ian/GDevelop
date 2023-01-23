@@ -944,6 +944,9 @@ namespace gdjs {
      * @return the X position, on the scene, of the origin of the texture of the object.
      */
     getDrawableX(): float {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
       if (this._animationFrame === null) {
         return this.x;
       }
@@ -966,6 +969,9 @@ namespace gdjs {
      * @return the Y position, on the scene, of the origin of the texture of the object.
      */
     getDrawableY(): float {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
       if (this._animationFrame === null) {
         return this.y;
       }

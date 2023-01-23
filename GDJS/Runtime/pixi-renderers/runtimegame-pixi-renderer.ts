@@ -640,7 +640,6 @@ namespace gdjs {
           if (window.focus !== undefined) {
             window.focus();
           }
-          e.preventDefault();
           return false;
         },
         false

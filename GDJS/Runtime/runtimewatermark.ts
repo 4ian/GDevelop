@@ -321,7 +321,6 @@ namespace gdjs {
 
       private addStyle() {
         const styleElement = document.createElement('style');
-        const hoverTransitionDuration = 0.2;
         styleElement.innerHTML = `
         @keyframes spin {
           0% {
@@ -378,7 +377,12 @@ namespace gdjs {
           color: white;
           font-family: 'Tahoma', 'Gill sans', 'Helvetica', 'Arial';
           font-size: ${this._textFontSize}px;
-          transition: opacity ${this._fadeDuration}s, text-decoration ${hoverTransitionDuration}s;
+          transition: opacity;
+          transition-duration: ${this._fadeDuration}s;
+
+          /* For Safari */
+          -webkit-transition: opacity;
+          -webkit-transition-duration: ${this._fadeDuration}s;
         }
 
         #watermark svg.spinning {
@@ -395,10 +399,16 @@ namespace gdjs {
 
         @media (hover: hover) {
           #watermark span {
-            text-decoration: underline solid transparent;
+            text-decoration: underline;
+            text-decoration-style: solid;
+            text-decoration-color: transparent;
           }
+
           #watermark:hover span {
-            text-decoration: underline solid white;
+            text-decoration-color: white;
+
+            /* For Safari */
+            -webkit-text-decoration-color: white;
           }
         }
         `;

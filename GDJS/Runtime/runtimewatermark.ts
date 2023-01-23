@@ -16,8 +16,8 @@ namespace gdjs {
       _authorUsername: string | undefined;
 
       // Dom elements
-      _watermarkContainerElement: HTMLDivElement | null = null;
-      _watermarkBackgroundElement: HTMLDivElement | null = null;
+      _containerElement: HTMLDivElement | null = null;
+      _backgroundElement: HTMLDivElement | null = null;
       _svgElement: SVGElement | null = null;
       _usernameTextElement: HTMLSpanElement | null = null;
       _madeWithTextElement: HTMLSpanElement | null = null;
@@ -102,12 +102,12 @@ namespace gdjs {
           this._svgElement.setAttribute('width', this._logoWidth.toString());
         }
         this.updateBackgroundHeight(height);
-        if (this._watermarkBackgroundElement) {
-          this._watermarkBackgroundElement.style.height = `${this._backgroundHeight}px`;
+        if (this._backgroundElement) {
+          this._backgroundElement.style.height = `${this._backgroundHeight}px`;
         }
         this.updateMargin(height);
-        if (this._watermarkContainerElement) {
-          this.updateElementMargins(this._watermarkContainerElement);
+        if (this._containerElement) {
+          this.updateElementMargins(this._containerElement);
         }
       }
 
@@ -117,7 +117,7 @@ namespace gdjs {
         this.updateLogoSize(gameContainerRectangle.height);
         this.updateBackgroundHeight(gameContainerRectangle.height);
 
-        this._watermarkContainerElement = this.createDivContainer();
+        this._containerElement = this.createDivContainer();
         this.createBackground();
         const textContainer = document.createElement('div');
 
@@ -125,39 +125,32 @@ namespace gdjs {
         this.createMadeWithTextElement();
         this.createUsernameTextElement();
         if (this._svgElement)
-          this._watermarkContainerElement.appendChild(this._svgElement);
+          this._containerElement.appendChild(this._svgElement);
         if (this._madeWithTextElement)
           textContainer.appendChild(this._madeWithTextElement);
         if (this._usernameTextElement)
           textContainer.appendChild(this._usernameTextElement);
-        this._watermarkContainerElement.appendChild(textContainer);
-        addTouchAndClickEventListeners(
-          this._watermarkContainerElement,
-          this.openCreatorProfile.bind(this)
-        );
-        if (this._watermarkBackgroundElement)
-          container.appendChild(this._watermarkBackgroundElement);
+        this._containerElement.appendChild(textContainer);
+        if (this._backgroundElement)
+          container.appendChild(this._backgroundElement);
 
-        container.appendChild(this._watermarkContainerElement);
+        container.appendChild(this._containerElement);
 
         this.setupAnimations();
       }
 
       private createBackground() {
-        this._watermarkBackgroundElement = document.createElement('div');
-        this._watermarkBackgroundElement.setAttribute(
-          'id',
-          'watermark-background'
-        );
-        this._watermarkBackgroundElement.style.height = `${this._backgroundHeight}px`;
-        this._watermarkBackgroundElement.style.opacity = '0';
+        this._backgroundElement = document.createElement('div');
+        this._backgroundElement.setAttribute('id', 'watermark-background');
+        this._backgroundElement.style.height = `${this._backgroundHeight}px`;
+        this._backgroundElement.style.opacity = '0';
         if (this._placement.startsWith('top')) {
-          this._watermarkBackgroundElement.style.top = '0';
-          this._watermarkBackgroundElement.style.backgroundImage =
+          this._backgroundElement.style.top = '0';
+          this._backgroundElement.style.backgroundImage =
             'linear-gradient(180deg, rgba(38, 38, 38, .6) 0%, rgba(38, 38, 38, 0) 100% )';
         } else {
-          this._watermarkBackgroundElement.style.bottom = '0';
-          this._watermarkBackgroundElement.style.backgroundImage =
+          this._backgroundElement.style.bottom = '0';
+          this._backgroundElement.style.backgroundImage =
             'linear-gradient(0deg, rgba(38, 38, 38, .6) 0%, rgba(38, 38, 38, 0) 100% )';
         }
       }
@@ -167,40 +160,29 @@ namespace gdjs {
         requestAnimationFrame(() => {
           // Display the watermark
           setTimeout(() => {
-            if (
-              !this._watermarkContainerElement ||
-              !this._watermarkBackgroundElement
-            )
-              return;
-            this._watermarkContainerElement.style.opacity = '1';
-            this._watermarkBackgroundElement.style.opacity = '1';
-            this._watermarkContainerElement.style.pointerEvents = 'all';
+            if (!this._containerElement || !this._backgroundElement) return;
+            this._containerElement.style.opacity = '1';
+            this._backgroundElement.style.opacity = '1';
+            this._containerElement.style.pointerEvents = 'all';
             if (this._svgElement) this._svgElement.classList.add('spinning');
           }, this._fadeInDelayAfterGameLoaded * 1000);
         });
 
         // Hide the watermark
         this._fadeOutTimeout = setTimeout(() => {
-          if (
-            !this._watermarkContainerElement ||
-            !this._watermarkBackgroundElement
-          ) {
+          if (!this._containerElement || !this._backgroundElement) {
             return;
           }
-          this._watermarkContainerElement.style.opacity = '0';
-          this._watermarkBackgroundElement.style.opacity = '0';
+          this._containerElement.style.opacity = '0';
+          this._backgroundElement.style.opacity = '0';
 
           // Completely remove the watermark once the fade out duration has ended.
           this._hideTimeout = setTimeout(
             () => {
-              if (
-                !this._watermarkContainerElement ||
-                !this._watermarkBackgroundElement
-              )
-                return;
-              this._watermarkContainerElement.style.pointerEvents = 'none';
-              this._watermarkContainerElement.style.display = 'none';
-              this._watermarkBackgroundElement.style.display = 'none';
+              if (!this._containerElement || !this._backgroundElement) return;
+              this._containerElement.style.pointerEvents = 'none';
+              this._containerElement.style.display = 'none';
+              this._backgroundElement.style.display = 'none';
               if (this._resizeObserver) this._resizeObserver.disconnect();
             },
             // Deactivate all interaction possibilities with watermark at

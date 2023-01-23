@@ -36,8 +36,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
             "actions and subevents following it to be run."),
           "Mark asynchronous function as ended",
           "",
-          "",
-          "")
+          "res/actions/quit24.png",
+          "res/actions/quit.png")
       .AddCodeOnlyParameter("eventsFunctionContext", "");
 }
 

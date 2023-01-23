@@ -16,6 +16,7 @@ namespace gdjs {
       _authorUsername: string | undefined;
 
       // Dom elements
+      _linkElement: HTMLAnchorElement | null = null;
       _containerElement: HTMLDivElement | null = null;
       _backgroundElement: HTMLDivElement | null = null;
       _svgElement: SVGElement | null = null;
@@ -106,8 +107,8 @@ namespace gdjs {
           this._backgroundElement.style.height = `${this._backgroundHeight}px`;
         }
         this.updateMargin(height);
-        if (this._containerElement) {
-          this.updateElementMargins(this._containerElement);
+        if (this._linkElement) {
+          this.updateElementMargins(this._linkElement);
         }
       }
 
@@ -124,6 +125,9 @@ namespace gdjs {
         this.generateSVGLogo(gameContainerRectangle.height);
         this.createMadeWithTextElement();
         this.createUsernameTextElement();
+
+        this._linkElement = this.createLinkElement();
+
         if (this._svgElement)
           this._containerElement.appendChild(this._svgElement);
         if (this._madeWithTextElement)
@@ -134,7 +138,8 @@ namespace gdjs {
         if (this._backgroundElement)
           container.appendChild(this._backgroundElement);
 
-        container.appendChild(this._containerElement);
+        this._linkElement.append(this._containerElement);
+        container.appendChild(this._linkElement);
 
         this.setupAnimations();
       }
@@ -208,12 +213,6 @@ namespace gdjs {
         }, (this._fadeInDelayAfterGameLoaded + this._changeTextDelay) * 1000);
       }
 
-      private openCreatorProfile() {
-        let targetUrl = `https://liluo.io/${this._authorUsername}`;
-        if (this._isDevEnvironment) targetUrl += '?dev=true';
-        this._gameRenderer.openURL(targetUrl);
-      }
-
       private createMadeWithTextElement() {
         this._madeWithTextElement = document.createElement('span');
         this._madeWithTextElement.innerText = 'Made with GDevelop';
@@ -261,12 +260,25 @@ namespace gdjs {
         }
       }
 
+      private createLinkElement(): HTMLAnchorElement {
+        const linkElement = document.createElement('a');
+        linkElement.id = 'watermark-link';
+
+        let targetUrl = `https://liluo.io/${this._authorUsername}`;
+        if (this._isDevEnvironment) targetUrl += '?dev=true';
+        linkElement.href = targetUrl;
+        linkElement.target = '_blank';
+
+        this.updateElementMargins(linkElement);
+
+        return linkElement;
+      }
+
       private createDivContainer(): HTMLDivElement {
         const divContainer = document.createElement('div');
         divContainer.setAttribute('id', 'watermark');
 
         divContainer.style.opacity = '0';
-        this.updateElementMargins(divContainer);
         return divContainer;
       }
 
@@ -337,12 +349,16 @@ namespace gdjs {
           transition-duration: ${this._fadeDuration}s;
         }
 
-        #watermark {
+        #watermark-link {
+          all: unset;
           position: absolute;
+          cursor: pointer;
           pointer-events: none;
+        }
+
+        #watermark {
           display: flex;
           flex-direction: row;
-          cursor: pointer;
           align-items: center;
           transition-property: opacity;
           transition-duration: ${this._fadeDuration}s;
@@ -397,23 +413,5 @@ namespace gdjs {
         document.head.appendChild(styleElement);
       }
     }
-
-    /**
-     * Helper to add event listeners on a pressable/clickable element
-     * to work on both desktop and mobile.
-     */
-    const addTouchAndClickEventListeners = function (
-      element: HTMLElement,
-      action: () => void
-    ) {
-      // Touch start event listener for mobile.
-      element.addEventListener('touchstart', (event) => {
-        action();
-      });
-      // Click event listener for desktop.
-      element.addEventListener('click', (event) => {
-        action();
-      });
-    };
   }
 }

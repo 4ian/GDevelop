@@ -296,9 +296,15 @@ const generateFreeFunction = (
   const functionFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     functionName
   );
-  instructionOrExpression
-    .setIncludeFile(functionFile)
-    .setFunctionName(functionName);
+  instructionOrExpression.setIncludeFile(functionFile);
+
+  if (
+    eventsFunction.isAsync() &&
+    typeof instructionOrExpression.setAsyncFunctionName === 'function'
+  )
+    //$FlowFixMe
+    instructionOrExpression.setAsyncFunctionName(functionName);
+  else instructionOrExpression.setFunctionName(functionName);
 
   // Always include the extension include files when using a free function.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
@@ -423,9 +429,15 @@ function generateBehavior(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      instructionOrExpression
-        .setIncludeFile(includeFile)
-        .setFunctionName(eventsFunctionMangledName);
+      instructionOrExpression.setIncludeFile(includeFile);
+
+      if (
+        eventsFunction.isAsync() &&
+        typeof instructionOrExpression.setAsyncFunctionName === 'function'
+      )
+        //$FlowFixMe
+        instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
+      else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });
 
     // Generate code for the behavior and its methods
@@ -544,9 +556,15 @@ function generateObject(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      instructionOrExpression
-        .setIncludeFile(includeFile)
-        .setFunctionName(eventsFunctionMangledName);
+      instructionOrExpression.setIncludeFile(includeFile);
+
+      if (
+        eventsFunction.isAsync() &&
+        typeof instructionOrExpression.setAsyncFunctionName === 'function'
+      )
+        //$FlowFixMe
+        instructionOrExpression.setAsyncFunctionName(eventsFunctionMangledName);
+      else instructionOrExpression.setFunctionName(eventsFunctionMangledName);
     });
 
     // Generate code for the object and its methods

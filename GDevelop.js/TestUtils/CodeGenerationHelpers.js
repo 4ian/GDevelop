@@ -238,7 +238,6 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
   }
 
   includeFiles.delete();
-  extension.delete();
   project.delete();
 
   return generatedExtensionModule;

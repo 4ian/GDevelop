@@ -42,17 +42,22 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(50);
 
       // All elements are added
-      expect(watermark._linkElement).not.to.be(null);
-      expect(watermark._linkElement.href).to.be('https://liluo.io/HelperWesley')
-      expect(watermark._containerElement).not.to.be(null);
+      if (
+        !watermark._linkElement ||
+        !watermark._containerElement ||
+        !watermark._backgroundElement ||
+        !watermark._usernameTextElement ||
+        !watermark._madeWithTextElement ||
+        !watermark._svgElement
+      )
+        throw new Error('Watermark DOM elements could not be found.');
+      expect(watermark._linkElement.href).to.be(
+        'https://liluo.io/HelperWesley'
+      );
       expect(watermark._containerElement.style.opacity).to.be('0');
-      expect(watermark._backgroundElement).not.to.be(null);
       expect(watermark._backgroundElement.style.opacity).to.be('0');
-      expect(watermark._usernameTextElement).not.to.be(null);
       expect(watermark._usernameTextElement.style.opacity).to.be('0');
       expect(watermark._usernameTextElement.innerHTML).to.be('@HelperWesley');
-      expect(watermark._madeWithTextElement).not.to.be(null);
-      expect(watermark._svgElement).not.to.be(null);
 
       clock.tick(watermarkDisplayDelay);
 
@@ -125,14 +130,18 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(50);
 
       // All elements are added
-      expect(watermark._linkElement).not.to.be(null);
-      expect(watermark._linkElement.href).to.be('https://liluo.io/')
-      expect(watermark._containerElement).not.to.be(null);
+      if (
+        !watermark._linkElement ||
+        !watermark._containerElement ||
+        !watermark._backgroundElement ||
+        !watermark._madeWithTextElement ||
+        !watermark._svgElement
+      )
+        throw new Error('Watermark DOM elements could not be found.');
+
+      expect(watermark._linkElement.href).to.be('https://liluo.io/');
       expect(watermark._containerElement.style.opacity).to.be('0');
-      expect(watermark._backgroundElement).not.to.be(null);
       expect(watermark._backgroundElement.style.opacity).to.be('0');
-      expect(watermark._madeWithTextElement).not.to.be(null);
-      expect(watermark._svgElement).not.to.be(null);
       // Username text element should not exist
       expect(watermark._usernameTextElement).to.be(null);
 

@@ -66,8 +66,6 @@ export const doesPathContainDialog = (path: Array<Element>): boolean => {
   }
 };
 
-export const isElementAMultilineTextfieldParentDiv = (
-  element: Element
-): boolean => {
+export const isElementAMuiInput = (element: Element): boolean => {
   return element.classList.contains('MuiInputBase-root');
 };

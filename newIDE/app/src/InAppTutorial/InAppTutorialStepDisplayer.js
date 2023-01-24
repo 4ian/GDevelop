@@ -14,7 +14,7 @@ import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 import {
   isElementADialog,
-  isElementAMultilineTextfieldParentDiv,
+  isElementAMuiInput,
 } from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 import InAppTutorialDialog from './InAppTutorialDialog';
@@ -106,10 +106,7 @@ export const queryElementOrItsMostVisuallySignificantParent = (
     // and the textarea only occupies a fraction of the whole input. So we're going
     // to highlight the parent div.
     const parentDiv = foundElement.closest('div');
-    if (
-      parentDiv instanceof HTMLElement &&
-      isElementAMultilineTextfieldParentDiv(parentDiv)
-    ) {
+    if (parentDiv instanceof HTMLElement && isElementAMuiInput(parentDiv)) {
       foundElement = parentDiv;
     }
   } else if (

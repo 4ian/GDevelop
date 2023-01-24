@@ -274,7 +274,8 @@ namespace gdjs {
         const linkElement = document.createElement('a');
         linkElement.id = 'watermark-link';
 
-        let targetUrl = `https://liluo.io/${this._authorUsername}`;
+        let targetUrl = 'https://liluo.io';
+        if (this._authorUsername) targetUrl += `/${this._authorUsername}`;
         if (this._isDevEnvironment) targetUrl += '?dev=true';
         linkElement.href = targetUrl;
         linkElement.target = '_blank';

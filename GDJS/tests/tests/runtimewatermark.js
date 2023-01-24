@@ -43,6 +43,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       // All elements are added
       expect(watermark._linkElement).not.to.be(null);
+      expect(watermark._linkElement.href).to.be('https://liluo.io/HelperWesley')
       expect(watermark._containerElement).not.to.be(null);
       expect(watermark._containerElement.style.opacity).to.be('0');
       expect(watermark._backgroundElement).not.to.be(null);
@@ -124,6 +125,8 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(50);
 
       // All elements are added
+      expect(watermark._linkElement).not.to.be(null);
+      expect(watermark._linkElement.href).to.be('https://liluo.io/')
       expect(watermark._containerElement).not.to.be(null);
       expect(watermark._containerElement.style.opacity).to.be('0');
       expect(watermark._backgroundElement).not.to.be(null);

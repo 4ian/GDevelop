@@ -365,6 +365,10 @@ namespace gdjs {
           position: absolute;
           cursor: pointer;
           pointer-events: none;
+          user-select: none;
+
+          /* For Safari */
+          -webkit-user-select: none;
         }
 
         #watermark {

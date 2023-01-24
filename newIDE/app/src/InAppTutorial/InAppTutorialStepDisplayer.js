@@ -112,6 +112,14 @@ export const queryElementOrItsMostVisuallySignificantParent = (
     ) {
       foundElement = parentDiv;
     }
+  } else if (
+    foundElement instanceof HTMLInputElement &&
+    'searchBar' in foundElement.dataset
+  ) {
+    const containerDiv = foundElement.closest('div[data-search-bar-container]');
+    if (containerDiv instanceof HTMLElement) {
+      foundElement = containerDiv;
+    }
   }
   return foundElement;
 };

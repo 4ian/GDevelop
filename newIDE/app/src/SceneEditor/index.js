@@ -154,7 +154,14 @@ type State = {|
 
   renamedObjectWithContext: ?ObjectWithContext,
   selectedObjectsWithContext: Array<ObjectWithContext>,
-  activeEditor: string | null,
+  activeEditor:
+    | 'instance-properties-editor'
+    | 'layers-list'
+    | 'instances-list'
+    | 'instances-editor'
+    | 'objects-list'
+    | 'object-groups-list'
+    | null,
 |};
 
 type CopyCutPasteOptions = {|

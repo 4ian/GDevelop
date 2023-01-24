@@ -30,8 +30,8 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       const watermark = runtimeGame._watermark;
 
-      expect(watermark._watermarkBackgroundElement).to.be(null);
-      expect(watermark._watermarkContainerElement).to.be(null);
+      expect(watermark._backgroundElement).to.be(null);
+      expect(watermark._containerElement).to.be(null);
 
       // Prevent calling runtimeGame.startGameLoop so manually display the
       // watermark
@@ -42,10 +42,11 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(50);
 
       // All elements are added
-      expect(watermark._watermarkContainerElement).not.to.be(null);
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('0');
-      expect(watermark._watermarkBackgroundElement).not.to.be(null);
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('0');
+      expect(watermark._linkElement).not.to.be(null);
+      expect(watermark._containerElement).not.to.be(null);
+      expect(watermark._containerElement.style.opacity).to.be('0');
+      expect(watermark._backgroundElement).not.to.be(null);
+      expect(watermark._backgroundElement.style.opacity).to.be('0');
       expect(watermark._usernameTextElement).not.to.be(null);
       expect(watermark._usernameTextElement.style.opacity).to.be('0');
       expect(watermark._usernameTextElement.innerHTML).to.be('@HelperWesley');
@@ -55,8 +56,10 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(watermarkDisplayDelay);
 
       // Watermark fade-in
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('1');
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('1');
+      expect(watermark._backgroundElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.pointerEvents).to.be('all');
+
       // Logo is spinning
       expect(watermark._svgElement.classList.contains('spinning')).to.be(true);
 
@@ -79,25 +82,23 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       // Make sure the watermark is still displayed
       expect(watermark._usernameTextElement.style.opacity).to.be('1');
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('1');
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('1');
-      expect(watermark._watermarkContainerElement.style.display).to.be('');
-      expect(watermark._watermarkBackgroundElement.style.display).to.be('');
+      expect(watermark._backgroundElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.display).to.be('');
+      expect(watermark._backgroundElement.style.display).to.be('');
 
       clock.tick(delta);
 
       // Watermark starts to fade out
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('0');
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('0');
+      expect(watermark._backgroundElement.style.opacity).to.be('0');
+      expect(watermark._containerElement.style.opacity).to.be('0');
 
       clock.tick(fadeTransitionDuration);
 
       // Watermark loses all interaction possibilities
-      expect(watermark._watermarkContainerElement.style.display).to.be('none');
-      expect(watermark._watermarkContainerElement.style.pointerEvents).to.be(
-        'none'
-      );
-      expect(watermark._watermarkBackgroundElement.style.display).to.be('none');
+      expect(watermark._containerElement.style.display).to.be('none');
+      expect(watermark._containerElement.style.pointerEvents).to.be('none');
+      expect(watermark._backgroundElement.style.display).to.be('none');
     });
 
     it('should correctly display elements in the right order (without username)', () => {
@@ -111,8 +112,8 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       const watermark = runtimeGame._watermark;
 
-      expect(watermark._watermarkBackgroundElement).to.be(null);
-      expect(watermark._watermarkContainerElement).to.be(null);
+      expect(watermark._backgroundElement).to.be(null);
+      expect(watermark._containerElement).to.be(null);
 
       // Prevent calling runtimeGame.startGameLoop so manually display the
       // watermark
@@ -123,10 +124,10 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(50);
 
       // All elements are added
-      expect(watermark._watermarkContainerElement).not.to.be(null);
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('0');
-      expect(watermark._watermarkBackgroundElement).not.to.be(null);
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('0');
+      expect(watermark._containerElement).not.to.be(null);
+      expect(watermark._containerElement.style.opacity).to.be('0');
+      expect(watermark._backgroundElement).not.to.be(null);
+      expect(watermark._backgroundElement.style.opacity).to.be('0');
       expect(watermark._madeWithTextElement).not.to.be(null);
       expect(watermark._svgElement).not.to.be(null);
       // Username text element should not exist
@@ -135,8 +136,9 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       clock.tick(watermarkDisplayDelay);
 
       // Watermark fade-in
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('1');
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('1');
+      expect(watermark._backgroundElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.pointerEvents).to.be('all');
       // Logo is spinning
       expect(watermark._svgElement.classList.contains('spinning')).to.be(true);
 
@@ -149,25 +151,23 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       expect(watermark._usernameTextElement).to.be(null);
       expect(watermark._madeWithTextElement.style.lineHeight).to.be('');
       expect(watermark._madeWithTextElement.style.opacity).not.to.be('0');
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('1');
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('1');
-      expect(watermark._watermarkContainerElement.style.display).to.be('');
-      expect(watermark._watermarkBackgroundElement.style.display).to.be('');
+      expect(watermark._backgroundElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.opacity).to.be('1');
+      expect(watermark._containerElement.style.display).to.be('');
+      expect(watermark._backgroundElement.style.display).to.be('');
 
       clock.tick(delta);
 
       // Watermark starts to fade out
-      expect(watermark._watermarkBackgroundElement.style.opacity).to.be('0');
-      expect(watermark._watermarkContainerElement.style.opacity).to.be('0');
+      expect(watermark._backgroundElement.style.opacity).to.be('0');
+      expect(watermark._containerElement.style.opacity).to.be('0');
 
       clock.tick(fadeTransitionDuration);
 
       // Watermark loses all interaction possibilities
-      expect(watermark._watermarkContainerElement.style.display).to.be('none');
-      expect(watermark._watermarkContainerElement.style.pointerEvents).to.be(
-        'none'
-      );
-      expect(watermark._watermarkBackgroundElement.style.display).to.be('none');
+      expect(watermark._containerElement.style.display).to.be('none');
+      expect(watermark._containerElement.style.pointerEvents).to.be('none');
+      expect(watermark._backgroundElement.style.display).to.be('none');
     });
   });
 });

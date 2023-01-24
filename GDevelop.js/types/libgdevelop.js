@@ -64,6 +64,7 @@ declare class libGDevelop {
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
+  Watermark: Class<gdWatermark>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   ExtensionProperties: Class<gdExtensionProperties>;
@@ -224,6 +225,7 @@ declare class libGDevelop {
   ObjectCodeGenerator: Class<gdObjectCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;
+  ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
 };

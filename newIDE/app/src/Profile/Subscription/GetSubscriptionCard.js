@@ -3,12 +3,13 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
 import Text from '../../UI/Text';
-import { Column, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
 import { LineStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
-import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
-import Window from '../../Utils/Window';
+import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
+import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 
 const styles = {
   subscriptionContainer: {
@@ -22,7 +23,12 @@ const styles = {
   },
 };
 
-const GetSubscriptionCard = () => {
+type Props = {|
+  children: React.Node,
+  subscriptionDialogOpeningReason: SubscriptionDialogDisplayReason,
+|};
+
+const GetSubscriptionCard = (props: Props) => {
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
@@ -36,34 +42,16 @@ const GetSubscriptionCard = () => {
   return (
     <div style={subscriptionContainerStyle}>
       <img src="res/diamond.svg" style={styles.diamondIcon} alt="diamond" />
-      <LineStackLayout alignItems="center">
-        <Column noMargin>
-          <Text>
-            <Trans>
-              Get a silver or gold subscription to unlock color customization.
-            </Trans>
-          </Text>
-          <Line noMargin>
-            <Link
-              href="https://liluo.io/playground/test-leaderboard"
-              onClick={() =>
-                Window.openExternalURL(
-                  'https://liluo.io/playground/test-leaderboard'
-                )
-              }
-            >
-              <Text noMargin color="inherit">
-                <Trans>Test it out!</Trans>
-              </Text>
-            </Link>
-          </Line>
+      <LineStackLayout alignItems="center" expand>
+        <Column noMargin expand>
+          {props.children}
         </Column>
         <Column>
           <Link
             href="#"
             onClick={() => {
               openSubscriptionDialog({
-                reason: 'Leaderboard customization',
+                reason: props.subscriptionDialogOpeningReason,
               });
             }}
           >

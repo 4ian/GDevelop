@@ -4,6 +4,7 @@ declare class gdPreviewExportOptions {
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): gdPreviewExportOptions;
   useWindowMessageDebuggerClient(): gdPreviewExportOptions;
   setLayoutName(layoutName: string): gdPreviewExportOptions;
+  setFallbackAuthor(id: string, username: string): gdPreviewExportOptions;
   setExternalLayoutName(externalLayoutName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;

@@ -241,6 +241,13 @@ export default class LocalPreviewLauncher extends React.Component<
               previewOptions.fullLoadingScreen
             );
 
+            if (previewOptions.fallbackAuthor) {
+              previewExportOptions.setFallbackAuthor(
+                previewOptions.fallbackAuthor.id,
+                previewOptions.fallbackAuthor.username
+              );
+            }
+
             exporter.exportProjectForPixiPreview(previewExportOptions);
             previewExportOptions.delete();
             exporter.delete();

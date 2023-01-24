@@ -7,7 +7,7 @@ import SubscriptionChecker, {
 import Checkbox from '../UI/Checkbox';
 import ColorField from '../UI/ColorField';
 import { I18n } from '@lingui/react';
-import { Line } from '../UI/Grid';
+import { Line, Column } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import {
@@ -20,9 +20,13 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
+import AlertMessage from '../UI/AlertMessage';
+import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   loadingScreen: gdLoadingScreen,
+  watermark: gdWatermark,
   onLoadingScreenUpdated: () => void,
   onChangeSubscription: () => Promise<void> | void,
 
@@ -31,15 +35,28 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
+const watermarkPlacementOptions = [
+  { value: 'top', primaryText: t`Top` },
+  { value: 'top-left', primaryText: t`Top left corner` },
+  { value: 'top-right', primaryText: t`Top right corner` },
+  { value: 'bottom', primaryText: t`Bottom` },
+  { value: 'bottom-left', primaryText: t`Bottom left corner` },
+  { value: 'bottom-right', primaryText: t`Bottom right corner` },
+];
+
 export const LoadingScreenEditor = ({
   loadingScreen,
+  watermark,
   onLoadingScreenUpdated,
   onChangeSubscription,
   project,
   resourceManagementProps,
 }: Props) => {
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();
+  const shouldDisplayGetSubscriptionCard =
+    !authenticatedUser.subscription || !authenticatedUser.subscription.planId;
 
   const onUpdate = () => {
     forceUpdate();
@@ -50,6 +67,128 @@ export const LoadingScreenEditor = ({
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout expand noMargin>
+          <Text size="section-title">
+            <Trans>Branding</Trans>
+          </Text>
+          <ColumnStackLayout noMargin>
+            <ResponsiveLineStackLayout noMargin>
+              <Column expand noMargin justifyContent="center">
+                <Checkbox
+                  label={
+                    <Trans>
+                      Display GDevelop logo at startup (in exported game)
+                    </Trans>
+                  }
+                  checked={loadingScreen.isGDevelopLogoShownDuringLoadingScreen()}
+                  onCheck={(e, checked) => {
+                    if (
+                      !checked &&
+                      !watermark.isGDevelopWatermarkShown() &&
+                      subscriptionChecker.current &&
+                      !subscriptionChecker.current.checkUserHasSubscription()
+                    ) {
+                      // If user wants to deactivate GDevelop splash screen although
+                      // watermark is hidden, we don't allow it if they have no subscription.
+                      return;
+                    }
+                    loadingScreen.showGDevelopLogoDuringLoadingScreen(checked);
+                    onUpdate();
+                  }}
+                />
+              </Column>
+              <Column expand noMargin justifyContent="center">
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>GDevelop logo style</Trans>}
+                  value={loadingScreen.getGDevelopLogoStyle()}
+                  onChange={(e, i, newGdevelopLogoStyle: string) => {
+                    const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
+                    if (currentGDevelopLogoStyle === newGdevelopLogoStyle)
+                      return;
+                    loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
+                    onUpdate();
+                  }}
+                  disabled={
+                    !loadingScreen.isGDevelopLogoShownDuringLoadingScreen()
+                  }
+                >
+                  <SelectOption value="light" primaryText={t`Light (plain)`} />
+                  <SelectOption
+                    value="light-colored"
+                    primaryText={t`Light (colored)`}
+                  />
+                  <SelectOption value="dark" primaryText={t`Dark (plain)`} />
+                  <SelectOption
+                    value="dark-colored"
+                    primaryText={t`Dark (colored)`}
+                  />
+                </SelectField>
+              </Column>
+            </ResponsiveLineStackLayout>
+
+            <ResponsiveLineStackLayout noMargin>
+              <Column expand noMargin justifyContent="center">
+                <Checkbox
+                  label={
+                    <Trans>
+                      Display GDevelop watermark after the game is loaded (in
+                      exported game)
+                    </Trans>
+                  }
+                  checked={watermark.isGDevelopWatermarkShown()}
+                  onCheck={(e, checked) => {
+                    if (
+                      !checked &&
+                      !loadingScreen.isGDevelopLogoShownDuringLoadingScreen() &&
+                      subscriptionChecker.current &&
+                      !subscriptionChecker.current.checkUserHasSubscription()
+                    ) {
+                      // If user wants to deactivate watermark although GDevelop splash
+                      // screen is hidden, we don't allow it if they have no subscription.
+                      return;
+                    }
+                    watermark.showGDevelopWatermark(checked);
+                    onUpdate();
+                  }}
+                />
+              </Column>
+              <Column expand noMargin justifyContent="center">
+                <SelectField
+                  fullWidth
+                  floatingLabelText={
+                    <Trans>GDevelop watermark placement</Trans>
+                  }
+                  value={watermark.getPlacement()}
+                  onChange={(e, i, newPlacement: string) => {
+                    const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
+                    if (currentGDevelopLogoStyle === newPlacement) return;
+                    watermark.setPlacement(newPlacement);
+                    onUpdate();
+                  }}
+                  disabled={!watermark.isGDevelopWatermarkShown()}
+                >
+                  {watermarkPlacementOptions.map(option => (
+                    <SelectOption
+                      key={option.value}
+                      value={option.value}
+                      primaryText={option.primaryText}
+                    />
+                  ))}
+                </SelectField>
+              </Column>
+            </ResponsiveLineStackLayout>
+            {shouldDisplayGetSubscriptionCard && (
+              <GetSubscriptionCard subscriptionDialogOpeningReason="Disable GDevelop splash at startup">
+                <Text>
+                  Get a silver or gold subscription to disable GDevelop
+                  branding.
+                </Text>
+              </GetSubscriptionCard>
+            )}
+          </ColumnStackLayout>
+          <Text size="section-title">
+            <Trans>Loading screen</Trans>
+          </Text>
           <Text size="block-title">
             <Trans>Background</Trans>
           </Text>
@@ -103,100 +242,6 @@ export const LoadingScreenEditor = ({
                   return;
                 loadingScreen.setBackgroundFadeInDuration(
                   newBackgroundFadeInDuration
-                );
-                onUpdate();
-              }}
-            />
-          </ResponsiveLineStackLayout>
-          <Text size="block-title">
-            <Trans>Logo</Trans>
-          </Text>
-          <Checkbox
-            label={
-              <Trans>Display GDevelop logo at startup (in exported game)</Trans>
-            }
-            checked={loadingScreen.isGDevelopSplashShown()}
-            onCheck={(e, checked) => {
-              if (!checked) {
-                if (
-                  subscriptionChecker.current &&
-                  !subscriptionChecker.current.checkUserHasSubscription()
-                )
-                  return;
-              }
-              loadingScreen.showGDevelopSplash(checked);
-              onUpdate();
-            }}
-          />
-          <SelectField
-            fullWidth
-            floatingLabelText={<Trans>GDevelop logo style</Trans>}
-            value={loadingScreen.getGDevelopLogoStyle()}
-            onChange={(e, i, newGdevelopLogoStyle: string) => {
-              const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
-              if (currentGDevelopLogoStyle === newGdevelopLogoStyle) return;
-              loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
-              onUpdate();
-            }}
-          >
-            <SelectOption value="light" primaryText={t`Light (plain)`} />
-            <SelectOption
-              value="light-colored"
-              primaryText={t`Light (colored)`}
-            />
-            <SelectOption value="dark" primaryText={t`Dark (plain)`} />
-            <SelectOption
-              value="dark-colored"
-              primaryText={t`Dark (colored)`}
-            />
-          </SelectField>
-          <ResponsiveLineStackLayout noMargin>
-            <SemiControlledTextField
-              floatingLabelText={
-                <Trans>Logo and progress fade in delay (in seconds)</Trans>
-              }
-              step={0.1}
-              fullWidth
-              type="number"
-              value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
-              onChange={newValue => {
-                const currentLogoAndProgressLogoFadeInDelay = loadingScreen.getLogoAndProgressLogoFadeInDelay();
-                const newLogoAndProgressLogoFadeInDelay = Math.max(
-                  0,
-                  parseFloat(newValue)
-                );
-                if (
-                  currentLogoAndProgressLogoFadeInDelay ===
-                  newLogoAndProgressLogoFadeInDelay
-                )
-                  return;
-                loadingScreen.setLogoAndProgressLogoFadeInDelay(
-                  newLogoAndProgressLogoFadeInDelay
-                );
-                onUpdate();
-              }}
-            />
-            <SemiControlledTextField
-              floatingLabelText={
-                <Trans>Logo and progress fade in duration (in seconds)</Trans>
-              }
-              step={0.1}
-              fullWidth
-              type="number"
-              value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
-              onChange={newValue => {
-                const currentLogoAndProgressFadeInDuration = loadingScreen.getLogoAndProgressFadeInDuration();
-                const newLogoAndProgressFadeInDuration = Math.max(
-                  0,
-                  parseFloat(newValue)
-                );
-                if (
-                  currentLogoAndProgressFadeInDuration ===
-                  newLogoAndProgressFadeInDuration
-                )
-                  return;
-                loadingScreen.setLogoAndProgressFadeInDuration(
-                  newLogoAndProgressFadeInDuration
                 );
                 onUpdate();
               }}
@@ -277,36 +322,107 @@ export const LoadingScreenEditor = ({
               helperMarkdownText={i18n._(t`In pixels. 0 to ignore.`)}
             />
           </ResponsiveLineStackLayout>
-          <SemiControlledTextField
-            floatingLabelText={<Trans>Progress bar height</Trans>}
-            fullWidth
-            type="number"
-            value={'' + loadingScreen.getProgressBarHeight()}
-            onChange={newValue => {
-              const currentProgressBarHeight = loadingScreen.getProgressBarHeight();
-              const newProgressBarHeight = Math.max(1, parseFloat(newValue));
-              if (currentProgressBarHeight === newProgressBarHeight) {
-                return;
+          <ResponsiveLineStackLayout noMargin>
+            <SemiControlledTextField
+              floatingLabelText={<Trans>Progress bar height</Trans>}
+              fullWidth
+              type="number"
+              value={'' + loadingScreen.getProgressBarHeight()}
+              onChange={newValue => {
+                const currentProgressBarHeight = loadingScreen.getProgressBarHeight();
+                const newProgressBarHeight = Math.max(1, parseFloat(newValue));
+                if (currentProgressBarHeight === newProgressBarHeight) {
+                  return;
+                }
+                loadingScreen.setProgressBarHeight(newProgressBarHeight);
+                onUpdate();
+              }}
+              helperMarkdownText={i18n._(t`In pixels.`)}
+            />
+            <ColorField
+              fullWidth
+              floatingLabelText={<Trans>Progress bar color</Trans>}
+              disableAlpha
+              color={hexNumberToRGBString(loadingScreen.getProgressBarColor())}
+              onChange={newColor => {
+                const currentProgressBarColor = loadingScreen.getProgressBarColor();
+                const newProgressBarColor = rgbStringToHexNumber(newColor);
+                if (currentProgressBarColor === newProgressBarColor) {
+                  return;
+                }
+                loadingScreen.setProgressBarColor(newProgressBarColor);
+                onUpdate();
+              }}
+            />
+          </ResponsiveLineStackLayout>
+          <ResponsiveLineStackLayout noMargin>
+            <SemiControlledTextField
+              floatingLabelText={
+                loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (
+                  <Trans>Logo and progress fade in delay (in seconds)</Trans>
+                ) : (
+                  <Trans>Progress fade in delay (in seconds)</Trans>
+                )
               }
-              loadingScreen.setProgressBarHeight(newProgressBarHeight);
-              onUpdate();
-            }}
-          />
-          <ColorField
-            fullWidth
-            floatingLabelText={<Trans>Progress bar color</Trans>}
-            disableAlpha
-            color={hexNumberToRGBString(loadingScreen.getProgressBarColor())}
-            onChange={newColor => {
-              const currentProgressBarColor = loadingScreen.getProgressBarColor();
-              const newProgressBarColor = rgbStringToHexNumber(newColor);
-              if (currentProgressBarColor === newProgressBarColor) {
-                return;
+              step={0.1}
+              fullWidth
+              type="number"
+              value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
+              onChange={newValue => {
+                const currentLogoAndProgressLogoFadeInDelay = loadingScreen.getLogoAndProgressLogoFadeInDelay();
+                const newLogoAndProgressLogoFadeInDelay = Math.max(
+                  0,
+                  parseFloat(newValue)
+                );
+                if (
+                  currentLogoAndProgressLogoFadeInDelay ===
+                  newLogoAndProgressLogoFadeInDelay
+                )
+                  return;
+                loadingScreen.setLogoAndProgressLogoFadeInDelay(
+                  newLogoAndProgressLogoFadeInDelay
+                );
+                onUpdate();
+              }}
+            />
+            <SemiControlledTextField
+              floatingLabelText={
+                loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (
+                  <Trans>Logo and progress fade in duration (in seconds)</Trans>
+                ) : (
+                  <Trans>Progress fade in duration (in seconds)</Trans>
+                )
               }
-              loadingScreen.setProgressBarColor(newProgressBarColor);
-              onUpdate();
-            }}
-          />
+              step={0.1}
+              fullWidth
+              type="number"
+              value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
+              onChange={newValue => {
+                const currentLogoAndProgressFadeInDuration = loadingScreen.getLogoAndProgressFadeInDuration();
+                const newLogoAndProgressFadeInDuration = Math.max(
+                  0,
+                  parseFloat(newValue)
+                );
+                if (
+                  currentLogoAndProgressFadeInDuration ===
+                  newLogoAndProgressFadeInDuration
+                )
+                  return;
+                loadingScreen.setLogoAndProgressFadeInDuration(
+                  newLogoAndProgressFadeInDuration
+                );
+                onUpdate();
+              }}
+            />
+          </ResponsiveLineStackLayout>
+          {loadingScreen.isGDevelopLogoShownDuringLoadingScreen() ? (
+            <AlertMessage kind="info">
+              <Trans>
+                Progress bar fade in delay and duration will be applied to
+                GDevelop logo.
+              </Trans>
+            </AlertMessage>
+          ) : null}
           <Text size="block-title">
             <Trans>Duration</Trans>
           </Text>
@@ -331,6 +447,7 @@ export const LoadingScreenEditor = ({
               t`When previewing the game in the editor, this duration is ignored (the game preview starts as soon as possible).`
             )}
           />
+
           <SubscriptionChecker
             ref={subscriptionChecker}
             onChangeSubscription={onChangeSubscription}

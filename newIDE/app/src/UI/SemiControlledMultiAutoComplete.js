@@ -104,12 +104,12 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           fullWidth={props.fullWidth}
           disabled={props.disabled || props.loading}
           noOptionsText={
-            <Text>
+            <Text noMargin>
               <Trans>No options</Trans>
             </Text>
           }
           loadingText={
-            <Text>
+            <Text noMargin>
               <Trans>Loading...</Trans>
             </Text>
           }

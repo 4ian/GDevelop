@@ -181,6 +181,8 @@ declare interface ProjectPropertiesData {
   version: string;
   name: string;
   author: string;
+  authorIds: string[];
+  authorUsernames: string[];
   windowWidth: number;
   windowHeight: number;
   latestCompilationDirectory: string;
@@ -188,6 +190,7 @@ declare interface ProjectPropertiesData {
   minFPS: number;
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
+  watermark: WatermarkData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
@@ -198,6 +201,17 @@ declare interface ExtensionProperty {
   extension: string;
   property: string;
   value: string;
+}
+
+declare interface WatermarkData {
+  showWatermark: boolean;
+  placement:
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'bottom'
+    | 'top';
 }
 
 declare interface LoadingScreenData {

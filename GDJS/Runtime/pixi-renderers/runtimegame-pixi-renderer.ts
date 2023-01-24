@@ -527,6 +527,14 @@ namespace gdjs {
 
         return true;
       };
+      const isTargetDomElement = (event: TouchEvent) => {
+        // Fast bailout when the game canvas should receive the inputs (i.e: almost always).
+        // Any event with a target that is not the body or the canvas should
+        // not go to the game (<input> or <a> elements for instances).
+        if (event.target === canvas || event.target === document.body)
+          return false;
+        return true;
+      };
       document.onkeydown = function (e) {
         if (isFocusingDomElement()) {
           // Bail out if the game canvas is not focused. For example,
@@ -640,7 +648,6 @@ namespace gdjs {
           if (window.focus !== undefined) {
             window.focus();
           }
-          e.preventDefault();
           return false;
         },
         false
@@ -657,7 +664,7 @@ namespace gdjs {
 
       // Touches:
       window.addEventListener('touchmove', function (e) {
-        if (isFocusingDomElement()) {
+        if (isTargetDomElement(e)) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
           // touch events to move the selection (and do other native gestures).
@@ -682,7 +689,7 @@ namespace gdjs {
         }
       });
       window.addEventListener('touchstart', function (e) {
-        if (isFocusingDomElement()) {
+        if (isTargetDomElement(e)) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
           // touch events to move the selection (and do other native gestures).
@@ -703,7 +710,7 @@ namespace gdjs {
         return false;
       });
       window.addEventListener('touchend', function (e) {
-        if (isFocusingDomElement()) {
+        if (isTargetDomElement(e)) {
           // Bail out if the game canvas is not focused. For example,
           // an `<input>` element can be focused, and needs to receive
           // touch events to move the selection (and do other native gestures).

@@ -63,7 +63,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     error: null,
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter = (): Promise<{|
+    outputDir: string,
+    exporter: gdjsExporter,
+    browserS3FileSystem: BrowserS3FileSystem,
+  |}> => {
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -150,6 +154,13 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
       );
+
+      if (previewOptions.fallbackAuthor) {
+        previewExportOptions.setFallbackAuthor(
+          previewOptions.fallbackAuthor.id,
+          previewOptions.fallbackAuthor.username
+        );
+      }
 
       exporter.exportProjectForPixiPreview(previewExportOptions);
       previewExportOptions.delete();

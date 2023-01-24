@@ -129,15 +129,21 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
 
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter
+    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter,
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
-    const exportOptions = new gd.MapStringBoolean();
-    exportOptions.set('exportForFacebookInstantGames', true);
-    exporter.exportWholePixiProject(
+    const exportOptions = new gd.ExportOptions(
       context.project,
-      temporaryOutputDir,
-      exportOptions
+      temporaryOutputDir
     );
+    exportOptions.setTarget('facebookInstantGames');
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

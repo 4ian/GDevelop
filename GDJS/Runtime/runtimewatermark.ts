@@ -165,10 +165,15 @@ namespace gdjs {
         requestAnimationFrame(() => {
           // Display the watermark
           setTimeout(() => {
-            if (!this._containerElement || !this._backgroundElement) return;
+            if (
+              !this._containerElement ||
+              !this._backgroundElement ||
+              !this._linkElement
+            )
+              return;
             this._containerElement.style.opacity = '1';
             this._backgroundElement.style.opacity = '1';
-            this._containerElement.style.pointerEvents = 'all';
+            this._linkElement.style.pointerEvents = 'all';
             if (this._svgElement) this._svgElement.classList.add('spinning');
           }, this._fadeInDelayAfterGameLoaded * 1000);
         });
@@ -184,8 +189,13 @@ namespace gdjs {
           // Completely remove the watermark once the fade out duration has ended.
           this._hideTimeout = setTimeout(
             () => {
-              if (!this._containerElement || !this._backgroundElement) return;
-              this._containerElement.style.pointerEvents = 'none';
+              if (
+                !this._containerElement ||
+                !this._backgroundElement ||
+                !this._linkElement
+              )
+                return;
+              this._linkElement.style.pointerEvents = 'none';
               this._containerElement.style.display = 'none';
               this._backgroundElement.style.display = 'none';
               if (this._resizeObserver) this._resizeObserver.disconnect();

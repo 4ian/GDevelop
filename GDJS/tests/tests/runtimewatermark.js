@@ -58,7 +58,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       // Watermark fade-in
       expect(watermark._backgroundElement.style.opacity).to.be('1');
       expect(watermark._containerElement.style.opacity).to.be('1');
-      expect(watermark._containerElement.style.pointerEvents).to.be('all');
+      expect(watermark._linkElement.style.pointerEvents).to.be('all');
 
       // Logo is spinning
       expect(watermark._svgElement.classList.contains('spinning')).to.be(true);
@@ -97,7 +97,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       // Watermark loses all interaction possibilities
       expect(watermark._containerElement.style.display).to.be('none');
-      expect(watermark._containerElement.style.pointerEvents).to.be('none');
+      expect(watermark._linkElement.style.pointerEvents).to.be('none');
       expect(watermark._backgroundElement.style.display).to.be('none');
     });
 
@@ -138,7 +138,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       // Watermark fade-in
       expect(watermark._backgroundElement.style.opacity).to.be('1');
       expect(watermark._containerElement.style.opacity).to.be('1');
-      expect(watermark._containerElement.style.pointerEvents).to.be('all');
+      expect(watermark._linkElement.style.pointerEvents).to.be('all');
       // Logo is spinning
       expect(watermark._svgElement.classList.contains('spinning')).to.be(true);
 
@@ -166,7 +166,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
 
       // Watermark loses all interaction possibilities
       expect(watermark._containerElement.style.display).to.be('none');
-      expect(watermark._containerElement.style.pointerEvents).to.be('none');
+      expect(watermark._linkElement.style.pointerEvents).to.be('none');
       expect(watermark._backgroundElement.style.display).to.be('none');
     });
   });

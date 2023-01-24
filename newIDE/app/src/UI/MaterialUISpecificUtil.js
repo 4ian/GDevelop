@@ -65,3 +65,7 @@ export const doesPathContainDialog = (path: Array<Element>): boolean => {
     return false;
   }
 };
+
+export const isElementAMuiInput = (element: Element): boolean => {
+  return element.classList.contains('MuiInputBase-root');
+};

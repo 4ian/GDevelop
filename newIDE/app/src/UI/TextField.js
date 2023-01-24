@@ -6,6 +6,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
 import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =
   // Support "text" and "password" type:
@@ -69,6 +70,7 @@ type Props = {|
   hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
+  dataset?: HTMLDataset,
 
   // Keyboard focus:
   autoFocus?: 'desktop' | 'desktopAndMobileDevices',
@@ -296,6 +298,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               min: props.min,
               step: props.step,
               style: props.inputStyle,
+              ...dataObjectToProps(props.dataset),
             },
             // Input adornment:
             endAdornment: props.endAdornment ? (

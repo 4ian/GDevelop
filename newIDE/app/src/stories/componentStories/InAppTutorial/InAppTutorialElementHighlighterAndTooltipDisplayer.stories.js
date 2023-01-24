@@ -40,6 +40,10 @@ const elementIdToTooltip = {
     description: 'Description only (without quit button)',
     placement: 'left',
   },
+  '#multiline-input': {
+    description: 'Description with `selectable [code]`.',
+    placement: 'left',
+  },
   'element-in-list': {
     description:
       'It should disappear when element not visible, and an **arrow** should appear to show the direction where to scroll.',
@@ -58,6 +62,9 @@ export const Default = () => {
   const [elementToHighlight, setElementToHighlight] = React.useState<any>(null);
   const [textFieldValue, setTextFieldValue] = React.useState<string>(
     'Object.Variable'
+  );
+  const [multilineInputValue, setMultilineInputValue] = React.useState<string>(
+    "First layout\nThis is what we're gonna do"
   );
   const [
     elementToHighlightId,
@@ -83,7 +90,6 @@ export const Default = () => {
     [elementToHighlightId]
   );
 
-  console.log(elementToHighlight);
   return (
     <>
       <ColumnStackLayout useLargeSpacer>
@@ -108,6 +114,11 @@ export const Default = () => {
             value="#input"
             control={<Radio />}
             label="Textfield"
+          />
+          <FormControlLabel
+            value="#multiline-input"
+            control={<Radio />}
+            label="Multiline textfield"
           />
           <FormControlLabel
             value="element-in-list"
@@ -159,7 +170,15 @@ export const Default = () => {
               </ScrollView>
             </FixedHeightFlexContainer>
           </Column>
-          <Column expand />
+          <Column expand>
+            <SemiControlledTextField
+              multiline
+              floatingLabelText="Multiline input"
+              id="multiline-input"
+              onChange={setMultilineInputValue}
+              value={multilineInputValue}
+            />
+          </Column>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
 

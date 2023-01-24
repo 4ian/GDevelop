@@ -19,6 +19,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { List, ListItem } from '../../../UI/List';
 import { Column } from '../../../UI/Grid';
+import { queryElementOrItsMostVisuallySignificantParent } from '../../../InAppTutorial/InAppTutorialStepDisplayer';
 
 export default {
   title: 'In-app tutorial/ElementHighlighterAndTooltipDisplayer',
@@ -84,7 +85,9 @@ export const Default = () => {
   React.useEffect(
     () => {
       if (elementToHighlightId.startsWith('#')) {
-        setElementToHighlight(document.querySelector(elementToHighlightId));
+        setElementToHighlight(
+          queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
+        );
       }
     },
     [elementToHighlightId]

@@ -12,7 +12,10 @@ import {
 } from './InAppTutorialContext';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
-import { isElementADialog, isElementAMultilineTextfieldParentDiv } from '../UI/MaterialUISpecificUtil';
+import {
+  isElementADialog,
+  isElementAMultilineTextfieldParentDiv,
+} from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 import InAppTutorialDialog from './InAppTutorialDialog';
 
@@ -94,6 +97,25 @@ const getWrongEditorTooltip = (
   };
 };
 
+export const queryElementOrItsMostVisuallySignificantParent = (
+  elementToHighlightId: string
+) => {
+  let foundElement = document.querySelector(elementToHighlightId);
+  if (foundElement instanceof HTMLTextAreaElement) {
+    // In this case, the element to highlight is a Material UI multiline text field
+    // and the textarea only occupies a fraction of the whole input. So we're going
+    // to highlight the parent div.
+    const parentDiv = foundElement.closest('div');
+    if (
+      parentDiv instanceof HTMLElement &&
+      isElementAMultilineTextfieldParentDiv(parentDiv)
+    ) {
+      foundElement = parentDiv;
+    }
+  }
+  return foundElement;
+};
+
 type Props = {|
   step: InAppTutorialFlowFormattedStep,
   expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
@@ -140,17 +162,10 @@ function InAppTutorialStepDisplayer({
   const queryElement = React.useCallback(
     () => {
       if (!elementToHighlightId) return;
-      let foundElement = document.querySelector(elementToHighlightId);
-      if (foundElement instanceof HTMLTextAreaElement) {
-        // In this case, the element to highlight is a Material UI multiline text field
-        // and the textarea only occupies a fraction of the whole input. So we're going
-        // to highlight the parent div.
-        const parentDiv = foundElement.closest('div');
-        if (parentDiv instanceof HTMLElement && isElementAMultilineTextfieldParentDiv(parentDiv)) {
-          foundElement = parentDiv;
-        }
-      }
-      setElementToHighlight(foundElement);
+
+      setElementToHighlight(
+        queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
+      );
     },
     [elementToHighlightId]
   );

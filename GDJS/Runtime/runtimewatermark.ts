@@ -276,17 +276,21 @@ namespace gdjs {
         const linkElement = document.createElement('a');
         linkElement.id = 'watermark-link';
 
-        let targetUrl = 'https://liluo.io';
-        if (this._authorUsername) targetUrl += `/${this._authorUsername}`;
+        let targetUrl = this._authorUsername
+          ? new URL(`https://liluo.io/${this._authorUsername}`)
+          : new URL('https://liluo.io');
 
-        if (this._isDevEnvironment) targetUrl += '?dev=true';
-        else {
-          targetUrl += `?utm_source=gdevelop-game&utm_medium=game-watermark`;
+        if (this._isDevEnvironment) {
+          targetUrl.searchParams.set('dev', 'true');
+        } else {
+          targetUrl.searchParams.set('utm_source', 'gdevelop-game');
+          targetUrl.searchParams.set('utm_medium', 'game-watermark');
+
           if (this._gameId) {
-            targetUrl += `&utm_campaign=${this._gameId}`;
+            targetUrl.searchParams.set('utm_campaign', this._gameId);
           }
         }
-        linkElement.href = targetUrl;
+        linkElement.href = targetUrl.href;
         linkElement.target = '_blank';
 
         this.updateElementMargins(linkElement);

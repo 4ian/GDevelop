@@ -14,6 +14,7 @@ namespace gdjs {
         | 'top';
       _showAtStartup: boolean;
       _authorUsername: string | undefined;
+      _gameId: string | undefined;
 
       // Dom elements
       _linkElement: HTMLAnchorElement | null = null;
@@ -49,6 +50,7 @@ namespace gdjs {
         authorUsernames: Array<string>,
         watermarkData: WatermarkData
       ) {
+        this._gameId = game._data.properties.projectUuid;
         this._gameRenderer = game.getRenderer();
         this._authorUsername = authorUsernames[0];
         this._placement = watermarkData.placement;
@@ -276,7 +278,14 @@ namespace gdjs {
 
         let targetUrl = 'https://liluo.io';
         if (this._authorUsername) targetUrl += `/${this._authorUsername}`;
+
         if (this._isDevEnvironment) targetUrl += '?dev=true';
+        else {
+          targetUrl += `?utm_source=gdevelop-game&utm_medium=game-watermark`;
+          if (this._gameId) {
+            targetUrl += `&utm_campaign=${this._gameId}`;
+          }
+        }
         linkElement.href = targetUrl;
         linkElement.target = '_blank';
 

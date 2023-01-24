@@ -27,7 +27,7 @@ type Props<Item> = {|
   getItemData?: (Item, index: number) => HTMLDataset,
   isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
-  itemEqualityTest?: (Item, Item) => boolean,
+  areItemsEqual?: (Item, Item) => boolean,
   onEditItem?: Item => void,
   renamedItem: ?Item,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
@@ -68,7 +68,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       getItemData,
       renderItemLabel,
       scaleUpItemIconWhenSelected,
-      itemEqualityTest,
+      areItemsEqual,
     } = this.props;
 
     const nameBeingEdited = renamedItem === item;
@@ -90,9 +90,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
         }
         selected={
-          itemEqualityTest
+          areItemsEqual
             ? selectedItems.some(selectedItem =>
-                itemEqualityTest(selectedItem, item)
+                areItemsEqual(selectedItem, item)
               )
             : selectedItems.indexOf(item) !== -1
         }

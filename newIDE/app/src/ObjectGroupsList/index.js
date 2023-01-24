@@ -450,7 +450,7 @@ export default class ObjectGroupsList extends React.Component<Props, State> {
                             selectedGroupWithContext: groupWithContext,
                           });
                         }}
-                        itemEqualityTest={(a, b) =>
+                        areItemsEqual={(a, b) =>
                           a.group.ptr === b.group.ptr && a.global === b.global
                         }
                         renamedItem={renamedGroupWithContext}

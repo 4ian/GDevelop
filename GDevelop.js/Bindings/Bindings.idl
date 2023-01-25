@@ -1283,6 +1283,7 @@ interface InstructionMetadata {
     [Ref] ExtraInformation GetCodeExtraInformation();
 
     [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName);
+    [Ref] ExtraInformation SetAsyncFunctionName([Const] DOMString functionName);
 
     [Ref] InstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] InstructionMetadata AddIncludeFile([Const] DOMString includeFile);
@@ -2409,6 +2410,8 @@ interface EventsFunction {
     [Const, Ref] ValueTypeMetadata GetExpressionType();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    [Ref] EventsFunction SetAsync(boolean isAsync);
+    boolean IsAsync();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();

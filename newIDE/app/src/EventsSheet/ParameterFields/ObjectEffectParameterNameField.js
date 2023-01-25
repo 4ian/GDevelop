@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import uniq from 'lodash/uniq';
 import GenericExpressionField from './GenericExpressionField';
 import {
   type ParameterFieldProps,
@@ -12,6 +13,8 @@ import {
   getPreviousParameterValue,
   tryExtractStringLiteralContent,
 } from './ParameterMetadataTools';
+import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+import { mapVector } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,7 +38,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         parameterIndex,
       } = props;
 
-      const objectName = getLastObjectParameterValue({
+      const objectOrGroupName = getLastObjectParameterValue({
         instructionMetadata,
         instruction,
         expressionMetadata,
@@ -49,17 +52,56 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           parameterIndex,
         })
       );
-      if (!objectName || !project || !effectName) {
+      if (!objectOrGroupName || !project || !effectName) {
         return [];
       }
 
-      const object = getObjectByName(project, scope.layout, objectName);
-      if (!object || !object.getEffects().hasEffectNamed(effectName)) {
-        return [];
+      let effectType: string | null = null;
+      const object = getObjectByName(project, scope.layout, objectOrGroupName);
+      if (object && object.getEffects().hasEffectNamed(effectName)) {
+        effectType = object
+          .getEffects()
+          .getEffect(effectName)
+          .getEffectType();
       }
-      const effect = object.getEffects().getEffect(effectName);
 
-      const effectType = effect.getEffectType();
+      if (!effectType) {
+        const group = getObjectGroupByName(
+          project,
+          scope.layout,
+          objectOrGroupName
+        );
+        if (group) {
+          // If the instruction targets a group, we check that the effect behind
+          // the effect name on every object of the group is of the same type.
+          const effectTypes: Array<string | null> = mapVector(
+            group.getAllObjectsNames(),
+            objectName => {
+              const object = getObjectByName(project, scope.layout, objectName);
+              if (!object) {
+                // If object not found, we consider this as an error.
+                return null;
+              }
+              if (!object.getEffects().hasEffectNamed(effectName)) {
+                return null;
+              }
+              return object
+                .getEffects()
+                .getEffect(effectName)
+                .getEffectType();
+            }
+          );
+          if (
+            effectTypes.every(type => !!type) &&
+            uniq(effectTypes).length === 1
+          ) {
+            effectType = effectTypes[0];
+          }
+        }
+      }
+
+      if (!effectType) return [];
+
       const effectMetadata = gd.MetadataProvider.getEffectMetadata(
         project.getCurrentPlatform(),
         effectType

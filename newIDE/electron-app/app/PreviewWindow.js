@@ -1,7 +1,9 @@
-const electron = require('electron');
-const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
+const {
+  BrowserWindow, // Module to create native browser window.
+  ipcMain,
+  shell,
+} = require('electron');
 const isDev = require('electron-is').dev();
-const ipcMain = electron.ipcMain;
 const { load } = require('./Utils/UrlLoader');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -50,8 +52,7 @@ const openPreviewWindow = ({
 
   previewWindow.on('closed', event => {
     previewWindows = previewWindows.filter(
-      otherPreviewBrowserWindow =>
-        otherPreviewBrowserWindow !== previewWindow
+      otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
     );
     previewWindow = null;
   });

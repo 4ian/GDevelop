@@ -50,6 +50,9 @@ export const OnlineGamePropertiesDialog = ({
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     project.getAuthorIds().toJSArray()
   );
+  const [authorUsernames, setAuthorUsernames] = React.useState<string[]>(
+    project.getAuthorUsernames().toJSArray()
+  );
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState<boolean>(
     project.isPlayableWithKeyboard()
   );
@@ -81,6 +84,7 @@ export const OnlineGamePropertiesDialog = ({
         categories: categories || [],
         description: description || '',
         authorIds,
+        authorUsernames,
         playWithKeyboard: !!playWithKeyboard,
         playWithGamepad: !!playWithGamepad,
         playWithMobile: !!playWithMobile,
@@ -140,6 +144,7 @@ export const OnlineGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        setAuthorUsernames={setAuthorUsernames}
         setPlayableWithKeyboard={setPlayableWithKeyboard}
         playWithKeyboard={playWithKeyboard}
         setPlayableWithGamepad={setPlayableWithGamepad}

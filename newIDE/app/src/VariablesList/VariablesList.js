@@ -1096,7 +1096,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               value={
                                 isCollection
                                   ? i18n._(
-                                      t`${variable.getChildrenCount()} children`
+                                      variable.getChildrenCount() === 0
+                                        ? t`No children`
+                                        : variable.getChildrenCount() === 1
+                                        ? t`1 child`
+                                        : t`${variable.getChildrenCount()} children`
                                     )
                                   : type === gd.Variable.String
                                   ? variable.getString()

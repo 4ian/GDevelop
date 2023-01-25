@@ -110,7 +110,7 @@ describe('getLayouts', () => {
     });
   });
 
-  it('can anchor a chid to another child', () => {
+  it('can anchor a child to another child', () => {
     const eventBasedObject = createEventBasedObject([
       // Private properties
       {
@@ -141,6 +141,48 @@ describe('getLayouts', () => {
         anchorOrigin: 0.5,
         anchorTarget: 0.5,
         anchorTargetObject: 'PanelBar',
+      },
+    });
+  });
+
+  it('can anchor a child to another child and be scaled proportionally', () => {
+    const eventBasedObject = createEventBasedObject([
+      // Private properties
+      {
+        name: 'ThumbAnchorOrigin',
+        extraInfos: ['Thumb'],
+        value: 'Center-center',
+      },
+      {
+        name: 'ThumbAnchorTarget',
+        extraInfos: ['Border'],
+        value: 'Center-center',
+      },
+      {
+        name: 'ThumbIsScaledProportionally',
+        extraInfos: ['Thumb'],
+        value: 'true',
+      },
+    ]);
+    const customObjectConfiguration = createCustomObjectConfiguration(
+      eventBasedObject,
+      []
+    );
+    const layouts = getLayouts(eventBasedObject, customObjectConfiguration);
+
+    expect(layouts.get('Thumb')).toStrictEqual({
+      isShown: true,
+      horizontalLayout: {
+        anchorOrigin: 0.5,
+        anchorTarget: 0.5,
+        anchorTargetObject: 'Border',
+        isScaledProportionally: true,
+      },
+      verticalLayout: {
+        anchorOrigin: 0.5,
+        anchorTarget: 0.5,
+        anchorTargetObject: 'Border',
+        isScaledProportionally: true,
       },
     });
   });
@@ -262,7 +304,7 @@ describe('applyChildLayouts', () => {
     expect(tiledBar.getCustomHeight()).toBe(40);
   });
 
-  it('can anchor a chid to another child', () => {
+  it('can anchor a child to another child', () => {
     const parent = new MockedParent(200, 100);
     parent.addChild('Background', {
       isShown: true,
@@ -302,6 +344,46 @@ describe('applyChildLayouts', () => {
     expect(thumb.hasCustomSize()).toBe(true);
     expect(thumb.getCustomWidth()).toBe(50);
     expect(thumb.getCustomHeight()).toBe(60);
+  });
+
+  it('can anchor a child to another child and be scaled proportionally', () => {
+    const parent = new MockedParent(200, 100);
+    parent.addChild(
+      'Border',
+      {
+        isShown: true,
+        horizontalLayout: {},
+        verticalLayout: {},
+      },
+      { defaultWidth: 25, defaultHeight: 50 }
+    );
+    const thumb = parent.addChild(
+      'Thumb',
+      {
+        isShown: true,
+        horizontalLayout: {
+          anchorOrigin: 0.5,
+          anchorTarget: 0.5,
+          anchorTargetObject: 'Border',
+          isScaledProportionally: true,
+        },
+        verticalLayout: {
+          anchorOrigin: 0.5,
+          anchorTarget: 0.5,
+          anchorTargetObject: 'Border',
+          isScaledProportionally: true,
+        },
+      },
+      { defaultWidth: 10, defaultHeight: 15 }
+    );
+
+    applyChildLayouts(parent);
+
+    expect(thumb.hasCustomSize()).toBe(true);
+    expect(thumb.getCustomWidth()).toBe((200 / 25) * 10);
+    expect(thumb.getCustomHeight()).toBe((100 / 50) * 15);
+    expect(thumb.getX()).toBe(((200 / 25) * (25 - 10)) / 2);
+    expect(thumb.getY()).toBe(((100 / 50) * (50 - 15)) / 2);
   });
 });
 

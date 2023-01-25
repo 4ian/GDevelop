@@ -1,10 +1,12 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import PublishIcon from '@material-ui/icons/Publish';
+import TranslateIcon from '@material-ui/icons/Translate';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
 import {
@@ -135,17 +137,23 @@ const MainPage = ({
   ].filter(Boolean);
 
   const renderTutorialsRow = (category: TutorialCategory) => (
-    <ImageTileRow
-      title={TUTORIAL_CATEGORY_TEXTS[category].title}
-      description={TUTORIAL_CATEGORY_TEXTS[category].description}
-      items={tutorials
-        .filter(tutorial => tutorial.category === category)
-        .map(formatTutorialToImageTileComponent)}
-      onShowAll={() => onSelectCategory(category)}
-      showAllIcon={<ArrowRight fontSize="small" />}
-      getColumnsFromWidth={getTutorialsColumnsFromWidth}
-      getLimitFromWidth={getTutorialsColumnsFromWidth}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <ImageTileRow
+          title={TUTORIAL_CATEGORY_TEXTS[category].title}
+          description={TUTORIAL_CATEGORY_TEXTS[category].description}
+          items={tutorials
+            .filter(tutorial => tutorial.category === category)
+            .map(tutorial =>
+              formatTutorialToImageTileComponent(i18n, tutorial)
+            )}
+          onShowAll={() => onSelectCategory(category)}
+          showAllIcon={<ArrowRight fontSize="small" />}
+          getColumnsFromWidth={getTutorialsColumnsFromWidth}
+          getLimitFromWidth={getTutorialsColumnsFromWidth}
+        />
+      )}
+    </I18n>
   );
 
   return (
@@ -218,10 +226,9 @@ const MainPage = ({
                 <Trans>Guides and tutorials</Trans>
               </Text>
             </Column>
-            <Column noMargin>
+            <LineStackLayout noMargin>
               {windowWidth === 'large' && (
                 <FlatButton
-                  key="submit-example"
                   onClick={() => {
                     Window.openExternalURL(
                       'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
@@ -232,7 +239,21 @@ const MainPage = ({
                   label={<Trans>Submit your project as an example</Trans>}
                 />
               )}
-            </Column>
+              {windowWidth === 'large' && (
+                <FlatButton
+                  onClick={() => {
+                    Window.openExternalURL(
+                      'https://airtable.com/shrv295oHlsuS69el'
+                    );
+                  }}
+                  primary
+                  leftIcon={<TranslateIcon />}
+                  label={
+                    <Trans>Submit a tutorial translated in your language</Trans>
+                  }
+                />
+              )}
+            </LineStackLayout>
           </LineStackLayout>
           <Line noMargin>
             <Text noMargin>

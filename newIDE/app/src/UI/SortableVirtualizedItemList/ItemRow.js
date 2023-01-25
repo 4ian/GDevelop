@@ -18,6 +18,7 @@ import GDevelopThemeContext from '../Theme/ThemeContext';
 const styles = {
   textField: {
     top: noMarginTextFieldInListItemTopOffset,
+    fontSize: 14,
   },
 };
 

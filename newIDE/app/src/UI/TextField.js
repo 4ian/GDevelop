@@ -6,6 +6,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
 import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =
   // Support "text" and "password" type:
@@ -69,6 +70,7 @@ type Props = {|
   hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
+  dataset?: HTMLDataset,
 
   // Keyboard focus:
   autoFocus?: 'desktop' | 'desktopAndMobileDevices',
@@ -94,7 +96,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 14 | 18 | '1.3em',
+    fontSize?: 14 | 18 | '1.3em' | 'inherit', // 'inherit' should only be used on an event sheet where font size is adapted to zoom.
     fontStyle?: 'normal' | 'italic',
     width?: number | '30%' | '70%' | '100%',
     flex?: 1,
@@ -109,10 +111,8 @@ type Props = {|
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
-    lineHeight?: 1.4 | 1.5,
     padding?: 0,
   |},
-  underlineFocusStyle?: {| borderColor: string |}, // TODO
   underlineShow?: boolean,
 |};
 
@@ -168,7 +168,7 @@ export const computeTextFieldStyleProps = (props: {
 };
 
 export type TextFieldInterface = {|
-  focus: () => void,
+  focus: (?{ caretPosition: 'end' }) => void,
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
@@ -181,9 +181,17 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
 
-  const focus = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+  const focus = (options: ?{ caretPosition: 'end' }) => {
+    const { current: input } = inputRef;
+    if (input) {
+      input.focus();
+
+      if (options && options.caretPosition === 'end' && props.value) {
+        input.setSelectionRange(
+          props.value.toString().length,
+          props.value.toString().length
+        );
+      }
     }
   };
 
@@ -290,6 +298,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               min: props.min,
               step: props.step,
               style: props.inputStyle,
+              ...dataObjectToProps(props.dataset),
             },
             // Input adornment:
             endAdornment: props.endAdornment ? (

@@ -11,6 +11,7 @@
 
 #include "GDCore/Project/ExtensionProperties.h"
 #include "GDCore/Project/LoadingScreen.h"
+#include "GDCore/Project/Watermark.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
@@ -119,6 +120,16 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Get the author ids of the project, to modify them (non-const).
    */
   std::vector<gd::String>& GetAuthorIds() { return authorIds; };
+
+  /**
+   * \brief Get the author usernames of the project.
+   */
+  const std::vector<gd::String>& GetAuthorUsernames() const { return authorUsernames; };
+
+  /**
+   * \brief Get the author usernames of the project, to modify them (non-const).
+   */
+  std::vector<gd::String>& GetAuthorUsernames() { return authorUsernames; };
 
   /**
    * Define the project as playable with a keyboard.
@@ -255,6 +266,16 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return a reference to loading screen setup for the project
    */
   const gd::LoadingScreen& GetLoadingScreen() const { return loadingScreen; }
+
+  /**
+   * \brief Return a reference to watermark setup for the project
+   */
+  gd::Watermark& GetWatermark() { return watermark; }
+
+  /**
+   * \brief Return a reference to watermark setup for the project
+   */
+  const gd::Watermark& GetWatermark() const { return watermark; }
 
   /**
    * Change game's main window default width.
@@ -1044,6 +1065,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::vector<gd::String>
       authorIds;           ///< Game author ids, from GDevelop users DB.
   std::vector<gd::String>
+      authorUsernames;     ///< Game author usernames, from GDevelop users DB.
+  std::vector<gd::String>
       categories;           ///< Game categories
   bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.
   bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
@@ -1062,6 +1085,7 @@ class GD_CORE_API Project : public ObjectsContainer {
       currentPlatform;  ///< The platform being used to edit the project.
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
+  gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
   ExtensionProperties

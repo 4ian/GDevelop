@@ -70,6 +70,7 @@ import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
+import debounce from 'lodash/debounce';
 
 const gd: libGDevelop = global.gd;
 
@@ -125,8 +126,10 @@ type State = {|
   setupGridOpen: boolean,
   scenePropertiesDialogOpen: boolean,
   layersListOpen: boolean,
-  layerRemoveDialogOpen: boolean,
-  onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
+  onCloseLayerRemoveDialog: ?(
+    doRemove: boolean,
+    newLayer: string | null
+  ) => void,
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
@@ -183,7 +186,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       setupGridOpen: false,
       scenePropertiesDialogOpen: false,
       layersListOpen: false,
-      layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
       editedLayer: null,
@@ -417,6 +419,22 @@ export default class SceneEditor extends React.Component<Props, State> {
       instancesEditorSettings,
     });
   };
+
+  /**
+   * Debounced version of `setInstancesEditorSettings` to be called when the
+   * settings have been mutated. The `InstancesEditor` can mutate these settings
+   * very quickly (the zoom factor changes 60 times per second when the user does a
+   * "pinch to zoom"). In this case, we don't want to have the React updates to be a
+   * bottleneck. We let the mutations be done and trigger an update only when the user
+   * is done.
+   */
+  _onInstancesEditorSettingsMutated = debounce(
+    (instancesEditorSettings: InstancesEditorSettings) => {
+      this.setInstancesEditorSettings(instancesEditorSettings);
+    },
+    1000,
+    { leading: false, trailing: true }
+  );
 
   undo = () => {
     // TODO: Do not clear selection so that the user can actually see
@@ -662,12 +680,14 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
     this.setState({
-      layerRemoveDialogOpen: true,
       layerRemoved: layerName,
-      onCloseLayerRemoveDialog: (doRemove, newLayer) => {
+      onCloseLayerRemoveDialog: (
+        doRemove: boolean,
+        newLayer: string | null
+      ) => {
         this.setState(
           {
-            layerRemoveDialogOpen: false,
+            layerRemoved: null,
           },
           () => {
             if (doRemove) {
@@ -1421,7 +1441,9 @@ export default class SceneEditor extends React.Component<Props, State> {
             layout={layout}
             initialInstances={initialInstances}
             instancesEditorSettings={this.state.instancesEditorSettings}
-            onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
+            onInstancesEditorSettingsMutated={
+              this._onInstancesEditorSettingsMutated
+            }
             instancesSelection={this.instancesSelection}
             onInstancesAdded={this._onInstancesAdded}
             onInstancesSelected={this._onInstancesSelected}
@@ -1778,7 +1800,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               }}
             />
           )}
-        {!!this.state.layerRemoveDialogOpen && (
+        {!!this.state.layerRemoved && this.state.onCloseLayerRemoveDialog && (
           <LayerRemoveDialog
             open
             layersContainer={layout}

@@ -8,7 +8,10 @@ import {
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type StorageProvider } from '../ProjectsStorage';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { updateResourceJsonMetadata } from './ResourceUtils';
+import {
+  applyResourceDefaults,
+  updateResourceJsonMetadata,
+} from './ResourceUtils';
 import { convertDataURLtoBlob } from '../Utils/BlobDownloader';
 
 /**
@@ -160,6 +163,7 @@ export const saveBlobUrlsFromExternalEditorBase64Resources = async ({
             extension,
           })
         );
+        applyResourceDefaults(project, newResource);
         resourcesManager.addResource(newResource);
         newResource.delete();
 

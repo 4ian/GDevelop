@@ -24,6 +24,7 @@ import Cross from './CustomSvgIcons/Cross';
 import GDevelopThemeContext from './Theme/ThemeContext';
 import { type GDevelopTheme } from './Theme';
 import { useDebounce } from '../Utils/UseDebounce';
+import { dataObjectToProps } from '../Utils/HTMLDataset';
 
 type TagsHandler = {|
   remove: string => void,
@@ -129,8 +130,12 @@ const getStyles = ({
     },
     searchContainer: {
       position: 'relative',
-      margin: 'auto 4px',
+      display: 'flex',
       width: '100%',
+    },
+    inputContainer: {
+      margin: 'auto 4px',
+      flex: 1,
     },
     popperContainer: {
       left: `-${leftIconSpace}px`,
@@ -368,68 +373,75 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                 <div style={styles.iconButtonSearch.container}>
                   <Search style={styles.iconButtonSearch.iconStyle} />
                 </div>
-                <div style={styles.searchContainer}>
-                  {tags ? (
-                    <Autocomplete
-                      id={id}
-                      options={tags}
-                      freeSolo
-                      fullWidth
-                      defaultValue=""
-                      inputValue={value}
-                      value={autocompleteValue}
-                      onChange={handleAutocompleteInput}
-                      onInputChange={handleAutocompleteInputChange}
-                      onKeyPress={handleKeyPressed}
-                      onBlur={handleBlur}
-                      onFocus={handleFocus}
-                      getOptionDisabled={option =>
-                        option.disabled ||
-                        (!!tagsHandler && !!tagsHandler.chosenTags.has(option))
-                      }
-                      getOptionSelected={(option, _) =>
-                        !!tagsHandler && tagsHandler.chosenTags.has(option)
-                      }
-                      PopperComponent={props => (
-                        <div style={styles.popperContainer}>
-                          {props.children}
-                        </div>
-                      )}
-                      renderOption={option => <Text noMargin>{option}</Text>}
-                      renderInput={params => (
-                        <MuiTextField
-                          margin="none"
-                          {...params}
-                          autoFocus={shouldAutoFocusTextField}
-                          inputRef={textField}
-                          InputProps={{
-                            ...params.InputProps,
-                            disableUnderline: true,
-                            endAdornment: null,
-                            placeholder: i18n._(placeholder || t`Search`),
-                            style: styles.inputStyle,
-                          }}
-                        />
-                      )}
-                    />
-                  ) : (
-                    <TextField
-                      id={id}
-                      margin="none"
-                      translatableHintText={placeholder || t`Search`}
-                      onBlur={handleBlur}
-                      value={value}
-                      onChange={handleInput}
-                      onKeyUp={handleKeyPressed}
-                      fullWidth
-                      underlineShow={false}
-                      disabled={disabled}
-                      ref={textField}
-                      inputStyle={styles.inputStyle}
-                      onFocus={handleFocus}
-                      autoFocus={autoFocus}
-                    />
-                  )}
+                <div
+                  style={styles.searchContainer}
+                  {...dataObjectToProps({ searchBarContainer: 'true' })}
+                >
+                  <div style={styles.inputContainer}>
+                    {tags ? (
+                      <Autocomplete
+                        id={id}
+                        options={tags}
+                        freeSolo
+                        fullWidth
+                        defaultValue=""
+                        inputValue={value}
+                        value={autocompleteValue}
+                        onChange={handleAutocompleteInput}
+                        onInputChange={handleAutocompleteInputChange}
+                        onKeyPress={handleKeyPressed}
+                        onBlur={handleBlur}
+                        onFocus={handleFocus}
+                        getOptionDisabled={option =>
+                          option.disabled ||
+                          (!!tagsHandler &&
+                            !!tagsHandler.chosenTags.has(option))
+                        }
+                        getOptionSelected={(option, _) =>
+                          !!tagsHandler && tagsHandler.chosenTags.has(option)
+                        }
+                        PopperComponent={props => (
+                          <div style={styles.popperContainer}>
+                            {props.children}
+                          </div>
+                        )}
+                        renderOption={option => <Text noMargin>{option}</Text>}
+                        renderInput={params => (
+                          <MuiTextField
+                            margin="none"
+                            {...params}
+                            autoFocus={shouldAutoFocusTextField}
+                            inputRef={textField}
+                            InputProps={{
+                              ...params.InputProps,
+                              disableUnderline: true,
+                              endAdornment: null,
+                              placeholder: i18n._(placeholder || t`Search`),
+                              style: styles.inputStyle,
+                            }}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <TextField
+                        id={id}
+                        margin="none"
+                        dataset={{ searchBar: 'true' }}
+                        translatableHintText={placeholder || t`Search`}
+                        onBlur={handleBlur}
+                        value={value}
+                        onChange={handleInput}
+                        onKeyUp={handleKeyPressed}
+                        fullWidth
+                        underlineShow={false}
+                        disabled={disabled}
+                        ref={textField}
+                        inputStyle={styles.inputStyle}
+                        onFocus={handleFocus}
+                        autoFocus={autoFocus}
+                      />
+                    )}
+                  </div>
                 </div>
                 {buildMenuTemplate && (
                   <ElementWithMenu

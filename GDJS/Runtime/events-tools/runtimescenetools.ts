@@ -300,6 +300,15 @@ namespace gdjs {
           false
         );
       };
+
+      /**
+       * Check if the game has just resumed from being hidden
+       */
+      export const hasGameJustResumed = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        return instanceContainer.getGame().hasJustResumed();
+      };
     }
   }
 }

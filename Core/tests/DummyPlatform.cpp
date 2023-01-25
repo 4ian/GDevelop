@@ -187,7 +187,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetDefaultValue("\"\"")
       .AddParameter("camera", _("Camera"), "", true)
       .SetDefaultValue("0")
-      .SetFunctionName("getMouseX");
+      .SetFunctionName("getCursorX");
   extension
       ->AddExpression("GetGlobalVariableAsNumber",
                       "Get me a global variable value",

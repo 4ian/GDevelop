@@ -11,7 +11,7 @@
 namespace gd {
 
 LoadingScreen::LoadingScreen()
-    : showGDevelopSplash(true),
+    : showGDevelopLogoDuringLoadingScreen(false),
       gdevelopLogoStyle("light"),
       backgroundImageResourceName(""),
       backgroundColor(0),
@@ -27,7 +27,7 @@ LoadingScreen::LoadingScreen()
       progressBarColor(0xFFFFFF){};
 
 void LoadingScreen::SerializeTo(SerializerElement& element) const {
-  element.SetAttribute("showGDevelopSplash", showGDevelopSplash);
+  element.SetAttribute("showGDevelopSplash", showGDevelopLogoDuringLoadingScreen);
   element.SetAttribute("gdevelopLogoStyle",
                        gdevelopLogoStyle);
   element.SetAttribute("backgroundImageResourceName",
@@ -46,7 +46,7 @@ void LoadingScreen::SerializeTo(SerializerElement& element) const {
 }
 
 void LoadingScreen::UnserializeFrom(const SerializerElement& element) {
-  showGDevelopSplash = element.GetBoolAttribute("showGDevelopSplash", true);
+  showGDevelopLogoDuringLoadingScreen = element.GetBoolAttribute("showGDevelopSplash", true);
   gdevelopLogoStyle =
       element.GetStringAttribute("gdevelopLogoStyle", "light");
   backgroundImageResourceName =

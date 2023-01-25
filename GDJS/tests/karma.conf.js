@@ -11,7 +11,7 @@ module.exports = function (config) {
   ];
 
   config.set({
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'sinon'],
     browserNoActivityTimeout: 400000,
     browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
     plugins: [
@@ -19,6 +19,7 @@ module.exports = function (config) {
       require('@chiragrupani/karma-chromium-edge-launcher'),
       require('karma-firefox-launcher'),
       require('karma-mocha'),
+      require('karma-sinon'),
     ],
     client: {
       mocha: {
@@ -59,6 +60,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/timer.js',
       './newIDE/app/resources/GDJS/Runtime/inputmanager.js',
       './newIDE/app/resources/GDJS/Runtime/runtimegame.js',
+      './newIDE/app/resources/GDJS/Runtime/runtimewatermark.js',
       './newIDE/app/resources/GDJS/Runtime/variable.js',
       './newIDE/app/resources/GDJS/Runtime/variablescontainer.js',
       './newIDE/app/resources/GDJS/Runtime/oncetriggers.js',
@@ -131,6 +133,7 @@ module.exports = function (config) {
       // Other test initialization files:
       './GDJS/tests/tests-utils/init.js',
       './GDJS/tests/tests-utils/init.pixiruntimegamewithassets.js',
+      './GDJS/tests/tests-utils/init.pixiruntimegame.js',
 
       // Test helpers
       './Extensions/PlatformBehavior/tests/PlatformerTestHelper.js',

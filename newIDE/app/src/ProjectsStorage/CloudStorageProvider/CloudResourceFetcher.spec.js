@@ -98,7 +98,7 @@ describe('CloudResourceFetcher', () => {
           url: 'blob:http://something.com/123456',
           resource: blobResourceToUpload,
           filename:
-            "My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
+            "My Blob Resource To Download with 汉字 and funk¥__character__'_.png",
         },
         blob: 'some blob',
         error: null,
@@ -123,7 +123,7 @@ describe('CloudResourceFetcher', () => {
       },
       {
         url:
-          "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
+          "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character__'_.png",
         error: null,
       },
     ]);
@@ -143,7 +143,7 @@ describe('CloudResourceFetcher', () => {
           url: 'blob:http://something.com/123456',
           resource: expect.any(gd.Resource),
           filename:
-            "My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
+            "My Blob Resource To Download with 汉字 and funk¥__character__'_.png",
         },
       ],
       onProgress: expect.any(Function), // onProgress
@@ -165,7 +165,7 @@ describe('CloudResourceFetcher', () => {
             url: 'blob:http://something.com/123456',
             resource: expect.any(gd.Resource),
             filename:
-              "My Blob Resource To Download with 汉字 and funk¥__character$_'_.png",
+              "My Blob Resource To Download with 汉字 and funk¥__character__'_.png",
           },
           blob: 'some blob',
           error: null,
@@ -195,7 +195,7 @@ describe('CloudResourceFetcher', () => {
       .getResourcesManager()
       .getResource(blobResourceName);
     expect(updatedBlobResource.getFile()).toBe(
-      "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character$_'_.png"
+      "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character__'_.png"
     );
   });
 });

@@ -306,10 +306,14 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
 
       // Replace leaderboards in events.
       if (Object.keys(replacedLeaderboardsMap).length) {
+        const renamedLeaderboardsMap = toNewGdMapStringString(
+          replacedLeaderboardsMap
+        );
         const eventsLeaderboardReplacer = new gd.EventsLeaderboardsRenamer(
           project,
-          toNewGdMapStringString(replacedLeaderboardsMap)
+          renamedLeaderboardsMap
         );
+        renamedLeaderboardsMap.delete();
 
         gd.WholeProjectRefactorer.exposeProjectEvents(
           project,

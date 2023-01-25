@@ -268,9 +268,19 @@ export default class ExportLauncher extends Component<Props, State> {
       const preparedExporter = await exportPipeline.prepareExporter(
         exportPipelineContext
       );
+      const { profile } = authenticatedUser;
+
+      const fallbackAuthor = profile
+        ? {
+            username: profile.username || '',
+            id: profile.id,
+          }
+        : undefined;
+
       const exportOutput = await exportPipeline.launchExport(
         exportPipelineContext,
-        preparedExporter
+        preparedExporter,
+        fallbackAuthor
       );
       setStep('resources-download');
       // TODO: use a GenericRetryableProcessWithProgressDialog to show errors

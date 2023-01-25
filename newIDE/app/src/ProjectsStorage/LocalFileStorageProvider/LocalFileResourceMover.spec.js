@@ -285,7 +285,7 @@ describe('LocalResourceMover', () => {
         // No extension because none was specified, and the filename is inferred.
         path.join(
           'assets',
-          "My Blob Resource To Download with 汉字 and funk¥__character$_'_"
+          "My Blob Resource To Download with 汉字 and funk¥__character__'_"
         )
       );
       expect(

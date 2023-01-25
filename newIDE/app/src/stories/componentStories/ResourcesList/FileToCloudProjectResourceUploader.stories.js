@@ -36,6 +36,25 @@ export const Default = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => CloudStorageProvider}
+      automaticallyOpenInput={false}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
+export const AutomaticallyOpenInput = () => (
+  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <FileToCloudProjectResourceUploader
+      project={testProject.project}
+      createNewResource={() => new gd.ImageResource()}
+      onChooseResources={action('onChooseResources')}
+      options={{
+        initialSourceName: 'unused',
+        multiSelection: true,
+        resourceKind: 'image',
+      }}
+      fileMetadata={{ fileIdentifier: 'fake-identifier' }}
+      getStorageProvider={() => CloudStorageProvider}
+      automaticallyOpenInput
     />
   </AuthenticatedUserContext.Provider>
 );
@@ -53,6 +72,7 @@ export const SingleFile = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => CloudStorageProvider}
+      automaticallyOpenInput={false}
     />
   </AuthenticatedUserContext.Provider>
 );
@@ -70,6 +90,7 @@ export const IncompatibleStorageProvider = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => UrlStorageProvider}
+      automaticallyOpenInput={false}
     />
   </AuthenticatedUserContext.Provider>
 );
@@ -89,6 +110,7 @@ export const NotAuthenticatedUser = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => UrlStorageProvider}
+      automaticallyOpenInput={false}
     />
   </AuthenticatedUserContext.Provider>
 );

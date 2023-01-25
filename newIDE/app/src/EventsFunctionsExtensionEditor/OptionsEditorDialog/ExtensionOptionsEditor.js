@@ -296,10 +296,12 @@ export const ExtensionOptionsEditor = ({
           />
           <UsersAutocomplete
             userIds={eventsFunctionsExtension.getAuthorIds().toJSArray()}
-            onChange={userIds => {
+            onChange={userIdAndUsernames => {
               const projectAuthorIds = eventsFunctionsExtension.getAuthorIds();
               projectAuthorIds.clear();
-              userIds.forEach(userId => projectAuthorIds.push_back(userId));
+              userIdAndUsernames.forEach(userIdAndUsername =>
+                projectAuthorIds.push_back(userIdAndUsername.userId)
+              );
             }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={

@@ -2,12 +2,7 @@
 
 describe('gdjs.evtTools.object', function () {
   it('can count picked instances of objects', function () {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore TODO: make a function to create an empty game and use it across tests.
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
     const objectA1 = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -61,12 +56,7 @@ describe('gdjs.evtTools.object', function () {
   });
 
   it('can count instances of objects living on the scene', function () {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore TODO: make a function to create an empty game and use it across tests.
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
     const objectA1 = new gdjs.TestRuntimeObject(runtimeScene, {

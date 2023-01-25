@@ -87,6 +87,10 @@ export function getMuiOverrides({
         padding: 0,
         paddingBottom: 3,
       },
+      multiline: {
+        padding: 0,
+        paddingBottom: 3,
+      },
       underline: {
         '&:before': {
           borderBottom: `1px solid ${inputBorderBottomColor}`,

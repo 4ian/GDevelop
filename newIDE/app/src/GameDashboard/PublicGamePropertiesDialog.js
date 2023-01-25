@@ -30,6 +30,7 @@ type PublicProjectProperties = {|
   categories: string[],
   description: string,
   authorIds: string[],
+  authorUsernames: string[],
   playWithKeyboard: boolean,
   playWithGamepad: boolean,
   playWithMobile: boolean,
@@ -41,7 +42,13 @@ export const applyPublicPropertiesToProject = (
   newProperties: PublicProjectProperties
 ) => {
   const t = str => str; //TODO
-  const { name, authorIds, description, categories } = newProperties;
+  const {
+    name,
+    authorIds,
+    authorUsernames,
+    description,
+    categories,
+  } = newProperties;
   project.setName(name);
   const projectCategories = project.getCategories();
   projectCategories.clear();
@@ -50,6 +57,11 @@ export const applyPublicPropertiesToProject = (
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  const projectAuthorUsernames = project.getAuthorUsernames();
+  projectAuthorUsernames.clear();
+  authorUsernames.forEach(authorUsername =>
+    projectAuthorUsernames.push_back(authorUsername)
+  );
   project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
   project.setPlayableWithGamepad(newProperties.playWithGamepad);
   project.setPlayableWithMobile(newProperties.playWithMobile);
@@ -76,12 +88,18 @@ export const PublicGamePropertiesDialog = ({
   const { profile } = React.useContext(AuthenticatedUserContext);
 
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
+  const publicGameAuthorUsernames = publicGame.authors
+    .map(author => author.username)
+    .filter(Boolean);
   const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
   const [categories, setCategories] = React.useState(publicGame.categories);
   const [description, setDescription] = React.useState(publicGame.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
+  );
+  const [authorUsernames, setAuthorUsernames] = React.useState<string[]>(
+    publicGameAuthorUsernames
   );
   const [ownerIds, setOwnerIds] = React.useState<string[]>(publicGameOwnerIds);
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
@@ -111,6 +129,7 @@ export const PublicGamePropertiesDialog = ({
         categories: categories || [],
         description: description || '',
         authorIds,
+        authorUsernames,
         playWithKeyboard: !!playWithKeyboard,
         playWithGamepad: !!playWithGamepad,
         playWithMobile: !!playWithMobile,
@@ -157,6 +176,7 @@ export const PublicGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        setAuthorUsernames={setAuthorUsernames}
         ownerIds={ownerIds}
         setOwnerIds={setOwnerIds}
         setPlayableWithKeyboard={setPlayableWithKeyboard}

@@ -165,6 +165,10 @@ import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialPro
 import TabsTitlebar from './TabsTitlebar';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import RouterContext from './RouterContext';
+import {
+  useStableUpToDateCallback,
+  useStableUpToDateRef,
+} from '../Utils/UseStableUpToDateCallback';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -213,7 +217,7 @@ const findStorageProviderFor = (
  * It is useful to detect if the project stored in a variable is still
  * valid (still currently opened). If it's not, it means the variable is "stale".
  */
-const isCurrentProjectStale = (
+const isCurrentProjectFresh = (
   currentProjectRef: {| current: ?gdProject |},
   currentProject: gdProject
 ) =>
@@ -408,14 +412,6 @@ const MainFrame = (props: Props) => {
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
 
-  /** This reference is useful to get the current opened project,
-   * even in the callback of a hook/promise - without risking to read "stale" data.
-   * This can be different from the `currentProject` (coming from the state)
-   * that an effect or a callback manipulates when a promise resolves for instance.
-   * See `isCurrentProjectStale`.
-   */
-  const currentProjectRef = React.useRef<?gdProject>(null);
-
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -452,12 +448,19 @@ const MainFrame = (props: Props) => {
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
 
-  React.useEffect(
-    () => {
-      currentProjectRef.current = currentProject;
-    },
-    [currentProject]
-  );
+  /**
+   * This reference is useful to get the current opened project,
+   * even in the callback of a hook/promise - without risking to read "stale" data.
+   * This can be different from the `currentProject` (coming from the state)
+   * that an effect or a callback manipulates when a promise resolves for instance.
+   * See `isCurrentProjectFresh`.
+   */
+  const currentProjectRef = useStableUpToDateRef(currentProject);
+
+  /**
+   * Similar to `currentProjectRef`, an always fresh reference to the latest `currentFileMetadata`.
+   */
+  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
 
   React.useEffect(
     () => {
@@ -764,13 +767,13 @@ const MainFrame = (props: Props) => {
         //   to this base URL and which will be converted to full URLs.
         // ...
         // See `ResourceFetcher` for all the cases.
-        await ensureResourcesAreFetched({
+        await ensureResourcesAreFetched(() => ({
           project,
           fileMetadata,
           storageProvider,
           storageProviderOperations,
           authenticatedUser,
-        });
+        }));
       }
 
       return state;
@@ -1365,6 +1368,13 @@ const MainFrame = (props: Props) => {
       // from the user.
       findAndLogProjectPreviewErrors(currentProject);
 
+      const fallbackAuthor = authenticatedUser.profile
+        ? {
+            username: authenticatedUser.profile.username || '',
+            id: authenticatedUser.profile.id,
+          }
+        : null;
+
       eventsFunctionsExtensionsState
         .ensureLoadFinished()
         .then(() =>
@@ -1376,6 +1386,7 @@ const MainFrame = (props: Props) => {
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
             fullLoadingScreen: !!fullLoadingScreen,
+            fallbackAuthor,
             getIsMenuBarHiddenInPreview:
               preferences.getIsMenuBarHiddenInPreview,
             getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
@@ -1402,6 +1413,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
+      authenticatedUser.profile,
     ]
   );
 
@@ -2004,7 +2016,7 @@ const MainFrame = (props: Props) => {
         // Ensure resources are re-loaded from their new location.
         ResourcesLoader.burstAllUrlsCache();
 
-        if (isCurrentProjectStale(currentProjectRef, currentProject)) {
+        if (isCurrentProjectFresh(currentProjectRef, currentProject)) {
           // We do not want to change the current file metadata if the
           // project has changed since the beginning of the save, which
           // can happen if another project was loaded in the meantime.
@@ -2032,6 +2044,7 @@ const MainFrame = (props: Props) => {
       i18n,
       isSavingProject,
       currentProject,
+      currentProjectRef,
       currentFileMetadata,
       getStorageProviderOperations,
       unsavedChanges,
@@ -2134,7 +2147,7 @@ const MainFrame = (props: Props) => {
               fileMetadataAndStorageProviderName,
             });
           }
-          if (isCurrentProjectStale(currentProjectRef, currentProject)) {
+          if (isCurrentProjectFresh(currentProjectRef, currentProject)) {
             // We do not want to change the current file metadata if the
             // project has changed since the beginning of the save, which
             // can happen if another project was loaded in the meantime.
@@ -2162,6 +2175,7 @@ const MainFrame = (props: Props) => {
     [
       isSavingProject,
       currentProject,
+      currentProjectRef,
       currentFileMetadata,
       getStorageProviderOperations,
       _showSnackMessage,
@@ -2586,28 +2600,35 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const onFetchNewlyAddedResources = React.useCallback(
+  const fetchNewlyAddedResources = React.useCallback(
     async (): Promise<void> => {
-      if (!currentProject || !currentFileMetadata) return;
+      if (!currentProjectRef.current || !currentFileMetadataRef.current) return;
 
-      const storageProvider = getStorageProvider();
-      const storageProviderOperations = getStorageProviderOperations();
-      await ensureResourcesAreFetched({
-        project: currentProject,
-        fileMetadata: currentFileMetadata,
-        storageProvider,
-        storageProviderOperations,
+      await ensureResourcesAreFetched(() => ({
+        // Use the refs to the `currentProject` and `currentFileMetadata` to ensure
+        // that we never fetch resources for a stale project or file metadata, even
+        // if it changed in the meantime (like, a save took a long time before updating
+        // the fileMetadata).
+        project: currentProjectRef.current,
+        fileMetadata: currentFileMetadataRef.current,
+        storageProvider: getStorageProvider(),
+        storageProviderOperations: getStorageProviderOperations(),
         authenticatedUser,
-      });
+      }));
     },
     [
-      currentProject,
-      currentFileMetadata,
+      currentProjectRef,
+      currentFileMetadataRef,
       ensureResourcesAreFetched,
       getStorageProvider,
       getStorageProviderOperations,
       authenticatedUser,
     ]
+  );
+
+  /** (Stable) callback to launch the fetching of the resources of the project. */
+  const onFetchNewlyAddedResources = useStableUpToDateCallback(
+    fetchNewlyAddedResources
   );
 
   useKeyboardShortcuts(

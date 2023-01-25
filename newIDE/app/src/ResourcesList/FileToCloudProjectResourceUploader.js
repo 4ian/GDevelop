@@ -1,11 +1,14 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import React from 'react';
-import { type ChooseResourceOptions } from './ResourceSource';
+import * as React from 'react';
+import {
+  allResourceKindsAndMetadata,
+  type ChooseResourceOptions,
+  type ResourceKind,
+} from './ResourceSource';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import RaisedButton from '../UI/RaisedButton';
 import {
   type UploadedProjectResourceFiles,
   uploadProjectResourceFiles,
@@ -24,17 +27,32 @@ type FileToCloudProjectResourceUploaderProps = {
   getStorageProvider: () => StorageProvider,
   onChooseResources: (resources: Array<gdResource>) => void,
   createNewResource: () => gdResource,
+  automaticallyOpenInput: boolean,
 };
 
-const resourceKindToInputAcceptedFiles = {
-  audio: 'audio/aac,audio/x-wav,audio/mpeg,audio/mp3,audio/ogg',
-  image: 'image/jpeg,image/png,image/webp',
-  font: 'font/ttf,font/otf',
-  video: 'video/mp4,video/webm',
-  json: 'application/json',
-  tilemap: 'application/json',
-  tileset: 'application/json',
-  bitmapFont: '.fnt,.xml',
+const resourceKindToInputAcceptedMimes = {
+  audio: ['audio/aac', 'audio/x-wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg'],
+  image: ['image/jpeg', 'image/png', 'image/webp'],
+  font: ['font/ttf', 'font/otf'],
+  video: ['video/mp4', 'video/webm'],
+  json: ['application/json'],
+  tilemap: ['application/json'],
+  tileset: ['application/json'],
+  bitmapFont: [],
+};
+
+export const getInputAcceptedMimesAndExtensions = (
+  resourceKind: ResourceKind
+) => {
+  const resourceKindMetadata =
+    allResourceKindsAndMetadata.find(({ kind }) => kind === resourceKind) ||
+    null;
+  const acceptedExtensions = resourceKindMetadata
+    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
+    : [];
+  const acceptedMimes = resourceKindToInputAcceptedMimes[resourceKind] || [];
+
+  return [...acceptedMimes, ...acceptedExtensions].join(',');
 };
 
 export const FileToCloudProjectResourceUploader = ({
@@ -43,8 +61,10 @@ export const FileToCloudProjectResourceUploader = ({
   getStorageProvider,
   onChooseResources,
   createNewResource,
+  automaticallyOpenInput,
 }: FileToCloudProjectResourceUploaderProps) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
+  const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -126,11 +146,32 @@ export const FileToCloudProjectResourceUploader = ({
   const isConnected = !!authenticatedUser.authenticated;
   const canChooseFiles =
     !isUploading && isConnected && canUploadWithThisStorageProvider;
+
+  // Automatically open the input once, at the first render, if asked.
+  React.useLayoutEffect(
+    () => {
+      if (automaticallyOpenInput && !hasAutomaticallyOpenedInput.current) {
+        hasAutomaticallyOpenedInput.current = true;
+        if (inputRef.current) inputRef.current.click();
+      }
+    },
+    [automaticallyOpenInput]
+  );
+
+  // Start uploading after choosing some files (if there are no errors).
   const canUploadFiles =
     !isUploading &&
     canChooseFiles &&
     hasSelectedFiles &&
     invalidFiles.length === 0;
+  React.useEffect(
+    () => {
+      if (canUploadFiles) {
+        onUpload();
+      }
+    },
+    [canUploadFiles, onUpload]
+  );
 
   return (
     <ColumnStackLayout noMargin>
@@ -153,7 +194,7 @@ export const FileToCloudProjectResourceUploader = ({
         <Line expand>
           <Column expand>
             <input
-              accept={resourceKindToInputAcceptedFiles[options.resourceKind]}
+              accept={getInputAcceptedMimesAndExtensions(options.resourceKind)}
               style={{
                 color: gdevelopTheme.text.color.primary,
               }}
@@ -190,22 +231,10 @@ export const FileToCloudProjectResourceUploader = ({
           </AlertMessage>
         );
       })}
-      <LineStackLayout alignItems="center" justifyContent="flex-end" expand>
+      <LineStackLayout alignItems="center" justifyContent="stretch" expand>
         {isUploading ? (
           <LinearProgress expand value={uploadProgress} variant="determinate" />
         ) : null}
-        <RaisedButton
-          onClick={onUpload}
-          disabled={!canUploadFiles}
-          primary
-          label={
-            options.multiSelection ? (
-              <Trans>Add selected file(s)</Trans>
-            ) : (
-              <Trans>Add selected file</Trans>
-            )
-          }
-        />
       </LineStackLayout>
     </ColumnStackLayout>
   );

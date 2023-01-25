@@ -107,15 +107,21 @@ export const localElectronExportPipeline: ExportPipeline<
 
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, localFileSystem }: PreparedExporter
+    { exporter, localFileSystem }: PreparedExporter,
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
-    const exportOptions = new gd.MapStringBoolean();
-    exportOptions.set('exportForElectron', true);
-    exporter.exportWholePixiProject(
+    const exportOptions = new gd.ExportOptions(
       context.project,
-      context.exportState.outputDir,
-      exportOptions
+      context.exportState.outputDir
     );
+    exportOptions.setTarget('electron');
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

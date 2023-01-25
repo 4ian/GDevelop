@@ -12,6 +12,7 @@ import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
+  businessPlan,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -290,9 +291,25 @@ export default function SubscriptionDialog({
                   actions={[button]}
                   isPending={isLoading}
                   isHighlighted={isCurrentPlan}
+                  background="medium"
                 />
               );
             })}
+            <PlanCard
+              plan={businessPlan}
+              actions={
+                <RaisedButton
+                  primary
+                  label={<Trans>Learn more</Trans>}
+                  onClick={() => {
+                    Window.openExternalURL('https://gdevelop.io/pricing');
+                  }}
+                />
+              }
+              isPending={false}
+              isHighlighted={false}
+              background="dark"
+            />
             <Column>
               <Line>
                 <EmptyMessage>

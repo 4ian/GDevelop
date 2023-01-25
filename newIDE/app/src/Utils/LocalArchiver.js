@@ -30,7 +30,7 @@ export const archiveLocalFolder = ({
     output.on('close', () => {
       const fileSize = archive.pointer();
       console.log(
-        `Archive written at ${outputFilename}, ${fileSize}} total bytes.`
+        `Archive written at ${outputFilename}, ${fileSize} total bytes.`
       );
       if (sizeLimit && fileSize > sizeLimit) {
         const roundFileSizeInMb = Math.round(fileSize / (1000 * 1000));

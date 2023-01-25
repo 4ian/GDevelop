@@ -285,13 +285,71 @@ namespace gdjs {
         return instanceContainer.getGame().getInputManager().isScrollingDown();
       };
 
+      /**
+       * @deprecated Use getCursorX instead.
+       */
       export const getMouseX = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
+        return getCursorX(instanceContainer, layer, camera);
+      };
+
+      /**
+       * @deprecated Use getCursorY instead.
+       */
+      export const getMouseY = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        return getCursorY(instanceContainer, layer, camera);
+      };
+
+      export const getCursorX = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getMouseX
+          gdjs.evtTools.input.getCursorX
+        ) as FloatPoint;
+        return instanceContainer
+          .getLayer(layer)
+          .convertCoords(
+            instanceContainer.getGame().getInputManager().getCursorX(),
+            instanceContainer.getGame().getInputManager().getCursorY(),
+            0,
+            workingPoint
+          )[0];
+      };
+
+      export const getCursorY = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getCursorY
+        ) as FloatPoint;
+        return instanceContainer
+          .getLayer(layer)
+          .convertCoords(
+            instanceContainer.getGame().getInputManager().getCursorX(),
+            instanceContainer.getGame().getInputManager().getCursorY(),
+            0,
+            workingPoint
+          )[1];
+      };
+
+      export const getMouseOnlyCursorX = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getMouseOnlyCursorX
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
@@ -303,13 +361,13 @@ namespace gdjs {
           )[0];
       };
 
-      export const getMouseY = function (
+      export const getMouseOnlyCursorY = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getMouseY
+          gdjs.evtTools.input.getMouseOnlyCursorY
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
@@ -389,7 +447,61 @@ namespace gdjs {
           )[1];
       };
 
+      /**
+       * @deprecated
+       */
       export const hasAnyTouchStarted = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        const startedTouchIdentifiers = instanceContainer
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers();
+        return (
+          startedTouchIdentifiers.length > 1 ||
+          (startedTouchIdentifiers.length > 0 &&
+            startedTouchIdentifiers[0] !== gdjs.InputManager.MOUSE_TOUCH_ID)
+        );
+      };
+
+      /**
+       * @deprecated
+       */
+      export const getStartedTouchCount = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): integer => {
+        const startedTouchIdentifiers = instanceContainer
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers();
+        return (
+          startedTouchIdentifiers.length +
+          (startedTouchIdentifiers.includes(gdjs.InputManager.MOUSE_TOUCH_ID)
+            ? -1
+            : 0)
+        );
+      };
+
+      /**
+       * @deprecated
+       */
+      export const getStartedTouchIdentifier = (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        index: integer
+      ): integer => {
+        const startedTouchIdentifiers = instanceContainer
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers();
+        const mouseIndex = startedTouchIdentifiers.indexOf(
+          gdjs.InputManager.MOUSE_TOUCH_ID
+        );
+        return mouseIndex < 0
+          ? startedTouchIdentifiers[index]
+          : startedTouchIdentifiers[index < mouseIndex ? index : index + 1];
+      };
+
+      export const hasAnyTouchOrMouseStarted = (
         instanceContainer: gdjs.RuntimeInstanceContainer
       ): boolean => {
         return (
@@ -400,7 +512,7 @@ namespace gdjs {
         );
       };
 
-      export const getStartedTouchCount = (
+      export const getStartedTouchOrMouseCount = (
         instanceContainer: gdjs.RuntimeInstanceContainer
       ): integer => {
         return instanceContainer
@@ -409,7 +521,7 @@ namespace gdjs {
           .getStartedTouchIdentifiers().length;
       };
 
-      export const getStartedTouchIdentifier = (
+      export const getStartedTouchOrMouseIdentifier = (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         index: integer
       ): integer => {

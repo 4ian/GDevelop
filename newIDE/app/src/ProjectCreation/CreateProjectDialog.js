@@ -59,7 +59,7 @@ export const createNewProject = async (): Promise<?NewProjectSource> => {
 
 export const createNewProjectWithDefaultLogin = async (): Promise<?NewProjectSource> => {
   const url =
-    'https://resources.gdevelop.io/examples-database/login-template.json';
+    'https://resources.gdevelop-app.com/examples-database/login-template.json';
   sendNewGameCreated({
     exampleUrl: url,
     exampleSlug: 'login-template',

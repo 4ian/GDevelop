@@ -1,10 +1,6 @@
 describe('Inventory', function () {
   it('Inventories can be serialized then unserialized with no data loss', () => {
-    var runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
     gdjs.evtTools.inventory.add(runtimeScene, 'MyInventory', 'sword');

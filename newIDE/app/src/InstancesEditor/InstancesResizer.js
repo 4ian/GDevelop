@@ -138,7 +138,8 @@ export default class InstancesResizer {
     deltaX: number,
     deltaY: number,
     grabbingLocation: ResizeGrabbingLocation,
-    proportional: boolean
+    proportional: boolean,
+    noGridSnap: boolean
   ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
@@ -166,7 +167,8 @@ export default class InstancesResizer {
     grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
     if (
       this.instancesEditorSettings.snap &&
-      this.instancesEditorSettings.grid
+      this.instancesEditorSettings.grid &&
+      !noGridSnap
     ) {
       roundPositionForResizing(
         grabbingPosition,

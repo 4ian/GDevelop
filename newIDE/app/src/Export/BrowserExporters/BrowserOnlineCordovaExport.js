@@ -105,13 +105,19 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   launchExport: (
     context: ExportPipelineContext<ExportState>,
-    { exporter, outputDir, abstractFileSystem }: PreparedExporter
+    { exporter, outputDir, abstractFileSystem }: PreparedExporter,
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
     const { project } = context;
-
-    const exportOptions = new gd.MapStringBoolean();
-    exportOptions.set('exportForCordova', true);
-    exporter.exportWholePixiProject(project, outputDir, exportOptions);
+    const exportOptions = new gd.ExportOptions(project, outputDir);
+    exportOptions.setTarget('cordova');
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

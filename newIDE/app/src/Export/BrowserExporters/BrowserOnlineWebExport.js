@@ -114,12 +114,18 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
 
   launchExport: (
     context: ExportPipelineContext<ExportState>,
-    { exporter, outputDir, abstractFileSystem }: PreparedExporter
+    { exporter, outputDir, abstractFileSystem }: PreparedExporter,
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
     const { project } = context;
-
-    const exportOptions = new gd.MapStringBoolean();
-    exporter.exportWholePixiProject(project, outputDir, exportOptions);
+    const exportOptions = new gd.ExportOptions(project, outputDir);
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

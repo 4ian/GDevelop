@@ -445,7 +445,7 @@ namespace gdjs {
      * Helper to add event listeners on a pressable/clickable element
      * to work on both desktop and mobile.
      */
-    export const addTouchAndClickEventListeners = function (
+    const addTouchAndClickEventListeners = function (
       element: HTMLElement,
       action: () => void
     ) {

@@ -18,7 +18,7 @@ import {
   type LeaderboardCustomizationSettings,
   type LeaderboardScoreFormattingTimeUnit,
 } from '../../Utils/GDevelopServices/Play';
-import { Spacer } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import {
   formatScore,
   orderedTimeUnits,
@@ -28,9 +28,11 @@ import AlertMessage from '../../UI/AlertMessage';
 import HelpButton from '../../UI/HelpButton';
 import ColorField from '../../UI/ColorField';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import GetSubscriptionCard from './GetSubscriptionCard';
+import GetSubscriptionCard from '../../Profile/Subscription/GetSubscriptionCard';
 import LeaderboardPlaygroundCard from './LeaderboardPlaygroundCard';
 import { rgbStringToHexString } from '../../Utils/ColorTransformer';
+import Link from '../../UI/Link';
+import Window from '../../Utils/Window';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -324,7 +326,30 @@ function LeaderboardAppearanceDialog({
               />
             </ResponsiveLineStackLayout>
             {!canUserCustomizeTheme ? (
-              <GetSubscriptionCard />
+              <GetSubscriptionCard subscriptionDialogOpeningReason="Leaderboard customization">
+                <Line>
+                  <Column noMargin>
+                    <Text noMargin>
+                      <Trans>
+                        Get a silver or gold subscription to unlock color
+                        customization.
+                      </Trans>
+                    </Text>
+                    <Link
+                      href="https://liluo.io/playground/test-leaderboard"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://liluo.io/playground/test-leaderboard'
+                        )
+                      }
+                    >
+                      <Text noMargin color="inherit">
+                        <Trans>Test it out!</Trans>
+                      </Text>
+                    </Link>
+                  </Column>
+                </Line>
+              </GetSubscriptionCard>
             ) : (
               <LeaderboardPlaygroundCard />
             )}

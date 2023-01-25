@@ -26,6 +26,11 @@ namespace gdjs {
     _clearColor: Array<integer>;
 
     /**
+     * Pixi doesn't sort children with zIndex == 0.
+     */
+    private static readonly zeroZOrder = Math.pow(2, -24);
+
+    /**
      * @param layer The layer
      * @param runtimeInstanceContainerRenderer The scene renderer
      */
@@ -137,9 +142,9 @@ namespace gdjs {
      * @param pixiChild The child (PIXI object) to be added.
      * @param zOrder The z order of the associated object.
      */
-    addRendererObject(pixiChild, zOrder: integer): void {
+    addRendererObject(pixiChild, zOrder: float): void {
       const child = pixiChild as PIXI.DisplayObject;
-      child.zIndex = zOrder;
+      child.zIndex = zOrder || LayerPixiRenderer.zeroZOrder;
       this._pixiContainer.addChild(child);
     }
 
@@ -149,7 +154,7 @@ namespace gdjs {
      * @param pixiChild The child (PIXI object) to be modified.
      * @param newZOrder The z order of the associated object.
      */
-    changeRendererObjectZOrder(pixiChild, newZOrder: integer): void {
+    changeRendererObjectZOrder(pixiChild, newZOrder: float): void {
       const child = pixiChild as PIXI.DisplayObject;
       child.zIndex = newZOrder;
     }

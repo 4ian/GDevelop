@@ -17,20 +17,6 @@ namespace gdjs {
     content: Object | null
   ) => void;
 
-  const checkIfCredentialsRequired = (url: string) => {
-    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-    // i.e: its gdevelop.io cookie, to be passed.
-    // Note that this is only useful during previews.
-    if (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    )
-      return true;
-
-    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-    return false;
-  };
-
   /**
    * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
    * registered in the game resources.
@@ -40,6 +26,7 @@ namespace gdjs {
    * that loading failed.
    */
   export class JsonManager {
+    _resourcesLoader: RuntimeGameResourcesLoader;
     _resources: ResourceData[];
 
     _loadedJsons: { [key: string]: Object } = {};
@@ -47,9 +34,14 @@ namespace gdjs {
 
     /**
      * @param resources The resources data of the game.
+     * @param resourcesLoader The resources loader of the game.
      */
-    constructor(resources: ResourceData[]) {
+    constructor(
+      resources: ResourceData[],
+      resourcesLoader: RuntimeGameResourcesLoader
+    ) {
       this._resources = resources;
+      this._resourcesLoader = resourcesLoader;
     }
 
     /**
@@ -151,8 +143,10 @@ namespace gdjs {
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
-      xhr.withCredentials = checkIfCredentialsRequired(resource.file);
-      xhr.open('GET', resource.file);
+      xhr.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
+        resource.file
+      );
+      xhr.open('GET', this._resourcesLoader.getFullUrl(resource.file));
       xhr.onload = function () {
         const callbacks = that._callbacks[resourceName];
         if (!callbacks) {

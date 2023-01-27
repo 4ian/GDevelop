@@ -43,16 +43,88 @@ namespace gdjs {
     electronRemoteRequirePath?: string;
 
     /**
+     * the token to use by the game engine when requiring any resource stored on
+     * GDevelop Cloud buckets. Note that this is only useful during previews.
+     */
+    gdevelopResourceToken?: string;
+
+    /**
      * If set, the game should use the specified environment for making calls
      * to GDevelop APIs ("dev" = development APIs).
      */
     environment?: 'dev';
   };
 
+  const addSearchParameterToUrl = (
+    url: string,
+    urlEncodedParameterName: string,
+    urlEncodedValue: string
+  ) => {
+    if (url.startsWith('data:') || url.startsWith('blob:')) {
+      // blob/data protocol does not support search parameters, which are useless anyway.
+      return url;
+    }
+
+    const separator = url.indexOf('?') === -1 ? '?' : '&';
+    return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
+  };
+
+  const checkIfIsGDevelopCloudBucketUrl = (url: string): boolean => {
+    return (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    );
+  };
+
+  /**
+   * Gives helper methods used when resources are loaded from an URL.
+   */
+  export class RuntimeGameResourcesLoader {
+    _runtimeGame: RuntimeGame;
+
+    constructor(runtimeGame: RuntimeGame) {
+      this._runtimeGame = runtimeGame;
+    }
+
+    /**
+     * Complete the given URL with any specific parameter required to access
+     * the resource (this can be for example a token needed to access the resource).
+     */
+    getFullUrl(url: string) {
+      const { gdevelopResourceToken } = this._runtimeGame._options;
+      if (!gdevelopResourceToken) return url;
+
+      if (!checkIfIsGDevelopCloudBucketUrl(url)) return url;
+
+      return addSearchParameterToUrl(
+        url,
+        'gd_resource_token',
+        encodeURIComponent(gdevelopResourceToken)
+      );
+    }
+
+    /**
+     * Return true if the specified URL must be loaded with cookies ("credentials")
+     * sent to grant access to them.
+     */
+    checkIfCredentialsRequired(url: string) {
+      if (this._runtimeGame._options.gdevelopResourceToken) return false;
+
+      // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+      // i.e: its gdevelop.io cookie, to be passed.
+      // Note that this is only useful during previews.
+      if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
+
+      // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+      return false;
+    }
+  }
+
   /**
    * Represents a game being played.
    */
   export class RuntimeGame {
+    _resourcesLoader: RuntimeGameResourcesLoader;
     _variables: VariablesContainer;
     _data: ProjectData;
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
@@ -127,16 +199,26 @@ namespace gdjs {
       this._options = options || {};
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
+      this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
       this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources
+        this._data.resources.resources,
+        this._resourcesLoader
       );
       this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources
+        this._data.resources.resources,
+        this._resourcesLoader
       );
-      this._fontManager = new gdjs.FontManager(this._data.resources.resources);
-      this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
+      this._fontManager = new gdjs.FontManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      );
+      this._jsonManager = new gdjs.JsonManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         this._data.resources.resources,
+        this._resourcesLoader,
         this._imageManager
       );
       this._effectsManager = new gdjs.EffectsManager();

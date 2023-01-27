@@ -12,6 +12,7 @@ declare class gdPreviewExportOptions {
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
+  setGDevelopResourceToken(gdevelopResourceToken: string): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

@@ -14,6 +14,7 @@ import {
 } from './BrowserPreviewDebuggerServer';
 import Window from '../../../Utils/Window';
 import { displayBlackLoadingScreen } from '../../../Utils/BrowserExternalWindowUtils';
+import { getGDevelopResourceJwtToken } from '../../../Utils/GDevelopServices/Project';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -161,6 +162,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           previewOptions.fallbackAuthor.username
         );
       }
+
+      // The token, if any, to be used to read resources on GDevelop Cloud buckets.
+      const gdevelopResourceToken = getGDevelopResourceJwtToken();
+      if (gdevelopResourceToken)
+        previewExportOptions.setGDevelopResourceToken(gdevelopResourceToken);
 
       exporter.exportProjectForPixiPreview(previewExportOptions);
       previewExportOptions.delete();

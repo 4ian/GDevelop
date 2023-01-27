@@ -7,13 +7,16 @@ import {
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import PromisePool from '@supercharge/promise-pool';
 import { getFileSha512TruncatedTo256 } from '../FileHasher';
+import { isNativeMobileApp } from '../Platform';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
 const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
-  withCredentials: true,
+  // On web/desktop, "credentials" are necessary to use the cookie previously
+  // returned by the server.
+  withCredentials: !isNativeMobileApp(),
 });
 
 const apiClient = axios.create({
@@ -22,8 +25,35 @@ const apiClient = axios.create({
 
 const projectResourcesCredentialsApiClient = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
-  withCredentials: true, // Necessary to save cookie returned by the server.
+  // On web/desktop, "credentials" are necessary to save cookie returned by the server.
+  withCredentials: !isNativeMobileApp(),
 });
+
+/**
+ * The token returned by the server to access the project resources and files, if not using a cookie.
+ */
+let gdResourceJwt: string | null = null;
+
+export const storeGDevelopResourceJwtToken = (token: string) => {
+  gdResourceJwt = token;
+};
+
+export const getGDevelopResourceJwtToken = (): string | null => {
+  return gdResourceJwt;
+};
+
+export const cleanGDevelopResourceJwtToken = () => {
+  gdResourceJwt = null;
+};
+
+export const addGDevelopResourceJwtTokenToUrl = (url: string) => {
+  if (!gdResourceJwt) return url;
+
+  const separator = url.indexOf('?') === -1 ? '?' : '&';
+  return (
+    url + separator + 'gd_resource_token=' + encodeURIComponent(gdResourceJwt)
+  );
+};
 
 type ResourceFileWithUploadPresignedUrl = {|
   resourceFile: File,
@@ -96,16 +126,30 @@ export const getCredentialsForCloudProject = async (
   const response = await projectResourcesCredentialsApiClient.get(
     `/project/${cloudProjectId}/action/authorize`,
     {
-      headers: { Authorization: authorizationHeader },
+      headers: {
+        Authorization: authorizationHeader,
+      },
       params: { userId },
       validateStatus: status => true,
     }
   );
+
+  if (isNativeMobileApp()) {
+    if (response.data && typeof response.data.gd_resource_jwt === 'string')
+      storeGDevelopResourceJwtToken(response.data.gd_resource_jwt);
+  }
+
   return response.status >= 200 && response.status < 400;
 };
 
 export const clearCloudProjectCredentials = async (): Promise<void> => {
-  await projectResourcesCredentialsApiClient.get('/action/clear-authorization');
+  if (isNativeMobileApp()) {
+    cleanGDevelopResourceJwtToken();
+  } else {
+    await projectResourcesCredentialsApiClient.get(
+      '/action/clear-authorization'
+    );
+  }
 };
 
 export const createCloudProject = async (
@@ -150,9 +194,13 @@ export const commitVersion = async (
     authenticatedUser,
     cloudProjectId,
     () =>
-      projectResourcesClient.post(presignedUrl, zippedProject, {
-        headers: { 'content-type': 'application/zip' },
-      })
+      projectResourcesClient.post(
+        addGDevelopResourceJwtTokenToUrl(presignedUrl),
+        zippedProject,
+        {
+          headers: { 'content-type': 'application/zip' },
+        }
+      )
   );
   // Inform backend a new version has been uploaded.
   const response = await apiClient.post(
@@ -192,9 +240,13 @@ export const uploadProjectResourceFiles = async (
           authenticatedUser,
           cloudProjectId,
           () =>
-            projectResourcesClient.post(presignedUrl, resourceFile, {
-              headers: { 'content-type': resourceFile.type },
-            })
+            projectResourcesClient.post(
+              addGDevelopResourceJwtTokenToUrl(presignedUrl),
+              resourceFile,
+              {
+                headers: { 'content-type': resourceFile.type },
+              }
+            )
         );
 
         const fullUrl = `${
@@ -371,8 +423,11 @@ export const getProjectFileAsZipBlob = async (
   if (!cloudProject.currentVersion) {
     throw new Error('Opening of project without current version not handled');
   }
+
   const response = await projectResourcesClient.get(
-    `/${cloudProject.id}/versions/${cloudProject.currentVersion}.zip`,
+    addGDevelopResourceJwtTokenToUrl(
+      `/${cloudProject.id}/versions/${cloudProject.currentVersion}.zip`
+    ),
     { responseType: 'blob' }
   );
   return response.data;

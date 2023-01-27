@@ -215,7 +215,7 @@ namespace gdjs {
         fontFamily: string,
         fontResources: ResourceData[]
       ) => {
-        fontResources.forEach(function (resource) {
+        fontResources.forEach((resource) => {
           this._loadedFontFamily[resource.name] = fontFamily;
           this._loadedFonts[resource.name] = resource;
         });

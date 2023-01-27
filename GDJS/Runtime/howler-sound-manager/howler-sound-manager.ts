@@ -15,20 +15,6 @@ namespace gdjs {
       logger.error('Error while loading an audio file: ' + error),
   };
 
-  const checkIfCredentialsRequired = (url: string) => {
-    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-    // i.e: its gdevelop.io cookie, to be passed.
-    // Note that this is only useful during previews.
-    if (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    )
-      return true;
-
-    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-    return false;
-  };
-
   /**
    * Ensure the volume is between 0 and 1.
    */
@@ -392,8 +378,18 @@ namespace gdjs {
     _pausedSounds: HowlerSound[] = [];
     _paused: boolean = false;
 
-    constructor(resources: ResourceData[]) {
+    _resourcesLoader: RuntimeGameResourcesLoader;
+
+    /**
+     * @param resources The resources data of the game.
+     * @param resourcesLoader The resources loader of the game.
+     */
+    constructor(
+      resources: ResourceData[],
+      resourcesLoader: RuntimeGameResourcesLoader
+    ) {
       this._resources = resources;
+      this._resourcesLoader = resourcesLoader;
 
       const that = this;
       document.addEventListener('deviceready', function () {
@@ -529,10 +525,12 @@ namespace gdjs {
         cacheContainer[soundFile] = new Howl(
           Object.assign(
             {
-              src: [soundFile],
+              src: [this._resourcesLoader.getFullUrl(soundFile)],
               html5: isMusic,
               xhr: {
-                withCredentials: checkIfCredentialsRequired(soundFile),
+                withCredentials: this._resourcesLoader.checkIfCredentialsRequired(
+                  soundFile
+                ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -566,10 +564,12 @@ namespace gdjs {
       cacheContainer[soundFile] = new Howl(
         Object.assign(
           {
-            src: [soundFile],
+            src: [this._resourcesLoader.getFullUrl(soundFile)],
             html5: isMusic,
             xhr: {
-              withCredentials: checkIfCredentialsRequired(soundFile),
+              withCredentials: this._resourcesLoader.checkIfCredentialsRequired(
+                soundFile
+              ),
             },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.
@@ -807,12 +807,14 @@ namespace gdjs {
         const container = isMusic ? this._loadedMusics : this._loadedSounds;
         container[file] = new Howl(
           Object.assign({}, HowlParameters, {
-            src: [file],
+            src: [this._resourcesLoader.getFullUrl(file)],
             onload: onLoadCallback,
             onloaderror: onLoadCallback,
             html5: isMusic,
             xhr: {
-              withCredentials: checkIfCredentialsRequired(file),
+              withCredentials: this._resourcesLoader.checkIfCredentialsRequired(
+                file
+              ),
             },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.
@@ -846,7 +848,9 @@ namespace gdjs {
           // preloading as sound already does a XHR request, hence "else if"
           loadCounter++;
           const sound = new XMLHttpRequest();
-          sound.withCredentials = checkIfCredentialsRequired(file);
+          sound.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
+            file
+          );
           sound.addEventListener('load', callback);
           sound.addEventListener('error', (_) =>
             callback(_, 'XHR error: ' + file)
@@ -854,7 +858,7 @@ namespace gdjs {
           sound.addEventListener('abort', (_) =>
             callback(_, 'XHR abort: ' + file)
           );
-          sound.open('GET', file);
+          sound.open('GET', this._resourcesLoader.getFullUrl(file));
           sound.send();
         }
 

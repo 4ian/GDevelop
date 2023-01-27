@@ -1,7 +1,10 @@
 // @flow
 import {
+  addGDevelopResourceJwtTokenToUrl,
+  cleanGDevelopResourceJwtToken,
   extractFilenameFromProjectResourceUrl,
   extractProjectUuidFromProjetResourceUrl,
+  storeGDevelopResourceJwtToken,
 } from './Project';
 
 describe('Project service', () => {
@@ -100,6 +103,71 @@ describe('Project service', () => {
         extractProjectUuidFromProjetResourceUrl('https://example.com')
       ).toBe(null);
       expect(extractProjectUuidFromProjetResourceUrl('example')).toBe(null);
+    });
+  });
+  describe('addGDevelopResourceJwtTokenToUrl', () => {
+    it('add the token if one is stored in memory', () => {
+      storeGDevelopResourceJwtToken('123');
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
+        )
+      ).toBe(
+        'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter&gd_resource_token=123'
+      );
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
+        )
+      ).toBe(
+        'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?gd_resource_token=123'
+      );
+
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
+        )
+      ).toBe(
+        '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter&gd_resource_token=123'
+      );
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
+        )
+      ).toBe(
+        '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?gd_resource_token=123'
+      );
+
+      cleanGDevelopResourceJwtToken();
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
+        )
+      ).toBe(
+        'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
+      );
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
+        )
+      ).toBe(
+        'https://project-resources.gdevelop.io/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
+      );
+
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
+        )
+      ).toBe(
+        '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png?some=parameter'
+      );
+      expect(
+        addGDevelopResourceJwtTokenToUrl(
+          '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
+        )
+      ).toBe(
+        '/a9fe5bce-de39-4147-a669-93fc5cd69632/resources/6ef87bc678921eb4bfa2d04e5dc6a16b75f7b239f3163d0c5efe64d4cc501711-Pea-Happy.png'
+      );
     });
   });
 });

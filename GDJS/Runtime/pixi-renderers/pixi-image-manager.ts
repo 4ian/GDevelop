@@ -40,20 +40,6 @@ namespace gdjs {
     return null;
   };
 
-  const checkIfCredentialsRequired = (url: string) => {
-    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-    // i.e: its gdevelop.io cookie, to be passed.
-    // Note that this is only useful during previews.
-    if (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    )
-      return true;
-
-    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-    return false;
-  };
-
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
    */
@@ -71,11 +57,18 @@ namespace gdjs {
      */
     _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
 
+    _resourcesLoader: RuntimeGameResourcesLoader;
+
     /**
      * @param resources The resources data of the game.
+     * @param resourcesLoader The resources loader of the game.
      */
-    constructor(resources: ResourceData[]) {
+    constructor(
+      resources: ResourceData[],
+      resourcesLoader: RuntimeGameResourcesLoader
+    ) {
       this._resources = resources;
+      this._resourcesLoader = resourcesLoader;
       this._invalidTexture = PIXI.Texture.from(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA'
       );
@@ -130,16 +123,19 @@ namespace gdjs {
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
-      const texture = PIXI.Texture.from(file, {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-        },
-      }).on('error', (error) => {
+      const texture = PIXI.Texture.from(
+        this._resourcesLoader.getFullUrl(file),
+        {
+          resourceOptions: {
+            // Note that using `false`
+            // to not having `crossorigin` at all would NOT work because the browser would taint the
+            // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+            crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+              ? 'use-credentials'
+              : 'anonymous',
+          },
+        }
+      ).on('error', (error) => {
         logFileLoadingError(file, error);
       });
       applyTextureSettings(texture, resource);
@@ -179,16 +175,19 @@ namespace gdjs {
       logger.log(
         'Loading video texture for resource "' + resourceName + '"...'
       );
-      const texture = PIXI.Texture.from(file, {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-        },
-      }).on('error', (error) => {
+      const texture = PIXI.Texture.from(
+        this._resourcesLoader.getFullUrl(file),
+        {
+          resourceOptions: {
+            // Note that using `false`
+            // to not having `crossorigin` at all would NOT work because the browser would taint the
+            // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+            crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+              ? 'use-credentials'
+              : 'anonymous',
+          },
+        }
+      ).on('error', (error) => {
         logFileLoadingError(file, error);
       });
 
@@ -245,9 +244,9 @@ namespace gdjs {
         if (resourceFiles.hasOwnProperty(file)) {
           loader.add({
             name: file,
-            url: file,
+            url: this._resourcesLoader.getFullUrl(file),
             loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
-            crossOrigin: checkIfCredentialsRequired(file)
+            crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(file)
               ? 'use-credentials'
               : 'anonymous',
           });

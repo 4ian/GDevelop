@@ -186,6 +186,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (options.isDevelopmentEnvironment) {
     runtimeGameOptions.AddChild("environment").SetStringValue("dev");
   }
+  if (!options.gdevelopResourceToken.empty()) {
+    runtimeGameOptions.AddChild("gdevelopResourceToken")
+        .SetStringValue(options.gdevelopResourceToken);
+  }
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");

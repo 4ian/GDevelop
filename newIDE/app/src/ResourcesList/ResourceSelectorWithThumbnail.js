@@ -9,6 +9,7 @@ import {
 import ResourceThumbnail from './ResourceThumbnail';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { LineStackLayout } from '../UI/Layout';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   project: gdProject,
@@ -31,8 +32,15 @@ const ResourceSelectorWithThumbnail = ({
   hintText,
   helperMarkdownText,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const itemsAlignment = windowWidth === 'small' ? 'center' : 'flex-end';
   return (
-    <LineStackLayout noMargin expand alignItems="flex-end">
+    <LineStackLayout noMargin expand alignItems={itemsAlignment}>
+      <ResourceThumbnail
+        resourceName={resourceName}
+        resourcesLoader={ResourcesLoader}
+        project={project}
+      />
       <ResourceSelector
         project={project}
         resourceManagementProps={resourceManagementProps}
@@ -44,11 +52,6 @@ const ResourceSelectorWithThumbnail = ({
         floatingLabelText={floatingLabelText}
         hintText={hintText}
         helperMarkdownText={helperMarkdownText}
-      />
-      <ResourceThumbnail
-        resourceName={resourceName}
-        resourcesLoader={ResourcesLoader}
-        project={project}
       />
     </LineStackLayout>
   );

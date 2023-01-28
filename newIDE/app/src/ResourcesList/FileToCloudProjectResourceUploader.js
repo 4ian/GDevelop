@@ -14,7 +14,6 @@ import {
   uploadProjectResourceFiles,
   PROJECT_RESOURCE_MAX_SIZE_IN_BYTES,
 } from '../Utils/GDevelopServices/Project';
-import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { Line, Column } from '../UI/Grid';
 import LinearProgress from '../UI/LinearProgress';

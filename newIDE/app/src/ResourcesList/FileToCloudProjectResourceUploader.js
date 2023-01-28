@@ -20,6 +20,7 @@ import { Line, Column } from '../UI/Grid';
 import LinearProgress from '../UI/LinearProgress';
 import Paper from '../UI/Paper';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import RaisedButton from '../UI/RaisedButton';
 
 type FileToCloudProjectResourceUploaderProps = {
   options: ChooseResourceOptions,
@@ -67,6 +68,7 @@ export const FileToCloudProjectResourceUploader = ({
   const hasAutomaticallyOpenedInput = React.useRef(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [error, setError] = React.useState<?Error>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
   const hasSelectedFiles = selectedFiles.length > 0;
@@ -83,6 +85,7 @@ export const FileToCloudProjectResourceUploader = ({
 
       try {
         setIsUploading(true);
+        setError(null);
         setUploadProgress(0);
         const results: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
           authenticatedUser,
@@ -109,13 +112,7 @@ export const FileToCloudProjectResourceUploader = ({
           );
         }
       } catch (error) {
-        showErrorBox({
-          message:
-            'There was an error while uploading some resources. Verify your internet connection or try again later.',
-          rawError: error,
-          errorId: 'upload-cloud-project-resource-error',
-          doNotReport: true,
-        });
+        setError(error);
       } finally {
         setIsUploading(false);
       }
@@ -158,7 +155,8 @@ export const FileToCloudProjectResourceUploader = ({
     [automaticallyOpenInput]
   );
 
-  // Start uploading after choosing some files (if there are no errors).
+  // Start uploading after choosing some files (if there are no errors and
+  // if no error happened during the last upload attempt).
   const canUploadFiles =
     !isUploading &&
     canChooseFiles &&
@@ -166,11 +164,11 @@ export const FileToCloudProjectResourceUploader = ({
     invalidFiles.length === 0;
   React.useEffect(
     () => {
-      if (canUploadFiles) {
+      if (canUploadFiles && !error) {
         onUpload();
       }
     },
-    [canUploadFiles, onUpload]
+    [canUploadFiles, onUpload, error]
   );
 
   return (
@@ -208,6 +206,9 @@ export const FileToCloudProjectResourceUploader = ({
                   files.push(event.currentTarget.files[i]);
                 }
                 setSelectedFiles(files);
+
+                // Remove the previous error, if any, to let a new upload attempt be triggered.
+                setError(null);
               }}
             />
           </Column>
@@ -231,11 +232,28 @@ export const FileToCloudProjectResourceUploader = ({
           </AlertMessage>
         );
       })}
+      {error && (
+        <AlertMessage kind="error">
+          <Trans>
+            There was an error while uploading some resources. Verify your
+            internet connection or try again later.
+          </Trans>
+        </AlertMessage>
+      )}
       <LineStackLayout alignItems="center" justifyContent="stretch" expand>
         {isUploading ? (
           <LinearProgress expand value={uploadProgress} variant="determinate" />
         ) : null}
       </LineStackLayout>
+      {error && (
+        <Line noMargin expand justifyContent="flex-end">
+          <RaisedButton
+            primary
+            label={<Trans>Retry</Trans>}
+            onClick={onUpload}
+          />
+        </Line>
+      )}
     </ColumnStackLayout>
   );
 };

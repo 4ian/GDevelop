@@ -26,6 +26,11 @@ namespace gdjs {
     _clearColor: Array<integer>;
 
     /**
+     * Pixi doesn't sort children with zIndex == 0.
+     */
+    private static readonly zeroZOrder = Math.pow(2, -24);
+
+    /**
      * @param layer The layer
      * @param runtimeInstanceContainerRenderer The scene renderer
      */
@@ -35,6 +40,7 @@ namespace gdjs {
       pixiRenderer: PIXI.Renderer | null
     ) {
       this._pixiContainer = new PIXI.Container();
+      this._pixiContainer.sortableChildren = true;
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeInstanceContainerRenderer;
       this._pixiRenderer = pixiRenderer;
@@ -133,33 +139,24 @@ namespace gdjs {
      * Add a child to the pixi container associated to the layer.
      * All objects which are on this layer must be children of this container.
      *
-     * @param child The child (PIXI object) to be added.
+     * @param pixiChild The child (PIXI object) to be added.
      * @param zOrder The z order of the associated object.
      */
-    addRendererObject(child, zOrder: integer): void {
-      child.zOrder = zOrder;
-
-      //Extend the pixi object with a z order.
-      for (let i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
-        // @ts-ignore - we added a "zOrder" property.
-        if (this._pixiContainer.children[i].zOrder >= zOrder) {
-          //TODO : Dichotomic search
-          this._pixiContainer.addChildAt(child, i);
-          return;
-        }
-      }
+    addRendererObject(pixiChild, zOrder: float): void {
+      const child = pixiChild as PIXI.DisplayObject;
+      child.zIndex = zOrder || LayerPixiRenderer.zeroZOrder;
       this._pixiContainer.addChild(child);
     }
 
     /**
      * Change the z order of a child associated to an object.
      *
-     * @param child The child (PIXI object) to be modified.
+     * @param pixiChild The child (PIXI object) to be modified.
      * @param newZOrder The z order of the associated object.
      */
-    changeRendererObjectZOrder(child, newZOrder: integer): void {
-      this._pixiContainer.removeChild(child);
-      this.addRendererObject(child, newZOrder);
+    changeRendererObjectZOrder(pixiChild, newZOrder: float): void {
+      const child = pixiChild as PIXI.DisplayObject;
+      child.zIndex = newZOrder;
     }
 
     /**

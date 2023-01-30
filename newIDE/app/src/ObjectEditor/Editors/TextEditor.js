@@ -106,7 +106,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
             style={styles.checkbox}
           />
-          <ButtonGroup>
+          <ButtonGroup size="small">
             <Tooltip title={<Trans>Align text on the left</Trans>}>
               <Button
                 variant={textAlignment === 'left' ? 'contained' : 'outlined'}

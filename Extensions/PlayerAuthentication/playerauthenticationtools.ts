@@ -838,7 +838,7 @@ namespace gdjs {
     /**
      * Remove the banner displaying the authentication status.
      */
-    const removeAuthenticationBanner = function (
+    export const removeAuthenticationBanner = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
       if (!_authenticationBanner) {

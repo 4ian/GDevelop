@@ -70,6 +70,29 @@ module.exports = {
 
     extension
       .addAction(
+        'HideAuthenticationBanner',
+        _('Hide authentication banner'),
+        _(
+          'Hide the authentication banner from the top of the game screen.'
+        ),
+        _('Hide the authentication banner'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/player-authentication')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.removeAuthenticationBanner');
+
+    extension
+      .addAction(
         'OpenAuthenticationWindow',
         _('Open authentication window'),
         _('Open an authentication window for the player to log in.'),

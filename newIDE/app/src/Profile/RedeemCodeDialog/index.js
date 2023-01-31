@@ -1,6 +1,6 @@
 // @flow
+import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
-
 import React from 'react';
 import FlatButton from '../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
@@ -10,6 +10,7 @@ import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import LeftLoader from '../../UI/LeftLoader';
 import { redeemCode } from '../../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import AlertMessage from '../../UI/AlertMessage';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
@@ -88,46 +89,72 @@ export default function RedeemCodeDialog({
   };
 
   const canRedeem = !!redemptionCode && !isLoading;
+  const { subscription } = authenticatedUser;
 
   return (
-    <Dialog
-      title={<Trans>Redeem a code</Trans>}
-      actions={[
-        <FlatButton
-          label={<Trans>Close</Trans>}
-          key="close"
-          primary={false}
-          disabled={isLoading}
-          onClick={() => onClose(false)}
-        />,
-        <LeftLoader isLoading={isLoading}>
-          <DialogPrimaryButton
-            label={<Trans>Redeem</Trans>}
-            disabled={!canRedeem}
-            primary
-            key="redeem"
-            onClick={onRedeemCode}
-          />
-        </LeftLoader>,
-      ]}
-      cannotBeDismissed={isLoading}
-      onRequestClose={() => onClose(false)}
-      onApply={() => {
-        if (canRedeem) onRedeemCode();
-      }}
-      maxWidth="sm"
-      open
-    >
-      <ColumnStackLayout noMargin>
-        <SemiControlledTextField
-          value={redemptionCode}
-          onChange={setRedemptionCode}
-          translatableHintText={t`Enter your code here`}
-          floatingLabelText={<Trans>Redemption code</Trans>}
-          floatingLabelFixed
-          errorText={getRedeemCodeErrorText(error)}
-        />
-      </ColumnStackLayout>
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          title={<Trans>Redeem a code</Trans>}
+          actions={[
+            <FlatButton
+              label={<Trans>Close</Trans>}
+              key="close"
+              primary={false}
+              disabled={isLoading}
+              onClick={() => onClose(false)}
+            />,
+            <LeftLoader isLoading={isLoading}>
+              <DialogPrimaryButton
+                label={<Trans>Redeem</Trans>}
+                disabled={!canRedeem}
+                primary
+                key="redeem"
+                onClick={onRedeemCode}
+              />
+            </LeftLoader>,
+          ]}
+          cannotBeDismissed={isLoading}
+          onRequestClose={() => onClose(false)}
+          onApply={() => {
+            if (canRedeem) onRedeemCode();
+          }}
+          maxWidth="sm"
+          open
+        >
+          <ColumnStackLayout noMargin>
+            <SemiControlledTextField
+              value={redemptionCode}
+              onChange={setRedemptionCode}
+              translatableHintText={t`Enter your code here`}
+              floatingLabelText={<Trans>Redemption code</Trans>}
+              floatingLabelFixed
+              errorText={getRedeemCodeErrorText(error)}
+            />
+
+            {!subscription ||
+            !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? (
+              <AlertMessage kind="warning">
+                <Trans>
+                  You currently have a subscription, applied thanks to a
+                  redemption code, valid until{' '}
+                  {i18n.date(subscription.redemptionCodeValidUntil)}. If you
+                  redeem another code, you will lose the existing subscription
+                  and its validity period!
+                </Trans>
+              </AlertMessage>
+            ) : (
+              <AlertMessage kind="info">
+                <Trans>
+                  You currently have a subscription. If you redeem a code, the
+                  existing subscription will be cancelled and replaced by the
+                  one given by the code.
+                </Trans>
+              </AlertMessage>
+            )}
+          </ColumnStackLayout>
+        </Dialog>
+      )}
+    </I18n>
   );
 }

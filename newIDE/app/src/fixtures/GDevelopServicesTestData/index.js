@@ -168,6 +168,15 @@ export const subscriptionForSilverUser: Subscription = {
   userId: 'silver-user',
 };
 
+export const subscriptionWithRedemptionCode: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  redemptionCode: 'test-123-code',
+  redemptionCodeValidUntil: 1695194209000,
+};
+
 export const noSubscription: Subscription = {
   planId: null,
   createdAt: 1515084011000,
@@ -373,6 +382,11 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
     console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeSubscriptionWithRedemptionCodeAuthenticatedUser: AuthenticatedUser = {
+  ...fakeNoSubscriptionAuthenticatedUser,
+  subscription: subscriptionWithRedemptionCode,
 };
 
 export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: AuthenticatedUser = {

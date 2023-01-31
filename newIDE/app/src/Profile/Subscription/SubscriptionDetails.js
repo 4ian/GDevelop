@@ -1,4 +1,5 @@
 // @flow
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line } from '../../UI/Grid';
 import {
@@ -12,7 +13,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
-import { LineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import FlatButton from '../../UI/FlatButton';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Paper from '../../UI/Paper';
@@ -62,9 +63,10 @@ const SubscriptionDetails = ({
         <Text size="block-title">My online services subscription</Text>
       </Line>
       {userPlan && userPlan.planId ? (
-        <>
+        <ColumnStackLayout noMargin>
           <PlanCard
             plan={userPlan}
+            hidePrice={!!subscription.redemptionCodeValidUntil}
             actions={[
               <LeftLoader
                 key="manage-online"
@@ -90,7 +92,31 @@ const SubscriptionDetails = ({
             isHighlighted={false}
             background="medium"
           />
-        </>
+          {!!subscription.redemptionCodeValidUntil && (
+            <I18n>
+              {({ i18n }) => (
+                <Paper background="dark" variant="outlined">
+                  <LineStackLayout alignItems="center">
+                    <img
+                      src="res/diamond.svg"
+                      style={styles.diamondIcon}
+                      alt=""
+                    />
+                    <Column>
+                      <Text>
+                        <Trans>
+                          Thanks to the redemption code you've used, you have
+                          this subscription enabled until{' '}
+                          {i18n.date(subscription.redemptionCodeValidUntil)}.
+                        </Trans>
+                      </Text>
+                    </Column>
+                  </LineStackLayout>
+                </Paper>
+              )}
+            </I18n>
+          )}
+        </ColumnStackLayout>
       ) : (
         <>
           <Paper background="medium" variant="outlined" style={styles.paper}>

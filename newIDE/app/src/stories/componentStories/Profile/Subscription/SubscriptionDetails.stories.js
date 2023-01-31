@@ -8,6 +8,7 @@ import {
   noSubscription,
   subscriptionForIndieUser,
   subscriptionForSilverUser,
+  subscriptionWithRedemptionCode,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
@@ -21,6 +22,13 @@ export default {
 export const WithSilverSubscription = () => (
   <SubscriptionDetails
     subscription={subscriptionForSilverUser}
+    onManageSubscription={action('manage subscription')}
+    isManageSubscriptionLoading={false}
+  />
+);
+export const WithRedemptionCodeSubscription = () => (
+  <SubscriptionDetails
+    subscription={subscriptionWithRedemptionCode}
     onManageSubscription={action('manage subscription')}
     isManageSubscriptionLoading={false}
   />

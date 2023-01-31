@@ -320,27 +320,23 @@ export default function NewBehaviorDialog({
                     ))}
                 </List>
                 <Line justifyContent="center" alignItems="center">
-                  {!showDeprecated ? (
-                    <FlatButton
-                      key="toggle-experimental"
-                      leftIcon={<Visibility />}
-                      primary={false}
-                      onClick={() => {
-                        setShowDeprecated(true);
-                      }}
-                      label={<Trans>Show deprecated (old) behaviors</Trans>}
-                    />
-                  ) : (
-                    <FlatButton
-                      key="toggle-experimental"
-                      leftIcon={<VisibilityOff />}
-                      primary={false}
-                      onClick={() => {
-                        setShowDeprecated(false);
-                      }}
-                      label={<Trans>Show deprecated (old) behaviors</Trans>}
-                    />
-                  )}
+                  <FlatButton
+                    key="toggle-deprecated"
+                    leftIcon={
+                      !showDeprecated ? <Visibility /> : <VisibilityOff />
+                    }
+                    primary={false}
+                    onClick={() => {
+                      setShowDeprecated(!showDeprecated);
+                    }}
+                    label={
+                      !showDeprecated ? (
+                        <Trans>Show deprecated (old) behaviors</Trans>
+                      ) : (
+                        <Trans>Hide deprecated (old) behaviors</Trans>
+                      )
+                    }
+                  />
                 </Line>
                 <Line justifyContent="center" alignItems="center">
                   <FlatButton

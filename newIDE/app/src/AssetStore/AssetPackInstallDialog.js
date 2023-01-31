@@ -14,7 +14,7 @@ import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
 import {
-  checkRequiredExtensionUpdate,
+  checkRequiredExtensionsUpdateForAssets,
   installRequiredExtensions,
   installPublicAsset,
 } from './InstallAsset';
@@ -144,16 +144,17 @@ const AssetPackInstallDialog = ({
       setAreAssetsBeingInstalled(true);
       try {
         const assets = await fetchAssets(assetShortHeaders);
-        const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
+        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
           {
             assets,
             project,
           }
         );
         const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensions.length > 0 &&
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
+            0 &&
           (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensions
+            requiredExtensionInstallation.outOfDateExtensionShortHeaders
           ));
         await installRequiredExtensions({
           requiredExtensionInstallation,

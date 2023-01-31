@@ -5,6 +5,19 @@ namespace gdjs {
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {
     export namespace leaderboards {
+      let _hasPlayerJustClosedLeaderboardView = false;
+
+      gdjs.registerRuntimeScenePostEventsCallback(() => {
+        // Set it back to false for the next frame.
+        _hasPlayerJustClosedLeaderboardView = false;
+      });
+
+      /**
+       * Returns true if the player has just closed the leaderboard view.
+       */
+      export const hasPlayerJustClosedLeaderboardView = () =>
+        _hasPlayerJustClosedLeaderboardView;
+
       const computeDigest = (payload: string): string => {
         const shaObj = new jsSHA('SHA-256', 'TEXT', { encoding: 'UTF8' });
         shaObj.update(payload);
@@ -521,6 +534,7 @@ namespace gdjs {
       ) {
         switch (event.data) {
           case 'closeLeaderboardView':
+            _hasPlayerJustClosedLeaderboardView = true;
             closeLeaderboardView(runtimeScene);
             break;
           case 'leaderboardViewLoaded':

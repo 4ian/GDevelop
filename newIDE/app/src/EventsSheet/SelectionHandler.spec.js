@@ -1,5 +1,5 @@
 // @flow
-const {
+import {
   getInitialSelection,
   getSelectedTopMostOnlyEventContexts,
   getSelectedEventContexts,
@@ -13,7 +13,10 @@ const {
   isInstructionSelected,
   getSelectedInstructions,
   getSelectedInstructionsLocatingEvents,
-} = require('./SelectionHandler');
+  getLastSelectedEventContext,
+  getLastSelectedEventContextWhichCanHaveSubEvents,
+  getLastSelectedInstructionsContext,
+} from './SelectionHandler';
 const gd: libGDevelop = global.gd;
 
 describe('SelectionHandler', () => {
@@ -35,6 +38,10 @@ describe('SelectionHandler', () => {
     emptyStandardEvent.delete();
 
     let currentSelection = getInitialSelection();
+    expect(getLastSelectedEventContext(currentSelection)).toBe(null);
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toBe(null);
     expect(getSelectedEventContexts(currentSelection)).toEqual([]);
     expect(getSelectedTopMostOnlyEventContexts(currentSelection)).toEqual([]);
     expect(getLastSelectedTopMostOnlyEventContext(currentSelection)).toEqual(
@@ -52,6 +59,18 @@ describe('SelectionHandler', () => {
     expect(isEventSelected(currentSelection, standardEvent1_2)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent1_2_1)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent2)).toBe(false);
+    expect(getLastSelectedEventContext(currentSelection)).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent1,
+      indexInList: 0,
+    });
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent1,
+      indexInList: 0,
+    });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: topEventsList,
@@ -83,6 +102,18 @@ describe('SelectionHandler', () => {
     expect(isEventSelected(currentSelection, standardEvent1_2)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent1_2_1)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent2)).toBe(false);
+    expect(getLastSelectedEventContext(currentSelection)).toEqual({
+      eventsList: standardEvent1.getSubEvents(),
+      event: standardEvent1_1,
+      indexInList: 0,
+    });
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: standardEvent1.getSubEvents(),
+      event: standardEvent1_1,
+      indexInList: 0,
+    });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1.getSubEvents(),
@@ -119,6 +150,18 @@ describe('SelectionHandler', () => {
     expect(isEventSelected(currentSelection, standardEvent1_2)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent1_2_1)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent2)).toBe(false);
+    expect(getLastSelectedEventContext(currentSelection)).toEqual({
+      eventsList: standardEvent1_2.getSubEvents(),
+      event: standardEvent1_2_1,
+      indexInList: 0,
+    });
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: standardEvent1_2.getSubEvents(),
+      event: standardEvent1_2_1,
+      indexInList: 0,
+    });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1.getSubEvents(),
@@ -174,6 +217,18 @@ describe('SelectionHandler', () => {
     expect(isEventSelected(currentSelection, standardEvent1_2)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent1_2_1)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent2)).toBe(false);
+    expect(getLastSelectedEventContext(currentSelection)).toEqual({
+      eventsList: standardEvent1.getSubEvents(),
+      event: standardEvent1_2,
+      indexInList: 1,
+    });
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: standardEvent1.getSubEvents(),
+      event: standardEvent1_2,
+      indexInList: 1,
+    });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1_2.getSubEvents(),
@@ -224,6 +279,18 @@ describe('SelectionHandler', () => {
     expect(isEventSelected(currentSelection, standardEvent1_2)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent1_2_1)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent2)).toBe(false);
+    expect(getLastSelectedEventContext(currentSelection)).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent1,
+      indexInList: 0,
+    });
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent1,
+      indexInList: 0,
+    });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1_2.getSubEvents(),
@@ -274,6 +341,18 @@ describe('SelectionHandler', () => {
     expect(isEventSelected(currentSelection, standardEvent1_2)).toBe(false);
     expect(isEventSelected(currentSelection, standardEvent1_2_1)).toBe(true);
     expect(isEventSelected(currentSelection, standardEvent2)).toBe(true);
+    expect(getLastSelectedEventContext(currentSelection)).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent2,
+      indexInList: 1,
+    });
+    expect(
+      getLastSelectedEventContextWhichCanHaveSubEvents(currentSelection)
+    ).toEqual({
+      eventsList: topEventsList,
+      event: standardEvent2,
+      indexInList: 1,
+    });
     expect(getSelectedEventContexts(currentSelection)).toEqual([
       {
         eventsList: standardEvent1_2.getSubEvents(),
@@ -446,6 +525,16 @@ describe('SelectionHandler', () => {
     expect(getSelectedInstructionsLocatingEvents(currentSelection)).toEqual([
       standardEvent1_2,
     ]);
+    expect(getLastSelectedInstructionsContext(currentSelection)).toEqual({
+      isCondition: true,
+      instrsList: gd.asStandardEvent(standardEvent1_2).getConditions(),
+      instruction: gd
+        .asStandardEvent(standardEvent1_2)
+        .getConditions()
+        .get(1),
+      indexInList: 1,
+      locatingEvent: standardEvent1_2,
+    });
 
     // Select an action of another event.
     currentSelection = selectInstruction(
@@ -541,6 +630,16 @@ describe('SelectionHandler', () => {
       standardEvent1_2,
       standardEvent1_2_1,
     ]);
+    expect(getLastSelectedInstructionsContext(currentSelection)).toEqual({
+      isCondition: false,
+      instrsList: gd.asStandardEvent(standardEvent1_2_1).getActions(),
+      instruction: gd
+        .asStandardEvent(standardEvent1_2_1)
+        .getActions()
+        .get(0),
+      indexInList: 0,
+      locatingEvent: standardEvent1_2_1,
+    });
 
     topEventsList.delete();
   });

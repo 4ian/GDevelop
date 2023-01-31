@@ -41,12 +41,12 @@ export type EventContext = {|
   indexInList: number,
 |};
 
-export type SelectionState = {
+export type SelectionState = {|
   // Arrays are in order of selection (last selected element at the last position).
   selectedInstructions: Array<InstructionContextWithLocatingEvent>,
   selectedInstructionsLists: Array<InstructionsListContext>,
   selectedEvents: Array<EventContext>,
-};
+|};
 
 export const getInitialSelection = () => {
   return {
@@ -64,10 +64,37 @@ export const getSelectedEvents = (
   );
 };
 
+export const getLastSelectedEvent = (
+  selection: SelectionState
+): Event | null => {
+  if (!selection.selectedEvents.length) return null;
+
+  return selection.selectedEvents[selection.selectedEvents.length - 1].event;
+};
+
 export const getSelectedEventContexts = (
   selection: SelectionState
 ): Array<EventContext> => {
   return selection.selectedEvents;
+};
+
+export const getLastSelectedEventContext = (
+  selection: SelectionState
+): EventContext | null => {
+  if (!selection.selectedEvents.length) return null;
+
+  return selection.selectedEvents[selection.selectedEvents.length - 1];
+};
+
+export const getLastSelectedEventContextWhichCanHaveSubEvents = (
+  selection: SelectionState
+): EventContext | null => {
+  const candidates = selection.selectedEvents.filter(({ event }) =>
+    event.canHaveSubEvents()
+  );
+  if (!candidates.length) return null;
+
+  return candidates[candidates.length - 1];
 };
 
 export const getSelectedTopMostOnlyEventContexts = (
@@ -138,6 +165,25 @@ export const getSelectedInstructionsListsContexts = (
   selection: SelectionState
 ): Array<InstructionsListContext> => {
   return selection.selectedInstructionsLists;
+};
+
+export const getLastSelectedInstructionsContext = (
+  selection: SelectionState
+): InstructionContextWithLocatingEvent | null => {
+  return (
+    selection.selectedInstructions[selection.selectedInstructions.length - 1] ||
+    null
+  );
+};
+
+export const getLastSelectedInstructionsListsContext = (
+  selection: SelectionState
+): InstructionsListContext | null => {
+  return (
+    selection.selectedInstructionsLists[
+      selection.selectedInstructionsLists.length - 1
+    ] || null
+  );
 };
 
 export const isEventSelected = (

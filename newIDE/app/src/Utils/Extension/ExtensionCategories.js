@@ -33,6 +33,8 @@ export const translateExtensionCategory = (
       return i18n._(t`Third-party`);
     case 'User interface':
       return i18n._(t`User interface`);
+    case 'General':
+      return i18n._(t`General`);
     default:
       return category;
   }

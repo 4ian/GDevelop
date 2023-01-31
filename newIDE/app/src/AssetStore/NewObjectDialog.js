@@ -231,6 +231,7 @@ export default function NewObjectDialog({
         onObjectsAddedFromAssets(installOutput.createdObjects);
 
         await resourceManagementProps.onFetchNewlyAddedResources();
+        setIsAssetBeingInstalled(false);
         return true;
       } catch (error) {
         console.error('Error while installing the asset:', error);
@@ -240,9 +241,8 @@ export default function NewObjectDialog({
             assetShortHeader.name
           }". Verify your internet connection or try again later.`,
         });
-        return false;
-      } finally {
         setIsAssetBeingInstalled(false);
+        return false;
       }
     },
     [

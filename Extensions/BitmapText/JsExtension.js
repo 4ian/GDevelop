@@ -36,9 +36,10 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/objects/bitmap_text')
-      .setCategory('User interface');
-    extension.addInstructionOrExpressionGroupMetadata(_("Bitmap Text"))
-        .setIcon("JsPlatform/Extensions/bitmapfont32.png");
+      .setCategory('Text');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Bitmap Text'))
+      .setIcon('JsPlatform/Extensions/bitmapfont32.png');
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -91,7 +92,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('bitmapFont') //fnt or xml files
         .setLabel(_('Bitmap Font'))
-        .setGroup(_("Font"));
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('textureAtlasResourceName')
@@ -99,7 +100,7 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Bitmap atlas image'))
-        .setGroup(_("Font"));
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('scale')
@@ -113,7 +114,7 @@ module.exports = {
         .setValue(objectContent.tint)
         .setType('color')
         .setLabel(_('Font tint'))
-        .setGroup(_("Font"));
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('wordWrap')
@@ -174,7 +175,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('User interface'));
+      .setCategoryFullName(_('Text'));
 
     object
       .addExpressionAndConditionAndAction(
@@ -652,8 +653,7 @@ module.exports = {
 
     // This is called to update the PIXI object on the scene editor
     RenderedBitmapTextInstance.prototype.update = function () {
-      const properties = this._associatedObjectConfiguration
-        .getProperties();
+      const properties = this._associatedObjectConfiguration.getProperties();
 
       // Update the rendered text properties (note: Pixi is only
       // applying changes if there were changed).

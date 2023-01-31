@@ -485,6 +485,8 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
 
+    boolean HasEventsBasedBehavior([Const] DOMString type);
+    [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);
     boolean HasEventsBasedObject([Const] DOMString type);
     [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
 

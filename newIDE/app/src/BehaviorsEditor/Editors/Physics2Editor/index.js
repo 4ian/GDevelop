@@ -100,7 +100,7 @@ const BitGroupEditor = (props: {|
 const Physics2Editor = (props: Props) => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
-  const { behavior } = props;
+  const { behavior, onBehaviorsUpdated } = props;
   const forceUpdate = useForceUpdate();
 
   const isBitEnabled = (bitsValue: number, pos: number) => {
@@ -134,6 +134,7 @@ const Physics2Editor = (props: Props) => {
           value={properties.get('bodyType').getValue()}
           onChange={(e, i, newValue: string) => {
             behavior.updateProperty('bodyType', newValue);
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         >
@@ -162,6 +163,7 @@ const Physics2Editor = (props: Props) => {
           checked={properties.get('bullet').getValue() === 'true'}
           onCheck={(e, checked) => {
             behavior.updateProperty('bullet', checked ? '1' : '0');
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         />
@@ -170,6 +172,7 @@ const Physics2Editor = (props: Props) => {
           checked={properties.get('fixedRotation').getValue() === 'true'}
           onCheck={(e, checked) => {
             behavior.updateProperty('fixedRotation', checked ? '1' : '0');
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         />
@@ -178,6 +181,7 @@ const Physics2Editor = (props: Props) => {
           checked={properties.get('canSleep').getValue() === 'true'}
           onCheck={(e, checked) => {
             behavior.updateProperty('canSleep', checked ? '1' : '0');
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         />
@@ -204,6 +208,7 @@ const Physics2Editor = (props: Props) => {
           value={properties.get('shape').getValue()}
           onChange={(e, i, newValue: string) => {
             behavior.updateProperty('shape', newValue);
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         >
@@ -237,6 +242,7 @@ const Physics2Editor = (props: Props) => {
             min={0}
             onChange={newValue => {
               behavior.updateProperty('shapeDimensionA', newValue);
+              onBehaviorsUpdated();
               forceUpdate();
             }}
             type="number"
@@ -254,6 +260,7 @@ const Physics2Editor = (props: Props) => {
             min={shape === 'Edge' ? undefined : 0}
             onChange={newValue => {
               behavior.updateProperty('shapeDimensionB', newValue);
+              onBehaviorsUpdated();
               forceUpdate();
             }}
             type="number"
@@ -269,6 +276,7 @@ const Physics2Editor = (props: Props) => {
             value={properties.get('polygonOrigin').getValue()}
             onChange={(e, i, newValue: string) => {
               behavior.updateProperty('polygonOrigin', newValue);
+              onBehaviorsUpdated();
               forceUpdate();
             }}
           >
@@ -297,6 +305,7 @@ const Physics2Editor = (props: Props) => {
           step={1}
           onUpdate={newValue => {
             behavior.updateProperty('shapeOffsetX', newValue);
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         />
@@ -306,6 +315,7 @@ const Physics2Editor = (props: Props) => {
           step={1}
           onUpdate={newValue => {
             behavior.updateProperty('shapeOffsetY', newValue);
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         />
@@ -325,6 +335,7 @@ const Physics2Editor = (props: Props) => {
           fullWidth
           onChange={resourceName => {
             setImage(resourceName);
+            onBehaviorsUpdated();
             forceUpdate();
           }}
         />
@@ -397,6 +408,7 @@ const Physics2Editor = (props: Props) => {
                         JSON.stringify(vertices)
                       );
                       forceUpdate();
+                      onBehaviorsUpdated();
                     }}
                   />
                 );
@@ -414,12 +426,14 @@ const Physics2Editor = (props: Props) => {
               vertices[index].x = newValue;
               behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
+              onBehaviorsUpdated();
             }}
             onChangeVertexY={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].y = newValue;
               behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
+              onBehaviorsUpdated();
             }}
             onAdd={() => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
@@ -427,12 +441,14 @@ const Physics2Editor = (props: Props) => {
               vertices.push({ x: 0, y: 0 });
               behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
+              onBehaviorsUpdated();
             }}
             onRemove={index => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices.splice(index, 1);
               behavior.updateProperty('vertices', JSON.stringify(vertices));
               forceUpdate();
+              onBehaviorsUpdated();
             }}
           />
         </Line>
@@ -449,6 +465,7 @@ const Physics2Editor = (props: Props) => {
               parseFloat(newValue) > 0 ? newValue : '0'
             );
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
         <NumericProperty
@@ -458,6 +475,7 @@ const Physics2Editor = (props: Props) => {
           onUpdate={newValue => {
             behavior.updateProperty('gravityScale', newValue);
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
       </ResponsiveLineStackLayout>
@@ -472,6 +490,7 @@ const Physics2Editor = (props: Props) => {
               parseFloat(newValue) > 0 ? newValue : '0'
             );
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
         <NumericProperty
@@ -484,6 +503,7 @@ const Physics2Editor = (props: Props) => {
               parseFloat(newValue) > 0 ? newValue : '0'
             );
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
       </ResponsiveLineStackLayout>
@@ -495,6 +515,7 @@ const Physics2Editor = (props: Props) => {
           onUpdate={newValue => {
             behavior.updateProperty('linearDamping', newValue);
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
         <NumericProperty
@@ -505,6 +526,7 @@ const Physics2Editor = (props: Props) => {
           onUpdate={newValue => {
             behavior.updateProperty('angularDamping', newValue);
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
       </ResponsiveLineStackLayout>
@@ -518,6 +540,7 @@ const Physics2Editor = (props: Props) => {
             const newValue = enableBit(layersValues, index, value);
             behavior.updateProperty('layers', newValue.toString(10));
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
       </Line>
@@ -531,6 +554,7 @@ const Physics2Editor = (props: Props) => {
             const newValue = enableBit(masksValues, index, value);
             behavior.updateProperty('masks', newValue.toString(10));
             forceUpdate();
+            onBehaviorsUpdated();
           }}
         />
       </Line>

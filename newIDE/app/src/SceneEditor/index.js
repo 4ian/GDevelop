@@ -117,6 +117,7 @@ type Props = {|
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
   canInstallPrivateAsset: () => boolean,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1660,6 +1661,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onUpdateBehaviorsSharedData={() =>
                     this.updateBehaviorsSharedData()
                   }
+                  openBehaviorEvents={this.props.openBehaviorEvents}
                 />
               )}
             </React.Fragment>

@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -32,6 +33,8 @@ export const Default = () => (
         resourceExternalEditors: fakeResourceExternalEditors,
       }}
       onUpdateBehaviorsSharedData={() => {}}
+      openBehaviorEvents={() => action('Open behavior events')}
+      onBehaviorsUpdated={() => {}}
     />
   </SerializedObjectDisplay>
 );
@@ -50,6 +53,8 @@ export const WithoutAnyBehaviors = () => (
         resourceExternalEditors: fakeResourceExternalEditors,
       }}
       onUpdateBehaviorsSharedData={() => {}}
+      openBehaviorEvents={() => action('Open behavior events')}
+      onBehaviorsUpdated={() => {}}
     />
   </SerializedObjectDisplay>
 );

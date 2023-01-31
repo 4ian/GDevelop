@@ -29,6 +29,7 @@ import {
   listObjectBehaviorsTypes,
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 
 const gd: libGDevelop = global.gd;
 
@@ -39,7 +40,11 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
   resourceManagementProps: ResourceManagementProps,
-  onBehaviorsUpdated?: () => void,
+  onBehaviorsUpdated: () => void,
+  openBehaviorEvents: (
+    extensionName: string,
+    behaviorName: string
+  ) => Promise<void>,
 |};
 
 const BehaviorsEditor = (props: Props) => {
@@ -109,6 +114,23 @@ const BehaviorsEditor = (props: Props) => {
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
     if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
+  };
+
+  const openExtension = (behaviorType: string) => {
+    const elements = behaviorType.split('::');
+    if (elements.length !== 2) {
+      return;
+    }
+    const extensionName = elements[0];
+    const behaviorName = elements[1];
+
+    if (
+      !extensionName ||
+      !props.project.hasEventsFunctionsExtensionNamed(extensionName)
+    ) {
+      return;
+    }
+    props.openBehaviorEvents(extensionName, behaviorName);
   };
 
   return (
@@ -206,6 +228,16 @@ const BehaviorsEditor = (props: Props) => {
                         size="small"
                         helpPagePath={behaviorMetadata.getHelpPath()}
                       />,
+                      project.hasEventsBasedBehavior(behaviorTypeName) ? (
+                        <IconButton
+                          tooltip={t`Open extension events`}
+                          onClick={() => {
+                            openExtension(behaviorTypeName);
+                          }}
+                        >
+                          <OpenInNew />
+                        </IconButton>
+                      ) : null,
                       <IconButton
                         key="delete"
                         size="small"
@@ -266,6 +298,7 @@ const BehaviorsEditor = (props: Props) => {
                           resourceManagementProps={
                             props.resourceManagementProps
                           }
+                          onBehaviorsUpdated={props.onBehaviorsUpdated}
                         />
                       </Line>
                     </Column>

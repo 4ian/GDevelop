@@ -87,6 +87,9 @@ export type RenderEditorContainerProps = {|
 
   // Project creation
   onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+
+  // Object editing
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

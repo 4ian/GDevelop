@@ -1528,7 +1528,7 @@ const MainFrame = (props: Props) => {
   const openEventsFunctionsExtension = React.useCallback(
     (
       name: string,
-      initiallyFocusedFunctionName?: string,
+      initiallyFocusedFunctionName?: ?string,
       initiallyFocusedBehaviorName?: ?string
     ) => {
       setState(state => ({
@@ -1647,6 +1647,39 @@ const MainFrame = (props: Props) => {
           functionName.name,
           functionName.behaviorName
         );
+      }
+    } else {
+      // It's not an events functions extension, we should not be here.
+      console.warn(
+        `Extension with name=${extensionName} can not be opened (no editor for this)`
+      );
+    }
+  };
+
+  const openBehaviorEvents = (extensionName: string, behaviorName: string) => {
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      // It's an events functions extension, open the editor for it.
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabs,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        // Open the given function and focus the tab
+        foundTab.editor.selectEventsBasedBehaviorByName(behaviorName);
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        openEventsFunctionsExtension(extensionName, null, behaviorName);
       }
     } else {
       // It's not an events functions extension, we should not be here.
@@ -2934,6 +2967,7 @@ const MainFrame = (props: Props) => {
 
                       cb(true);
                     },
+                    openBehaviorEvents: openBehaviorEvents,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>

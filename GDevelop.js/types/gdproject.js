@@ -91,6 +91,8 @@ declare class gdProject extends gdObjectsContainer {
   insertNewEventsFunctionsExtension(name: string, position: number): gdEventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: gdEventsFunctionsExtension, position: number): gdEventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  hasEventsBasedBehavior(type: string): boolean;
+  getEventsBasedBehavior(type: string): gdEventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;

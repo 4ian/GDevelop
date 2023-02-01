@@ -139,8 +139,8 @@ export default function RedeemCodeDialog({
                   You currently have a subscription, applied thanks to a
                   redemption code, valid until{' '}
                   {i18n.date(subscription.redemptionCodeValidUntil)}. If you
-                  redeem another code, you will lose the existing subscription
-                  and its validity period!
+                  redeem another code, your existing subscription will be
+                  canceled and not redeemable anymore!
                 </Trans>
               </AlertMessage>
             ) : (

@@ -35,7 +35,7 @@ import {
   type InstancesEditorSettings,
 } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
-import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
+import { shouldPreventRenderingInstanceEditors } from '../UI/MaterialUISpecificUtil';
 import {
   clampInstancesEditorZoom,
   getWheelStepZoomFactor,
@@ -956,7 +956,7 @@ export default class InstancesEditor extends Component<Props> {
     if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
-    if (this.fpsLimiter.shouldUpdate() && isNoDialogOpened()) {
+    if (this.fpsLimiter.shouldUpdate() && !shouldPreventRenderingInstanceEditors()) {
       this.backgroundColor.render();
       this.viewPosition.render();
       this.canvasCursor.render();

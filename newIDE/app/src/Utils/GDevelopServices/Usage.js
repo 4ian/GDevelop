@@ -21,6 +21,9 @@ export type Subscription = {|
   stripeCustomerId?: string,
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
+
+  redemptionCode?: string | null,
+  redemptionCodeValidUntil?: number | null,
 |};
 
 /**

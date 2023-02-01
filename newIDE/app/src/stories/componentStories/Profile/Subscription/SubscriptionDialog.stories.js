@@ -10,6 +10,7 @@ import {
   fakeIndieAuthenticatedUser,
   fakeNoSubscriptionAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
+  fakeSubscriptionWithRedemptionCodeAuthenticatedUser,
   subscriptionForIndieUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
@@ -49,6 +50,17 @@ export const AuthenticatedButLoading = () => (
 );
 export const AuthenticatedUserWithSubscription = () => (
   <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <SubscriptionDialog
+      open
+      onClose={action('on close')}
+      analyticsMetadata={{ reason: 'Debugger' }}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+export const AuthenticatedUserWithRedemptionCodeSubscription = () => (
+  <AuthenticatedUserContext.Provider
+    value={fakeSubscriptionWithRedemptionCodeAuthenticatedUser}
+  >
     <SubscriptionDialog
       open
       onClose={action('on close')}

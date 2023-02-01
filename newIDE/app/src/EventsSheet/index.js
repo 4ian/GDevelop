@@ -45,7 +45,6 @@ import {
   getSelectedEvents,
   getSelectedInstructions,
   clearSelection,
-  getSelectedEventContexts,
   getSelectedInstructionsContexts,
   getSelectedInstructionsLocatingEvents,
   selectEventsAfterHistoryChange,

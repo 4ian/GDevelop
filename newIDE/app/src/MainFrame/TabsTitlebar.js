@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
+import FloppyIcon from '../UI/CustomSvgIcons/Floppy';
 import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ThemeContext from '../UI/Theme/ThemeContext';
@@ -14,6 +15,8 @@ const electron = optionalRequire('electron');
 type Props = {|
   onBuildMenuTemplate: () => Array<MenuItemTemplate>,
   children: React.Node,
+  onSave: () => Promise<void>,
+  canSave: boolean,
 |};
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -23,12 +26,18 @@ const styles = {
   leftSideArea: { alignSelf: 'stretch' },
   rightSideArea: { alignSelf: 'stretch', flex: 1 },
   menuIcon: { marginLeft: 4, marginRight: 4 },
+  saveIcon: { marginRight: 4 },
 };
 
 /**
  * The titlebar containing a menu, the tabs and giving space for window controls.
  */
-export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
+export default function TabsTitlebar({
+  children,
+  onBuildMenuTemplate,
+  onSave,
+  canSave,
+}: Props) {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(ThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
@@ -87,6 +96,16 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
         }
         buildMenuTemplate={onBuildMenuTemplate}
       />
+      <IconButton
+        size="small"
+        id="titlebar-save-button"
+        style={styles.saveIcon}
+        color="default"
+        onClick={onSave}
+        disabled={!canSave}
+      >
+        <FloppyIcon />
+      </IconButton>
       {children}
       <div
         style={{

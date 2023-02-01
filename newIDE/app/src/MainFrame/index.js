@@ -2810,6 +2810,8 @@ const MainFrame = (props: Props) => {
             mainMenuCallbacks
           )
         }
+        onSave={saveProject}
+        canSave={!!state.currentProject && !isSavingProject}
       >
         <DraggableEditorTabs
           hideLabels={false}

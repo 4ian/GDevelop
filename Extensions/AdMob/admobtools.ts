@@ -77,13 +77,13 @@ namespace gdjs {
     let interstitialShowing = false; // Becomes true when the interstitial is showing.
     let interstitialErrored = false; // Becomes true when the interstitial fails to load.
 
-    // Reward video
-    let video;
-    let videoLoading = false; // Becomes true when the video is loading.
-    let videoReady = false; // Becomes true when the video is loaded and ready to be shown.
-    let videoShowing = false; // Becomes true when the video is showing.
-    let videoRewardReceived = false; // Becomes true when the video is closed and the reward is received.
-    let videoErrored = false; // Becomes true when the video fails to load.
+    // Rewarded video
+    let rewardedVideo;
+    let rewardedVideoLoading = false; // Becomes true when the video is loading.
+    let rewardedVideoReady = false; // Becomes true when the video is loaded and ready to be shown.
+    let rewardedVideoShowing = false; // Becomes true when the video is showing.
+    let rewardedVideoRewardReceived = false; // Becomes true when the video is closed and the reward is received.
+    let rewardedVideoErrored = false; // Becomes true when the video fails to load.
 
     let npaValue = '0'; // TODO: expose an API to change this and also an automatic way using the consent SDK.
 
@@ -346,111 +346,111 @@ namespace gdjs {
     };
 
     // Reward video
-    export const isVideoLoading = () => videoLoading;
-    export const isVideoReady = () => videoReady;
-    export const isVideoShowing = () => videoShowing;
-    export const isVideoErrored = () => videoErrored;
+    export const isRewardedVideoLoading = () => rewardedVideoLoading;
+    export const isRewardedVideoReady = () => rewardedVideoReady;
+    export const isRewardedVideoShowing = () => rewardedVideoShowing;
+    export const isRewardedVideoErrored = () => rewardedVideoErrored;
 
-    /** Check if the reward of the video was received. */
-    export const wasVideoRewardReceived = function (markAsClaimed) {
-      const reward = videoRewardReceived;
+    /** Check if the reward of the rewarded video was received. */
+    export const wasRewardedVideoRewardReceived = function (markAsClaimed) {
+      const reward = rewardedVideoRewardReceived;
       if (markAsClaimed) {
-        videoRewardReceived = false;
+        rewardedVideoRewardReceived = false;
       }
       return reward;
     };
 
-    /** Load a reward video. */
-    export const loadVideo = async (
+    /** Load a rewarded video. */
+    export const loadRewardedVideo = async (
       androidAdUnitID,
       iosAdUnitID,
       displayWhenLoaded
     ) => {
       if (!checkIfAdMobIsAvailable()) return;
-      if (videoLoading || videoShowing) {
+      if (rewardedVideoLoading || rewardedVideoShowing) {
         return;
       }
 
       const adUnitId = getAdUnitId(androidAdUnitID, iosAdUnitID, 'rewarded');
       if (!adUnitId) return;
 
-      videoLoading = true;
-      videoReady = false;
-      videoErrored = false;
+      rewardedVideoLoading = true;
+      rewardedVideoReady = false;
+      rewardedVideoErrored = false;
 
-      video = new admob.RewardedAd({
+      rewardedVideo = new admob.RewardedAd({
         adUnitId,
         npa: npaValue,
       });
 
-      // Reward video event listeners
-      video.on('load', () => {
-        videoReady = true;
-        videoLoading = false;
+      // Rewarded video event listeners
+      rewardedVideo.on('load', () => {
+        rewardedVideoReady = true;
+        rewardedVideoLoading = false;
       });
-      video.on('loadfail', () => {
-        videoLoading = false;
-        videoErrored = true;
+      rewardedVideo.on('loadfail', () => {
+        rewardedVideoLoading = false;
+        rewardedVideoErrored = true;
       });
-      video.on('show', () => {
-        videoShowing = true;
-        videoReady = false;
+      rewardedVideo.on('show', () => {
+        rewardedVideoShowing = true;
+        rewardedVideoReady = false;
       });
-      video.on('showfail', () => {
-        videoShowing = false;
-        videoErrored = true;
+      rewardedVideo.on('showfail', () => {
+        rewardedVideoShowing = false;
+        rewardedVideoErrored = true;
       });
-      video.on('dismiss', () => {
-        videoShowing = false;
+      rewardedVideo.on('dismiss', () => {
+        rewardedVideoShowing = false;
       });
-      video.on('reward', () => {
-        videoRewardReceived = true;
+      rewardedVideo.on('reward', () => {
+        rewardedVideoRewardReceived = true;
       });
 
       try {
-        logger.info('Loading AdMob reward video...');
-        await video.load();
-        logger.info('AdMob reward video successfully loaded.');
-        videoLoading = false;
-        videoReady = true;
-        if (displayWhenLoaded) showVideo();
+        logger.info('Loading AdMob rewarded video...');
+        await rewardedVideo.load();
+        logger.info('AdMob rewarded video successfully loaded.');
+        rewardedVideoLoading = false;
+        rewardedVideoReady = true;
+        if (displayWhenLoaded) showRewardedVideo();
       } catch (error) {
-        videoLoading = false;
-        videoReady = false;
-        videoErrored = true;
-        logger.error('Error while loading a reward video:', error);
+        rewardedVideoLoading = false;
+        rewardedVideoReady = false;
+        rewardedVideoErrored = true;
+        logger.error('Error while loading a rewarded video:', error);
       }
     };
 
     /** Show the loaded reward video. */
-    export const showVideo = async () => {
+    export const showRewardedVideo = async () => {
       if (!checkIfAdMobIsAvailable()) return;
 
-      if (!video) {
-        logger.warn('Video has not been set up, call loadVideo first.');
+      if (!rewardedVideo) {
+        logger.warn('Video has not been set up, call loadRewardedVideo first.');
         return;
       }
-      if (!videoReady) {
-        logger.info('Video not loaded yet, cannot display it.');
+      if (!rewardedVideoReady) {
+        logger.info('Rewarded video not loaded yet, cannot display it.');
       }
-      videoErrored = false;
+      rewardedVideoErrored = false;
 
       try {
-        logger.info('showing AdMob reward video...');
-        await video.show();
-        // Video will be shown and
-        // `videoShowing` will be updated thanks to events
+        logger.info('showing AdMob rewarded video...');
+        await rewardedVideo.show();
+        // Rewarded video will be shown and
+        // `rewardedVideoShowing` will be updated thanks to events
         // (but it's too early to change it now).
       } catch (error) {
-        logger.error('Error while showing an AdMob reward video:', error);
-        videoShowing = false;
-        videoErrored = true;
+        logger.error('Error while showing an AdMob rewarded video:', error);
+        rewardedVideoShowing = false;
+        rewardedVideoErrored = true;
       }
     };
 
     /** Mark the reward of the video as claimed. */
-    export const markVideoRewardAsClaimed = () => {
-      videoRewardReceived = false;
+    export const markRewardedVideoRewardAsClaimed = () => {
+      rewardedVideoRewardReceived = false;
     };
   }
 }

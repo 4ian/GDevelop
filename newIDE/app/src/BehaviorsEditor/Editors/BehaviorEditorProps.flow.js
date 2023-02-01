@@ -9,5 +9,5 @@ export type BehaviorEditorProps = {|
   project: gdProject,
   object: gdObject,
   resourceManagementProps: ResourceManagementProps,
-  onBehaviorsUpdated: () => void,
+  onBehaviorUpdated: () => void,
 |};

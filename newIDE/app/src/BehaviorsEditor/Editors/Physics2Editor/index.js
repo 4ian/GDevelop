@@ -100,7 +100,7 @@ const BitGroupEditor = (props: {|
 const Physics2Editor = (props: Props) => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
-  const { behavior, onBehaviorsUpdated } = props;
+  const { behavior, onBehaviorUpdated } = props;
   const forceUpdate = useForceUpdate();
 
   const isBitEnabled = (bitsValue: number, pos: number) => {
@@ -111,6 +111,12 @@ const Physics2Editor = (props: Props) => {
     if (enable) bitsValue |= 1 << pos;
     else bitsValue &= ~(1 << pos);
     return bitsValue;
+  };
+
+  const updateBehaviorProperty = (property, value) => {
+    behavior.updateProperty(property, value);
+    forceUpdate();
+    onBehaviorUpdated();
   };
 
   const properties = behavior.getProperties();
@@ -132,11 +138,9 @@ const Physics2Editor = (props: Props) => {
           fullWidth
           floatingLabelText={properties.get('bodyType').getLabel()}
           value={properties.get('bodyType').getValue()}
-          onChange={(e, i, newValue: string) => {
-            behavior.updateProperty('bodyType', newValue);
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onChange={(e, i, newValue: string) =>
+            updateBehaviorProperty('bodyType', newValue)
+          }
         >
           {[
             <SelectOption
@@ -161,29 +165,23 @@ const Physics2Editor = (props: Props) => {
         <Checkbox
           label={properties.get('bullet').getLabel()}
           checked={properties.get('bullet').getValue() === 'true'}
-          onCheck={(e, checked) => {
-            behavior.updateProperty('bullet', checked ? '1' : '0');
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onCheck={(e, checked) =>
+            updateBehaviorProperty('bullet', checked ? '1' : '0')
+          }
         />
         <Checkbox
           label={properties.get('fixedRotation').getLabel()}
           checked={properties.get('fixedRotation').getValue() === 'true'}
-          onCheck={(e, checked) => {
-            behavior.updateProperty('fixedRotation', checked ? '1' : '0');
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onCheck={(e, checked) =>
+            updateBehaviorProperty('fixedRotation', checked ? '1' : '0')
+          }
         />
         <Checkbox
           label={properties.get('canSleep').getLabel()}
           checked={properties.get('canSleep').getValue() === 'true'}
-          onCheck={(e, checked) => {
-            behavior.updateProperty('canSleep', checked ? '1' : '0');
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onCheck={(e, checked) =>
+            updateBehaviorProperty('canSleep', checked ? '1' : '0')
+          }
         />
       </ResponsiveLineStackLayout>
       <Line>
@@ -206,11 +204,9 @@ const Physics2Editor = (props: Props) => {
           fullWidth
           floatingLabelText={properties.get('shape').getLabel()}
           value={properties.get('shape').getValue()}
-          onChange={(e, i, newValue: string) => {
-            behavior.updateProperty('shape', newValue);
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onChange={(e, i, newValue: string) =>
+            updateBehaviorProperty('shape', newValue)
+          }
         >
           <SelectOption key={'box'} value={'Box'} primaryText={t`Box`} />
           <SelectOption
@@ -240,11 +236,9 @@ const Physics2Editor = (props: Props) => {
                 : 'Width'
             }
             min={0}
-            onChange={newValue => {
-              behavior.updateProperty('shapeDimensionA', newValue);
-              onBehaviorsUpdated();
-              forceUpdate();
-            }}
+            onChange={newValue =>
+              updateBehaviorProperty('shapeDimensionA', newValue)
+            }
             type="number"
             endAdornment={
               <UnitAdornment property={properties.get('shapeDimensionA')} />
@@ -258,11 +252,9 @@ const Physics2Editor = (props: Props) => {
             key={'shapeDimensionB'}
             floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
             min={shape === 'Edge' ? undefined : 0}
-            onChange={newValue => {
-              behavior.updateProperty('shapeDimensionB', newValue);
-              onBehaviorsUpdated();
-              forceUpdate();
-            }}
+            onChange={newValue =>
+              updateBehaviorProperty('shapeDimensionB', newValue)
+            }
             type="number"
             endAdornment={
               <UnitAdornment property={properties.get('shapeDimensionB')} />
@@ -274,11 +266,9 @@ const Physics2Editor = (props: Props) => {
             fullWidth
             floatingLabelText={properties.get('polygonOrigin').getLabel()}
             value={properties.get('polygonOrigin').getValue()}
-            onChange={(e, i, newValue: string) => {
-              behavior.updateProperty('polygonOrigin', newValue);
-              onBehaviorsUpdated();
-              forceUpdate();
-            }}
+            onChange={(e, i, newValue: string) =>
+              updateBehaviorProperty('polygonOrigin', newValue)
+            }
           >
             {[
               <SelectOption
@@ -303,21 +293,17 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'shapeOffsetX'}
           step={1}
-          onUpdate={newValue => {
-            behavior.updateProperty('shapeOffsetX', newValue);
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onUpdate={newValue =>
+            updateBehaviorProperty('shapeOffsetX', newValue)
+          }
         />
         <NumericProperty
           properties={properties}
           propertyName={'shapeOffsetY'}
           step={1}
-          onUpdate={newValue => {
-            behavior.updateProperty('shapeOffsetY', newValue);
-            onBehaviorsUpdated();
-            forceUpdate();
-          }}
+          onUpdate={newValue =>
+            updateBehaviorProperty('shapeOffsetY', newValue)
+          }
         />
       </ResponsiveLineStackLayout>
       <Line>
@@ -335,7 +321,7 @@ const Physics2Editor = (props: Props) => {
           fullWidth
           onChange={resourceName => {
             setImage(resourceName);
-            onBehaviorsUpdated();
+            onBehaviorUpdated();
             forceUpdate();
           }}
         />
@@ -408,7 +394,7 @@ const Physics2Editor = (props: Props) => {
                         JSON.stringify(vertices)
                       );
                       forceUpdate();
-                      onBehaviorsUpdated();
+                      onBehaviorUpdated();
                     }}
                   />
                 );
@@ -424,31 +410,23 @@ const Physics2Editor = (props: Props) => {
             onChangeVertexX={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].x = newValue;
-              behavior.updateProperty('vertices', JSON.stringify(vertices));
-              forceUpdate();
-              onBehaviorsUpdated();
+              updateBehaviorProperty('vertices', JSON.stringify(vertices));
             }}
             onChangeVertexY={(newValue, index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices[index].y = newValue;
-              behavior.updateProperty('vertices', JSON.stringify(vertices));
-              forceUpdate();
-              onBehaviorsUpdated();
+              updateBehaviorProperty('vertices', JSON.stringify(vertices));
             }}
             onAdd={() => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               if (vertices.length >= 8) return;
               vertices.push({ x: 0, y: 0 });
-              behavior.updateProperty('vertices', JSON.stringify(vertices));
-              forceUpdate();
-              onBehaviorsUpdated();
+              updateBehaviorProperty('vertices', JSON.stringify(vertices));
             }}
             onRemove={index => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices.splice(index, 1);
-              behavior.updateProperty('vertices', JSON.stringify(vertices));
-              forceUpdate();
-              onBehaviorsUpdated();
+              updateBehaviorProperty('vertices', JSON.stringify(vertices));
             }}
           />
         </Line>
@@ -459,24 +437,20 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'density'}
           step={0.1}
-          onUpdate={newValue => {
-            behavior.updateProperty(
+          onUpdate={newValue =>
+            updateBehaviorProperty(
               'density',
               parseFloat(newValue) > 0 ? newValue : '0'
-            );
-            forceUpdate();
-            onBehaviorsUpdated();
-          }}
+            )
+          }
         />
         <NumericProperty
           properties={properties}
           propertyName={'gravityScale'}
           step={0.1}
-          onUpdate={newValue => {
-            behavior.updateProperty('gravityScale', newValue);
-            forceUpdate();
-            onBehaviorsUpdated();
-          }}
+          onUpdate={newValue =>
+            updateBehaviorProperty('gravityScale', newValue)
+          }
         />
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
@@ -484,27 +458,23 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'friction'}
           step={0.1}
-          onUpdate={newValue => {
-            behavior.updateProperty(
+          onUpdate={newValue =>
+            updateBehaviorProperty(
               'friction',
               parseFloat(newValue) > 0 ? newValue : '0'
-            );
-            forceUpdate();
-            onBehaviorsUpdated();
-          }}
+            )
+          }
         />
         <NumericProperty
           properties={properties}
           propertyName={'restitution'}
           step={0.1}
-          onUpdate={newValue => {
-            behavior.updateProperty(
+          onUpdate={newValue =>
+            updateBehaviorProperty(
               'restitution',
               parseFloat(newValue) > 0 ? newValue : '0'
-            );
-            forceUpdate();
-            onBehaviorsUpdated();
-          }}
+            )
+          }
         />
       </ResponsiveLineStackLayout>
       <ResponsiveLineStackLayout>
@@ -512,22 +482,18 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'linearDamping'}
           step={0.05}
-          onUpdate={newValue => {
-            behavior.updateProperty('linearDamping', newValue);
-            forceUpdate();
-            onBehaviorsUpdated();
-          }}
+          onUpdate={newValue =>
+            updateBehaviorProperty('linearDamping', newValue)
+          }
         />
         <NumericProperty
           id="physics2-parameter-angular-damping"
           properties={properties}
           propertyName={'angularDamping'}
           step={0.05}
-          onUpdate={newValue => {
-            behavior.updateProperty('angularDamping', newValue);
-            forceUpdate();
-            onBehaviorsUpdated();
-          }}
+          onUpdate={newValue =>
+            updateBehaviorProperty('angularDamping', newValue)
+          }
         />
       </ResponsiveLineStackLayout>
       <Line>
@@ -538,9 +504,7 @@ const Physics2Editor = (props: Props) => {
           bits={bits.map((_, idx) => isBitEnabled(layersValues, idx))}
           onChange={(index, value) => {
             const newValue = enableBit(layersValues, index, value);
-            behavior.updateProperty('layers', newValue.toString(10));
-            forceUpdate();
-            onBehaviorsUpdated();
+            updateBehaviorProperty('layers', newValue.toString(10));
           }}
         />
       </Line>
@@ -552,9 +516,7 @@ const Physics2Editor = (props: Props) => {
           bits={bits.map((_, idx) => isBitEnabled(masksValues, idx))}
           onChange={(index, value) => {
             const newValue = enableBit(masksValues, index, value);
-            behavior.updateProperty('masks', newValue.toString(10));
-            forceUpdate();
-            onBehaviorsUpdated();
+            updateBehaviorProperty('masks', newValue.toString(10));
           }}
         />
       </Line>

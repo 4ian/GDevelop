@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
@@ -69,6 +68,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
@@ -130,9 +130,9 @@ const InnerDialog = (props: InnerDialogProps) => {
         if (!answer) return;
       }
       onCancelChanges();
-      props.openBehaviorEvents(extensionName, behaviorName);
+      openBehaviorEvents(extensionName, behaviorName);
     },
-    [hasUnsavedChanges, onCancelChanges, props, showConfirmation]
+    [hasUnsavedChanges, onCancelChanges, openBehaviorEvents, showConfirmation]
   );
 
   return (
@@ -232,7 +232,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             project={props.project}
             resourceManagementProps={props.resourceManagementProps}
             onSizeUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positionned*/
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
             }
             objectName={props.objectName}
             onObjectUpdated={notifyOfChange}
@@ -240,22 +240,18 @@ const InnerDialog = (props: InnerDialogProps) => {
         </Column>
       ) : null}
       {currentTab === 'behaviors' && (
-        <I18n>
-          {({ i18n }) => (
-            <BehaviorsEditor
-              object={props.object}
-              project={props.project}
-              eventsFunctionsExtension={props.eventsFunctionsExtension}
-              resourceManagementProps={props.resourceManagementProps}
-              onSizeUpdated={
-                forceUpdate /*Force update to ensure dialog is properly positionned*/
-              }
-              onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
-              onBehaviorsUpdated={notifyOfChange}
-              openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
-            />
-          )}
-        </I18n>
+        <BehaviorsEditor
+          object={props.object}
+          project={props.project}
+          eventsFunctionsExtension={props.eventsFunctionsExtension}
+          resourceManagementProps={props.resourceManagementProps}
+          onSizeUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
+          }
+          onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
+          onBehaviorsUpdated={notifyOfChange}
+          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+        />
       )}
       {currentTab === 'variables' && (
         <Column expand noMargin>
@@ -291,7 +287,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}
           onEffectsUpdated={() => {
-            forceUpdate(); /*Force update to ensure dialog is properly positionned*/
+            forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
           }}
         />

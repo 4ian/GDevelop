@@ -298,7 +298,7 @@ const BehaviorsEditor = (props: Props) => {
                           resourceManagementProps={
                             props.resourceManagementProps
                           }
-                          onBehaviorsUpdated={props.onBehaviorsUpdated}
+                          onBehaviorUpdated={props.onBehaviorsUpdated}
                         />
                       </Line>
                     </Column>

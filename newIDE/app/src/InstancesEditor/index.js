@@ -956,7 +956,10 @@ export default class InstancesEditor extends Component<Props> {
     if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
-    if (this.fpsLimiter.shouldUpdate() && !shouldPreventRenderingInstanceEditors()) {
+    if (
+      this.fpsLimiter.shouldUpdate() &&
+      !shouldPreventRenderingInstanceEditors()
+    ) {
       this.backgroundColor.render();
       this.viewPosition.render();
       this.canvasCursor.render();

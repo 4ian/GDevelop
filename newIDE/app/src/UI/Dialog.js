@@ -174,7 +174,11 @@ type DialogProps = {|
    */
   cannotBeDismissed?: boolean,
 
-  exceptionallyStillAllowRenderingInstancesEditors?: boolean;
+  /**
+   * Indicates that even when this dialog is opened, the instances editor should still continue to render.
+   * Useful to see changes in realtime.
+   */
+  exceptionallyStillAllowRenderingInstancesEditors?: boolean,
 
   children: React.Node, // The content of the dialog
 

@@ -21,6 +21,7 @@ import GDevelopThemeContext from './Theme/ThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
 const electron = optionalRequire('electron');
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -173,6 +174,8 @@ type DialogProps = {|
    */
   cannotBeDismissed?: boolean,
 
+  exceptionallyStillAllowRenderingInstancesEditors?: boolean;
+
   children: React.Node, // The content of the dialog
 
   // Display:
@@ -209,6 +212,7 @@ const Dialog = ({
   fullHeight,
   id,
   cannotBeDismissed,
+  exceptionallyStillAllowRenderingInstancesEditors,
   noMobileFullScreen,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
@@ -313,6 +317,7 @@ const Dialog = ({
       fullScreen={isFullScreen}
       className={classNames({
         'safe-area-aware-container': isFullScreen,
+        [classNameToStillAllowRenderingInstancesEditor]: exceptionallyStillAllowRenderingInstancesEditors,
       })}
       PaperProps={{
         id,

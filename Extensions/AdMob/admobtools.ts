@@ -140,6 +140,16 @@ namespace gdjs {
         size: bannerRequestedAdSizeType,
       });
 
+      banner.on('load', () => {
+        bannerShowing = true;
+        bannerLoaded = true;
+      });
+      banner.on('load_fail', () => {
+        bannerShowing = false;
+        bannerLoaded = false;
+        bannerErrored = true;
+      });
+
       bannerConfigured = true;
     };
 
@@ -158,6 +168,7 @@ namespace gdjs {
       bannerErrored = false;
 
       try {
+        logger.info('Showing AdMob banner...');
         await banner.show();
         if (bannerLoaded) {
           // Banner is already loaded, so it will be shown immediately.
@@ -198,6 +209,7 @@ namespace gdjs {
       displayWhenLoaded
     ) => {
       if (!checkIfAdMobIsAvailable()) return;
+      // If an interstitial is already loading or showing, we don't stop it.
       if (interstitialLoading || interstitialShowing) {
         return;
       }
@@ -214,7 +226,28 @@ namespace gdjs {
         npa: npaValue,
       });
 
+      interstitial.on('load', () => {
+        interstitialReady = true;
+        interstitialLoading = false;
+      });
+      interstitial.on('loadfail', () => {
+        interstitialLoading = false;
+        interstitialErrored = true;
+      });
+      interstitial.on('show', () => {
+        interstitialShowing = true;
+        interstitialReady = false;
+      });
+      interstitial.on('showfail', () => {
+        interstitialShowing = false;
+        interstitialErrored = true;
+      });
+      interstitial.on('dismiss', () => {
+        interstitialShowing = false;
+      });
+
       try {
+        logger.info('loading Admob interstitial.....');
         await interstitial.load();
         logger.info('AdMob interstitial successfully loaded.');
         interstitialLoading = false;
@@ -240,10 +273,12 @@ namespace gdjs {
       }
       if (!interstitialReady) {
         logger.info('Interstitial not loaded yet, cannot display it.');
+        return;
       }
       interstitialErrored = false;
 
       try {
+        logger.info('Showing AdMob interstitial...');
         await interstitial.show();
         // Interstitial will be shown and
         // `interstitialShowing` will be updated thanks to events
@@ -290,6 +325,7 @@ namespace gdjs {
       });
 
       try {
+        logger.info('Loading AdMob reward video...');
         await video.load();
         logger.info('AdMob reward video successfully loaded.');
         videoLoading = false;
@@ -317,6 +353,7 @@ namespace gdjs {
       videoErrored = false;
 
       try {
+        logger.info('showing AdMob reward video...');
         await video.show();
         // Video will be shown and
         // `videoShowing` will be updated thanks to events
@@ -345,47 +382,6 @@ namespace gdjs {
       },
       false
     );
-
-    // Banner event listeners:
-    document.addEventListener('admob.banner.load', () => {
-      bannerShowing = true;
-      bannerLoaded = true;
-    });
-    document.addEventListener('admob.banner.load_fail', () => {
-      bannerShowing = false;
-      bannerLoaded = false;
-      bannerErrored = true;
-    });
-
-    document.addEventListener('admob.banner.open', () => {
-      // Not implemented.
-    });
-
-    document.addEventListener('admob.banner.exit_app', () => {
-      // Not implemented.
-    });
-    document.addEventListener('admob.banner.close', () => {
-      // Not implemented.
-    });
-
-    // Interstitial event listeners
-    document.addEventListener('admob.interstitial.load', () => {
-      interstitialReady = true;
-      interstitialLoading = false;
-    });
-    document.addEventListener('admob.interstitial.load_fail', () => {
-      interstitialLoading = false;
-    });
-    document.addEventListener('admob.interstitial.open', () => {
-      interstitialShowing = true;
-      interstitialReady = false;
-    });
-    document.addEventListener('admob.interstitial.close', () => {
-      interstitialShowing = false;
-    });
-    document.addEventListener('admob.interstitial.exit_app', () => {
-      // Not implemented.
-    });
 
     // Reward video event listeners
     document.addEventListener('admob.reward_video.load', () => {

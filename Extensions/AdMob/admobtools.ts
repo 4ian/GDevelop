@@ -77,6 +77,14 @@ namespace gdjs {
     let interstitialShowing = false; // Becomes true when the interstitial is showing.
     let interstitialErrored = false; // Becomes true when the interstitial fails to load.
 
+    // Rewarded interstitial
+    let rewardedInterstitial;
+    let rewardedInterstitialLoading = false; // Becomes true when the interstitial is loading.
+    let rewardedInterstitialReady = false; // Becomes true when the interstitial is loaded and ready to be shown.
+    let rewardedInterstitialShowing = false; // Becomes true when the interstitial is showing.
+    let rewardedInterstitialRewardReceived = false; // Becomes true when the interstitial is closed and the reward is received.
+    let rewardedInterstitialErrored = false; // Becomes true when the interstitial fails to load.
+
     // Rewarded video
     let rewardedVideo;
     let rewardedVideoLoading = false; // Becomes true when the video is loading.
@@ -345,7 +353,129 @@ namespace gdjs {
       }
     };
 
-    // Reward video
+    // Rewarded interstitial
+    export const isRewardedInterstitialLoading = () =>
+      rewardedInterstitialLoading;
+    export const isRewardedInterstitialReady = () => rewardedInterstitialReady;
+    export const isRewardedInterstitialShowing = () =>
+      rewardedInterstitialShowing;
+    export const isRewardedInterstitialErrored = () =>
+      rewardedInterstitialErrored;
+
+    /** Check if the reward of the rewarded interstitial was received. */
+    export const wasRewardedInterstitialRewardReceived = function (
+      markAsClaimed
+    ) {
+      const reward = rewardedInterstitialRewardReceived;
+      if (markAsClaimed) {
+        rewardedInterstitialRewardReceived = false;
+      }
+      return reward;
+    };
+
+    /** Load a rewarded interstitial. */
+    export const loadRewardedInterstitial = async (
+      androidAdUnitID,
+      iosAdUnitID,
+      displayWhenLoaded
+    ) => {
+      if (!checkIfAdMobIsAvailable()) return;
+      if (rewardedInterstitialLoading || rewardedInterstitialShowing) {
+        return;
+      }
+
+      const adUnitId = getAdUnitId(
+        androidAdUnitID,
+        iosAdUnitID,
+        'rewardedInterstitial'
+      );
+      if (!adUnitId) return;
+
+      rewardedInterstitialLoading = true;
+      rewardedInterstitialReady = false;
+      rewardedInterstitialErrored = false;
+
+      rewardedInterstitial = new admob.RewardedInterstitialAd({
+        adUnitId,
+        npa: npaValue,
+      });
+
+      // Rewarded video event listeners
+      rewardedInterstitial.on('load', () => {
+        rewardedInterstitialReady = true;
+        rewardedInterstitialLoading = false;
+      });
+      rewardedInterstitial.on('loadfail', () => {
+        rewardedInterstitialLoading = false;
+        rewardedInterstitialErrored = true;
+      });
+      rewardedInterstitial.on('show', () => {
+        rewardedInterstitialShowing = true;
+        rewardedInterstitialReady = false;
+      });
+      rewardedInterstitial.on('showfail', () => {
+        rewardedInterstitialShowing = false;
+        rewardedInterstitialErrored = true;
+      });
+      rewardedInterstitial.on('dismiss', () => {
+        rewardedInterstitialShowing = false;
+      });
+      rewardedInterstitial.on('reward', () => {
+        rewardedInterstitialRewardReceived = true;
+      });
+
+      try {
+        logger.info('Loading AdMob rewarded interstitial...');
+        await rewardedInterstitial.load();
+        logger.info('AdMob rewarded interstitial successfully loaded.');
+        rewardedInterstitialLoading = false;
+        rewardedInterstitialReady = true;
+        if (displayWhenLoaded) showRewardedInterstitial();
+      } catch (error) {
+        rewardedInterstitialLoading = false;
+        rewardedInterstitialReady = false;
+        rewardedInterstitialErrored = true;
+        logger.error('Error while loading a rewarded interstitial:', error);
+      }
+    };
+
+    /** Show the loaded reward interstitial. */
+    export const showRewardedInterstitial = async () => {
+      if (!checkIfAdMobIsAvailable()) return;
+
+      if (!rewardedInterstitial) {
+        logger.warn(
+          'interstitial has not been set up, call loadRewardedInterstitial first.'
+        );
+        return;
+      }
+      if (!rewardedInterstitialReady) {
+        logger.info('Rewarded interstitial not loaded yet, cannot display it.');
+      }
+      rewardedInterstitialErrored = false;
+
+      try {
+        logger.info('showing AdMob rewarded interstitial...');
+        await rewardedInterstitial.show();
+        // Rewarded interstitial will be shown and
+        // `rewardedInterstitialShowing` will be updated thanks to events
+        // (but it's too early to change it now).
+      } catch (error) {
+        logger.error(
+          'Error while showing an AdMob rewarded interstitial:',
+          error
+        );
+        rewardedInterstitialShowing = false;
+        rewardedInterstitialErrored = true;
+      }
+    };
+
+    /** Mark the reward of the interstitial as claimed. */
+    export const markRewardedInterstitialRewardAsClaimed = () => {
+      rewardedInterstitialRewardReceived = false;
+    };
+
+    // Rewarded video
     export const isRewardedVideoLoading = () => rewardedVideoLoading;
     export const isRewardedVideoReady = () => rewardedVideoReady;
     export const isRewardedVideoShowing = () => rewardedVideoShowing;

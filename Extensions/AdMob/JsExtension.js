@@ -342,6 +342,155 @@ module.exports = {
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.showInterstitial');
 
+    // Rewarded Interstitial
+    extension
+      .addCondition(
+        'RewardedInterstitialLoading',
+        _('Rewarded interstitial loading'),
+        _('Check if a rewarded interstitial is currently loading.'),
+        _('Rewarded interstitial is loading'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isRewardedInterstitialLoading');
+
+    extension
+      .addCondition(
+        'RewardedInterstitialReady',
+        _('Rewarded interstitial ready'),
+        _('Check if a rewarded interstitial is ready to be displayed.'),
+        _('Rewarded interstitial is ready'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isRewardedInterstitialReady');
+
+    extension
+      .addCondition(
+        'RewardedInterstitialShowing',
+        _('Rewarded interstitial showing'),
+        _('Check if there is a rewarded interstitial being displayed.'),
+        _('Rewarded interstitial is showing'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isRewardedInterstitialShowing');
+
+    extension
+      .addCondition(
+        'RewardedInterstitialErrored',
+        _('Rewarded interstitial had an error'),
+        _(
+          'Check if there was a error while loading the rewarded interstitial.'
+        ),
+        _('Rewarded Interstitial had an error'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isRewardedInterstitialErrored');
+
+    extension
+      .addCondition(
+        'RewardedInterstitialRewardReceived',
+        _('Rewarded Interstitial reward received'),
+        _(
+          'Check if the reward of the rewarded interstitial was given to the user.\nYou can mark this reward as cleared, so that the condition will be false and you can show later another rewarded interstitial.'
+        ),
+        _(
+          'User got the reward of the rewarded interstitial (and clear this reward: _PARAM0_)'
+        ),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .addParameter(
+        'yesorno',
+        _('Clear the reward (needed to show another rewarded interstitial)'),
+        '',
+        false
+      )
+      .setDefaultValue('true')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.wasRewardedInterstitialRewardReceived');
+
+    extension
+      .addAction(
+        'LoadRewardedInterstitial',
+        _('Load rewarded interstitial'),
+        _(
+          'Start loading a rewarded interstitial (that can be displayed automatically when the loading is finished).\nIf test mode is set, a test rewarded interstitial will be displayed.\nThis is similar to a rewarded video, but can be displayed at any time, and the user can close it.'
+        ),
+        _(
+          'Load rewarded interstitial with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_ (display automatically when loaded: _PARAM2_)'
+        ),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .addParameter('string', _('Android rewarded interstitial ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5354046379"` for loading a test rewarded interstitial.'
+      )
+      .addParameter('string', _('iOS interstitial ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/6978759866"` for loading a test rewarded interstitial.'
+      )
+      .addParameter(
+        'yesorno',
+        _('Displayed automatically when loading is finished?'),
+        '',
+        false
+      )
+      .setDefaultValue('true')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.loadRewardedInterstitial');
+
+    extension
+      .addAction(
+        'ShowRewardedInterstitial',
+        _('Show rewarded interstitial'),
+        _(
+          'Show the rewarded interstitial that was loaded. Will work only when the rewarded interstitial is fully loaded.'
+        ),
+        _('Show the loaded rewarded interstitial'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.showRewardedInterstitial');
+
+    extension
+      .addAction(
+        'ClaimRewardedInterstitialReward',
+        _('Mark the reward of the rewarded interstitial as claimed'),
+        _(
+          'Mark the rewarded interstitial reward as claimed. Useful if you used the condition to check if the reward was given to the user without clearing the reward.'
+        ),
+        _('Mark the reward of the rewarded interstitial as claimed'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.markRewardedInterstitialRewardAsClaimed');
+
     // Rewarded video
     extension
       .addCondition(
@@ -424,7 +573,7 @@ module.exports = {
         'RewardedVideoRewardReceived',
         _('Rewarded Video reward received'),
         _(
-          'Check if the reward of the rewarded video was given to the user.\nYou can mark this reward as cleared, so that the condition will be false and you can show later another reward video.'
+          'Check if the reward of the rewarded video was given to the user.\nYou can mark this reward as cleared, so that the condition will be false and you can show later another rewarded video.'
         ),
         _(
           'User got the reward of the rewarded video (and clear this reward: _PARAM0_)'
@@ -506,7 +655,7 @@ module.exports = {
 
     extension
       .addAction(
-        'ClaimReward',
+        'ClaimRewardedVideoReward',
         _('Mark the reward of the rewarded video as claimed'),
         _(
           'Mark the rewarded video reward as claimed. Useful if you used the condition to check if the reward was given to the user without clearing the reward.'
@@ -519,6 +668,11 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.markRewardedVideoRewardAsClaimed');
+
+    // Deprecated action (was renamed):
+    extension
+      .addDuplicatedAction('ClaimReward', 'ClaimRewardedVideoReward')
+      .setHidden();
 
     return extension;
   },

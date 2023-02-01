@@ -188,7 +188,7 @@ module.exports = {
       )
       .addParameter('string', _('iOS banner ID'), '', false)
       .setParameterLongDescription(
-        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/6300978111"` for showing a test banner.'
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/2934735716"` for showing a test banner.'
       )
       .addParameter(
         'yesorno',
@@ -313,7 +313,7 @@ module.exports = {
       )
       .addParameter('string', _('iOS interstitial ID'), '', false)
       .setParameterLongDescription(
-        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/1033173712"` for loading a test interstitial.'
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/4411468910"` for loading a test interstitial.'
       )
       .addParameter(
         'yesorno',
@@ -442,7 +442,7 @@ module.exports = {
       )
       .addParameter('string', _('iOS reward video ID'), '', false)
       .setParameterLongDescription(
-        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5224354917"` for loading a test rewarded video.'
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/1712485313"` for loading a test rewarded video.'
       )
       .addParameter(
         'yesorno',

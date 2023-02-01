@@ -5,6 +5,41 @@ namespace gdjs {
   export namespace adMob {
     const logger = new gdjs.Logger('AdMob');
 
+    const testAdIds = {
+      appOpen: {
+        android: 'ca-app-pub-3940256099942544/3419835294',
+        ios: 'ca-app-pub-3940256099942544/5662855259',
+      },
+      banner: {
+        android: 'ca-app-pub-3940256099942544/6300978111',
+        ios: 'ca-app-pub-3940256099942544/2934735716',
+      },
+      interstitial: {
+        android: 'ca-app-pub-3940256099942544/1033173712',
+        ios: 'ca-app-pub-3940256099942544/4411468910',
+      },
+      interstitialVideo: {
+        android: 'ca-app-pub-3940256099942544/8691691433',
+        ios: 'ca-app-pub-3940256099942544/5135589807',
+      },
+      rewarded: {
+        android: 'ca-app-pub-3940256099942544/5224354917',
+        ios: 'ca-app-pub-3940256099942544/1712485313',
+      },
+      rewardedInterstitial: {
+        android: 'ca-app-pub-3940256099942544/5354046379',
+        ios: 'ca-app-pub-3940256099942544/6978759866',
+      },
+      native: {
+        android: 'ca-app-pub-3940256099942544/2247696110',
+        ios: 'ca-app-pub-3940256099942544/3986624511',
+      },
+      nativeVideo: {
+        android: 'ca-app-pub-3940256099942544/1044960115',
+        ios: 'ca-app-pub-3940256099942544/2521693316',
+      },
+    };
+
     export enum AdSizeType {
       BANNER,
       LARGE_BANNER,
@@ -25,6 +60,7 @@ namespace gdjs {
 
     // Admob does not initialize automatically, so we store a flag to know if it's initialized.
     let admobStarted = false;
+    let isUsingTestAds = false;
 
     // Banner
     let banner;
@@ -84,15 +120,15 @@ namespace gdjs {
     /**
      * Helper to get the correct ad id depending on the platform. Android and iOS use different ids.
      */
-    const getAdUnitId = (androidAdUnitId, iosAdUnitId) => {
+    const getAdUnitId = (androidAdUnitId, iosAdUnitId, type) => {
       if (typeof cordova === 'undefined') {
         logger.warn('Cordova is not available.');
         return;
       }
       if (cordova.platformId === 'android') {
-        return androidAdUnitId;
+        return isUsingTestAds ? testAdIds[type].android : androidAdUnitId;
       } else if (cordova.platformId === 'ios') {
-        return iosAdUnitId;
+        return isUsingTestAds ? testAdIds[type].ios : iosAdUnitId;
       }
 
       logger.error('Unsupported platform: ', cordova.platformId);
@@ -110,7 +146,7 @@ namespace gdjs {
     export const setTestMode = (enable: boolean) => {
       if (!checkIfAdMobIsAvailable()) return;
 
-      admob.setDevMode(enable);
+      isUsingTestAds = enable;
     };
 
     // Banner
@@ -138,7 +174,7 @@ namespace gdjs {
      */
     export const setupBanner = async (androidAdUnitId, iosAdUnitId, atTop) => {
       if (!checkIfAdMobIsAvailable()) return;
-      const adUnitId = getAdUnitId(androidAdUnitId, iosAdUnitId);
+      const adUnitId = getAdUnitId(androidAdUnitId, iosAdUnitId, 'banner');
       if (!adUnitId) return;
 
       if (banner && bannerShowing) {
@@ -229,7 +265,11 @@ namespace gdjs {
         return;
       }
 
-      const adUnitId = getAdUnitId(androidAdUnitId, iosAdUnitId);
+      const adUnitId = getAdUnitId(
+        androidAdUnitId,
+        iosAdUnitId,
+        'interstitial'
+      );
       if (!adUnitId) return;
 
       interstitialLoading = true;
@@ -321,13 +361,17 @@ namespace gdjs {
     };
 
     /** Load a reward video. */
-    export const loadVideo = async (androidID, iosID, displayWhenLoaded) => {
+    export const loadVideo = async (
+      androidAdUnitID,
+      iosAdUnitID,
+      displayWhenLoaded
+    ) => {
       if (!checkIfAdMobIsAvailable()) return;
       if (videoLoading || videoShowing) {
         return;
       }
 
-      const adUnitId = getAdUnitId(androidID, iosID);
+      const adUnitId = getAdUnitId(androidAdUnitID, iosAdUnitID, 'rewarded');
       if (!adUnitId) return;
 
       videoLoading = true;

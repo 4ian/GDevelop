@@ -97,27 +97,30 @@ const BitGroupEditor = (props: {|
   );
 };
 
+const isBitEnabled = (bitsValue: number, pos: number) => {
+  return !!(bitsValue & (1 << pos));
+};
+
+const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
+  if (enable) bitsValue |= 1 << pos;
+  else bitsValue &= ~(1 << pos);
+  return bitsValue;
+};
+
 const Physics2Editor = (props: Props) => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
   const { behavior, onBehaviorUpdated } = props;
   const forceUpdate = useForceUpdate();
 
-  const isBitEnabled = (bitsValue: number, pos: number) => {
-    return !!(bitsValue & (1 << pos));
-  };
-
-  const enableBit = (bitsValue: number, pos: number, enable: boolean) => {
-    if (enable) bitsValue |= 1 << pos;
-    else bitsValue &= ~(1 << pos);
-    return bitsValue;
-  };
-
-  const updateBehaviorProperty = (property, value) => {
-    behavior.updateProperty(property, value);
-    forceUpdate();
-    onBehaviorUpdated();
-  };
+  const updateBehaviorProperty = React.useCallback(
+    (property, value) => {
+      behavior.updateProperty(property, value);
+      forceUpdate();
+      onBehaviorUpdated();
+    },
+    [behavior, forceUpdate, onBehaviorUpdated]
+  );
 
   const properties = behavior.getProperties();
   const bits = Array(16).fill(null);

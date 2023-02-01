@@ -103,22 +103,6 @@ module.exports = {
     // Banner
     extension
       .addCondition(
-        'BannerLoading',
-        _('Banner loading'),
-        _(
-          'Check if a banner is currently loading. It will be shown automatically when loaded.'
-        ),
-        _('Banner is loading'),
-        '',
-        'JsPlatform/Extensions/admobicon24.png',
-        'JsPlatform/Extensions/admobicon16.png'
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/AdMob/admobtools.js')
-      .setFunctionName('gdjs.adMob.isBannerLoading');
-
-    extension
-      .addCondition(
         'BannerShowing',
         _('Banner showing'),
         _('Check if there is a banner being displayed.'),
@@ -130,6 +114,34 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.isBannerShowing');
+
+    extension
+      .addCondition(
+        'BannerConfigured',
+        _('Banner configured'),
+        _('Check if there is a banner correctly configured ready to be shown.'),
+        _('Banner is configured'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isBannerConfigured');
+
+    extension
+      .addCondition(
+        'BannerLoaded',
+        _('Banner loaded'),
+        _('Check if there is a banner correctly loaded ready to be shown.'),
+        _('Banner is loaded'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isBannerLoaded');
 
     extension
       .addCondition(
@@ -150,6 +162,9 @@ module.exports = {
       .addDuplicatedCondition('BannerReady', 'BannerShowing')
       .setHidden();
     extension
+      .addDuplicatedCondition('Bannerloading', 'BannerShowing')
+      .setHidden();
+    extension
       .addDuplicatedCondition('BannerExists', 'BannerShowing')
       .setHidden();
 
@@ -158,7 +173,7 @@ module.exports = {
         'SetupBanner',
         _('Configure the banner'),
         _(
-          "Configure a banner, which can then be displayed.\nIf test mode is set, a test banner will be displayed.\n\nOnce a banner is positioned (at the top or bottom of the game), it can't be moved anymore."
+          "Configure a banner, which can then be displayed.\nIf a banner is already displayed, it will be removed\nIf test mode is set, a test banner will be displayed.\n\nOnce a banner is positioned (at the top or bottom of the game), it can't be moved anymore."
         ),
         _(
           'Configure the banner with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_, display at top: _PARAM2_'

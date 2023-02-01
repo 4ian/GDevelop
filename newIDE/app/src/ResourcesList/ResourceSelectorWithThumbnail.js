@@ -34,12 +34,14 @@ const ResourceSelectorWithThumbnail = ({
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const itemsAlignment = windowWidth === 'small' ? 'center' : 'flex-end';
+
   return (
     <LineStackLayout noMargin expand alignItems={itemsAlignment}>
       <ResourceThumbnail
         resourceName={resourceName}
         resourcesLoader={ResourcesLoader}
         project={project}
+        resourceKind={resourceKind}
       />
       <ResourceSelector
         project={project}

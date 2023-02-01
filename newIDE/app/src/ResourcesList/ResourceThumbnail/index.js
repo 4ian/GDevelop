@@ -8,6 +8,7 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcesLoader: typeof ResourcesLoader,
+  resourceKind: ResourceKind,
   style?: Object,
   selectable?: boolean,
   selected?: boolean,
@@ -22,27 +23,14 @@ const ResourceThumbnail = ({
   project,
   resourceName,
   resourcesLoader,
+  resourceKind,
   style,
   selectable,
   selected,
   onSelect,
   onContextMenu,
 }: Props) => {
-  const [resourceKind, setResourceKind] = React.useState<?ResourceKind>(null);
-
-  React.useEffect(
-    () => {
-      const resourcesManager = project.getResourcesManager();
-      const resourceKind = resourcesManager.hasResource(resourceName)
-        ? resourcesManager.getResource(resourceName).getKind()
-        : null;
-      setResourceKind(resourceKind);
-    },
-    [project, resourceName]
-  );
-
   switch (resourceKind) {
-    case null: // If no resource loaded yet, use the image thumbnail checkered background.
     case 'image':
       return (
         <ImageThumbnail

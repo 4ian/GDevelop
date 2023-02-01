@@ -36,20 +36,35 @@ namespace gdjs {
 
     // Interstitial
     let interstitial;
-    let interstitialLoading = false;
-    let interstitialReady = false;
-    let interstitialErrored = false;
-    let interstitialShowing = false;
+    let interstitialLoading = false; // Becomes true when the interstitial is loading.
+    let interstitialReady = false; // Becomes true when the interstitial is loaded and ready to be shown.
+    let interstitialShowing = false; // Becomes true when the interstitial is showing.
+    let interstitialErrored = false; // Becomes true when the interstitial fails to load.
 
     // Reward video
     let video;
-    let videoLoading = false;
-    let videoReady = false;
-    let videoErrored = false;
-    let videoShowing = false;
-    let videoRewardReceived = false;
+    let videoLoading = false; // Becomes true when the video is loading.
+    let videoReady = false; // Becomes true when the video is loaded and ready to be shown.
+    let videoShowing = false; // Becomes true when the video is showing.
+    let videoRewardReceived = false; // Becomes true when the video is closed and the reward is received.
+    let videoErrored = false; // Becomes true when the video fails to load.
 
     let npaValue = '0'; // TODO: expose an API to change this and also an automatic way using the consent SDK.
+
+    // Admob initialization listener
+    document.addEventListener(
+      'deviceready',
+      async () => {
+        // Obtain user consent ?
+
+        await admob.start();
+
+        logger.info('AdMob succesfully started');
+
+        admobStarted = true;
+      },
+      false
+    );
 
     /**
      * Helper to know if we are on mobile and admob is correctly initialized.
@@ -324,6 +339,30 @@ namespace gdjs {
         npa: npaValue,
       });
 
+      // Reward video event listeners
+      video.on('load', () => {
+        videoReady = true;
+        videoLoading = false;
+      });
+      video.on('loadfail', () => {
+        videoLoading = false;
+        videoErrored = true;
+      });
+      video.on('show', () => {
+        videoShowing = true;
+        videoReady = false;
+      });
+      video.on('showfail', () => {
+        videoShowing = false;
+        videoErrored = true;
+      });
+      video.on('dismiss', () => {
+        videoShowing = false;
+      });
+      video.on('reward', () => {
+        videoRewardReceived = true;
+      });
+
       try {
         logger.info('Loading AdMob reward video...');
         await video.load();
@@ -369,46 +408,5 @@ namespace gdjs {
     export const markVideoRewardAsClaimed = () => {
       videoRewardReceived = false;
     };
-
-    // Admob initialization listener
-    document.addEventListener(
-      'deviceready',
-      async () => {
-        // Obtain user consent ?
-
-        await admob.start();
-
-        admobStarted = true;
-      },
-      false
-    );
-
-    // Reward video event listeners
-    document.addEventListener('admob.reward_video.load', () => {
-      videoReady = true;
-      videoLoading = false;
-    });
-    document.addEventListener('admob.reward_video.load_fail', () => {
-      videoLoading = false;
-    });
-    document.addEventListener('admob.reward_video.open', () => {
-      videoShowing = true;
-      videoReady = false;
-    });
-    document.addEventListener('admob.reward_video.close', () => {
-      videoShowing = false;
-    });
-    document.addEventListener('admob.reward_video.start', () => {
-      // Not implemented.
-    });
-    document.addEventListener('admob.reward_video.complete', () => {
-      // Not implemented.
-    });
-    document.addEventListener('admob.reward_video.reward', () => {
-      videoRewardReceived = true;
-    });
-    document.addEventListener('admob.reward_video.exit_app', () => {
-      // Not implemented.
-    });
   }
 }

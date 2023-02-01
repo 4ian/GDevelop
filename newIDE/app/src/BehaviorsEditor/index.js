@@ -30,6 +30,7 @@ import {
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
 import OpenInNew from '@material-ui/icons/OpenInNew';
+import AccordionActions from '@material-ui/core/AccordionActions';
 
 const gd: libGDevelop = global.gd;
 
@@ -230,6 +231,8 @@ const BehaviorsEditor = (props: Props) => {
                       />,
                       project.hasEventsBasedBehavior(behaviorTypeName) ? (
                         <IconButton
+                          key="open-extension"
+                          size="small"
                           tooltip={t`Open extension events`}
                           onClick={() => {
                             openExtension(behaviorTypeName);

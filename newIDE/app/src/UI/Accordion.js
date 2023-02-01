@@ -7,6 +7,7 @@ import MUIAccordionActions from '@material-ui/core/AccordionActions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from './IconButton';
 import GDevelopThemeContext from './Theme/ThemeContext';
+import { Column, Line } from '../UI/Grid';
 
 const styles = {
   bodyRoot: {
@@ -27,24 +28,42 @@ type AccordionHeadProps = {|
  */
 export const AccordionHeader = (props: AccordionHeadProps) => {
   return (
-    <MUIAccordionSummary
-      expandIcon={
-        props.expandIcon || (
-          <IconButton size="small">
-            <ExpandMoreIcon />
-          </IconButton>
-        )
-      }
-    >
-      <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-        {props.children}
-      </div>
-      {props.actions && (
-        <div style={{ flexGrow: 0, flexShrink: 0, alignSelf: 'center' }}>
-          {props.actions}
-        </div>
-      )}
-    </MUIAccordionSummary>
+    <Column expand>
+      <Line noMargin expand alignItems="center">
+        <Column noMargin expand>
+          <MUIAccordionSummary
+            style={{
+              flexDirection: 'row-reverse',
+              paddingLeft: 0,
+              paddingRight: 0,
+            }}
+            expandIcon={
+              props.expandIcon || (
+                <IconButton size="small">
+                  <ExpandMoreIcon />
+                </IconButton>
+              )
+            }
+          >
+            <div
+              style={{
+                flexGrow: 1,
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: 16,
+              }}
+            >
+              {props.children}
+            </div>
+          </MUIAccordionSummary>
+        </Column>
+        {props.actions && (
+          <div style={{ flexGrow: 0, flexShrink: 0, alignSelf: 'center' }}>
+            {props.actions}
+          </div>
+        )}
+      </Line>
+    </Column>
   );
 };
 

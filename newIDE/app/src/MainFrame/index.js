@@ -2843,8 +2843,6 @@ const MainFrame = (props: Props) => {
             mainMenuCallbacks
           )
         }
-        onSave={saveProject}
-        canSave={!!state.currentProject && !isSavingProject}
       >
         <DraggableEditorTabs
           hideLabels={false}
@@ -2870,6 +2868,8 @@ const MainFrame = (props: Props) => {
               : null
           )
         }
+        canSave={!!state.currentProject && !isSavingProject}
+        onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
         onOpenDebugger={launchDebuggerAndPreview}
@@ -2923,6 +2923,8 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     resourceManagementProps,
+                    onSave: saveProject,
+                    canSave: !!state.currentProject && !isSavingProject,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     unsavedChanges: unsavedChanges,

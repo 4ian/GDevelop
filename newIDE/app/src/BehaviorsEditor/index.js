@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import TextField from '../UI/TextField';
 import Add from '@material-ui/icons/Add';
@@ -29,8 +30,8 @@ import {
   listObjectBehaviorsTypes,
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import AccordionActions from '@material-ui/core/AccordionActions';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -229,28 +230,28 @@ const BehaviorsEditor = (props: Props) => {
                         size="small"
                         helpPagePath={behaviorMetadata.getHelpPath()}
                       />,
-                      project.hasEventsBasedBehavior(behaviorTypeName) ? (
-                        <IconButton
-                          key="open-extension"
-                          size="small"
-                          tooltip={t`Open extension events`}
-                          onClick={() => {
-                            openExtension(behaviorTypeName);
-                          }}
-                        >
-                          <OpenInNew />
-                        </IconButton>
-                      ) : null,
-                      <IconButton
-                        key="delete"
-                        size="small"
-                        onClick={ev => {
-                          ev.stopPropagation();
-                          onRemoveBehavior(behaviorName);
-                        }}
-                      >
-                        <Delete />
-                      </IconButton>,
+                      <ElementWithMenu
+                        element={
+                          <IconButton size="small">
+                            <ThreeDotsMenu />
+                          </IconButton>
+                        }
+                        buildMenuTemplate={(i18n: I18nType) => [
+                          {
+                            label: i18n._(t`Delete`),
+                            click: () => onRemoveBehavior(behaviorName),
+                          },
+                          ...(project.hasEventsBasedBehavior(behaviorTypeName)
+                            ? [
+                                { type: 'separator' },
+                                {
+                                  label: i18n._(t`Edit this behavior`),
+                                  click: () => openExtension(behaviorTypeName),
+                                },
+                              ]
+                            : []),
+                        ]}
+                      />,
                     ]}
                   >
                     {iconUrl ? (

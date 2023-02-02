@@ -123,9 +123,10 @@ const InnerDialog = (props: InnerDialogProps) => {
     async (extensionName, behaviorName) => {
       if (hasUnsavedChanges()) {
         const answer = await showConfirmation({
-          title: t`Abort changes and open events`,
+          title: t`Discard changes and open events`,
           message: t`You've made some changes here. Are you sure you want to discard them and open the behavior events?`,
-          confirmButtonLabel: t`Abort changes`,
+          confirmButtonLabel: t`Yes, discard my changes`,
+          dismissButtonLabel: t`Stay there`,
         });
         if (!answer) return;
       }

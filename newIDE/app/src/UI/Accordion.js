@@ -14,6 +14,19 @@ const styles = {
     // Remove body padding
     padding: 0,
   },
+  accordionSummaryWithExpandOnLeft: {
+    flexDirection: 'row-reverse',
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  accordionSummaryContent: {
+    flexGrow: 1,
+    display: 'flex',
+    alignItems: 'center',
+    // Avoids the summary content to overlap the expand icon that was put on the left
+    marginLeft: 16,
+  },
+  actionsContainer: { flexGrow: 0, flexShrink: 0, alignSelf: 'center' },
 };
 
 type AccordionHeadProps = {|
@@ -24,7 +37,7 @@ type AccordionHeadProps = {|
 
 /**
  * The header of an accordion section.
- * Based on Material-UI AccordionSummary.
+ * Based on Material-UI AccordionSummary (but we could almost remove it).
  */
 export const AccordionHeader = (props: AccordionHeadProps) => {
   return (
@@ -32,11 +45,7 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
       <Line noMargin expand alignItems="center">
         <Column noMargin expand>
           <MUIAccordionSummary
-            style={{
-              flexDirection: 'row-reverse',
-              paddingLeft: 0,
-              paddingRight: 0,
-            }}
+            style={styles.accordionSummaryWithExpandOnLeft}
             expandIcon={
               props.expandIcon || (
                 <IconButton size="small">
@@ -45,22 +54,11 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
               )
             }
           >
-            <div
-              style={{
-                flexGrow: 1,
-                display: 'flex',
-                alignItems: 'center',
-                marginLeft: 16,
-              }}
-            >
-              {props.children}
-            </div>
+            <div style={styles.accordionSummaryContent}>{props.children}</div>
           </MUIAccordionSummary>
         </Column>
         {props.actions && (
-          <div style={{ flexGrow: 0, flexShrink: 0, alignSelf: 'center' }}>
-            {props.actions}
-          </div>
+          <div style={styles.actionsContainer}>{props.actions}</div>
         )}
       </Line>
     </Column>

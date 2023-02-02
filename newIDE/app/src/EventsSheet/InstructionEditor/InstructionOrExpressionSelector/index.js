@@ -106,9 +106,15 @@ export default class InstructionOrExpressionSelector<
       id,
     } = this.props;
     const { searchText } = this.state;
+
+    const extendSearchText = `'${searchText
+      .trim()
+      .split(' ')
+      .join(" '")}`;
+
     const displayedInstructionsList: Array<SearchResult<T>> =
-      !!searchText && this.searchApi
-        ? this.searchApi.search(`'${searchText}`).map(result => ({
+      !!extendSearchText && this.searchApi
+        ? this.searchApi.search(extendSearchText).map(result => ({
             item: result.item,
             matches: tuneMatches(result, searchText),
           }))

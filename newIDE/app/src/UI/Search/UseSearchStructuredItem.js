@@ -29,6 +29,7 @@ export const sharedFuseConfiguration = {
   threshold: 0.35,
   includeMatches: true,
   ignoreLocation: true,
+  useExtendedSearch: true,
 };
 
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
@@ -211,6 +212,7 @@ export const useSearchStructuredItem = <
           threshold: 0.35,
           includeMatches: true,
           ignoreLocation: true,
+          useExtendedSearch: true,
         });
 
         const totalTime = performance.now() - startTime;
@@ -251,8 +253,13 @@ export const useSearchStructuredItem = <
           return;
         }
 
+        const extendSearchText = `'${searchText
+          .trim()
+          .split(' ')
+          .join(" '")}`;
+
         const startTime = performance.now();
-        const results = searchApi.search(`'${searchText}`);
+        const results = searchApi.search(extendSearchText);
         const totalTime = performance.now() - startTime;
         console.info(
           `Found ${results.length} items in ${totalTime.toFixed(3)}ms.`

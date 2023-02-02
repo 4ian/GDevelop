@@ -193,28 +193,33 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _search = (searchText: string) => {
     if (searchText === '') return;
 
+    const extendSearchText = `'${searchText
+      .trim()
+      .split(' ')
+      .join(" '")}`;
+
     this.setState({
       searchResults: {
         objects: this.objectSearchApi
-          ? this.objectSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.objectSearchApi.search(extendSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         groups: this.groupSearchApi
-          ? this.groupSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.groupSearchApi.search(extendSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         instructions: this.instructionSearchApi
-          ? this.instructionSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.instructionSearchApi.search(extendSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         tags: this.tagSearchApi
-          ? this.tagSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.tagSearchApi.search(extendSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))

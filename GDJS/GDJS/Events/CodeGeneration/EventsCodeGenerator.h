@@ -375,7 +375,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   gd::String GenerateFreeEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters,
-      const gd::String& onceTriggersVariable);
+      const gd::String& onceTriggersVariable,
+      bool isAsync);
 
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a behavior
@@ -386,6 +387,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const std::vector<gd::ParameterMetadata>& parameters,
       const gd::String& onceTriggersVariable,
+      bool isAsync,
       const gd::String& thisObjectName,
       const gd::String& thisBehaviorName);
 
@@ -398,6 +400,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsBasedObject& eventsBasedObject,
       const std::vector<gd::ParameterMetadata>& parameters,
       const gd::String& onceTriggersVariable,
+      bool isAsync,
       const gd::String& thisObjectName);
 
   gd::String GenerateEventsFunctionReturn(
@@ -429,6 +432,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String& objectsGettersMap,
       gd::String& objectArraysMap,
       gd::String& behaviorNamesMap,
+      bool isAsync,
       const gd::String& thisObjectName = "",
       const gd::String& thisBehaviorName = "");
 };

@@ -2,6 +2,7 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 const {
   generateCompiledEventsForEventsFunction,
   generateCompiledEventsFromSerializedEvents,
+  generateCompiledEventsForSerializedEventsBasedExtension,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks');
 const { makeTestExtensions } = require('../TestUtils/TestExtensions');
@@ -2315,7 +2316,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     });
 
     describe('async object actions, waiting for all objects to be finished', () => {
-      const expectProgressivelyResolvedTasksForObjects = (runCompiledEvents) => {
+      const expectProgressivelyResolvedTasksForObjects = (
+        runCompiledEvents
+      ) => {
         const { gdjs, runtimeScene } = makeMinimalGDJSMock();
         const myObjectA1 = runtimeScene.createObject('MyObjectA');
         const myObjectA2 = runtimeScene.createObject('MyObjectA');
@@ -3566,6 +3569,79 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       expect(myObjectC2.getVariables().get('TestVariable').getAsNumber()).toBe(
         4 + 4
       );
+    });
+  });
+
+  describe('Events based asynchronous functions', () => {
+    it('Resolves after awaiting an async action', () => {
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const extensionModule =
+        generateCompiledEventsForSerializedEventsBasedExtension(
+          gd,
+          require('./extensions/EBAsyncAction.json'),
+          gdjs,
+          runtimeScene
+        );
+
+      const {
+        freeFunctions: { wait },
+        behaviors: { Behavior },
+        objects: { Object },
+      } = extensionModule;
+
+      const freeFunctionExtensionTask = wait();
+      expect(freeFunctionExtensionTask.update()).toBe(false);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks();
+      expect(freeFunctionExtensionTask.update()).toBe(true);
+
+      const object = new Object(runtimeScene, {});
+      const objectExtensionTask = object.wait();
+      expect(objectExtensionTask.update()).toBe(false);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks();
+      expect(objectExtensionTask.update()).toBe(true);
+
+      const behavior = new Behavior(runtimeScene, {});
+      const behaviorExtensionTask = behavior.wait();
+      expect(behaviorExtensionTask.update()).toBe(false);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks();
+      expect(behaviorExtensionTask.update()).toBe(true);
+    });
+
+    it('Resolves without awaiting an async action', () => {
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const extensionModule =
+        generateCompiledEventsForSerializedEventsBasedExtension(
+          gd,
+          require('./extensions/EBAsyncAction.json'),
+          gdjs,
+          runtimeScene
+        );
+
+      const {
+        freeFunctions: { noWait },
+        behaviors: { Behavior },
+        objects: { Object },
+      } = extensionModule;
+
+      const extensionTask = noWait();
+      expect(extensionTask.update()).toBe(true);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(0);
+
+      const obj = new Object(runtimeScene, {});
+      const objectExtensionTask = obj.noWait();
+      expect(objectExtensionTask.update()).toBe(true);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(0);
+
+      const behavior = new Behavior(runtimeScene, {});
+      const behaviorExtensionTask = behavior.noWait();
+      expect(behaviorExtensionTask.update()).toBe(true);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(0);
     });
   });
 });

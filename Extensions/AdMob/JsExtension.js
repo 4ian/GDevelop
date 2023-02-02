@@ -100,6 +100,119 @@ module.exports = {
       .setIncludeFile('Extensions/AdMob/admobtools.js')
       .setFunctionName('gdjs.adMob.setTestMode');
 
+    // App Open
+    extension
+      .addCondition(
+        'AppOpenLoading',
+        _('App open loading'),
+        _('Check if an app open is currently loading.'),
+        _('App open is loading'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isAppOpenLoading');
+
+    extension
+      .addCondition(
+        'AppOpenReady',
+        _('App open ready'),
+        _('Check if an app open is ready to be displayed.'),
+        _('App open is ready'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isAppOpenReady');
+
+    extension
+      .addCondition(
+        'AppOpenShowing',
+        _('App open showing'),
+        _('Check if there is an app open being displayed.'),
+        _('App open is showing'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isAppOpenShowing');
+
+    extension
+      .addCondition(
+        'AppOpenErrored',
+        _('App open errored'),
+        _('Check if there was a error while loading the app open.'),
+        _('App open had an error'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.isAppOpenErrored');
+
+    extension
+      .addAction(
+        'LoadAppOpen',
+        _('Load app open'),
+        _(
+          'Start loading an app open (that can be displayed automatically when the loading is finished).\nIf test mode is set, a test app open will be displayed.'
+        ),
+        _(
+          'Load app open with Android ad unit ID: _PARAM0_, iOS ad unit ID: _PARAM1_ (landscape: _PARAM2_, display automatically when loaded: _PARAM3_)'
+        ),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .addParameter('string', _('Android app open ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/3419835294"` for loading a test app open.'
+      )
+      .addParameter('string', _('iOS app open ID'), '', false)
+      .setParameterLongDescription(
+        'Get it from your AdMob account. You can use `"ca-app-pub-3940256099942544/5662855259"` for loading a test app open.'
+      )
+      .addParameter(
+        'yesorno',
+        _('Display in landscape? (portait otherwise)'),
+        '',
+        false
+      )
+      .setDefaultValue('false')
+      .addParameter(
+        'yesorno',
+        _('Displayed automatically when loading is finished?'),
+        '',
+        false
+      )
+      .setDefaultValue('true')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.loadAppOpen');
+
+    extension
+      .addAction(
+        'ShowAppOpen',
+        _('Show app open'),
+        _(
+          'Show the app open that was loaded. Will work only when the app open is fully loaded.'
+        ),
+        _('Show the loaded app open'),
+        '',
+        'JsPlatform/Extensions/admobicon24.png',
+        'JsPlatform/Extensions/admobicon16.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/AdMob/admobtools.js')
+      .setFunctionName('gdjs.adMob.showAppOpen');
+
     // Banner
     extension
       .addCondition(

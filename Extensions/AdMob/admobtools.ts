@@ -40,7 +40,7 @@ namespace gdjs {
       },
     };
 
-    export enum AdSizeType {
+    enum AdSizeType {
       BANNER,
       LARGE_BANNER,
       MEDIUM_RECTANGLE,
@@ -57,6 +57,13 @@ namespace gdjs {
       LEADERBOARD: AdSizeType.LEADERBOARD,
       SMART_BANNER: AdSizeType.SMART_BANNER,
     };
+
+    enum AppOpenAdOrientation {
+      Portrait = 1,
+      PortraitUpsideDown = 2,
+      LandscapeRight = 3,
+      LandscapeLeft = 4,
+    }
 
     // Admob does not initialize automatically, so we store a flag to know if it's initialized.
     let admobStarted = false;
@@ -76,6 +83,13 @@ namespace gdjs {
     let interstitialReady = false; // Becomes true when the interstitial is loaded and ready to be shown.
     let interstitialShowing = false; // Becomes true when the interstitial is showing.
     let interstitialErrored = false; // Becomes true when the interstitial fails to load.
+
+    // App Open
+    let appOpen;
+    let appOpenLoading = false; // Becomes true when the appOpen is loading.
+    let appOpenReady = false; // Becomes true when the appOpen is loaded and ready to be shown.
+    let appOpenShowing = false; // Becomes true when the appOpen is showing.
+    let appOpenErrored = false; // Becomes true when the appOpen fails to load.
 
     // Rewarded interstitial
     let rewardedInterstitial;
@@ -103,7 +117,7 @@ namespace gdjs {
 
         await admob.start();
 
-        logger.info('AdMob succesfully started');
+        logger.info('AdMob succesfully started.');
 
         admobStarted = true;
       },
@@ -157,7 +171,106 @@ namespace gdjs {
       isUsingTestAds = enable;
     };
 
-    // Banner
+    // -------------------
+    // ---- App Open -----
+    // -------------------
+    export const isAppOpenLoading = () => appOpenLoading;
+    export const isAppOpenReady = () => appOpenReady;
+    export const isAppOpenShowing = () => appOpenShowing;
+    export const isAppOpenErrored = () => appOpenErrored;
+
+    /** Load an AppOpen. */
+    export const loadAppOpen = async (
+      androidAdUnitId,
+      iosAdUnitId,
+      displayLandscape,
+      displayWhenLoaded
+    ) => {
+      if (!checkIfAdMobIsAvailable()) return;
+      // If an appOpen is already loading or showing, we don't stop it.
+      if (appOpenLoading || appOpenShowing) {
+        return;
+      }
+
+      const adUnitId = getAdUnitId(androidAdUnitId, iosAdUnitId, 'appOpen');
+      if (!adUnitId) return;
+
+      appOpenLoading = true;
+      appOpenReady = false;
+      appOpenErrored = false;
+
+      appOpen = new admob.AppOpenAd({
+        adUnitId,
+        orientation: displayLandscape
+          ? AppOpenAdOrientation.LandscapeLeft
+          : AppOpenAdOrientation.Portrait,
+      });
+
+      appOpen.on('load', () => {
+        appOpenReady = true;
+        appOpenLoading = false;
+      });
+      appOpen.on('loadfail', () => {
+        appOpenLoading = false;
+        appOpenErrored = true;
+      });
+      appOpen.on('show', () => {
+        appOpenShowing = true;
+        appOpenReady = false;
+      });
+      appOpen.on('showfail', () => {
+        appOpenShowing = false;
+        appOpenErrored = true;
+      });
+      appOpen.on('dismiss', () => {
+        appOpenShowing = false;
+      });
+
+      try {
+        logger.info('Loading Admob App Open.');
+        await appOpen.load();
+        logger.info('AdMob App Open successfully loaded.');
+        appOpenLoading = false;
+        appOpenReady = true;
+        if (displayWhenLoaded) showAppOpen();
+      } catch (error) {
+        logger.error('Error while loading an App Open:', error);
+        appOpenLoading = false;
+        appOpenReady = false;
+        appOpenErrored = true;
+      }
+    };
+
+    /** Show the loaded appOpen. */
+    export const showAppOpen = async () => {
+      if (!checkIfAdMobIsAvailable()) return;
+
+      if (!appOpen) {
+        logger.warn('App Open has not been set up, call loadAppOpen first.');
+        return;
+      }
+      if (!appOpenReady) {
+        logger.info('App Open not loaded yet, cannot display it.');
+        return;
+      }
+      appOpenErrored = false;
+
+      try {
+        logger.info('Showing AdMob App Open.');
+        await appOpen.show();
+        // AppOpen will be shown and
+        // `appOpenShowing` will be updated thanks to events
+        // (but it's too early to change it now).
+      } catch (error) {
+        logger.error('Error while showing an AdMob App Open:', error);
+        appOpenShowing = false;
+        appOpenErrored = true;
+      }
+    };
+
+    // -----------------
+    // ---- Banner -----
+    // -----------------
     export const isBannerConfigured = () => bannerConfigured;
     export const isBannerLoaded = () => bannerLoaded;
     export const isBannerShowing = () => bannerShowing;
@@ -227,7 +340,7 @@ namespace gdjs {
       bannerErrored = false;
 
       try {
-        logger.info('Showing AdMob banner...');
+        logger.info('Showing AdMob banner.');
         await banner.show();
         if (bannerLoaded) {
           // Banner is already loaded, so it will be shown immediately.
@@ -255,7 +368,9 @@ namespace gdjs {
       // We hide the banner, but keep it configured to display it again if needed.
     };
 
-    // Interstitial
+    // -----------------------
+    // ---- Interstitial -----
+    // -----------------------
     export const isInterstitialLoading = () => interstitialLoading;
     export const isInterstitialReady = () => interstitialReady;
     export const isInterstitialShowing = () => interstitialShowing;
@@ -310,7 +425,7 @@ namespace gdjs {
       });
 
       try {
-        logger.info('loading Admob interstitial.....');
+        logger.info('Loading Admob interstitial.');
         await interstitial.load();
         logger.info('AdMob interstitial successfully loaded.');
         interstitialLoading = false;
@@ -341,7 +456,7 @@ namespace gdjs {
       interstitialErrored = false;
 
       try {
-        logger.info('Showing AdMob interstitial...');
+        logger.info('Showing AdMob interstitial.');
         await interstitial.show();
         // Interstitial will be shown and
         // `interstitialShowing` will be updated thanks to events
@@ -353,7 +468,9 @@ namespace gdjs {
       }
     };
 
-    // Rewarded interstitial
+    // --------------------------------
+    // ---- Rewarded Interstitial -----
+    // --------------------------------
     export const isRewardedInterstitialLoading = () =>
       rewardedInterstitialLoading;
     export const isRewardedInterstitialReady = () => rewardedInterstitialReady;
@@ -425,7 +542,7 @@ namespace gdjs {
       });
 
       try {
-        logger.info('Loading AdMob rewarded interstitial...');
+        logger.info('Loading AdMob rewarded interstitial.');
         await rewardedInterstitial.load();
         logger.info('AdMob rewarded interstitial successfully loaded.');
         rewardedInterstitialLoading = false;
@@ -455,7 +572,7 @@ namespace gdjs {
       rewardedInterstitialErrored = false;
 
       try {
-        logger.info('showing AdMob rewarded interstitial...');
+        logger.info('Showing AdMob rewarded interstitial.');
         await rewardedInterstitial.show();
         // Rewarded interstitial will be shown and
         // `rewardedInterstitialShowing` will be updated thanks to events
@@ -475,7 +592,9 @@ namespace gdjs {
       rewardedInterstitialRewardReceived = false;
     };
 
-    // Rewarded video
+    // -------------------------
+    // ---- Rewarded Video -----
+    // -------------------------
     export const isRewardedVideoLoading = () => rewardedVideoLoading;
     export const isRewardedVideoReady = () => rewardedVideoReady;
     export const isRewardedVideoShowing = () => rewardedVideoShowing;
@@ -538,7 +657,7 @@ namespace gdjs {
       });
 
       try {
-        logger.info('Loading AdMob rewarded video...');
+        logger.info('Loading AdMob rewarded video.');
         await rewardedVideo.load();
         logger.info('AdMob rewarded video successfully loaded.');
         rewardedVideoLoading = false;
@@ -566,7 +685,7 @@ namespace gdjs {
       rewardedVideoErrored = false;
 
       try {
-        logger.info('showing AdMob rewarded video...');
+        logger.info('Showing AdMob rewarded video.');
         await rewardedVideo.show();
         // Rewarded video will be shown and
         // `rewardedVideoShowing` will be updated thanks to events

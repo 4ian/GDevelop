@@ -150,8 +150,8 @@ export default function NewObjectDialog({
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
   const [
-    customObjectEnumeratedMetadata,
-    setCustomObjectEnumeratedMetadata,
+    selectedCustomObjectEnumeratedMetadata,
+    setSelectedCustomObjectEnumeratedMetadata,
   ] = React.useState<?EnumeratedObjectMetadata>(null);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -236,7 +236,7 @@ export default function NewObjectDialog({
       } catch (error) {
         console.error('Error while installing the asset:', error);
         showAlert({
-          title: `Coult not install the asset`,
+          title: `Could not install the asset`,
           message: `There was an error while installing the asset "${
             assetShortHeader.name
           }". Verify your internet connection or try again later.`,
@@ -263,9 +263,10 @@ export default function NewObjectDialog({
   const onInstallEmptyCustomObject = React.useCallback(
     async () => {
       const requiredExtensions =
-        customObjectEnumeratedMetadata &&
-        customObjectEnumeratedMetadata.requiredExtensions;
-      if (!customObjectEnumeratedMetadata || !requiredExtensions) return;
+        selectedCustomObjectEnumeratedMetadata &&
+        selectedCustomObjectEnumeratedMetadata.requiredExtensions;
+      if (!selectedCustomObjectEnumeratedMetadata || !requiredExtensions)
+        return;
       try {
         setIsAssetBeingInstalled(true);
         const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
@@ -287,13 +288,13 @@ export default function NewObjectDialog({
           project,
         });
 
-        onCreateNewObject(customObjectEnumeratedMetadata.name);
+        onCreateNewObject(selectedCustomObjectEnumeratedMetadata.name);
       } catch (error) {
         console.error('Error while creating the object:', error);
         showAlert({
-          title: `Coult not create the object`,
+          title: `Could not create the object`,
           message: `There was an error while creating the object "${
-            customObjectEnumeratedMetadata.fullName
+            selectedCustomObjectEnumeratedMetadata.fullName
           }". Verify your internet connection or try again later.`,
         });
       } finally {
@@ -301,7 +302,7 @@ export default function NewObjectDialog({
       }
     },
     [
-      customObjectEnumeratedMetadata,
+      selectedCustomObjectEnumeratedMetadata,
       onCreateNewObject,
       project,
       showExtensionUpdateConfirmation,
@@ -375,7 +376,7 @@ export default function NewObjectDialog({
               <HelpButton helpPagePath="/objects" key="help" />,
             ]}
             actions={[
-              !customObjectEnumeratedMetadata ? (
+              !selectedCustomObjectEnumeratedMetadata ? (
                 <FlatButton
                   key="close"
                   label={<Trans>Close</Trans>}
@@ -440,8 +441,10 @@ export default function NewObjectDialog({
             {currentTab === 'new-object' && (
               <NewObjectFromScratch
                 onCreateNewObject={onCreateNewObject}
-                onCustomObjectSelected={setCustomObjectEnumeratedMetadata}
-                selectedCustomObject={customObjectEnumeratedMetadata}
+                onCustomObjectSelected={
+                  setSelectedCustomObjectEnumeratedMetadata
+                }
+                selectedCustomObject={selectedCustomObjectEnumeratedMetadata}
                 onInstallAsset={async assetShortHeader => {
                   const result = await onInstallAsset(assetShortHeader);
                   if (result) {

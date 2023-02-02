@@ -92,8 +92,6 @@ export const CustomObjectPackResults = ({
     filters
   );
 
-  console.log(selectedAssetPackSearchResults);
-
   return (
     <>
       <Column noMargin expand>

@@ -399,7 +399,9 @@ const InstructionParametersEditor = React.forwardRef<
                           <Trans>Edit this action events</Trans>
                         )
                       }
-                      onClick={() => openExtension(i18n)}
+                      onClick={() => {
+                        openExtension(i18n);
+                      }}
                       leftIcon={<Edit />}
                     />
                   </Line>

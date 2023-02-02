@@ -140,6 +140,15 @@ const SortableList = SortableContainer(
               />
             );
           }),
+          spritesCount === 0 && (
+            <ImageThumbnail
+              key="empty"
+              project={project}
+              resourceName=""
+              resourcesLoader={resourcesLoader}
+              style={styles.thumbnailExtraStyle}
+            />
+          ),
           <AddSpriteButton
             displayHint={!direction.getSpritesCount()}
             key="add-sprite-button"

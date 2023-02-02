@@ -36,7 +36,6 @@ export const Default = () => (
             resourceExternalEditors: fakeResourceExternalEditors,
           }}
           canInstallPrivateAsset={() => false}
-          i18n={i18n}
         />
       )}
     </I18n>

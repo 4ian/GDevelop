@@ -239,7 +239,13 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           {...dataObjectToProps(props.data)}
         >
           {props.leftIcon && (
-            <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
+            <MUIListItemIcon
+              style={{
+                marginTop: 0, // MUI applies an unnecessary marginTop when items are aligned to the top.
+              }}
+            >
+              {props.leftIcon}
+            </MUIListItemIcon>
           )}
           <MUIListItemText
             style={styles.listItemText}

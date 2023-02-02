@@ -300,7 +300,7 @@ export const sendAssetPackOpened = (options: {|
   assetPackTag: string | null,
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
-  source: 'store-home' | 'author-profile',
+  source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
   recordEvent('asset_pack_opened', options);
 };

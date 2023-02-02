@@ -145,7 +145,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               </ColumnStackLayout>
                             </Line>
                           ) : null}
-                          <Line>
+                          <Line noMargin>
                             <Column expand>
                               <EditorComponent
                                 objectConfiguration={childObjectConfiguration}

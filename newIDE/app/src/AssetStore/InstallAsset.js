@@ -218,7 +218,7 @@ export const addAssetToProject = async ({
 
 export const installPublicAsset = addAssetToProject;
 
-type RequiredExtension = {|
+export type RequiredExtension = {|
   extensionName: string,
   extensionVersion: string,
 |};
@@ -253,9 +253,9 @@ const filterMissingExtensions = (
 };
 
 export type RequiredExtensionInstallation = {|
-  requiredExtensions: Array<ExtensionShortHeader>,
-  missingExtensions: Array<ExtensionShortHeader>,
-  outOfDateExtensions: Array<ExtensionShortHeader>,
+  requiredExtensionShortHeaders: Array<ExtensionShortHeader>,
+  missingExtensionShortHeaders: Array<ExtensionShortHeader>,
+  outOfDateExtensionShortHeaders: Array<ExtensionShortHeader>,
 |};
 
 export type InstallRequiredExtensionsArgs = {|
@@ -272,18 +272,21 @@ export const installRequiredExtensions = async ({
   project,
 }: InstallRequiredExtensionsArgs): Promise<void> => {
   const {
-    requiredExtensions,
-    missingExtensions,
-    outOfDateExtensions,
+    requiredExtensionShortHeaders,
+    missingExtensionShortHeaders,
+    outOfDateExtensionShortHeaders,
   } = requiredExtensionInstallation;
 
-  if (missingExtensions.length === 0 && outOfDateExtensions.length === 0) {
+  if (
+    missingExtensionShortHeaders.length === 0 &&
+    outOfDateExtensionShortHeaders.length === 0
+  ) {
     return;
   }
 
   const neededExtensions = shouldUpdateExtension
-    ? [...missingExtensions, ...outOfDateExtensions]
-    : missingExtensions;
+    ? [...missingExtensionShortHeaders, ...outOfDateExtensionShortHeaders]
+    : missingExtensionShortHeaders;
 
   const serializedExtensions = await Promise.all(
     uniq(neededExtensions).map(extensionShortHeader =>
@@ -299,12 +302,12 @@ export const installRequiredExtensions = async ({
 
   const stillMissingExtensions = filterMissingExtensions(
     gd,
-    requiredExtensions
+    requiredExtensionShortHeaders
   );
   if (stillMissingExtensions.length) {
     throw new Error(
       'These extensions could not be installed: ' +
-        missingExtensions.map(extension => extension.name).join(', ')
+        missingExtensionShortHeaders.map(extension => extension.name).join(', ')
     );
   }
 };
@@ -347,49 +350,36 @@ export const addSerializedExtensionsToProject = (
   );
 };
 
-type CheckExtensionArgs = {|
-  assets: Array<Asset>,
+type CheckRequiredExtensionsArgs = {|
+  requiredExtensions: RequiredExtension[],
   project: gdProject,
 |};
 
-export const checkRequiredExtensionUpdate = async ({
-  assets,
+export const checkRequiredExtensionsUpdate = async ({
+  requiredExtensions,
   project,
-}: CheckExtensionArgs): Promise<RequiredExtensionInstallation> => {
-  const requiredExtensionNames: Array<string> = [];
-  assets.forEach(asset => {
-    getRequiredExtensionsFromAsset(asset).forEach(requiredExtension => {
-      if (
-        !requiredExtensionNames.some(
-          extensionName => extensionName === requiredExtension.extensionName
-        )
-      ) {
-        requiredExtensionNames.push(requiredExtension.extensionName);
-      }
-    });
-  });
-
-  if (requiredExtensionNames.length === 0) {
+}: CheckRequiredExtensionsArgs): Promise<RequiredExtensionInstallation> => {
+  if (requiredExtensions.length === 0) {
     return {
-      requiredExtensions: [],
-      missingExtensions: [],
-      outOfDateExtensions: [],
+      requiredExtensionShortHeaders: [],
+      missingExtensionShortHeaders: [],
+      outOfDateExtensionShortHeaders: [],
     };
   }
 
   const extensionsRegistry = await getExtensionsRegistry();
 
-  const requiredExtensions = requiredExtensionNames.map(
-    requiredExtensionName => {
+  const requiredExtensionShortHeaders = requiredExtensions.map(
+    requiredExtension => {
       const extensionShortHeader = extensionsRegistry.extensionShortHeaders.find(
         extensionShortHeader => {
-          return extensionShortHeader.name === requiredExtensionName;
+          return extensionShortHeader.name === requiredExtension.extensionName;
         }
       );
       if (!extensionShortHeader) {
         throw new Error(
           'Unable to find extension ' +
-            requiredExtensionName +
+            requiredExtension.extensionName +
             ' in the registry.'
         );
       }
@@ -398,7 +388,7 @@ export const checkRequiredExtensionUpdate = async ({
     }
   );
 
-  const outOfDateExtensions = requiredExtensions.filter(
+  const outOfDateExtensionShortHeaders = requiredExtensionShortHeaders.filter(
     requiredExtensionShortHeader =>
       project.hasEventsFunctionsExtensionNamed(
         requiredExtensionShortHeader.name
@@ -408,7 +398,41 @@ export const checkRequiredExtensionUpdate = async ({
         .getVersion() !== requiredExtensionShortHeader.version
   );
 
-  const missingExtensions = filterMissingExtensions(gd, requiredExtensions);
+  const missingExtensionShortHeaders = filterMissingExtensions(
+    gd,
+    requiredExtensionShortHeaders
+  );
 
-  return { requiredExtensions, missingExtensions, outOfDateExtensions };
+  return {
+    requiredExtensionShortHeaders,
+    missingExtensionShortHeaders,
+    outOfDateExtensionShortHeaders,
+  };
+};
+
+type CheckRequiredExtensionsForAssetsArgs = {|
+  assets: Array<Asset>,
+  project: gdProject,
+|};
+
+export const checkRequiredExtensionsUpdateForAssets = async ({
+  assets,
+  project,
+}: CheckRequiredExtensionsForAssetsArgs): Promise<RequiredExtensionInstallation> => {
+  const requiredExtensions: Array<RequiredExtension> = [];
+  assets.forEach(asset => {
+    getRequiredExtensionsFromAsset(asset).forEach(requiredExtensionForAsset => {
+      if (
+        !requiredExtensions.some(
+          requiredExtension =>
+            requiredExtension.extensionName ===
+            requiredExtensionForAsset.extensionName
+        )
+      ) {
+        requiredExtensions.push(requiredExtensionForAsset);
+      }
+    });
+  });
+
+  return checkRequiredExtensionsUpdate({ requiredExtensions, project });
 };

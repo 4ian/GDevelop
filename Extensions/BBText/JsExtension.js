@@ -36,7 +36,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/objects/bbtext')
-      .setCategory('User interface');
+      .setCategory('Text');
     extension
       .addInstructionOrExpressionGroupMetadata(_('BBCode Text Object'))
       .setIcon('JsPlatform/Extensions/bbcode32.png');
@@ -174,7 +174,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('User interface'));
+      .setCategoryFullName(_('Text'));
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.

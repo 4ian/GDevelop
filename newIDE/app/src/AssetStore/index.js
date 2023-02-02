@@ -240,7 +240,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     // When a private pack is selected from the home page,
     // if the user owns it, we set it as the chosen category,
-    // otherwise we open the dialog to buy it.
+    // otherwise we open the page to buy it.
     const selectPrivateAssetPack = React.useCallback(
       (assetPackListingData: PrivateAssetPackListingData) => {
         const receivedAssetPack = receivedAssetPacks

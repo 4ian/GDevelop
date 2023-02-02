@@ -644,7 +644,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
-      eventsFunction.getGroup() || '',
+      eventsFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
@@ -764,7 +766,9 @@ export const declareObjectInstructionOrExpressionMetadata = (
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
-      eventsFunction.getGroup() || '',
+      eventsFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {

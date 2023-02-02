@@ -7,12 +7,26 @@ import MUIAccordionActions from '@material-ui/core/AccordionActions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from './IconButton';
 import GDevelopThemeContext from './Theme/ThemeContext';
+import { Column, Line } from '../UI/Grid';
 
 const styles = {
   bodyRoot: {
     // Remove body padding
     padding: 0,
   },
+  accordionSummaryWithExpandOnLeft: {
+    flexDirection: 'row-reverse',
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  accordionSummaryContent: {
+    flexGrow: 1,
+    display: 'flex',
+    alignItems: 'center',
+    // Avoids the summary content to overlap the expand icon that was put on the left
+    marginLeft: 16,
+  },
+  actionsContainer: { flexGrow: 0, flexShrink: 0, alignSelf: 'center' },
 };
 
 type AccordionHeadProps = {|
@@ -23,28 +37,31 @@ type AccordionHeadProps = {|
 
 /**
  * The header of an accordion section.
- * Based on Material-UI AccordionSummary.
+ * Based on Material-UI AccordionSummary (but we could almost remove it).
  */
 export const AccordionHeader = (props: AccordionHeadProps) => {
   return (
-    <MUIAccordionSummary
-      expandIcon={
-        props.expandIcon || (
-          <IconButton size="small">
-            <ExpandMoreIcon />
-          </IconButton>
-        )
-      }
-    >
-      <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-        {props.children}
-      </div>
-      {props.actions && (
-        <div style={{ flexGrow: 0, flexShrink: 0, alignSelf: 'center' }}>
-          {props.actions}
-        </div>
-      )}
-    </MUIAccordionSummary>
+    <Column expand>
+      <Line noMargin expand alignItems="center">
+        <Column noMargin expand>
+          <MUIAccordionSummary
+            style={styles.accordionSummaryWithExpandOnLeft}
+            expandIcon={
+              props.expandIcon || (
+                <IconButton size="small">
+                  <ExpandMoreIcon />
+                </IconButton>
+              )
+            }
+          >
+            <div style={styles.accordionSummaryContent}>{props.children}</div>
+          </MUIAccordionSummary>
+        </Column>
+        {props.actions && (
+          <div style={styles.actionsContainer}>{props.actions}</div>
+        )}
+      </Line>
+    </Column>
   );
 };
 

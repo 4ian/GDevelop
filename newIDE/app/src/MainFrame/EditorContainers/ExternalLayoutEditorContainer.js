@@ -187,6 +187,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
             canInstallPrivateAsset={this.props.canInstallPrivateAsset}
+            openBehaviorEvents={this.props.openBehaviorEvents}
           />
         )}
         {!layout && (

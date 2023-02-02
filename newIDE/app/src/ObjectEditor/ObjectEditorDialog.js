@@ -22,6 +22,7 @@ import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,6 +56,7 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 |};
 
 type InnerDialogProps = {|
@@ -66,6 +68,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
@@ -74,6 +77,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   const {
     onCancelChanges,
     notifyOfChange,
+    hasUnsavedChanges,
   } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
@@ -111,6 +115,25 @@ const InnerDialog = (props: InnerDialogProps) => {
       }
     },
     [currentTab]
+  );
+
+  const { showConfirmation } = useAlertDialog();
+
+  const askConfirmationAndOpenBehaviorEvents = React.useCallback(
+    async (extensionName, behaviorName) => {
+      if (hasUnsavedChanges()) {
+        const answer = await showConfirmation({
+          title: t`Discard changes and open events`,
+          message: t`You've made some changes here. Are you sure you want to discard them and open the behavior events?`,
+          confirmButtonLabel: t`Yes, discard my changes`,
+          dismissButtonLabel: t`Stay there`,
+        });
+        if (!answer) return;
+      }
+      onCancelChanges();
+      openBehaviorEvents(extensionName, behaviorName);
+    },
+    [hasUnsavedChanges, onCancelChanges, openBehaviorEvents, showConfirmation]
   );
 
   return (
@@ -210,7 +233,7 @@ const InnerDialog = (props: InnerDialogProps) => {
             project={props.project}
             resourceManagementProps={props.resourceManagementProps}
             onSizeUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positionned*/
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
             }
             objectName={props.objectName}
             onObjectUpdated={notifyOfChange}
@@ -224,10 +247,11 @@ const InnerDialog = (props: InnerDialogProps) => {
           eventsFunctionsExtension={props.eventsFunctionsExtension}
           resourceManagementProps={props.resourceManagementProps}
           onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positionned*/
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
+          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
         />
       )}
       {currentTab === 'variables' && (
@@ -264,7 +288,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}
           onEffectsUpdated={() => {
-            forceUpdate(); /*Force update to ensure dialog is properly positionned*/
+            forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
           }}
         />

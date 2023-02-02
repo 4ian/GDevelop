@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import TextField from '../UI/TextField';
 import Add from '@material-ui/icons/Add';
@@ -29,6 +30,8 @@ import {
   listObjectBehaviorsTypes,
 } from '../Utils/Behavior';
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -39,7 +42,11 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   onSizeUpdated?: ?() => void,
   resourceManagementProps: ResourceManagementProps,
-  onBehaviorsUpdated?: () => void,
+  onBehaviorsUpdated: () => void,
+  openBehaviorEvents: (
+    extensionName: string,
+    behaviorName: string
+  ) => Promise<void>,
 |};
 
 const BehaviorsEditor = (props: Props) => {
@@ -109,6 +116,23 @@ const BehaviorsEditor = (props: Props) => {
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
     if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
+  };
+
+  const openExtension = (behaviorType: string) => {
+    const elements = behaviorType.split('::');
+    if (elements.length !== 2) {
+      return;
+    }
+    const extensionName = elements[0];
+    const behaviorName = elements[1];
+
+    if (
+      !extensionName ||
+      !props.project.hasEventsFunctionsExtensionNamed(extensionName)
+    ) {
+      return;
+    }
+    props.openBehaviorEvents(extensionName, behaviorName);
   };
 
   return (
@@ -206,16 +230,28 @@ const BehaviorsEditor = (props: Props) => {
                         size="small"
                         helpPagePath={behaviorMetadata.getHelpPath()}
                       />,
-                      <IconButton
-                        key="delete"
-                        size="small"
-                        onClick={ev => {
-                          ev.stopPropagation();
-                          onRemoveBehavior(behaviorName);
-                        }}
-                      >
-                        <Delete />
-                      </IconButton>,
+                      <ElementWithMenu
+                        element={
+                          <IconButton size="small">
+                            <ThreeDotsMenu />
+                          </IconButton>
+                        }
+                        buildMenuTemplate={(i18n: I18nType) => [
+                          {
+                            label: i18n._(t`Delete`),
+                            click: () => onRemoveBehavior(behaviorName),
+                          },
+                          ...(project.hasEventsBasedBehavior(behaviorTypeName)
+                            ? [
+                                { type: 'separator' },
+                                {
+                                  label: i18n._(t`Edit this behavior`),
+                                  click: () => openExtension(behaviorTypeName),
+                                },
+                              ]
+                            : []),
+                        ]}
+                      />,
                     ]}
                   >
                     {iconUrl ? (
@@ -266,6 +302,7 @@ const BehaviorsEditor = (props: Props) => {
                           resourceManagementProps={
                             props.resourceManagementProps
                           }
+                          onBehaviorUpdated={props.onBehaviorsUpdated}
                         />
                       </Line>
                     </Column>

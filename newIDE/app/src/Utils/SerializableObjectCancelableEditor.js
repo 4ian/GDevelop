@@ -55,6 +55,10 @@ export const useSerializableObjectCancelableEditor = ({
     numberOfChangesRef.current++;
   }, []);
 
+  const hasUnsavedChanges = React.useCallback(() => {
+    return numberOfChangesRef.current > 0;
+  }, []);
+
   const onCancelChanges = React.useCallback(
     async () => {
       // Use the value that was serialized to cancel the changes
@@ -105,5 +109,5 @@ export const useSerializableObjectCancelableEditor = ({
     ]
   );
 
-  return { onCancelChanges, notifyOfChange };
+  return { onCancelChanges, notifyOfChange, hasUnsavedChanges };
 };

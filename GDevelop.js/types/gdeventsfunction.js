@@ -23,6 +23,8 @@ declare class gdEventsFunction {
   getExpressionType(): gdValueTypeMetadata;
   setPrivate(isPrivate: boolean): gdEventsFunction;
   isPrivate(): boolean;
+  setAsync(isAsync: boolean): gdEventsFunction;
+  isAsync(): boolean;
   isAction(): boolean;
   isExpression(): boolean;
   isCondition(): boolean;

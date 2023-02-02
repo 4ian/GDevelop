@@ -73,6 +73,12 @@ class FakeAsyncTask {
   }
 }
 
+class ManuallyResolvableTask extends FakeAsyncTask {
+  resolve() {
+    this._finished = true;
+  }
+}
+
 class TaskGroup {
   constructor() {
     /** @type {FakeAsyncTask[]} */
@@ -178,6 +184,14 @@ class RuntimeObject {
   markFakeAsyncActionAsFinished() {
     if (this._task) this._task.markAsFinished();
   }
+}
+
+class CustomRuntimeObject extends RuntimeObject {
+  constructor(parentInstanceContainer, objectData) {
+    super(parentInstanceContainer, objectData);
+    this._instanceContainer = parentInstanceContainer;
+  }
+  onCreated() {}
 }
 
 /**
@@ -336,7 +350,7 @@ const getSceneInstancesCount = (objectsContext, objectsLists) => {
     count += objectsContext.getInstancesCountOnScene(objectName);
   }
   return count;
-}
+};
 
 /**
  * @param {Hashtable<RuntimeObject[]>} objectsLists
@@ -349,7 +363,7 @@ const getPickedInstancesCount = (objectsLists) => {
     count += lists[i].length;
   }
   return count;
-}
+};
 
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
@@ -414,7 +428,7 @@ class RuntimeScene {
 
     return 0;
   }
-  
+
   getInitialSharedDataForBehavior(name) {
     return null;
   }
@@ -498,6 +512,7 @@ class LongLivedObjectsList {
  */
 function makeMinimalGDJSMock() {
   const behaviorCtors = {};
+  const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
   const runtimeScene = new RuntimeScene();
 
@@ -505,14 +520,24 @@ function makeMinimalGDJSMock() {
     gdjs: {
       evtTools: {
         variable: { getVariableNumber: (variable) => variable.getAsNumber() },
-        object: { createObjectOnScene, getSceneInstancesCount, getPickedInstancesCount },
+        object: {
+          createObjectOnScene,
+          getSceneInstancesCount,
+          getPickedInstancesCount,
+        },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
           noop: () => {},
         },
+        common: {
+          resolveAsyncEventsFunction: ({ task }) => task.resolve(),
+        },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;
+      },
+      registerObject: (objectTypeName, Ctor) => {
+        customObjectsCtors[objectTypeName] = Ctor;
       },
       registerRuntimeScenePreEventsCallback: (cb) => {
         runtimeScenePreEventsCallbacks.push(cb);
@@ -529,6 +554,8 @@ function makeMinimalGDJSMock() {
       Hashtable,
       LongLivedObjectsList,
       TaskGroup,
+      CustomRuntimeObject,
+      ManuallyResolvableTask,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

@@ -385,6 +385,17 @@ namespace gdjs {
           angle1 + gdjs.evtTools.common.angleDifference(angle2, angle1) * x
         );
       };
+
+      export const resolveAsyncEventsFunction = (
+        eventsFunctionContext: EventsFunctionContext
+      ) => {
+        if (
+          !!eventsFunctionContext &&
+          !!eventsFunctionContext.task &&
+          !!eventsFunctionContext.task.resolve
+        )
+          eventsFunctionContext.task.resolve();
+      };
     }
   }
 }

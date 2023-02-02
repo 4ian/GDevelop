@@ -15,11 +15,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
   extension
       .SetExtensionInformation(
           "BuiltinAsync",
-          _("Async functions"),
+          _("Asynchronous functions"),
           _("Functions that defer the execution of the events after it."),
           "Arthur Pacaud (arthuro555)",
           "Open source (MIT License)")
       .SetCategory("Advanced");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Asynchronous functions"))
+      .SetIcon("res/function32.png");
 
   extension.AddEvent("Async",
                      _("Async event"),

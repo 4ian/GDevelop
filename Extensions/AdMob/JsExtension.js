@@ -30,7 +30,7 @@ module.exports = {
         'AdMob',
         _('AdMob'),
         _(
-          'Allow to display AdMob banners, interstitials and reward video ads.'
+          'Allow to display AdMob banners, app open, interstitials, rewarded interstitials and rewarded video ads.'
         ),
         'Florian Rival',
         'MIT'

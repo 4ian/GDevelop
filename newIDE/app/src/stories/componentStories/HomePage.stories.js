@@ -126,6 +126,8 @@ const WrappedHomePage = ({
                 onOpenNewProjectSetupDialog={() =>
                   action('onOpenNewProjectSetupDialog')()
                 }
+                canSave={true}
+                onSave={() => action('onSave')()}
                 selectInAppTutorial={() => action('select in app tutorial')()}
                 onOpenProfile={() => action('open profile')()}
                 onOpenPreferences={() => action('open preferences')()}

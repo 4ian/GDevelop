@@ -118,7 +118,6 @@ namespace gdjs {
         await admob.start();
 
         logger.info('AdMob succesfully started.');
-
         admobStarted = true;
       },
       false
@@ -316,7 +315,7 @@ namespace gdjs {
         bannerShowing = true;
         bannerLoaded = true;
       });
-      banner.on('load_fail', () => {
+      banner.on('loadfail', () => {
         bannerShowing = false;
         bannerLoaded = false;
         bannerErrored = true;

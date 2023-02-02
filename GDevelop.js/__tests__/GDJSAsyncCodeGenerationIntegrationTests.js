@@ -3584,20 +3584,20 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         );
 
       const {
-        free: { wait },
+        freeFunctions: { wait },
         behaviors: { Behavior },
         objects: { Object },
       } = extensionModule;
 
-      const freeExtensionTask = wait();
-      expect(freeExtensionTask.update()).toBe(false);
+      const freeFunctionExtensionTask = wait();
+      expect(freeFunctionExtensionTask.update()).toBe(false);
       expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
       runtimeScene.getAsyncTasksManager().processTasks();
-      expect(freeExtensionTask.update()).toBe(true);
+      expect(freeFunctionExtensionTask.update()).toBe(true);
 
-      const obj = new Object(runtimeScene, {});
-      const objectExtensionTask = obj.wait();
+      const object = new Object(runtimeScene, {});
+      const objectExtensionTask = object.wait();
       expect(objectExtensionTask.update()).toBe(false);
       expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -3624,7 +3624,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         );
 
       const {
-        free: { noWait },
+        freeFunctions: { noWait },
         behaviors: { Behavior },
         objects: { Object },
       } = extensionModule;

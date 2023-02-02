@@ -103,7 +103,7 @@ function generateCompiledEventsForEventsBasedBehavior(
     true
   );
 
-  // Create a function with the generated behavior.
+  // Create a function returning the generated behavior.
   const compiledBehavior = new Function(
     'gdjs',
     `let behaviorNamespace = {};
@@ -154,7 +154,7 @@ function generateCompiledEventsForEventsBasedObject(
   includeFiles.delete();
   objectMethodMangledNames.delete();
 
-  // Create a function with the generated behavior.
+  // Create a function returning the generated object.
   const compiledObject = new Function(
     'gdjs',
     `let objectNamespace = {};
@@ -171,13 +171,13 @@ function generateCompiledEventsForEventsBasedObject(
  *
  * Usage:
  * Pass in the extension as a JS object. You will get in return an object
- * `{ free: { [functionName]: FreeEventsFunction }, behaviors: { [behaviorName]: RuntimeBehavior }, objects: { [objectName]: RuntimeObject } }`
+ * `{ freeFunctions: { [functionName]: FreeEventsFunction }, behaviors: { [behaviorName]: RuntimeBehavior }, objects: { [objectName]: RuntimeObject } }`
  *
  * Example:
  * ```js
  * const extension = require("./extensions/Extension.json"):
- * const { free } = generateCompiledEventsForSerializedEventsBasedExtension(extension);
- * const { RGBToHex } = free;
+ * const { freeFunctions } = generateCompiledEventsForSerializedEventsBasedExtension(extension);
+ * const { RGBToHex } = freeFunctions;
  * const result = RGBToHex(gdjs, runtimeScene, ["1;2;3"])
  * ```
  */
@@ -202,13 +202,17 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
   const includeFiles = new gd.SetString();
   const codeNamespace = 'functionNamespace';
 
-  const generatedExtensionModule = { free: {}, behaviors: {}, objects: {} };
+  const generatedExtensionModule = {
+    freeFunctions: {},
+    behaviors: {},
+    objects: {},
+  };
 
   const eventsFunctionsExtensionCodeGenerator =
     new gd.EventsFunctionsExtensionCodeGenerator(project);
   for (let i = 0; i < extension.getEventsFunctionsCount(); i++) {
     const eventsFunction = extension.getEventsFunctionAt(i);
-    generatedExtensionModule.free[eventsFunction.getName()] =
+    generatedExtensionModule.freeFunctions[eventsFunction.getName()] =
       generatedEventsCodeToJSFunction(
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
           extension,

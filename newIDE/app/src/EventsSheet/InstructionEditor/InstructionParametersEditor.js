@@ -18,8 +18,6 @@ import Window from '../../Utils/Window';
 import { getExtraInstructionInformation } from '../../Hints';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
 import Text from '../../UI/Text';
@@ -30,6 +28,9 @@ import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import Edit from '@material-ui/icons/Edit';
+import FlatButton from '../../UI/FlatButton';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -259,16 +260,6 @@ const InstructionParametersEditor = React.forwardRef<
                     {instructionMetadata.getDescription()}
                   </Text>
                 </Column>
-                {isAnEventFunctionMetadata(instructionMetadata) && (
-                  <IconButton
-                    tooltip={t`Open extension events`}
-                    onClick={() => {
-                      openExtension(i18n);
-                    }}
-                  >
-                    <OpenInNew />
-                  </IconButton>
-                )}
               </Line>
               {instructionExtraInformation && (
                 <Line>
@@ -396,6 +387,16 @@ const InstructionParametersEditor = React.forwardRef<
                       forceUpdate();
                     }}
                   />
+                )}
+                {isAnEventFunctionMetadata(instructionMetadata) && (
+                  <Line>
+                    <FlatButton
+                      key={'open-extension'}
+                      label={<Trans>Open extension events</Trans>}
+                      onClick={() => openExtension(i18n)}
+                      leftIcon={<Edit />}
+                    />
+                  </Line>
                 )}
               </div>
               <Line>

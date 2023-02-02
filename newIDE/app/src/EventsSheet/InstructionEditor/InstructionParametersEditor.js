@@ -392,7 +392,13 @@ const InstructionParametersEditor = React.forwardRef<
                   <Line>
                     <FlatButton
                       key={'open-extension'}
-                      label={<Trans>Open extension events</Trans>}
+                      label={
+                        isCondition ? (
+                          <Trans>Edit this condition events</Trans>
+                        ) : (
+                          <Trans>Edit this action events</Trans>
+                        )
+                      }
                       onClick={() => openExtension(i18n)}
                       leftIcon={<Edit />}
                     />

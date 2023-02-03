@@ -33,18 +33,16 @@ export default function EmailVerificationDialog({
     !!authenticatedUser.firebaseUser &&
     !!authenticatedUser.firebaseUser.emailVerified;
 
-  const [hasSentEmail, setHasSentEmail] = React.useState(
-    sendEmailAutomatically
-  );
+  const [hasSentEmailManually, setHasSentEmailManually] = React.useState(false);
 
   // Send the email once on dialog opening if configured as so.
   React.useEffect(
     () => {
-      if (!isVerified && sendEmailAutomatically && !showSendEmailButton) {
+      if (!isVerified && sendEmailAutomatically) {
         onSendEmail();
       }
     },
-    [isVerified, onSendEmail, sendEmailAutomatically, showSendEmailButton]
+    [isVerified, onSendEmail, sendEmailAutomatically]
   );
 
   // Check every 5 seconds if the email has been verified.
@@ -101,12 +99,12 @@ export default function EmailVerificationDialog({
                 store, as well as weekly stats about your games.
               </Trans>
             </Text>
-            {!hasSentEmail && showSendEmailButton ? (
+            {!hasSentEmailManually && showSendEmailButton ? (
               <RaisedButton
                 primary
                 label={<Trans>Send it again</Trans>}
                 onClick={() => {
-                  setHasSentEmail(true);
+                  setHasSentEmailManually(true);
                   onSendEmail();
                 }}
               />
@@ -125,17 +123,12 @@ export default function EmailVerificationDialog({
             )}
           </ColumnStackLayout>
         ) : (
-          <ColumnStackLayout noMargin alignItems="center">
-            <LineStackLayout justifyContent="center" alignItems="center">
-              <VerifiedUser />
-              <Text size="title" align="center">
-                <Trans>Email verified</Trans>
-              </Text>
-            </LineStackLayout>
-            <Text>
-              <Trans>You can now close this tab</Trans>
+          <LineStackLayout justifyContent="center" alignItems="center">
+            <VerifiedUser />
+            <Text size="title" align="center">
+              <Trans>Email verified</Trans>
             </Text>
-          </ColumnStackLayout>
+          </LineStackLayout>
         )}
       </ColumnStackLayout>
     </Dialog>

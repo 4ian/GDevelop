@@ -3,11 +3,11 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import ProfileDetails from './ProfileDetails';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   onEditProfile: () => void,
@@ -38,7 +38,7 @@ const AuthenticatedUserProfileDetails = ({
         <AlertMessage
           kind="info"
           renderRightButton={() => (
-            <FlatButton
+            <RaisedButton
               label={<Trans>Send it again</Trans>}
               onClick={openEmailVerificationDialog}
               primary

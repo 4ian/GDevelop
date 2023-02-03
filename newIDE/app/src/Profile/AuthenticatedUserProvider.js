@@ -96,6 +96,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutAdditionalInfo = false;
+  _hasNotifiedUserAboutEmailVerification = false;
 
   componentDidMount() {
     this._resetAuthenticatedUser();
@@ -178,6 +179,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
     this._hasNotifiedUserAboutAdditionalInfo = false;
+    this._hasNotifiedUserAboutEmailVerification = false;
   }
 
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
@@ -379,17 +381,6 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     }
 
-    // If the user has not filled their additional information, show
-    // the dialog to fill it.
-    // Use a state value to show the dialog only once.
-    if (
-      userProfile &&
-      !this._hasNotifiedUserAboutAdditionalInfo &&
-      shouldAskForAdditionalUserInfo(userProfile)
-    ) {
-      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
-    }
-
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -397,6 +388,8 @@ export default class AuthenticatedUserProvider extends React.Component<
         loginState: 'done',
       },
     }));
+
+    this._notifyUserAboutEmailVerificationAndAdditionalInfo();
   };
 
   _fetchUserSubscriptionLimitsAndUsages = async () => {
@@ -545,6 +538,51 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading user badges:', error);
+    }
+  };
+
+  _notifyUserAboutEmailVerificationAndAdditionalInfo = () => {
+    const { profile } = this.state.authenticatedUser;
+    if (!profile) return;
+    // If the user has not verified their email when logging in we show a dialog to do so.
+    // - If they just registered, we don't send the email again as it will be sent automatically,
+    // nor do we show a button to send again.
+    // - If they are just logging in, we don't send the email but we show a button to send again.
+    // Use a state value to show the dialog only once.
+    const accountAgeInMs = Date.now() - profile.createdAt;
+    const hasJustCreatedAccount = accountAgeInMs < 1000 * 10; // 10 seconds.
+    if (
+      this.state.authenticatedUser.firebaseUser &&
+      !this.state.authenticatedUser.firebaseUser.emailVerified &&
+      !this._hasNotifiedUserAboutEmailVerification
+    ) {
+      setTimeout(
+        () =>
+          this.openEmailVerificationDialog({
+            open: true,
+            sendEmailAutomatically: false,
+            showSendEmailButton: !hasJustCreatedAccount,
+          }),
+        1000
+      );
+    } else {
+      // If the user has not filled additional info, we show a dialog to do so.
+      this._notifyUserAboutAdditionalInfo();
+    }
+  };
+
+  _notifyUserAboutAdditionalInfo = () => {
+    const profile = this.state.authenticatedUser.profile;
+    if (!profile) return;
+    // If the user has not filled their additional information, show
+    // the dialog to fill it, but ensure they have closed the email verification dialog first.
+    // Use a state value to show the dialog only once.
+    if (
+      profile &&
+      !this._hasNotifiedUserAboutAdditionalInfo &&
+      shouldAskForAdditionalUserInfo(profile)
+    ) {
+      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
     }
   };
 
@@ -785,11 +823,17 @@ export default class AuthenticatedUserProvider extends React.Component<
   }) => {
     this.setState({
       emailVerificationDialogOpen: open,
-      EmailVerificationDialogProps: {
+      emailVerificationDialogProps: {
         sendEmailAutomatically: open ? sendEmailAutomatically : false, // reset to false when closing dialog.
         showSendEmailButton: open ? showSendEmailButton : false, // reset to false when closing dialog.
       },
     });
+    // We save the fact that the user has seen the dialog when they close it.
+    // And we show them the additional info dialog if they haven't seen it yet.
+    if (!open) {
+      this._hasNotifiedUserAboutEmailVerification = true;
+      this._notifyUserAboutAdditionalInfo();
+    }
   };
 
   openResetPassword = (open: boolean = true) => {

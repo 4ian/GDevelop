@@ -21,8 +21,11 @@ export type Profile = {|
   email: string,
   username: ?string,
   description: ?string,
+  updatedAt: number,
+  createdAt: number,
   getGameStatsEmail: boolean,
   getNewsletterEmail: boolean,
+  appLanguage: ?string,
   isCreator: boolean,
   isPlayer: boolean,
   donateLink: ?string,
@@ -220,16 +223,14 @@ export default class Authentication {
     const { currentUser } = this.auth;
     if (!currentUser || currentUser.emailVerified) return;
 
-    try {
-      sendEmailVerification(currentUser);
-    } catch (error) {
+    sendEmailVerification(currentUser).catch(error => {
       showErrorBox({
         message:
           'An email has been sent recently, check your inbox or please try again later.',
         rawError: error,
         errorId: 'email-verification-send-error',
       });
-    }
+    });
   };
 
   changeEmail = async (
@@ -271,7 +272,9 @@ export default class Authentication {
       });
   };
 
-  getUserProfile = async (getAuthorizationHeader: () => Promise<string>) => {
+  getUserProfile = async (
+    getAuthorizationHeader: () => Promise<string>
+  ): Promise<Profile> => {
     const { currentUser } = this.auth;
     if (!currentUser)
       throw new Error('Tried to get user profile while not authenticated.');

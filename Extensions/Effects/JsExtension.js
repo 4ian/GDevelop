@@ -176,12 +176,12 @@ module.exports = {
       .setType('number');
     bevelProperties
       .getOrCreate('lightColor')
-      .setValue('#ffffff')
+      .setValue('255;255;255')
       .setLabel(_('Light color (color of the outline)'))
       .setType('color');
     bevelProperties
       .getOrCreate('shadowColor')
-      .setValue('#000000')
+      .setValue('0;0;0')
       .setLabel(_('Shadow color (color of the outline)'))
       .setType('color');
     bevelProperties
@@ -333,13 +333,13 @@ module.exports = {
     const colorReplaceProperties = colorReplaceEffect.getProperties();
     colorReplaceProperties
       .getOrCreate('originalColor')
-      .setValue('#ff0000')
+      .setValue('252;3;65')
       .setLabel(_('Original Color'))
       .setType('color')
       .setDescription('The color that will be changed');
     colorReplaceProperties
       .getOrCreate('newColor')
-      .setValue('#000000')
+      .setValue('255;255;255')
       .setLabel(_('New Color'))
       .setType('color')
       .setDescription('The new color');
@@ -517,7 +517,7 @@ module.exports = {
       .setType('number');
     dropShadowProperties
       .getOrCreate('color')
-      .setValue('#000000')
+      .setValue('255;255;255')
       .setLabel(_('Color of the shadow'))
       .setType('color');
     dropShadowProperties
@@ -646,7 +646,7 @@ module.exports = {
       .setType('number');
     glowProperties
       .getOrCreate('color')
-      .setValue('#ffffff')
+      .setValue('255;255;255')
       .setLabel(_('Color (color of the outline)'))
       .setType('color');
 
@@ -868,7 +868,7 @@ module.exports = {
       .setType('number');
     outlineProperties
       .getOrCreate('color')
-      .setValue('1')
+      .setValue('255;255;255')
       .setLabel(_('Color of the outline'))
       .setType('color');
     outlineProperties

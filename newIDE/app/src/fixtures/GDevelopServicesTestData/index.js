@@ -337,7 +337,20 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
+  receivedAssetPacks: [
+    {
+      id: '07a9f974-aeca-4a3f-b501-4808400eda4f',
+      createdAt: '2022-12-13T19:45:47.318Z',
+      updatedAt: '2022-12-13T19:45:47.318Z',
+      name: 'Gamepasses',
+      longDescription: '',
+      previewImageUrls: [
+        'https://resources.gdevelop-app.com/staging/private-assets/Gamepasses/thumbnail.png',
+      ],
+      tag: 'gamepasses',
+      content: {},
+    },
+  ],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
   onLogin: () => {},

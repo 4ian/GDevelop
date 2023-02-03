@@ -150,14 +150,13 @@ export const PrivateAssetPackTile = ({
           src={assetPackListingData.thumbnailUrls[0]}
           alt={`Preview image of asset pack ${assetPackListingData.name}`}
         />
-        {!owned && (
-          <div style={styles.priceTagContainer}>
-            <PriceTag
-              value={assetPackListingData.prices[0].value}
-              withOverlay
-            />
-          </div>
-        )}
+        <div style={styles.priceTagContainer}>
+          <PriceTag
+            value={assetPackListingData.prices[0].value}
+            withOverlay
+            owned={owned}
+          />
+        </div>
         <Column>
           <Line justifyContent="space-between" noMargin>
             <Text style={styles.packTitle} size="body2">

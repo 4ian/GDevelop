@@ -40,6 +40,10 @@ export type AuthenticatedUser = {|
   onSubscriptionUpdated: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
+  onOpenEmailVerificationDialog: ({
+    sendEmailAutomatically: boolean,
+    showSendEmailButton: boolean,
+  }) => void,
   onAcceptGameStatsEmail: () => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};
@@ -70,6 +74,7 @@ export const initialAuthenticatedUser = {
   onSubscriptionUpdated: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
+  onOpenEmailVerificationDialog: () => {},
   onAcceptGameStatsEmail: async () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };

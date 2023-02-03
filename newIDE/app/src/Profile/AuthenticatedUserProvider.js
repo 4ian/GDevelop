@@ -26,7 +26,7 @@ import AuthenticatedUserContext, {
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
 import ChangeEmailDialog from './ChangeEmailDialog';
-import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
+import EmailVerificationDialog from './EmailVerificationDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
@@ -58,7 +58,11 @@ type State = {|
   additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
-  emailVerificationPendingDialogOpen: boolean,
+  emailVerificationDialogOpen: boolean,
+  emailVerificationDialogProps: {
+    sendEmailAutomatically: boolean,
+    showSendEmailButton: boolean,
+  },
   forgotPasswordInProgress: boolean,
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
@@ -80,7 +84,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
-    emailVerificationPendingDialogOpen: false,
+    emailVerificationDialogOpen: false,
+    emailVerificationDialogProps: {
+      sendEmailAutomatically: false,
+      showSendEmailButton: false,
+    },
     forgotPasswordInProgress: false,
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
@@ -152,6 +160,18 @@ export default class AuthenticatedUserProvider extends React.Component<
         onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
         onPurchaseSuccessful: this._fetchUserAssets,
         onSendEmailVerification: this._doSendEmailVerification,
+        onOpenEmailVerificationDialog: ({
+          sendEmailAutomatically,
+          showSendEmailButton,
+        }: {
+          sendEmailAutomatically: boolean,
+          showSendEmailButton: boolean,
+        }) =>
+          this.openEmailVerificationDialog({
+            open: true,
+            sendEmailAutomatically,
+            showSendEmailButton,
+          }),
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
@@ -704,7 +724,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!authentication) return;
 
     await authentication.sendFirebaseEmailVerification();
-    this.openEmailVerificationPendingDialog(true);
   };
 
   _doAcceptGameStatsEmail = async () => {
@@ -755,9 +774,21 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  openEmailVerificationPendingDialog = (open: boolean = true) => {
+  openEmailVerificationDialog = ({
+    open = true,
+    sendEmailAutomatically = false,
+    showSendEmailButton = false,
+  }: {
+    open?: boolean,
+    sendEmailAutomatically?: boolean,
+    showSendEmailButton?: boolean,
+  }) => {
     this.setState({
-      emailVerificationPendingDialogOpen: open,
+      emailVerificationDialogOpen: open,
+      EmailVerificationDialogProps: {
+        sendEmailAutomatically: open ? sendEmailAutomatically : false, // reset to false when closing dialog.
+        showSendEmailButton: open ? showSendEmailButton : false, // reset to false when closing dialog.
+      },
     });
   };
 
@@ -875,17 +906,26 @@ export default class AuthenticatedUserProvider extends React.Component<
                   updateInProgress={this.state.editInProgress}
                 />
               )}
-            {this.state.emailVerificationPendingDialogOpen && (
-              <EmailVerificationPendingDialog
+            {this.state.emailVerificationDialogOpen && (
+              <EmailVerificationDialog
                 authenticatedUser={this.state.authenticatedUser}
                 onClose={() => {
-                  this.openEmailVerificationPendingDialog(false);
+                  this.openEmailVerificationDialog({
+                    open: false,
+                  });
                   this.state.authenticatedUser
                     .onRefreshFirebaseProfile()
                     .catch(() => {
                       // Ignore any error, we can't do much.
                     });
                 }}
+                sendEmailAutomatically={
+                  this.state.emailVerificationDialogProps.sendEmailAutomatically
+                }
+                showSendEmailButton={
+                  this.state.emailVerificationDialogProps.showSendEmailButton
+                }
+                onSendEmail={this._doSendEmailVerification}
               />
             )}
             <Snackbar

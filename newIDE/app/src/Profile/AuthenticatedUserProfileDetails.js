@@ -7,7 +7,6 @@ import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
-import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
 
 type Props = {|
@@ -23,18 +22,14 @@ const AuthenticatedUserProfileDetails = ({
 }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
-  const isMounted = useIsMounted();
-  const [emailSent, setEmailSent] = React.useState<boolean>(false);
-  const sendEmail = React.useCallback(
+  const openEmailVerificationDialog = React.useCallback(
     () => {
-      authenticatedUser.onSendEmailVerification();
-      setEmailSent(true);
-      setTimeout(() => {
-        if (!isMounted.current) return;
-        setEmailSent(false);
-      }, 3000);
+      authenticatedUser.onOpenEmailVerificationDialog({
+        sendEmailAutomatically: true,
+        showSendEmailButton: false,
+      });
     },
-    [authenticatedUser, isMounted]
+    [authenticatedUser]
   );
 
   return firebaseUser && profile ? (
@@ -44,22 +39,15 @@ const AuthenticatedUserProfileDetails = ({
           kind="info"
           renderRightButton={() => (
             <FlatButton
-              label={
-                emailSent ? (
-                  <Trans>Email sent!</Trans>
-                ) : (
-                  <Trans>Send it again</Trans>
-                )
-              }
-              onClick={sendEmail}
-              disabled={emailSent}
+              label={<Trans>Send it again</Trans>}
+              onClick={openEmailVerificationDialog}
               primary
             />
           )}
         >
           <Trans>
-            It looks like your email is not verified. Click on the link received
-            by email to verify your account. Didn't receive it?
+            You are missing out on asset store discounts and other benefits!
+            Verify your email address. Didn't receive it?
           </Trans>
         </AlertMessage>
       )}

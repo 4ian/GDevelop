@@ -857,7 +857,7 @@ module.exports = {
       .setDefaultValue('yes')
       .addParameter('expression', _('To Saturation (0 to 100, -1 to ignore)'), '', false)
       .setDefaultValue('-1')
-      .addParameter('expression', _('To Lightness (-1 to ignore to 100)'), '', false)
+      .addParameter('expression', _('To Lightness (0 to 100, -1 to ignore)'), '', false)
       .setDefaultValue('-1')
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')

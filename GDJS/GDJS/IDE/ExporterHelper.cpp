@@ -589,8 +589,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
   InsertUnique(includesFiles, "force.js");
+  InsertUnique(includesFiles, "RuntimeLayer.js");
   InsertUnique(includesFiles, "layer.js");
-  InsertUnique(includesFiles, "RuntimeSceneLayer.js");
+  InsertUnique(includesFiles, "RuntimeCustomObjectLayer.js");
   InsertUnique(includesFiles, "timer.js");
   InsertUnique(includesFiles, "runtimewatermark.js");
   InsertUnique(includesFiles, "runtimegame.js");

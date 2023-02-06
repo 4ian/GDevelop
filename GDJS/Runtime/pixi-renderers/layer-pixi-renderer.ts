@@ -13,7 +13,7 @@ namespace gdjs {
   export class LayerPixiRenderer {
     _pixiContainer: PIXI.Container;
 
-    _layer: gdjs.Layer;
+    _layer: gdjs.RuntimeLayer;
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
     _runtimeSceneRenderer: gdjs.RuntimeInstanceContainerRenderer;
@@ -35,7 +35,7 @@ namespace gdjs {
      * @param runtimeInstanceContainerRenderer The scene renderer
      */
     constructor(
-      layer: gdjs.Layer,
+      layer: gdjs.RuntimeLayer,
       runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer,
       pixiRenderer: PIXI.Renderer | null
     ) {

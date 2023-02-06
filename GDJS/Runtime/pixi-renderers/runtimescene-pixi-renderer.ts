@@ -104,7 +104,7 @@ namespace gdjs {
       return this._pixiRenderer;
     }
 
-    setLayerIndex(layer: gdjs.Layer, index: float): void {
+    setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
       const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
       let layerPixiObject:
         | PIXI.Container

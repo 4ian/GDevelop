@@ -72,7 +72,6 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
@@ -1120,69 +1119,6 @@ storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <BackgroundText>Hello World, this is a background text</BackgroundText>
-  ));
-
-storiesOf('UI Building Blocks/AlertMessage', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AlertMessage kind="info">Hello World, this is an alert text</AlertMessage>
-  ))
-  .add('default with button', () => (
-    <AlertMessage kind="info" onHide={() => {}}>
-      Hello World, this is an alert text
-    </AlertMessage>
-  ))
-  .add('long text', () => (
-    <AlertMessage kind="info">
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('long text with button', () => (
-    <AlertMessage kind="info" onHide={() => {}}>
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('long text with icon', () => (
-    <AlertMessage
-      kind="info"
-      renderLeftIcon={() => (
-        <img
-          src="res/tutorial_icons/tween-behavior.jpg"
-          alt=""
-          style={{
-            maxWidth: 128,
-            maxHeight: 128,
-          }}
-        />
-      )}
-      onHide={() => {}}
-    >
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('warning', () => (
-    <AlertMessage kind="warning">
-      Hello World, this is an alert text
-    </AlertMessage>
-  ))
-  .add('error', () => (
-    <AlertMessage kind="error">Hello World, this is an alert text</AlertMessage>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)

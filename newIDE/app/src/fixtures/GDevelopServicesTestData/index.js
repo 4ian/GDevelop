@@ -128,6 +128,9 @@ export const indieUserProfile: Profile = {
   description: 'Just here to develop indie games',
   getGameStatsEmail: false,
   getNewsletterEmail: true,
+  createdAt: 12345,
+  updatedAt: 12345,
+  appLanguage: null,
   isCreator: true,
   isPlayer: false,
   donateLink: 'https://www.paypal.me/indie-user',
@@ -319,6 +322,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
@@ -361,6 +365,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
@@ -408,6 +413,7 @@ export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: Authent
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
@@ -450,6 +456,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
@@ -492,6 +499,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
@@ -541,6 +549,7 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {
@@ -583,6 +592,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
   onBadgesChanged: async () => {},
   onCloudProjectsChanged: async () => {},
   onRefreshUserProfile: async () => {

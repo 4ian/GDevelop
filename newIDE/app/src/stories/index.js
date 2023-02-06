@@ -52,7 +52,6 @@ import {
   noSubscription,
   fakeIndieAuthenticatedUser,
   fakeAuthenticatedButLoadingAuthenticatedUser,
-  fakeAuthenticatedAndEmailVerifiedUser,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -88,7 +87,6 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
@@ -2705,22 +2703,6 @@ storiesOf('AuthenticatedUserProfileDetails', module)
       authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
-    />
-  ));
-
-storiesOf('EmailVerificationPendingDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('non verified user - loading', () => (
-    <EmailVerificationPendingDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
-      onClose={action('on close')}
-    />
-  ))
-  .add('verified user', () => (
-    <EmailVerificationPendingDialog
-      authenticatedUser={fakeAuthenticatedAndEmailVerifiedUser}
-      onClose={action('on close')}
     />
   ));
 

@@ -24,6 +24,9 @@ const defaultProps = {
     getNewsletterEmail: true,
     isCreator: true,
     isPlayer: false,
+    createdAt: 12345,
+    updatedAt: 12345,
+    appLanguage: 'en',
     donateLink: 'https://www.gdevelop-app.com',
   },
 };

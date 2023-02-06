@@ -66,7 +66,7 @@ export const AnnouncementsFeed = ({
 
               return (
                 <AlertMessage
-                  kind={announcement.type === 'warning' ? 'warning' : 'info'}
+                  kind={announcement.type}
                   renderRightButton={
                     buttonLabelByLocale && buttonUrl
                       ? () => (

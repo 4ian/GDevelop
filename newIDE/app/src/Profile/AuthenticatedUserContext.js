@@ -40,10 +40,10 @@ export type AuthenticatedUser = {|
   onSubscriptionUpdated: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
-  onOpenEmailVerificationDialog: ({
+  onOpenEmailVerificationDialog: ({|
     sendEmailAutomatically: boolean,
     showSendEmailButton: boolean,
-  }) => void,
+  |}) => void,
   onAcceptGameStatsEmail: () => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};

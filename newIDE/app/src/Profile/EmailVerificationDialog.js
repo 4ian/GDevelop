@@ -6,13 +6,13 @@ import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import BackgroundText from '../UI/BackgroundText';
-import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import Text from '../UI/Text';
 import { useInterval } from '../Utils/UseInterval';
 import CircularProgress from '../UI/CircularProgress';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
+import UserVerified from '../UI/CustomSvgIcons/UserVerified';
 
 type Props = {|
   onClose: () => void,
@@ -114,8 +114,9 @@ export default function EmailVerificationDialog({
                   <CircularProgress size={20} />
                   <Text>
                     <Trans>
-                      Waiting for the email verification of
-                      {authenticatedUser.firebaseUser.email}...
+                      Email sent to
+                      {authenticatedUser.firebaseUser.email}, waiting for
+                      validation...
                     </Trans>
                   </Text>
                 </LineStackLayout>
@@ -124,7 +125,7 @@ export default function EmailVerificationDialog({
           </ColumnStackLayout>
         ) : (
           <LineStackLayout justifyContent="center" alignItems="center">
-            <VerifiedUser />
+            <UserVerified />
             <Text size="title" align="center">
               <Trans>Email verified</Trans>
             </Text>

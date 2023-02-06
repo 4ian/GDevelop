@@ -59,10 +59,10 @@ type State = {|
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   emailVerificationDialogOpen: boolean,
-  emailVerificationDialogProps: {
+  emailVerificationDialogProps: {|
     sendEmailAutomatically: boolean,
     showSendEmailButton: boolean,
-  },
+  |},
   forgotPasswordInProgress: boolean,
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
@@ -164,10 +164,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         onOpenEmailVerificationDialog: ({
           sendEmailAutomatically,
           showSendEmailButton,
-        }: {
+        }: {|
           sendEmailAutomatically: boolean,
           showSendEmailButton: boolean,
-        }) =>
+        |}) =>
           this.openEmailVerificationDialog({
             open: true,
             sendEmailAutomatically,
@@ -548,7 +548,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     // - If they just registered, we don't send the email again as it will be sent automatically,
     // nor do we show a button to send again.
     // - If they are just logging in, we don't send the email but we show a button to send again.
-    // Use a state value to show the dialog only once.
+    // Use a boolean to show the dialog only once.
     const accountAgeInMs = Date.now() - profile.createdAt;
     const hasJustCreatedAccount = accountAgeInMs < 1000 * 10; // 10 seconds.
     if (
@@ -576,7 +576,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!profile) return;
     // If the user has not filled their additional information, show
     // the dialog to fill it, but ensure they have closed the email verification dialog first.
-    // Use a state value to show the dialog only once.
+    // Use a boolean to show the dialog only once.
     if (
       profile &&
       !this._hasNotifiedUserAboutAdditionalInfo &&
@@ -816,11 +816,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     open = true,
     sendEmailAutomatically = false,
     showSendEmailButton = false,
-  }: {
+  }: {|
     open?: boolean,
     sendEmailAutomatically?: boolean,
     showSendEmailButton?: boolean,
-  }) => {
+  |}) => {
     this.setState({
       emailVerificationDialogOpen: open,
       emailVerificationDialogProps: {
@@ -963,12 +963,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                       // Ignore any error, we can't do much.
                     });
                 }}
-                sendEmailAutomatically={
-                  this.state.emailVerificationDialogProps.sendEmailAutomatically
-                }
-                showSendEmailButton={
-                  this.state.emailVerificationDialogProps.showSendEmailButton
-                }
+                {...this.state.emailVerificationDialogProps}
                 onSendEmail={this._doSendEmailVerification}
               />
             )}

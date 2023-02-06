@@ -223,14 +223,16 @@ export default class Authentication {
     const { currentUser } = this.auth;
     if (!currentUser || currentUser.emailVerified) return;
 
-    sendEmailVerification(currentUser).catch(error => {
+    try {
+      await sendEmailVerification(currentUser);
+    } catch (error) {
       showErrorBox({
         message:
           'An email has been sent recently, check your inbox or please try again later.',
         rawError: error,
         errorId: 'email-verification-send-error',
       });
-    });
+    }
   };
 
   changeEmail = async (

@@ -941,6 +941,44 @@ namespace gdjs {
     };
 
     /**
+     * Shortcut to return the size of an array or structure variable.
+     * @returns {number}
+     */
+    getVariableLength = function (array: gdjs.Variable): number {
+      return array.getChildrenCount();
+    };
+
+    /**
+     * Shortcut to get the value of an array variable at a given index.
+     * @returns {string | number | boolean}
+     */
+    getVariableValueAtIndex = function (array: gdjs.Variable, index: number) {
+      if (index < 0 || index >= array.getChildrenCount()) {
+        return 0;
+      }
+      return array.getAllChildrenArray()[index].getValue();
+    };
+
+    /**
+     * Shortcut to get the first value of an array variable.
+     * @returns {string | number | boolean}
+     */
+    getFirstVariableValue = function (array: gdjs.Variable) {
+      return array.getAllChildrenArray()[0].getValue();
+    };
+
+    /**
+     * Shortcut to get the last value of an array variable.
+     * @returns {string | number | boolean}
+     */
+    getLastVariableValue = function (array: gdjs.Variable) {
+      const children = array.getAllChildrenArray();
+      return children.length === 0
+        ? 0
+        : children[children.length - 1].getValue();
+    };
+
+    /**
      * Shortcut to test if a variable exists for the object.
      * @param name The variable to be tested
      * @return true if the variable exists.

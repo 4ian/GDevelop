@@ -20,6 +20,7 @@ export type PrivateAssetPackListingData = {|
   listing: 'ASSET_PACK',
   name: string,
   description: string,
+  categories: Array<string>,
   updatedAt: string,
   createdAt: string,
   thumbnailUrls: string[],

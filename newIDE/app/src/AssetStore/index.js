@@ -57,6 +57,16 @@ export type AssetStoreInterface = {|
   onClose: () => void,
 |};
 
+export const assetCategories = {
+  'full-game-pack': <Trans>Full Game Packs</Trans>,
+  character: <Trans>Characters</Trans>,
+  props: <Trans>Props</Trans>,
+  background: <Trans>Backgrounds</Trans>,
+  'visual-effect': <Trans>Visual Effects</Trans>,
+  interface: <Trans>UI/Interface</Trans>,
+  prefab: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
+};
+
 const identifyAssetPackKind = ({
   privateAssetPacks,
   publicAssetPacks,
@@ -99,6 +109,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const {
       openedAssetPack,
       openedAssetShortHeader,
+      openedAssetCategory,
       openedPrivateAssetPackListingData,
       filtersState,
     } = navigationState.getCurrentPage();
@@ -278,6 +289,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [receivedAssetPacks, saveScrollPosition, navigationState, setSearchText]
     );
 
+    const selectAssetCategory = React.useCallback(
+      (category: string) => {
+        navigationState.openAssetCategoryPage(category);
+      },
+      [navigationState]
+    );
+
     // If the user has received the pack they are currently viewing,
     // we update the window to show it if they are not already on the pack page.
     React.useEffect(
@@ -424,18 +442,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     />
                   </Column>
                 </LineStackLayout>
-                {!isOnHomePage && <Spacer />}
+                <Spacer />
                 <Column noMargin>
                   <Line
                     justifyContent="space-between"
                     noMargin
                     alignItems="center"
                   >
-                    {isOnHomePage ? (
-                      <Text size="block-title">
-                        <Trans>Discover</Trans>
-                      </Text>
-                    ) : (
+                    {(!isOnHomePage ||
+                      (isOnHomePage && !!openedAssetCategory)) && (
                       <>
                         <Column expand alignItems="flex-start" noMargin>
                           <TextButton
@@ -559,6 +574,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         assetPackRandomOrdering={assetPackRandomOrdering}
                         onPublicAssetPackSelection={selectPublicAssetPack}
                         onPrivateAssetPackSelection={selectPrivateAssetPack}
+                        onCategorySelection={selectAssetCategory}
+                        openedAssetCategory={openedAssetCategory}
                       />
                     ) : (
                       <PlaceholderLoader />

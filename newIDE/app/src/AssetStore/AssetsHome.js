@@ -19,10 +19,15 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
 import { mergeArraysPerGroup } from '../Utils/Array';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { assetCategories } from '.';
 
 const columns = 3;
 const columnsForSmallWindow = 1;
 const columnsForMediumWindow = 2;
+const categoryColumns = 4;
+const categoryColumnsForSmallWindow = 2;
+const categoryColumnsForMediumWindow = 3;
 const cellSpacing = 2;
 
 const styles = {
@@ -49,10 +54,8 @@ const styles = {
     margin: 4,
   },
   packTitle: {
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
+    ...textEllipsisStyle,
     overflowWrap: 'break-word',
-    whiteSpace: 'nowrap',
   },
 };
 
@@ -75,14 +78,13 @@ const PublicAssetPackTile = ({
 }: {|
   assetPack: PublicAssetPack,
   onSelect: () => void,
-  /** Props needed so that GidList component can adjust tile size */
+  /** Props needed so that GridList component can adjust tile size */
   style?: any,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
   return (
     <GridListTile
       classes={classesForGridListItem}
-      key={assetPack.tag}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event)) {
@@ -133,7 +135,6 @@ export const PrivateAssetPackTile = ({
   return (
     <GridListTile
       classes={classesForGridListItem}
-      key={assetPackListingData.id}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event)) {
@@ -172,6 +173,46 @@ export const PrivateAssetPackTile = ({
   );
 };
 
+export const CategoryTile = ({
+  title,
+  onSelect,
+  style,
+}: {|
+  title: React.Node,
+  onSelect: () => void,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onSelect();
+        }
+      }}
+      style={style}
+      onClick={onSelect}
+    >
+      <Paper elevation={2} style={styles.paper} background="light">
+        {/* <CorsAwareImage
+          style={styles.previewImage}
+          src={assetPackListingData.thumbnailUrls[0]}
+        /> */}
+        <Column>
+          <Line justifyContent="center" noMargin>
+            <Text style={styles.packTitle} size="sub-title">
+              {title}
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  );
+};
+
 export type AssetsHomeInterface = {|
   getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
@@ -183,6 +224,8 @@ type Props = {|
   assetPackRandomOrdering: Array<number>,
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
+  onCategorySelection: string => void,
+  openedAssetCategory: string | null,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
@@ -193,6 +236,8 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
+      onCategorySelection,
+      openedAssetCategory,
     }: Props,
     ref
   ) => {
@@ -218,33 +263,39 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       },
     }));
 
-    const starterPacksTiles: Array<React.Node> = starterPacks.map(
-      (assetPack, index) => (
-        <PublicAssetPackTile
-          assetPack={assetPack}
-          onSelect={() => onPublicAssetPackSelection(assetPack)}
-          key={`${assetPack.tag}-${index}`}
-        />
+    const starterPacksTiles: Array<React.Node> = starterPacks
+      .map((assetPack, index) =>
+        !openedAssetCategory ||
+        assetPack.categories.includes(openedAssetCategory) ? (
+          <PublicAssetPackTile
+            assetPack={assetPack}
+            onSelect={() => onPublicAssetPackSelection(assetPack)}
+            key={`${assetPack.tag}-${index}`}
+          />
+        ) : null
       )
-    );
+      .filter(Boolean);
 
-    const privateAssetPacksTiles: Array<React.Node> = privateAssetPacksListingData.map(
-      assetPackListingData => (
-        <PrivateAssetPackTile
-          assetPackListingData={assetPackListingData}
-          onSelect={() => {
-            onPrivateAssetPackSelection(assetPackListingData);
-          }}
-          owned={
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === assetPackListingData.id
-            )
-          }
-          key={assetPackListingData.id}
-        />
+    const privateAssetPacksTiles: Array<React.Node> = privateAssetPacksListingData
+      .map(assetPackListingData =>
+        !openedAssetCategory ||
+        assetPackListingData.categories.includes(openedAssetCategory) ? (
+          <PrivateAssetPackTile
+            assetPackListingData={assetPackListingData}
+            onSelect={() => {
+              onPrivateAssetPackSelection(assetPackListingData);
+            }}
+            owned={
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              )
+            }
+            key={assetPackListingData.id}
+          />
+        ) : null
       )
-    );
+      .filter(Boolean);
 
     const allTiles = mergeArraysPerGroup(
       privateAssetPacksTiles,
@@ -256,8 +307,59 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       1
     );
 
+    const categoryTiles = Object.entries(assetCategories).map(([id, title]) => (
+      <CategoryTile
+        key={id}
+        // $FlowExpectedError - Object.entries does not infer well the type of the value.
+        title={title}
+        onSelect={() => {
+          onCategorySelection(id);
+        }}
+      />
+    ));
+
+    const openedAssetCategoryTitle = openedAssetCategory
+      ? assetCategories[openedAssetCategory]
+      : null;
+
     return (
       <ScrollView ref={scrollView}>
+        {openedAssetCategory ? null : (
+          <>
+            <Column>
+              <Line>
+                <Text size="block-title">
+                  <Trans>Explore by category</Trans>
+                </Text>
+              </Line>
+            </Column>
+            <GridList
+              cols={
+                windowWidth === 'small'
+                  ? categoryColumnsForSmallWindow
+                  : windowWidth === 'medium'
+                  ? categoryColumnsForMediumWindow
+                  : categoryColumns
+              }
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {categoryTiles}
+            </GridList>
+          </>
+        )}
+        <Column>
+          <Line>
+            <Text size="block-title">
+              {openedAssetCategoryTitle ? (
+                openedAssetCategoryTitle
+              ) : (
+                <Trans>All asset packs</Trans>
+              )}
+            </Text>
+          </Line>
+        </Column>
         <GridList
           cols={
             windowWidth === 'small'

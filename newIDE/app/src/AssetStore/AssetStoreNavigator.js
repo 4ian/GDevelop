@@ -15,6 +15,7 @@ export type AssetStorePageState = {|
   openedPrivateAssetPackListingData: ?PrivateAssetPackListingData,
   filtersState: FiltersState,
   scrollPosition?: ?number,
+  displayAssets: boolean,
 |};
 
 export type NavigationState = {|
@@ -44,6 +45,7 @@ export const assetStoreHomePageState: AssetStorePageState = {
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
+  displayAssets: false,
 };
 
 const searchPageState: AssetStorePageState = {
@@ -52,14 +54,17 @@ const searchPageState: AssetStorePageState = {
   openedAssetPack: null,
   openedPrivateAssetPackListingData: null,
   filtersState: noFilter,
+  displayAssets: true,
 };
 
 export const isHomePage = (pageState: AssetStorePageState) => {
   return (
-    pageState.openedAssetShortHeader === null &&
-    pageState.openedAssetPack === null &&
-    pageState.openedPrivateAssetPackListingData === null &&
-    pageState.filtersState === noFilter
+    pageState === assetStoreHomePageState ||
+    (!pageState.openedAssetShortHeader &&
+      !pageState.openedPrivateAssetPackListingData &&
+      !pageState.openedAssetPack &&
+      pageState.filtersState === noFilter &&
+      !pageState.displayAssets)
   );
 };
 
@@ -134,6 +139,7 @@ export const useNavigation = (): NavigationState => {
               openedAssetCategory: null,
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
+              displayAssets: true,
               filtersState: {
                 chosenCategory: {
                   node: { name: tag, allChildrenTags: [], children: [] },
@@ -159,6 +165,7 @@ export const useNavigation = (): NavigationState => {
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
               filtersState: noFilter,
+              displayAssets: false,
             },
           ],
         }));
@@ -179,6 +186,7 @@ export const useNavigation = (): NavigationState => {
                   (currentPage && currentPage.openedAssetCategory) || null,
                 openedAssetPack: assetPack,
                 openedPrivateAssetPackListingData: null,
+                displayAssets: true,
                 filtersState: {
                   chosenCategory: {
                     node: {
@@ -211,6 +219,7 @@ export const useNavigation = (): NavigationState => {
               openedAssetPack: null,
               openedPrivateAssetPackListingData: assetPack,
               filtersState: noFilter,
+              displayAssets: false,
             },
           ],
         }));
@@ -226,6 +235,7 @@ export const useNavigation = (): NavigationState => {
               openedAssetPack: null,
               openedPrivateAssetPackListingData: null,
               filtersState: noFilter,
+              displayAssets: false,
             },
           ],
         }));

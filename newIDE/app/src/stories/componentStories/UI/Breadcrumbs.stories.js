@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
@@ -20,16 +19,20 @@ export const Default = () => (
     <Line>
       <Breadcrumbs
         steps={[
-          { label: t`Home`, onClick: action('Click on home'), href: '/' },
+          {
+            label: <span>Home</span>,
+            onClick: action('Click on home'),
+            href: '/',
+          },
         ]}
       />
     </Line>
     <Line>
       <Breadcrumbs
         steps={[
-          { label: t`Home` },
+          { label: <span>Home</span> },
           {
-            label: t`Categories`,
+            label: <span>Categories</span>,
             onClick: action('Click on categories'),
             href: '/categories',
           },

@@ -24,23 +24,23 @@ const variable = new gdjs.Variable().fromJSObject({
   it: ['is', true],
 });
 
+/**
+ * A firebase configuration of a project made only for those tests.
+ */
+const firebaseConfig = {
+  apiKey: 'AIzaSyBwPnGpfEBXDjwQrWfU0wqgp4m9qEt7YM8',
+  authDomain: 'gdtest-e11a5.firebaseapp.com',
+  databaseURL: 'https://gdtest-e11a5.firebaseio.com',
+  projectId: 'gdtest-e11a5',
+  storageBucket: 'gdtest-e11a5.appspot.com',
+  messagingSenderId: '254035412678',
+  appId: '1:254035412678:web:2ddd6b83019b7f259b79c7',
+  measurementId: 'G-4REML26L59',
+};
+
 // The tests require an internet connection, as a real Firebase instance is used.
 const describeIfOnline = navigator.onLine ? describe : describe.skip;
 describeIfOnline('Firebase extension end-to-end tests', function () {
-  /**
-   * A firebase configuration of a project made only for those tests.
-   */
-  const firebaseConfig = {
-    apiKey: 'AIzaSyBwPnGpfEBXDjwQrWfU0wqgp4m9qEt7YM8',
-    authDomain: 'gdtest-e11a5.firebaseapp.com',
-    databaseURL: 'https://gdtest-e11a5.firebaseio.com',
-    projectId: 'gdtest-e11a5',
-    storageBucket: 'gdtest-e11a5.appspot.com',
-    messagingSenderId: '254035412678',
-    appId: '1:254035412678:web:2ddd6b83019b7f259b79c7',
-    measurementId: 'G-4REML26L59',
-  };
-
   // Increase the timeout to work on low connections as well.
   this.timeout('5s');
 
@@ -48,8 +48,8 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     .toString()
     .replace('.', '-')}-${Date.now()}`;
 
-  before(function setupFirebase() {
-    gdjs.evtTools.firebaseTools._setupFirebase({
+  before(async function setupFirebase() {
+    await gdjs.evtTools.firebaseTools._setupFirebase({
       getGame: () => ({
         getExtensionProperty: () => JSON.stringify(firebaseConfig),
       }),

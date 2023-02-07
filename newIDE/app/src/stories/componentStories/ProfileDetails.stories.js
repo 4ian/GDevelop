@@ -44,7 +44,7 @@ const getAssetPacksListingData = userId => [
     listing: 'ASSET_PACK',
     name: 'French food',
     description: 'The best asset pack about french food',
-    categories: ["props"],
+    categories: ['props'],
     updatedAt: '2021-11-18T10:19:50.417Z',
     createdAt: '2021-11-18T10:19:50.417Z',
     thumbnailUrls: [

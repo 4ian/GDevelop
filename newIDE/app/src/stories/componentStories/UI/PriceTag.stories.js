@@ -21,7 +21,7 @@ export const Default = () => (
       <PriceTag value={850} />
       <PriceTag value={1200} />
       <PriceTag value={1225} />
-      <PriceTag value={1225} owned/>
+      <PriceTag value={1225} owned />
     </LineStackLayout>
     <LineStackLayout>
       <div
@@ -52,7 +52,7 @@ export const Default = () => (
           alignItems: 'flex-start',
         }}
       >
-        <PriceTag value={1200} withOverlay owned/>
+        <PriceTag value={1200} withOverlay owned />
       </div>
     </LineStackLayout>
   </ColumnStackLayout>

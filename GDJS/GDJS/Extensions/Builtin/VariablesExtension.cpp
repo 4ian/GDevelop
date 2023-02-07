@@ -46,11 +46,27 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.variable.getVariableNumber");
   GetAllStrExpressions()["GlobalVariableString"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableString");
+  GetAllExpressions()["GlobalVariableFirst"].SetFunctionName(
+      "gdjs.evtTools.variable.getFirstVariableValue");
+  GetAllExpressions()["GlobalVariableLast"].SetFunctionName(
+      "gdjs.evtTools.variable.getLastVariableValue");
+  GetAllExpressions()["GlobalVariableAt"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableValueAt");
+  GetAllExpressions()["SceneVariableFirst"].SetFunctionName(
+      "gdjs.evtTools.variable.getFirstVariableValue");
+  GetAllExpressions()["SceneVariableLast"].SetFunctionName(
+      "gdjs.evtTools.variable.getLastVariableValue");
+  GetAllExpressions()["SceneVariableAt"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableValueAt");
 
   GetAllConditions()["VarSceneDef"].SetFunctionName(
       "gdjs.evtTools.variable.sceneVariableExists");
   GetAllConditions()["VarGlobalDef"].SetFunctionName(
       "gdjs.evtTools.variable.globalVariableExists");
+  GetAllConditions()["SceneVariableSize"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableChildCount");
+  GetAllConditions()["GlobalVariableSize"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableChildCount");
 
   GetAllActions()["SetSceneVariableAsBoolean"].SetFunctionName(
       "gdjs.evtTools.variable.setVariableBoolean");

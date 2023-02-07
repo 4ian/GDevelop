@@ -164,7 +164,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["CollisionPoint"]
       .SetFunctionName("isCollidingWithPoint")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["ObjectTimer"] // deprecated
+  objectConditions["ObjectTimer"]  // deprecated
       .SetFunctionName("timerElapsedTime")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["CompareObjectTimer"]
@@ -247,6 +247,12 @@ BaseObjectExtension::BaseObjectExtension() {
       "getXFromAngleAndDistance");
   objectExpressions["YFromAngleAndDistance"].SetFunctionName(
       "getYFromAngleAndDistance");
+  objectExpressions["ArrayVariableFirst"].SetFunctionName(
+      "getFirstVariableValue");
+  objectExpressions["ArrayVariableLast"].SetFunctionName(
+      "getLastVariableValue");
+  objectExpressions["ArrayVariableAt"].SetFunctionName(
+      "getVariableValueAtIndex");
 
   GetAllActions()["Create"].SetFunctionName(
       "gdjs.evtTools.object.createObjectOnScene");
@@ -254,9 +260,9 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.createObjectFromGroupOnScene");
 
   GetAllExpressions()["Count"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
+      "gdjs.evtTools.object.pickedObjectsCount");  // Deprecated
   GetAllConditions()["NbObjet"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
+      "gdjs.evtTools.object.pickedObjectsCount");  // Deprecated
 
   GetAllExpressions()["SceneInstancesCount"].SetFunctionName(
       "gdjs.evtTools.object.getSceneInstancesCount");
@@ -334,6 +340,9 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetIncludeFile("runtimeobject.js");
   objectActions["ObjectVariableRemoveAt"]
       .SetFunctionName("variableRemoveAt")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectVariableSize"]
+      .SetFunctionName("getVariableSize")
       .SetIncludeFile("runtimeobject.js");
 
   GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(

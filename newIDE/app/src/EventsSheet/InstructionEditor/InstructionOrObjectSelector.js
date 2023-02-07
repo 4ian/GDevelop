@@ -55,6 +55,8 @@ import {
   type SearchResult,
   tuneMatches,
   sharedFuseConfiguration,
+  getFuseSearchQueryForSimpleArray,
+  getFuseSearchQueryForMultipleKeys,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
 
@@ -193,33 +195,37 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _search = (searchText: string) => {
     if (searchText === '') return;
 
-    const extendSearchText = `'${searchText
-      .trim()
-      .split(' ')
-      .join(" '")}`;
+    const extendedSearchText = getFuseSearchQueryForSimpleArray(searchText);
 
     this.setState({
       searchResults: {
         objects: this.objectSearchApi
-          ? this.objectSearchApi.search(extendSearchText).map(result => ({
+          ? this.objectSearchApi.search(extendedSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         groups: this.groupSearchApi
-          ? this.groupSearchApi.search(extendSearchText).map(result => ({
+          ? this.groupSearchApi.search(extendedSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         instructions: this.instructionSearchApi
-          ? this.instructionSearchApi.search(extendSearchText).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
+          ? this.instructionSearchApi
+              .search(
+                getFuseSearchQueryForMultipleKeys(searchText, [
+                  'displayedName',
+                  'fullGroupName',
+                ])
+              )
+              .map(result => ({
+                item: result.item,
+                matches: tuneMatches(result, searchText),
+              }))
           : [],
         tags: this.tagSearchApi
-          ? this.tagSearchApi.search(extendSearchText).map(result => ({
+          ? this.tagSearchApi.search(extendedSearchText).map(result => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))

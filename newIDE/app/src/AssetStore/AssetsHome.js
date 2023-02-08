@@ -306,38 +306,40 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     }));
 
     const starterPacksTiles: Array<React.Node> = starterPacks
-      .map((assetPack, index) =>
-        !openedAssetCategory ||
-        assetPack.categories.includes(openedAssetCategory) ? (
-          <PublicAssetPackTile
-            assetPack={assetPack}
-            onSelect={() => onPublicAssetPackSelection(assetPack)}
-            key={`${assetPack.tag}-${index}`}
-          />
-        ) : null
+      .filter(
+        assetPack =>
+          !openedAssetCategory ||
+          assetPack.categories.includes(openedAssetCategory)
       )
-      .filter(Boolean);
+      .map((assetPack, index) => (
+        <PublicAssetPackTile
+          assetPack={assetPack}
+          onSelect={() => onPublicAssetPackSelection(assetPack)}
+          key={`${assetPack.tag}-${index}`}
+        />
+      ));
 
     const privateAssetPacksTiles: Array<React.Node> = privateAssetPacksListingData
-      .map(assetPackListingData =>
-        !openedAssetCategory ||
-        assetPackListingData.categories.includes(openedAssetCategory) ? (
-          <PrivateAssetPackTile
-            assetPackListingData={assetPackListingData}
-            onSelect={() => {
-              onPrivateAssetPackSelection(assetPackListingData);
-            }}
-            owned={
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              )
-            }
-            key={assetPackListingData.id}
-          />
-        ) : null
+      .filter(
+        assetPackListingData =>
+          !openedAssetCategory ||
+          assetPackListingData.categories.includes(openedAssetCategory)
       )
-      .filter(Boolean);
+      .map(assetPackListingData => (
+        <PrivateAssetPackTile
+          assetPackListingData={assetPackListingData}
+          onSelect={() => {
+            onPrivateAssetPackSelection(assetPackListingData);
+          }}
+          owned={
+            !!receivedAssetPacks &&
+            !!receivedAssetPacks.find(
+              pack => pack.id === assetPackListingData.id
+            )
+          }
+          key={assetPackListingData.id}
+        />
+      ));
 
     const allTiles = mergeArraysPerGroup(
       privateAssetPacksTiles,

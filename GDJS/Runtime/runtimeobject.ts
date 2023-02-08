@@ -941,6 +941,46 @@ namespace gdjs {
     };
 
     /**
+     * Shortcut to get the first value of an array variable as a string.
+     */
+    static getFirstVariableString = function (array: gdjs.Variable): string {
+      if (array.getChildrenCount() === 0) {
+        return '';
+      }
+      return array.getAllChildrenArray()[0].getAsString();
+    };
+
+    /**
+     * Shortcut to get the first value of an array variable as a number.
+     */
+    static getFirstVariableNumber = function (array: gdjs.Variable): number {
+      if (array.getChildrenCount() === 0) {
+        return 0;
+      }
+      return array.getAllChildrenArray()[0].getAsNumber();
+    };
+
+    /**
+     * Shortcut to get the last value of an array variable as a string.
+     */
+    static getLastVariableString = function (array: gdjs.Variable): string {
+      const children = array.getAllChildrenArray();
+      return children.length === 0
+        ? ''
+        : children[children.length - 1].getAsString();
+    };
+
+    /**
+     * Shortcut to get the last value of an array variable as a number.
+     */
+    static getLastVariableNumber = function (array: gdjs.Variable): number {
+      const children = array.getAllChildrenArray();
+      return children.length === 0
+        ? 0
+        : children[children.length - 1].getAsNumber();
+    };
+
+    /**
      * Shortcut to test if a variable exists for the object.
      * @param name The variable to be tested
      * @return true if the variable exists.
@@ -2531,6 +2571,11 @@ namespace gdjs {
     setVariableString = RuntimeObject.setVariableString;
     getVariableBoolean = RuntimeObject.getVariableBoolean;
     setVariableBoolean = RuntimeObject.setVariableBoolean;
+    getVariableChildCount = RuntimeObject.getVariableChildCount;
+    getFirstVariableNumber = RuntimeObject.getFirstVariableNumber;
+    getFirstVariableString = RuntimeObject.getFirstVariableString;
+    getLastVariableNumber = RuntimeObject.getLastVariableNumber;
+    getLastVariableString = RuntimeObject.getLastVariableString;
     toggleVariableBoolean = RuntimeObject.toggleVariableBoolean;
     variableChildExists = RuntimeObject.variableChildExists;
     variableRemoveChild = RuntimeObject.variableRemoveChild;

@@ -170,6 +170,54 @@ namespace gdjs {
       ): number {
         return variable.getChildrenCount();
       };
+
+      /**
+       * Shortcut to get the first value of an array variable as a number.
+       */
+      export const getFirstVariableNumber = function (
+        array: gdjs.Variable
+      ): number {
+        if (array.getChildrenCount() === 0) {
+          return 0;
+        }
+        return array.getAllChildrenArray()[0].getAsNumber();
+      };
+
+      /**
+       * Shortcut to get the last value of an array variable as a string.
+       */
+      export const getFirstVariableString = function (
+        array: gdjs.Variable
+      ): string {
+        if (array.getChildrenCount() === 0) {
+          return '';
+        }
+        return array.getAllChildrenArray()[0].getAsString();
+      };
+
+      /**
+       * Shortcut to get the last value of an array variable as a number.
+       */
+      export const getLastVariableNumber = function (
+        array: gdjs.Variable
+      ): number {
+        const children = array.getAllChildrenArray();
+        return children.length === 0
+          ? 0
+          : children[children.length - 1].getAsNumber();
+      };
+
+      /**
+       * Shortcut to get the last value of an array variable as a string.
+       */
+      export const getLastVariableString = function (
+        array: gdjs.Variable
+      ): string {
+        const children = array.getAllChildrenArray();
+        return children.length === 0
+          ? ''
+          : children[children.length - 1].getAsString();
+      };
     }
 
     export namespace common {

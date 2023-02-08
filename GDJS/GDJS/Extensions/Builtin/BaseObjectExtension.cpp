@@ -164,7 +164,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["CollisionPoint"]
       .SetFunctionName("isCollidingWithPoint")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["ObjectTimer"] // deprecated
+  objectConditions["ObjectTimer"]  // deprecated
       .SetFunctionName("timerElapsedTime")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["CompareObjectTimer"]
@@ -223,6 +223,18 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["VariableChildCount"]
       .SetFunctionName("gdjs.RuntimeObject.getVariableChildCount")
       .SetStatic();
+  objectExpressions["ArrayVariableFirstNumber"]
+      .SetFunctionName("gdjs.RuntimeObject.getFirstVariableNumber")
+      .SetStatic();
+  objectStrExpressions["ArrayVariableFirstString"]
+      .SetFunctionName("gdjs.RuntimeObject.getFirstVariableString")
+      .SetStatic();
+  objectExpressions["ArrayVariableLastNumber"]
+      .SetFunctionName("gdjs.RuntimeObject.getLastVariableNumber")
+      .SetStatic();
+  objectStrExpressions["ArrayVariableLastString"]
+      .SetFunctionName("gdjs.RuntimeObject.getLastVariableString")
+      .SetStatic();
   objectExpressions["ForceX"].SetFunctionName("getAverageForce().getX");
   objectExpressions["ForceY"].SetFunctionName("getAverageForce().getY");
   objectExpressions["ForceAngle"].SetFunctionName("getAverageForce().getAngle");
@@ -254,9 +266,9 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.createObjectFromGroupOnScene");
 
   GetAllExpressions()["Count"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
+      "gdjs.evtTools.object.pickedObjectsCount");  // Deprecated
   GetAllConditions()["NbObjet"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
+      "gdjs.evtTools.object.pickedObjectsCount");  // Deprecated
 
   GetAllExpressions()["SceneInstancesCount"].SetFunctionName(
       "gdjs.evtTools.object.getSceneInstancesCount");
@@ -334,6 +346,9 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetIncludeFile("runtimeobject.js");
   objectActions["ObjectVariableRemoveAt"]
       .SetFunctionName("variableRemoveAt")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectVariableChildCount"]
+      .SetFunctionName("getVariableChildCount")
       .SetIncludeFile("runtimeobject.js");
 
   GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(

@@ -2,15 +2,15 @@
 import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import React from 'react';
-import FlatButton from '../../UI/FlatButton';
-import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
-import { type AuthenticatedUser } from '../AuthenticatedUserContext';
-import { ColumnStackLayout } from '../../UI/Layout';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import LeftLoader from '../../UI/LeftLoader';
-import { redeemCode } from '../../Utils/GDevelopServices/Usage';
-import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import AlertMessage from '../../UI/AlertMessage';
+import FlatButton from '../UI/FlatButton';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
+import { type AuthenticatedUser } from './AuthenticatedUserContext';
+import { ColumnStackLayout } from '../UI/Layout';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import LeftLoader from '../UI/LeftLoader';
+import { redeemCode } from '../Utils/GDevelopServices/Usage';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
@@ -130,6 +130,7 @@ export default function RedeemCodeDialog({
               floatingLabelText={<Trans>Redemption code</Trans>}
               floatingLabelFixed
               errorText={getRedeemCodeErrorText(error)}
+              autoFocus="desktop"
             />
 
             {!subscription ||

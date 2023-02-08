@@ -83,7 +83,7 @@ const ExportDialog = ({
   const openBuildDialog = () => {
     if (!game) {
       showWarningBox(
-        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on Liluo.io."
+        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on gd.games."
       );
       return;
     }

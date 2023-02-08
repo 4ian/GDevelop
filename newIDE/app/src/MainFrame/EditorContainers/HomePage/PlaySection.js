@@ -18,7 +18,7 @@ const PlaySection = () => {
 
   window.addEventListener('message', event => {
     if (
-      event.origin === 'https://liluo.io' &&
+      event.origin === 'https://gd.games' &&
       event.data.id === 'set-embedded-height'
     ) {
       setIframeHeight(event.data.height);
@@ -33,8 +33,8 @@ const PlaySection = () => {
     >
       <SectionRow expand>
         <iframe
-          src={`https://liluo.io/embedded/${paletteType}`}
-          title="Liluo"
+          src={`https://gd.games/embedded/${paletteType}`}
+          title="gdgames"
           style={{ ...styles.iframe, height: iframeHeight }}
           scrolling="no" // This is deprecated, but this is the only way to disable the scrollbar.
         />

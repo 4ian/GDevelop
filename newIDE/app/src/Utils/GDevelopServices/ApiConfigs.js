@@ -10,20 +10,20 @@ export const GDevelopGamePreviews = {
 export const GDevelopGamesPlatform = {
   getInstantBuildUrl: (buildId: string) =>
     isDev
-      ? `https://liluo.io/instant-builds/${buildId}?dev=true`
-      : `https://liluo.io/instant-builds/${buildId}`,
+      ? `https://gd.games/instant-builds/${buildId}?dev=true`
+      : `https://gd.games/instant-builds/${buildId}`,
   getGameUrl: (gameId: string) =>
     isDev
-      ? `https://liluo.io/games/${gameId}?dev=true`
-      : `https://liluo.io/games/${gameId}`,
+      ? `https://gd.games/games/${gameId}?dev=true`
+      : `https://gd.games/games/${gameId}`,
   getGameUrlWithSlug: (userSlug: string, gameSlug: string) =>
     isDev
-      ? `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
-      : `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
+      ? `https://gd.games/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
+      : `https://gd.games/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
   getUserPublicProfileUrl: (userId: string, username: ?string) =>
     username
-      ? `https://liluo.io/${username}${isDev ? '?dev=true' : ''}`
-      : `https://liluo.io/user/${userId}${isDev ? '?dev=true' : ''}`,
+      ? `https://gd.games/${username}${isDev ? '?dev=true' : ''}`
+      : `https://gd.games/user/${userId}${isDev ? '?dev=true' : ''}`,
 };
 
 export const GDevelopFirebaseConfig = {

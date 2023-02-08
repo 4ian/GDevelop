@@ -686,7 +686,7 @@ namespace gdjs {
         const isDev = runtimeScene
           .getGame()
           .isUsingGDevelopDevelopmentEnvironment();
-        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true${
+        const targetUrl = `https://gd.games/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true${
           isDev ? '&dev=true' : ''
         }`;
         checkLeaderboardAvailability(targetUrl).then(
@@ -728,9 +728,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(

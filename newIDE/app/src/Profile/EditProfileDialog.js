@@ -171,7 +171,7 @@ const EditProfileDialog = ({
                 disabled={updateProfileInProgress}
                 floatingLabelFixed
                 helperMarkdownText={i18n._(
-                  t`Add a link to your donation page. It will be displayed on your Liluo.io profile and game pages.`
+                  t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
                 )}
                 errorText={donateLinkFormattingError}
               />

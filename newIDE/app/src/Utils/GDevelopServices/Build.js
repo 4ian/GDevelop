@@ -95,9 +95,9 @@ export const getWebBuildThumbnailUrl = (
   buildId: string
 ): string => {
   const resourceManager = project.getResourcesManager();
-  const resourceName = project
-    .getPlatformSpecificAssets()
-    .get('liluo', `thumbnail`);
+  const resourceName =
+    project.getPlatformSpecificAssets().get('games-platform', `thumbnail`) ||
+    project.getPlatformSpecificAssets().get('liluo', `thumbnail`); // Old name.
   if (!resourceManager.hasResource(resourceName)) {
     return '';
   }

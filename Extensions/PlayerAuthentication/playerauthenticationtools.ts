@@ -24,9 +24,8 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _cordovaAuthenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
@@ -38,12 +37,12 @@ namespace gdjs {
     });
 
     // If the extension is used, register an eventlistener to know if the user is
-    // logged in while playing the game on Liluo.io.
+    // logged in while playing the game on GDevelop games platform.
     // Then send a message to the parent iframe to say that the player auth is ready.
     gdjs.registerFirstRuntimeSceneLoadedCallback(
       (runtimeScene: RuntimeScene) => {
         if (getPlatform(runtimeScene) !== 'web') {
-          // Automatic authentication is only valid when the game is hosted in Liluo.io.
+          // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
           return;
         }
         removeAuthenticationCallbacks(); // Remove any callback that could have been registered before.
@@ -64,9 +63,9 @@ namespace gdjs {
           {
             id: 'playerAuthReady',
           },
-          '*' // We could restrict to liluo.io but it's not necessary as the message is not sensitive, and it allows easy debugging.
+          '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
-        // If no answer after 3 seconds, assume that the game is not embedded in Liluo.io, and remove the listener.
+        // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
         _initialAuthenticationTimeoutId = setTimeout(() => {
           logger.info('Removing initial authentication listener.');
           removeAuthenticationCallbacks();
@@ -86,7 +85,7 @@ namespace gdjs {
       gameId: string;
       connectionId?: string;
     }) =>
-      `https://liluo.io/auth?gameId=${gameId}${
+      `https://gd.games/auth?gameId=${gameId}${
         connectionId ? `&connectionId=${connectionId}` : ''
       }${
         runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
@@ -509,7 +508,7 @@ namespace gdjs {
 
     /**
      * Helper to recompute the authentication banner.
-     * This is useful if the user is already logged in on Liluo.io
+     * This is useful if the user is already logged on GDevelop games platform
      * and we want to display the banner with the username.
      */
     const refreshAuthenticationBannerIfAny = function (
@@ -722,12 +721,10 @@ namespace gdjs {
       if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
       const platform = getPlatform(runtimeScene);
-      const {
-        rootContainer,
-        loaderContainer,
-      } = authComponents.computeAuthenticationContainer(
-        onAuthenticationContainerDismissed
-      );
+      const { rootContainer, loaderContainer } =
+        authComponents.computeAuthenticationContainer(
+          onAuthenticationContainerDismissed
+        );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
 
@@ -748,12 +745,13 @@ namespace gdjs {
                   )
               : null; // Only show a link if we're on electron.
 
-            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
-              _authenticationLoaderContainer,
-              platform,
-              isGameRegistered,
-              wikiOpenAction
-            );
+            _authenticationTextContainer =
+              authComponents.addAuthenticationTextsToLoadingContainer(
+                _authenticationLoaderContainer,
+                platform,
+                isGameRegistered,
+                wikiOpenAction
+              );
           }
           if (isGameRegistered) {
             startAuthenticationWindowTimeout(runtimeScene);

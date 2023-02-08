@@ -68,7 +68,7 @@ const ExportHome = ({
         <div style={styles.titleContainer}>
           <Line>
             <Text size="block-title">
-              <Trans>Publish and share with friends on Liluo.io</Trans>
+              <Trans>Publish on gd.games, GDevelop's game platform</Trans>
             </Text>
           </Line>
         </div>

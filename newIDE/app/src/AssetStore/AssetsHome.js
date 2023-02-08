@@ -20,7 +20,6 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
-import { assetCategories } from '.';
 
 const columns = 3;
 const columnsForSmallWindow = 1;
@@ -29,6 +28,37 @@ const categoryColumns = 4;
 const categoryColumnsForSmallWindow = 2;
 const categoryColumnsForMediumWindow = 3;
 const cellSpacing = 2;
+
+export const assetCategories = {
+  'full-game-pack': {
+    title: <Trans>Full Game Packs</Trans>,
+    imageSource: 'res/asset-categories/Full_game_pack.jpeg',
+  },
+  character: {
+    title: <Trans>Characters</Trans>,
+    imageSource: 'res/asset-categories/Characters.jpeg',
+  },
+  props: {
+    title: <Trans>Props</Trans>,
+    imageSource: 'res/asset-categories/Props.jpeg',
+  },
+  background: {
+    title: <Trans>Backgrounds</Trans>,
+    imageSource: 'res/asset-categories/Backgrounds.jpeg',
+  },
+  'visual-effect': {
+    title: <Trans>Visual Effects</Trans>,
+    imageSource: 'res/asset-categories/Visual_Effects.jpeg',
+  },
+  interface: {
+    title: <Trans>UI/Interface</Trans>,
+    imageSource: 'res/asset-categories/Interface.jpeg',
+  },
+  prefab: {
+    title: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
+    imageSource: 'res/asset-categories/Prefabs.jpeg',
+  },
+};
 
 const styles = {
   grid: { margin: '0 10px' },
@@ -175,10 +205,12 @@ export const PrivateAssetPackTile = ({
 
 export const CategoryTile = ({
   title,
+  imageSource,
   onSelect,
   style,
 }: {|
   title: React.Node,
+  imageSource: string,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
@@ -197,10 +229,7 @@ export const CategoryTile = ({
       onClick={onSelect}
     >
       <Paper elevation={2} style={styles.paper} background="light">
-        {/* <CorsAwareImage
-          style={styles.previewImage}
-          src={assetPackListingData.thumbnailUrls[0]}
-        /> */}
+        <CorsAwareImage style={styles.previewImage} src={imageSource} />
         <Column>
           <Line justifyContent="center" noMargin>
             <Text style={styles.packTitle} size="sub-title">
@@ -307,19 +336,21 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       1
     );
 
-    const categoryTiles = Object.entries(assetCategories).map(([id, title]) => (
-      <CategoryTile
-        key={id}
-        // $FlowExpectedError - Object.entries does not infer well the type of the value.
-        title={title}
-        onSelect={() => {
-          onCategorySelection(id);
-        }}
-      />
-    ));
+    const categoryTiles = Object.entries(assetCategories).map(
+      ([id, { title, imageSource }]) => (
+        <CategoryTile
+          key={id}
+          imageSource={imageSource}
+          title={title}
+          onSelect={() => {
+            onCategorySelection(id);
+          }}
+        />
+      )
+    );
 
     const openedAssetCategoryTitle = openedAssetCategory
-      ? assetCategories[openedAssetCategory]
+      ? assetCategories[openedAssetCategory].title
       : null;
 
     return (

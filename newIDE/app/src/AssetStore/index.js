@@ -57,16 +57,6 @@ export type AssetStoreInterface = {|
   onClose: () => void,
 |};
 
-export const assetCategories = {
-  'full-game-pack': <Trans>Full Game Packs</Trans>,
-  character: <Trans>Characters</Trans>,
-  props: <Trans>Props</Trans>,
-  background: <Trans>Backgrounds</Trans>,
-  'visual-effect': <Trans>Visual Effects</Trans>,
-  interface: <Trans>UI/Interface</Trans>,
-  prefab: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
-};
-
 const identifyAssetPackKind = ({
   privateAssetPacks,
   publicAssetPacks,

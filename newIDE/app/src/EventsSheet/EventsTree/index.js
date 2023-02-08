@@ -152,14 +152,13 @@ const EventContainer = (props: EventsContainerProps) => {
     [event, eventsHeightsCache, height]
   );
 
-  const _onEventUpdated = () => {
-    forceUpdate();
-  };
-
-  const _onEventContextMenu = (domEvent: MouseEvent) => {
-    domEvent.preventDefault();
-    props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
-  };
+  const _onEventContextMenu = React.useCallback(
+    (domEvent: MouseEvent) => {
+      domEvent.preventDefault();
+      onEventContextMenu(domEvent.clientX, domEvent.clientY);
+    },
+    [onEventContextMenu]
+  );
 
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
@@ -192,7 +191,7 @@ const EventContainer = (props: EventsContainerProps) => {
               selected={isEventSelected(props.selection, event)}
               selection={props.selection}
               leftIndentWidth={props.leftIndentWidth}
-              onUpdate={_onEventUpdated}
+              onUpdate={forceUpdate}
               onAddNewInstruction={props.onAddNewInstruction}
               onPasteInstructions={props.onPasteInstructions}
               onMoveToInstruction={props.onMoveToInstruction}

@@ -32,30 +32,37 @@ const cellSpacing = 2;
 export const assetCategories = {
   'full-game-pack': {
     title: <Trans>Full Game Packs</Trans>,
+    imageAlt: 'Full game asset packs category',
     imageSource: 'res/asset-categories/Full_game_pack.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
+    imageAlt: 'Characters asset packs category',
     imageSource: 'res/asset-categories/Characters.jpeg',
   },
   props: {
     title: <Trans>Props</Trans>,
+    imageAlt: 'Props asset packs category',
     imageSource: 'res/asset-categories/Props.jpeg',
   },
   background: {
     title: <Trans>Backgrounds</Trans>,
+    imageAlt: 'Backgrounds asset packs category',
     imageSource: 'res/asset-categories/Backgrounds.jpeg',
   },
   'visual-effect': {
     title: <Trans>Visual Effects</Trans>,
+    imageAlt: 'Visual effects asset packs category',
     imageSource: 'res/asset-categories/Visual_Effects.jpeg',
   },
   interface: {
     title: <Trans>UI/Interface</Trans>,
+    imageAlt: 'User Interface asset packs category',
     imageSource: 'res/asset-categories/Interface.jpeg',
   },
   prefab: {
     title: <Trans>Prefabs (Ready-to-use Objects)</Trans>,
+    imageAlt: 'Prefabs asset packs category',
     imageSource: 'res/asset-categories/Prefabs.jpeg',
   },
 };
@@ -206,11 +213,13 @@ export const PrivateAssetPackTile = ({
 export const CategoryTile = ({
   title,
   imageSource,
+  imageAlt,
   onSelect,
   style,
 }: {|
   title: React.Node,
   imageSource: string,
+  imageAlt: string,
   onSelect: () => void,
   /** Props needed so that GridList component can adjust tile size */
   style?: any,
@@ -229,7 +238,11 @@ export const CategoryTile = ({
       onClick={onSelect}
     >
       <Paper elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage style={styles.previewImage} src={imageSource} />
+        <CorsAwareImage
+          style={styles.previewImage}
+          src={imageSource}
+          alt={imageAlt}
+        />
         <Column>
           <Line justifyContent="center" noMargin>
             <Text style={styles.packTitle} size="sub-title">
@@ -337,10 +350,12 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     );
 
     const categoryTiles = Object.entries(assetCategories).map(
-      ([id, { title, imageSource }]) => (
+      // $FlowExpectedError - Object.entries does not infer well the type of the value.
+      ([id, { title, imageSource, imageAlt }]) => (
         <CategoryTile
           key={id}
           imageSource={imageSource}
+          imageAlt={imageAlt}
           title={title}
           onSelect={() => {
             onCategorySelection(id);

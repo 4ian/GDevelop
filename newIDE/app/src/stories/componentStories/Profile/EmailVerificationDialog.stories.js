@@ -6,8 +6,8 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import EmailVerificationDialog from '../../../Profile/EmailVerificationDialog';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeAuthenticatedAndEmailVerifiedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithEmailVerified,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -19,7 +19,7 @@ export default {
 export const EmailAlreadySentNoButton = () => (
   <EmailVerificationDialog
     onClose={action('onClose')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onSendEmail={action('onSendEmail')}
     sendEmailAutomatically={false}
     showSendEmailButton={false}
@@ -29,7 +29,7 @@ export const EmailAlreadySentNoButton = () => (
 export const EmailAlreadySentWithButton = () => (
   <EmailVerificationDialog
     onClose={action('onClose')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onSendEmail={action('onSendEmail')}
     sendEmailAutomatically={false}
     showSendEmailButton
@@ -39,7 +39,7 @@ export const EmailAlreadySentWithButton = () => (
 export const SendEmailOnOpeningNoButton = () => (
   <EmailVerificationDialog
     onClose={action('onClose')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onSendEmail={action('onSendEmail')}
     sendEmailAutomatically
     showSendEmailButton={false}
@@ -49,7 +49,7 @@ export const SendEmailOnOpeningNoButton = () => (
 export const VerifiedUser = () => (
   <EmailVerificationDialog
     onClose={action('onClose')}
-    authenticatedUser={fakeAuthenticatedAndEmailVerifiedUser}
+    authenticatedUser={fakeAuthenticatedUserWithEmailVerified}
     onSendEmail={action('onSendEmail')}
     sendEmailAutomatically
     showSendEmailButton

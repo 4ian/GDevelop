@@ -9,7 +9,7 @@ import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContex
 import { AssetStore } from '../../../../AssetStore';
 import {
   fakeAssetPacks,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
@@ -43,7 +43,7 @@ const apiDataFakePacks = {
 
 export const Default = () => (
   <FixedHeightFlexContainer height={500}>
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <AssetStoreStateProvider>
         <AssetStore />
       </AssetStoreStateProvider>
@@ -55,7 +55,7 @@ Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
   <FixedHeightFlexContainer height={500}>
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <AssetStoreStateProvider>
         <AssetStore />
       </AssetStoreStateProvider>

@@ -47,11 +47,11 @@ import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfile
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
   subscriptionForIndieUser,
-  limitsForIndieUser,
+  limitsForSilverUser,
   limitsReached,
   noSubscription,
-  fakeIndieAuthenticatedUser,
-  fakeAuthenticatedButLoadingAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserLoggingIn,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -2605,7 +2605,7 @@ storiesOf('CurrentUsageDisplayer', module)
   .add('default', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
-      currentUsage={limitsForIndieUser.limits['cordova-build']}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
       onChangeSubscription={action('on change subscription callback')}
     />
   ))
@@ -2629,14 +2629,14 @@ storiesOf('AuthenticatedUserProfileDetails', module)
   .addDecorator(muiDecorator)
   .add('profile', () => (
     <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
     />
   ))
   .add('loading', () => (
     <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
+      authenticatedUser={fakeAuthenticatedUserLoggingIn}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
     />

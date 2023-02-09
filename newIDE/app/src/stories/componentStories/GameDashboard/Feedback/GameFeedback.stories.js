@@ -11,7 +11,7 @@ import {
   commentProcessed,
   commentUnprocessed,
   completeWebBuild,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   game1,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import MockAdapter from 'axios-mock-adapter';
@@ -45,7 +45,7 @@ export const DefaultGameFeedback = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -70,7 +70,7 @@ export const GameFeedbackOneSolvedComment = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -95,7 +95,7 @@ export const GameFeedbackWithError = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -120,7 +120,7 @@ export const GameFeedbackEmpty = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}

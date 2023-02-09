@@ -9,7 +9,7 @@ import { GameAnalyticsPanel } from '../../../GameDashboard/GameAnalyticsPanel';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 import {
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   game1,
   gameRollingMetricsFor364Days,
   gameRollingMetricsWithUndefinedDurationMetrics,
@@ -40,7 +40,7 @@ export const ErrorLoadingAnalytics = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -58,7 +58,7 @@ export const MissingAnalytics = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -76,7 +76,7 @@ export const WithPartialAnalytics = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -94,7 +94,7 @@ export const WithAnalytics = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -112,7 +112,7 @@ export const WithAnalyticsWithMissingNewMetrics = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -130,7 +130,7 @@ export const WithAnalyticsOnlyFor19Days = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -148,7 +148,7 @@ export const WithAnalyticsWithHoles = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -166,7 +166,7 @@ export const WithAnalyticsOnlyFor1Day = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );
@@ -184,7 +184,7 @@ export const WithAnalyticsLongLoading = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameAnalyticsPanel game={game1} />
     </AuthenticatedUserContext.Provider>
   );

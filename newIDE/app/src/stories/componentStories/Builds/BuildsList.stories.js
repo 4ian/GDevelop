@@ -16,7 +16,7 @@ import {
   completeElectronBuild,
   completeWebBuild,
   game1,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -38,7 +38,7 @@ const buildArray = [
 export const DefaultBuildsList = () => (
   <BuildsList
     builds={buildArray}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     error={null}
     loadBuilds={action('loadBuilds')}
     game={game1}
@@ -50,7 +50,7 @@ export const DefaultBuildsList = () => (
 export const ErroredBuildsList = () => (
   <BuildsList
     builds={null}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     error={
       new Error(
         'There was an issue getting the game builds, verify your internet connection or try again later.'

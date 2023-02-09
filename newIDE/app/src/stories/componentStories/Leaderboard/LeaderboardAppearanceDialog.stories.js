@@ -7,8 +7,8 @@ import paperDecorator from '../../PaperDecorator';
 import LeaderboardAppearanceDialog from '../../../GameDashboard/LeaderboardAdmin/LeaderboardAppearanceDialog';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNoSubscriptionAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithNoSubscription,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -19,7 +19,7 @@ export default {
 
 export const WithoutSubscription = () => (
   <AuthenticatedUserContext.Provider
-    value={fakeNoSubscriptionAuthenticatedUser}
+    value={fakeAuthenticatedUserWithNoSubscription}
   >
     <LeaderboardAppearanceDialog
       open
@@ -39,7 +39,7 @@ export const WithoutSubscription = () => (
 );
 
 export const WithSubscription = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open
       onClose={() => action('onClose')()}

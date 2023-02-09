@@ -379,7 +379,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Cloud Project limit reached'
   | 'Consult profile'
   | 'Build limit reached'
-  | 'Leaderboard customization';
+  | 'Leaderboard customization'
+  | 'Extend redeemed subscription';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

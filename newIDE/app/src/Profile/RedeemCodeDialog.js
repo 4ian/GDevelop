@@ -132,19 +132,21 @@ export default function RedeemCodeDialog({
               errorText={getRedeemCodeErrorText(error)}
               autoFocus="desktop"
             />
-
             {!subscription ||
-            !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? (
-              <AlertMessage kind="warning">
-                <Trans>
-                  You currently have a subscription, applied thanks to a
-                  redemption code, valid until{' '}
-                  {i18n.date(subscription.redemptionCodeValidUntil)}. If you
-                  redeem another code, your existing subscription will be
-                  canceled and not redeemable anymore!
-                </Trans>
-              </AlertMessage>
+            !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
+              subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
+                <AlertMessage kind="warning">
+                  <Trans>
+                    You currently have a subscription, applied thanks to a
+                    redemption code, valid until{' '}
+                    {i18n.date(subscription.redemptionCodeValidUntil)}. If you
+                    redeem another code, your existing subscription will be
+                    canceled and not redeemable anymore!
+                  </Trans>
+                </AlertMessage>
+              ) : null // Has expired subscription, do not show a warning.
             ) : (
+              // Has a subscription, but not applied thanks to a redemption code.
               <AlertMessage kind="info">
                 <Trans>
                   You currently have a subscription. If you redeem a code, the

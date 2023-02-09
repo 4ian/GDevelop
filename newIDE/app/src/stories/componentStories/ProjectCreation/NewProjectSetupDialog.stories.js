@@ -10,9 +10,9 @@ import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider'
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects,
+  fakeAuthenticatedUserNotAuthenticated,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -25,7 +25,7 @@ export const OpenAndAuthenticated = () => {
   return (
     <NewProjectSetupDialog
       isFromExample={false}
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -43,7 +43,7 @@ export const TooManyCloudProjects = () => {
     <NewProjectSetupDialog
       isFromExample={false}
       authenticatedUser={
-        fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser
+        fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects
       }
       storageProviders={[
         CloudStorageProvider,
@@ -62,7 +62,7 @@ export const FromExample = () => {
     <NewProjectSetupDialog
       isFromExample
       sourceExampleName="RPG story"
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -79,7 +79,7 @@ export const OpenAndNotAuthenticated = () => {
   return (
     <NewProjectSetupDialog
       isFromExample={false}
-      authenticatedUser={fakeNotAuthenticatedAuthenticatedUser}
+      authenticatedUser={fakeAuthenticatedUserNotAuthenticated}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -96,7 +96,7 @@ export const Opening = () => {
   return (
     <NewProjectSetupDialog
       isFromExample={false}
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       isOpening
       storageProviders={[
         UrlStorageProvider,

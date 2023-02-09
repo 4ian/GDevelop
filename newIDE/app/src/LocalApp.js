@@ -30,7 +30,6 @@ import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
-import ErrorBoundary from './UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 
@@ -49,62 +48,60 @@ export const create = (authentication: Authentication) => {
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (
-        <ErrorBoundary title="GDevelop encountered an issue" scope="app">
-          <ProjectStorageProviders
-            appArguments={appArguments}
-            storageProviders={[
-              LocalFileStorageProvider,
-              UrlStorageProvider,
-              CloudStorageProvider,
-            ]}
-            defaultStorageProvider={LocalFileStorageProvider}
-          >
-            {({
-              getStorageProviderOperations,
-              storageProviders,
-              initialFileMetadataToOpen,
-              getStorageProvider,
-            }) => (
-              <MainFrame
-                i18n={i18n}
-                renderMainMenu={(props, callbacks) => (
-                  <ElectronMainMenu props={props} callbacks={callbacks} />
-                )}
-                renderPreviewLauncher={(props, ref) => (
-                  <LocalPreviewLauncher {...props} ref={ref} />
-                )}
-                renderExportDialog={props => (
-                  <ExportDialog
-                    project={props.project}
-                    onSaveProject={props.onSaveProject}
-                    onChangeSubscription={props.onChangeSubscription}
-                    onClose={props.onClose}
-                    automatedExporters={localAutomatedExporters}
-                    manualExporters={localManualExporters}
-                    onlineWebExporter={localOnlineWebExporter}
-                  />
-                )}
-                renderGDJSDevelopmentWatcher={
-                  isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
-                }
-                storageProviders={storageProviders}
-                resourceMover={LocalResourceMover}
-                resourceFetcher={LocalResourceFetcher}
-                getStorageProviderOperations={getStorageProviderOperations}
-                getStorageProvider={getStorageProvider}
-                resourceSources={localResourceSources}
-                resourceExternalEditors={localResourceExternalEditors}
-                extensionsLoader={makeExtensionsLoader({
-                  gd,
-                  objectsEditorService: ObjectsEditorService,
-                  objectsRenderingService: ObjectsRenderingService,
-                  filterExamples: !isDev,
-                })}
-                initialFileMetadataToOpen={initialFileMetadataToOpen}
-              />
-            )}
-          </ProjectStorageProviders>
-        </ErrorBoundary>
+        <ProjectStorageProviders
+          appArguments={appArguments}
+          storageProviders={[
+            LocalFileStorageProvider,
+            UrlStorageProvider,
+            CloudStorageProvider,
+          ]}
+          defaultStorageProvider={LocalFileStorageProvider}
+        >
+          {({
+            getStorageProviderOperations,
+            storageProviders,
+            initialFileMetadataToOpen,
+            getStorageProvider,
+          }) => (
+            <MainFrame
+              i18n={i18n}
+              renderMainMenu={(props, callbacks) => (
+                <ElectronMainMenu props={props} callbacks={callbacks} />
+              )}
+              renderPreviewLauncher={(props, ref) => (
+                <LocalPreviewLauncher {...props} ref={ref} />
+              )}
+              renderExportDialog={props => (
+                <ExportDialog
+                  project={props.project}
+                  onSaveProject={props.onSaveProject}
+                  onChangeSubscription={props.onChangeSubscription}
+                  onClose={props.onClose}
+                  automatedExporters={localAutomatedExporters}
+                  manualExporters={localManualExporters}
+                  onlineWebExporter={localOnlineWebExporter}
+                />
+              )}
+              renderGDJSDevelopmentWatcher={
+                isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
+              }
+              storageProviders={storageProviders}
+              resourceMover={LocalResourceMover}
+              resourceFetcher={LocalResourceFetcher}
+              getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProvider={getStorageProvider}
+              resourceSources={localResourceSources}
+              resourceExternalEditors={localResourceExternalEditors}
+              extensionsLoader={makeExtensionsLoader({
+                gd,
+                objectsEditorService: ObjectsEditorService,
+                objectsRenderingService: ObjectsRenderingService,
+                filterExamples: !isDev,
+              })}
+              initialFileMetadataToOpen={initialFileMetadataToOpen}
+            />
+          )}
+        </ProjectStorageProviders>
       )}
     </Providers>
   );

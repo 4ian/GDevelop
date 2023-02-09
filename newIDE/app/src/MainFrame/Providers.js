@@ -37,6 +37,7 @@ import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/Priv
 import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
 import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import { RouterContextProvider } from './RouterContext';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -82,52 +83,57 @@ const Providers = ({
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
-                          <InAppTutorialProvider>
-                            <AuthenticatedUserProvider
-                              authentication={authentication}
-                            >
-                              <PublicProfileProvider>
-                                <I18n update>
-                                  {({ i18n }) => (
-                                    <EventsFunctionsExtensionsProvider
-                                      i18n={i18n}
-                                      makeEventsFunctionCodeWriter={
-                                        makeEventsFunctionCodeWriter
-                                      }
-                                      eventsFunctionsExtensionWriter={
-                                        eventsFunctionsExtensionWriter
-                                      }
-                                      eventsFunctionsExtensionOpener={
-                                        eventsFunctionsExtensionOpener
-                                      }
-                                    >
-                                      <AlertProvider>
-                                        <SubscriptionSuggestionProvider>
-                                          <CommandsContextProvider>
-                                            <AssetStoreStateProvider>
-                                              <ResourceStoreStateProvider>
-                                                <ExampleStoreStateProvider>
-                                                  <ExtensionStoreStateProvider>
-                                                    <TutorialStateProvider>
-                                                      <AnnouncementsFeedStateProvider>
-                                                        <PrivateAssetsAuthorizationProvider>
-                                                          {children({ i18n })}
-                                                        </PrivateAssetsAuthorizationProvider>
-                                                      </AnnouncementsFeedStateProvider>
-                                                    </TutorialStateProvider>
-                                                  </ExtensionStoreStateProvider>
-                                                </ExampleStoreStateProvider>
-                                              </ResourceStoreStateProvider>
-                                            </AssetStoreStateProvider>
-                                          </CommandsContextProvider>
-                                        </SubscriptionSuggestionProvider>
-                                      </AlertProvider>
-                                    </EventsFunctionsExtensionsProvider>
-                                  )}
-                                </I18n>
-                              </PublicProfileProvider>
-                            </AuthenticatedUserProvider>
-                          </InAppTutorialProvider>
+                          <ErrorBoundary
+                            title="GDevelop encountered an issue"
+                            scope="app"
+                          >
+                            <InAppTutorialProvider>
+                              <AuthenticatedUserProvider
+                                authentication={authentication}
+                              >
+                                <PublicProfileProvider>
+                                  <I18n update>
+                                    {({ i18n }) => (
+                                      <EventsFunctionsExtensionsProvider
+                                        i18n={i18n}
+                                        makeEventsFunctionCodeWriter={
+                                          makeEventsFunctionCodeWriter
+                                        }
+                                        eventsFunctionsExtensionWriter={
+                                          eventsFunctionsExtensionWriter
+                                        }
+                                        eventsFunctionsExtensionOpener={
+                                          eventsFunctionsExtensionOpener
+                                        }
+                                      >
+                                        <AlertProvider>
+                                          <SubscriptionSuggestionProvider>
+                                            <CommandsContextProvider>
+                                              <AssetStoreStateProvider>
+                                                <ResourceStoreStateProvider>
+                                                  <ExampleStoreStateProvider>
+                                                    <ExtensionStoreStateProvider>
+                                                      <TutorialStateProvider>
+                                                        <AnnouncementsFeedStateProvider>
+                                                          <PrivateAssetsAuthorizationProvider>
+                                                            {children({ i18n })}
+                                                          </PrivateAssetsAuthorizationProvider>
+                                                        </AnnouncementsFeedStateProvider>
+                                                      </TutorialStateProvider>
+                                                    </ExtensionStoreStateProvider>
+                                                  </ExampleStoreStateProvider>
+                                                </ResourceStoreStateProvider>
+                                              </AssetStoreStateProvider>
+                                            </CommandsContextProvider>
+                                          </SubscriptionSuggestionProvider>
+                                        </AlertProvider>
+                                      </EventsFunctionsExtensionsProvider>
+                                    )}
+                                  </I18n>
+                                </PublicProfileProvider>
+                              </AuthenticatedUserProvider>
+                            </InAppTutorialProvider>
+                          </ErrorBoundary>
                         </ThemeProvider>
                       </StylesProvider>
                     </GDevelopThemeContext.Provider>

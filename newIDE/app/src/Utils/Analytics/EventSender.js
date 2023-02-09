@@ -334,7 +334,12 @@ export const sendHelpSearch = (searchText: string) => {
 
 export const sendErrorMessage = (
   message: string,
-  type: 'error' | 'error-boundary',
+  type:
+    | 'error'
+    | 'error-boundary_mainframe'
+    | 'error-boundary_list-search-result'
+    | 'error-boundary_box-search-result'
+    | 'error-boundary_app',
   rawError: any,
   errorId: string
 ) => {

@@ -110,7 +110,10 @@ export const ListSearchResults = <SearchItem>({
   }
 
   return (
-    <ErrorBoundary title="An error occurred when displaying search results">
+    <ErrorBoundary
+      title="An error occurred when displaying search results"
+      scope="list-search-result"
+    >
       <div
         style={styles.container}
         className={disableAutoTranslate ? 'notranslate' : ''}

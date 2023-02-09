@@ -19,11 +19,22 @@ import {
   getUserAgent,
 } from '../Utils/Platform';
 
-const errorHandler = (error: Error, componentStack: string) => {
-  console.error('Error catched by Boundary:', error, componentStack);
+type ErrorBoundaryScope =
+  | 'mainframe'
+  | 'list-search-result'
+  | 'box-search-result'
+  | 'app';
+
+const errorHandler = (
+  error: Error,
+  componentStack: string,
+  scope: ErrorBoundaryScope
+) => {
+  console.error('Error caught by Boundary:', error, componentStack);
   sendErrorMessage(
     'Error catched by error boundary',
-    'error-boundary',
+    // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
+    `error-boundary_${scope}`,
     {
       error,
       componentStack,
@@ -99,6 +110,7 @@ ${componentStack || 'No component stack found'}
 type Props = {|
   children: React.Node,
   title: string,
+  scope: ErrorBoundaryScope,
 |};
 
 const ErrorBoundary = (props: Props) => (
@@ -106,7 +118,9 @@ const ErrorBoundary = (props: Props) => (
     FallbackComponent={fallbackComponentProps => (
       <ErrorFallbackComponent {...fallbackComponentProps} title={props.title} />
     )}
-    onError={errorHandler}
+    onError={(error, componentStack) =>
+      errorHandler(error, componentStack, props.scope)
+    }
   >
     {props.children}
   </ReactErrorBoundary>

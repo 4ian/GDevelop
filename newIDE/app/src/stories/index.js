@@ -2543,7 +2543,11 @@ storiesOf('ErrorBoundary', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ErrorFallbackComponent componentStack="Fake stack" error={fakeError} />
+    <ErrorFallbackComponent
+      componentStack="Fake stack"
+      error={fakeError}
+      title="Error customizable title"
+    />
   ));
 
 storiesOf('Changelog', module)

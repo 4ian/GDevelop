@@ -325,6 +325,8 @@ export const ExtensionOptionsEditor = ({
                   }}
                 />,
               ]}
+              flexColumnBody
+              fullHeight
               open
               onRequestClose={() => {
                 setResourceStoreOpen(false);

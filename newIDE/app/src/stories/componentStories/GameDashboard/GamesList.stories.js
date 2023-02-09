@@ -6,7 +6,7 @@ import muiDecorator from '../../ThemeDecorator';
 
 import paperDecorator from '../../PaperDecorator';
 import {
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   game1,
   game2,
 } from '../../../fixtures/GDevelopServicesTestData';
@@ -34,7 +34,7 @@ export const WithoutAProjectOpened = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GamesList project={null} />
     </AuthenticatedUserContext.Provider>
   );
@@ -52,7 +52,7 @@ export const WithoutAProjectOpenedLongLoading = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GamesList project={null} />
     </AuthenticatedUserContext.Provider>
   );
@@ -69,7 +69,7 @@ export const WithAnError = () => {
       return [504, null];
     });
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GamesList project={null} />
     </AuthenticatedUserContext.Provider>
   );

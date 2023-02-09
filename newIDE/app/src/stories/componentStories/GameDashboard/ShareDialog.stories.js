@@ -8,7 +8,7 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ShareDialog from '../../../GameDashboard/ShareDialog';
 import {
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   game1,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -20,7 +20,7 @@ export default {
 };
 
 export const DefaultShareDialog = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <ShareDialog game={game1} onClose={action('onClose')} />
   </AuthenticatedUserContext.Provider>
 );

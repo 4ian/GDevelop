@@ -273,6 +273,12 @@ export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
   return !!subscription.stripeSubscriptionId;
 };
 
+export const hasValidSubscriptionPlan = (subscription: ?Subscription) =>
+  !!subscription &&
+  !!subscription.planId &&
+  (!subscription.redemptionCodeValidUntil || // No redemption code
+    subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
+
 type UploadType = 'build' | 'preview';
 
 export const getSignedUrl = (params: {|

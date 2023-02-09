@@ -5,8 +5,8 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNoSubscriptionAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithNoSubscription,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionPendingDialog from '../../../../Profile/Subscription/SubscriptionPendingDialog';
 
@@ -18,13 +18,13 @@ export default {
 
 export const DefaultNoSubscription = () => (
   <SubscriptionPendingDialog
-    authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
+    authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
     onClose={action('on close')}
   />
 );
 export const AuthenticatedUserWithSubscription = () => (
   <SubscriptionPendingDialog
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onClose={action('on close')}
   />
 );

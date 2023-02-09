@@ -164,6 +164,13 @@ export const subscriptionForIndieUser: Subscription = {
   userId: 'indie-user',
 };
 
+export const subscriptionForProUser: Subscription = {
+  planId: 'gdevelop_pro',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'pro-user',
+};
+
 export const subscriptionForSilverUser: Subscription = {
   planId: 'gdevelop_silver',
   createdAt: 1515084011000,
@@ -171,13 +178,29 @@ export const subscriptionForSilverUser: Subscription = {
   userId: 'silver-user',
 };
 
-export const subscriptionWithRedemptionCode: Subscription = {
+export const subscriptionForGoldUser: Subscription = {
+  planId: 'gdevelop_gold',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+};
+
+export const silverSubscriptionWithRedemptionCode: Subscription = {
   planId: 'gdevelop_silver',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'silver-user',
   redemptionCode: 'test-123-code',
   redemptionCodeValidUntil: 1695194209000,
+};
+
+export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  redemptionCode: 'test-123-code',
+  redemptionCodeValidUntil: Date.now() - 1000,
 };
 
 export const noSubscription: Subscription = {
@@ -216,7 +239,7 @@ export const limitsForNoSubscriptionUser: Limits = {
   message: undefined,
 };
 
-export const limitsForIndieUser: Limits = {
+export const limitsForSilverUser: Limits = {
   capabilities: {
     analytics: {
       sessions: true,
@@ -245,7 +268,7 @@ export const limitsForIndieUser: Limits = {
   message: undefined,
 };
 
-export const limitsForProUser: Limits = {
+export const limitsForGoldUser: Limits = {
   capabilities: {
     analytics: {
       sessions: true,
@@ -303,7 +326,7 @@ export const limitsReached: Limits = {
   message: undefined,
 };
 
-export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
+const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
@@ -311,179 +334,101 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForNoSubscriptionUser,
+  receivedAssetPacks: [],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
+  onLogin: () => {},
+  onForgotPassword: async () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
+  onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
-  usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+  limits: limitsForSilverUser,
 };
 
-export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
-  badges: null,
+export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForGoldUser,
+  limits: limitsForGoldUser,
+};
+
+export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
   cloudProjects: tenCloudProjects,
-  cloudProjectsFetchingErrorLabel: null,
-  firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
-  usages: usagesForIndieUser,
   limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeSubscriptionWithRedemptionCodeAuthenticatedUser: AuthenticatedUser = {
-  ...fakeNoSubscriptionAuthenticatedUser,
-  subscription: subscriptionWithRedemptionCode,
+export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionWithRedemptionCode,
+  limits: limitsForSilverUser,
 };
 
-export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
-  badges: null,
+export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionWithExpiredRedemptionCode,
+  limits: limitsForSilverUser,
+};
+
+export const fakeAuthenticatedUserWithLegacyIndieSubscription = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForIndieUser,
+  limits: limitsForSilverUser,
+};
+
+export const fakeAuthenticatedUserWithLegacyProSubscription = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForProUser,
+  limits: limitsForGoldUser,
+};
+
+export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
   cloudProjects: tenCloudProjects,
-  cloudProjectsFetchingErrorLabel: null,
-  firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
-  usages: usagesForIndieUser,
   limits: limitsReached,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
-  badges: null,
-  cloudProjects: cloudProjectsForIndieUser,
-  cloudProjectsFetchingErrorLabel: null,
+export const fakeAuthenticatedUserWithEmailVerified: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   firebaseUser: indieVerifiedFirebaseUser,
-  subscription: noSubscription,
-  usages: usagesForIndieUser,
-  limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
+export const fakeAuthenticatedUserLoggingIn: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: true,
-  profile: null,
   loginState: 'loggingIn',
+  profile: null,
   badges: null,
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
@@ -491,42 +436,10 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
+  ...defaultAuthenticatedUserWithNoSubscription,
   badges: [
     {
       seen: false,
@@ -535,45 +448,10 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
       achievementId: 'badge1',
     },
   ],
-  cloudProjects: cloudProjectsForIndieUser,
-  cloudProjectsFetchingErrorLabel: null,
-  firebaseUser: indieVerifiedFirebaseUser,
-  subscription: noSubscription,
-  usages: usagesForIndieUser,
-  limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
+export const fakeNotAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: false,
   profile: null,
   loginState: 'done',
@@ -584,36 +462,6 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onOpenEmailVerificationDialog: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const release: Release = {

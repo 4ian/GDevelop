@@ -7,10 +7,10 @@ import paperDecorator from '../../PaperDecorator';
 
 import UserChipComponent from '../../../UI/User/UserChip';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
   fakeAuthenticatedUserWithBadges,
-  fakeAuthenticatedButLoadingAuthenticatedUser,
+  fakeAuthenticatedUserLoggingIn,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
@@ -32,9 +32,9 @@ export default {
       ],
       defaultValue: 'Signed in',
       mapping: {
-        Anonymous: fakeNotAuthenticatedAuthenticatedUser,
-        'Logging in': fakeAuthenticatedButLoadingAuthenticatedUser,
-        'Signed in': fakeIndieAuthenticatedUser,
+        Anonymous: fakeNotAuthenticatedUser,
+        'Logging in': fakeAuthenticatedUserLoggingIn,
+        'Signed in': fakeSilverAuthenticatedUser,
         'Signed in with notifications': fakeAuthenticatedUserWithBadges,
       },
     },

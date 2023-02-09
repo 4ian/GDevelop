@@ -7,8 +7,8 @@ import paperDecorator from '../../../PaperDecorator';
 import PrivateAssetPackPurchaseDialog from '../../../../AssetStore/PrivateAssets/PrivateAssetPackPurchaseDialog';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -39,9 +39,7 @@ const privateAssetPackListingData = {
 
 export const NotLoggedIn = () => {
   return (
-    <AuthenticatedUserContext.Provider
-      value={fakeNotAuthenticatedAuthenticatedUser}
-    >
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}
@@ -53,7 +51,7 @@ export const NotLoggedIn = () => {
 
 export const LoggedIn = () => {
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}

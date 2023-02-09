@@ -93,8 +93,12 @@ export const GenericRetryableProcessWithProgressDialog = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHeaderColumn>Resource name</TableHeaderColumn>
-                <TableHeaderColumn>Error</TableHeaderColumn>
+                <TableHeaderColumn>
+                  <Trans>Resource name</Trans>
+                </TableHeaderColumn>
+                <TableHeaderColumn>
+                  <Trans>Error</Trans>
+                </TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody>

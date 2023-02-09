@@ -2,15 +2,15 @@
 import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import React from 'react';
-import FlatButton from '../../UI/FlatButton';
-import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
-import { type AuthenticatedUser } from '../AuthenticatedUserContext';
-import { ColumnStackLayout } from '../../UI/Layout';
-import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import LeftLoader from '../../UI/LeftLoader';
-import { redeemCode } from '../../Utils/GDevelopServices/Usage';
-import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import AlertMessage from '../../UI/AlertMessage';
+import FlatButton from '../UI/FlatButton';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
+import { type AuthenticatedUser } from './AuthenticatedUserContext';
+import { ColumnStackLayout } from '../UI/Layout';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import LeftLoader from '../UI/LeftLoader';
+import { redeemCode } from '../Utils/GDevelopServices/Usage';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {|
   onClose: (hasJustRedeemedCode: boolean) => Promise<void>,
@@ -130,20 +130,23 @@ export default function RedeemCodeDialog({
               floatingLabelText={<Trans>Redemption code</Trans>}
               floatingLabelFixed
               errorText={getRedeemCodeErrorText(error)}
+              autoFocus="desktop"
             />
-
             {!subscription ||
-            !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? (
-              <AlertMessage kind="warning">
-                <Trans>
-                  You currently have a subscription, applied thanks to a
-                  redemption code, valid until{' '}
-                  {i18n.date(subscription.redemptionCodeValidUntil)}. If you
-                  redeem another code, your existing subscription will be
-                  canceled and not redeemable anymore!
-                </Trans>
-              </AlertMessage>
+            !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
+              subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
+                <AlertMessage kind="warning">
+                  <Trans>
+                    You currently have a subscription, applied thanks to a
+                    redemption code, valid until{' '}
+                    {i18n.date(subscription.redemptionCodeValidUntil)}. If you
+                    redeem another code, your existing subscription will be
+                    canceled and not redeemable anymore!
+                  </Trans>
+                </AlertMessage>
+              ) : null // Has expired subscription, do not show a warning.
             ) : (
+              // Has a subscription, but not applied thanks to a redemption code.
               <AlertMessage kind="info">
                 <Trans>
                   You currently have a subscription. If you redeem a code, the

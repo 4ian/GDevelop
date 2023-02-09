@@ -208,7 +208,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             <Line justifyContent="flex-start" noMargin>
               <TutorialButton
                 tutorialId="Intermediate-externals"
-                label="Watch the tutorial"
+                label={<Trans>Watch tutorial</Trans>}
                 renderIfNotFound={
                   <HelpButton helpPagePath="/interface/events-editor/external-events" />
                 }

@@ -10,8 +10,8 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../../GDevelopJsInitializerDecorator';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
@@ -24,7 +24,7 @@ export default {
 };
 
 export const Default = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -42,7 +42,7 @@ export const Default = () => (
 );
 
 export const AutomaticallyOpenInput = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -60,7 +60,7 @@ export const AutomaticallyOpenInput = () => (
 );
 
 export const SingleFile = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -78,7 +78,7 @@ export const SingleFile = () => (
 );
 
 export const IncompatibleStorageProvider = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -96,9 +96,7 @@ export const IncompatibleStorageProvider = () => (
 );
 
 export const NotAuthenticatedUser = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNotAuthenticatedAuthenticatedUser}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}

@@ -27,6 +27,7 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
 import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
+import ErrorBoundary from './UI/ErrorBoundary';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -43,55 +44,57 @@ export const create = (authentication: Authentication) => {
       eventsFunctionsExtensionOpener={null}
     >
       {({ i18n }) => (
-        <ProjectStorageProviders
-          appArguments={appArguments}
-          storageProviders={[
-            UrlStorageProvider,
-            CloudStorageProvider,
-            GoogleDriveStorageProvider,
-            DownloadFileStorageProvider,
-          ]}
-          defaultStorageProvider={UrlStorageProvider}
-        >
-          {({
-            getStorageProviderOperations,
-            storageProviders,
-            initialFileMetadataToOpen,
-            getStorageProvider,
-          }) => (
-            <MainFrame
-              i18n={i18n}
-              renderPreviewLauncher={(props, ref) => (
-                <BrowserS3PreviewLauncher {...props} ref={ref} />
-              )}
-              renderExportDialog={props => (
-                <ExportDialog
-                  project={props.project}
-                  onSaveProject={props.onSaveProject}
-                  onChangeSubscription={props.onChangeSubscription}
-                  onClose={props.onClose}
-                  automatedExporters={browserAutomatedExporters}
-                  manualExporters={browserManualExporters}
-                  onlineWebExporter={browserOnlineWebExporter}
-                  allExportersRequireOnline
-                />
-              )}
-              storageProviders={storageProviders}
-              resourceMover={BrowserResourceMover}
-              resourceFetcher={BrowserResourceFetcher}
-              getStorageProviderOperations={getStorageProviderOperations}
-              getStorageProvider={getStorageProvider}
-              resourceSources={browserResourceSources}
-              resourceExternalEditors={browserResourceExternalEditors}
-              extensionsLoader={makeExtensionsLoader({
-                objectsEditorService: ObjectsEditorService,
-                objectsRenderingService: ObjectsRenderingService,
-                filterExamples: !Window.isDev(),
-              })}
-              initialFileMetadataToOpen={initialFileMetadataToOpen}
-            />
-          )}
-        </ProjectStorageProviders>
+        <ErrorBoundary>
+          <ProjectStorageProviders
+            appArguments={appArguments}
+            storageProviders={[
+              UrlStorageProvider,
+              CloudStorageProvider,
+              GoogleDriveStorageProvider,
+              DownloadFileStorageProvider,
+            ]}
+            defaultStorageProvider={UrlStorageProvider}
+          >
+            {({
+              getStorageProviderOperations,
+              storageProviders,
+              initialFileMetadataToOpen,
+              getStorageProvider,
+            }) => (
+              <MainFrame
+                i18n={i18n}
+                renderPreviewLauncher={(props, ref) => (
+                  <BrowserS3PreviewLauncher {...props} ref={ref} />
+                )}
+                renderExportDialog={props => (
+                  <ExportDialog
+                    project={props.project}
+                    onSaveProject={props.onSaveProject}
+                    onChangeSubscription={props.onChangeSubscription}
+                    onClose={props.onClose}
+                    automatedExporters={browserAutomatedExporters}
+                    manualExporters={browserManualExporters}
+                    onlineWebExporter={browserOnlineWebExporter}
+                    allExportersRequireOnline
+                  />
+                )}
+                storageProviders={storageProviders}
+                resourceMover={BrowserResourceMover}
+                resourceFetcher={BrowserResourceFetcher}
+                getStorageProviderOperations={getStorageProviderOperations}
+                getStorageProvider={getStorageProvider}
+                resourceSources={browserResourceSources}
+                resourceExternalEditors={browserResourceExternalEditors}
+                extensionsLoader={makeExtensionsLoader({
+                  objectsEditorService: ObjectsEditorService,
+                  objectsRenderingService: ObjectsRenderingService,
+                  filterExamples: !Window.isDev(),
+                })}
+                initialFileMetadataToOpen={initialFileMetadataToOpen}
+              />
+            )}
+          </ProjectStorageProviders>
+        </ErrorBoundary>
       )}
     </Providers>
   );

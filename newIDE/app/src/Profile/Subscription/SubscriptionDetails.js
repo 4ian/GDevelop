@@ -74,8 +74,7 @@ const SubscriptionDetails = ({
   const redemptionCodeExpirationDate =
     subscription && subscription.redemptionCodeValidUntil;
   const isSubscriptionExpired =
-    !!redemptionCodeExpirationDate &&
-    redemptionCodeExpirationDate - Date.now() < 0;
+    !!redemptionCodeExpirationDate && redemptionCodeExpirationDate < Date.now();
 
   if (!subscription) return <PlaceholderLoader />;
 

@@ -8,7 +8,7 @@ import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
 } from '../../../../Profile/Subscription/SubscriptionChecker';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import { fakeAuthenticatedUserNotAuthenticated } from '../../../../fixtures/GDevelopServicesTestData';
+import { fakeNotAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
 import RaisedButton from '../../../../UI/RaisedButton';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 
@@ -27,9 +27,7 @@ export const TryMode = () => {
     }
   };
   return (
-    <AuthenticatedUserContext.Provider
-      value={fakeAuthenticatedUserNotAuthenticated}
-    >
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
         ref={checkerRef}
@@ -50,9 +48,7 @@ export const MandatoryMode = () => {
     }
   };
   return (
-    <AuthenticatedUserContext.Provider
-      value={fakeAuthenticatedUserNotAuthenticated}
-    >
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <RaisedButton label="Click here" onClick={onClick} primary />
       <SubscriptionChecker
         ref={checkerRef}

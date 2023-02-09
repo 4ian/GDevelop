@@ -12,7 +12,7 @@ import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileSt
 import {
   fakeSilverAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects,
-  fakeAuthenticatedUserNotAuthenticated,
+  fakeNotAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -79,7 +79,7 @@ export const OpenAndNotAuthenticated = () => {
   return (
     <NewProjectSetupDialog
       isFromExample={false}
-      authenticatedUser={fakeAuthenticatedUserNotAuthenticated}
+      authenticatedUser={fakeNotAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,

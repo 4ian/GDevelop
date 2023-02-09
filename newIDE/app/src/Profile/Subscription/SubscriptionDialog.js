@@ -13,6 +13,7 @@ import {
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
   businessPlan,
+  hasValidSubscriptionPlan,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -235,11 +236,7 @@ export default function SubscriptionDialog({
     !authenticatedUser.profile ||
     isChangingSubscription;
 
-  const isPlanValid =
-    !!authenticatedUser.subscription &&
-    !!authenticatedUser.subscription.planId &&
-    (!authenticatedUser.subscription.redemptionCodeValidUntil || // No redemption code
-      authenticatedUser.subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
+  const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
 
   return (
     <I18n>

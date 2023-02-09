@@ -8,7 +8,7 @@ import PrivateAssetPackPurchaseDialog from '../../../../AssetStore/PrivateAssets
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
   fakeSilverAuthenticatedUser,
-  fakeAuthenticatedUserNotAuthenticated,
+  fakeNotAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -39,9 +39,7 @@ const privateAssetPackListingData = {
 
 export const NotLoggedIn = () => {
   return (
-    <AuthenticatedUserContext.Provider
-      value={fakeAuthenticatedUserNotAuthenticated}
-    >
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
         onClose={() => action('close')()}

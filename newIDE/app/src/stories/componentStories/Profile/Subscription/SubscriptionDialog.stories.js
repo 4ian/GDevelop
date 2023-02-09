@@ -11,8 +11,8 @@ import {
   fakeAuthenticatedUserLoggingIn,
   fakeSilverAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
-  fakeAuthenticatedUserNotAuthenticated,
-  fakeAuthenticatedUserWithValidSliverRedemptionCode,
+  fakeNotAuthenticatedUser,
+  fakeAuthenticatedUserWithValidSilverRedemptionCode,
   fakeAuthenticatedUserWithExpiredSilverRedemptionCode,
   fakeAuthenticatedUserWithLegacyIndieSubscription,
   fakeGoldAuthenticatedUser,
@@ -44,9 +44,7 @@ const SubscriptionDialogWrapper = ({
 );
 
 export const NotAuthenticated = () => (
-  <SubscriptionDialogWrapper
-    authenticatedUser={fakeAuthenticatedUserNotAuthenticated}
-  />
+  <SubscriptionDialogWrapper authenticatedUser={fakeNotAuthenticatedUser} />
 );
 
 export const AuthenticatedButLoading = () => (
@@ -71,7 +69,7 @@ export const WithGoldSubscription = () => (
 
 export const WithValidSilverRedemptionCodeSubscription = () => (
   <SubscriptionDialogWrapper
-    authenticatedUser={fakeAuthenticatedUserWithValidSliverRedemptionCode}
+    authenticatedUser={fakeAuthenticatedUserWithValidSilverRedemptionCode}
   />
 );
 

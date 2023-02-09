@@ -388,7 +388,7 @@ export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   limits: limitsForNoSubscriptionUser,
 };
 
-export const fakeAuthenticatedUserWithValidSliverRedemptionCode: AuthenticatedUser = {
+export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser = {
   ...fakeAuthenticatedUserWithNoSubscription,
   subscription: silverSubscriptionWithRedemptionCode,
   limits: limitsForSilverUser,
@@ -450,7 +450,7 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   ],
 };
 
-export const fakeAuthenticatedUserNotAuthenticated: AuthenticatedUser = {
+export const fakeNotAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: false,
   profile: null,

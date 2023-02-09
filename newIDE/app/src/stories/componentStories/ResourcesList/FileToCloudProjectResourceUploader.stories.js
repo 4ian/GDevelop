@@ -11,7 +11,7 @@ import GDevelopJsInitializerDecorator, {
 } from '../../GDevelopJsInitializerDecorator';
 import {
   fakeSilverAuthenticatedUser,
-  fakeAuthenticatedUserNotAuthenticated,
+  fakeNotAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
@@ -96,9 +96,7 @@ export const IncompatibleStorageProvider = () => (
 );
 
 export const NotAuthenticatedUser = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeAuthenticatedUserNotAuthenticated}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}

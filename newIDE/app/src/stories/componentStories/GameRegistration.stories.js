@@ -10,7 +10,7 @@ import GDevelopJsInitializerDecorator, {
 } from '../GDevelopJsInitializerDecorator';
 import {
   fakeSilverAuthenticatedUser,
-  fakeAuthenticatedUserNotAuthenticated,
+  fakeNotAuthenticatedUser,
 } from '../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import withMock from 'storybook-addon-mock';
@@ -29,9 +29,7 @@ export const NoProjectLoaded = () => (
 );
 
 export const NotLoggedIn = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeAuthenticatedUserNotAuthenticated}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}

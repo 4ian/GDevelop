@@ -12,7 +12,7 @@ import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
-  fakeAuthenticatedUserNotAuthenticated,
+  fakeNotAuthenticatedUser,
   fakeAuthenticatedUserWithEmailVerified,
 } from '../../../fixtures/GDevelopServicesTestData';
 
@@ -23,9 +23,7 @@ export default {
 };
 
 export const UserNotAuthenticated = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeAuthenticatedUserNotAuthenticated}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <SaveToStorageProviderDialog
       storageProviders={[
         UrlStorageProvider,

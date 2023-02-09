@@ -105,7 +105,7 @@ const LoginDialog = ({
         alignItems="center"
       >
         <GDevelopGLogo fontSize="large" />
-        <Text size="title">
+        <Text size="title" align="center">
           <Trans>Log in to your account</Trans>
         </Text>
         <Column noMargin alignItems="center">

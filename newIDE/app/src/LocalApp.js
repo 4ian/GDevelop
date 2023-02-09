@@ -49,7 +49,7 @@ export const create = (authentication: Authentication) => {
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (
-        <ErrorBoundary>
+        <ErrorBoundary title="GDevelop encountered an issue">
           <ProjectStorageProviders
             appArguments={appArguments}
             storageProviders={[

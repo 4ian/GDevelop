@@ -97,7 +97,7 @@ export const BoxSearchResults = React.forwardRef<
     }
 
     return (
-      <ErrorBoundary>
+      <ErrorBoundary title="An error occurred when displaying search results">
         <div style={styles.container}>
           <AutoSizer>
             {({ width, height }) => {

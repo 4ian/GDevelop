@@ -2897,7 +2897,7 @@ const MainFrame = (props: Props) => {
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
-                <ErrorBoundary>
+                <ErrorBoundary title="This tab encountered a problem">
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,

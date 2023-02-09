@@ -110,7 +110,7 @@ export const ListSearchResults = <SearchItem>({
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary title="An error occurred when displaying search results">
       <div
         style={styles.container}
         className={disableAutoTranslate ? 'notranslate' : ''}

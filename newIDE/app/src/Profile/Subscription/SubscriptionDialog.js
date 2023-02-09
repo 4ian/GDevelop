@@ -380,8 +380,11 @@ export default function SubscriptionDialog({
                   ]}
                 >
                   <Text>
-                    It's free and you'll get access to online services: cloud
-                    projects, leaderboards, player feedbacks, cloud builds...
+                    <Trans>
+                      It is free and you will get access to online services:
+                      cloud projects, leaderboards, player feedbacks, cloud
+                      builds...
+                    </Trans>
                   </Text>
                 </Dialog>
               )}

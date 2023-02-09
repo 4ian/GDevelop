@@ -264,7 +264,9 @@ const PrivateAssetPackPurchaseDialog = ({
             <Line justifyContent="center" alignItems="center">
               <CircularProgress size={20} />
               <Spacer />
-              <Text>Waiting for the purchase confirmation...</Text>
+              <Text>
+                <Trans>Waiting for the purchase confirmation...</Trans>
+              </Text>
             </Line>
             <Spacer />
             <Line justifyContent="center">

@@ -81,7 +81,9 @@ const SubscriptionDetails = ({
   return (
     <Column noMargin>
       <Line alignItems="center">
-        <Text size="block-title">My online services subscription</Text>
+        <Text size="block-title">
+          <Trans>My online services subscription</Trans>
+        </Text>
       </Line>
       {userPlan && userPlan.planId && !isSubscriptionExpired ? (
         <ColumnStackLayout noMargin>

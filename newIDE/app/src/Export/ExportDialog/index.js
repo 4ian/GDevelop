@@ -170,7 +170,7 @@ const ExportDialog = ({
           <TutorialButton
             key="tutorial"
             tutorialId="export-to-itch"
-            label="How to export to Itch.io"
+            label={<Trans>How to export to Itch.io"</Trans>}
           />
         ) : null,
         <FlatButton

@@ -140,14 +140,18 @@ const LayerEditorDialog = (props: Props) => {
             </DismissableAlertMessage>
           ) : null}
           <Text>
-            There are {instancesCount} instances of objects on this layer.
+            <Trans>
+              There are {instancesCount} instances of objects on this layer.
+            </Trans>
           </Text>
           {!props.project.getUseDeprecatedZeroAsDefaultZOrder() && (
             <Text>
-              Objects created using events on this layer will be given a "Z
-              order" of {highestZOrder + 1}, so that they appear in front of all
-              objects of this layer. You can change this using the action to
-              change an object Z order, after using an action to create it.
+              <Trans>
+                Objects created using events on this layer will be given a "Z
+                order" of {highestZOrder + 1}, so that they appear in front of
+                all objects of this layer. You can change this using the action
+                to change an object Z order, after using an action to create it.
+              </Trans>
             </Text>
           )}
           <InlineCheckbox

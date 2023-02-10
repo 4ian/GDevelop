@@ -10,6 +10,8 @@ import { type ForgotPasswordForm } from '../Utils/GDevelopServices/Authenticatio
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
 
+const emailRegex = /^(.+)@(.+)$/;
+
 type Props = {|
   onClose: () => void,
   onForgotPassword: ForgotPasswordForm => Promise<void>,
@@ -19,8 +21,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
   const [email, setEmail] = React.useState('');
   const [resetDone, setResetDone] = React.useState(false);
   const [resetInProgress, setResetInProgress] = React.useState(false);
-  const emailRegex = /^(.+)@(.+)$/;
-  const isEmailValid = emailRegex.test(email);
+  const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 
   const doResetPassword = async () => {
     if (resetInProgress || !email || !isEmailValid) return;
@@ -76,12 +77,18 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
             value={email}
             floatingLabelText={<Trans>Email</Trans>}
             onChange={(e, value) => {
+              if (!isEmailValid) setIsEmailValid(true);
               setEmail(value);
             }}
+            errorText={
+              !isEmailValid ? <Trans>Invalid email address.</Trans> : undefined
+            }
             fullWidth
             onBlur={event => {
-                  setEmail(event.currentTarget.value.trim());
-                }}
+              const trimmedEmail = event.currentTarget.value.trim();
+              setEmail(trimmedEmail);
+              setIsEmailValid(emailRegex.test(trimmedEmail));
+            }}
           />
         )}
       </Column>

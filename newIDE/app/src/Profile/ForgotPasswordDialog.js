@@ -62,8 +62,8 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
       maxWidth="xs"
       onApply={doResetPassword}
     >
-      <Column noMargin>
-        {resetDone ? (
+      {resetDone ? (
+        <Column noMargin>
           <Text>
             <Trans>
               You should have received an email containing instructions to reset
@@ -71,27 +71,42 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
               password in GDevelop.
             </Trans>
           </Text>
-        ) : (
-          <TextField
-            autoFocus="desktop"
-            value={email}
-            floatingLabelText={<Trans>Email</Trans>}
-            onChange={(e, value) => {
-              if (!isEmailValid) setIsEmailValid(true);
-              setEmail(value);
-            }}
-            errorText={
-              !isEmailValid ? <Trans>Invalid email address.</Trans> : undefined
-            }
-            fullWidth
-            onBlur={event => {
-              const trimmedEmail = event.currentTarget.value.trim();
-              setEmail(trimmedEmail);
-              setIsEmailValid(emailRegex.test(trimmedEmail));
-            }}
-          />
-        )}
-      </Column>
+        </Column>
+      ) : (
+        <form
+          onSubmit={event => {
+            event.preventDefault();
+            doResetPassword();
+          }}
+          autoComplete="on"
+          name="resetPassword"
+        >
+          <Column noMargin>
+            <TextField
+              autoFocus="desktop"
+              value={email}
+              floatingLabelText={<Trans>Email</Trans>}
+              onChange={(e, value) => {
+                if (!isEmailValid) setIsEmailValid(true);
+                setEmail(value);
+              }}
+              errorText={
+                !isEmailValid ? (
+                  <Trans>Invalid email address.</Trans>
+                ) : (
+                  undefined
+                )
+              }
+              fullWidth
+              onBlur={event => {
+                const trimmedEmail = event.currentTarget.value.trim();
+                setEmail(trimmedEmail);
+                setIsEmailValid(emailRegex.test(trimmedEmail));
+              }}
+            />
+          </Column>
+        </form>
+      )}
     </Dialog>
   );
 };

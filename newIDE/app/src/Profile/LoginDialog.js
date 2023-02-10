@@ -123,33 +123,42 @@ const LoginDialog = ({
           </Link>
         </Column>
         <div style={styles.formContainer}>
-          <ColumnStackLayout noMargin>
-            <TextField
-              autoFocus="desktop"
-              value={email}
-              floatingLabelText={<Trans>Email</Trans>}
-              errorText={getEmailErrorText(error)}
-              onChange={(e, value) => {
-                setEmail(value);
-              }}
-              onBlur={event => {
-                setEmail(event.currentTarget.value.trim());
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
-            <TextField
-              value={password}
-              floatingLabelText={<Trans>Password</Trans>}
-              errorText={getPasswordErrorText(error)}
-              type="password"
-              onChange={(e, value) => {
-                setPassword(value);
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
-          </ColumnStackLayout>
+          <form
+            onSubmit={event => {
+              event.preventDefault();
+              doLogin();
+            }}
+            autoComplete="on"
+            name="login"
+          >
+            <ColumnStackLayout noMargin>
+              <TextField
+                autoFocus="desktop"
+                value={email}
+                floatingLabelText={<Trans>Email</Trans>}
+                errorText={getEmailErrorText(error)}
+                onChange={(e, value) => {
+                  setEmail(value);
+                }}
+                onBlur={event => {
+                  setEmail(event.currentTarget.value.trim());
+                }}
+                fullWidth
+                disabled={loginInProgress}
+              />
+              <TextField
+                value={password}
+                floatingLabelText={<Trans>Password</Trans>}
+                errorText={getPasswordErrorText(error)}
+                type="password"
+                onChange={(e, value) => {
+                  setPassword(value);
+                }}
+                fullWidth
+                disabled={loginInProgress}
+              />
+            </ColumnStackLayout>
+          </form>
         </div>
         <Link
           href=""

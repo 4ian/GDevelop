@@ -548,7 +548,7 @@
           "value": "rgb(78, 78, 78)"
         }
       },
-      "expression": {
+      "number": {
         "color": {
           "value": "rgb(27, 143, 1)"
         }

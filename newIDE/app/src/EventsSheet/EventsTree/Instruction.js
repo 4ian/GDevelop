@@ -162,7 +162,11 @@ const Instruction = (props: Props) => {
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
-          const parameterType = parameterMetadata.getType();
+          // TODO remove the ternary when any parameter declaration use 'number' instead of 'expression'.
+          const parameterType =
+            parameterMetadata.getType() === 'expression'
+              ? 'number'
+              : parameterMetadata.getType();
           let expressionIsValid = true;
           if (
             gd.ParameterMetadata.isExpression('number', parameterType) ||

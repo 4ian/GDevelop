@@ -232,7 +232,10 @@ namespace gdjs {
      * (x and y position of the point in parent coordinates).
      */
     applyObjectTransformation(x: float, y: float, destination: FloatPoint) {
-      this.getLocalTransformation().transform([x, y], destination);
+      const source = destination;
+      source[0] = x;
+      source[1] = y;
+      this.getLocalTransformation().transform(source, destination);
     }
 
     /**
@@ -255,21 +258,23 @@ namespace gdjs {
     }
 
     _updateLocalTransformation() {
-      const centerX = this.getUnscaledCenterX();
-      const centerY = this.getUnscaledCenterY();
       const absScaleX = Math.abs(this._scaleX);
       const absScaleY = Math.abs(this._scaleY);
+      const centerX = this.getUnscaledCenterX() * absScaleX;
+      const centerY = this.getUnscaledCenterY() * absScaleY;
       const angleInRadians = (this.angle * Math.PI) / 180;
 
       this._localTransformation.setToTranslation(this.x, this.y);
-      this._localTransformation.scale(absScaleX, absScaleY);
-      this._localTransformation.rotateAround(angleInRadians, centerX, centerY);
+      this._localTransformation.translate(centerX, centerY);
+      this._localTransformation.rotate(angleInRadians);
       if (this._flippedX) {
-        this._localTransformation.flipX(centerX);
+        this._localTransformation.scale(-1, 1);
       }
       if (this._flippedY) {
-        this._localTransformation.flipY(centerY);
+        this._localTransformation.scale(1, -1);
       }
+      this._localTransformation.translate(-centerX, -centerY);
+      this._localTransformation.scale(absScaleX, absScaleY);
 
       this._localInverseTransformation.copyFrom(this._localTransformation);
       this._localInverseTransformation.invert();
@@ -292,21 +297,46 @@ namespace gdjs {
       y: float,
       destination: FloatPoint
     ) {
-      this.getLocalInverseTransformation().transform([x, y], destination);
+      const source = destination;
+      source[0] = x;
+      source[1] = y;
+      this.getLocalInverseTransformation().transform(source, destination);
     }
 
     getDrawableX(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this.x + this._unrotatedAABB.min[0] * this._scaleX;
+      const absScaleX = this.getScaleX();
+      if (!this._flippedX) {
+        return this.x + this._unrotatedAABB.min[0] * absScaleX;
+      } else {
+        return (
+          this.x +
+          (-this._unrotatedAABB.min[0] -
+            this.getUnscaledWidth() +
+            2 * this.getUnscaledCenterX()) *
+            absScaleX
+        );
+      }
     }
 
     getDrawableY(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this.y + this._unrotatedAABB.min[1] * this._scaleY;
+      const absScaleY = this.getScaleY();
+      if (!this._flippedY) {
+        return this.y + this._unrotatedAABB.min[1] * absScaleY;
+      } else {
+        return (
+          this.y +
+          (-this._unrotatedAABB.min[1] -
+            this.getUnscaledHeight() +
+            2 * this.getUnscaledCenterY()) *
+            absScaleY
+        );
+      }
     }
 
     /**

@@ -121,7 +121,7 @@ const CreateAccountDialog = ({
     if (!canCreateAccount) return;
     try {
       await onCreateAccount({
-        email,
+        email: email.trim(),
         password,
         username,
         getNewsletterEmail,
@@ -222,6 +222,9 @@ const CreateAccountDialog = ({
                 required
                 onChange={(e, value) => {
                   setEmail(value);
+                }}
+                onBlur={event => {
+                  setEmail(event.currentTarget.value.trim());
                 }}
                 disabled={createAccountInProgress}
               />

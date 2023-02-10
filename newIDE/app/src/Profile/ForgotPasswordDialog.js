@@ -24,11 +24,15 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
   const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 
   const doResetPassword = async () => {
+    const trimmedEmail = email.trim();
+    setEmail(trimmedEmail);
+    setIsEmailValid(emailRegex.test(trimmedEmail));
+
     if (resetInProgress || !email || !isEmailValid) return;
     setResetInProgress(true);
 
     await onForgotPassword({
-      email: email.trim(),
+      email,
     });
 
     setResetInProgress(false);

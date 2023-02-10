@@ -281,9 +281,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     const selectAssetCategory = React.useCallback(
       (category: string) => {
+        saveScrollPosition();
         navigationState.openAssetCategoryPage(category);
       },
-      [navigationState]
+      [navigationState, saveScrollPosition]
     );
 
     // If the user has received the pack they are currently viewing,

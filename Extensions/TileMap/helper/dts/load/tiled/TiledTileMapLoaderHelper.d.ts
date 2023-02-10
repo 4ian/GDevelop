@@ -12,7 +12,7 @@ export declare const decodeBase64LayerData: (
   pako: any,
   tiledLayer: TiledLayer
 ) => number[];
-export type TiledGID = {
+export declare type TiledGID = {
   id: integer;
   flippedHorizontally: boolean;
   flippedVertically: boolean;

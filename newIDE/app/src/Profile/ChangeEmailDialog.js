@@ -65,7 +65,7 @@ const ChangeEmailDialog = ({
           />
         </LeftLoader>,
       ]}
-      maxWidth="sm"
+      maxWidth="xs"
       cannotBeDismissed={changeEmailInProgress}
       onRequestClose={onClose}
       onApply={doChangeEmail}

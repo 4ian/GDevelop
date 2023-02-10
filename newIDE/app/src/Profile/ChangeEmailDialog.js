@@ -70,23 +70,38 @@ export default class ChangeEmailDialog extends Component<Props, State> {
         onApply={this._onChangeEmail}
         open
       >
-        <ColumnStackLayout noMargin>
-          <TextField
-            value={this.state.form.email}
-            floatingLabelText={<Trans>Email</Trans>}
-            errorText={getEmailErrorText(error)}
-            fullWidth
-            required
-            onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  email: value,
-                },
-              });
-            }}
-          />
-        </ColumnStackLayout>
+        <form
+          onSubmit={event => {
+            event.preventDefault();
+            this._onChangeEmail();
+          }}
+          autoComplete="on"
+          name="changePassword"
+        >
+          <ColumnStackLayout noMargin>
+            <TextField
+              value={this.state.form.email}
+              floatingLabelText={<Trans>Email</Trans>}
+              errorText={getEmailErrorText(error)}
+              fullWidth
+              required
+              onChange={(e, value) => {
+                this.setState({
+                  form: {
+                    email: value,
+                  },
+                });
+              }}
+              onBlur={event => {
+                this.setState({
+                  form: {
+                    email: event.currentTarget.value.trim(),
+                  },
+                });
+              }}
+            />
+          </ColumnStackLayout>
+        </form>
       </Dialog>
     );
   }

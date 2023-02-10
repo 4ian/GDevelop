@@ -117,6 +117,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     clearHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},
+    openAssetCategoryPage: category => {},
     openPackPage: assetPack => {},
     openDetailPage: assetShortHeader => {},
     openPrivateAssetPackInformationPage: privateAssetPackListingData => {},

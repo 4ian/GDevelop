@@ -337,7 +337,20 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
+  receivedAssetPacks: [
+    {
+      id: '07a9f974-aeca-4a3f-b501-4808400eda4f',
+      createdAt: '2022-12-13T19:45:47.318Z',
+      updatedAt: '2022-12-13T19:45:47.318Z',
+      name: 'Gamepasses',
+      longDescription: '',
+      previewImageUrls: [
+        'https://resources.gdevelop-app.com/staging/private-assets/Gamepasses/thumbnail.png',
+      ],
+      tag: 'gamepasses',
+      content: {},
+    },
+  ],
   receivedAssetShortHeaders: [],
   onLogout: async () => {},
   onLogin: () => {},
@@ -1332,6 +1345,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'GDevelop Platformer',
       tag: 'platformer',
+      categories: ['full-game-pack'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
       assetsCount: 16,
@@ -1339,6 +1353,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Space Shooter',
       tag: 'space shooter',
+      categories: [],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
       assetsCount: 140,
@@ -1346,6 +1361,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Tanks',
       tag: 'tank pack',
+      categories: [],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
       assetsCount: 32,
@@ -1353,6 +1369,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Pixel Adventure',
       tag: 'pixel adventure pack',
+      categories: ['full-game-pack'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
       assetsCount: 80,
@@ -1360,6 +1377,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Fake Paid External',
       tag: 'pirate bomb pack',
+      categories: ['full-game-pack'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
       assetsCount: 48,
@@ -1369,6 +1387,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Particles',
       tag: 'pixel effects pack',
+      categories: ['visual-effect'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
       assetsCount: 20,
@@ -1376,12 +1395,14 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Emotes',
       tag: 'emote',
+      categories: [],
       thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
       assetsCount: 176,
     },
     {
       name: 'Dinosaurus Characters',
       tag: '24x24 dino characters',
+      categories: ['character'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
       assetsCount: 5,
@@ -1389,6 +1410,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Fake Paid Spinning Items',
       tag: '16x16 pixel art spinning items',
+      categories: ['props'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
       assetsCount: 30,
@@ -1397,6 +1419,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'RPG Items #2',
       tag: '16x16 pixel art rpg items',
+      categories: ['props'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
       assetsCount: 64,
@@ -1404,6 +1427,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'RPG Items',
       tag: '16x16 rpg item pack',
+      categories: ['props'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
       assetsCount: 144,
@@ -1411,6 +1435,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Fantasy Icons',
       tag: '32x32 fantasy icons pack v2',
+      categories: [],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
       assetsCount: 285,
@@ -1418,6 +1443,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'On-Screen Controls',
       tag: 'on-screen controls',
+      categories: ['interface'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
       assetsCount: 287,

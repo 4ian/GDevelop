@@ -21,6 +21,7 @@ export const Default = () => (
       <PriceTag value={850} />
       <PriceTag value={1200} />
       <PriceTag value={1225} />
+      <PriceTag value={1225} owned />
     </LineStackLayout>
     <LineStackLayout>
       <div
@@ -36,6 +37,22 @@ export const Default = () => (
         }}
       >
         <PriceTag value={1200} withOverlay />
+      </div>
+    </LineStackLayout>
+    <LineStackLayout>
+      <div
+        style={{
+          backgroundSize: 'contain',
+          backgroundImage:
+            "url('https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png?gdUsage=img')",
+          aspectRatio: '16 / 9',
+          height: 200,
+          padding: 10,
+          display: 'flex',
+          alignItems: 'flex-start',
+        }}
+      >
+        <PriceTag value={1200} withOverlay owned />
       </div>
     </LineStackLayout>
   </ColumnStackLayout>

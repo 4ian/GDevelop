@@ -99,6 +99,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const {
       openedAssetPack,
       openedAssetShortHeader,
+      openedAssetCategory,
       openedPrivateAssetPackListingData,
       filtersState,
     } = navigationState.getCurrentPage();
@@ -164,7 +165,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           return;
         }
         const scrollPosition = navigationState.getCurrentPage().scrollPosition;
-        scrollPosition && scrollView.scrollToPosition(scrollPosition);
+        if (scrollPosition) scrollView.scrollToPosition(scrollPosition);
+        // If no saved scroll position, force scroll to 0 in case the displayed component
+        // is the same as the previous page so the scroll is naturally kept between pages
+        // although the user navigated and the scroll should be reset.
+        else scrollView.scrollToPosition(0);
         hasAppliedSavedScrollPosition.current = true;
       },
       [getScrollView, navigationState]
@@ -276,6 +281,14 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         setIsFiltersPanelOpen(true);
       },
       [receivedAssetPacks, saveScrollPosition, navigationState, setSearchText]
+    );
+
+    const selectAssetCategory = React.useCallback(
+      (category: string) => {
+        saveScrollPosition();
+        navigationState.openAssetCategoryPage(category);
+      },
+      [navigationState, saveScrollPosition]
     );
 
     // If the user has received the pack they are currently viewing,
@@ -424,18 +437,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     />
                   </Column>
                 </LineStackLayout>
-                {!isOnHomePage && <Spacer />}
+                <Spacer />
                 <Column noMargin>
                   <Line
                     justifyContent="space-between"
                     noMargin
                     alignItems="center"
                   >
-                    {isOnHomePage ? (
-                      <Text size="block-title">
-                        <Trans>Discover</Trans>
-                      </Text>
-                    ) : (
+                    {(!isOnHomePage ||
+                      (isOnHomePage && !!openedAssetCategory)) && (
                       <>
                         <Column expand alignItems="flex-start" noMargin>
                           <TextButton
@@ -559,6 +569,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         assetPackRandomOrdering={assetPackRandomOrdering}
                         onPublicAssetPackSelection={selectPublicAssetPack}
                         onPrivateAssetPackSelection={selectPrivateAssetPack}
+                        onCategorySelection={selectAssetCategory}
+                        openedAssetCategory={openedAssetCategory}
                       />
                     ) : (
                       <PlaceholderLoader />

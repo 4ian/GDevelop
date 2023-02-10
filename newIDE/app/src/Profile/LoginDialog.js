@@ -157,6 +157,11 @@ const LoginDialog = ({
                 fullWidth
                 disabled={loginInProgress}
               />
+              {/*
+                This input is needed so that the browser submits the form when
+                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
+              */}
+              <input type="submit" value="Submit" style={{ display: 'none' }} />
             </ColumnStackLayout>
           </form>
         </div>

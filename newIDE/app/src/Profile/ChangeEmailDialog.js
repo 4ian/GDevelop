@@ -88,6 +88,7 @@ const ChangeEmailDialog = ({
               (!isEmailValid ? <Trans>Invalid email address</Trans> : null)
             }
             fullWidth
+            disabled={changeEmailInProgress}
             required
             onChange={(e, value) => {
               if (!isEmailValid) setIsEmailValid(true);

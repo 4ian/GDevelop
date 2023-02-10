@@ -122,40 +122,49 @@ export default function RedeemCodeDialog({
           maxWidth="sm"
           open
         >
-          <ColumnStackLayout noMargin>
-            <SemiControlledTextField
-              value={redemptionCode}
-              onChange={setRedemptionCode}
-              translatableHintText={t`Enter your code here`}
-              floatingLabelText={<Trans>Redemption code</Trans>}
-              floatingLabelFixed
-              errorText={getRedeemCodeErrorText(error)}
-              autoFocus="desktop"
-            />
-            {!subscription ||
-            !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
-              subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
-                <AlertMessage kind="warning">
+          <form
+            onSubmit={event => {
+              event.preventDefault();
+              onRedeemCode();
+            }}
+            autoComplete="on"
+            name="login"
+          >
+            <ColumnStackLayout noMargin>
+              <SemiControlledTextField
+                value={redemptionCode}
+                onChange={setRedemptionCode}
+                translatableHintText={t`Enter your code here`}
+                floatingLabelText={<Trans>Redemption code</Trans>}
+                floatingLabelFixed
+                errorText={getRedeemCodeErrorText(error)}
+                autoFocus="desktop"
+              />
+              {!subscription ||
+              !subscription.planId ? null : !!subscription.redemptionCodeValidUntil ? ( // No subscription, do not show a warning.
+                subscription.redemptionCodeValidUntil > Date.now() ? ( // Has valid subscription.
+                  <AlertMessage kind="warning">
+                    <Trans>
+                      You currently have a subscription, applied thanks to a
+                      redemption code, valid until{' '}
+                      {i18n.date(subscription.redemptionCodeValidUntil)}. If you
+                      redeem another code, your existing subscription will be
+                      canceled and not redeemable anymore!
+                    </Trans>
+                  </AlertMessage>
+                ) : null // Has expired subscription, do not show a warning.
+              ) : (
+                // Has a subscription, but not applied thanks to a redemption code.
+                <AlertMessage kind="info">
                   <Trans>
-                    You currently have a subscription, applied thanks to a
-                    redemption code, valid until{' '}
-                    {i18n.date(subscription.redemptionCodeValidUntil)}. If you
-                    redeem another code, your existing subscription will be
-                    canceled and not redeemable anymore!
+                    You currently have a subscription. If you redeem a code, the
+                    existing subscription will be cancelled and replaced by the
+                    one given by the code.
                   </Trans>
                 </AlertMessage>
-              ) : null // Has expired subscription, do not show a warning.
-            ) : (
-              // Has a subscription, but not applied thanks to a redemption code.
-              <AlertMessage kind="info">
-                <Trans>
-                  You currently have a subscription. If you redeem a code, the
-                  existing subscription will be cancelled and replaced by the
-                  one given by the code.
-                </Trans>
-              </AlertMessage>
-            )}
-          </ColumnStackLayout>
+              )}
+            </ColumnStackLayout>
+          </form>
         </Dialog>
       )}
     </I18n>

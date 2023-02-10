@@ -5,6 +5,7 @@ import * as React from 'react';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
 import {
+  hasValidSubscriptionPlan,
   type CurrentUsage,
   type Subscription,
 } from '../Utils/GDevelopServices/Usage';
@@ -27,8 +28,9 @@ const CurrentUsageDisplayer = ({
     SubscriptionSuggestionContext
   );
   if (!currentUsage) return <PlaceholderLoader />;
-  const hasSubscription = subscription && !!subscription.planId;
-  const noSubscription = subscription && !subscription.planId;
+  const hasSubscription = hasValidSubscriptionPlan(subscription);
+  const loadedButHasNoSubscription =
+    subscription && !hasValidSubscriptionPlan(subscription);
 
   return (
     <Column noMargin>
@@ -58,14 +60,14 @@ const CurrentUsageDisplayer = ({
           />
         </Line>
       )}
-      {noSubscription && (
+      {loadedButHasNoSubscription && (
         <Text>
           <Trans>
             You don't have a subscription. Get one to increase the limits!
           </Trans>
         </Text>
       )}
-      {noSubscription && (
+      {loadedButHasNoSubscription && (
         <Line justifyContent="center" alignItems="center">
           <RaisedButton
             label={<Trans>Get a subscription</Trans>}

@@ -47,6 +47,8 @@ import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfile
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
   subscriptionForIndieUser,
+  silverSubscriptionWithRedemptionCode,
+  silverSubscriptionWithExpiredRedemptionCode,
   limitsForSilverUser,
   limitsReached,
   noSubscription,
@@ -2609,6 +2611,20 @@ storiesOf('CurrentUsageDisplayer', module)
   .add('default', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
+      onChangeSubscription={action('on change subscription callback')}
+    />
+  ))
+  .add('with redemption code', () => (
+    <CurrentUsageDisplayer
+      subscription={silverSubscriptionWithRedemptionCode}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
+      onChangeSubscription={action('on change subscription callback')}
+    />
+  ))
+  .add('with expired redemption code', () => (
+    <CurrentUsageDisplayer
+      subscription={silverSubscriptionWithExpiredRedemptionCode}
       currentUsage={limitsForSilverUser.limits['cordova-build']}
       onChangeSubscription={action('on change subscription callback')}
     />

@@ -115,8 +115,8 @@
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
-.gd-events-sheet .instruction-parameter.expression {
-  color: var(--event-sheet-instruction-parameter-expression-color);
+.gd-events-sheet .instruction-parameter.number {
+  color: var(--event-sheet-instruction-parameter-number-color);
 }
 
 .gd-events-sheet .instruction-parameter.object,

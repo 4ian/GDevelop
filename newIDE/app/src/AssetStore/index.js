@@ -165,7 +165,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           return;
         }
         const scrollPosition = navigationState.getCurrentPage().scrollPosition;
-        scrollPosition && scrollView.scrollToPosition(scrollPosition);
+        if (scrollPosition) scrollView.scrollToPosition(scrollPosition);
+        // If no saved scroll position, force scroll to 0 in case the displayed component
+        // is the same as the previous page so the scroll is naturally kept between pages
+        // although the user navigated and the scroll should be reset.
+        else scrollView.scrollToPosition(0);
         hasAppliedSavedScrollPosition.current = true;
       },
       [getScrollView, navigationState]

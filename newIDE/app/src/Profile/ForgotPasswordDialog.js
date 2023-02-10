@@ -27,7 +27,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
     setResetInProgress(true);
 
     await onForgotPassword({
-      email,
+      email: email.trim(),
     });
 
     setResetInProgress(false);
@@ -79,6 +79,9 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
               setEmail(value);
             }}
             fullWidth
+            onBlur={event => {
+                  setEmail(event.currentTarget.value.trim());
+                }}
           />
         )}
       </Column>

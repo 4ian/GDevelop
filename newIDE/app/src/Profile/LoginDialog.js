@@ -55,7 +55,7 @@ const LoginDialog = ({
     if (loginInProgress) return;
 
     onLogin({
-      email,
+      email: email.trim(),
       password,
     });
   };
@@ -131,6 +131,9 @@ const LoginDialog = ({
               errorText={getEmailErrorText(error)}
               onChange={(e, value) => {
                 setEmail(value);
+              }}
+              onBlur={event => {
+                setEmail(event.currentTarget.value.trim());
               }}
               fullWidth
               disabled={loginInProgress}

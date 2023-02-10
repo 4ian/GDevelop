@@ -162,7 +162,8 @@ const Instruction = (props: Props) => {
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
-          // TODO remove the ternary when any parameter declaration use 'number' instead of 'expression'.
+          // TODO Remove the ternary when any parameter declaration uses
+          // 'number' instead of 'expression'.
           const parameterType =
             parameterMetadata.getType() === 'expression'
               ? 'number'

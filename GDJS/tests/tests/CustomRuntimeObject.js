@@ -198,8 +198,8 @@ describe('gdjs.CustomRuntimeObject', function () {
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [32, 32],
-        [31.999999999999993, -31.999999999999996],
-        [96, 31.999999999999996],
+        [32, -32],
+        [96, 32],
       ]);
       expect(customObject.getHitBoxes()[1].vertices).to.eql([
         [32, 96],

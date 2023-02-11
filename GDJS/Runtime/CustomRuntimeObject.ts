@@ -265,15 +265,13 @@ namespace gdjs {
       const angleInRadians = (this.angle * Math.PI) / 180;
 
       this._localTransformation.setToTranslation(this.x, this.y);
-      this._localTransformation.translate(centerX, centerY);
-      this._localTransformation.rotate(angleInRadians);
+      this._localTransformation.rotateAround(angleInRadians, centerX, centerY);
       if (this._flippedX) {
-        this._localTransformation.scale(-1, 1);
+        this._localTransformation.flipX(centerX);
       }
       if (this._flippedY) {
-        this._localTransformation.scale(1, -1);
+        this._localTransformation.flipY(centerY);
       }
-      this._localTransformation.translate(-centerX, -centerY);
       this._localTransformation.scale(absScaleX, absScaleY);
 
       this._localInverseTransformation.copyFrom(this._localTransformation);

@@ -385,8 +385,8 @@ namespace gdjs {
         }
       }
 
-      const previousVelocityX = this._xVelocity;
-      const previousVelocityY = this._yVelocity;
+      let previousVelocityX = this._xVelocity;
+      let previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;
 
       if (this._cellSize > 0) {
@@ -539,6 +539,8 @@ namespace gdjs {
             }
           }
           //console.log("X: " + object.x + "SpeedX: " + this._xVelocity);
+          // The velocity is exact. There no need for Verlet integration.
+          previousVelocityX = this._xVelocity;
         }
 
         if (this._targetY !== null) {
@@ -569,6 +571,8 @@ namespace gdjs {
               console.log('Stop Y');
             }
           }
+          // The velocity is exact. There no need for Verlet integration.
+          previousVelocityY = this._yVelocity;
         }
       }
 

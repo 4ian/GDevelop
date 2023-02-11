@@ -124,20 +124,17 @@ namespace gdjs {
 
     setViewpoint(viewpoint: string, customIsometryAngle: float): void {
       if (viewpoint === 'PixelIsometry') {
-        this._basisTransformation =
-          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-            Math.atan(0.5)
-          );
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          Math.atan(0.5)
+        );
       } else if (viewpoint === 'TrueIsometry') {
-        this._basisTransformation =
-          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-            Math.PI / 6
-          );
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          Math.PI / 6
+        );
       } else if (viewpoint === 'CustomIsometry') {
-        this._basisTransformation =
-          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-            (customIsometryAngle * Math.PI) / 180
-          );
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          (customIsometryAngle * Math.PI) / 180
+        );
       } else {
         this._basisTransformation = null;
       }
@@ -325,36 +322,40 @@ namespace gdjs {
           direction = 0;
         }
 
-        const deltaX = this._xVelocity * timeDelta;
-        const deltaY = this._yVelocity * timeDelta;
-        
-        if (direction === 4 || direction === 0) {
-          if (this._yVelocity < 0) {
-            if (Math.abs(this.ceilToCellY(object.y) - object.y) > deltaY) {
-              direction = 6;
+        if (this._cellSize > 0) {
+          // Forbid to turn before being aligned on the grid.
+
+          const deltaX = this._xVelocity * timeDelta;
+          const deltaY = this._yVelocity * timeDelta;
+
+          if (direction === 4 || direction === 0) {
+            if (this._yVelocity < 0) {
+              if (Math.abs(this.ceilToCellY(object.y) - object.y) > deltaY) {
+                direction = 6;
+              } else {
+                object.y = this.ceilToCellY(object.y);
+              }
             } else {
-              object.y = this.ceilToCellY(object.y);
-            }
-          } else {
-            if (Math.abs(this.floorToCellY(object.y) - object.y) > deltaY) {
-              direction = 2;
-            } else {
-              object.y = this.floorToCellY(object.y);
+              if (Math.abs(this.floorToCellY(object.y) - object.y) > deltaY) {
+                direction = 2;
+              } else {
+                object.y = this.floorToCellY(object.y);
+              }
             }
           }
-        }
-        if (direction === 6 || direction === 2) {
-          if (this._xVelocity < 0) {
-            if (Math.abs(this.ceilToCellX(object.x) - object.x) > deltaX) {
-              direction = 4;
+          if (direction === 6 || direction === 2) {
+            if (this._xVelocity < 0) {
+              if (Math.abs(this.ceilToCellX(object.x) - object.x) > deltaX) {
+                direction = 4;
+              } else {
+                object.x = this.ceilToCellX(object.x);
+              }
             } else {
-              object.x = this.ceilToCellX(object.x);
-            }
-          } else {
-            if (Math.abs(this.floorToCellX(object.x) - object.x) > deltaX) {
-              direction = 0;
-            } else {
-              object.x = this.floorToCellX(object.x);
+              if (Math.abs(this.floorToCellX(object.x) - object.x) > deltaX) {
+                direction = 0;
+              } else {
+                object.x = this.floorToCellX(object.x);
+              }
             }
           }
         }
@@ -391,43 +392,41 @@ namespace gdjs {
       if (this._cellSize > 0) {
         if (this._leftKey || this._rightKey) {
           this._targetX = null;
-        }
-        else if (this._targetX === null) {
+        } else if (this._targetX === null) {
           // Find where the deceleration should stop the object.
           if (this._xVelocity > 0) {
             this._targetX = this.ceilToCellX(
               object.x + this.getBreakingDistanceX()
             );
             this._targetDirectionX = 1;
-            console.log("x: " + object.x + " --> " + this._targetX);
+            console.log('x: ' + object.x + ' --> ' + this._targetX);
           }
           if (this._xVelocity < 0) {
             this._targetX = this.floorToCellX(
               object.x - this.getBreakingDistanceX()
             );
             this._targetDirectionX = -1;
-            console.log("x: " + object.x + " --> " + this._targetX);
+            console.log('x: ' + object.x + ' --> ' + this._targetX);
           }
         }
 
         if (this._upKey || this._downKey) {
           this._targetY = null;
-        }
-        else if (this._targetY === null) {
+        } else if (this._targetY === null) {
           // Find where the deceleration should stop the object.
           if (this._yVelocity > 0) {
             this._targetY = this.ceilToCellY(
               object.y + this.getBreakingDistanceY()
             );
             this._targetDirectionY = 1;
-            console.log("y: " + object.y + " --> " + this._targetY);
+            console.log('y: ' + object.y + ' --> ' + this._targetY);
           }
           if (this._yVelocity < 0) {
             this._targetY = this.floorToCellY(
               object.y - this.getBreakingDistanceY()
             );
             this._targetDirectionY = -1;
-            console.log("y: " + object.y + " --> " + this._targetY);
+            console.log('y: ' + object.y + ' --> ' + this._targetY);
           }
         }
       }
@@ -508,6 +507,9 @@ namespace gdjs {
       }
 
       if (this._cellSize > 0) {
+        // Make as if the player had press button a bit longer to reach exactly
+        // the next cell.
+
         if (this._targetX !== null) {
           if (this._targetX > object.x) {
             if (this._targetDirectionX > 0) {
@@ -520,7 +522,7 @@ namespace gdjs {
               this._xVelocity = 0;
               object.x = this.roundToCellX(object.x);
               this._targetX = null;
-              console.log("Stop x");
+              console.log('Stop x');
             }
           } else {
             if (this._targetDirectionX < 0) {
@@ -533,7 +535,7 @@ namespace gdjs {
               this._xVelocity = 0;
               object.x = this.roundToCellX(object.x);
               this._targetX = null;
-              console.log("Stop x");
+              console.log('Stop x');
             }
           }
           //console.log("X: " + object.x + "SpeedX: " + this._xVelocity);
@@ -551,7 +553,7 @@ namespace gdjs {
               this._yVelocity = 0;
               object.y = this.roundToCellY(object.y);
               this._targetY = null;
-              console.log("Stop Y");
+              console.log('Stop Y');
             }
           } else {
             if (this._targetDirectionY < 0) {
@@ -564,7 +566,7 @@ namespace gdjs {
               this._yVelocity = 0;
               object.y = this.roundToCellY(object.y);
               this._targetY = null;
-              console.log("Stop Y");
+              console.log('Stop Y');
             }
           }
         }

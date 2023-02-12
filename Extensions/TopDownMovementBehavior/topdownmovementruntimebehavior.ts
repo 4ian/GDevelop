@@ -325,38 +325,69 @@ namespace gdjs {
         if (this._cellSize > 0) {
           // Forbid to turn before being aligned on the grid.
 
-          const deltaX = this._xVelocity * timeDelta;
-          const deltaY = this._yVelocity * timeDelta;
+          const deltaX = Math.abs(this._xVelocity * timeDelta);
+          const deltaY = Math.abs(this._yVelocity * timeDelta);
 
-          if (direction === 4 || direction === 0) {
+          const isTryingToMoveOnX = direction === 4 || direction === 0;
+          const isTryingToMoveOnY = direction === 6 || direction === 2;
+          if (isTryingToMoveOnX) {
             if (this._yVelocity < 0) {
               if (Math.abs(this.ceilToCellY(object.y) - object.y) > deltaY) {
+                console.log("Continue Up");
                 direction = 6;
               } else {
                 object.y = this.ceilToCellY(object.y);
+                console.log("Stop Up: " + object.y);
               }
-            } else {
+            }
+            if (this._yVelocity > 0) {
               if (Math.abs(this.floorToCellY(object.y) - object.y) > deltaY) {
+                console.log("Continue Down");
                 direction = 2;
               } else {
                 object.y = this.floorToCellY(object.y);
+                console.log("Stop Down: " + object.y);
               }
             }
           }
-          if (direction === 6 || direction === 2) {
+          else if (isTryingToMoveOnY) {
             if (this._xVelocity < 0) {
               if (Math.abs(this.ceilToCellX(object.x) - object.x) > deltaX) {
+                console.log("Continue Right");
                 direction = 4;
               } else {
                 object.x = this.ceilToCellX(object.x);
+                console.log("Stop Right: " + object.x);
               }
-            } else {
+            }
+            if (this._xVelocity > 0) {
               if (Math.abs(this.floorToCellX(object.x) - object.x) > deltaX) {
+                console.log("Continue Left");
                 direction = 0;
               } else {
                 object.x = this.floorToCellX(object.x);
+                console.log("Stop Left: " + object.x);
               }
             }
+          }
+
+          // Ensure sharp turn even with Verlet integrations.
+          const speed = Math.abs(this._xVelocity + this._yVelocity);
+          if (direction === 0) {
+            this._xVelocity = speed;
+            this._yVelocity = 0;
+          }
+          else if (direction === 4) {
+            this._xVelocity = -speed;
+            this._yVelocity = 0;
+          }
+          else if (direction === 2) {
+            this._yVelocity = speed;
+            this._xVelocity = 0;
+          }
+          else if (direction === 6) {
+            this._yVelocity = -speed;
+            this._xVelocity = 0;
           }
         }
       } else {
@@ -385,12 +416,9 @@ namespace gdjs {
         }
       }
 
-      let previousVelocityX = this._xVelocity;
-      let previousVelocityY = this._yVelocity;
-      this._wasStickUsed = false;
-
       if (this._cellSize > 0) {
-        if (this._leftKey || this._rightKey) {
+        const isMovingOnX = direction !== -1 && direction !== 2 && direction !== 6;
+        if (isMovingOnX) {
           this._targetX = null;
         } else if (this._targetX === null) {
           // Find where the deceleration should stop the object.
@@ -410,7 +438,8 @@ namespace gdjs {
           }
         }
 
-        if (this._upKey || this._downKey) {
+        const isMovingOnY = direction !== -1 && direction !== 0 && direction !== 4;
+        if (isMovingOnY) {
           this._targetY = null;
         } else if (this._targetY === null) {
           // Find where the deceleration should stop the object.
@@ -430,6 +459,10 @@ namespace gdjs {
           }
         }
       }
+
+      let previousVelocityX = this._xVelocity;
+      let previousVelocityY = this._yVelocity;
+      this._wasStickUsed = false;
 
       // These 4 values are not actually used.
       // JavaScript doesn't allow to declare

@@ -557,7 +557,6 @@ namespace gdjs {
               this._targetX = null;
             }
           }
-          //console.log("X: " + object.x + "SpeedX: " + this._xVelocity);
           // The velocity is exact. There no need for Verlet integration.
           previousVelocityX = this._xVelocity;
         }

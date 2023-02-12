@@ -53,6 +53,8 @@ namespace gdjs {
     private _targetY: integer | null = null;
     private _targetDirectionX: integer = 0;
     private _targetDirectionY: integer = 0;
+    private _lastDirection = -1;
+    private static epsilon = 1 / (1 << 20);
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -629,10 +631,45 @@ namespace gdjs {
         }
       }
 
+      this._lastDirection = direction;
       this._leftKey = false;
       this._rightKey = false;
       this._upKey = false;
       this._downKey = false;
+    }
+
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const object = this.owner;
+
+      const isMovingOnX =
+        this._lastDirection !== -1 &&
+        this._lastDirection !== 2 &&
+        this._lastDirection !== 6;
+      const isMovingOnY =
+        this._lastDirection !== -1 &&
+        this._lastDirection !== 0 &&
+        this._lastDirection !== 4;
+
+      // Avoid rounding errors after a call to "separate" to make characters
+      // move indefinitely in front of a wall because they can't reach the cell.
+      if (!isMovingOnX && this._xVelocity !== 0) {
+        const x = object.getX();
+        const roundedX = this.roundToCellX(x);
+        if (Math.abs(roundedX - x) < TopDownMovementRuntimeBehavior.epsilon) {
+          object.setX(roundedX);
+          this._targetDirectionX = 0;
+          this._xVelocity = 0;
+        }
+      }
+      if (!isMovingOnY && this._yVelocity !== 0) {
+        const y = object.getY();
+        const roundedY = this.roundToCellY(y);
+        if (Math.abs(roundedY - y) < TopDownMovementRuntimeBehavior.epsilon) {
+          object.setY(roundedY);
+          this._targetDirectionY = 0;
+          this._yVelocity = 0;
+        }
+      }
     }
 
     /**

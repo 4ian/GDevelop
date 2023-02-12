@@ -15,6 +15,7 @@ import {
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Text from '../../UI/Text';
 import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
+import { isNativeMobileApp } from '../../Utils/Platform';
 
 export type SubscriptionCheckerInterface = {|
   checkUserHasSubscription: () => boolean,
@@ -57,8 +58,12 @@ const SubscriptionChecker = React.forwardRef<
       return true;
     }
 
-    setDialogOpen(true);
-    sendSubscriptionCheckDialogShown({ mode, id });
+    if (isNativeMobileApp()) {
+      // Would present App Store screen.
+    } else {
+      setDialogOpen(true);
+      sendSubscriptionCheckDialogShown({ mode, id });
+    }
 
     return false;
   };

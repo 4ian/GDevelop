@@ -333,40 +333,31 @@ namespace gdjs {
           if (isTryingToMoveOnX) {
             if (this._yVelocity < 0) {
               if (Math.abs(this.ceilToCellY(object.y) - object.y) > deltaY) {
-                console.log("Continue Up");
                 direction = 6;
               } else {
                 object.y = this.ceilToCellY(object.y);
-                console.log("Stop Up: " + object.y);
               }
             }
             if (this._yVelocity > 0) {
               if (Math.abs(this.floorToCellY(object.y) - object.y) > deltaY) {
-                console.log("Continue Down");
                 direction = 2;
               } else {
                 object.y = this.floorToCellY(object.y);
-                console.log("Stop Down: " + object.y);
               }
             }
-          }
-          else if (isTryingToMoveOnY) {
+          } else if (isTryingToMoveOnY) {
             if (this._xVelocity < 0) {
               if (Math.abs(this.ceilToCellX(object.x) - object.x) > deltaX) {
-                console.log("Continue Right");
                 direction = 4;
               } else {
                 object.x = this.ceilToCellX(object.x);
-                console.log("Stop Right: " + object.x);
               }
             }
             if (this._xVelocity > 0) {
               if (Math.abs(this.floorToCellX(object.x) - object.x) > deltaX) {
-                console.log("Continue Left");
                 direction = 0;
               } else {
                 object.x = this.floorToCellX(object.x);
-                console.log("Stop Left: " + object.x);
               }
             }
           }
@@ -376,16 +367,13 @@ namespace gdjs {
           if (direction === 0) {
             this._xVelocity = speed;
             this._yVelocity = 0;
-          }
-          else if (direction === 4) {
+          } else if (direction === 4) {
             this._xVelocity = -speed;
             this._yVelocity = 0;
-          }
-          else if (direction === 2) {
+          } else if (direction === 2) {
             this._yVelocity = speed;
             this._xVelocity = 0;
-          }
-          else if (direction === 6) {
+          } else if (direction === 6) {
             this._yVelocity = -speed;
             this._xVelocity = 0;
           }
@@ -417,7 +405,8 @@ namespace gdjs {
       }
 
       if (this._cellSize > 0) {
-        const isMovingOnX = direction !== -1 && direction !== 2 && direction !== 6;
+        const isMovingOnX =
+          direction !== -1 && direction !== 2 && direction !== 6;
         if (isMovingOnX) {
           this._targetX = null;
         } else if (this._targetX === null) {
@@ -427,18 +416,17 @@ namespace gdjs {
               object.x + this.getBreakingDistanceX()
             );
             this._targetDirectionX = 1;
-            console.log('x: ' + object.x + ' --> ' + this._targetX);
           }
           if (this._xVelocity < 0) {
             this._targetX = this.floorToCellX(
               object.x - this.getBreakingDistanceX()
             );
             this._targetDirectionX = -1;
-            console.log('x: ' + object.x + ' --> ' + this._targetX);
           }
         }
 
-        const isMovingOnY = direction !== -1 && direction !== 0 && direction !== 4;
+        const isMovingOnY =
+          direction !== -1 && direction !== 0 && direction !== 4;
         if (isMovingOnY) {
           this._targetY = null;
         } else if (this._targetY === null) {
@@ -448,14 +436,12 @@ namespace gdjs {
               object.y + this.getBreakingDistanceY()
             );
             this._targetDirectionY = 1;
-            console.log('y: ' + object.y + ' --> ' + this._targetY);
           }
           if (this._yVelocity < 0) {
             this._targetY = this.floorToCellY(
               object.y - this.getBreakingDistanceY()
             );
             this._targetDirectionY = -1;
-            console.log('y: ' + object.y + ' --> ' + this._targetY);
           }
         }
       }
@@ -555,7 +541,6 @@ namespace gdjs {
               this._xVelocity = 0;
               object.x = this.roundToCellX(object.x);
               this._targetX = null;
-              console.log('Stop x');
             }
           } else {
             if (this._targetDirectionX < 0) {
@@ -568,7 +553,6 @@ namespace gdjs {
               this._xVelocity = 0;
               object.x = this.roundToCellX(object.x);
               this._targetX = null;
-              console.log('Stop x');
             }
           }
           //console.log("X: " + object.x + "SpeedX: " + this._xVelocity);
@@ -588,7 +572,6 @@ namespace gdjs {
               this._yVelocity = 0;
               object.y = this.roundToCellY(object.y);
               this._targetY = null;
-              console.log('Stop Y');
             }
           } else {
             if (this._targetDirectionY < 0) {
@@ -601,7 +584,6 @@ namespace gdjs {
               this._yVelocity = 0;
               object.y = this.roundToCellY(object.y);
               this._targetY = null;
-              console.log('Stop Y');
             }
           }
           // The velocity is exact. There no need for Verlet integration.

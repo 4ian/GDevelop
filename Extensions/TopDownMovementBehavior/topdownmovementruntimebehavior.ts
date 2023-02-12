@@ -45,6 +45,17 @@ namespace gdjs {
     private _basisTransformation: gdjs.TopDownMovementRuntimeBehavior.BasisTransformation | null;
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
+    // Pixel perfect
+    private _cellSize: integer = 16;
+    private _gridOffsetX: integer = 0;
+    private _gridOffsetY: integer = 0;
+    private _targetX: integer | null = null;
+    private _targetY: integer | null = null;
+    private _targetDirectionX: integer = 0;
+    private _targetDirectionY: integer = 0;
+    private _lastDirection = -1;
+    private static epsilon = 1 / (1 << 20);
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -234,6 +245,9 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const object = this.owner;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -309,6 +323,63 @@ namespace gdjs {
         ) {
           direction = 0;
         }
+
+        if (this._cellSize > 0) {
+          // Forbid to turn before being aligned on the grid.
+
+          const deltaX = Math.abs(this._xVelocity * timeDelta);
+          const deltaY = Math.abs(this._yVelocity * timeDelta);
+
+          const isTryingToMoveOnX = direction === 4 || direction === 0;
+          const isTryingToMoveOnY = direction === 6 || direction === 2;
+          if (isTryingToMoveOnX) {
+            if (this._yVelocity < 0) {
+              if (Math.abs(this.ceilToCellY(object.y) - object.y) > deltaY) {
+                direction = 6;
+              } else {
+                object.y = this.ceilToCellY(object.y);
+              }
+            }
+            if (this._yVelocity > 0) {
+              if (Math.abs(this.floorToCellY(object.y) - object.y) > deltaY) {
+                direction = 2;
+              } else {
+                object.y = this.floorToCellY(object.y);
+              }
+            }
+          } else if (isTryingToMoveOnY) {
+            if (this._xVelocity < 0) {
+              if (Math.abs(this.ceilToCellX(object.x) - object.x) > deltaX) {
+                direction = 4;
+              } else {
+                object.x = this.ceilToCellX(object.x);
+              }
+            }
+            if (this._xVelocity > 0) {
+              if (Math.abs(this.floorToCellX(object.x) - object.x) > deltaX) {
+                direction = 0;
+              } else {
+                object.x = this.floorToCellX(object.x);
+              }
+            }
+          }
+
+          // Ensure sharp turn even with Verlet integrations.
+          const speed = Math.abs(this._xVelocity + this._yVelocity);
+          if (direction === 0) {
+            this._xVelocity = speed;
+            this._yVelocity = 0;
+          } else if (direction === 4) {
+            this._xVelocity = -speed;
+            this._yVelocity = 0;
+          } else if (direction === 2) {
+            this._yVelocity = speed;
+            this._xVelocity = 0;
+          } else if (direction === 6) {
+            this._yVelocity = -speed;
+            this._xVelocity = 0;
+          }
+        }
       } else {
         if (this._upKey && !this._downKey) {
           if (this._leftKey && !this._rightKey) {
@@ -335,10 +406,50 @@ namespace gdjs {
         }
       }
 
-      const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime() / 1000;
-      const previousVelocityX = this._xVelocity;
-      const previousVelocityY = this._yVelocity;
+      if (this._cellSize > 0) {
+        const isMovingOnX =
+          direction !== -1 && direction !== 2 && direction !== 6;
+        if (isMovingOnX) {
+          this._targetX = null;
+        } else if (this._targetX === null) {
+          // Find where the deceleration should stop the object.
+          if (this._xVelocity > 0) {
+            this._targetX = this.ceilToCellX(
+              object.x + this.getBreakingDistanceX()
+            );
+            this._targetDirectionX = 1;
+          }
+          if (this._xVelocity < 0) {
+            this._targetX = this.floorToCellX(
+              object.x - this.getBreakingDistanceX()
+            );
+            this._targetDirectionX = -1;
+          }
+        }
+
+        const isMovingOnY =
+          direction !== -1 && direction !== 0 && direction !== 4;
+        if (isMovingOnY) {
+          this._targetY = null;
+        } else if (this._targetY === null) {
+          // Find where the deceleration should stop the object.
+          if (this._yVelocity > 0) {
+            this._targetY = this.ceilToCellY(
+              object.y + this.getBreakingDistanceY()
+            );
+            this._targetDirectionY = 1;
+          }
+          if (this._yVelocity < 0) {
+            this._targetY = this.floorToCellY(
+              object.y - this.getBreakingDistanceY()
+            );
+            this._targetDirectionY = -1;
+          }
+        }
+      }
+
+      let previousVelocityX = this._xVelocity;
+      let previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;
 
       // These 4 values are not actually used.
@@ -416,6 +527,71 @@ namespace gdjs {
         this._yVelocity = this._maxSpeed * sin;
       }
 
+      if (this._cellSize > 0) {
+        // Make as if the player had press button a bit longer to reach exactly
+        // the next cell.
+
+        if (this._targetX !== null) {
+          if (this._targetX > object.x) {
+            if (this._targetDirectionX > 0) {
+              this._xVelocity = Math.min(
+                this._xVelocity + this._acceleration,
+                this._maxSpeed,
+                this.getSpeedToReach(this._targetX - object.x)
+              );
+            } else {
+              this._xVelocity = 0;
+              object.x = this.roundToCellX(object.x);
+              this._targetX = null;
+            }
+          } else {
+            if (this._targetDirectionX < 0) {
+              this._xVelocity = Math.max(
+                this._xVelocity - this._acceleration,
+                -this._maxSpeed,
+                this.getSpeedToReach(this._targetX - object.x)
+              );
+            } else {
+              this._xVelocity = 0;
+              object.x = this.roundToCellX(object.x);
+              this._targetX = null;
+            }
+          }
+          // The velocity is exact. There no need for Verlet integration.
+          previousVelocityX = this._xVelocity;
+        }
+
+        if (this._targetY !== null) {
+          if (this._targetY > object.y) {
+            if (this._targetDirectionY > 0) {
+              this._yVelocity = Math.min(
+                this._yVelocity + this._acceleration,
+                this._maxSpeed,
+                this.getSpeedToReach(this._targetY - object.y)
+              );
+            } else {
+              this._yVelocity = 0;
+              object.y = this.roundToCellY(object.y);
+              this._targetY = null;
+            }
+          } else {
+            if (this._targetDirectionY < 0) {
+              this._yVelocity = Math.max(
+                this._yVelocity - this._acceleration,
+                -this._maxSpeed,
+                this.getSpeedToReach(this._targetY - object.y)
+              );
+            } else {
+              this._yVelocity = 0;
+              object.y = this.roundToCellY(object.y);
+              this._targetY = null;
+            }
+          }
+          // The velocity is exact. There no need for Verlet integration.
+          previousVelocityY = this._yVelocity;
+        }
+      }
+
       // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
 
@@ -454,10 +630,111 @@ namespace gdjs {
         }
       }
 
+      this._lastDirection = direction;
       this._leftKey = false;
       this._rightKey = false;
       this._upKey = false;
       this._downKey = false;
+    }
+
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const object = this.owner;
+
+      const isMovingOnX =
+        this._lastDirection !== -1 &&
+        this._lastDirection !== 2 &&
+        this._lastDirection !== 6;
+      const isMovingOnY =
+        this._lastDirection !== -1 &&
+        this._lastDirection !== 0 &&
+        this._lastDirection !== 4;
+
+      // Avoid rounding errors after a call to "separate" to make characters
+      // move indefinitely in front of a wall because they can't reach the cell.
+      if (!isMovingOnX && this._xVelocity !== 0) {
+        const x = object.getX();
+        const roundedX = this.roundToCellX(x);
+        if (Math.abs(roundedX - x) < TopDownMovementRuntimeBehavior.epsilon) {
+          object.setX(roundedX);
+          this._targetDirectionX = 0;
+          this._xVelocity = 0;
+        }
+      }
+      if (!isMovingOnY && this._yVelocity !== 0) {
+        const y = object.getY();
+        const roundedY = this.roundToCellY(y);
+        if (Math.abs(roundedY - y) < TopDownMovementRuntimeBehavior.epsilon) {
+          object.setY(roundedY);
+          this._targetDirectionY = 0;
+          this._yVelocity = 0;
+        }
+      }
+    }
+
+    /**
+     * @returns the braking distance according to an initial speed and a deceleration.
+     */
+    getBreakingDistanceX() {
+      return (this._xVelocity * this._xVelocity) / (2 * this._deceleration);
+    }
+
+    /**
+     * @returns the braking distance according to an initial speed and a deceleration.
+     */
+    getBreakingDistanceY() {
+      return (this._yVelocity * this._yVelocity) / (2 * this._deceleration);
+    }
+
+    /**
+     * @returns the speed necessary to cover a distance according to the deceleration.
+     */
+    getSpeedToReach(displacement: number) {
+      return (
+        Math.sign(displacement) *
+        Math.sqrt(2 * Math.abs(displacement) * this._deceleration)
+      );
+    }
+
+    ceilToCellX(x: float) {
+      return (
+        this._gridOffsetX +
+        this._cellSize * Math.ceil((x - this._gridOffsetX) / this._cellSize)
+      );
+    }
+
+    roundToCellX(x: float) {
+      return (
+        this._gridOffsetX +
+        this._cellSize * Math.round((x - this._gridOffsetX) / this._cellSize)
+      );
+    }
+
+    floorToCellX(x: float) {
+      return (
+        this._gridOffsetX +
+        this._cellSize * Math.floor((x - this._gridOffsetX) / this._cellSize)
+      );
+    }
+
+    ceilToCellY(y: float) {
+      return (
+        this._gridOffsetY +
+        this._cellSize * Math.ceil((y - this._gridOffsetY) / this._cellSize)
+      );
+    }
+
+    roundToCellY(y: float) {
+      return (
+        this._gridOffsetY +
+        this._cellSize * Math.round((y - this._gridOffsetY) / this._cellSize)
+      );
+    }
+
+    floorToCellY(y: float) {
+      return (
+        this._gridOffsetY +
+        this._cellSize * Math.floor((y - this._gridOffsetY) / this._cellSize)
+      );
     }
 
     simulateControl(input: string) {

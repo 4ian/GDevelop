@@ -56,7 +56,7 @@
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",
-    "pixi.js-legacy": "^6.1.2",
+    "pixi.js-legacy": "^6.5.9",
     "posthog-js": "^1.34.0",
     "prop-types": "^15.5.10",
     "raven-js": "^3.19.1",

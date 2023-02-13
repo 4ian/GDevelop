@@ -10,7 +10,7 @@ import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { getIDEVersion } from '../../Version';
 import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';

@@ -145,8 +145,9 @@ export function ExampleDialog({
             <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
           <Column>
-            {exampleShortHeader.authors && (
+            {(exampleShortHeader.authors || exampleShortHeader.codeSizeLevel || exampleShortHeader.difficultyLevel) && (
               <Line>
+                <div style={{ flexWrap: 'wrap' }}>
                 {exampleShortHeader.codeSizeLevel && (
                   <ExampleSizeChip
                     codeSizeLevel={exampleShortHeader.codeSizeLevel}
@@ -164,6 +165,7 @@ export function ExampleDialog({
                     isClickable
                   />
                 ))}
+                </div>
               </Line>
             )}
             <Text noMargin>{exampleShortHeader.shortDescription}</Text>

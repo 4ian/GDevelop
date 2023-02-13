@@ -10,7 +10,7 @@ import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { getIDEVersion } from '../../Version';
 import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
@@ -113,8 +113,9 @@ export const ExampleListItem = ({
           )}
           <Column expand>
             <Text noMargin>{renderExampleField('name')} </Text>
-            {exampleShortHeader.authors && (
+            {(exampleShortHeader.authors || exampleShortHeader.codeSizeLevel || exampleShortHeader.difficultyLevel) && (
               <Line>
+                <div style={{ flexWrap: 'wrap' }}>
                 {exampleShortHeader.codeSizeLevel && (
                   <ExampleSizeChip
                     codeSizeLevel={exampleShortHeader.codeSizeLevel}
@@ -128,6 +129,7 @@ export const ExampleListItem = ({
                 {exampleShortHeader.authors.map(author => (
                   <UserPublicProfileChip user={author} key={author.id} />
                 ))}
+                </div>
               </Line>
             )}
             <Text noMargin size="body2">

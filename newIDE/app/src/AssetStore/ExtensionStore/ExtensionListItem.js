@@ -96,9 +96,11 @@ export const ExtensionListItem = ({
             </LineStackLayout>
             {extensionShortHeader.authors && (
               <Line>
-                {extensionShortHeader.authors.map(author => (
-                  <UserPublicProfileChip user={author} key={author.id} />
-                ))}
+                <div style={{ flexWrap: 'wrap' }}>
+                  {extensionShortHeader.authors.map(author => (
+                    <UserPublicProfileChip user={author} key={author.id} />
+                  ))}
+                </div>
               </Line>
             )}
             <Text noMargin size="body2">

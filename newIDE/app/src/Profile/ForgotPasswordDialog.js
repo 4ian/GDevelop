@@ -79,6 +79,7 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
       ) : (
         <form
           onSubmit={event => {
+            // Prevent browser to navigate on form submission.
             event.preventDefault();
             doResetPassword();
           }}

@@ -73,6 +73,7 @@ const ChangeEmailDialog = ({
     >
       <form
         onSubmit={event => {
+          // Prevent browser to navigate on form submission.
           event.preventDefault();
           doChangeEmail();
         }}

@@ -128,7 +128,7 @@ export default function RedeemCodeDialog({
               onRedeemCode();
             }}
             autoComplete="on"
-            name="login"
+            name="redeemSubscriptionCoupon"
           >
             <ColumnStackLayout noMargin>
               <SemiControlledTextField

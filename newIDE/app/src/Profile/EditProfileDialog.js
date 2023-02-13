@@ -126,6 +126,7 @@ const EditProfileDialog = ({
         >
           <form
             onSubmit={event => {
+              // Prevent browser to navigate on form submission.
               event.preventDefault();
               edit();
             }}

@@ -125,6 +125,7 @@ const LoginDialog = ({
         <div style={styles.formContainer}>
           <form
             onSubmit={event => {
+              // Prevent browser to navigate on form submission.
               event.preventDefault();
               doLogin();
             }}

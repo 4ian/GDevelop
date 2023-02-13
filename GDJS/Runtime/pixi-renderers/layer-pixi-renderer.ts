@@ -209,7 +209,8 @@ namespace gdjs {
         this._oldWidth = this._pixiRenderer.screen.width;
         this._oldHeight = this._pixiRenderer.screen.height;
       }
-      const oldRenderTexture = this._pixiRenderer.renderTexture.current || undefined;
+      const oldRenderTexture =
+        this._pixiRenderer.renderTexture.current || undefined;
       const oldSourceFrame = this._pixiRenderer.renderTexture.sourceFrame;
       this._pixiRenderer.renderTexture.bind(this._renderTexture);
       this._pixiRenderer.renderTexture.clear(this._clearColor);

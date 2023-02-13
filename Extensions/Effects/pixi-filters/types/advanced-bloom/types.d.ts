@@ -10,7 +10,6 @@ declare namespace PIXI.filters {
     blur: number;
     quality: number;
     pixelSize: number | PIXI.Point | number[];
-    resolution: number;
   }
   export interface AdvancedBloomOptions {
     threshold?: number;

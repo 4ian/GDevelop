@@ -546,7 +546,7 @@ namespace gdjs {
         this._oldWidth = pixiRenderer.screen.width;
         this._oldHeight = pixiRenderer.screen.height;
       }
-      const oldRenderTexture = pixiRenderer.renderTexture.current;
+      const oldRenderTexture = pixiRenderer.renderTexture.current || undefined;
       const oldSourceFrame = pixiRenderer.renderTexture.sourceFrame;
       pixiRenderer.renderTexture.bind(this._renderTexture);
 

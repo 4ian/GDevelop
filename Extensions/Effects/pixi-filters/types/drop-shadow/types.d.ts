@@ -9,7 +9,6 @@ declare namespace PIXI.filters {
     kernels: number[];
     pixelSize: number | number[] | PIXI.Point;
     quality: number;
-    resolution: number;
     rotation: number;
     shadowOnly: boolean;
   }

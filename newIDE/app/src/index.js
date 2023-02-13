@@ -7,7 +7,6 @@ import {
   sendProgramOpening,
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
-import { installRaven } from './Utils/Analytics/Raven';
 import { register } from './serviceWorker';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
@@ -69,7 +68,6 @@ class Bootstrapper extends Component<{}, State> {
 
   componentDidMount() {
     installAnalyticsEvents(this.authentication);
-    installRaven();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.

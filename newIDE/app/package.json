@@ -62,7 +62,7 @@
     "node-require-function": "^1.2.0",
     "path-browserify": "^1.0.1",
     "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",
-    "pixi.js-legacy": "6.1.2",
+    "pixi.js-legacy": "^6.5.10",
     "@pixi/assets": "6.5.10",
     "posthog-js": "^1.57.2",
     "prop-types": "^15.5.10",

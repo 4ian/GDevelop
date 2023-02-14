@@ -26,6 +26,7 @@ import {
   ExplanationHeader,
   OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
+import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -47,6 +48,9 @@ type ResourcesDownloadOutput = {|
 |};
 
 type CompressionOutput = Blob;
+
+const FREE_SIZE_LIMIT_IN_MB = 50;
+const SUBSCRIBED_SIZE_LIMIT_IN_MB = 250;
 
 export const browserOnlineWebExportPipeline: ExportPipeline<
   ExportState,
@@ -152,12 +156,25 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
+    const hasValidSubscription = hasValidSubscriptionPlan(context.subscription);
     return archiveFiles({
       blobFiles,
       textFiles,
       basePath: '/export/',
       onProgress: context.updateStepProgress,
-      sizeLimit: 250 * 1000 * 1000,
+      sizeOptions: {
+        // Higher limit for users with a subscription.
+        limit:
+          (hasValidSubscription
+            ? SUBSCRIBED_SIZE_LIMIT_IN_MB
+            : FREE_SIZE_LIMIT_IN_MB) *
+          1000 *
+          1000,
+        getMessage: fileSizeInMb =>
+          hasValidSubscription
+            ? `Archive is of size ${fileSizeInMb} MB, which is above the limit allowed of ${SUBSCRIBED_SIZE_LIMIT_IN_MB} MB.`
+            : `Archive is of size ${fileSizeInMb} MB, which is above the limit allowed of ${FREE_SIZE_LIMIT_IN_MB} MB. You can subscribe to GDevelop to increase the limit to ${SUBSCRIBED_SIZE_LIMIT_IN_MB} MB.`,
+      },
     });
   },
 

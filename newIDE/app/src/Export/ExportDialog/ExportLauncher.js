@@ -257,6 +257,7 @@ export default class ExportLauncher extends Component<Props, State> {
         project,
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
+        subscription: authenticatedUser.subscription,
       };
       setStep('export');
       this.setState({

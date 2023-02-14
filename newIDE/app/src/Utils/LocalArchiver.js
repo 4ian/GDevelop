@@ -12,11 +12,14 @@ const lazyRequireArchiver = optionalLazyRequire('archiver');
 export const archiveLocalFolder = ({
   path,
   outputFilename,
-  sizeLimit,
+  sizeOptions,
 }: {|
   path: string,
   outputFilename: string,
-  sizeLimit?: number,
+  sizeOptions?: {|
+    limit: number,
+    getMessage: (fileSizeInMb: number) => string,
+  |},
 |}): Promise<string> => {
   const archiver = lazyRequireArchiver();
   return new Promise((resolve, reject) => {
@@ -32,14 +35,9 @@ export const archiveLocalFolder = ({
       console.log(
         `Archive written at ${outputFilename}, ${fileSize} total bytes.`
       );
-      if (sizeLimit && fileSize > sizeLimit) {
+      if (sizeOptions && fileSize > sizeOptions.limit) {
         const roundFileSizeInMb = Math.round(fileSize / (1000 * 1000));
-        reject(
-          new Error(
-            `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${sizeLimit /
-              (1000 * 1000)} MB.`
-          )
-        );
+        reject(new Error(sizeOptions.getMessage(roundFileSizeInMb)));
       }
       resolve(outputFilename);
     });

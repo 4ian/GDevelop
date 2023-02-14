@@ -276,7 +276,7 @@ const OnlineGameLink = ({
     game && buildUrl && !isBuildPublished && (
       <DialogPrimaryButton
         key="publish"
-        label={<Trans>Verify and Publish to Liluo.io</Trans>}
+        label={<Trans>Verify and Publish to gd.games</Trans>}
         primary
         onClick={() => setIsOnlineGamePropertiesDialogOpen(true)}
       />
@@ -335,7 +335,7 @@ const OnlineGameLink = ({
                         <Trans>
                           This link is private so you can share it with friends
                           and testers. When you're ready you can update your
-                          Liluo.io game page.
+                          gd.games game page.
                         </Trans>
                       </AlertMessage>
                     </Line>

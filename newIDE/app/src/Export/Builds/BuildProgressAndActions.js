@@ -139,13 +139,13 @@ const BuildProgressAndActions = ({
               t`"${build.name ||
                 shortenUuidForDisplay(
                   build.id
-                )}" will be the new build of this game published on Liluo.io. Continue?`
+                )}" will be the new build of this game published on gd.games. Continue?`
             )
           : i18n._(
               t`"${build.name ||
                 shortenUuidForDisplay(
                   build.id
-                )}" will be unpublished on Liluo.io. Continue?`
+                )}" will be unpublished on gd.games. Continue?`
             )
       );
       if (!answer) return;
@@ -272,7 +272,7 @@ const BuildProgressAndActions = ({
                 {game && !!build.s3Key && (
                   <>
                     <Toggle
-                      label={<Trans>Publish this build on Liluo.io</Trans>}
+                      label={<Trans>Publish this build on gd.games</Trans>}
                       labelPosition="left"
                       toggled={isBuildPublished}
                       onToggle={() => {

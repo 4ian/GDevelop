@@ -49,33 +49,33 @@ type TogglableProperties =
 const confirmationMessage = {
   discoverable: {
     true: t`
-        You are about to make this game discoverable on Liluo.io categories pages. 
+        You are about to make this game discoverable on gd.games categories pages. 
         Do you want to continue?
       `,
     false: t`
-        You are about to hide this game from Liluo.io categories pages.
+        You are about to hide this game from gd.games categories pages.
         Do you want to continue?
       `,
   },
   acceptsBuildComments: {
     true: t`
         You are about to activate a feedback banner on all builds of this game.
-        By doing this you're allowing feedback from any player who has access to your Liluo.io build URLs.
+        By doing this you're allowing feedback from any player who has access to your gd.games build URLs.
         Do you want to continue?
       `,
     false: t`
-        You are about to de-activate the feedback banner on all your Liluo.io build pages.
+        You are about to de-activate the feedback banner on all your gd.games build pages.
         Do you want to continue ?
       `,
   },
   acceptsGameComments: {
     true: t`
-        You are about to activate a feedback banner on your Liluo.io game page.
-        By doing this you will receive feedback from any Liluo.io visitor.
+        You are about to activate a feedback banner on your gd.games game page.
+        By doing this you will receive feedback from any gd.games visitor.
         Do you want to continue?
       `,
     false: t`
-        You are about to de-activate the feedback banner on your Liluo.io game page.
+        You are about to de-activate the feedback banner on your gd.games game page.
         Do you want to continue ?
       `,
   },
@@ -230,9 +230,9 @@ export const GameCard = ({
                   <>
                     <Text size="body2" noMargin displayInlineAsSpan>
                       {game.discoverable ? (
-                        <Trans>Public on Liluo.io</Trans>
+                        <Trans>Public on gd.games</Trans>
                       ) : (
-                        <Trans>Not visible on Liluo.io</Trans>
+                        <Trans>Not visible on gd.games</Trans>
                       )}
                     </Text>
                     <Spacer />
@@ -305,7 +305,7 @@ export const GameCard = ({
                       onToggle(i18n, 'discoverable', !game.discoverable);
                     }}
                     toggled={!!game.discoverable}
-                    label={<Trans>Make discoverable on Liluo.io</Trans>}
+                    label={<Trans>Make discoverable on gd.games</Trans>}
                     disabled={
                       editedProperty === 'discoverable' || isDeletingGame
                     }
@@ -321,7 +321,7 @@ export const GameCard = ({
                     }}
                     toggled={!!game.acceptsGameComments}
                     label={
-                      <Trans>Show feedback banner on Liluo.io game page</Trans>
+                      <Trans>Show feedback banner on gd.games game page</Trans>
                     }
                     disabled={
                       editedProperty === 'acceptsGameComments' || isDeletingGame

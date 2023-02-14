@@ -330,7 +330,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                     <BackgroundText>
                       <Trans>
                         This is all the feedback received on {game.gameName}{' '}
-                        coming from Liluo.
+                        coming from gd.games.
                       </Trans>
                     </BackgroundText>
                   </LineStackLayout>

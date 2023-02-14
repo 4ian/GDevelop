@@ -24,8 +24,9 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
-      null;
+    let _authenticationMessageCallback:
+      | ((event: MessageEvent) => void)
+      | null = null;
     let _cordovaAuthenticationMessageCallback:
       | ((event: MessageEvent) => void)
       | null = null;
@@ -721,10 +722,12 @@ namespace gdjs {
       if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
       const platform = getPlatform(runtimeScene);
-      const { rootContainer, loaderContainer } =
-        authComponents.computeAuthenticationContainer(
-          onAuthenticationContainerDismissed
-        );
+      const {
+        rootContainer,
+        loaderContainer,
+      } = authComponents.computeAuthenticationContainer(
+        onAuthenticationContainerDismissed
+      );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
 
@@ -745,13 +748,12 @@ namespace gdjs {
                   )
               : null; // Only show a link if we're on electron.
 
-            _authenticationTextContainer =
-              authComponents.addAuthenticationTextsToLoadingContainer(
-                _authenticationLoaderContainer,
-                platform,
-                isGameRegistered,
-                wikiOpenAction
-              );
+            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
+              _authenticationLoaderContainer,
+              platform,
+              isGameRegistered,
+              wikiOpenAction
+            );
           }
           if (isGameRegistered) {
             startAuthenticationWindowTimeout(runtimeScene);

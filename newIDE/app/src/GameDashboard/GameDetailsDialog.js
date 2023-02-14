@@ -23,7 +23,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { Chip } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
 import Builds from '../Export/Builds';
 import AlertMessage from '../UI/AlertMessage';
 import RaisedButton from '../UI/RaisedButton';
@@ -431,6 +431,7 @@ export const GameDetailsDialog = ({
                                       undefined
                                     )
                                   }
+                                  className="notranslate"
                                   label={username}
                                   color={index === 0 ? 'primary' : 'default'}
                                 />

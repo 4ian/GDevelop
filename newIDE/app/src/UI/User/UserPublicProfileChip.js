@@ -27,6 +27,7 @@ export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
       label={user.username}
       key={user.username}
       onClick={isClickable ? () => openUserPublicProfile(user.id) : null}
+      disableAutoTranslate
     />
   );
 };

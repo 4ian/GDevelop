@@ -26,7 +26,7 @@
 </pattern>
 <filter id="filter0_b_1094_3534" x="31.8506" y="33.1113" width="33.5776" height="49.0557" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feGaussianBlur in="BackgroundImage" stdDeviation="2.5"/>
+<feGaussianBlur in="BackgroundImageFix" stdDeviation="2.5"/>
 <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_1094_3534"/>
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_1094_3534" result="shape"/>
 </filter>

@@ -6,18 +6,19 @@
 
 namespace gd {
 
-const int InstructionsCountEvaluator::ScanProject(gd::Project& project) {
+const int InstructionsCountEvaluator::ScanProject(gd::Project &project) {
   InstructionsCountEvaluator worker(project);
-  gd::WholeProjectRefactorer::ExposeProjectEventsWithoutExtensions(project, worker);
+  gd::WholeProjectRefactorer::ExposeProjectEventsWithoutExtensions(project,
+                                                                   worker);
   return worker.instructionCount;
 };
 
 // Instructions scanner
 
-bool InstructionsCountEvaluator::DoVisitInstruction(gd::Instruction& instruction,
-                                              bool isCondition) {
+bool InstructionsCountEvaluator::DoVisitInstruction(
+    gd::Instruction &instruction, bool isCondition) {
   instructionCount++;
   return false;
 }
 
-}  // namespace gd
+} // namespace gd

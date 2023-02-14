@@ -17,24 +17,34 @@ namespace gd {
 class Project;
 class Object;
 class Behavior;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
-class GD_CORE_API InstructionsCountEvaluator: public ArbitraryEventsWorker {
- public:
-  static const int ScanProject(gd::Project& project);
+/**
+ * @brief Count the number of instructions in a project excluding extensions.
+ *
+ * This is used by the examples repository to evaluate examples size.
+ *
+ */
+class GD_CORE_API InstructionsCountEvaluator : public ArbitraryEventsWorker {
+public:
+  /**
+   * Return the number of instructions in the project excluding extensions.
+   */
+  static const int ScanProject(gd::Project &project);
 
- private:
-  InstructionsCountEvaluator(gd::Project& project_) : project(project_), instructionCount(0){};
-  gd::Project& project;
+private:
+  InstructionsCountEvaluator(gd::Project &project_)
+      : project(project_), instructionCount(0){};
+  gd::Project &project;
   int instructionCount;
 
   // Instructions Visitor
-  bool DoVisitInstruction(gd::Instruction& instruction,
+  bool DoVisitInstruction(gd::Instruction &instruction,
                           bool isCondition) override;
 };
 
-};  // namespace gd
+}; // namespace gd
 
 #endif

@@ -79,12 +79,8 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
   _loadFrom(project: gdProject): State {
     const platformSpecificAssets = project.getPlatformSpecificAssets();
-    const thumbnailResourceName = platformSpecificAssets.get(
-      'liluo',
-      'thumbnail'
-    );
     return {
-      thumbnailResourceName,
+      thumbnailResourceName: platformSpecificAssets.get('liluo', 'thumbnail'),
       desktopIconResourceNames: desktopSizes.map(size =>
         platformSpecificAssets.get('desktop', `icon-${size}`)
       ),
@@ -257,11 +253,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     const platformSpecificAssets = project.getPlatformSpecificAssets();
 
-    platformSpecificAssets.set(
-      'games-platform',
-      `thumbnail`,
-      thumbnailResourceName
-    );
+    platformSpecificAssets.set('liluo', `thumbnail`, thumbnailResourceName);
 
     desktopSizes.forEach((size, index) => {
       platformSpecificAssets.set(

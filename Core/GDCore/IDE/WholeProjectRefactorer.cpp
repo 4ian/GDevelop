@@ -49,14 +49,8 @@ void WholeProjectRefactorer::ExposeProjectEvents(
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources).
 
-  // Add layouts events
-  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
-    worker.Launch(project.GetLayout(s).GetEvents());
-  }
-  // Add external events events
-  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
-    worker.Launch(project.GetExternalEvents(s).GetEvents());
-  }
+  ExposeProjectEventsWithoutExtensions(project, worker);
+
   // Add events based extensions
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
@@ -87,6 +81,18 @@ void WholeProjectRefactorer::ExposeProjectEvents(
         worker.Launch(eventsFunction->GetEvents());
       }
     }
+  }
+}
+
+void WholeProjectRefactorer::ExposeProjectEventsWithoutExtensions(
+    gd::Project& project, gd::ArbitraryEventsWorker& worker) {
+  // Add layouts events
+  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
+    worker.Launch(project.GetLayout(s).GetEvents());
+  }
+  // Add external events events
+  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
+    worker.Launch(project.GetExternalEvents(s).GetEvents());
   }
 }
 

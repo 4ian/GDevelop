@@ -192,7 +192,11 @@ export const Item = ({
     <div
       style={{ display: 'inline-flex', width: '100%', alignItems: 'center' }}
     >
-      <span style={textEllipsisStyle} title={primaryText}>
+      <span
+        style={textEllipsisStyle}
+        title={primaryText}
+        className="notranslate"
+      >
         {primaryText}
       </span>
       {textEndAdornment && (

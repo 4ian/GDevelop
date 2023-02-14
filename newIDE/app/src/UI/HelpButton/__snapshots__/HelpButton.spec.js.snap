@@ -47,7 +47,9 @@ exports[`HelpButton renders the button linking to a GDevelop documentation help 
         }
       }
     />
-    Help
+    <span>
+      Help
+    </span>
   </span>
 </button>
 `;

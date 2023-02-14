@@ -2,6 +2,7 @@
 
 import optionalRequire from './OptionalRequire';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
+import { type ExportSizeOptions } from './GDevelopServices/Usage';
 const fs = optionalRequire('fs');
 const lazyRequireArchiver = optionalLazyRequire('archiver');
 
@@ -16,10 +17,7 @@ export const archiveLocalFolder = ({
 }: {|
   path: string,
   outputFilename: string,
-  sizeOptions?: {|
-    limit: number,
-    getMessage: (fileSizeInMb: number) => string,
-  |},
+  sizeOptions?: ExportSizeOptions,
 |}): Promise<string> => {
   const archiver = lazyRequireArchiver();
   return new Promise((resolve, reject) => {
@@ -37,7 +35,7 @@ export const archiveLocalFolder = ({
       );
       if (sizeOptions && fileSize > sizeOptions.limit) {
         const roundFileSizeInMb = Math.round(fileSize / (1000 * 1000));
-        reject(new Error(sizeOptions.getMessage(roundFileSizeInMb)));
+        reject(new Error(sizeOptions.getErrorMessage(roundFileSizeInMb)));
       }
       resolve(outputFilename);
     });

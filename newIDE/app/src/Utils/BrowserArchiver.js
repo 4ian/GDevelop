@@ -3,6 +3,7 @@ import { initializeZipJs } from './Zip.js';
 import { downloadUrlsToBlobs, type ItemResult } from './BlobDownloader';
 import path from 'path';
 import { shortenString } from './StringHelpers.js';
+import { type ExportSizeOptions } from './GDevelopServices/Usage';
 
 export type BlobFileDescriptor = {|
   filePath: string,
@@ -101,10 +102,7 @@ export const archiveFiles = async ({
   blobFiles: Array<BlobFileDescriptor>,
   basePath: string,
   onProgress: (count: number, total: number) => void,
-  sizeOptions?: {|
-    limit: number,
-    getMessage: (fileSizeInMb: number) => string,
-  |},
+  sizeOptions?: ExportSizeOptions,
 |}): Promise<Blob> => {
   const zipJs: ZipJs = await initializeZipJs();
 
@@ -162,7 +160,7 @@ export const archiveFiles = async ({
                       fileSize / (1000 * 1000)
                     );
                     reject(
-                      new Error(sizeOptions.getMessage(roundFileSizeInMb))
+                      new Error(sizeOptions.getErrorMessage(roundFileSizeInMb))
                     );
                   }
                   resolve(blob);

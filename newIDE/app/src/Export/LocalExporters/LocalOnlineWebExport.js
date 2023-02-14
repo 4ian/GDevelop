@@ -22,15 +22,15 @@ import {
   OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
-import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
+import {
+  hasValidSubscriptionPlan,
+  onlineWebExportSizeOptions,
+} from '../../Utils/GDevelopServices/Usage';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
-
-const FREE_SIZE_LIMIT_IN_MB = 50;
-const SUBSCRIBED_SIZE_LIMIT_IN_MB = 250;
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -165,19 +165,10 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     return archiveLocalFolder({
       path: temporaryOutputDir,
       outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
-      sizeOptions: {
-        // Higher limit for users with a subscription.
-        limit:
-          (hasValidSubscription
-            ? SUBSCRIBED_SIZE_LIMIT_IN_MB
-            : FREE_SIZE_LIMIT_IN_MB) *
-          1000 *
-          1000,
-        getMessage: fileSizeInMb =>
-          hasValidSubscription
-            ? `Archive is of size ${fileSizeInMb} MB, which is above the limit allowed of ${SUBSCRIBED_SIZE_LIMIT_IN_MB} MB.`
-            : `Archive is of size ${fileSizeInMb} MB, which is above the limit allowed of ${FREE_SIZE_LIMIT_IN_MB} MB. You can subscribe to GDevelop to increase the limit to ${SUBSCRIBED_SIZE_LIMIT_IN_MB} MB.`,
-      },
+      // Higher limit for users with a subscription.
+      sizeOptions: hasValidSubscription
+        ? onlineWebExportSizeOptions.subscribed
+        : onlineWebExportSizeOptions.guest,
     });
   },
 

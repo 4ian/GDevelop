@@ -40,6 +40,7 @@
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
+#include <GDCore/IDE/Events/InstructionsCountEvaluator.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>

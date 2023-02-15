@@ -342,6 +342,10 @@ export default class Window {
     window.open(url, '_blank');
   }
 
+  static getOrientation(): 'portrait' | 'landscape' {
+    return window.screen.orientation.type.split('-')[0];
+  }
+
   static hasMainMenu() {
     return !!electron;
   }

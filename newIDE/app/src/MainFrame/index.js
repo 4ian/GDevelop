@@ -875,21 +875,26 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       try {
         await delay(150);
-        const autoSavefileMetadata = await checkForAutosave();
+        const autoSaveFileMetadata = await checkForAutosave();
         let content;
         try {
           const result = await onOpen(
-            autoSavefileMetadata,
+            autoSaveFileMetadata,
             setLoaderModalProgress
           );
           content = result.content;
         } catch (error) {
           // onOpen failed, tried to find again an autosave
-          const autoSaveAfterFailurefileMetadata = await checkForAutosaveAfterFailure();
-          if (autoSaveAfterFailurefileMetadata) {
-            const result = await onOpen(autoSaveAfterFailurefileMetadata);
+          const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
+          if (autoSaveAfterFailureFileMetadata) {
+            const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        }
+        if (!content) {
+          throw new Error(
+            'The project file content could not be read. It might be corrupted/malformed.'
+          );
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.

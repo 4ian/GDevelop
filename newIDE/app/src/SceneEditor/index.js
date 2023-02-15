@@ -97,12 +97,12 @@ const initialMosaicEditorNodes = {
   },
 };
 
-const initialMosaicEditorNodesSmallWindow = {
-  direction: 'row',
+const getInitialMosaicEditorNodesSmallWindow = () => ({
+  direction: Window.getOrientation() === 'portrait' ? 'column' : 'row',
   first: 'instances-editor',
   second: 'objects-list',
   splitPercentage: 70,
-};
+});
 
 type Props = {|
   initialInstances: gdInitialInstancesContainer,
@@ -1590,7 +1590,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   initialNodes={
                     windowWidth === 'small'
                       ? getDefaultEditorMosaicNode('scene-editor-small') ||
-                        initialMosaicEditorNodesSmallWindow
+                        getInitialMosaicEditorNodesSmallWindow()
                       : getDefaultEditorMosaicNode('scene-editor') ||
                         initialMosaicEditorNodes
                   }

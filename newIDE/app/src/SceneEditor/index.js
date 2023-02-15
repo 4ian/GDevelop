@@ -500,6 +500,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
 
     if (this._objectsList) this._objectsList.openNewObjectDialog();
+    else this.openObjectsList();
   };
 
   _onAddInstanceUnderCursor = () => {

@@ -15,6 +15,7 @@ export type ExampleShortHeader = {|
   authorIds?: Array<string>,
   previewImageUrls: Array<string>,
   gdevelopVersion: string,
+  codeSizeLevel: ?string,
 |};
 
 export type Example = {|

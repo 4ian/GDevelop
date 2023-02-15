@@ -343,7 +343,12 @@ export default class Window {
   }
 
   static getOrientation(): 'portrait' | 'landscape' {
-    return window.screen.orientation.type.split('-')[0];
+    try {
+      return window.screen.orientation.type.split('-')[0];
+    } catch (error) {
+      console.warn('An error occurred when reading screen orientation', error);
+      return 'landscape';
+    }
   }
 
   static hasMainMenu() {

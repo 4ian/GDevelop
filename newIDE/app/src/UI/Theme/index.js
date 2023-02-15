@@ -10,7 +10,7 @@ import 'react-virtualized/styles.css';
 // Styles
 import './Global/Animation.css';
 import './Global/EventsSheet.css';
-import './Global/App.css';
+import './Global/Snackbar.css';
 import './Global/Markdown.css';
 import './Global/Scrollbar.css';
 import './Global/Mosaic.css';

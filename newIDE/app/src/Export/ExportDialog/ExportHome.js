@@ -47,6 +47,7 @@ type ExportHomeProps = {|
   isNavigationDisabled: boolean,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   onGameUpdated: () => void,
+  showOnlineWebExporterOnly: boolean,
 |};
 
 const ExportHome = ({
@@ -61,6 +62,7 @@ const ExportHome = ({
   isNavigationDisabled,
   setIsNavigationDisabled,
   onGameUpdated,
+  showOnlineWebExporterOnly,
 }: ExportHomeProps) => {
   return (
     <ResponsiveLineStackLayout>
@@ -87,53 +89,57 @@ const ExportHome = ({
           />
         </div>
       </ColumnStackLayout>
-      <ExportHomeSeparator />
-      <ColumnStackLayout alignItems="center" expand>
-        <div style={styles.titleContainer}>
-          <Line>
-            <Text size="block-title">
-              <Trans>Export and publish on other platforms</Trans>
-            </Text>
-          </Line>
-        </div>
-        <Line expand>
-          <div style={styles.iconsContainer}>
-            <Chrome style={styles.icon} />
-            <PhoneIphone style={styles.icon} />
-            <LaptopMac style={styles.icon} />
-          </div>
-        </Line>
-        <div style={styles.contentContainer}>
-          <Column alignItems="center">
-            <Line>
-              <Text align="center">
-                <Trans>
-                  Export your game to mobile, desktop and web platforms.
-                </Trans>
-              </Text>
+      {showOnlineWebExporterOnly ? null : (
+        <>
+          <ExportHomeSeparator />
+          <ColumnStackLayout alignItems="center" expand>
+            <div style={styles.titleContainer}>
+              <Line>
+                <Text size="block-title">
+                  <Trans>Export and publish on other platforms</Trans>
+                </Text>
+              </Line>
+            </div>
+            <Line expand>
+              <div style={styles.iconsContainer}>
+                <Chrome style={styles.icon} />
+                <PhoneIphone style={styles.icon} />
+                <LaptopMac style={styles.icon} />
+              </div>
             </Line>
-            <RaisedButton
-              label={<Trans>Export to other platforms</Trans>}
-              onClick={() => {
-                setChosenExporterSection('automated');
-                setChosenExporterKey('webexport');
-              }}
-              primary
-              disabled={isNavigationDisabled}
-            />
-            <Spacer />
-            <FlatButton
-              label={<Trans>Build manually</Trans>}
-              primary
-              onClick={() => {
-                setChosenExporterSection('manual');
-                setChosenExporterKey('webexport');
-              }}
-              disabled={isNavigationDisabled}
-            />
-          </Column>
-        </div>
-      </ColumnStackLayout>
+            <div style={styles.contentContainer}>
+              <Column alignItems="center">
+                <Line>
+                  <Text align="center">
+                    <Trans>
+                      Export your game to mobile, desktop and web platforms.
+                    </Trans>
+                  </Text>
+                </Line>
+                <RaisedButton
+                  label={<Trans>Export to other platforms</Trans>}
+                  onClick={() => {
+                    setChosenExporterSection('automated');
+                    setChosenExporterKey('webexport');
+                  }}
+                  primary
+                  disabled={isNavigationDisabled}
+                />
+                <Spacer />
+                <FlatButton
+                  label={<Trans>Build manually</Trans>}
+                  primary
+                  onClick={() => {
+                    setChosenExporterSection('manual');
+                    setChosenExporterKey('webexport');
+                  }}
+                  disabled={isNavigationDisabled}
+                />
+              </Column>
+            </div>
+          </ColumnStackLayout>
+        </>
+      )}
     </ResponsiveLineStackLayout>
   );
 };

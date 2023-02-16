@@ -40,6 +40,26 @@ export const Default = () => {
       isNavigationDisabled={false}
       setIsNavigationDisabled={action('setIsNavigationDisabled')}
       onGameUpdated={action('onGameUpdated')}
+      showOnlineWebExporterOnly={false}
+    />
+  );
+};
+
+export const OnlineWebExportOnly = () => {
+  return (
+    <ExportHome
+      onlineWebExporter={onlineWebExporter}
+      setChosenExporterKey={action('chooseExporterKey')}
+      setChosenExporterSection={action('chooseExporterSection')}
+      cantExportBecauseOffline={false}
+      project={testProject.project}
+      onSaveProject={action('onSaveProject')}
+      onChangeSubscription={action('onChangeSubscription')}
+      authenticatedUser={fakeSilverAuthenticatedUser}
+      isNavigationDisabled={false}
+      setIsNavigationDisabled={action('setIsNavigationDisabled')}
+      onGameUpdated={action('onGameUpdated')}
+      showOnlineWebExporterOnly
     />
   );
 };

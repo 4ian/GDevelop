@@ -44,8 +44,16 @@ export type ExportDialogWithoutExportsProps = {|
 
 type Props = {|
   ...ExportDialogWithoutExportsProps,
-  automatedExporters: Array<Exporter>,
-  manualExporters: Array<Exporter>,
+  /**
+   * Use `null` to hide automated exporters.
+   * It should be used with manualExporters set to `null` as well.
+   */
+  automatedExporters: ?Array<Exporter>,
+  /**
+   * Use `null` to hide manual exporters.
+   * It should be used with automatedExporters set to `null` as well.
+   */
+  manualExporters: ?Array<Exporter>,
   onlineWebExporter: Exporter,
   allExportersRequireOnline?: boolean,
 |};
@@ -121,8 +129,8 @@ const ExportDialog = ({
 
   if (!project) return null;
   const exporters = [
-    ...automatedExporters,
-    ...manualExporters,
+    ...(automatedExporters || []),
+    ...(manualExporters || []),
     onlineWebExporter,
   ];
 
@@ -132,9 +140,13 @@ const ExportDialog = ({
 
   if (!exporter || !exporter.exportPipeline) return null;
 
+  const shouldShowOnlineWebExporterOnly =
+    !manualExporters && !automatedExporters;
+
   return (
     <Dialog
       id="export-dialog"
+      maxWidth={shouldShowOnlineWebExporterOnly ? 'sm' : 'md'}
       title={
         chosenExporterSection === 'automated' ? (
           <Trans>Publish your game</Trans>
@@ -183,26 +195,28 @@ const ExportDialog = ({
       onRequestClose={onClose}
       open
       fixedContent={
-        chosenExporterSection === 'automated' ? (
-          <Tabs
-            value={chosenExporterKey}
-            onChange={setChosenExporterKey}
-            options={automatedExporters.map(exporter => ({
-              value: exporter.key,
-              label: exporter.tabName,
-              disabled: isNavigationDisabled,
-            }))}
-          />
-        ) : chosenExporterSection === 'manual' ? (
-          <Tabs
-            value={chosenExporterKey}
-            onChange={setChosenExporterKey}
-            options={manualExporters.map(exporter => ({
-              value: exporter.key,
-              label: exporter.tabName,
-              disabled: isNavigationDisabled,
-            }))}
-          />
+        automatedExporters && manualExporters ? (
+          chosenExporterSection === 'automated' ? (
+            <Tabs
+              value={chosenExporterKey}
+              onChange={setChosenExporterKey}
+              options={automatedExporters.map(exporter => ({
+                value: exporter.key,
+                label: exporter.tabName,
+                disabled: isNavigationDisabled,
+              }))}
+            />
+          ) : chosenExporterSection === 'manual' ? (
+            <Tabs
+              value={chosenExporterKey}
+              onChange={setChosenExporterKey}
+              options={manualExporters.map(exporter => ({
+                value: exporter.key,
+                label: exporter.tabName,
+                disabled: isNavigationDisabled,
+              }))}
+            />
+          ) : null
         ) : null
       }
     >
@@ -227,6 +241,7 @@ const ExportDialog = ({
           isNavigationDisabled={isNavigationDisabled}
           setIsNavigationDisabled={setIsNavigationDisabled}
           onGameUpdated={setGame}
+          showOnlineWebExporterOnly={shouldShowOnlineWebExporterOnly}
         />
       ) : (
         <ExportLauncher

@@ -35,6 +35,7 @@ import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
 import LinearProgress from '../../../UI/LinearProgress';
 import CircularProgress from '../../../UI/CircularProgress';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -316,17 +317,28 @@ const OnlineGameLink = ({
                     <ShareButton url={buildUrl} />
                   )}
                   {isBuildPublished && !navigator.share && (
-                    <Line justifyContent="space-between">
-                      <Column justifyContent="center">
-                        <AlertMessage kind="info">
-                          <Trans>
-                            Your game is published! Share it with the community!
-                          </Trans>
-                        </AlertMessage>
-                      </Column>
-                      <Column justifyContent="flex-end">
-                        <SocialShareButtons url={buildUrl} />
-                      </Column>
+                    <Line expand>
+                      <ResponsiveLineStackLayout
+                        expand
+                        justifyContent="space-between"
+                        noMargin
+                      >
+                        <Column justifyContent="center" noMargin>
+                          <AlertMessage kind="info">
+                            <Trans>
+                              Your game is published! Share it with the
+                              community!
+                            </Trans>
+                          </AlertMessage>
+                        </Column>
+                        <Column
+                          justifyContent="flex-end"
+                          noMargin
+                          alignItems="center"
+                        >
+                          <SocialShareButtons url={buildUrl} />
+                        </Column>
+                      </ResponsiveLineStackLayout>
                     </Line>
                   )}
                   {!isBuildPublished && game && (

@@ -113,25 +113,26 @@ export const ExampleListItem = ({
           )}
           <Column expand>
             <Text noMargin>{renderExampleField('name')} </Text>
-            {(exampleShortHeader.authors || exampleShortHeader.codeSizeLevel || exampleShortHeader.difficultyLevel) && (
+            {
               <Line>
                 <div style={{ flexWrap: 'wrap' }}>
-                {exampleShortHeader.codeSizeLevel && (
-                  <ExampleSizeChip
-                    codeSizeLevel={exampleShortHeader.codeSizeLevel}
-                  />
-                )}
-                {exampleShortHeader.difficultyLevel && (
-                  <ExampleDifficultyChip
-                    codeSizeLevel={exampleShortHeader.difficultyLevel}
-                  />
-                )}
-                {exampleShortHeader.authors.map(author => (
-                  <UserPublicProfileChip user={author} key={author.id} />
-                ))}
+                  {exampleShortHeader.codeSizeLevel && (
+                    <ExampleSizeChip
+                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                    />
+                  )}
+                  {exampleShortHeader.difficultyLevel && (
+                    <ExampleDifficultyChip
+                      codeSizeLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
+                  {exampleShortHeader.authors &&
+                    exampleShortHeader.authors.map(author => (
+                      <UserPublicProfileChip user={author} key={author.id} />
+                    ))}
                 </div>
               </Line>
-            )}
+            }
             <Text noMargin size="body2">
               {renderExampleField('shortDescription')}
             </Text>

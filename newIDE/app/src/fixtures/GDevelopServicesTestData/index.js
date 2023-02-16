@@ -1080,7 +1080,7 @@ export const fakeGame: Game = {
   createdAt: 1606065498,
   publicWebBuildId: 'fake-public-web-build-id-sonic',
   displayAdsOnGamePage: true,
-}
+};
 
 export const game1: Game = {
   id: 'fake-game1-id',

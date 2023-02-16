@@ -884,7 +884,7 @@ const MainFrame = (props: Props) => {
           );
           content = result.content;
         } catch (error) {
-          // onOpen failed, tried to find again an autosave
+          // onOpen failed, try to find again an autosave.
           const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
           if (autoSaveAfterFailureFileMetadata) {
             const result = await onOpen(autoSaveAfterFailureFileMetadata);

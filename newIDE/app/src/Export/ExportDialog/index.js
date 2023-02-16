@@ -220,17 +220,15 @@ const ExportDialog = ({
         ) : null
       }
     >
-      {cantExportBecauseOffline && (
+      {cantExportBecauseOffline ? (
         <AlertMessage kind="error">
           <Trans>
             You must be online and have a proper internet connection to export
             your game.
           </Trans>
         </AlertMessage>
-      )}
-      {chosenExporterSection === 'home' ? (
+      ) : chosenExporterSection === 'home' ? (
         <ExportHome
-          cantExportBecauseOffline={cantExportBecauseOffline}
           onlineWebExporter={onlineWebExporter}
           setChosenExporterKey={setChosenExporterKey}
           setChosenExporterSection={setChosenExporterSection}

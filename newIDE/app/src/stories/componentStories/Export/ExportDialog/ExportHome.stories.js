@@ -32,7 +32,6 @@ export const Default = () => {
       onlineWebExporter={onlineWebExporter}
       setChosenExporterKey={action('chooseExporterKey')}
       setChosenExporterSection={action('chooseExporterSection')}
-      cantExportBecauseOffline={false}
       project={testProject.project}
       onSaveProject={action('onSaveProject')}
       onChangeSubscription={action('onChangeSubscription')}
@@ -51,7 +50,6 @@ export const OnlineWebExportOnly = () => {
       onlineWebExporter={onlineWebExporter}
       setChosenExporterKey={action('chooseExporterKey')}
       setChosenExporterSection={action('chooseExporterSection')}
-      cantExportBecauseOffline={false}
       project={testProject.project}
       onSaveProject={action('onSaveProject')}
       onChangeSubscription={action('onChangeSubscription')}

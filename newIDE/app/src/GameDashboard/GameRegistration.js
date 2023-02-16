@@ -220,7 +220,7 @@ export const GameRegistration = ({
           />
         )}
       >
-        <Trans>Get stats about your game every week!</Trans>
+        <Trans>Receive weekly stats about your game by email!</Trans>
       </AlertMessage>
     );
   }

@@ -1073,6 +1073,15 @@ export const communityTierExtensionHeader: ExtensionHeader = {
   iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
 };
 
+export const fakeGame: Game = {
+  id: 'complete-game-id',
+  authorName: 'SonicFan',
+  gameName: 'Sonic1995',
+  createdAt: 1606065498,
+  publicWebBuildId: 'fake-public-web-build-id-sonic',
+  displayAdsOnGamePage: true,
+};
+
 export const game1: Game = {
   id: 'fake-game1-id',
   authorName: 'My company',

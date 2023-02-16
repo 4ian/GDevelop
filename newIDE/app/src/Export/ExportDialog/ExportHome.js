@@ -69,7 +69,7 @@ const ExportHome = ({
       <ColumnStackLayout alignItems="center" expand>
         <div style={styles.titleContainer}>
           <Line>
-            <Text size="block-title">
+            <Text size="block-title" align="center">
               <Trans>Publish on gd.games, GDevelop's game platform</Trans>
             </Text>
           </Line>
@@ -95,7 +95,7 @@ const ExportHome = ({
           <ColumnStackLayout alignItems="center" expand>
             <div style={styles.titleContainer}>
               <Line>
-                <Text size="block-title">
+                <Text size="block-title" align="center">
                   <Trans>Export and publish on other platforms</Trans>
                 </Text>
               </Line>

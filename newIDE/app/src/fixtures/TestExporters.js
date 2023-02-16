@@ -12,9 +12,7 @@ import {
   type BlobFileDescriptor,
 } from '../Utils/BrowserArchiver';
 import BrowserFileSystem from '../Export/BrowserExporters/BrowserFileSystem';
-import {
-  completeWebBuild,
-} from '../fixtures/GDevelopServicesTestData';
+import { completeWebBuild } from '../fixtures/GDevelopServicesTestData';
 import {
   ExplanationHeader,
   OnlineGameLink,

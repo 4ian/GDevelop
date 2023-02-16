@@ -68,6 +68,10 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(
     }
   }
 
+  if (relationalOperator == "startsWith") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").startsWith(" + rhs + ")";
+  }
+
   return callStartString + "(" + argumentsStr + ") " + relationalOperator +
          " " + rhs;
 }
@@ -675,7 +679,8 @@ const gd::String EventsCodeGenerator::GenerateRelationalOperatorCodes(const gd::
         return "==";
     }
     if (operatorString != "<" && operatorString != ">" &&
-        operatorString != "<=" && operatorString != ">=" && operatorString != "!=") {
+        operatorString != "<=" && operatorString != ">=" && operatorString != "!=" &&
+        operatorString != "startsWith") {
       cout << "Warning: Bad relational operator: Set to == by default." << endl;
       return "==";
     }

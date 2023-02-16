@@ -8,6 +8,7 @@ import PublicProfileContext from '../../Profile/PublicProfileContext';
 const styles = {
   chip: {
     marginRight: 2,
+    marginBottom: 2,
   },
 };
 

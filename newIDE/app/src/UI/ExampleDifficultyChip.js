@@ -7,6 +7,7 @@ import { Trans } from '@lingui/macro';
 const styles = {
   chip: {
     marginRight: 2,
+    marginBottom: 2,
   },
 };
 

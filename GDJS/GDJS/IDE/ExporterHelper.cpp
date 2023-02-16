@@ -190,6 +190,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     runtimeGameOptions.AddChild("gdevelopResourceToken")
         .SetStringValue(options.gdevelopResourceToken);
   }
+  runtimeGameOptions.AddChild("allowAuthenticationUsingIframeForPreview")
+      .SetBoolValue(options.allowAuthenticationUsingIframeForPreview);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");

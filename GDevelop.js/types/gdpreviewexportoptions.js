@@ -13,6 +13,7 @@ declare class gdPreviewExportOptions {
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
   setGDevelopResourceToken(gdevelopResourceToken: string): gdPreviewExportOptions;
+  setAllowAuthenticationUsingIframeForPreview(enable: boolean): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

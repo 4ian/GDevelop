@@ -49,6 +49,14 @@ namespace gdjs {
     gdevelopResourceToken?: string;
 
     /**
+     * Check if, in some exceptional cases, we allow authentication
+     * to be done through a iframe.
+     * This is usually discouraged as the user can't verify that the authentication
+     * window is a genuine one. It's only to be used in trusted contexts.
+     */
+    allowAuthenticationUsingIframeForPreview?: boolean;
+
+    /**
      * If set, the game should use the specified environment for making calls
      * to GDevelop APIs ("dev" = development APIs).
      */

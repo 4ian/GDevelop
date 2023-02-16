@@ -18,6 +18,7 @@ namespace gdjs {
     let _authenticationInAppWindow: Window | null = null; // For Cordova.
     let _authenticationRootContainer: HTMLDivElement | null = null;
     let _authenticationLoaderContainer: HTMLDivElement | null = null;
+    let _authenticationIframeContainer: HTMLDivElement | null = null;
     let _authenticationTextContainer: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
     let _initialAuthenticationTimeoutId: NodeJS.Timeout | null = null;
@@ -85,12 +86,16 @@ namespace gdjs {
       runtimeGame: gdjs.RuntimeGame;
       gameId: string;
       connectionId?: string;
-    }) =>
-      `https://gd.games/auth?gameId=${gameId}${
+    }) => {
+      // Uncomment to test the case of a failing loading:
+      // return 'https://gd.games.wronglink';
+
+      return `https://gd.games/auth?gameId=${gameId}${
         connectionId ? `&connectionId=${connectionId}` : ''
       }${
         runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
       }`;
+    };
 
     /**
      * Helper returning the platform.
@@ -98,12 +103,29 @@ namespace gdjs {
     const getPlatform = (
       runtimeScene: RuntimeScene
     ): 'electron' | 'cordova' | 'web' => {
-      const electron = runtimeScene.getGame().getRenderer().getElectron();
+      const runtimeGame = runtimeScene.getGame();
+      const electron = runtimeGame.getRenderer().getElectron();
       if (electron) {
         return 'electron';
       }
       if (typeof cordova !== 'undefined') return 'cordova';
+
       return 'web';
+    };
+
+    /**
+     * Check if, in some exceptional cases, we allow authentication
+     * to be done through a iframe.
+     * This is usually discouraged as the user can't verify that the authentication
+     * window is a genuine one. It's only to be used in trusted contexts.
+     */
+    const shouldWebAuthenticationUsingIframe = (runtimeScene: RuntimeScene) => {
+      const runtimeGameOptions = runtimeScene.getGame().getAdditionalOptions();
+      return (
+        runtimeGameOptions &&
+        runtimeGameOptions.isPreview &&
+        runtimeGameOptions.allowAuthenticationUsingIframeForPreview
+      );
     };
 
     /**
@@ -686,6 +708,47 @@ namespace gdjs {
     };
 
     /**
+     * Helper to handle authentication iframe on web.
+     * We open an iframe, and listen to messages posted back to the game window.
+     */
+    const openAuthenticationIframeForWeb = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) => {
+      if (
+        !_authenticationIframeContainer ||
+        !_authenticationLoaderContainer ||
+        !_authenticationTextContainer
+      ) {
+        console.error(
+          "Can't open an authentication iframe - no iframe container, loader container or text container was opened for it."
+        );
+        return;
+      }
+
+      const targetUrl = getAuthWindowUrl({
+        runtimeGame: runtimeScene.getGame(),
+        gameId,
+      });
+
+      // Listen to messages posted by the authentication window, so that we can
+      // know when the user is authenticated.
+      _authenticationMessageCallback = (event: MessageEvent) => {
+        receiveAuthenticationMessage(runtimeScene, event, {
+          checkOrigin: true,
+        });
+      };
+      window.addEventListener('message', _authenticationMessageCallback, true);
+
+      authComponents.displayIframeInsideAuthenticationContainer(
+        _authenticationIframeContainer,
+        _authenticationLoaderContainer,
+        _authenticationTextContainer,
+        targetUrl
+      );
+    };
+
+    /**
      * Action to display the authentication window to the user.
      */
     export const openAuthenticationWindow = function (
@@ -725,11 +788,13 @@ namespace gdjs {
       const {
         rootContainer,
         loaderContainer,
+        iframeContainer,
       } = authComponents.computeAuthenticationContainer(
         onAuthenticationContainerDismissed
       );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
+      _authenticationIframeContainer = iframeContainer;
 
       // Display the authentication window right away, to show a loader
       // while the call for game registration is happening.
@@ -769,7 +834,11 @@ namespace gdjs {
                 break;
               case 'web':
               default:
-                openAuthenticationWindowForWeb(runtimeScene, _gameId);
+                if (shouldWebAuthenticationUsingIframe(runtimeScene)) {
+                  openAuthenticationIframeForWeb(runtimeScene, _gameId);
+                } else {
+                  openAuthenticationWindowForWeb(runtimeScene, _gameId);
+                }
                 break;
             }
           }
@@ -815,6 +884,7 @@ namespace gdjs {
 
       _authenticationRootContainer = null;
       _authenticationLoaderContainer = null;
+      _authenticationIframeContainer = null;
       _authenticationTextContainer = null;
     };
 

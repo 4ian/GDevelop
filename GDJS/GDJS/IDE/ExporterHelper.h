@@ -40,7 +40,8 @@ struct PreviewExportOptions {
         isDevelopmentEnvironment(false),
         nonRuntimeScriptsCacheBurst(0),
         fallbackAuthorId(""),
-        fallbackAuthorUsername(""){};
+        fallbackAuthorUsername(""),
+        allowAuthenticationUsingIframeForPreview(false){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -160,6 +161,20 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * Set if, in some exceptional cases, we allow authentication
+   * to be done through a iframe.
+   * This is usually discouraged as the user can't verify that the
+   * authentication window is a genuine one. It's only to be used in trusted
+   * contexts.
+   */
+  PreviewExportOptions &SetAllowAuthenticationUsingIframeForPreview(
+      bool allowAuthenticationUsingIframeForPreview_) {
+    allowAuthenticationUsingIframeForPreview =
+        allowAuthenticationUsingIframeForPreview_;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String websocketDebuggerServerAddress;
@@ -176,6 +191,7 @@ struct PreviewExportOptions {
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
   gd::String gdevelopResourceToken;
+  bool allowAuthenticationUsingIframeForPreview;
 };
 
 /**

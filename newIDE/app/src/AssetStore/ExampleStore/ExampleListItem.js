@@ -18,6 +18,8 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
+import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -113,6 +115,16 @@ export const ExampleListItem = ({
             <Text noMargin>{renderExampleField('name')} </Text>
             {exampleShortHeader.authors && (
               <Line>
+                {exampleShortHeader.codeSizeLevel && (
+                  <ExampleSizeChip
+                    codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                  />
+                )}
+                {exampleShortHeader.difficultyLevel && (
+                  <ExampleDifficultyChip
+                    codeSizeLevel={exampleShortHeader.difficultyLevel}
+                  />
+                )}
                 {exampleShortHeader.authors.map(author => (
                   <UserPublicProfileChip user={author} key={author.id} />
                 ))}

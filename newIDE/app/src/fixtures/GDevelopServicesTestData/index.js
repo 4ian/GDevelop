@@ -1302,6 +1302,7 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   tags: [],
   previewImageUrls: [],
   gdevelopVersion: '99.0.0',
+  codeSizeLevel: 'small',
 };
 
 export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
@@ -1338,6 +1339,7 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
     'Health (life points and damages for objects)',
   ],
   gdevelopVersion: '',
+  codeSizeLevel: 'small',
 };
 
 export const fakeAssetPacks: PublicAssetPacks = {

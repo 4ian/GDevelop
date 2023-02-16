@@ -25,6 +25,8 @@ import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
+import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
 const isDev = Window.isDev();
 
 const electron = optionalRequire('electron');
@@ -145,6 +147,16 @@ export function ExampleDialog({
           <Column>
             {exampleShortHeader.authors && (
               <Line>
+                {exampleShortHeader.codeSizeLevel && (
+                  <ExampleSizeChip
+                    codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                  />
+                )}
+                {exampleShortHeader.difficultyLevel && (
+                  <ExampleDifficultyChip
+                    codeSizeLevel={exampleShortHeader.difficultyLevel}
+                  />
+                )}
                 {exampleShortHeader.authors.map(author => (
                   <UserPublicProfileChip
                     user={author}

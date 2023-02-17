@@ -6,7 +6,18 @@ import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
 
-export type PublicGame = {
+export type CachedGameSlug = {|
+  username: string,
+  gameSlug: string,
+|};
+
+export type GameSlug = {|
+  username: string,
+  gameSlug: string,
+  createdAt: number,
+|};
+
+export type PublicGame = {|
   id: string,
   gameName: string,
   authorName: string, // this corresponds to the publisher name
@@ -26,9 +37,9 @@ export type PublicGame = {
   gameSlug?: string,
   discoverable?: boolean,
   donateLink: ?string,
-};
+|};
 
-export type Game = {
+export type Game = {|
   id: string,
   gameName: string,
   authorName: string, // this corresponds to the publisher name
@@ -40,20 +51,15 @@ export type Game = {
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
-};
+  cachedCurrentSlug?: CachedGameSlug,
+|};
 
-export type GameCategory = {
+export type GameCategory = {|
   name: string,
   type: 'user-defined' | 'admin-only',
-};
+|};
 
-export type GameSlug = {
-  username: string,
-  gameSlug: string,
-  createdAt: number,
-};
-
-export type ShowcasedGameLink = {
+export type ShowcasedGameLink = {|
   url: string,
   type:
     | 'app-store'
@@ -62,9 +68,9 @@ export type ShowcasedGameLink = {
     | 'download'
     | 'download-win-mac-linux'
     | 'learn-more',
-};
+|};
 
-export type ShowcasedGame = {
+export type ShowcasedGame = {|
   title: string,
   author: string,
   description: string,
@@ -79,12 +85,12 @@ export type ShowcasedGame = {
   bannerBackgroundPosition: string,
   thumbnailUrl: string,
   editorDescription: string,
-};
+|};
 
-export type AllShowcasedGames = {
+export type AllShowcasedGames = {|
   showcasedGames: Array<ShowcasedGame>,
   filters: Filters,
-};
+|};
 
 export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',
@@ -135,8 +141,9 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-export const getGameUrl = (game: ?Game, slug: ?GameSlug) => {
+export const getGameUrl = (game: ?Game) => {
   if (!game) return null;
+  const slug = game.cachedCurrentSlug;
   return slug
     ? GDevelopGamesPlatform.getGameUrlWithSlug(slug.username, slug.gameSlug)
     : GDevelopGamesPlatform.getGameUrl(game.id);
@@ -392,26 +399,6 @@ export const getGames = (
 export const getPublicGame = (gameId: string): Promise<PublicGame> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
-    .then(response => response.data);
-};
-
-export const getGameSlugs = (
-  getAuthorizationHeader: () => Promise<string>,
-  userId: string,
-  gameId: string
-): Promise<Array<GameSlug>> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopGameApi.baseUrl}/game-slug`, {
-        params: {
-          userId,
-          gameId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
     .then(response => response.data);
 };
 

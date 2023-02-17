@@ -34,6 +34,7 @@ import {
 } from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const styles = {
   fullHeightSelector: {
@@ -149,6 +150,7 @@ export default function InstructionEditorDialog({
     newExtensionDialogOpen,
     setNewExtensionDialogOpen,
   ] = React.useState<boolean>(false);
+  const shouldAutofocusInput = useShouldAutofocusInput();
 
   // Handle the back button
   const stepBackFrom = (origin: StepName, windowWidth: WidthType) => {
@@ -194,19 +196,19 @@ export default function InstructionEditorDialog({
       freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
   };
 
-  // Focus the parameters when showing them
   const instructionParametersEditor = React.useRef<?InstructionParametersEditorInterface>(
     null
   );
+  // Focus the parameters when showing them
   React.useEffect(
     () => {
-      if (step === 'parameters') {
+      if (shouldAutofocusInput && step === 'parameters') {
         if (instructionParametersEditor.current) {
           instructionParametersEditor.current.focus();
         }
       }
     },
-    [step]
+    [step, shouldAutofocusInput]
   );
 
   const instructionMetadata = getInstructionMetadata({
@@ -244,7 +246,7 @@ export default function InstructionEditorDialog({
             chooseObject(chosenObjectName);
             setStep('object-instructions');
           }}
-          focusOnMount={!instructionType}
+          focusOnMount={shouldAutofocusInput && !instructionType}
           onSearchStartOrReset={forceUpdate}
           onClickMore={() => setNewExtensionDialogOpen(true)}
           i18n={i18n}
@@ -266,7 +268,7 @@ export default function InstructionEditorDialog({
       resourceManagementProps={resourceManagementProps}
       openInstructionOrExpression={openInstructionOrExpression}
       ref={instructionParametersEditor}
-      focusOnMount={!!instructionType}
+      focusOnMount={shouldAutofocusInput && !!instructionType}
       noHelpButton
     />
   );
@@ -285,7 +287,7 @@ export default function InstructionEditorDialog({
         }}
         selectedType={instructionType}
         useSubheaders
-        focusOnMount={!instructionType}
+        focusOnMount={shouldAutofocusInput && !instructionType}
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
         onClickMore={() => setNewBehaviorDialogOpen(true)}

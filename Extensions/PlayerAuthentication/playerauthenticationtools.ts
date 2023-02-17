@@ -119,7 +119,7 @@ namespace gdjs {
      * This is usually discouraged as the user can't verify that the authentication
      * window is a genuine one. It's only to be used in trusted contexts.
      */
-    const shouldWebAuthenticationUsingIframe = (runtimeScene: RuntimeScene) => {
+    const shouldAuthenticationUseIframe = (runtimeScene: RuntimeScene) => {
       const runtimeGameOptions = runtimeScene.getGame().getAdditionalOptions();
       return (
         runtimeGameOptions &&
@@ -834,7 +834,7 @@ namespace gdjs {
                 break;
               case 'web':
               default:
-                if (shouldWebAuthenticationUsingIframe(runtimeScene)) {
+                if (shouldAuthenticationUseIframe(runtimeScene)) {
                   openAuthenticationIframeForWeb(runtimeScene, _gameId);
                 } else {
                   openAuthenticationWindowForWeb(runtimeScene, _gameId);

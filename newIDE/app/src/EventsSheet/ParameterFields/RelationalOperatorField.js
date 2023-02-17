@@ -14,13 +14,14 @@ const operatorLabels = {
   '<=': t`≤ (less or equal to)`,
   '>=': t`≥ (greater or equal to)`,
   '!=': t`≠ (not equal to)`,
+  startsWith: t`starts with`,
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
   time: ['<', '>', '<=', '>='],
-  string: ['=', '!='],
+  string: ['=', '!=', 'startsWith'],
   color: ['=', '!='],
 };
 
@@ -85,7 +86,8 @@ export const renderInlineRelationalOperator = ({
     value !== '>' &&
     value !== '<=' &&
     value !== '>=' &&
-    value !== '!='
+    value !== '!=' &&
+    value !== 'startsWith'
   ) {
     return <InvalidParameterValue>{value}</InvalidParameterValue>;
   }

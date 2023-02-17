@@ -18,7 +18,7 @@ const operatorLabels = {
   '<=': t`≤ (less or equal to)`,
   '>=': t`≥ (greater or equal to)`,
   '!=': t`≠ (not equal to)`,
-  startsWith: t`startsWith`,
+  startsWith: t`starts with`,
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {

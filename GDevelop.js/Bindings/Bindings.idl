@@ -3154,6 +3154,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);
+    [Ref] PreviewExportOptions SetAllowAuthenticationUsingIframeForPreview(boolean enable);
 };
 
 [Prefix="gdjs::"]

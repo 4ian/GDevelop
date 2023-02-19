@@ -118,6 +118,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       {
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
+      {
+        message: t`Immerse your players by removing the GDevelop watermak or the GDevelop logo when the game loads.`,
+      },
     ],
   },
   {
@@ -136,7 +139,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
       {
-        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
+        message: t`Immerse your players by removing the GDevelop watermak or the GDevelop logo when the game loads.`,
       },
     ],
   },

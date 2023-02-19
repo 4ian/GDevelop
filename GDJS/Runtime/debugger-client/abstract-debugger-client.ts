@@ -339,6 +339,7 @@ namespace gdjs {
         // Avoid circular reference from behavior to parent runtimeObject
         // Exclude rendering related objects:
         '_renderer',
+        '_gameRenderer',
         '_imageManager',
         // Exclude PIXI textures:
         'baseTexture',

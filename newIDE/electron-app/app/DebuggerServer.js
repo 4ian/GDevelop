@@ -50,6 +50,12 @@ module.exports = {
             options.onConnectionClose({ id });
           });
 
+          newWebSocket.on('error', error => {
+            const errorMessage = error.message || 'Unknown error';
+            log.error(`Error in debugger connection #${id}: ${errorMessage}.`);
+            options.onConnectionError({ id, errorMessage });
+          });
+
           options.onConnectionOpen({ id });
         });
 

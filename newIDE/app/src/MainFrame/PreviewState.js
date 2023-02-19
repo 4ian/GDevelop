@@ -55,6 +55,9 @@ export const usePreviewDebuggerServerWatcher = (
         onConnectionOpened: ({ id, debuggerIds }) => {
           setDebuggerIds([...debuggerIds]);
         },
+        onConnectionErrored: ({ id }) => {
+          // Nothing to do (onConnectionClosed is called if necessary).
+        },
         onServerStateChanged: () => {
           // Nothing to do.
         },

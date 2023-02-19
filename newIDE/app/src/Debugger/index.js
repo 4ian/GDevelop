@@ -184,6 +184,14 @@ export default class Debugger extends React.Component<Props, State> {
           () => this.updateToolbar()
         );
       },
+      onConnectionErrored: ({ id, errorMessage }) => {
+        this._getLogsManager(id).addLog({
+          type: 'error',
+          timestamp: performance.now(),
+          group: 'Debugger connection',
+          message: 'The debugger connection errored: ' + errorMessage,
+        });
+      },
       onServerStateChanged: () => {
         this.setState(
           {

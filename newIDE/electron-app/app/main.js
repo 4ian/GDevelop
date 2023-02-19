@@ -307,6 +307,8 @@ app.on('ready', function() {
         event.sender.send('debugger-connection-closed', { id }),
       onConnectionOpen: ({ id }) =>
         event.sender.send('debugger-connection-opened', { id }),
+      onConnectionError: ({ id, errorMessage }) =>
+        event.sender.send('debugger-connection-errored', { id, errorMessage }),
       onListening: ({ address }) =>
         event.sender.send('debugger-start-server-done', { address }),
     });

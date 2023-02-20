@@ -2,16 +2,18 @@
 import * as React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
 
+export const iconWithBackgroundStyle = {
+  background: 'linear-gradient(45deg, #FFFFFF33, #FFFFFF)',
+  borderRadius: 4,
+};
+
 const styles = {
   iconBackground: {
     flex: 0,
     display: 'flex',
     justifyContent: 'center',
   },
-  icon: {
-    background: 'linear-gradient(45deg, #FFFFFF33, #FFFFFF)',
-    borderRadius: 4,
-  },
+  icon: iconWithBackgroundStyle,
 };
 
 type Props = {|

@@ -15,6 +15,7 @@ import {
   isExtensionLifecycleEventsFunction,
   declareBehaviorPropertiesInstructionAndExpressions,
   declareObjectPropertiesInstructionAndExpressions,
+  declareObjectInternalInstructions,
 } from './MetadataDeclarationHelpers';
 
 const gd: libGDevelop = global.gd;
@@ -519,6 +520,12 @@ function generateObject(
 
     // Declare the instructions/expressions for properties
     declareObjectPropertiesInstructionAndExpressions(
+      options.i18n,
+      extension,
+      objectMetadata,
+      eventsBasedObject
+    );
+    declareObjectInternalInstructions(
       options.i18n,
       extension,
       objectMetadata,

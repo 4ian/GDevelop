@@ -186,12 +186,12 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
   update() {
     applyChildLayouts(this);
 
-    const defaultWidth = this.getDefaultWidth();
-    const defaultHeight = this.getDefaultHeight();
-    const originX = this._proportionalOriginX * defaultWidth;
-    const originY = this._proportionalOriginY * defaultHeight;
-    const centerX = defaultWidth / 2;
-    const centerY = defaultHeight / 2;
+    const width = this.getWidth();
+    const height = this.getHeight();
+    const originX = this._proportionalOriginX * width;
+    const originY = this._proportionalOriginY * height;
+    const centerX = width / 2;
+    const centerY = height / 2;
 
     this._pixiObject.pivot.x = centerX;
     this._pixiObject.pivot.y = centerY;
@@ -200,12 +200,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     );
     this._pixiObject.scale.x = 1;
     this._pixiObject.scale.y = 1;
-    this._pixiObject.position.x =
-      this._instance.getX() +
-      (centerX - originX) * Math.abs(this._pixiObject.scale.x);
-    this._pixiObject.position.y =
-      this._instance.getY() +
-      (centerY - originY) * Math.abs(this._pixiObject.scale.y);
+    this._pixiObject.position.x = this._instance.getX() + centerX - originX;
+    this._pixiObject.position.y = this._instance.getY() + centerY - originY;
   }
 
   getWidth() {
@@ -233,18 +229,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
   }
 
   getOriginX(): number {
-    return (
-      this._proportionalOriginX *
-      this.getDefaultWidth() *
-      this._pixiObject.scale.x
-    );
+    return this._proportionalOriginX * this.getWidth();
   }
 
   getOriginY(): number {
-    return (
-      this._proportionalOriginY *
-      this.getDefaultHeight() *
-      this._pixiObject.scale.y
-    );
+    return this._proportionalOriginY * this.getHeight();
   }
 }

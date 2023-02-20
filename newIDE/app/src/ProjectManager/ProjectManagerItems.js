@@ -91,7 +91,7 @@ type ItemProps = {|
   primaryText: string,
   textEndAdornment?: React.Node,
   editingName: boolean,
-  leftIcon: React.Node,
+  leftIcon: React.Element<any>,
   onEdit: () => void,
   onDelete: () => void,
   addLabel: string,

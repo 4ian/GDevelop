@@ -64,7 +64,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           "string",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Text to compare to")))
-      .AddParameter("yesorno", _("Case insensitive"))
       .SetFunctionName("GetString");
 
   obj.AddAction("Font",

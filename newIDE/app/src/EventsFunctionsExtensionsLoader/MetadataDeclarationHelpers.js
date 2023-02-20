@@ -1194,7 +1194,7 @@ export const declareObjectInternalInstructions = (
       i18n._(
         'Change the center of rotation of an object relatively to the object origin.'
       ),
-      i18n._('Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_'),
+      i18n._('Change the center of rotation of _PARAM0_ to _PARAM1_, _PARAM2_'),
       i18n._('Angle'),
       'res/actions/position24_black.png',
       'res/actions/position_black.png'

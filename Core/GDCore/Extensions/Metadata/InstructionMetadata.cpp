@@ -186,7 +186,12 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     size_t valueParamIndex = parameters.size() - 1;
 
     if (isObjectInstruction || isBehaviorInstruction) {
-      gd::String templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
+      gd::String templateSentence = "";
+      if (type == "string") {
+        templateSentence = _("<subject> of _PARAM0_ <operator> <value>, Case insensitive: _PARAM3_");
+      } else {
+        templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
+      }
 
       sentence =
           templateSentence.FindAndReplace("<subject>", sentence)

@@ -185,8 +185,18 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     size_t operatorParamIndex = parameters.size() - 2;
     size_t valueParamIndex = parameters.size() - 1;
 
+    // Add after calculating the operatorParamIndex and valueParamIndex
+    if (type == "string") {
+      AddParameter("yesorno", _("Case insensitive"));
+    }
+
+    gd::String templateSentence = "";
     if (isObjectInstruction || isBehaviorInstruction) {
-      gd::String templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
+      if (type == "string") {
+        templateSentence = _("<subject> of _PARAM0_ <operator> <value>, Case insensitive: _PARAM3_");
+      } else {
+        templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
+      }
 
       sentence =
           templateSentence.FindAndReplace("<subject>", sentence)
@@ -196,7 +206,11 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
               .FindAndReplace("<value>",
                               "_PARAM" + gd::String::From(valueParamIndex) + "_");
     } else {
-      gd::String templateSentence = _("<subject> <operator> <value>");
+      if (type == "string") {
+        templateSentence = _("<subject> <operator> <value>, Case insensitive: _PARAM3_");
+      } else {
+        templateSentence = _("<subject> <operator> <value>");
+      }
 
       sentence =
           templateSentence.FindAndReplace("<subject>", sentence)

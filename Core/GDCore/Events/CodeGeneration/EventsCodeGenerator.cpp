@@ -60,14 +60,36 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(
             1);  // Relational operator contains quote which must be removed.
 
   gd::String rhs = arguments[relationalOperatorIndex + 1];
+  bool caseInsensitive = arguments[relationalOperatorIndex + 2] == "true";
+  gd::String caseInsensitiveStr = caseInsensitive ? "i" : "";
+
   gd::String argumentsStr;
   for (std::size_t i = startFromArgument; i < arguments.size(); ++i) {
-    if (i != relationalOperatorIndex && i != relationalOperatorIndex + 1) {
+    if (i != relationalOperatorIndex && i != relationalOperatorIndex + 1 && i != relationalOperatorIndex + 2) {
       if (!argumentsStr.empty()) argumentsStr += ", ";
       argumentsStr += arguments[i];
     }
   }
 
+  // Check type of Relational Operator
+  if (relationalOperator == "startsWith") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr +
+        ").match(new RegExp('^' + " + rhs + ", '" + caseInsensitiveStr + "')) !== null";
+  } else if (relationalOperator == "endsWith") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr +
+        ").match(new RegExp(" + rhs + " + '$', '" + caseInsensitiveStr + "')) !== null";
+  } else if (relationalOperator == "contains") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr +
+        ").match(new RegExp(" + rhs + ", '" + caseInsensitiveStr + "')) !== null";
+  } else if (caseInsensitive && relationalOperator == "==") {
+    return callStartString + "(" + argumentsStr +
+        ").match(new RegExp('^' + " + rhs + " + '$', '" + caseInsensitiveStr + "')) !== null";
+  } else if (caseInsensitive && relationalOperator == "!=") {
+    return callStartString + "(" + argumentsStr +
+        ").match(new RegExp('^' + " + rhs + " + '$', '" + caseInsensitiveStr + "')) === null";
+  }
+
+  // Standard Relational Operator (==, !=)
   return callStartString + "(" + argumentsStr + ") " + relationalOperator +
          " " + rhs;
 }
@@ -675,7 +697,8 @@ const gd::String EventsCodeGenerator::GenerateRelationalOperatorCodes(const gd::
         return "==";
     }
     if (operatorString != "<" && operatorString != ">" &&
-        operatorString != "<=" && operatorString != ">=" && operatorString != "!=") {
+        operatorString != "<=" && operatorString != ">=" && operatorString != "!=" &&
+        operatorString != "startsWith" && operatorString != "endsWith" && operatorString != "contains") {
       cout << "Warning: Bad relational operator: Set to == by default." << endl;
       return "==";
     }

@@ -6,18 +6,18 @@ import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
 
-export type CachedGameSlug = {|
+export type CachedGameSlug = {
   username: string,
   gameSlug: string,
-|};
+};
 
-export type GameSlug = {|
+export type GameSlug = {
   username: string,
   gameSlug: string,
   createdAt: number,
-|};
+};
 
-export type PublicGame = {|
+export type PublicGame = {
   id: string,
   gameName: string,
   authorName: string, // this corresponds to the publisher name
@@ -37,9 +37,9 @@ export type PublicGame = {|
   gameSlug?: string,
   discoverable?: boolean,
   donateLink: ?string,
-|};
+};
 
-export type Game = {|
+export type Game = {
   id: string,
   gameName: string,
   authorName: string, // this corresponds to the publisher name
@@ -52,14 +52,14 @@ export type Game = {|
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
   cachedCurrentSlug?: CachedGameSlug,
-|};
+};
 
-export type GameCategory = {|
+export type GameCategory = {
   name: string,
   type: 'user-defined' | 'admin-only',
-|};
+};
 
-export type ShowcasedGameLink = {|
+export type ShowcasedGameLink = {
   url: string,
   type:
     | 'app-store'
@@ -68,9 +68,9 @@ export type ShowcasedGameLink = {|
     | 'download'
     | 'download-win-mac-linux'
     | 'learn-more',
-|};
+};
 
-export type ShowcasedGame = {|
+export type ShowcasedGame = {
   title: string,
   author: string,
   description: string,
@@ -85,12 +85,12 @@ export type ShowcasedGame = {|
   bannerBackgroundPosition: string,
   thumbnailUrl: string,
   editorDescription: string,
-|};
+};
 
-export type AllShowcasedGames = {|
+export type AllShowcasedGames = {
   showcasedGames: Array<ShowcasedGame>,
   filters: Filters,
-|};
+};
 
 export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',

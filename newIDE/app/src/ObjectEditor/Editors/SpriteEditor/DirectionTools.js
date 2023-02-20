@@ -44,6 +44,7 @@ type Props = {|
   project: gdProject,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onEditWith: (i18n: I18nType, ResourceExternalEditor) => Promise<void>,
+  onDirectionUpdated?: () => void,
 |};
 
 type State = {|
@@ -71,17 +72,23 @@ export default class DirectionTools extends Component<Props, State> {
 
   saveTimeBetweenFrames = () => {
     const { direction } = this.props;
+    const currentTimeBetweenFrames = direction.getTimeBetweenFrames();
+    const newTimeBetweenFrames = Math.max(
+      parseFloat(this.state.timeBetweenFrames),
+      0.00001
+    );
+    if (currentTimeBetweenFrames === newTimeBetweenFrames) return;
 
-    const newTime = Math.max(parseFloat(this.state.timeBetweenFrames), 0.00001);
-    const newTimeIsValid = !isNaN(newTime);
+    const newTimeIsValid = !isNaN(newTimeBetweenFrames);
 
-    if (newTimeIsValid) direction.setTimeBetweenFrames(newTime);
-    this.setState({
-      timeBetweenFrames: formatTime(
-        this.props.direction.getTimeBetweenFrames()
-      ),
-      timeError: newTimeIsValid,
-    });
+    if (newTimeIsValid) {
+      direction.setTimeBetweenFrames(newTimeBetweenFrames);
+      this.setState({
+        timeBetweenFrames: formatTime(newTimeBetweenFrames),
+        timeError: newTimeIsValid,
+      });
+      if (this.props.onDirectionUpdated) this.props.onDirectionUpdated();
+    }
   };
 
   setLooping = (check: boolean) => {
@@ -89,6 +96,8 @@ export default class DirectionTools extends Component<Props, State> {
 
     direction.setLoop(!!check);
     this.forceUpdate();
+
+    if (this.props.onDirectionUpdated) this.props.onDirectionUpdated();
   };
 
   openPreview = (open: boolean) => {

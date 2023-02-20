@@ -77,14 +77,6 @@ const PointsEditor = ({
     setHighlightedPointName,
   ] = React.useState<?string>(null);
 
-  // Note: these two booleans are set to false to avoid erasing points of other
-  // animations/frames (and they will be updated by updateSamePointsToggles). In
-  // theory, they should be set to the appropriate value at their initialization,
-  // for consistency of the state.
-  const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
-    false
-  );
-  const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
@@ -93,6 +85,22 @@ const PointsEditor = ({
     animationIndex,
     directionIndex,
     spriteIndex
+  );
+
+  // Note: sprite should always be defined so this value will be correctly initialised.
+  const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
+    sprite
+      ? every(
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
+            return allSpritesHaveSamePointsAs(sprite, otherAnimation);
+          })
+        )
+      : false
+  );
+  // Note: sprite & animation should always be defined so this value will be correctly initialised.
+  const [samePointsForSprites, setSamePointsForSprites] = React.useState(
+    sprite && animation ? allSpritesHaveSamePointsAs(sprite, animation) : false
   );
 
   const updatePoints = React.useCallback(
@@ -137,20 +145,19 @@ const PointsEditor = ({
     setSpriteIndex(index);
   };
 
-  const updateSamePointsToggles = () => {
-    if (!animation || !sprite) return;
-
-    setSamePointsForAnimations(
-      every(
-        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-          const otherAnimation = spriteConfiguration.getAnimation(i);
-          return allSpritesHaveSamePointsAs(sprite, otherAnimation);
-        })
-      )
-    );
-
-    setSamePointsForSprites(allSpritesHaveSamePointsAs(sprite, animation));
-  };
+  // When an animation or sprite is changed, recompute if all points are the same
+  // to enable the toggle.
+  // Note: we do not recompute if all animations have the same points, as we consider
+  // that if the user has enabled/disabled this, they want to keep it that way.
+  React.useEffect(
+    () => {
+      if (!sprite || !animation) {
+        return;
+      }
+      setSamePointsForSprites(allSpritesHaveSamePointsAs(sprite, animation));
+    },
+    [animation, sprite]
+  );
 
   const setSamePointsForAllAnimations = (enable: boolean) => {
     if (enable) {
@@ -162,6 +169,7 @@ const PointsEditor = ({
 
     setSamePointsForAnimations(enable);
     setSamePointsForSprites(enable || samePointsForSprites);
+    updatePoints();
   };
 
   const setSamePointsForAllSprites = (enable: boolean) => {
@@ -174,17 +182,8 @@ const PointsEditor = ({
 
     setSamePointsForAnimations(enable && samePointsForAnimations);
     setSamePointsForSprites(enable);
+    updatePoints();
   };
-
-  // Note: might be worth fixing these warnings:
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updateSamePointsToggles, [animationIndex]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updatePoints, [
-    samePointsForAnimations,
-    samePointsForSprites,
-  ]);
 
   // Keep panes vertical for small screens, side-by-side for large screens
   const screenSize = useResponsiveWindowWidth();

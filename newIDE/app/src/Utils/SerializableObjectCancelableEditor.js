@@ -11,7 +11,7 @@ type Props = {|
   onCancel: () => void | Promise<void>,
 |};
 
-const changesBeforeShowingWarning = 3;
+const changesBeforeShowingWarning = 1;
 
 /**
  * Custom hook serializing the object and allowing to restore back

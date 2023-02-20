@@ -77,18 +77,7 @@ const CollisionMasksEditor = ({
   const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
     null
   );
-  // Note: these two booleans are set to false to avoid erasing points of other
-  // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
-  // theory, they should be set to the appropriate value at their initialization,
-  // for consistency of the state.
-  const [
-    sameCollisionMasksForAnimations,
-    setSameCollisionMasksForAnimations,
-  ] = React.useState(false);
-  const [
-    sameCollisionMasksForSprites,
-    setSameCollisionMasksForSprites,
-  ] = React.useState(false);
+
   const [spriteWidth, setSpriteWidth] = React.useState(0);
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();
@@ -99,6 +88,31 @@ const CollisionMasksEditor = ({
     animationIndex,
     directionIndex,
     spriteIndex
+  );
+
+  // Note: sprite should always be defined so this value will be correctly initialised.
+  const [
+    sameCollisionMasksForAnimations,
+    setSameCollisionMasksForAnimations,
+  ] = React.useState(
+    sprite
+      ? every(
+          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+            const otherAnimation = spriteConfiguration.getAnimation(i);
+            return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
+          })
+        )
+      : false
+  );
+
+  // Note: sprite & animation should always be defined so this value will be correctly initialised.
+  const [
+    sameCollisionMasksForSprites,
+    setSameCollisionMasksForSprites,
+  ] = React.useState(
+    sprite && animation
+      ? allSpritesHaveSameCollisionMasksAs(sprite, animation)
+      : false
   );
 
   const updateCollisionMasks = React.useCallback(
@@ -143,22 +157,20 @@ const CollisionMasksEditor = ({
     setSpriteIndex(index);
   };
 
-  const updateSameCollisionMasksToggles = () => {
-    if (!animation || !sprite) return;
+  // When an animation or sprite is changed, recompute if all collision masks are the same
+  // to enable the toggle.
+  // Note: we do not recompute if all animations have the same collision masks, as we consider
+  // that if the user has enabled/disabled this, they want to keep it that way.
+  React.useEffect(
+    () => {
+      if (!animation || !sprite) return;
 
-    setSameCollisionMasksForAnimations(
-      every(
-        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-          const otherAnimation = spriteConfiguration.getAnimation(i);
-          return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
-        })
-      )
-    );
-
-    setSameCollisionMasksForSprites(
-      allSpritesHaveSameCollisionMasksAs(sprite, animation)
-    );
-  };
+      setSameCollisionMasksForSprites(
+        allSpritesHaveSameCollisionMasksAs(sprite, animation)
+      );
+    },
+    [animation, sprite]
+  );
 
   const onSetCollisionMaskAutomatic = React.useCallback(
     (automatic: boolean = true) => {
@@ -179,6 +191,7 @@ const CollisionMasksEditor = ({
 
     setSameCollisionMasksForAnimations(enable);
     setSameCollisionMasksForSprites(enable || sameCollisionMasksForSprites);
+    updateCollisionMasks();
   };
 
   const setSameCollisionMasksForAllSprites = (enable: boolean) => {
@@ -193,22 +206,13 @@ const CollisionMasksEditor = ({
       enable && sameCollisionMasksForAnimations
     );
     setSameCollisionMasksForSprites(enable);
+    updateCollisionMasks();
   };
 
   const setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
     setSpriteWidth(spriteWidth);
     setSpriteHeight(spriteHeight);
   };
-
-  // Note: might be worth fixing these warnings:
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updateCollisionMasks, [
-    sameCollisionMasksForAnimations,
-    sameCollisionMasksForSprites,
-  ]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updateSameCollisionMasksToggles, [animationIndex]);
 
   // Keep panes vertical for small screens, side-by-side for large screens
   const screenSize = useResponsiveWindowWidth();

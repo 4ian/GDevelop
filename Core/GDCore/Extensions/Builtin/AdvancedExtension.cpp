@@ -128,6 +128,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .UseStandardRelationalOperatorParameters(
           "string", gd::ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly();
+
+  extension
+      .AddAction(
+          "SetIncludedInParentCollisionMask",
+          _("Include in parent collision mask"),
+          _("Include or exclude a child from its parent collision mask."),
+          _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
+          "",
+          "res/function32.png",
+          "res/function32.png")
+      .SetHelpPath("/events/functions/return")
+      .AddParameter("objectPtr", "Child")
+      .AddParameter("yesorno", "Include in parent collision mask")
+      .SetRelevantForCustomObjectEventsOnly()
+      .MarkAsAdvanced();
 }
 
 }  // namespace gd

@@ -585,6 +585,13 @@ namespace gdjs {
         return count;
       };
 
+      export const setIncludedInParentCollisionMask = (
+        child: gdjs.RuntimeObject,
+        isIncluded: boolean
+      ): void => {
+        child.setIncludedInParentCollisionMask(isIncluded);
+      };
+
       /** @deprecated */
       export const pickedObjectsCount = getPickedInstancesCount;
     }

@@ -32,7 +32,7 @@ namespace gdjs {
     /** Is antialiasing enabled on the object? */
     antialiasing: boolean;
     /**Quality of the antialiasing filter */
-    antialiasingQuality: 'LOW' | 'MEDIUM' | 'HIGH';
+    antialiasingQuality: 'Low' | 'Medium' | 'High';
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -57,7 +57,7 @@ namespace gdjs {
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
     _antialiasing: boolean;
-    _antialiasingQuality: 'LOW' | 'MEDIUM' | 'HIGH';
+    _antialiasingQuality: 'Low' | 'Medium' | 'High';
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -354,17 +354,17 @@ namespace gdjs {
       return this._antialiasing;
     }
 
-    setAntialiasingQuality(value: 'LOW' | 'MEDIUM' | 'HIGH'): void {
+    setAntialiasingQuality(value: 'Low' | 'Medium' | 'High'): void {
       this._antialiasingQuality = value;
       this._renderer.updateAntialiasing();
     }
 
-    getAntialiasingQuality(): 'LOW' | 'MEDIUM' | 'HIGH' {
+    getAntialiasingQuality(): 'Low' | 'Medium' | 'High' {
       return this._antialiasingQuality;
     }
 
     checkAntialiasingQuality(
-      valueToCompare: 'LOW' | 'MEDIUM' | 'HIGH'
+      valueToCompare: 'Low' | 'Medium' | 'High'
     ): boolean {
       return this._antialiasingQuality === valueToCompare;
     }

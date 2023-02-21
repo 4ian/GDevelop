@@ -758,9 +758,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
   obj.AddAction("SetAntialiasing",
-                _("Set antialiasing on the shape drawer"),
-                _("(De)Activate antialiasing on the shape drawer"),
-                _("Set antialiasing of _PARAM0_ to _PARAM1_"),
+                _("Set anti-aliasing on the shape drawer"),
+                _("(De)Activate anti-aliasing on the shape drawer"),
+                _("Set anti-aliasing of _PARAM0_ to _PARAM1_"),
                 _("Setup"),
                 "res/actions/antialiasing24.png",
                 "res/actions/antialiasing.png")
@@ -769,17 +769,17 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "yesorno", _("Activated ?"), "Is the antialiasing activated ?");
   obj.AddCondition(
          "IsAntialiasingOn",
-         _("Antialiasing activated on the shape drawer"),
-         _("Checks if the antialiasing is activated for a shape drawer"),
-         _("Is the antialiasing on for _PARAM0_ ?"),
+         _("Anti-aliasing activated on the shape drawer"),
+         _("Checks if the anti-aliasing is activated for a shape drawer"),
+         _("Is the anti-aliasing enabled on _PARAM0_ ?"),
          _("Setup"),
          "res/actions/antialiasing24.png",
          "res/actions/antialiasing.png")
       .AddParameter("object", _("Object"), "Drawer");
 
   obj.AddAction("SetAntialiasingQuality",
-                _("Set antialiasing quality for the shape drawer"),
-                _("Set antialiasing quality for the shape drawer"),
+                _("Anti-aliasing quality"),
+                _("Anti-aliasing quality"),
                 _("Set antialiasing quality of _PARAM0_ to _PARAM1_"),
                 _("Setup"),
                 "res/actions/antialiasing24.png",
@@ -787,23 +787,23 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("stringWithSelector",
                     _("Antialiasing quality level"),
-                    "[\"LOW\",\"MEDIUM\",\"HIGH\"]");
+                    "[\"Low\",\"Medium\",\"High\"]");
   obj.AddCondition(
          "IsAntialiasingQuality",
          _("Antialiasing quality"),
-         _("Checks if the antialiasing quality is set to a certain value"),
-         _("Is the antialiasing quality of _PARAM0_ equal to _PARAM1_"),
+         _("Checks if the anti-aliasing quality is set to a certain value"),
+         _("Is the anti-aliasing quality of _PARAM0_ equal to _PARAM1_"),
          _("Setup"),
          "res/actions/antialiasing24.png",
          "res/actions/antialiasing.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("stringWithSelector",
                     _("Quality to check"),
-                    "[\"LOW\",\"MEDIUM\",\"HIGH\"]");
+                    "[\"Low\",\"Medium\",\"High\"]");
   obj.AddStrExpression(
          "AntialiasingQuality",
-         _("Current quality level of antialiasing on a shape drawer"),
-         _("Returns current antialiasing level of the shape drawer"),
+         _("Current quality level of anti-aliasing on a shape drawer"),
+         _("Returns current anti-aliasing level of the shape drawer"),
          _("Setup"),
          "res/actions/antialiasing.png")
       .AddParameter("object", _("Object"), "Drawer");

@@ -29,6 +29,10 @@ namespace gdjs {
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
+    /** Is antialiasing enabled on the object? */
+    antialiasing: boolean;
+    /**Quality of the antialiasing filter */
+    antialiasingQuality: 'Off' | 'Low' | 'Medium' | 'High';
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -52,6 +56,8 @@ namespace gdjs {
     _outlineSize: float;
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
+    _antialiasing: boolean;
+    _antialiasingQuality: 'Off' | 'Low' | 'Medium' | 'High';
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -86,6 +92,8 @@ namespace gdjs {
       this._outlineSize = shapePainterObjectData.outlineSize;
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
+      this._antialiasing = shapePainterObjectData.antialiasing;
+      this._antialiasingQuality = shapePainterObjectData.antialiasingQuality;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -335,6 +343,22 @@ namespace gdjs {
 
     isClearedBetweenFrames(): boolean {
       return this._clearBetweenFrames;
+    }
+
+
+    setAntialiasingQuality(value: 'Off' | 'Low' | 'Medium' | 'High'): void {
+      this._antialiasingQuality = value;
+      this._renderer.updateAntialiasing();
+    }
+
+    getAntialiasingQuality(): 'Off' | 'Low' | 'Medium' | 'High' {
+      return this._antialiasingQuality;
+    }
+
+    checkAntialiasingQuality(
+      valueToCompare: 'Off' | 'Low' | 'Medium' | 'High'
+    ): boolean {
+      return this._antialiasingQuality === valueToCompare;
     }
 
     setCoordinatesRelative(value: boolean): void {

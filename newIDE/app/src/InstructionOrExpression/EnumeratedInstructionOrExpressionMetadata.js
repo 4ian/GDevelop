@@ -82,7 +82,7 @@ const isFunctionVisibleInGivenScope = (
   } = enumeratedInstructionOrExpressionMetadata.scope;
   const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
-  return (
+  return !!(
     ((enumeratedInstructionOrExpressionMetadata.isRelevantForLayoutEvents &&
       (scope.layout || scope.externalEvents)) ||
       (enumeratedInstructionOrExpressionMetadata.isRelevantForFunctionEvents &&

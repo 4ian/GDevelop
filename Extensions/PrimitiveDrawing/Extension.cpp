@@ -782,6 +782,35 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
-
+  obj.AddAction("SetAntialiasingQuality",
+                _("Anti-aliasing quality"),
+                _("Anti-aliasing quality"),
+                _("Set antialiasing quality of _PARAM0_ to _PARAM1_"),
+                _("Setup"),
+                "res/actions/antialiasing24.png",
+                "res/actions/antialiasing.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("stringWithSelector",
+                    _("Antialiasing quality level"),
+                    "[\"Off\",\"Low\",\"Medium\",\"High\"]");
+  obj.AddCondition(
+         "IsAntialiasingQuality",
+         _("Antialiasing quality"),
+         _("Checks if the anti-aliasing quality is set to a certain value"),
+         _("Is the anti-aliasing quality of _PARAM0_ equal to _PARAM1_"),
+         _("Setup"),
+         "res/actions/antialiasing24.png",
+         "res/actions/antialiasing.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("stringWithSelector",
+                    _("Quality to check"),
+                    "[\"Off\",\"Low\",\"Medium\",\"High\"]");
+  obj.AddStrExpression(
+         "Antialiasing",
+         _("Type of anti-aliasing used by a shape painter"),
+         _("Gets the type of anti-aliasing in use: None, Low, Medium, or High."),
+         _("Setup"),
+         "res/actions/antialiasing.png")
+      .AddParameter("object", _("Object"), "Drawer");
 #endif
 }

@@ -137,7 +137,7 @@ class GD_CORE_API ExpressionMetadata {
    * to fulfill std::map requirements.
    */
   ExpressionMetadata()
-      : returnType("unknown"), shown(false), isPrivate(false){};
+      : returnType("unknown"), shown(false), isPrivate(false), releventContext("Any"){};
 
   virtual ~ExpressionMetadata(){};
 
@@ -181,6 +181,67 @@ class GD_CORE_API ExpressionMetadata {
    */
   ExpressionMetadata& SetPrivate() {
     isPrivate = true;
+    return *this;
+  }
+
+  /**
+   * Check if the instruction can be used in layouts or external events.
+   */
+  bool IsReleventForLayoutEvents() const {
+    return releventContext == "Any" || releventContext == "Layout";
+  }
+
+  /**
+   * Check if the instruction can be used in function events.
+   */
+  bool IsReleventForFunctionEvents() const {
+    return releventContext == "Any" || releventContext == "Function";
+  }
+
+  /**
+   * Check if the instruction can be used in asynchronous function events.
+   */
+  bool IsReleventForAsynchronousFunctionEvents() const {
+    return releventContext == "Any" || releventContext == "Function" ||
+           releventContext == "AsynchronousFunction";
+  }
+
+  /**
+   * Check if the instruction can be used in custom object events.
+   */
+  bool IsReleventForCustomObjectEvents() const {
+    return releventContext == "Any" || releventContext == "Object";
+  }
+
+  /**
+   * Set that the instruction can be used in layouts or external events.
+   */
+  ExpressionMetadata &SetReleventForLayoutEventsOnly() {
+    releventContext = "Layout";
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in function events.
+   */
+  ExpressionMetadata &SetReleventForFunctionEventsOnly() {
+    releventContext = "Function";
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in asynchronous function events.
+   */
+  ExpressionMetadata &SetReleventForAsynchronousFunctionEventsOnly() {
+    releventContext = "AsynchronousFunction";
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in custom object events.
+   */
+  ExpressionMetadata &SetReleventForCustomObjectEventsOnly() {
+    releventContext = "Object";
     return *this;
   }
 
@@ -326,6 +387,7 @@ class GD_CORE_API ExpressionMetadata {
   gd::String extensionNamespace;
   bool isPrivate;
   gd::String requiredBaseObjectCapability;
+  gd::String releventContext;
 };
 
 }  // namespace gd

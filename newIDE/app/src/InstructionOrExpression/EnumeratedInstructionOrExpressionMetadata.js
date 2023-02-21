@@ -16,6 +16,10 @@ export type EnumeratedInstructionMetadata = {|
   metadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   isPrivate: boolean,
+  isReleventForLayoutEvents: boolean,
+  isReleventForFunctionEvents: boolean,
+  isReleventForAsynchronousFunctionEvents: boolean,
+  isReleventForCustomObjectEvents: boolean,
 |};
 
 export type EnumeratedExpressionMetadata = {|
@@ -26,6 +30,10 @@ export type EnumeratedExpressionMetadata = {|
   metadata: gdExpressionMetadata,
   scope: InstructionOrExpressionScope,
   isPrivate: boolean,
+  isReleventForLayoutEvents: boolean,
+  isReleventForFunctionEvents: boolean,
+  isReleventForAsynchronousFunctionEvents: boolean,
+  isReleventForCustomObjectEvents: boolean,
   name: string,
   /** Represents only the visible parameters in the parentheses of the expression. */
   parameters: Array<gdParameterMetadata>,
@@ -64,27 +72,37 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
     const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
     return (
-      (!enumeratedInstructionOrExpressionMetadata.isPrivate &&
+      ((enumeratedInstructionOrExpressionMetadata.isReleventForLayoutEvents &&
+        (scope.layout || scope.externalEvents)) ||
+        (enumeratedInstructionOrExpressionMetadata.isReleventForFunctionEvents &&
+          scope.eventsFunction) ||
+        (enumeratedInstructionOrExpressionMetadata.isReleventForAsynchronousFunctionEvents &&
+          scope.eventsFunction &&
+          scope.eventsFunction.isAsync()) ||
+        (enumeratedInstructionOrExpressionMetadata.isReleventForCustomObjectEvents &&
+          scope.eventsBasedObject)) &&
+      // Check visibility.
+      ((!enumeratedInstructionOrExpressionMetadata.isPrivate &&
         (!behaviorMetadata || !behaviorMetadata.isPrivate())) ||
-      // The instruction or expression is marked as "private":
-      // we now compare its scope (where it was declared) and the current scope
-      // (where we are) to see if we should filter it or not.
+        // The instruction or expression is marked as "private":
+        // we now compare its scope (where it was declared) and the current scope
+        // (where we are) to see if we should filter it or not.
 
-      // Show private behavior functions when editing the behavior
-      (behaviorMetadata &&
-        eventsBasedBehavior &&
-        eventsFunctionsExtension &&
-        getBehaviorFullType(
-          eventsFunctionsExtension.getName(),
-          eventsBasedBehavior.getName()
-        ) === behaviorMetadata.getName()) ||
-      // When editing the extension...
-      (eventsFunctionsExtension &&
-        eventsFunctionsExtension.getName() === extension.getName() &&
-        // ...show public functions of a private behavior
-        (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
-          // ...show private non-behavior functions
-          !behaviorMetadata))
+        // Show private behavior functions when editing the behavior
+        (behaviorMetadata &&
+          eventsBasedBehavior &&
+          eventsFunctionsExtension &&
+          getBehaviorFullType(
+            eventsFunctionsExtension.getName(),
+            eventsBasedBehavior.getName()
+          ) === behaviorMetadata.getName()) ||
+        // When editing the extension...
+        (eventsFunctionsExtension &&
+          eventsFunctionsExtension.getName() === extension.getName() &&
+          // ...show public functions of a private behavior
+          (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
+            // ...show private non-behavior functions
+            !behaviorMetadata)))
     );
   });
 };

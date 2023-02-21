@@ -17,10 +17,18 @@ declare class gdInstructionMetadata {
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
+  isReleventForLayoutEvents(): boolean;
+  isReleventForFunctionEvents(): boolean;
+  isReleventForAsynchronousFunctionEvents(): boolean;
+  isReleventForCustomObjectEvents(): boolean;
   setCanHaveSubInstructions(): gdInstructionMetadata;
   setHelpPath(helpPath: string): gdInstructionMetadata;
   setHidden(): gdInstructionMetadata;
   setPrivate(): gdInstructionMetadata;
+  setReleventForLayoutEventsOnly(): gdInstructionMetadata;
+  setReleventForFunctionEventsOnly(): gdInstructionMetadata;
+  setReleventForAsynchronousFunctionEventsOnly(): gdInstructionMetadata;
+  setReleventForCustomObjectEventsOnly(): gdInstructionMetadata;
   addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): gdInstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdInstructionMetadata;
   setDefaultValue(defaultValue: string): gdInstructionMetadata;

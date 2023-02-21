@@ -102,6 +102,67 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
+   * Check if the instruction can be used in layouts or external events.
+   */
+  bool IsReleventForLayoutEvents() const {
+    return releventContext == "Any" || releventContext == "Layout";
+  }
+
+  /**
+   * Check if the instruction can be used in function events.
+   */
+  bool IsReleventForFunctionEvents() const {
+    return releventContext == "Any" || releventContext == "Function";
+  }
+
+  /**
+   * Check if the instruction can be used in asynchronous function events.
+   */
+  bool IsReleventForAsynchronousFunctionEvents() const {
+    return releventContext == "Any" || releventContext == "Function" ||
+           releventContext == "AsynchronousFunction";
+  }
+
+  /**
+   * Check if the instruction can be used in custom object events.
+   */
+  bool IsReleventForCustomObjectEvents() const {
+    return releventContext == "Any" || releventContext == "Object";
+  }
+
+  /**
+   * Set that the instruction can be used in layouts or external events.
+   */
+  InstructionMetadata &SetReleventForLayoutEventsOnly() {
+    releventContext = "Layout";
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in function events.
+   */
+  InstructionMetadata &SetReleventForFunctionEventsOnly() {
+    releventContext = "Function";
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in asynchronous function events.
+   */
+  InstructionMetadata &SetReleventForAsynchronousFunctionEventsOnly() {
+    releventContext = "AsynchronousFunction";
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in custom object events.
+   */
+  InstructionMetadata &SetReleventForCustomObjectEventsOnly() {
+    releventContext = "Object";
+    return *this;
+  }
+
+  /**
    * Check if the instruction is asynchronous - it will be running in the
    * background, executing the instructions following it before the frame after
    * it resolved.
@@ -539,6 +600,7 @@ class GD_CORE_API InstructionMetadata {
   bool isObjectInstruction;
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;
+  gd::String releventContext;
 };
 
 }  // namespace gd

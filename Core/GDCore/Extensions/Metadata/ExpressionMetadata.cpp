@@ -23,7 +23,8 @@ ExpressionMetadata::ExpressionMetadata(const gd::String& returnType_,
       shown(true),
       smallIconFilename(smallicon_),
       extensionNamespace(extensionNamespace_),
-      isPrivate(false) {
+      isPrivate(false),
+      releventContext("Any") {
 }
 
 ExpressionMetadata& ExpressionMetadata::SetHidden() {

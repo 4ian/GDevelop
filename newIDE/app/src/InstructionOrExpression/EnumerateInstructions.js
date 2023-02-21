@@ -196,6 +196,10 @@ const enumerateInstruction = (
     fullGroupName,
     scope,
     isPrivate: instrMetadata.isPrivate(),
+    isReleventForLayoutEvents: instrMetadata.isReleventForLayoutEvents(),
+    isReleventForFunctionEvents: instrMetadata.isReleventForFunctionEvents(),
+    isReleventForAsynchronousFunctionEvents: instrMetadata.isReleventForAsynchronousFunctionEvents(),
+    isReleventForCustomObjectEvents: instrMetadata.isReleventForCustomObjectEvents(),
   };
 };
 

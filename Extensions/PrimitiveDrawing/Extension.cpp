@@ -757,29 +757,29 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
-  obj.AddAction("SetAntialiasingQuality",
-                _("Anti-aliasing quality"),
-                _("Anti-aliasing quality"),
-                _("Set antialiasing quality of _PARAM0_ to _PARAM1_"),
+  obj.AddAction("SetAntialiasing",
+                _("Anti-aliasing"),
+                _("Anti-aliasing"),
+                _("Set anti-aliasing of _PARAM0_ to _PARAM1_"),
                 _("Setup"),
                 "res/actions/antialiasing24.png",
                 "res/actions/antialiasing.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("stringWithSelector",
-                    _("Antialiasing quality level"),
-                    "[\"Off\",\"Low\",\"Medium\",\"High\"]");
+                    _("Anti-aliasing type"),
+                    "[\"None\",\"Low\",\"Medium\",\"High\"]");
   obj.AddCondition(
-         "IsAntialiasingQuality",
-         _("Antialiasing quality"),
-         _("Checks if the anti-aliasing quality is set to a certain value"),
-         _("Is the anti-aliasing quality of _PARAM0_ equal to _PARAM1_"),
+         "CheckAntialiasingType",
+         _("Anti-aliasing type"),
+         _("Checks the selected type of anti-aliasing"),
+         _("The anti-aliasing of _PARAM0_ is set to _PARAM1_"),
          _("Setup"),
          "res/actions/antialiasing24.png",
          "res/actions/antialiasing.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("stringWithSelector",
-                    _("Quality to check"),
-                    "[\"Off\",\"Low\",\"Medium\",\"High\"]");
+                    _("Type of anti-aliasing to check the object against"),
+                    "[\"None\",\"Low\",\"Medium\",\"High\"]");
   obj.AddStrExpression(
          "Antialiasing",
          _("Type of anti-aliasing used by a shape painter"),

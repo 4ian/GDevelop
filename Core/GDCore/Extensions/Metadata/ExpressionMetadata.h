@@ -137,7 +137,7 @@ class GD_CORE_API ExpressionMetadata {
    * to fulfill std::map requirements.
    */
   ExpressionMetadata()
-      : returnType("unknown"), shown(false), isPrivate(false), releventContext("Any"){};
+      : returnType("unknown"), shown(false), isPrivate(false), relevantContext("Any"){};
 
   virtual ~ExpressionMetadata(){};
 
@@ -188,36 +188,36 @@ class GD_CORE_API ExpressionMetadata {
    * Check if the instruction can be used in layouts or external events.
    */
   bool IsRelevantForLayoutEvents() const {
-    return releventContext == "Any" || releventContext == "Layout";
+    return relevantContext == "Any" || relevantContext == "Layout";
   }
 
   /**
    * Check if the instruction can be used in function events.
    */
   bool IsRelevantForFunctionEvents() const {
-    return releventContext == "Any" || releventContext == "Function";
+    return relevantContext == "Any" || relevantContext == "Function";
   }
 
   /**
    * Check if the instruction can be used in asynchronous function events.
    */
   bool IsRelevantForAsynchronousFunctionEvents() const {
-    return releventContext == "Any" || releventContext == "Function" ||
-           releventContext == "AsynchronousFunction";
+    return relevantContext == "Any" || relevantContext == "Function" ||
+           relevantContext == "AsynchronousFunction";
   }
 
   /**
    * Check if the instruction can be used in custom object events.
    */
   bool IsRelevantForCustomObjectEvents() const {
-    return releventContext == "Any" || releventContext == "Object";
+    return relevantContext == "Any" || relevantContext == "Object";
   }
 
   /**
    * Set that the instruction can be used in layouts or external events.
    */
   ExpressionMetadata &SetRelevantForLayoutEventsOnly() {
-    releventContext = "Layout";
+    relevantContext = "Layout";
     return *this;
   }
 
@@ -225,7 +225,7 @@ class GD_CORE_API ExpressionMetadata {
    * Set that the instruction can be used in function events.
    */
   ExpressionMetadata &SetRelevantForFunctionEventsOnly() {
-    releventContext = "Function";
+    relevantContext = "Function";
     return *this;
   }
 
@@ -233,7 +233,7 @@ class GD_CORE_API ExpressionMetadata {
    * Set that the instruction can be used in asynchronous function events.
    */
   ExpressionMetadata &SetRelevantForAsynchronousFunctionEventsOnly() {
-    releventContext = "AsynchronousFunction";
+    relevantContext = "AsynchronousFunction";
     return *this;
   }
 
@@ -241,7 +241,7 @@ class GD_CORE_API ExpressionMetadata {
    * Set that the instruction can be used in custom object events.
    */
   ExpressionMetadata &SetRelevantForCustomObjectEventsOnly() {
-    releventContext = "Object";
+    relevantContext = "Object";
     return *this;
   }
 
@@ -387,7 +387,7 @@ class GD_CORE_API ExpressionMetadata {
   gd::String extensionNamespace;
   bool isPrivate;
   gd::String requiredBaseObjectCapability;
-  gd::String releventContext;
+  gd::String relevantContext;
 };
 
 }  // namespace gd

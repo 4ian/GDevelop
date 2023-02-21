@@ -105,36 +105,36 @@ class GD_CORE_API InstructionMetadata {
    * Check if the instruction can be used in layouts or external events.
    */
   bool IsRelevantForLayoutEvents() const {
-    return releventContext == "Any" || releventContext == "Layout";
+    return relevantContext == "Any" || relevantContext == "Layout";
   }
 
   /**
    * Check if the instruction can be used in function events.
    */
   bool IsRelevantForFunctionEvents() const {
-    return releventContext == "Any" || releventContext == "Function";
+    return relevantContext == "Any" || relevantContext == "Function";
   }
 
   /**
    * Check if the instruction can be used in asynchronous function events.
    */
   bool IsRelevantForAsynchronousFunctionEvents() const {
-    return releventContext == "Any" || releventContext == "Function" ||
-           releventContext == "AsynchronousFunction";
+    return relevantContext == "Any" || relevantContext == "Function" ||
+           relevantContext == "AsynchronousFunction";
   }
 
   /**
    * Check if the instruction can be used in custom object events.
    */
   bool IsRelevantForCustomObjectEvents() const {
-    return releventContext == "Any" || releventContext == "Object";
+    return relevantContext == "Any" || relevantContext == "Object";
   }
 
   /**
    * Set that the instruction can be used in layouts or external events.
    */
   InstructionMetadata &SetRelevantForLayoutEventsOnly() {
-    releventContext = "Layout";
+    relevantContext = "Layout";
     return *this;
   }
 
@@ -142,7 +142,7 @@ class GD_CORE_API InstructionMetadata {
    * Set that the instruction can be used in function events.
    */
   InstructionMetadata &SetRelevantForFunctionEventsOnly() {
-    releventContext = "Function";
+    relevantContext = "Function";
     return *this;
   }
 
@@ -150,7 +150,7 @@ class GD_CORE_API InstructionMetadata {
    * Set that the instruction can be used in asynchronous function events.
    */
   InstructionMetadata &SetRelevantForAsynchronousFunctionEventsOnly() {
-    releventContext = "AsynchronousFunction";
+    relevantContext = "AsynchronousFunction";
     return *this;
   }
 
@@ -158,7 +158,7 @@ class GD_CORE_API InstructionMetadata {
    * Set that the instruction can be used in custom object events.
    */
   InstructionMetadata &SetRelevantForCustomObjectEventsOnly() {
-    releventContext = "Object";
+    relevantContext = "Object";
     return *this;
   }
 
@@ -600,7 +600,7 @@ class GD_CORE_API InstructionMetadata {
   bool isObjectInstruction;
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;
-  gd::String releventContext;
+  gd::String relevantContext;
 };
 
 }  // namespace gd

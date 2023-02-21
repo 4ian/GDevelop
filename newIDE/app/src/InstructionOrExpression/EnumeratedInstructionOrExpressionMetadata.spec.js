@@ -5,7 +5,7 @@ import { enumerateAllInstructions } from './EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
 describe('EnumeratedInstructionOrExpressionMetadata', () => {
-  it('can hide actions that are not relevent to layouts', () => {
+  it('can hide actions that are not relevant to layouts', () => {
     const layout = new gd.Layout();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -28,7 +28,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     layout.delete();
   });
 
-  it('can show actions that are only relevent for functions', () => {
+  it('can show actions that are only relevant for functions', () => {
     const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsFunction = new gd.EventsFunction();
 

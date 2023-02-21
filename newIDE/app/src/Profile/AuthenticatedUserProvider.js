@@ -98,7 +98,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
 
-  componentDidMount() {
+  async componentDidMount() {
     this._resetAuthenticatedUser();
 
     // Listen to when the user log out so that we reset the user profile.
@@ -135,7 +135,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         'Fetching user profile as authenticated user found at startup...'
       );
       this._automaticallyUpdateUserProfile = false;
-      this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
       // Don't do anything. Either no user is logged (nothing to do)

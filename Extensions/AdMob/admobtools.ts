@@ -123,6 +123,20 @@ namespace gdjs {
       false
     );
 
+    document.addEventListener('pause', async () => {
+      logger.info('App paused, hiding banner if any.');
+      if (banner) {
+        banner.hide();
+      }
+    });
+
+    document.addEventListener('resume', async () => {
+      logger.info('App resumed, showing banner again.');
+      if (banner) {
+        banner.show();
+      }
+    });
+
     /**
      * Helper to know if we are on mobile and admob is correctly initialized.
      */
@@ -302,20 +316,46 @@ namespace gdjs {
         await hideBanner();
       }
 
+      const bannerId = localStorage.getItem('lastBannerId');
+
+      logger.info(`bannerId ${bannerId}`);
+
       bannerConfigured = false;
       bannerLoaded = false;
+
+      if (bannerId) {
+        logger.info('bannerId is set, trying to reuse it');
+        try {
+          const result = admob.BannerAd.getAdById(adUnitId);
+          if (result) {
+            logger.info('bannerId is valid, reusing it');
+          } else {
+            logger.info('result null');
+          }
+        } catch (error) {
+          logger.info(error);
+          logger.info('bannerId is invalid, not reusing it');
+        }
+      }
 
       banner = new admob.BannerAd({
         adUnitId,
         position: atTop ? 'top' : 'bottom',
         size: bannerRequestedAdSizeType,
+        id: 123,
       });
 
-      banner.on('load', () => {
+      console.log(banner);
+      console.log(admob);
+
+      banner.on('load', (event) => {
+        logger.info('banner loaded', JSON.stringify(event));
         bannerShowing = true;
         bannerLoaded = true;
+        localStorage.setItem('lastBannerId', event.adId);
       });
-      banner.on('loadfail', () => {
+      banner.on('loadfail', (event) => {
+        logger.info('banner did not load properly', JSON.stringify(event));
         bannerShowing = false;
         bannerLoaded = false;
         bannerErrored = true;

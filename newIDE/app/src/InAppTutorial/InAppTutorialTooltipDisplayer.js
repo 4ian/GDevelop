@@ -232,6 +232,7 @@ const TooltipHeader = ({
           <Typography
             variant="body2"
             style={{ ...styles.headerContentPreview, ...textEllipsisStyle }}
+            translate="no"
           >
             {tooltipContent}
           </Typography>

@@ -316,7 +316,13 @@ export default class ResourceSelector extends React.Component<Props, State> {
               </LineStackLayout>
             </Column>
             <RaisedButton
-              label={<Trans>Choose a file</Trans>}
+              label={
+                this.state.resourceName ? (
+                  <Trans>Replace</Trans>
+                ) : (
+                  <Trans>Choose a file</Trans>
+                )
+              }
               onClick={() => {
                 this._autoComplete && this._autoComplete.focus();
               }}

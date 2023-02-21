@@ -124,67 +124,82 @@ const EditProfileDialog = ({
           onApply={edit}
           open
         >
-          <ColumnStackLayout noMargin>
-            <UsernameField
-              initialUsername={profile.username}
-              value={username}
-              onChange={(e, value) => {
-                setUsername(value);
-              }}
-              errorText={getUsernameErrorText(error)}
-              onAvailabilityChecked={setUsernameAvailability}
-              onAvailabilityCheckLoading={setIsValidatingUsername}
-              isValidatingUsername={isValidatingUsername}
-              disabled={updateProfileInProgress}
-            />
-            <TextField
-              value={description}
-              floatingLabelText={<Trans>Bio</Trans>}
-              fullWidth
-              multiline
-              rows={3}
-              rowsMax={5}
-              translatableHintText={t`What are you using GDevelop for?`}
-              onChange={(e, value) => {
-                setDescription(value);
-              }}
-              disabled={updateProfileInProgress}
-              floatingLabelFixed
-            />
-            <TextField
-              value={donateLink}
-              floatingLabelText={<Trans>Donate link</Trans>}
-              fullWidth
-              translatableHintText={t`Do you have a Patreon? Ko-fi? Paypal?`}
-              onChange={(e, value) => {
-                setDonateLink(value);
-              }}
-              disabled={updateProfileInProgress}
-              floatingLabelFixed
-              helperMarkdownText={i18n._(
-                t`Add a link to your donation page. It will be displayed on your Liluo.io profile and game pages.`
-              )}
-              errorText={donateLinkFormattingError}
-            />
-            <Checkbox
-              label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
-              checked={getNewsletterEmail}
-              onCheck={(e, value) => {
-                setGetNewsletterEmail(value);
-              }}
-              disabled={updateProfileInProgress}
-            />
-            <Checkbox
-              label={
-                <Trans>I want to receive weekly stats about my games</Trans>
-              }
-              checked={getGameStatsEmail}
-              onCheck={(e, value) => {
-                setGetGameStatsEmail(value);
-              }}
-              disabled={updateProfileInProgress}
-            />
-          </ColumnStackLayout>
+          <form
+            onSubmit={event => {
+              // Prevent browser to navigate on form submission.
+              event.preventDefault();
+              edit();
+            }}
+            autoComplete="on"
+            name="editProfile"
+          >
+            <ColumnStackLayout noMargin>
+              <UsernameField
+                initialUsername={profile.username}
+                value={username}
+                onChange={(e, value) => {
+                  setUsername(value);
+                }}
+                errorText={getUsernameErrorText(error)}
+                onAvailabilityChecked={setUsernameAvailability}
+                onAvailabilityCheckLoading={setIsValidatingUsername}
+                isValidatingUsername={isValidatingUsername}
+                disabled={updateProfileInProgress}
+              />
+              <TextField
+                value={description}
+                floatingLabelText={<Trans>Bio</Trans>}
+                fullWidth
+                multiline
+                rows={3}
+                rowsMax={5}
+                translatableHintText={t`What are you using GDevelop for?`}
+                onChange={(e, value) => {
+                  setDescription(value);
+                }}
+                disabled={updateProfileInProgress}
+                floatingLabelFixed
+              />
+              <TextField
+                value={donateLink}
+                floatingLabelText={<Trans>Donate link</Trans>}
+                fullWidth
+                translatableHintText={t`Do you have a Patreon? Ko-fi? Paypal?`}
+                onChange={(e, value) => {
+                  setDonateLink(value);
+                }}
+                disabled={updateProfileInProgress}
+                floatingLabelFixed
+                helperMarkdownText={i18n._(
+                  t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
+                )}
+                errorText={donateLinkFormattingError}
+              />
+              <Checkbox
+                label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+                checked={getNewsletterEmail}
+                onCheck={(e, value) => {
+                  setGetNewsletterEmail(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <Checkbox
+                label={
+                  <Trans>I want to receive weekly stats about my games</Trans>
+                }
+                checked={getGameStatsEmail}
+                onCheck={(e, value) => {
+                  setGetGameStatsEmail(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              {/*
+                This input is needed so that the browser submits the form when
+                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
+              */}
+              <input type="submit" value="Submit" style={{ display: 'none' }} />
+            </ColumnStackLayout>
+          </form>
         </Dialog>
       )}
     </I18n>

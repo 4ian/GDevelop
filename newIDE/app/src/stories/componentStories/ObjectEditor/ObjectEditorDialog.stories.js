@@ -41,6 +41,7 @@ export const CustomObject = () => (
       launchProjectDataOnlyPreview: () => action('Hot-reload'),
       launchProjectWithLoadingScreenPreview: () => action('Reload'),
     }}
+    openBehaviorEvents={() => action('Open behavior events')}
   />
 );
 
@@ -68,5 +69,6 @@ export const StandardObject = () => (
       launchProjectDataOnlyPreview: () => action('Hot-reload'),
       launchProjectWithLoadingScreenPreview: () => action('Reload'),
     }}
+    openBehaviorEvents={() => action('Open behavior events')}
   />
 );

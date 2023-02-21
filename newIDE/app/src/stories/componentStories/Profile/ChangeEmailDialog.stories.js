@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ChangeEmailDialog from '../../../Profile/ChangeEmailDialog';
@@ -15,9 +16,9 @@ const defaultProps = {
     uid: 'id',
     email: 'email',
   },
-  onClose: () => {},
+  onClose: () => action('onClose')(),
   changeEmailInProgress: false,
-  onChangeEmail: async () => {},
+  onChangeEmail: action('onChangeEmail'),
   error: null,
 };
 export const Default = () => <ChangeEmailDialog {...defaultProps} />;

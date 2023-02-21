@@ -8,6 +8,7 @@ import PublicProfileContext from '../../Profile/PublicProfileContext';
 const styles = {
   chip: {
     marginRight: 2,
+    marginBottom: 2,
   },
 };
 
@@ -27,6 +28,7 @@ export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
       label={user.username}
       key={user.username}
       onClick={isClickable ? () => openUserPublicProfile(user.id) : null}
+      disableAutoTranslate
     />
   );
 };

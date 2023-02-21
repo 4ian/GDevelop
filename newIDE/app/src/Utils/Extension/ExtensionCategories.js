@@ -13,6 +13,8 @@ export const translateExtensionCategory = (
       return i18n._(t`Ads`);
     case 'Visual effect':
       return i18n._(t`Visual effect`);
+    case 'Text':
+      return i18n._(t`Text`);
     case 'Audio':
       return i18n._(t`Audio`);
     case 'Advanced':
@@ -31,6 +33,8 @@ export const translateExtensionCategory = (
       return i18n._(t`Third-party`);
     case 'User interface':
       return i18n._(t`User interface`);
+    case 'General':
+      return i18n._(t`General`);
     default:
       return category;
   }

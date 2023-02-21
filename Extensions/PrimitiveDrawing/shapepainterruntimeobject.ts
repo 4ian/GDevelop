@@ -474,7 +474,7 @@ namespace gdjs {
     /**
      * The center of rotation is defined relatively
      * to the drawing origin (the object position).
-     * This avoid the center to move on the drawing
+     * This avoids the center to move on the drawing
      * when new shapes push the bounds.
      *
      * When no custom center is defined, it will move

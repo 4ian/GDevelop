@@ -20,8 +20,8 @@ import AuthenticatedUserContext, {
 } from '../../Profile/AuthenticatedUserContext';
 import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeAuthenticatedButLoadingAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserLoggingIn,
   indieUserProfile,
 } from '../../fixtures/GDevelopServicesTestData';
 import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
@@ -126,6 +126,8 @@ const WrappedHomePage = ({
                 onOpenNewProjectSetupDialog={() =>
                   action('onOpenNewProjectSetupDialog')()
                 }
+                canSave={true}
+                onSave={() => action('onSave')()}
                 selectInAppTutorial={() => action('select in app tutorial')()}
                 onOpenProfile={() => action('open profile')()}
                 onOpenPreferences={() => action('open preferences')()}
@@ -157,42 +159,42 @@ export const BuildSectionLoading = () => (
   <WrappedHomePage
     project={null}
     recentProjectFiles={getRecentProjectFiles(5)}
-    user={fakeAuthenticatedButLoadingAuthenticatedUser}
+    user={fakeAuthenticatedUserLoggingIn}
   />
 );
 export const NoProjectOpened = () => (
   <WrappedHomePage
     project={null}
     recentProjectFiles={getRecentProjectFiles(5)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 export const ProjectOpened = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(5)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 export const NoRecentFiles = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={[]}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 export const LotOfRecentFiles = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 export const SomeRecentFilesNotSavedYet = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getPartiallySavedRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 
@@ -200,7 +202,7 @@ export const Connected = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 
@@ -209,7 +211,7 @@ export const ConnectedWithLongName = () => (
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
     user={{
-      ...fakeIndieAuthenticatedUser,
+      ...fakeSilverAuthenticatedUser,
       profile: {
         ...indieUserProfile,
         username: 'This is a very long username that should be truncated',
@@ -230,7 +232,7 @@ export const ConnectedWithInAppTutorialProgress = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
     tutorialProgress={{
       step: 40,
       progress: [100, 25, 0],
@@ -246,7 +248,7 @@ export const ConnectedWithInAppTutorialLoadingError = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
     tutorialProgress={undefined}
     inAppTutorialsFetchingError="fetching-error"
   />
@@ -256,7 +258,7 @@ export const ConnectedWithInAppTutorialCompleted = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
     tutorialProgress={{
       step: 40,
       progress: [100, 100, 100],
@@ -273,7 +275,7 @@ export const NetworkError = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
-    user={fakeIndieAuthenticatedUser}
+    user={fakeSilverAuthenticatedUser}
   />
 );
 NetworkError.decorators = [withMock];

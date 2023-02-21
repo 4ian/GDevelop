@@ -3,7 +3,7 @@ import * as React from 'react';
 import muiDecorator from '../../ThemeDecorator';
 import { action } from '@storybook/addon-actions';
 import RedeemCodeDialog from '../../../Profile/RedeemCodeDialog';
-import { fakeIndieAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
+import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { GDevelopUsageApi } from '../../../Utils/GDevelopServices/ApiConfigs';
@@ -27,7 +27,7 @@ export const WorkingCode = () => {
 
   return (
     <RedeemCodeDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onClose={action('onClose')}
     />
   );
@@ -46,7 +46,7 @@ export const CodeDoesNotExist = () => {
 
   return (
     <RedeemCodeDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onClose={action('onClose')}
     />
   );
@@ -65,7 +65,7 @@ export const UnknownError = () => {
 
   return (
     <RedeemCodeDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onClose={action('onClose')}
     />
   );
@@ -86,7 +86,7 @@ export const CannotBeRedeemedAnymoreError = () => {
 
   return (
     <RedeemCodeDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onClose={action('onClose')}
     />
   );
@@ -107,7 +107,7 @@ export const AlreadyRedeemedByUser = () => {
 
   return (
     <RedeemCodeDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onClose={action('onClose')}
     />
   );

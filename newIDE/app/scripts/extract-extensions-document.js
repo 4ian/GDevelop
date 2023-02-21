@@ -35,6 +35,9 @@ const generateExtensionFooterText = fullName => {
   return (
     `
 ---
+
+<tip>Learn [[gdevelop5:extensions:search|how to install new extensions]] by following a step-by-step guide.</tip>
+
 *This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
     ' ' +
     'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].'
@@ -49,7 +52,7 @@ const generateAuthorNamesWithLinks = authors => {
     .map(author => {
       if (!author.username) return null;
 
-      return `[${author.username}](https://liluo.io/${author.username})`;
+      return `[${author.username}](https://gd.games/${author.username})`;
     })
     .filter(Boolean)
     .join(', ');
@@ -80,7 +83,7 @@ const getAllExtensionHeaders = async () => {
           }).`
         );
       }
-      return { ...extensionHeader, ...extensionShortHeader};
+      return { ...extensionHeader, ...extensionShortHeader };
     })
   );
 
@@ -114,10 +117,7 @@ const sortKeys = table => {
  * @param {ExtensionHeader} extensionHeader The extension header
  * @param {boolean} isCommunity The tier
  */
-const createExtensionReferencePage = async (
-  extensionHeader,
-  isCommunity
-) => {
+const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extensionHeader.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
@@ -166,7 +166,7 @@ does or inspect its content before using it.
  * Generate a section for an extension.
  * @param {ExtensionHeader} extensionHeader The extension header
  */
-const generateExtensionSection = (extensionHeader) => {
+const generateExtensionSection = extensionHeader => {
   const folderName = getExtensionFolderName(extensionHeader.name);
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
@@ -201,9 +201,7 @@ const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
 
     extensionSectionsContent += `### ${category}\n\n`;
     for (const extensionHeader of extensions) {
-      extensionSectionsContent += generateExtensionSection(
-        extensionHeader
-      );
+      extensionSectionsContent += generateExtensionSection(extensionHeader);
     }
   }
   return extensionSectionsContent;
@@ -231,14 +229,9 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
     indexPageContent += '## Reviewed extensions\n\n';
     for (const extensionHeader of reviewedExtensionHeaders) {
-      await createExtensionReferencePage(
-        extensionHeader,
-        false
-      );
+      await createExtensionReferencePage(extensionHeader, false);
     }
-    indexPageContent += generateAllExtensionsSections(
-      reviewedExtensionHeaders
-    );
+    indexPageContent += generateAllExtensionsSections(reviewedExtensionHeaders);
 
     indexPageContent += `## Community extensions
 

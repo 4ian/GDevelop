@@ -45,10 +45,13 @@ import {
   getSelectedEvents,
   getSelectedInstructions,
   clearSelection,
-  getSelectedEventContexts,
   getSelectedInstructionsContexts,
   getSelectedInstructionsLocatingEvents,
   selectEventsAfterHistoryChange,
+  getLastSelectedTopMostOnlyEventContext,
+  getSelectedTopMostOnlyEventContexts,
+  getLastSelectedEventContext,
+  getLastSelectedEventContextWhichCanHaveSubEvents,
 } from './SelectionHandler';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
@@ -378,24 +381,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   addSubEvents = () => {
     const { project } = this.props;
-    const selectedEvents = getSelectedEvents(this.state.selection);
-    const newSubEvents = selectedEvents
-      .map(event => {
-        if (event.canHaveSubEvents()) {
-          return event
-            .getSubEvents()
-            .insertNewEvent(
-              project,
-              'BuiltinCommonInstructions::Standard',
-              event.getSubEvents().getEventsCount()
-            );
-        }
-        return null;
-      })
-      .filter(Boolean);
+
+    const selectedEventContext = getLastSelectedEventContextWhichCanHaveSubEvents(
+      this.state.selection
+    );
+    if (!selectedEventContext) return;
+
+    const newSubEvent = selectedEventContext.event
+      .getSubEvents()
+      .insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        selectedEventContext.event.getSubEvents().getEventsCount()
+      );
+
     this._eventsTree &&
       this._eventsTree.forceEventsUpdate(() => {
-        const positions = this._getChangedEventRows(newSubEvents);
+        const positions = this._getChangedEventRows([newSubEvent]);
         this._saveChangesToHistory('ADD', {
           positionsBeforeAction: positions,
           positionAfterAction: positions,
@@ -420,17 +422,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     context: ?EventInsertionContext
   ): Array<gdBaseEvent> => {
     const { project } = this.props;
-    const hasEventsSelected = hasEventSelected(this.state.selection);
+    const selectedEventContext = getLastSelectedEventContext(
+      this.state.selection
+    );
     let insertTopOfSelection = false;
 
     // This is not a real hook.
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const screenType = useScreenType();
 
-    let insertions: Array<EventInsertionContext> = [];
+    let insertion: EventInsertionContext;
     if (context) {
-      insertions = [context];
-    } else if (hasEventsSelected) {
+      insertion = context;
+    } else if (selectedEventContext) {
       if (
         type === 'BuiltinCommonInstructions::Comment' ||
         type === 'BuiltinCommonInstructions::Group'
@@ -438,42 +442,35 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         insertTopOfSelection = true;
       }
 
-      insertions = getSelectedEventContexts(this.state.selection).map(
-        selectedEvent => ({
-          eventsList: selectedEvent.eventsList,
-          indexInList: insertTopOfSelection
-            ? selectedEvent.indexInList - 1
-            : selectedEvent.indexInList,
-        })
-      );
+      insertion = {
+        eventsList: selectedEventContext.eventsList,
+        indexInList: insertTopOfSelection
+          ? selectedEventContext.indexInList - 1
+          : selectedEventContext.indexInList,
+      };
     } else {
-      insertions = [
-        {
-          eventsList: this.props.events,
-          indexInList: this.props.events.getEventsCount(),
-        },
-      ];
+      insertion = {
+        eventsList: this.props.events,
+        indexInList: this.props.events.getEventsCount(),
+      };
     }
 
-    const newEvents = insertions.map(
-      (context: { eventsList: gdEventsList, indexInList: number }) => {
-        return context.eventsList.insertNewEvent(
-          project,
-          type,
-          context.indexInList + 1
-        );
-      }
+    const newEvent = insertion.eventsList.insertNewEvent(
+      project,
+      type,
+      insertion.indexInList + 1
     );
+
     const currentTree = this._eventsTree;
     if (currentTree) {
       currentTree.forceEventsUpdate(() => {
-        const positions = this._getChangedEventRows(newEvents);
+        const positions = this._getChangedEventRows([newEvent]);
         this._saveChangesToHistory(
           'ADD',
           { positionsBeforeAction: positions, positionAfterAction: positions },
           () => {
-            if (!context && !hasEventsSelected) {
-              currentTree.scrollToRow(currentTree.getEventRow(newEvents[0]));
+            if (!context && !selectedEventContext) {
+              currentTree.scrollToRow(currentTree.getEventRow(newEvent));
             }
           }
         );
@@ -482,7 +479,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           (type === 'BuiltinCommonInstructions::Comment' ||
             type === 'BuiltinCommonInstructions::Group')
         ) {
-          const rowIndex = currentTree.getEventRow(newEvents[0]);
+          const rowIndex = currentTree.getEventRow(newEvent);
           const clickableElement = document.querySelector(
             `[data-row-index="${rowIndex}"] [data-editable-text="true"]`
           );
@@ -491,7 +488,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       });
     }
 
-    return newEvents;
+    return [newEvent];
   };
 
   openEventTextDialog = () => {
@@ -672,8 +669,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     if (isTryingToDragAnInstructionIntoItsOwnNestedInstructions) return;
 
-    selectedInstructions.forEach(instruction =>
-      destinationContext.instrsList.insert(instruction, destinationIndex)
+    // Insert copies of the moved instructions in the same order as the selection.
+    selectedInstructions.forEach((instruction, index) =>
+      destinationContext.instrsList.insert(
+        instruction,
+        destinationIndex + index
+      )
     );
 
     const locatingEvents = getSelectedInstructionsLocatingEvents(
@@ -1410,12 +1411,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   extractEventsToFunction = () => {
     const eventsList = new gd.EventsList();
 
-    getSelectedEvents(this.state.selection).forEach(event =>
-      eventsList.insertEvent(event, eventsList.getEventsCount())
+    // Only extract the top-most events, as the other will be contained inside.
+    getSelectedTopMostOnlyEventContexts(this.state.selection).forEach(
+      ({ event }) => eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
     this.props.onBeginCreateEventsFunction();
-
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
     });
@@ -1426,8 +1427,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   moveEventsIntoNewGroup = () => {
     const eventsList = new gd.EventsList();
 
-    getSelectedEvents(this.state.selection).forEach(event =>
-      eventsList.insertEvent(event, eventsList.getEventsCount())
+    // Only copy the top-most events, as the other will be contained inside.
+    getSelectedTopMostOnlyEventContexts(this.state.selection).forEach(
+      ({ event }) => eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
     this._replaceSelectionByGroupOfEvents(eventsList);
@@ -1438,23 +1440,24 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => {
-    const contexts = getSelectedEventContexts(this.state.selection);
-    if (!contexts.length) return;
+    const eventContext = getLastSelectedTopMostOnlyEventContext(
+      this.state.selection
+    );
+    if (!eventContext) return;
 
-    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Standard', {
-      eventsList: contexts[0].eventsList,
-      indexInList: contexts[0].indexInList,
-    });
-    if (!newEvents.length) {
-      console.error('A new event should have been created');
-      return;
-    }
+    const { project } = this.props;
+
+    const newEvent = eventContext.eventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Standard',
+      eventContext.indexInList
+    );
+    const standardEvt = gd.asStandardEvent(newEvent);
 
     const action = createNewInstructionForEventsFunction(
       extensionName,
       eventsFunction
     );
-    const standardEvt = gd.asStandardEvent(newEvents[0]);
     standardEvt.getActions().push_back(action);
     action.delete();
 
@@ -1462,19 +1465,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _replaceSelectionByGroupOfEvents = (eventsList: gdEventsList) => {
-    const contexts = getSelectedEventContexts(this.state.selection);
-    if (!contexts.length) return;
+    const eventContext = getLastSelectedTopMostOnlyEventContext(
+      this.state.selection
+    );
+    if (!eventContext) return;
 
-    const newEvents = this.addNewEvent('BuiltinCommonInstructions::Group', {
-      eventsList: contexts[0].eventsList,
-      indexInList: contexts[0].indexInList,
-    });
-    if (!newEvents.length) {
-      console.error('A new event should have been created');
-      return;
-    }
+    const { project } = this.props;
 
-    const groupEvent = gd.asGroupEvent(newEvents[0]);
+    const newEvent = eventContext.eventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Group',
+      eventContext.indexInList
+    );
+    const groupEvent = gd.asGroupEvent(newEvent);
 
     groupEvent.setName('Grouped events');
     groupEvent.setFolded(true);

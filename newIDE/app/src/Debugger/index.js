@@ -60,7 +60,6 @@ type State = {|
 
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
- * This is only supported on Electron runtime for now.
  */
 export default class Debugger extends React.Component<Props, State> {
   state = {
@@ -184,6 +183,14 @@ export default class Debugger extends React.Component<Props, State> {
           },
           () => this.updateToolbar()
         );
+      },
+      onConnectionErrored: ({ id, errorMessage }) => {
+        this._getLogsManager(id).addLog({
+          type: 'error',
+          timestamp: performance.now(),
+          group: 'Debugger connection',
+          message: 'The debugger connection errored: ' + errorMessage,
+        });
       },
       onServerStateChanged: () => {
         this.setState(

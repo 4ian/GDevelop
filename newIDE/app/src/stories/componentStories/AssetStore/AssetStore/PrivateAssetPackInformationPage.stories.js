@@ -31,6 +31,7 @@ const privateAssetPackListingData = {
   listing: 'ASSET_PACK',
   description: '5 assets',
   name: 'French Food',
+  categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
 };
 

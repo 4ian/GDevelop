@@ -669,34 +669,41 @@ const MainFrame = (props: Props) => {
   useDiscordRichPresence(currentProject);
 
   const closeProject = React.useCallback(
-    (): Promise<void> => {
+    async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
-      return setState(state => {
-        if (!currentProject) {
-          // It's important to return a new object to ensure that the promise
-          // will be fired.
-          return { ...state };
-        }
 
-        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-          currentProject
-        );
-        currentProject.delete();
-        if (unsavedChanges.hasUnsavedChanges) {
-          unsavedChanges.sealUnsavedChanges();
-        }
+      console.info('Closing project...');
 
-        return {
-          ...state,
-          currentProject: null,
-          currentFileMetadata: null,
-          editorTabs: closeProjectTabs(state.editorTabs, currentProject),
-        };
-      }).then(() => {});
+      // While not strictly necessary, use `currentProjectRef` to be 100%
+      // sure to have the latest project (avoid risking any stale variable to an old
+      // `currentProject` from the state in case someone kept an old reference to `closeProject`
+      // somewhere).
+      const currentProject = currentProjectRef.current;
+      if (!currentProject) return;
+
+      // Close the editors related to this project.
+      await setState(state => ({
+        ...state,
+        currentProject: null,
+        currentFileMetadata: null,
+        editorTabs: closeProjectTabs(state.editorTabs, currentProject),
+      }));
+
+      // Delete the project from memory. All references to it have been dropped previously
+      // by the setState.
+      console.info('Deleting project from memory...');
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      currentProject.delete();
+      if (unsavedChanges.hasUnsavedChanges) {
+        unsavedChanges.sealUnsavedChanges();
+      }
+      console.info('Project closed.');
     },
     [
-      currentProject,
+      currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
@@ -875,21 +882,26 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       try {
         await delay(150);
-        const autoSavefileMetadata = await checkForAutosave();
+        const autoSaveFileMetadata = await checkForAutosave();
         let content;
         try {
           const result = await onOpen(
-            autoSavefileMetadata,
+            autoSaveFileMetadata,
             setLoaderModalProgress
           );
           content = result.content;
         } catch (error) {
-          // onOpen failed, tried to find again an autosave
-          const autoSaveAfterFailurefileMetadata = await checkForAutosaveAfterFailure();
-          if (autoSaveAfterFailurefileMetadata) {
-            const result = await onOpen(autoSaveAfterFailurefileMetadata);
+          // onOpen failed, try to find again an autosave.
+          const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
+          if (autoSaveAfterFailureFileMetadata) {
+            const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        }
+        if (!content) {
+          throw new Error(
+            'The project file content could not be read. It might be corrupted/malformed.'
+          );
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
@@ -1528,7 +1540,7 @@ const MainFrame = (props: Props) => {
   const openEventsFunctionsExtension = React.useCallback(
     (
       name: string,
-      initiallyFocusedFunctionName?: string,
+      initiallyFocusedFunctionName?: ?string,
       initiallyFocusedBehaviorName?: ?string
     ) => {
       setState(state => ({
@@ -1647,6 +1659,39 @@ const MainFrame = (props: Props) => {
           functionName.name,
           functionName.behaviorName
         );
+      }
+    } else {
+      // It's not an events functions extension, we should not be here.
+      console.warn(
+        `Extension with name=${extensionName} can not be opened (no editor for this)`
+      );
+    }
+  };
+
+  const openBehaviorEvents = (extensionName: string, behaviorName: string) => {
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      // It's an events functions extension, open the editor for it.
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabs,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        // Open the given function and focus the tab
+        foundTab.editor.selectEventsBasedBehaviorByName(behaviorName);
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        openEventsFunctionsExtension(extensionName, null, behaviorName);
       }
     } else {
       // It's not an events functions extension, we should not be here.
@@ -2259,16 +2304,14 @@ const MainFrame = (props: Props) => {
   };
 
   const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
-    setState(state => {
-      return {
-        ...state,
-        editorTabs: moveTabToTheRightOfHoveredTab(
-          state.editorTabs,
-          fromIndex,
-          toHoveredIndex
-        ),
-      };
-    });
+    setState(state => ({
+      ...state,
+      editorTabs: moveTabToTheRightOfHoveredTab(
+        state.editorTabs,
+        fromIndex,
+        toHoveredIndex
+      ),
+    }));
   };
 
   const endTutorial = React.useCallback(
@@ -2835,6 +2878,8 @@ const MainFrame = (props: Props) => {
               : null
           )
         }
+        canSave={!!state.currentProject && !isSavingProject}
+        onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
         onOpenDebugger={launchDebuggerAndPreview}
@@ -2862,7 +2907,10 @@ const MainFrame = (props: Props) => {
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
-                <ErrorBoundary>
+                <ErrorBoundary
+                  title="This editor encountered a problem"
+                  scope="mainframe"
+                >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
@@ -2888,6 +2936,8 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     resourceManagementProps,
+                    onSave: saveProject,
+                    canSave: !!state.currentProject && !isSavingProject,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     unsavedChanges: unsavedChanges,
@@ -2934,6 +2984,7 @@ const MainFrame = (props: Props) => {
 
                       cb(true);
                     },
+                    openBehaviorEvents: openBehaviorEvents,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>

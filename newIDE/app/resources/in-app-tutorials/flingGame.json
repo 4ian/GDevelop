@@ -3626,8 +3626,8 @@
       "tooltip": {
         "description": {
           "messageByLocale": {
-            "en": "Copy this line and paste it here: `\"Time: \" + ToString(round( TimerElapsedTime(\"Score\")))`.",
-            "fr-FR": "Copier cette ligne et collez-là ici : `\"Temps : \" + ToString(round( TimerElapsedTime(\"Score\")))`."
+            "en": "Double click to highlight this line, then copy and paste it here: `\"Time: \" + ToString(round( TimerElapsedTime(\"Score\")))`.",
+            "fr-FR": "Double cliquez sur cette ligne pour la sélectionner et copiez-collez là ici : `\"Temps : \" + ToString(round( TimerElapsedTime(\"Score\")))`."
           }
         }
       },

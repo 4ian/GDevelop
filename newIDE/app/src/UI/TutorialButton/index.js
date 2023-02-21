@@ -9,7 +9,7 @@ import YouTube from '@material-ui/icons/YouTube';
 
 type PropsType = {|
   tutorialId: ?string,
-  label?: React.Node,
+  label: React.Node,
   renderIfNotFound?: React.Node,
 |};
 
@@ -34,7 +34,7 @@ const TutorialButton = (props: PropsType) => {
         }
       }}
       target="_blank"
-      label={<Trans>{props.label || 'Tutorial'}</Trans>}
+      label={props.label || <Trans>Tutorial</Trans>}
       icon={<YouTube />}
     />
   );

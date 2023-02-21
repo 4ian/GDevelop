@@ -4,15 +4,22 @@ import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../../../../Profile/AuthenticatedUserContext';
 import {
-  fakeAuthenticatedButLoadingAuthenticatedUser,
-  fakeIndieAuthenticatedUser,
-  fakeNoSubscriptionAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
-  subscriptionForIndieUser,
+  fakeAuthenticatedUserLoggingIn,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithNoSubscription,
+  fakeNotAuthenticatedUser,
+  fakeAuthenticatedUserWithValidSilverRedemptionCode,
+  fakeAuthenticatedUserWithExpiredSilverRedemptionCode,
+  fakeAuthenticatedUserWithLegacyIndieSubscription,
+  fakeGoldAuthenticatedUser,
+  fakeAuthenticatedUserWithLegacyProSubscription,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
+import AlertProvider from '../../../../UI/Alert/AlertProvider';
 
 export default {
   title: 'Subscription/SubscriptionDialog',
@@ -20,61 +27,66 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-const fakeIndieAuthenticatedUserWithFormerSubscription = {
-  ...fakeIndieAuthenticatedUser,
-  subscription: subscriptionForIndieUser,
-};
+const SubscriptionDialogWrapper = ({
+  authenticatedUser,
+}: {
+  authenticatedUser: AuthenticatedUser,
+}) => (
+  <AlertProvider>
+    <AuthenticatedUserContext.Provider value={authenticatedUser}>
+      <SubscriptionDialog
+        open
+        onClose={() => action('on close')()}
+        analyticsMetadata={{ reason: 'Debugger' }}
+      />
+    </AuthenticatedUserContext.Provider>
+  </AlertProvider>
+);
 
 export const NotAuthenticated = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNotAuthenticatedAuthenticatedUser}
-  >
-    <SubscriptionDialog
-      open
-      onClose={action('on close')}
-      analyticsMetadata={{ reason: 'Debugger' }}
-    />
-  </AuthenticatedUserContext.Provider>
+  <SubscriptionDialogWrapper authenticatedUser={fakeNotAuthenticatedUser} />
 );
+
 export const AuthenticatedButLoading = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeAuthenticatedButLoadingAuthenticatedUser}
-  >
-    <SubscriptionDialog
-      open
-      onClose={action('on close')}
-      analyticsMetadata={{ reason: 'Debugger' }}
-    />
-  </AuthenticatedUserContext.Provider>
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserLoggingIn}
+  />
 );
-export const AuthenticatedUserWithSubscription = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-    <SubscriptionDialog
-      open
-      onClose={action('on close')}
-      analyticsMetadata={{ reason: 'Debugger' }}
-    />
-  </AuthenticatedUserContext.Provider>
+
+export const WithNoSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+  />
 );
-export const AuthenticatedUserWithFormerSubscription = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeIndieAuthenticatedUserWithFormerSubscription}
-  >
-    <SubscriptionDialog
-      open
-      onClose={action('on close')}
-      analyticsMetadata={{ reason: 'Debugger' }}
-    />
-  </AuthenticatedUserContext.Provider>
+
+export const WithSilverSubscription = () => (
+  <SubscriptionDialogWrapper authenticatedUser={fakeSilverAuthenticatedUser} />
 );
-export const AuthenticatedUserWithNoSubscription = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNoSubscriptionAuthenticatedUser}
-  >
-    <SubscriptionDialog
-      open
-      onClose={action('on close')}
-      analyticsMetadata={{ reason: 'Debugger' }}
-    />
-  </AuthenticatedUserContext.Provider>
+
+export const WithGoldSubscription = () => (
+  <SubscriptionDialogWrapper authenticatedUser={fakeGoldAuthenticatedUser} />
+);
+
+export const WithValidSilverRedemptionCodeSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithValidSilverRedemptionCode}
+  />
+);
+
+export const WithExpiredSilverRedemptionCodeSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithExpiredSilverRedemptionCode}
+  />
+);
+
+export const WithLegacyIndieSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithLegacyIndieSubscription}
+  />
+);
+
+export const WithLegacyProSubscription = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithLegacyProSubscription}
+  />
 );

@@ -32,7 +32,7 @@ namespace gdjs {
     _objects: Hashtable<ObjectData>;
     _objectsCtor: Hashtable<typeof RuntimeObject>;
 
-    _layers: Hashtable<Layer>;
+    _layers: Hashtable<RuntimeLayer>;
     _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
 
     // Options for the debug draw:
@@ -601,7 +601,7 @@ namespace gdjs {
      * @param name The name of the layer
      * @returns The layer, or the base layer if not found
      */
-    getLayer(name: string): gdjs.Layer {
+    getLayer(name: string): gdjs.RuntimeLayer {
       if (this._layers.containsKey(name)) {
         return this._layers.get(name);
       }
@@ -620,9 +620,7 @@ namespace gdjs {
      * Add a layer.
      * @param layerData The data to construct the layer
      */
-    addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
-    }
+    abstract addLayer(layerData: LayerData);
 
     /**
      * Remove a layer. All {@link gdjs.RuntimeObject} on this layer will
@@ -647,7 +645,7 @@ namespace gdjs {
      * @param index The new position in the list of layers
      */
     setLayerIndex(layerName: string, index: integer): void {
-      const layer: gdjs.Layer = this._layers.get(layerName);
+      const layer: gdjs.RuntimeLayer = this._layers.get(layerName);
       if (!layer) {
         return;
       }

@@ -65,6 +65,7 @@ export default function SetupGridDialog(props: Props) {
       onApply={props.onApply}
       open
       maxWidth="sm"
+      exceptionallyStillAllowRenderingInstancesEditors
     >
       <ColumnStackLayout noMargin>
         <ResponsiveLineStackLayout noMargin expand>

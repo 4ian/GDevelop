@@ -146,6 +146,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         this.props.initiallyFocusedFunctionName,
         this.props.initiallyFocusedBehaviorName
       );
+    } else if (this.props.initiallyFocusedBehaviorName) {
+      this.selectEventsBasedBehaviorByName(
+        this.props.initiallyFocusedBehaviorName
+      );
     }
   }
 
@@ -469,6 +473,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
 
     cb(true);
+  };
+
+  selectEventsBasedBehaviorByName = (behaviorName: string) => {
+    const { eventsFunctionsExtension } = this.props;
+    const eventsBasedBehaviorsList = eventsFunctionsExtension.getEventsBasedBehaviors();
+    if (eventsBasedBehaviorsList.has(behaviorName)) {
+      this._selectEventsBasedBehavior(
+        eventsBasedBehaviorsList.get(behaviorName)
+      );
+    }
   };
 
   _selectEventsBasedBehavior = (

@@ -74,6 +74,7 @@ export type PublicAssetPack = {|
   assetsCount: number,
   externalWebLink?: ?string,
   userFriendlyPrice?: ?string,
+  categories: Array<string>,
 |};
 
 export type PublicAssetPacks = {|

@@ -154,6 +154,21 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isSaving');
 
+      extension
+        .addCondition(
+          'HasPlayerJustClosedLeaderboardView',
+          _('Closed by player'),
+          _('Check if the player has just closed the leaderboard view.'),
+          _('Player has just closed the leaderboard view'),
+          _('Display leaderboard'),
+          'JsPlatform/Extensions/leaderboard.svg',
+          'JsPlatform/Extensions/leaderboard.svg'
+        )
+        .setHelpPath('/all-features/leaderboards')
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+        .setFunctionName('gdjs.evtTools.leaderboards.hasPlayerJustClosedLeaderboardView');
+
     extension
       .addStrExpression(
         'LastSaveError',

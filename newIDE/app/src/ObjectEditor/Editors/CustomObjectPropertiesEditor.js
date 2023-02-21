@@ -19,7 +19,6 @@ import Text from '../../UI/Text';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { IconContainer } from '../../UI/IconContainer';
-import HelpIcon from '../../UI/HelpIcon';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const gd: libGDevelop = global.gd;
@@ -118,15 +117,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                   // of object cycles (thought it should be forbidden).
                   return (
                     <Accordion key={childObject.getName()} defaultExpanded>
-                      <AccordionHeader
-                        actions={[
-                          <HelpIcon
-                            key="help"
-                            size="small"
-                            helpPagePath={objectMetadata.getHelpPath()}
-                          />,
-                        ]}
-                      >
+                      <AccordionHeader>
                         {iconUrl ? (
                           <IconContainer
                             src={iconUrl}
@@ -154,7 +145,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               </ColumnStackLayout>
                             </Line>
                           ) : null}
-                          <Line>
+                          <Line noMargin>
                             <Column expand>
                               <EditorComponent
                                 objectConfiguration={childObjectConfiguration}

@@ -485,6 +485,8 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
 
+    boolean HasEventsBasedBehavior([Const] DOMString type);
+    [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);
     boolean HasEventsBasedObject([Const] DOMString type);
     [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
 
@@ -1283,6 +1285,7 @@ interface InstructionMetadata {
     [Ref] ExtraInformation GetCodeExtraInformation();
 
     [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName);
+    [Ref] ExtraInformation SetAsyncFunctionName([Const] DOMString functionName);
 
     [Ref] InstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] InstructionMetadata AddIncludeFile([Const] DOMString includeFile);
@@ -2248,6 +2251,10 @@ interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
 };
 
+interface InstructionsCountEvaluator {
+  long STATIC_ScanProject([Ref] Project project);
+};
+
 interface ExtensionAndBehaviorMetadata {
   [Const, Ref] PlatformExtension GetExtension();
   [Const, Ref] BehaviorMetadata GetMetadata();
@@ -2409,6 +2416,8 @@ interface EventsFunction {
     [Const, Ref] ValueTypeMetadata GetExpressionType();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
+    [Ref] EventsFunction SetAsync(boolean isAsync);
+    boolean IsAsync();
     boolean IsAction();
     boolean IsExpression();
     boolean IsCondition();
@@ -3145,6 +3154,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);
+    [Ref] PreviewExportOptions SetAllowAuthenticationUsingIframeForPreview(boolean enable);
 };
 
 [Prefix="gdjs::"]

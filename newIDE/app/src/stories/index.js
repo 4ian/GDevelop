@@ -47,12 +47,13 @@ import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfile
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
   subscriptionForIndieUser,
-  limitsForIndieUser,
+  silverSubscriptionWithRedemptionCode,
+  silverSubscriptionWithExpiredRedemptionCode,
+  limitsForSilverUser,
   limitsReached,
   noSubscription,
-  fakeIndieAuthenticatedUser,
-  fakeAuthenticatedButLoadingAuthenticatedUser,
-  fakeAuthenticatedAndEmailVerifiedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserLoggingIn,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -73,7 +74,6 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
@@ -88,7 +88,6 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
@@ -1122,69 +1121,6 @@ storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <BackgroundText>Hello World, this is a background text</BackgroundText>
-  ));
-
-storiesOf('UI Building Blocks/AlertMessage', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AlertMessage kind="info">Hello World, this is an alert text</AlertMessage>
-  ))
-  .add('default with button', () => (
-    <AlertMessage kind="info" onHide={() => {}}>
-      Hello World, this is an alert text
-    </AlertMessage>
-  ))
-  .add('long text', () => (
-    <AlertMessage kind="info">
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('long text with button', () => (
-    <AlertMessage kind="info" onHide={() => {}}>
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('long text with icon', () => (
-    <AlertMessage
-      kind="info"
-      renderLeftIcon={() => (
-        <img
-          src="res/tutorial_icons/tween-behavior.jpg"
-          alt=""
-          style={{
-            maxWidth: 128,
-            maxHeight: 128,
-          }}
-        />
-      )}
-      onHide={() => {}}
-    >
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('warning', () => (
-    <AlertMessage kind="warning">
-      Hello World, this is an alert text
-    </AlertMessage>
-  ))
-  .add('error', () => (
-    <AlertMessage kind="error">Hello World, this is an alert text</AlertMessage>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)
@@ -2609,7 +2545,11 @@ storiesOf('ErrorBoundary', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ErrorFallbackComponent componentStack="Fake stack" error={fakeError} />
+    <ErrorFallbackComponent
+      componentStack="Fake stack"
+      error={fakeError}
+      title="Error customizable title"
+    />
   ));
 
 storiesOf('Changelog', module)
@@ -2671,7 +2611,21 @@ storiesOf('CurrentUsageDisplayer', module)
   .add('default', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
-      currentUsage={limitsForIndieUser.limits['cordova-build']}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
+      onChangeSubscription={action('on change subscription callback')}
+    />
+  ))
+  .add('with redemption code', () => (
+    <CurrentUsageDisplayer
+      subscription={silverSubscriptionWithRedemptionCode}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
+      onChangeSubscription={action('on change subscription callback')}
+    />
+  ))
+  .add('with expired redemption code', () => (
+    <CurrentUsageDisplayer
+      subscription={silverSubscriptionWithExpiredRedemptionCode}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
       onChangeSubscription={action('on change subscription callback')}
     />
   ))
@@ -2695,32 +2649,16 @@ storiesOf('AuthenticatedUserProfileDetails', module)
   .addDecorator(muiDecorator)
   .add('profile', () => (
     <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
     />
   ))
   .add('loading', () => (
     <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
+      authenticatedUser={fakeAuthenticatedUserLoggingIn}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
-    />
-  ));
-
-storiesOf('EmailVerificationPendingDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('non verified user - loading', () => (
-    <EmailVerificationPendingDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
-      onClose={action('on close')}
-    />
-  ))
-  .add('verified user', () => (
-    <EmailVerificationPendingDialog
-      authenticatedUser={fakeAuthenticatedAndEmailVerifiedUser}
-      onClose={action('on close')}
     />
   ));
 

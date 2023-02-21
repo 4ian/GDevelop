@@ -23,6 +23,7 @@ import Text from '../UI/Text';
 import AlertMessage from '../UI/AlertMessage';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { hasValidSubscriptionPlan } from '../Utils/GDevelopServices/Usage';
 
 type Props = {|
   loadingScreen: gdLoadingScreen,
@@ -55,8 +56,9 @@ export const LoadingScreenEditor = ({
   const subscriptionChecker = React.useRef<?SubscriptionCheckerInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const forceUpdate = useForceUpdate();
-  const shouldDisplayGetSubscriptionCard =
-    !authenticatedUser.subscription || !authenticatedUser.subscription.planId;
+  const shouldDisplayGetSubscriptionCard = !hasValidSubscriptionPlan(
+    authenticatedUser.subscription
+  );
 
   const onUpdate = () => {
     forceUpdate();
@@ -180,8 +182,10 @@ export const LoadingScreenEditor = ({
             {shouldDisplayGetSubscriptionCard && (
               <GetSubscriptionCard subscriptionDialogOpeningReason="Disable GDevelop splash at startup">
                 <Text>
-                  Get a silver or gold subscription to disable GDevelop
-                  branding.
+                  <Trans>
+                    Get a silver or gold subscription to disable GDevelop
+                    branding.
+                  </Trans>
                 </Text>
               </GetSubscriptionCard>
             )}

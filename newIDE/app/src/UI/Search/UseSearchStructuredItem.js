@@ -29,6 +29,44 @@ export const sharedFuseConfiguration = {
   threshold: 0.35,
   includeMatches: true,
   ignoreLocation: true,
+  useExtendedSearch: true,
+  findAllMatches: true,
+};
+
+/**
+ * This helper allows creating the search query for a search within a simple array of strings.
+ */
+export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
+  const tokenisedSearchQuery = searchText.trim().split(' ');
+  return `'${tokenisedSearchQuery.join(" '")}`;
+};
+
+/**
+ * This helper allows creating the search query for searching within an array of
+ * objects with multiple keys.
+ * If we don't use this, the search will only be done on one of the keys.
+ * See https://github.com/krisk/Fuse/issues/235#issuecomment-850269634
+ */
+export const getFuseSearchQueryForMultipleKeys = (
+  searchText: string,
+  keys: Array<string>
+) => {
+  const tokenisedSearchQuery = searchText.trim().split(' ');
+  const searchQuery: {
+    $or: Fuse.Expression[],
+  }[] = tokenisedSearchQuery.map((searchToken: string) => {
+    const orFields: Fuse.Expression[] = keys.map(key => ({
+      [key]: searchToken,
+    }));
+
+    return {
+      $or: orFields,
+    };
+  });
+
+  return {
+    $and: searchQuery,
+  };
 };
 
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
@@ -211,6 +249,8 @@ export const useSearchStructuredItem = <
           threshold: 0.35,
           includeMatches: true,
           ignoreLocation: true,
+          useExtendedSearch: true,
+          findAllMatches: true,
         });
 
         const totalTime = performance.now() - startTime;
@@ -252,7 +292,14 @@ export const useSearchStructuredItem = <
         }
 
         const startTime = performance.now();
-        const results = searchApi.search(`'${searchText}`);
+        const results = searchApi.search(
+          getFuseSearchQueryForMultipleKeys(searchText, [
+            'name',
+            'fullName',
+            'shortDescription',
+            'tags',
+          ])
+        );
         const totalTime = performance.now() - startTime;
         console.info(
           `Found ${results.length} items in ${totalTime.toFixed(3)}ms.`

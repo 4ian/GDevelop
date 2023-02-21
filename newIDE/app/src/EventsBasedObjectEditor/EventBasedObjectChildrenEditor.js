@@ -337,6 +337,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 onUpdateBehaviorsSharedData={() =>
                   this.updateBehaviorsSharedData()
                 }
+                // TODO EBO Go to the behavior extension tab.
+                openBehaviorEvents={() => {}}
               />
             )}
           </React.Fragment>

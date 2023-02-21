@@ -21,6 +21,9 @@ export type Subscription = {|
   stripeCustomerId?: string,
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
+
+  redemptionCode?: string | null,
+  redemptionCodeValidUntil?: number | null,
 |};
 
 /**
@@ -115,6 +118,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       {
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
+      {
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
     ],
   },
   {
@@ -133,7 +139,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
       {
-        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
       },
     ],
   },
@@ -269,6 +275,12 @@ export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
   // Otherwise (Paypal), it needs to be cancelled first.
   return !!subscription.stripeSubscriptionId;
 };
+
+export const hasValidSubscriptionPlan = (subscription: ?Subscription) =>
+  !!subscription &&
+  !!subscription.planId &&
+  (!subscription.redemptionCodeValidUntil || // No redemption code
+    subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
 
 type UploadType = 'build' | 'preview';
 

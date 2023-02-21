@@ -1294,9 +1294,8 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile
     ) {
-      let tileMapJsonData = null;
       try {
-        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
@@ -1320,6 +1319,7 @@ module.exports = {
       } catch (err) {
         console.error('Unable to load a Tilemap JSON data: ', err);
       }
+      return null;
     };
 
     /**
@@ -1540,34 +1540,38 @@ module.exports = {
     // GDJS doesn't use Promise to avoid allocation.
     RenderedCollisionMaskInstance.prototype._loadTiledMapWithCallback =
       function (tilemapJsonFile, tilesetJsonFile, callback) {
-        this._loadTiledMap(tilemapJsonFile, tilesetJsonFile).then(callback);
+        this._loadTileMap(tilemapJsonFile, tilesetJsonFile).then(callback);
       };
 
-    RenderedCollisionMaskInstance.prototype._loadTiledMap = async function (
+    RenderedCollisionMaskInstance.prototype._loadTileMap = async function (
       tilemapJsonFile,
       tilesetJsonFile
     ) {
-      let tileMapJsonData = null;
       try {
-        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
 
-        const tilesetJsonData = tilesetJsonFile
-          ? await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilesetJsonFile
-            )
-          : null;
+        const tileMap = TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
-        if (tilesetJsonData) {
-          tileMapJsonData.tilesets = [tilesetJsonData];
+        if (tileMap.kind === 'tiled') {
+          const tilesetJsonData = tilesetJsonFile
+            ? await this._pixiResourcesLoader.getResourceJsonData(
+                this._project,
+                tilesetJsonFile
+              )
+            : null;
+
+          if (tilesetJsonData) {
+            tileMapJsonData.tilesets = [tilesetJsonData];
+          }
         }
+        return tileMap;
       } catch (err) {
         console.error('Unable to load a Tilemap JSON data: ', err);
       }
-      return tileMapJsonData;
+      return null;
     };
 
     /**

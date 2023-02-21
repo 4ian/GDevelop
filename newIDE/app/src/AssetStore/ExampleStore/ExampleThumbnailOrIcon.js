@@ -3,6 +3,7 @@ import * as React from 'react';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { iconWithBackgroundStyle } from '../../UI/IconContainer';
 
 const styles = {
   iconBackground: {
@@ -11,9 +12,8 @@ const styles = {
     justifyContent: 'center',
   },
   icon: {
-    background: 'linear-gradient(45deg, #FFFFFF33, #FFFFFF)',
+    ...iconWithBackgroundStyle,
     padding: 1,
-    borderRadius: 4,
   },
 };
 

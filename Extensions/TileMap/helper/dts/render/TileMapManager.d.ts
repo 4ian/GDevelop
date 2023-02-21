@@ -1,7 +1,7 @@
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
 import PIXI = GlobalPIXIModule.PIXI;
-import { TileMap } from '../types';
+import { TileMapFileContent } from '../load/TileMapFileContent';
 /**
  * A holder to share tile maps across the 2 extension objects.
  *
@@ -23,7 +23,7 @@ export declare class TileMapManager {
    * @param data JSON data.
    * @returns The data enclosed with its detected kind.
    */
-  static identify(data: any): TileMap | null;
+  static identify(data: any): TileMapFileContent | null;
   /**
    * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param tileMapJsonResourceName The resource name of the tile map.
@@ -36,7 +36,7 @@ export declare class TileMapManager {
     loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tileMap: TileMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
@@ -57,7 +57,7 @@ export declare class TileMapManager {
     loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tileMap: TileMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
     atlasImageResourceName: string,

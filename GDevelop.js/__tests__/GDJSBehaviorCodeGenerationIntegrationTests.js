@@ -150,7 +150,7 @@ function generateCompiledRuntimeBehaviorMaker(
     true
   );
 
-  // Create a function with the generated behavior.
+  // Create a function returning the generated behavior.
   const makeCompiledBehavior = new Function(
     'gdjs',
     `let behaviorNamespace = {};

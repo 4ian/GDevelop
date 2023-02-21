@@ -53,6 +53,8 @@ const defaultProps: MainFrameToolbarProps = {
   canDoNetworkPreview: true,
   isPreviewEnabled: false,
   hasPreviewsRunning: false,
+  canSave: true,
+  onSave: async () => {},
   previewState: {
     isPreviewOverriden: false,
     previewLayoutName: null,

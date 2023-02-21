@@ -110,7 +110,11 @@ const MeasuresTable = (props: Props) => {
         ) : (
           <div style={{ width: 24 }} />
         )}
-        {rowData.name}
+        {/*
+          The name is wrapped in a span to prevent crashes when Google Translate
+          translates the website. See https://github.com/4ian/GDevelop/issues/3453.
+        */}
+        <span>{rowData.name}</span>
       </div>
     );
   };

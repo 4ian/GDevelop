@@ -97,12 +97,12 @@ const initialMosaicEditorNodes = {
   },
 };
 
-const initialMosaicEditorNodesSmallWindow = {
-  direction: 'row',
+const getInitialMosaicEditorNodesSmallWindow = () => ({
+  direction: Window.getOrientation() === 'portrait' ? 'column' : 'row',
   first: 'instances-editor',
   second: 'objects-list',
   splitPercentage: 70,
-};
+});
 
 type Props = {|
   initialInstances: gdInitialInstancesContainer,
@@ -117,6 +117,7 @@ type Props = {|
   isActive: boolean,
   unsavedChanges?: ?UnsavedChanges,
   canInstallPrivateAsset: () => boolean,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -499,6 +500,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
 
     if (this._objectsList) this._objectsList.openNewObjectDialog();
+    else this.openObjectsList();
   };
 
   _onAddInstanceUnderCursor = () => {
@@ -1588,7 +1590,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   initialNodes={
                     windowWidth === 'small'
                       ? getDefaultEditorMosaicNode('scene-editor-small') ||
-                        initialMosaicEditorNodesSmallWindow
+                        getInitialMosaicEditorNodesSmallWindow()
                       : getDefaultEditorMosaicNode('scene-editor') ||
                         initialMosaicEditorNodes
                   }
@@ -1660,6 +1662,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   onUpdateBehaviorsSharedData={() =>
                     this.updateBehaviorsSharedData()
                   }
+                  openBehaviorEvents={this.props.openBehaviorEvents}
                 />
               )}
             </React.Fragment>

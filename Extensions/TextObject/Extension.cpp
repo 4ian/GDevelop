@@ -23,7 +23,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  "some indicators, menu buttons, dialogues..."),
                                "Florian Rival and Victor Levasseur",
                                "Open source (MIT License)")
-      .SetCategory("User interface")
+      .SetCategory("Text")
       .SetExtensionHelpPath("/objects/text");
   extension.AddInstructionOrExpressionGroupMetadata(_("Text object"))
       .SetIcon("CppPlatform/Extensions/texticon.png");
@@ -34,7 +34,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  _("Text"),
                                  _("Displays a text on the screen."),
                                  "CppPlatform/Extensions/texticon.png")
-          .SetCategoryFullName(_("User interface"));
+          .SetCategoryFullName(_("Text"));
 
   obj.AddAction("String",
                 _("Modify the text"),

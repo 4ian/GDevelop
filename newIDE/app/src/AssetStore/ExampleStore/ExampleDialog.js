@@ -25,6 +25,8 @@ import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
+import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
 const isDev = Window.isDev();
 
 const electron = optionalRequire('electron');
@@ -143,17 +145,30 @@ export function ExampleDialog({
             <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
           <Column>
-            {exampleShortHeader.authors && (
+            {
               <Line>
-                {exampleShortHeader.authors.map(author => (
-                  <UserPublicProfileChip
-                    user={author}
-                    key={author.id}
-                    isClickable
-                  />
-                ))}
+                <div style={{ flexWrap: 'wrap' }}>
+                  {exampleShortHeader.codeSizeLevel && (
+                    <ExampleSizeChip
+                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                    />
+                  )}
+                  {exampleShortHeader.difficultyLevel && (
+                    <ExampleDifficultyChip
+                      codeSizeLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
+                  {exampleShortHeader.authors &&
+                    exampleShortHeader.authors.map(author => (
+                      <UserPublicProfileChip
+                        user={author}
+                        key={author.id}
+                        isClickable
+                      />
+                    ))}
+                </div>
               </Line>
-            )}
+            }
             <Text noMargin>{exampleShortHeader.shortDescription}</Text>
           </Column>
         </ResponsiveLineStackLayout>

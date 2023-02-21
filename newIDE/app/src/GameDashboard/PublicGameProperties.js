@@ -168,8 +168,8 @@ export function PublicGameProperties({
                   floatingLabelText={<Trans>Genres</Trans>}
                   helperText={
                     <Trans>
-                      Select up to 4 genres for the game to be visible on
-                      Liluo.io's categories pages!
+                      Select up to 3 genres for the game to be visible on
+                      gd.games's categories pages!
                     </Trans>
                   }
                   value={
@@ -201,14 +201,14 @@ export function PublicGameProperties({
                     disabled: category.type === 'admin-only',
                   }))}
                   fullWidth
-                  optionsLimit={4}
+                  optionsLimit={3}
                   disabled={disabled}
                   loading={allGameCategories.length === 0}
                 />
               )}
               {setDiscoverable && (
                 <Checkbox
-                  label={<Trans>Make your game discoverable on Liluo.io</Trans>}
+                  label={<Trans>Make your game discoverable on gd.games</Trans>}
                   checked={!!discoverable}
                   onCheck={(e, checked) => setDiscoverable(checked)}
                   disabled={disabled}

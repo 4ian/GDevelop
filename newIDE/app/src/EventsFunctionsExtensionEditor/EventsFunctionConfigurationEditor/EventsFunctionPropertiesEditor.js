@@ -23,6 +23,7 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import ValueTypeEditor from './ValueTypeEditor';
+import AlertMessage from '../../UI/AlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -478,6 +479,16 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 }}
                 getLastObjectParameterObjectType={() => ''}
               />
+            )}
+            {eventsFunction.isAsync() && (
+              <AlertMessage kind="info">
+                <Trans>
+                  This is an asynchronous action, meaning that the actions and
+                  sub-events following it will wait for it to end. Don't forget
+                  to use the action "End asynchronous function" to mark the end
+                  of the action.
+                </Trans>
+              </AlertMessage>
             )}
             {helpPagePath ? (
               <Line noMargin>

@@ -644,7 +644,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
-      eventsFunction.getGroup() || '',
+      eventsFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
@@ -764,7 +766,9 @@ export const declareObjectInstructionOrExpressionMetadata = (
         eventsFunction.getFullName(),
       // An operator and an operand are inserted before user parameters.
       shiftSentenceParamIndexes(eventsFunction.getSentence(), 2),
-      eventsFunction.getGroup() || '',
+      eventsFunction.getGroup() ||
+        eventsBasedObject.getFullName() ||
+        eventsBasedObject.getName(),
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.ActionWithOperator) {
@@ -1165,6 +1169,42 @@ export const declareObjectPropertiesInstructionAndExpressions = (
       addObjectParameter
     );
   });
+};
+
+/**
+ * Declare the instructions (actions/conditions) and expressions for the
+ * properties of the given events based object.
+ * This is akin to what would happen by manually declaring a JS extension
+ * (see `JsExtension.js` files of extensions).
+ */
+export const declareObjectInternalInstructions = (
+  i18n: I18nType,
+  extension: gdPlatformExtension,
+  objectMetadata: gdObjectMetadata,
+  eventsBasedObject: gdEventsBasedObject
+): void => {
+  // TODO EBO Use full type to identify object to avoid collision.
+  // Objects are identified by their name alone.
+  const objectType = eventsBasedObject.getName();
+
+  objectMetadata
+    .addScopedAction(
+      'SetRotationCenter',
+      i18n._('Center of rotation'),
+      i18n._(
+        'Change the center of rotation of an object relatively to the object origin.'
+      ),
+      i18n._('Change the center of rotation of _PARAM0_ to _PARAM1_, _PARAM2_'),
+      i18n._('Angle'),
+      'res/actions/position24_black.png',
+      'res/actions/position_black.png'
+    )
+    .addParameter('object', i18n._('Object'), objectType)
+    .addParameter('number', i18n._('X position'))
+    .addParameter('number', i18n._('Y position'))
+    .markAsAdvanced()
+    .setPrivate()
+    .setFunctionName('setRotationCenter');
 };
 
 /**

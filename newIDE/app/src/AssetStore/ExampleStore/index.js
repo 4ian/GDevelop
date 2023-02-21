@@ -18,13 +18,26 @@ export const prepareExamples = (
   examples: Array<ExampleShortHeader>
 ): Array<ExampleShortHeader> =>
   examples.sort((example1, example2) => {
-    const isExample1Starter = example1.tags.includes('Starter');
-    const isExample2Starter = example2.tags.includes('Starter');
-    return isExample1Starter && !isExample2Starter
-      ? -1
-      : !isExample1Starter && isExample2Starter
-      ? 1
-      : 0;
+    let difference =
+      (example2.tags.includes('Starter') ? 1 : 0) -
+      (example1.tags.includes('Starter') ? 1 : 0);
+    if (difference) {
+      return difference;
+    }
+    difference =
+      (example2.tags.includes('game') ? 1 : 0) -
+      (example1.tags.includes('game') ? 1 : 0);
+    if (difference) {
+      return difference;
+    }
+    difference =
+      (example2.previewImageUrls.length ? 1 : 0) -
+      (example1.previewImageUrls.length ? 1 : 0);
+    if (difference) {
+      return difference;
+    }
+
+    return 0;
   });
 
 const getExampleName = (exampleShortHeader: ExampleShortHeader) =>

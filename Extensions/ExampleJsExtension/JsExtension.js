@@ -89,7 +89,7 @@ module.exports = {
       .addExtraInfo('image');
     dummyEffectProperties
       .getOrCreate('someColor')
-      .setValue('#0022FF')
+      .setValue('255;3;62')
       .setLabel(_("Color (won't be used, just for demonstration purpose)"))
       .setType('color')
       .setDescription(_('Another optional description.'));

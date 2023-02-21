@@ -300,7 +300,7 @@ export const sendAssetPackOpened = (options: {|
   assetPackTag: string | null,
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
-  source: 'store-home' | 'author-profile',
+  source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
   recordEvent('asset_pack_opened', options);
 };
@@ -334,7 +334,12 @@ export const sendHelpSearch = (searchText: string) => {
 
 export const sendErrorMessage = (
   message: string,
-  type: 'error' | 'error-boundary',
+  type:
+    | 'error'
+    | 'error-boundary_mainframe'
+    | 'error-boundary_list-search-result'
+    | 'error-boundary_box-search-result'
+    | 'error-boundary_app',
   rawError: any,
   errorId: string
 ) => {
@@ -379,7 +384,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Cloud Project limit reached'
   | 'Consult profile'
   | 'Build limit reached'
-  | 'Leaderboard customization';
+  | 'Leaderboard customization'
+  | 'Extend redeemed subscription';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

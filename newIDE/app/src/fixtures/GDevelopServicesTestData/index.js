@@ -128,6 +128,9 @@ export const indieUserProfile: Profile = {
   description: 'Just here to develop indie games',
   getGameStatsEmail: false,
   getNewsletterEmail: true,
+  createdAt: 12345,
+  updatedAt: 12345,
+  appLanguage: null,
   isCreator: true,
   isPlayer: false,
   donateLink: 'https://www.paypal.me/indie-user',
@@ -161,11 +164,43 @@ export const subscriptionForIndieUser: Subscription = {
   userId: 'indie-user',
 };
 
+export const subscriptionForProUser: Subscription = {
+  planId: 'gdevelop_pro',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'pro-user',
+};
+
 export const subscriptionForSilverUser: Subscription = {
   planId: 'gdevelop_silver',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'silver-user',
+};
+
+export const subscriptionForGoldUser: Subscription = {
+  planId: 'gdevelop_gold',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+};
+
+export const silverSubscriptionWithRedemptionCode: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  redemptionCode: 'test-123-code',
+  redemptionCodeValidUntil: 1695194209000,
+};
+
+export const silverSubscriptionWithExpiredRedemptionCode: Subscription = {
+  planId: 'gdevelop_silver',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  redemptionCode: 'test-123-code',
+  redemptionCodeValidUntil: Date.now() - 1000,
 };
 
 export const noSubscription: Subscription = {
@@ -204,7 +239,7 @@ export const limitsForNoSubscriptionUser: Limits = {
   message: undefined,
 };
 
-export const limitsForIndieUser: Limits = {
+export const limitsForSilverUser: Limits = {
   capabilities: {
     analytics: {
       sessions: true,
@@ -233,7 +268,7 @@ export const limitsForIndieUser: Limits = {
   message: undefined,
 };
 
-export const limitsForProUser: Limits = {
+export const limitsForGoldUser: Limits = {
   capabilities: {
     analytics: {
       sessions: true,
@@ -291,7 +326,7 @@ export const limitsReached: Limits = {
   message: undefined,
 };
 
-export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
+const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
@@ -299,170 +334,114 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
   firebaseUser: indieFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForNoSubscriptionUser,
+  receivedAssetPacks: [
+    {
+      id: '07a9f974-aeca-4a3f-b501-4808400eda4f',
+      createdAt: '2022-12-13T19:45:47.318Z',
+      updatedAt: '2022-12-13T19:45:47.318Z',
+      name: 'Gamepasses',
+      longDescription: '',
+      previewImageUrls: [
+        'https://resources.gdevelop-app.com/staging/private-assets/Gamepasses/thumbnail.png',
+      ],
+      tag: 'gamepasses',
+      content: {},
+    },
+  ],
+  receivedAssetShortHeaders: [],
+  onLogout: async () => {},
+  onLogin: () => {},
+  onForgotPassword: async () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onOpenEmailVerificationDialog: () => {},
+  onBadgesChanged: async () => {},
+  onCloudProjectsChanged: async () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onSubscriptionUpdated: async () => {
+    console.info('This should refresh the subscriptions');
+  },
+  onPurchaseSuccessful: async () => {
+    console.info('This should refresh the assets');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
-  usages: usagesForIndieUser,
-  limits: limitsForIndieUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+  limits: limitsForSilverUser,
 };
 
-export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
-  badges: null,
+export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForGoldUser,
+  limits: limitsForGoldUser,
+};
+
+export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
   cloudProjects: tenCloudProjects,
-  cloudProjectsFetchingErrorLabel: null,
-  firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
-  usages: usagesForIndieUser,
   limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
-  badges: null,
+export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionWithRedemptionCode,
+  limits: limitsForSilverUser,
+};
+
+export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionWithExpiredRedemptionCode,
+  limits: limitsForSilverUser,
+};
+
+export const fakeAuthenticatedUserWithLegacyIndieSubscription = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForIndieUser,
+  limits: limitsForSilverUser,
+};
+
+export const fakeAuthenticatedUserWithLegacyProSubscription = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForProUser,
+  limits: limitsForGoldUser,
+};
+
+export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
   cloudProjects: tenCloudProjects,
-  cloudProjectsFetchingErrorLabel: null,
-  firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
-  usages: usagesForIndieUser,
   limits: limitsReached,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
-  badges: null,
-  cloudProjects: cloudProjectsForIndieUser,
-  cloudProjectsFetchingErrorLabel: null,
+export const fakeAuthenticatedUserWithEmailVerified: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   firebaseUser: indieVerifiedFirebaseUser,
-  subscription: noSubscription,
-  usages: usagesForIndieUser,
-  limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
+export const fakeAuthenticatedUserLoggingIn: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: true,
-  profile: null,
   loginState: 'loggingIn',
+  profile: null,
   badges: null,
   cloudProjects: null,
   cloudProjectsFetchingErrorLabel: null,
@@ -470,41 +449,10 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
-  authenticated: true,
-  profile: indieUserProfile,
-  loginState: 'done',
+  ...defaultAuthenticatedUserWithNoSubscription,
   badges: [
     {
       seen: false,
@@ -513,44 +461,10 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
       achievementId: 'badge1',
     },
   ],
-  cloudProjects: cloudProjectsForIndieUser,
-  cloudProjectsFetchingErrorLabel: null,
-  firebaseUser: indieVerifiedFirebaseUser,
-  subscription: noSubscription,
-  usages: usagesForIndieUser,
-  limits: limitsForNoSubscriptionUser,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
+export const fakeNotAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
   authenticated: false,
   profile: null,
   loginState: 'done',
@@ -561,35 +475,6 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   subscription: null,
   usages: null,
   limits: null,
-  receivedAssetPacks: [],
-  receivedAssetShortHeaders: [],
-  onLogout: async () => {},
-  onLogin: () => {},
-  onForgotPassword: async () => {},
-  onEdit: () => {},
-  onChangeEmail: () => {},
-  onCreateAccount: () => {},
-  onBadgesChanged: async () => {},
-  onCloudProjectsChanged: async () => {},
-  onRefreshUserProfile: async () => {
-    console.info('This should refresh the user profile');
-  },
-  onSubscriptionUpdated: async () => {
-    console.info('This should refresh the subscriptions');
-  },
-  onPurchaseSuccessful: async () => {
-    console.info('This should refresh the assets');
-  },
-  onRefreshFirebaseProfile: async () => {
-    console.info('This should refresh the firebase profile');
-  },
-  onSendEmailVerification: async () => {
-    console.info('This should send the email verification');
-  },
-  onAcceptGameStatsEmail: async () => {
-    console.info('This should accept receiving game stats email');
-  },
-  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const release: Release = {
@@ -1188,6 +1073,15 @@ export const communityTierExtensionHeader: ExtensionHeader = {
   iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
 };
 
+export const fakeGame: Game = {
+  id: 'complete-game-id',
+  authorName: 'SonicFan',
+  gameName: 'Sonic1995',
+  createdAt: 1606065498,
+  publicWebBuildId: 'fake-public-web-build-id-sonic',
+  displayAdsOnGamePage: true,
+};
+
 export const game1: Game = {
   id: 'fake-game1-id',
   authorName: 'My company',
@@ -1417,6 +1311,7 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   tags: [],
   previewImageUrls: [],
   gdevelopVersion: '99.0.0',
+  codeSizeLevel: 'small',
 };
 
 export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
@@ -1453,6 +1348,7 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
     'Health (life points and damages for objects)',
   ],
   gdevelopVersion: '',
+  codeSizeLevel: 'small',
 };
 
 export const fakeAssetPacks: PublicAssetPacks = {
@@ -1460,6 +1356,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'GDevelop Platformer',
       tag: 'platformer',
+      categories: ['full-game-pack'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
       assetsCount: 16,
@@ -1467,6 +1364,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Space Shooter',
       tag: 'space shooter',
+      categories: [],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
       assetsCount: 140,
@@ -1474,6 +1372,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Tanks',
       tag: 'tank pack',
+      categories: [],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
       assetsCount: 32,
@@ -1481,6 +1380,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Pixel Adventure',
       tag: 'pixel adventure pack',
+      categories: ['full-game-pack'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
       assetsCount: 80,
@@ -1488,6 +1388,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Fake Paid External',
       tag: 'pirate bomb pack',
+      categories: ['full-game-pack'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
       assetsCount: 48,
@@ -1497,6 +1398,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Particles',
       tag: 'pixel effects pack',
+      categories: ['visual-effect'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
       assetsCount: 20,
@@ -1504,12 +1406,14 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Emotes',
       tag: 'emote',
+      categories: [],
       thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
       assetsCount: 176,
     },
     {
       name: 'Dinosaurus Characters',
       tag: '24x24 dino characters',
+      categories: ['character'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
       assetsCount: 5,
@@ -1517,6 +1421,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Fake Paid Spinning Items',
       tag: '16x16 pixel art spinning items',
+      categories: ['props'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
       assetsCount: 30,
@@ -1525,6 +1430,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'RPG Items #2',
       tag: '16x16 pixel art rpg items',
+      categories: ['props'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
       assetsCount: 64,
@@ -1532,6 +1438,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'RPG Items',
       tag: '16x16 rpg item pack',
+      categories: ['props'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
       assetsCount: 144,
@@ -1539,6 +1446,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'Fantasy Icons',
       tag: '32x32 fantasy icons pack v2',
+      categories: [],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
       assetsCount: 285,
@@ -1546,6 +1454,7 @@ export const fakeAssetPacks: PublicAssetPacks = {
     {
       name: 'On-Screen Controls',
       tag: 'on-screen controls',
+      categories: ['interface'],
       thumbnailUrl:
         'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
       assetsCount: 287,

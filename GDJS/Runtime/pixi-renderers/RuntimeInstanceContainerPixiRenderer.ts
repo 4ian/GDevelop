@@ -20,7 +20,7 @@ namespace gdjs {
      *
      * @see gdjs.RuntimeInstanceContainer.setLayerIndex
      */
-    setLayerIndex(layer: gdjs.Layer, index: integer): void;
+    setLayerIndex(layer: gdjs.RuntimeLayer, index: integer): void;
 
     getRendererObject(): PIXI.Container;
   }

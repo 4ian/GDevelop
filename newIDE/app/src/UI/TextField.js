@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import Visibility from '@material-ui/icons/Visibility';
+import IconButton from '@material-ui/core/IconButton';
 import MUITextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -180,6 +182,9 @@ export type TextFieldInterface = {|
 const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(
+    false
+  );
 
   const focus = (options: ?{ caretPosition: 'end' }) => {
     const { current: input } = inputRef;
@@ -243,7 +248,15 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           ref={muiTextFieldRef}
           color="secondary"
           // Value and change handling:
-          type={props.type !== undefined ? props.type : undefined}
+          type={
+            props.type !== undefined
+              ? props.type === 'password'
+                ? isPasswordVisible
+                  ? 'text'
+                  : 'password'
+                : props.type
+              : undefined
+          }
           value={props.value !== undefined ? props.value : undefined}
           defaultValue={
             props.defaultValue !== undefined ? props.defaultValue : undefined
@@ -301,13 +314,23 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               ...dataObjectToProps(props.dataset),
             },
             // Input adornment:
-            endAdornment: props.endAdornment ? (
-              <InputAdornment position="end">
-                {props.endAdornment}
-              </InputAdornment>
-            ) : (
-              undefined
-            ),
+            endAdornment:
+              props.type !== undefined && props.type === 'password' ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                  >
+                    <Visibility />
+                  </IconButton>
+                </InputAdornment>
+              ) : props.endAdornment ? (
+                <InputAdornment position="end">
+                  {props.endAdornment}
+                </InputAdornment>
+              ) : (
+                undefined
+              ),
           }}
           style={
             props.style

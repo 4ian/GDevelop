@@ -76,7 +76,9 @@ export default function SubscriptionPendingDialog({
           <Line justifyContent="center" alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            <Text>Waiting for the subscription confirmation...</Text>
+            <Text>
+              <Trans>Waiting for the subscription confirmation...</Trans>
+            </Text>
           </Line>
           <Spacer />
           <Line justifyContent="center">

@@ -730,13 +730,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Tags`),
             submenu: buildTagsMenuTemplate({
-              noTagLabel: 'No tags',
+              noTagLabel: i18n._(t`No tags`),
               getAllTags: getAllObjectTags,
               selectedTags: getTagsFromString(object.getTags()),
               onChange: objectTags => {
                 changeObjectTags(object, objectTags);
               },
-              editTagsLabel: 'Add/edit tags...',
+              editTagsLabel: i18n._(t`Add/edit tags...`),
               onEditTags: () => openEditTagDialog(object),
             }),
           },
@@ -853,21 +853,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           placeholder={t`Search objects`}
         />
         {newObjectDialogOpen && (
-          <I18n>
-            {({ i18n }) => (
-              <NewObjectDialog
-                onClose={() => setNewObjectDialogOpen(false)}
-                onCreateNewObject={addObject}
-                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
-                project={project}
-                layout={layout}
-                objectsContainer={objectsContainer}
-                resourceManagementProps={resourceManagementProps}
-                canInstallPrivateAsset={canInstallPrivateAsset}
-                i18n={i18n}
-              />
-            )}
-          </I18n>
+          <NewObjectDialog
+            onClose={() => setNewObjectDialogOpen(false)}
+            onCreateNewObject={addObject}
+            onObjectsAddedFromAssets={onObjectsAddedFromAssets}
+            project={project}
+            layout={layout}
+            objectsContainer={objectsContainer}
+            resourceManagementProps={resourceManagementProps}
+            canInstallPrivateAsset={canInstallPrivateAsset}
+          />
         )}
         {tagEditedObject && (
           <EditTagsDialog

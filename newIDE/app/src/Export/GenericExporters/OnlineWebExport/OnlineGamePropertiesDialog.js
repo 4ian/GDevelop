@@ -2,7 +2,7 @@
 import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { type Game, type GameSlug } from '../../../Utils/GDevelopServices/Game';
+import { type Game } from '../../../Utils/GDevelopServices/Game';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog from '../../../UI/Dialog';
 import {
@@ -22,7 +22,6 @@ type Props = {|
   onSaveProject: () => Promise<void>,
   buildId: string,
   game: Game,
-  slug: ?GameSlug,
   onClose: () => void,
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
@@ -33,7 +32,6 @@ export const OnlineGamePropertiesDialog = ({
   onSaveProject,
   buildId,
   game,
-  slug,
   onClose,
   onApply,
   isLoading,
@@ -63,10 +61,13 @@ export const OnlineGamePropertiesDialog = ({
     project.isPlayableWithMobile()
   );
   const [userSlug, setUserSlug] = React.useState<string>(
-    (slug && slug.username) || (profile && profile.username) || ''
+    (game.cachedCurrentSlug && game.cachedCurrentSlug.username) ||
+      (profile && profile.username) ||
+      ''
   );
   const [gameSlug, setGameSlug] = React.useState<string>(
-    (slug && slug.gameSlug) || cleanUpGameSlug(project.getName())
+    (game.cachedCurrentSlug && game.cachedCurrentSlug.gameSlug) ||
+      cleanUpGameSlug(project.getName())
   );
   const [orientation, setOrientation] = React.useState<string>(
     project.getOrientation()

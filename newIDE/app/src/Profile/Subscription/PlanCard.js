@@ -21,6 +21,7 @@ type Props = {|
   isHighlighted: boolean,
   actions?: React.Node,
   isPending?: boolean,
+  hidePrice?: boolean,
   background: 'medium' | 'dark',
 |};
 
@@ -38,7 +39,8 @@ const PlanCard = (props: Props) => {
               </span>
             </Text>
             <Text color="secondary">
-              {props.plan.monthlyPriceInEuros === null ? null : props.plan
+              {props.hidePrice ||
+              props.plan.monthlyPriceInEuros === null ? null : props.plan
                   .monthlyPriceInEuros === 0 ? (
                 <Trans>Free</Trans>
               ) : (

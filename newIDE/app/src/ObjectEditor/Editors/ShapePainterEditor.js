@@ -148,20 +148,21 @@ export default class PanelSpriteEditor extends React.Component<
         </ResponsiveLineStackLayout>
         <ResponsiveLineStackLayout alignItems={'center'}>
           <Text>
-            <Trans>Antialiasing Quality : </Trans>
+            <Trans>Anti-aliasing:</Trans>
           </Text>
           <SelectField
-            value={shapePainterConfiguration.getAntialiasingQuality()}
+            value={shapePainterConfiguration.getAntialiasing()}
             onChange={value => {
-              shapePainterConfiguration.setAntialiasingQuality(
+              shapePainterConfiguration.setAntialiasing(
                 value.target.value
               );
               this.forceUpdate();
             }}
           >
-            <SelectOption value={'Low'} primaryText={'Low quality'} />
-            <SelectOption value={'Medium'} primaryText={'Medium quality'} />
-            <SelectOption value={'High'} primaryText={'High quality'} />
+            <SelectOption value={'None'} primaryText={'No anti-aliasing'} />            
+            <SelectOption value={'Low'} primaryText={'Low quality anti-aliasing'} />
+            <SelectOption value={'Medium'} primaryText={'Medium quality anti-aliasing'} />
+            <SelectOption value={'High'} primaryText={'High quality anti-aliasing'} />
           </SelectField>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>

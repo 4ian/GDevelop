@@ -34,7 +34,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("expression", "The number to be returned")
-      .SetReleventForFunctionEventsOnly()
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -49,7 +49,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("string", "The text to be returned")
-      .SetReleventForFunctionEventsOnly()
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("trueorfalse", "Should the condition be true or false?")
-      .SetReleventForFunctionEventsOnly()
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -78,7 +78,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     "res/function32.png",
                     "res/function32.png")
       .AddParameter("functionParameterName", "Parameter name")
-      .SetReleventForFunctionEventsOnly()
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -89,7 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/function16.png")
       .AddParameter("functionParameterName", "Parameter name")
-      .SetReleventForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddStrExpression(
@@ -99,7 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/function16.png")
       .AddParameter("functionParameterName", "Parameter name")
-      .SetReleventForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddCondition(
@@ -113,7 +113,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddParameter("functionParameterName", "Parameter name")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
-      .SetReleventForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddCondition(
@@ -127,7 +127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .AddParameter("functionParameterName", "Parameter name")
       .UseStandardRelationalOperatorParameters(
           "string", gd::ParameterOptions::MakeNewOptions())
-      .SetReleventForFunctionEventsOnly();
+      .SetRelevantForFunctionEventsOnly();
 }
 
 }  // namespace gd

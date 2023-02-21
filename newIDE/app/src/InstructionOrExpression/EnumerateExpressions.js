@@ -52,10 +52,10 @@ const enumerateExpressionMetadataMap = (
       parameters: parameters,
       scope,
       isPrivate: exprMetadata.isPrivate(),
-      isReleventForLayoutEvents: exprMetadata.isReleventForLayoutEvents(),
-      isReleventForFunctionEvents: exprMetadata.isReleventForFunctionEvents(),
-      isReleventForAsynchronousFunctionEvents: exprMetadata.isReleventForAsynchronousFunctionEvents(),
-      isReleventForCustomObjectEvents: exprMetadata.isReleventForCustomObjectEvents(),
+      isRelevantForLayoutEvents: exprMetadata.isRelevantForLayoutEvents(),
+      isRelevantForFunctionEvents: exprMetadata.isRelevantForFunctionEvents(),
+      isRelevantForAsynchronousFunctionEvents: exprMetadata.isRelevantForAsynchronousFunctionEvents(),
+      isRelevantForCustomObjectEvents: exprMetadata.isRelevantForCustomObjectEvents(),
     };
   }).filter(Boolean);
 };

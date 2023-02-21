@@ -187,21 +187,21 @@ class GD_CORE_API ExpressionMetadata {
   /**
    * Check if the instruction can be used in layouts or external events.
    */
-  bool IsReleventForLayoutEvents() const {
+  bool IsRelevantForLayoutEvents() const {
     return releventContext == "Any" || releventContext == "Layout";
   }
 
   /**
    * Check if the instruction can be used in function events.
    */
-  bool IsReleventForFunctionEvents() const {
+  bool IsRelevantForFunctionEvents() const {
     return releventContext == "Any" || releventContext == "Function";
   }
 
   /**
    * Check if the instruction can be used in asynchronous function events.
    */
-  bool IsReleventForAsynchronousFunctionEvents() const {
+  bool IsRelevantForAsynchronousFunctionEvents() const {
     return releventContext == "Any" || releventContext == "Function" ||
            releventContext == "AsynchronousFunction";
   }
@@ -209,14 +209,14 @@ class GD_CORE_API ExpressionMetadata {
   /**
    * Check if the instruction can be used in custom object events.
    */
-  bool IsReleventForCustomObjectEvents() const {
+  bool IsRelevantForCustomObjectEvents() const {
     return releventContext == "Any" || releventContext == "Object";
   }
 
   /**
    * Set that the instruction can be used in layouts or external events.
    */
-  ExpressionMetadata &SetReleventForLayoutEventsOnly() {
+  ExpressionMetadata &SetRelevantForLayoutEventsOnly() {
     releventContext = "Layout";
     return *this;
   }
@@ -224,7 +224,7 @@ class GD_CORE_API ExpressionMetadata {
   /**
    * Set that the instruction can be used in function events.
    */
-  ExpressionMetadata &SetReleventForFunctionEventsOnly() {
+  ExpressionMetadata &SetRelevantForFunctionEventsOnly() {
     releventContext = "Function";
     return *this;
   }
@@ -232,7 +232,7 @@ class GD_CORE_API ExpressionMetadata {
   /**
    * Set that the instruction can be used in asynchronous function events.
    */
-  ExpressionMetadata &SetReleventForAsynchronousFunctionEventsOnly() {
+  ExpressionMetadata &SetRelevantForAsynchronousFunctionEventsOnly() {
     releventContext = "AsynchronousFunction";
     return *this;
   }
@@ -240,7 +240,7 @@ class GD_CORE_API ExpressionMetadata {
   /**
    * Set that the instruction can be used in custom object events.
    */
-  ExpressionMetadata &SetReleventForCustomObjectEventsOnly() {
+  ExpressionMetadata &SetRelevantForCustomObjectEventsOnly() {
     releventContext = "Object";
     return *this;
   }

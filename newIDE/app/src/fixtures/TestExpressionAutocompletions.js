@@ -32,10 +32,10 @@ const makeFakeEnumeratedExpressionMetadata = (
   ),
   scope: { extension },
   isPrivate: false,
-  isReleventForLayoutEvents: true,
-  isReleventForFunctionEvents: true,
-  isReleventForAsynchronousFunctionEvents: true,
-  isReleventForCustomObjectEvents: true,
+  isRelevantForLayoutEvents: true,
+  isRelevantForFunctionEvents: true,
+  isRelevantForAsynchronousFunctionEvents: true,
+  isRelevantForCustomObjectEvents: true,
 });
 
 export const makeFakeExactExpressionAutocompletion = () => {

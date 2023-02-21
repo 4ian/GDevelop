@@ -56,7 +56,6 @@ namespace gdjs {
     _outlineSize: float;
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
-    _antialiasing: boolean;
     _antialiasingQuality: 'Off' | 'Low' | 'Medium' | 'High';
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
@@ -92,7 +91,6 @@ namespace gdjs {
       this._outlineSize = shapePainterObjectData.outlineSize;
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
-      this._antialiasing = shapePainterObjectData.antialiasing;
       this._antialiasingQuality = shapePainterObjectData.antialiasingQuality;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
@@ -344,7 +342,6 @@ namespace gdjs {
     isClearedBetweenFrames(): boolean {
       return this._clearBetweenFrames;
     }
-
 
     setAntialiasingQuality(value: 'Off' | 'Low' | 'Medium' | 'High'): void {
       this._antialiasingQuality = value;
@@ -776,8 +773,8 @@ namespace gdjs {
       const centerY = this.getCenterY();
       const vertices = this.hitBoxes[0].vertices;
       if (this._customCollisionMask) {
-        const customCollisionMaskVertices = this._customCollisionMask[0]
-          .vertices;
+        const customCollisionMaskVertices =
+          this._customCollisionMask[0].vertices;
         for (let i = 0; i < 4; i++) {
           const point = this.transformToScene(
             customCollisionMaskVertices[i][0],

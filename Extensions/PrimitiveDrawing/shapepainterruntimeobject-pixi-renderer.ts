@@ -490,14 +490,15 @@ namespace gdjs {
       return point;
     }
     updateAntialiasing(): void {
-      if (this._object.getAntialiasingQuality() != "Off") {
+      if (this._object.getAntialiasingQuality() != 'Off') {
         const antialiasingFilter =
           this._antialiasingFilter ||
           (this._antialiasingFilter = new PIXI.filters.FXAAFilter());
         antialiasingFilter.enabled = true;
         antialiasingFilter.multisample =
-          PIXI.MSAA_QUALITY[this._object.getAntialiasingQuality().toUpperCase()] ||
-          PIXI.MSAA_QUALITY.LOW;
+          PIXI.MSAA_QUALITY[
+            this._object.getAntialiasingQuality().toUpperCase()
+          ] || PIXI.MSAA_QUALITY.LOW;
 
         if (!this._graphics.filters) {
           this._graphics.filters = [];
@@ -520,6 +521,8 @@ namespace gdjs {
     }
   }
 
-  export const ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
-  export type ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
+  export const ShapePainterRuntimeObjectRenderer =
+    ShapePainterRuntimeObjectPixiRenderer;
+  export type ShapePainterRuntimeObjectRenderer =
+    ShapePainterRuntimeObjectPixiRenderer;
 }

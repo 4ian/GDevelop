@@ -30,7 +30,10 @@ import EmailVerificationDialog from './EmailVerificationDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import {
+  listUserCloudProjects,
+  type CloudProjectWithUserAccessInfo,
+} from '../Utils/GDevelopServices/Project';
 import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
 import {
   listReceivedAssetShortHeaders,
@@ -97,6 +100,9 @@ export default class AuthenticatedUserProvider extends React.Component<
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
+  _cloudProjectListingPromise: Promise<
+    Array<CloudProjectWithUserAccessInfo>
+  > | null = null;
 
   async componentDidMount() {
     this._resetAuthenticatedUser();
@@ -303,10 +309,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
-    listUserCloudProjects(
-      authentication.getAuthorizationHeader,
-      firebaseUser.uid
-    ).then(
+    this._listUserCloudProjects(authentication, firebaseUser.uid).then(
       cloudProjects =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
@@ -485,6 +488,25 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
+  // Put user cloud projects listing promise in common to prevent duplicate api call:
+  // - First one comes from user authenticating and automatically fetching
+  //   their cloud projects;
+  // - Second one comes from the homepage fetching the cloud projects regularly.
+  _listUserCloudProjects = (
+    authentication: Authentication,
+    userId: string
+  ): Promise<Array<CloudProjectWithUserAccessInfo>> => {
+    if (!this._cloudProjectListingPromise) {
+      this._cloudProjectListingPromise = listUserCloudProjects(
+        authentication.getAuthorizationHeader,
+        userId
+      ).finally(() => {
+        this._cloudProjectListingPromise = null;
+      });
+    }
+    return this._cloudProjectListingPromise;
+  };
+
   _fetchUserCloudProjects = async () => {
     const { authentication } = this.props;
     const { firebaseUser } = this.state.authenticatedUser;
@@ -497,10 +519,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
 
-    listUserCloudProjects(
-      authentication.getAuthorizationHeader,
-      firebaseUser.uid
-    ).then(
+    this._listUserCloudProjects(authentication, firebaseUser.uid).then(
       cloudProjects =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {

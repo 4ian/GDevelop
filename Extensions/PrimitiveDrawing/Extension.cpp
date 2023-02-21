@@ -757,26 +757,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
-  obj.AddAction("SetAntialiasing",
-                _("Set anti-aliasing on the shape drawer"),
-                _("(De)Activate anti-aliasing on the shape drawer"),
-                _("Set anti-aliasing of _PARAM0_ to _PARAM1_"),
-                _("Setup"),
-                "res/actions/antialiasing24.png",
-                "res/actions/antialiasing.png")
-      .AddParameter("object", _("Object"), "Drawer")
-      .AddParameter(
-          "yesorno", _("Activated ?"), "Is the antialiasing activated ?");
-  obj.AddCondition(
-         "IsAntialiasingOn",
-         _("Anti-aliasing activated on the shape drawer"),
-         _("Checks if the anti-aliasing is activated for a shape drawer"),
-         _("Is the anti-aliasing enabled on _PARAM0_ ?"),
-         _("Setup"),
-         "res/actions/antialiasing24.png",
-         "res/actions/antialiasing.png")
-      .AddParameter("object", _("Object"), "Drawer");
-
   obj.AddAction("SetAntialiasingQuality",
                 _("Anti-aliasing quality"),
                 _("Anti-aliasing quality"),
@@ -787,7 +767,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("stringWithSelector",
                     _("Antialiasing quality level"),
-                    "[\"Low\",\"Medium\",\"High\"]");
+                    "[\"Off\",\"Low\",\"Medium\",\"High\"]");
   obj.AddCondition(
          "IsAntialiasingQuality",
          _("Antialiasing quality"),
@@ -799,7 +779,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("stringWithSelector",
                     _("Quality to check"),
-                    "[\"Low\",\"Medium\",\"High\"]");
+                    "[\"Off\",\"Low\",\"Medium\",\"High\"]");
   obj.AddStrExpression(
          "AntialiasingQuality",
          _("Current quality level of anti-aliasing on a shape drawer"),

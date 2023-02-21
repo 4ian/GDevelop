@@ -490,7 +490,7 @@ namespace gdjs {
       return point;
     }
     updateAntialiasing(): void {
-      if (this._object.isAntialiased()) {
+      if (this._object.getAntialiasingQuality() != "Off") {
         const antialiasingFilter =
           this._antialiasingFilter ||
           (this._antialiasingFilter = new PIXI.filters.FXAAFilter());

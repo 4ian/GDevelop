@@ -2872,8 +2872,6 @@ interface ShapePainterObject {
     unsigned long GetFillColorR();
     unsigned long GetFillColorG();
     unsigned long GetFillColorB();
-    boolean IsAntialiased();
-    void SetAntialiased(boolean value);
     [Const, Value] DOMString GetAntialiasingQuality();
     void SetAntialiasingQuality([Const] DOMString value);
 

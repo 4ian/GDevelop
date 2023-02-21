@@ -781,9 +781,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Quality to check"),
                     "[\"Off\",\"Low\",\"Medium\",\"High\"]");
   obj.AddStrExpression(
-         "AntialiasingQuality",
-         _("Current quality level of anti-aliasing on a shape drawer"),
-         _("Returns current anti-aliasing level of the shape drawer"),
+         "Antialiasing",
+         _("Type of anti-aliasing used by a shape painter"),
+         _("Gets the type of anti-aliasing in use: None, Low, Medium, or High."),
          _("Setup"),
          "res/actions/antialiasing.png")
       .AddParameter("object", _("Object"), "Drawer");

@@ -669,34 +669,41 @@ const MainFrame = (props: Props) => {
   useDiscordRichPresence(currentProject);
 
   const closeProject = React.useCallback(
-    (): Promise<void> => {
+    async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
-      return setState(state => {
-        if (!currentProject) {
-          // It's important to return a new object to ensure that the promise
-          // will be fired.
-          return { ...state };
-        }
 
-        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-          currentProject
-        );
-        currentProject.delete();
-        if (unsavedChanges.hasUnsavedChanges) {
-          unsavedChanges.sealUnsavedChanges();
-        }
+      console.info('Closing project...');
 
-        return {
-          ...state,
-          currentProject: null,
-          currentFileMetadata: null,
-          editorTabs: closeProjectTabs(state.editorTabs, currentProject),
-        };
-      }).then(() => {});
+      // While not strictly necessary, use `currentProjectRef` to be 100%
+      // sure to have the latest project (avoid risking any stale variable to an old
+      // `currentProject` from the state in case someone kept an old reference to `closeProject`
+      // somewhere).
+      const currentProject = currentProjectRef.current;
+      if (!currentProject) return;
+
+      // Close the editors related to this project.
+      await setState(state => ({
+        ...state,
+        currentProject: null,
+        currentFileMetadata: null,
+        editorTabs: closeProjectTabs(state.editorTabs, currentProject),
+      }));
+
+      // Delete the project from memory. All references to it have been dropped previously
+      // by the setState.
+      console.info('Deleting project from memory...');
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      currentProject.delete();
+      if (unsavedChanges.hasUnsavedChanges) {
+        unsavedChanges.sealUnsavedChanges();
+      }
+      console.info('Project closed.');
     },
     [
-      currentProject,
+      currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
@@ -2297,16 +2304,14 @@ const MainFrame = (props: Props) => {
   };
 
   const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
-    setState(state => {
-      return {
-        ...state,
-        editorTabs: moveTabToTheRightOfHoveredTab(
-          state.editorTabs,
-          fromIndex,
-          toHoveredIndex
-        ),
-      };
-    });
+    setState(state => ({
+      ...state,
+      editorTabs: moveTabToTheRightOfHoveredTab(
+        state.editorTabs,
+        fromIndex,
+        toHoveredIndex
+      ),
+    }));
   };
 
   const endTutorial = React.useCallback(

@@ -1257,11 +1257,19 @@ interface InstructionMetadata {
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
+    boolean IsRelevantForLayoutEvents();
+    boolean IsRelevantForFunctionEvents();
+    boolean IsRelevantForAsynchronousFunctionEvents();
+    boolean IsRelevantForCustomObjectEvents();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
     [Ref] InstructionMetadata SetPrivate();
+    [Ref] InstructionMetadata SetRelevantForLayoutEventsOnly();
+    [Ref] InstructionMetadata SetRelevantForFunctionEventsOnly();
+    [Ref] InstructionMetadata SetRelevantForAsynchronousFunctionEventsOnly();
+    [Ref] InstructionMetadata SetRelevantForCustomObjectEventsOnly();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -1310,12 +1318,20 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetHelpPath();
     boolean IsShown();
     boolean IsPrivate();
+    boolean IsRelevantForLayoutEvents();
+    boolean IsRelevantForFunctionEvents();
+    boolean IsRelevantForAsynchronousFunctionEvents();
+    boolean IsRelevantForCustomObjectEvents();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
     [Const, Ref] VectorParameterMetadata GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
     [Ref] ExpressionMetadata SetPrivate();
+    [Ref] ExpressionMetadata SetRelevantForLayoutEventsOnly();
+    [Ref] ExpressionMetadata SetRelevantForFunctionEventsOnly();
+    [Ref] ExpressionMetadata SetRelevantForAsynchronousFunctionEventsOnly();
+    [Ref] ExpressionMetadata SetRelevantForCustomObjectEventsOnly();
     [Ref] ExpressionMetadata AddParameter(
         [Const] DOMString type,
         [Const] DOMString description,

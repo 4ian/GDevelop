@@ -45,6 +45,10 @@ namespace gdjs {
     private _basisTransformation: gdjs.TopDownMovementRuntimeBehavior.BasisTransformation | null;
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
+    private _topDownMovementHooks: Array<
+      gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    > = [];
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -335,6 +339,13 @@ namespace gdjs {
         }
       }
 
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        direction = topDownMovementHook.overrideDirection(direction);
+      }
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        topDownMovementHook.beforeSpeedUpdate();
+      }
+
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousVelocityX = this._xVelocity;
@@ -418,6 +429,10 @@ namespace gdjs {
 
       // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
+
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        topDownMovementHook.beforePositionUpdate();
+      }
 
       // Position object.
       // This is a Verlet integration considering the acceleration as constant.
@@ -523,8 +538,37 @@ namespace gdjs {
     getLastStickInputAngle() {
       return this._stickAngle;
     }
+
+    registerHook(
+      hook: gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    ) {
+      this._topDownMovementHooks.push(hook);
+    }
   }
+
   export namespace TopDownMovementRuntimeBehavior {
+    /**
+     * Allow extensions relying on the top-down movement to customize its
+     * behavior a bit.
+     */
+    export interface TopDownMovementHook {
+      /**
+       * Return the direction to use instead of the direction given in
+       * parameter.
+       */
+      overrideDirection(direction: integer): integer;
+      /**
+       * Called before the acceleration and new direction is applied to the
+       * velocity.
+       */
+      beforeSpeedUpdate(): void;
+      /**
+       * Called before the velocity is applied to the object position and
+       * angle.
+       */
+      beforePositionUpdate(): void;
+    }
+
     export interface BasisTransformation {
       toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
     }

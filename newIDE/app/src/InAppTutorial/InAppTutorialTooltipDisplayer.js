@@ -138,13 +138,13 @@ const TooltipBody = ({
   return (
     <>
       {tooltip.title && (
-        <Typography style={styles.title} variant="subtitle">
+        <Typography style={styles.title} variant="subtitle" translate="no">
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}
       {tooltip.title && tooltip.description && <span style={styles.divider} />}
       {tooltip.description && (
-        <Typography style={styles.description}>
+        <Typography style={styles.description} translate="no">
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}
@@ -205,7 +205,10 @@ const TooltipHeader = ({
       noMargin
       justifyContent={tooltipContent ? undefined : 'space-between'}
     >
-      <Typography style={{ ...styles.headerText, color: progressColor }}>
+      <Typography
+        style={{ ...styles.headerText, color: progressColor }}
+        translate="no"
+      >
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
@@ -222,7 +225,7 @@ const TooltipHeader = ({
               }}
             >
               <Cross />
-              <Typography style={styles.headerText}>
+              <Typography style={styles.headerText} translate="no">
                 <Trans>Quit tutorial</Trans>
               </Typography>
             </div>

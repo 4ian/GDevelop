@@ -24,6 +24,10 @@ import {
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Add from '@material-ui/icons/Add';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -343,6 +347,20 @@ export default class EventsBasedBehaviorsList extends React.Component<
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search behaviors`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -354,8 +372,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsBasedBehavior}
-                    addNewItemLabel={<Trans>Add a new behavior</Trans>}
                     renderItemLabel={renderEventsBehaviorLabel}
                     getItemName={getEventsBasedBehaviorName}
                     selectedItems={
@@ -377,17 +393,26 @@ export default class EventsBasedBehaviorsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search behaviors`}
-        />
+        <ResponsiveWindowMeasurer>
+          {windowWidth => (
+            <Line>
+              <Column expand>
+                <RaisedButton
+                  label={
+                    windowWidth === 'small' ? (
+                      ''
+                    ) : (
+                      <Trans>Add a new behavior</Trans>
+                    )
+                  }
+                  primary
+                  onClick={this._addNewEventsBasedBehavior}
+                  icon={<Add />}
+                />
+              </Column>
+            </Line>
+          )}
+        </ResponsiveWindowMeasurer>
       </Background>
     );
   }

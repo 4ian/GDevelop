@@ -22,6 +22,10 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import RaisedButton from '../UI/RaisedButton';
+import { Column, Line } from '../UI/Grid';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Add from '@material-ui/icons/Add';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -297,6 +301,20 @@ export default class EventsBasedObjectsList extends React.Component<
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -308,8 +326,6 @@ export default class EventsBasedObjectsList extends React.Component<
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsBasedObject}
-                    addNewItemLabel={<Trans>Add a new object</Trans>}
                     getItemName={getEventsBasedObjectName}
                     selectedItems={
                       selectedEventsBasedObject
@@ -330,17 +346,26 @@ export default class EventsBasedObjectsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search objects`}
-        />
+        <ResponsiveWindowMeasurer>
+          {windowWidth => (
+            <Line>
+              <Column expand>
+                <RaisedButton
+                  label={
+                    windowWidth === 'small' ? (
+                      ''
+                    ) : (
+                      <Trans>Add a new object</Trans>
+                    )
+                  }
+                  primary
+                  onClick={this._addNewEventsBasedObject}
+                  icon={<Add />}
+                />
+              </Column>
+            </Line>
+          )}
+        </ResponsiveWindowMeasurer>
       </Background>
     );
   }

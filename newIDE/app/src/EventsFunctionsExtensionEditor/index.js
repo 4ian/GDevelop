@@ -28,9 +28,6 @@ import {
   isObjectLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
 } from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
-import FlatButton from '../UI/FlatButton';
-import { Line } from '../UI/Grid';
-import Divider from '@material-ui/core/Divider';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -42,6 +39,9 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import { ToolbarGroup } from '../UI/Toolbar';
+import IconButton from '../UI/IconButton';
+import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -200,9 +200,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   updateToolbar = () => {
     if (this.editor) {
+      // If the scene editor is open, let it handle the toolbar.
       this.editor.updateToolbar();
     } else {
-      this.props.setToolbar(null);
+      // Otherwise, show the extension settings buttons.
+      this.props.setToolbar(
+        <ToolbarGroup lastChild>
+          <IconButton
+            size="small"
+            color="default"
+            onClick={this._editOptions}
+            tooltip={t`Open extension settings`}
+          >
+            <EditSceneIcon />
+          </IconButton>
+        </ToolbarGroup>
+      );
     }
   };
 
@@ -1186,18 +1199,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 )}
                 onAddEventsFunction={this._onAddFreeEventsFunction}
                 onEventsFunctionAdded={() => {}}
-                renderHeader={() => (
-                  <React.Fragment>
-                    <Line justifyContent="center">
-                      <FlatButton
-                        label={<Trans>Edit extension options</Trans>}
-                        primary
-                        onClick={() => this._editOptions()}
-                      />
-                    </Line>
-                    <Divider />
-                  </React.Fragment>
-                )}
                 unsavedChanges={this.props.unsavedChanges}
               />
             )}
@@ -1249,20 +1250,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       eventsFunction
                     )
                   }
-                  renderHeader={() => (
-                    <React.Fragment>
-                      <Line justifyContent="center">
-                        <FlatButton
-                          label={<Trans>Edit object properties</Trans>}
-                          primary
-                          onClick={() =>
-                            this._editObject(selectedEventsBasedObject)
-                          }
-                        />
-                      </Line>
-                      <Divider />
-                    </React.Fragment>
-                  )}
                   unsavedChanges={this.props.unsavedChanges}
                 />
               )}
@@ -1306,20 +1293,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       eventsFunction
                     )
                   }
-                  renderHeader={() => (
-                    <React.Fragment>
-                      <Line justifyContent="center">
-                        <FlatButton
-                          label={<Trans>Edit behavior properties</Trans>}
-                          primary
-                          onClick={() =>
-                            this._editBehavior(selectedEventsBasedBehavior)
-                          }
-                        />
-                      </Line>
-                      <Divider />
-                    </React.Fragment>
-                  )}
                   unsavedChanges={this.props.unsavedChanges}
                 />
               )}

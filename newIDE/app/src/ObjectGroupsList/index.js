@@ -25,6 +25,10 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Add from '@material-ui/icons/Add';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -400,6 +404,20 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search object groups`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -419,9 +437,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     onEditItem={groupWithContext =>
                       this.props.onEditGroup(groupWithContext.group)
                     }
-                    onAddNewItem={this.addGroup}
-                    addNewItemLabel={<Trans>Add a new group</Trans>}
-                    addNewItemId="add-new-group-button"
                     selectedItems={[]}
                     onItemSelected={groupWithContext => {
                       this.setState({
@@ -440,17 +455,27 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search object groups`}
-        />
+        <ResponsiveWindowMeasurer>
+          {windowWidth => (
+            <Line>
+              <Column expand>
+                <RaisedButton
+                  label={
+                    windowWidth === 'small' ? (
+                      ''
+                    ) : (
+                      <Trans>Add a new group</Trans>
+                    )
+                  }
+                  primary
+                  onClick={this.addGroup}
+                  id="add-new-group-button"
+                  icon={<Add />}
+                />
+              </Column>
+            </Line>
+          )}
+        </ResponsiveWindowMeasurer>
       </Background>
     );
   }

@@ -45,6 +45,10 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import RaisedButton from '../UI/RaisedButton';
+import { Column, Line } from '../UI/Grid';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Add from '@material-ui/icons/Add';
 
 const gd: libGDevelop = global.gd;
 
@@ -178,6 +182,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const forceUpdate = useForceUpdate();
+    const windowWidth = useResponsiveWindowWidth();
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -799,6 +804,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     return (
       <Background maxWidth>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text => setSearchText(text)}
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </Line>
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
@@ -827,9 +842,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     onEditItem={objectWithContext =>
                       onEditObject(objectWithContext.object)
                     }
-                    onAddNewItem={onAddNewObject}
-                    addNewItemLabel={<Trans>Add a new object</Trans>}
-                    addNewItemId="add-new-object-button"
                     selectedItems={selectedObjects}
                     onItemSelected={selectObject}
                     renamedItem={displayedRenamedObjectWithContext}
@@ -845,13 +857,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text => setSearchText(text)}
-          aspect="integrated-search-bar"
-          placeholder={t`Search objects`}
-        />
+        <Line>
+          <Column expand>
+            <RaisedButton
+              label={
+                windowWidth === 'small' ? '' : <Trans>Add a new object</Trans>
+              }
+              primary
+              onClick={onAddNewObject}
+              id="add-new-object-button"
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
         {newObjectDialogOpen && (
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(false)}

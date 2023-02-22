@@ -104,7 +104,7 @@ const PointsEditor = ({
   );
 
   const updatePoints = React.useCallback(
-    () => {
+    (samePointsForAnimations: boolean, samePointsForSprites: boolean) => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
           mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
@@ -119,15 +119,7 @@ const PointsEditor = ({
       forceUpdate(); // Refresh the preview
       if (onPointsUpdated) onPointsUpdated();
     },
-    [
-      animation,
-      sprite,
-      spriteConfiguration,
-      samePointsForAnimations,
-      samePointsForSprites,
-      forceUpdate,
-      onPointsUpdated,
-    ]
+    [animation, sprite, spriteConfiguration, forceUpdate, onPointsUpdated]
   );
 
   const chooseAnimation = index => {
@@ -167,9 +159,12 @@ const PointsEditor = ({
       if (!answer) return;
     }
 
-    setSamePointsForAnimations(enable);
-    setSamePointsForSprites(enable || samePointsForSprites);
-    updatePoints();
+    const newSamePointsForAnimations = enable;
+    const newSamePointsForSprites = enable || samePointsForSprites;
+
+    setSamePointsForAnimations(newSamePointsForAnimations);
+    setSamePointsForSprites(newSamePointsForSprites);
+    updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
   };
 
   const setSamePointsForAllSprites = (enable: boolean) => {
@@ -180,9 +175,12 @@ const PointsEditor = ({
       if (!answer) return;
     }
 
-    setSamePointsForAnimations(enable && samePointsForAnimations);
-    setSamePointsForSprites(enable);
-    updatePoints();
+    const newSamePointsForAnimations = enable && samePointsForAnimations;
+    const newSamePointsForSprites = enable;
+
+    setSamePointsForAnimations(newSamePointsForAnimations);
+    setSamePointsForSprites(newSamePointsForSprites);
+    updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
   };
 
   // Keep panes vertical for small screens, side-by-side for large screens
@@ -216,7 +214,12 @@ const PointsEditor = ({
                   <PointsPreview
                     {...overlayProps}
                     pointsContainer={sprite}
-                    onPointsUpdated={updatePoints}
+                    onPointsUpdated={() =>
+                      updatePoints(
+                        samePointsForAnimations,
+                        samePointsForSprites
+                      )
+                    }
                     selectedPointName={selectedPointName}
                     highlightedPointName={highlightedPointName}
                     onClickPoint={setSelectedPointName}
@@ -263,7 +266,9 @@ const PointsEditor = ({
               {!!sprite && (
                 <PointsList
                   pointsContainer={sprite}
-                  onPointsUpdated={updatePoints}
+                  onPointsUpdated={() =>
+                    updatePoints(samePointsForAnimations, samePointsForSprites)
+                  }
                   selectedPointName={selectedPointName}
                   onHoverPoint={setHighlightedPointName}
                   onSelectPoint={setSelectedPointName}

@@ -99,7 +99,12 @@ const CollisionMasksEditor = ({
       ? every(
           mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
             const otherAnimation = spriteConfiguration.getAnimation(i);
-            return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
+            const same = allSpritesHaveSameCollisionMasksAs(
+              sprite,
+              otherAnimation
+            );
+            console.log(same);
+            return same;
           })
         )
       : false
@@ -116,7 +121,7 @@ const CollisionMasksEditor = ({
   );
 
   const updateCollisionMasks = React.useCallback(
-    () => {
+    (sameCollisionMasksForAnimations, sameCollisionMasksForSprites) => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
           mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
@@ -131,15 +136,7 @@ const CollisionMasksEditor = ({
       forceUpdate(); // Refresh the preview and the list
       if (onMasksUpdated) onMasksUpdated();
     },
-    [
-      animation,
-      sprite,
-      spriteConfiguration,
-      sameCollisionMasksForAnimations,
-      sameCollisionMasksForSprites,
-      forceUpdate,
-      onMasksUpdated,
-    ]
+    [animation, sprite, spriteConfiguration, forceUpdate, onMasksUpdated]
   );
 
   const chooseAnimation = index => {
@@ -165,6 +162,11 @@ const CollisionMasksEditor = ({
     () => {
       if (!animation || !sprite) return;
 
+      console.log(
+        'effect triggering',
+        allSpritesHaveSameCollisionMasksAs(sprite, animation)
+      );
+
       setSameCollisionMasksForSprites(
         allSpritesHaveSameCollisionMasksAs(sprite, animation)
       );
@@ -176,9 +178,17 @@ const CollisionMasksEditor = ({
     (automatic: boolean = true) => {
       if (!sprite) return;
       sprite.setCollisionMaskAutomatic(automatic);
-      updateCollisionMasks();
+      updateCollisionMasks(
+        sameCollisionMasksForAnimations,
+        sameCollisionMasksForSprites
+      );
     },
-    [sprite, updateCollisionMasks]
+    [
+      sprite,
+      updateCollisionMasks,
+      sameCollisionMasksForAnimations,
+      sameCollisionMasksForSprites,
+    ]
   );
 
   const setSameCollisionMasksForAllAnimations = (enable: boolean) => {
@@ -189,9 +199,19 @@ const CollisionMasksEditor = ({
       if (!answer) return;
     }
 
-    setSameCollisionMasksForAnimations(enable);
-    setSameCollisionMasksForSprites(enable || sameCollisionMasksForSprites);
-    updateCollisionMasks();
+    console.log('setting same');
+
+    const newSameCollisionMasksForAnimationsValue = enable;
+    const newSameCollisionMasksForSpritesValue =
+      enable || sameCollisionMasksForSprites;
+
+    setSameCollisionMasksForAnimations(newSameCollisionMasksForAnimationsValue);
+    setSameCollisionMasksForSprites(newSameCollisionMasksForSpritesValue);
+    updateCollisionMasks(
+      newSameCollisionMasksForAnimationsValue,
+      newSameCollisionMasksForSpritesValue
+    );
+    console.log('done updating');
   };
 
   const setSameCollisionMasksForAllSprites = (enable: boolean) => {
@@ -202,11 +222,16 @@ const CollisionMasksEditor = ({
       if (!answer) return;
     }
 
-    setSameCollisionMasksForAnimations(
-      enable && sameCollisionMasksForAnimations
+    const newSameCollisionMasksForAnimationsValue =
+      enable && sameCollisionMasksForAnimations;
+    const newSameCollisionMasksForSpritesValue = enable;
+
+    setSameCollisionMasksForAnimations(newSameCollisionMasksForAnimationsValue);
+    setSameCollisionMasksForSprites(newSameCollisionMasksForSpritesValue);
+    updateCollisionMasks(
+      newSameCollisionMasksForAnimationsValue,
+      newSameCollisionMasksForSpritesValue
     );
-    setSameCollisionMasksForSprites(enable);
-    updateCollisionMasks();
   };
 
   const setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
@@ -247,7 +272,12 @@ const CollisionMasksEditor = ({
                     {...overlayProps}
                     isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
                     polygons={sprite.getCustomCollisionMask()}
-                    onPolygonsUpdated={updateCollisionMasks}
+                    onPolygonsUpdated={() =>
+                      updateCollisionMasks(
+                        sameCollisionMasksForAnimations,
+                        sameCollisionMasksForSprites
+                      )
+                    }
                     highlightedVerticePtr={highlightedVerticePtr}
                     selectedVerticePtr={selectedVerticePtr}
                     onClickVertice={setSelectedVerticePtr}
@@ -298,7 +328,12 @@ const CollisionMasksEditor = ({
                 <React.Fragment>
                   <PolygonsList
                     polygons={sprite.getCustomCollisionMask()}
-                    onPolygonsUpdated={updateCollisionMasks}
+                    onPolygonsUpdated={() =>
+                      updateCollisionMasks(
+                        sameCollisionMasksForAnimations,
+                        sameCollisionMasksForSprites
+                      )
+                    }
                     restoreCollisionMask={() =>
                       onSetCollisionMaskAutomatic(true)
                     }

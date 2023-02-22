@@ -75,7 +75,8 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.makeDirectory');
+      .setFunctionName('gdjs.fileSystem.makeDirectory')
+      .setAsyncFunctionName('gdjs.fileSystem.makeDirectoryAsync');
 
     extension
       .addAction(
@@ -127,7 +128,8 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.saveStringToFileAsync');
+      .setFunctionName('gdjs.fileSystem.saveStringToFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.saveStringToFileAsyncTask');
 
     extension
       .addAction(
@@ -179,7 +181,8 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.saveVariableToJSONFileAsync');
+      .setFunctionName('gdjs.fileSystem.saveVariableToJSONFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.saveVariableToJSONFileAsyncTask');
 
     extension
       .addAction(
@@ -217,7 +220,8 @@ module.exports = {
       .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.loadStringFromFileAsync');
+      .setFunctionName('gdjs.fileSystem.loadStringFromFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.loadStringFromFileAsyncTask');
 
     extension
       .addAction(
@@ -331,7 +335,10 @@ module.exports = {
       .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFileAsync');
+      .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFileAsync')
+      .setAsyncFunctionName(
+        'gdjs.fileSystem.loadVariableFromJSONFileAsyncTask'
+      );
 
     extension
       .addAction(
@@ -379,7 +386,8 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.deleteFileAsync');
+      .setFunctionName('gdjs.fileSystem.deleteFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.deleteFileAsyncTask');
 
     extension
       .addStrExpression(

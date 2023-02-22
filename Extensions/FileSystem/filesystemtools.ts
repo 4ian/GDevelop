@@ -7,6 +7,13 @@ namespace gdjs {
     // The Node.js fs module, or null if it can't be loaded.
     const fs: typeof import('fs') | null =
       typeof require !== 'undefined' ? require('fs') : null;
+    const asyncFs: typeof import('fs/promises') | null =
+      typeof require !== 'undefined' ? require('fs/promises') : null;
+
+    if (!fs)
+      logger.warn(
+        'Filesystem is not supported on this platform! Only PC builds support filesystem access.'
+      );
 
     export const getDirectoryName = function (fileOrFolderPath: string) {
       if (!path) {
@@ -219,6 +226,27 @@ namespace gdjs {
       resultVar.setString(result);
     };
 
+    export const makeDirectoryAsync = (
+      directory: string,
+      resultVar: gdjs.Variable
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .mkdir(directory, { recursive: true })
+              .then(() => {
+                resultVar.setString('ok');
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to create directory at: '" + directory + "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
+
     /**
      * Save a string into a file, asynchronously.
      * @param text The string to be saved
@@ -243,6 +271,28 @@ namespace gdjs {
         });
       }
     };
+
+    export const saveStringToFileAsyncTask = (
+      text: string,
+      savePath: string,
+      resultVar: gdjs.Variable
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .writeFile(savePath, text, { encoding: 'utf8' })
+              .then(() => {
+                resultVar.setString('ok');
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to save the text to path: '" + savePath + "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
 
     /**
      * Save a string into a file.
@@ -329,6 +379,30 @@ namespace gdjs {
         );
       }
     };
+
+    export const saveVariableToJSONFileAsyncTask = (
+      variable: gdjs.Variable,
+      savePath: string,
+      resultVar: gdjs.Variable
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .writeFile(savePath, JSON.stringify(variable.toJSObject()), {
+                encoding: 'utf8',
+              })
+              .then(() => {
+                resultVar.setString('ok');
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to save the text to path: '" + savePath + "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
 
     /**
      * Load a string from a file into a scene variable.
@@ -432,6 +506,35 @@ namespace gdjs {
       }
     };
 
+    export const loadVariableFromJSONFileAsyncTask = (
+      variable: gdjs.Variable,
+      loadPath: string,
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .readFile(loadPath, { encoding: 'utf8' })
+              .then((data) => {
+                if (data)
+                  variable.fromJSON(
+                    removeCRCharacters ? data.replace(/\r/g, '') : data
+                  );
+                resultVar.setString('ok');
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to load the JSON file from path: '" +
+                    loadPath +
+                    "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
+
     /**
      * Load a string from a file into a scene variable, asynchronously.
      * @param stringVar Variable where to store the content
@@ -463,6 +566,35 @@ namespace gdjs {
         });
       }
     };
+
+    export const loadStringFromFileAsyncTask = (
+      variable: gdjs.Variable,
+      loadPath: string,
+      resultVar: gdjs.Variable,
+      removeCRCharacters: boolean
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .readFile(loadPath, { encoding: 'utf8' })
+              .then((data) => {
+                if (data)
+                  variable.setString(
+                    removeCRCharacters ? data.replace(/\r/g, '') : data
+                  );
+                resultVar.setString('ok');
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to load the text file from path: '" +
+                    loadPath +
+                    "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
 
     /**
      * Delete a file from the fs.
@@ -508,6 +640,27 @@ namespace gdjs {
         });
       }
     };
+
+    export const deleteFileAsyncTask = (
+      filePath: string,
+      resultVar: gdjs.Variable
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .rm(filePath, { recursive: true })
+              .then(() => {
+                resultVar.setString('ok');
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to delete the file: '" + filePath + "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
 
     /**
      * Check if the file or directory exists.

@@ -98,7 +98,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 14 | 18 | '1.3em' | 'inherit', // 'inherit' should only be used on an event sheet where font size is adapted to zoom.
+    fontSize?: 12 | 14 | 18 | '1.3em' | 'inherit', // 'inherit' should only be used on an event sheet where font size is adapted to zoom.
     fontStyle?: 'normal' | 'italic',
     width?: number | '30%' | '70%' | '100%',
     flex?: 1,

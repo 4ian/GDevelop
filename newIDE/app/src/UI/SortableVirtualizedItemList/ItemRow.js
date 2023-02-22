@@ -19,7 +19,7 @@ import Text from '../Text';
 const styles = {
   textField: {
     top: noMarginTextFieldInListItemTopOffset,
-    fontSize: 14,
+    fontSize: 12,
   },
 };
 

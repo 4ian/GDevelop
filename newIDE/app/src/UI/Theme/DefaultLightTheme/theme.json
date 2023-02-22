@@ -633,7 +633,8 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "#000000"
+        "value": "#1D1D26",
+        "comment": "Palette/Grey/100"
       }
     },
     "layout": {
@@ -646,7 +647,8 @@
     },
     "toolbar": {
       "background-color": {
-        "value": "#e1e1e1"
+        "value": "#C5C5C9",
+        "comment": "Palette/Grey/30"
       },
       "border-color-hover": {
         "value": "#efefef"

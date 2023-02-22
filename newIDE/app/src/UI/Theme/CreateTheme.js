@@ -81,6 +81,12 @@ export function getMuiOverrides({
         fontWeight: 400,
         letterSpacing: '0.01em',
       },
+      caption: {
+        fontSize: '12px',
+        lineHeight: '16px',
+        fontWeight: 400,
+        letterSpacing: '0.02em',
+      },
     },
     MuiInput: {
       input: {
@@ -114,6 +120,8 @@ export function getMuiOverrides({
       root: {
         // Fix color being grey if not set to (almost) black
         color: iconColor,
+        minWidth: 0,
+        paddingRight: 8,
       },
     },
     // Reduce right margins from 16px to 8px in lists:
@@ -121,10 +129,14 @@ export function getMuiOverrides({
       secondaryAction: {
         paddingRight: 40,
       },
+      gutters: {
+        paddingRight: 8,
+        paddingLeft: 8,
+      },
     },
     MuiListItemSecondaryAction: {
       root: {
-        right: 8,
+        right: 4,
       },
     },
     // Use a more visible color scheme for tabs:

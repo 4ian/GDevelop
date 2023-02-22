@@ -202,7 +202,7 @@ std::set<gd::String> EventsIdentifiersFinder::FindAllIdentifierExpressions(
   std::set<gd::String> results;
 
   const bool isObjectIdentifier = identifierType.find("object") == 0;
-  // The object from the context is only relevent for object identifiers.
+  // The object from the context is only relevant for object identifiers.
   auto& actualObjectName = isObjectIdentifier ? contextObjectName : "";
 
   FindArgumentsInEventsAndDependencies(

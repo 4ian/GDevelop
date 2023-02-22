@@ -37,6 +37,7 @@ import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
+import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import {
   type HistoryState,
   undo,
@@ -257,6 +258,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.openSceneProperties}
+        settingsIcon={<EditSceneIcon />}
         canRenameObject={this.state.selectedObjectsWithContext.length === 1}
         onRenameObject={this._startRenamingSelectedObject}
       />

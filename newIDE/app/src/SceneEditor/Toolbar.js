@@ -41,6 +41,7 @@ type Props = {|
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
+  settingsIcon?: React.Node,
   canRenameObject: boolean,
   onRenameObject: () => void,
 |};
@@ -203,7 +204,7 @@ const Toolbar = (props: Props) => {
             onClick={props.onOpenSettings}
             tooltip={t`Open settings`}
           >
-            <EditSceneIcon />
+            {props.settingsIcon || <EditSceneIcon />}
           </IconButton>
         )}
       </ToolbarGroup>

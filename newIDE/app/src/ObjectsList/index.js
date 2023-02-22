@@ -45,10 +45,9 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -182,7 +181,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const forceUpdate = useForceUpdate();
-    const windowWidth = useResponsiveWindowWidth();
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -859,10 +857,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         </div>
         <Line>
           <Column expand>
-            <RaisedButton
-              label={
-                windowWidth === 'small' ? '' : <Trans>Add a new object</Trans>
-              }
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new object</Trans>}
               primary
               onClick={onAddNewObject}
               id="add-new-object-button"

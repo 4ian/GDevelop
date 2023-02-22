@@ -22,10 +22,9 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import RaisedButton from '../UI/RaisedButton';
 import { Column, Line } from '../UI/Grid';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -346,26 +345,16 @@ export default class EventsBasedObjectsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <ResponsiveWindowMeasurer>
-          {windowWidth => (
-            <Line>
-              <Column expand>
-                <RaisedButton
-                  label={
-                    windowWidth === 'small' ? (
-                      ''
-                    ) : (
-                      <Trans>Add a new object</Trans>
-                    )
-                  }
-                  primary
-                  onClick={this._addNewEventsBasedObject}
-                  icon={<Add />}
-                />
-              </Column>
-            </Line>
-          )}
-        </ResponsiveWindowMeasurer>
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new object</Trans>}
+              primary
+              onClick={this._addNewEventsBasedObject}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

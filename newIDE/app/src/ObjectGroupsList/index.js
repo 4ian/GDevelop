@@ -26,9 +26,8 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { Column, Line } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -455,27 +454,17 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <ResponsiveWindowMeasurer>
-          {windowWidth => (
-            <Line>
-              <Column expand>
-                <RaisedButton
-                  label={
-                    windowWidth === 'small' ? (
-                      ''
-                    ) : (
-                      <Trans>Add a new group</Trans>
-                    )
-                  }
-                  primary
-                  onClick={this.addGroup}
-                  id="add-new-group-button"
-                  icon={<Add />}
-                />
-              </Column>
-            </Line>
-          )}
-        </ResponsiveWindowMeasurer>
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new group</Trans>}
+              primary
+              onClick={this.addGroup}
+              id="add-new-group-button"
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

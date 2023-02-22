@@ -25,9 +25,8 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { Column, Line } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -393,26 +392,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <ResponsiveWindowMeasurer>
-          {windowWidth => (
-            <Line>
-              <Column expand>
-                <RaisedButton
-                  label={
-                    windowWidth === 'small' ? (
-                      ''
-                    ) : (
-                      <Trans>Add a new behavior</Trans>
-                    )
-                  }
-                  primary
-                  onClick={this._addNewEventsBasedBehavior}
-                  icon={<Add />}
-                />
-              </Column>
-            </Line>
-          )}
-        </ResponsiveWindowMeasurer>
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new behavior</Trans>}
+              primary
+              onClick={this._addNewEventsBasedBehavior}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

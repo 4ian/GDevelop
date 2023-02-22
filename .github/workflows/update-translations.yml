@@ -14,6 +14,9 @@ jobs:
   update-translations:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v3
+          with:
+            node-version: 16
       - uses: actions/checkout@v2
 
       # Cache npm dependencies to speed up the workflow

@@ -198,7 +198,8 @@
     "search-bar": {
       "default": {
         "background-color": {
-          "value": "#FFFFFF"
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
         },
         "text-color": {
           "value": "#7F7F85",

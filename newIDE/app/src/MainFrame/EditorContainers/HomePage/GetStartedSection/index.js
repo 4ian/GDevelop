@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { isMobile } from '../../../../Utils/Platform';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import {
   useResponsiveWindowWidth,
@@ -31,6 +30,8 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../InAppTutorial/InAppTutorialProvider';
 import PlaceholderError from '../../../../UI/PlaceholderError';
+import optionalRequire from '../../../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -71,6 +72,12 @@ const styles = {
   },
 };
 
+export const canShowInAppTutorials = (windowWidth: WidthType) => {
+  if (!!electron) return true;
+
+  return windowWidth !== 'small';
+};
+
 type Props = {|
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
@@ -97,7 +104,7 @@ const GetStartedSection = ({
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
-  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
+  const shouldShowInAppTutorialButtons = canShowInAppTutorials(windowWidth);
   const items: {
     key: string,
     title: React.Node,

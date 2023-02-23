@@ -17,6 +17,9 @@ PropertyDescriptor::~PropertyDescriptor() {}
 void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   element.AddChild("value").SetStringValue(currentValue);
   element.AddChild("type").SetStringValue(type);
+  if (type == "Number" && !measurementUnit.IsUndefined()) {
+    element.AddChild("unit").SetStringValue(measurementUnit.GetName());
+  }
   element.AddChild("label").SetStringValue(label);
   element.AddChild("description").SetStringValue(description);
   element.AddChild("group").SetStringValue(group);
@@ -32,6 +35,14 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
 void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   currentValue = element.GetChild("value").GetStringValue();
   type = element.GetChild("type").GetStringValue();
+  if (type == "Number") {
+    gd::String unitName = element.GetChild("unit").GetStringValue();
+    if (gd::MeasurementUnit::HasDefaultMeasurementUnitNamed(
+        unitName)) {
+      measurementUnit = gd::MeasurementUnit::GetDefaultMeasurementUnitByName(
+          unitName);
+    }
+  }
   label = element.GetChild("label").GetStringValue();
   description = element.GetChild("description").GetStringValue();
   group = element.GetChild("group").GetStringValue();

@@ -675,6 +675,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ScanProject ScanProject
 
 #define STATIC_ApplyTranslation ApplyTranslation
+#define STATIC_GetUndefined GetUndefined
 #define STATIC_GetDimensionless GetDimensionless
 #define STATIC_GetDegreeAngle GetDegreeAngle
 #define STATIC_GetSecond GetSecond
@@ -682,6 +683,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetPixelSpeed GetPixelSpeed
 #define STATIC_GetPixelAcceleration GetPixelAcceleration
 #define STATIC_GetNewton GetNewton
+#define STATIC_GetDefaultMeasurementUnitCount GetDefaultMeasurementUnitCount
+#define STATIC_GetDefaultMeasurementUnitByIndex GetDefaultMeasurementUnitByIndex
+#define STATIC_GetDefaultMeasurementUnitByName GetDefaultMeasurementUnitByName
+#define STATIC_HasDefaultMeasurementUnitNamed HasDefaultMeasurementUnitNamed
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -289,6 +289,28 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             />
                           )}
                         </SelectField>
+                        {property.getType() === "Number" && (
+                        <SelectField
+                          floatingLabelText={<Trans>Measurement unit</Trans>}
+                          value={property.getMeasurementUnit().getName()}
+                          onChange={(e, i, value: string) => {
+                            property.setMeasurementUnit(gd.MeasurementUnit.getDefaultMeasurementUnitByName(value));
+                            this.forceUpdate();
+                            this.props.onPropertiesUpdated &&
+                              this.props.onPropertiesUpdated();
+                          }}
+                          fullWidth
+                        >
+                          {mapFor(0, gd.MeasurementUnit.getDefaultMeasurementUnitCount(), i => {
+                            const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitByIndex(i);
+                            return (
+                            <SelectOption
+                              value={measurementUnit.getName()}
+                              primaryText={measurementUnit.getLabel()}
+                            />
+                          )})}
+                        </SelectField>
+                        )}
                         {(property.getType() === 'String' ||
                           property.getType() === 'Number') && (
                           <SemiControlledTextField

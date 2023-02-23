@@ -74,7 +74,9 @@ public:
     return elements.at(elementIndex).GetBaseUnit();
   }
 
-  bool IsUndefined() const { return this == &gd::MeasurementUnit::undefined; }
+  bool IsUndefined() const {
+    return this == &gd::MeasurementUnit::undefined || name == "Undefined";
+  }
 
   static void ApplyTranslation();
 
@@ -98,7 +100,14 @@ public:
 
   static gd::MeasurementUnit &GetNewton() { return newton; }
 
+  static const std::vector<gd::MeasurementUnit*> &GetDefaultMeasurementUnits();
+  static std::size_t GetDefaultMeasurementUnitCount();
+  static const gd::MeasurementUnit &GetDefaultMeasurementUnitByIndex(std::size_t index);
+  static bool HasDefaultMeasurementUnitNamed(const gd::String &name);
+  static const gd::MeasurementUnit &GetDefaultMeasurementUnitByName(const gd::String &name);
+
 private:
+  static std::vector<gd::MeasurementUnit*> defaultMeasurementUnits;
   static gd::MeasurementUnit undefined;
   static gd::MeasurementUnit dimensionless;
   static gd::MeasurementUnit degreeAngle;

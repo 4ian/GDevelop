@@ -864,6 +864,7 @@ interface MeasurementUnit {
 
   void STATIC_ApplyTranslation();
 
+  [Ref] MeasurementUnit STATIC_GetUndefined();
   [Ref] MeasurementUnit STATIC_GetDimensionless();
   [Ref] MeasurementUnit STATIC_GetDegreeAngle();
   [Ref] MeasurementUnit STATIC_GetSecond();
@@ -871,6 +872,11 @@ interface MeasurementUnit {
   [Ref] MeasurementUnit STATIC_GetPixelSpeed();
   [Ref] MeasurementUnit STATIC_GetPixelAcceleration();
   [Ref] MeasurementUnit STATIC_GetNewton();
+
+  long STATIC_GetDefaultMeasurementUnitCount();
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitByIndex(long index);
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitByName([Const] DOMString name);
+  boolean STATIC_HasDefaultMeasurementUnitNamed([Const] DOMString name);
 };
 
 interface MeasurementBaseUnit {

@@ -22,6 +22,45 @@ gd::MeasurementUnit MeasurementUnit::pixelAcceleration =
     CreatePixelAcceleration();
 gd::MeasurementUnit MeasurementUnit::newton = CreateNewton();
 gd::MeasurementUnit MeasurementUnit::angularSpeed = CreateAngularSpeed();
+std::vector<gd::MeasurementUnit*> MeasurementUnit::defaultMeasurementUnits;
+
+const std::vector<gd::MeasurementUnit*> &
+MeasurementUnit::GetDefaultMeasurementUnits() {
+  if (defaultMeasurementUnits.size() == 0) {
+    defaultMeasurementUnits.push_back(&undefined);
+    defaultMeasurementUnits.push_back(&dimensionless);
+    defaultMeasurementUnits.push_back(&degreeAngle);
+    defaultMeasurementUnits.push_back(&second);
+    defaultMeasurementUnits.push_back(&pixel);
+    defaultMeasurementUnits.push_back(&pixelSpeed);
+    defaultMeasurementUnits.push_back(&pixelAcceleration);
+    defaultMeasurementUnits.push_back(&angularSpeed);
+    defaultMeasurementUnits.push_back(&newton);
+  }
+  return defaultMeasurementUnits;
+}
+
+std::size_t MeasurementUnit::GetDefaultMeasurementUnitCount() {
+  return GetDefaultMeasurementUnits().size();
+}
+
+const gd::MeasurementUnit &
+MeasurementUnit::GetDefaultMeasurementUnitByIndex(std::size_t index) {
+  return *GetDefaultMeasurementUnits().at(index);
+}
+
+bool MeasurementUnit::HasDefaultMeasurementUnitNamed(const gd::String &name) {
+  auto units = GetDefaultMeasurementUnits();
+  return std::find_if(units.begin(), units.end(),
+             [name](const gd::MeasurementUnit* unit) -> bool { return unit->GetName() == name; }) != units.end();
+}
+
+const gd::MeasurementUnit &
+MeasurementUnit::GetDefaultMeasurementUnitByName(const gd::String &name) {
+  auto units = GetDefaultMeasurementUnits();
+  return **std::find_if(units.begin(), units.end(),
+             [name](const gd::MeasurementUnit* unit) -> bool { return unit->GetName() == name; });
+}
 
 void MeasurementUnit::ApplyTranslation() {
   undefined = CreateUndefined();
@@ -33,6 +72,7 @@ void MeasurementUnit::ApplyTranslation() {
   pixelAcceleration = CreatePixelAcceleration();
   newton = CreateNewton();
   angularSpeed = CreateAngularSpeed();
+  defaultMeasurementUnits.clear();
 }
 
 } // namespace gd

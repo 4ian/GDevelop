@@ -521,8 +521,6 @@ namespace gdjs {
     }
   }
 
-  export const ShapePainterRuntimeObjectRenderer =
-    ShapePainterRuntimeObjectPixiRenderer;
-  export type ShapePainterRuntimeObjectRenderer =
-    ShapePainterRuntimeObjectPixiRenderer;
+  export const ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
+  export type ShapePainterRuntimeObjectRenderer = ShapePainterRuntimeObjectPixiRenderer;
 }

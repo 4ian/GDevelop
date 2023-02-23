@@ -99,12 +99,7 @@ const CollisionMasksEditor = ({
       ? every(
           mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
             const otherAnimation = spriteConfiguration.getAnimation(i);
-            const same = allSpritesHaveSameCollisionMasksAs(
-              sprite,
-              otherAnimation
-            );
-            console.log(same);
-            return same;
+            return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
           })
         )
       : false
@@ -162,11 +157,6 @@ const CollisionMasksEditor = ({
     () => {
       if (!animation || !sprite) return;
 
-      console.log(
-        'effect triggering',
-        allSpritesHaveSameCollisionMasksAs(sprite, animation)
-      );
-
       setSameCollisionMasksForSprites(
         allSpritesHaveSameCollisionMasksAs(sprite, animation)
       );
@@ -199,8 +189,6 @@ const CollisionMasksEditor = ({
       if (!answer) return;
     }
 
-    console.log('setting same');
-
     const newSameCollisionMasksForAnimationsValue = enable;
     const newSameCollisionMasksForSpritesValue =
       enable || sameCollisionMasksForSprites;
@@ -211,7 +199,6 @@ const CollisionMasksEditor = ({
       newSameCollisionMasksForAnimationsValue,
       newSameCollisionMasksForSpritesValue
     );
-    console.log('done updating');
   };
 
   const setSameCollisionMasksForAllSprites = (enable: boolean) => {

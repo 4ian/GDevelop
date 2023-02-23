@@ -69,6 +69,7 @@ type AnimationProps = {|
   objectName: string,
   onChangeName: string => void,
   isAnimationListLocked: boolean,
+  onSpriteUpdated: () => void,
 |};
 
 class Animation extends React.Component<AnimationProps, void> {
@@ -87,6 +88,7 @@ class Animation extends React.Component<AnimationProps, void> {
       objectName,
       onChangeName,
       isAnimationListLocked,
+      onSpriteUpdated,
     } = this.props;
 
     const animationName = animation.getName();
@@ -137,6 +139,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 objectName={objectName}
                 animationName={animationName}
                 onChangeName={onChangeName}
+                onSpriteUpdated={onSpriteUpdated}
               />
             );
           })}
@@ -164,6 +167,7 @@ const SortableAnimationsList = SortableContainer(
     onSelectSprite,
     onReplaceDirection,
     isAnimationListLocked,
+    onSpriteUpdated,
   }) => {
     // Note that it's important to have <ScrollView> *inside* this
     // component, otherwise the sortable list won't work (because the
@@ -191,6 +195,7 @@ const SortableAnimationsList = SortableContainer(
                 onReplaceDirection(i, directionId, newDirection)
               }
               objectName={objectName}
+              onSpriteUpdated={onSpriteUpdated}
             />
           );
         })}
@@ -257,13 +262,16 @@ class AnimationsListContainer extends React.Component<
   changeAnimationName = (i, newName) => {
     const { spriteConfiguration } = this.props;
 
+    const currentName = spriteConfiguration.getAnimation(i).getName();
+    if (currentName === newName) return;
+
     const otherNames = mapFor(
       0,
       spriteConfiguration.getAnimationsCount(),
       index => {
         return index === i
           ? undefined // Don't check the current animation name as we're changing it.
-          : spriteConfiguration.getAnimation(index).getName();
+          : currentName;
       }
     );
 
@@ -365,6 +373,7 @@ class AnimationsListContainer extends React.Component<
               useDragHandle
               lockAxis="y"
               axis="y"
+              onSpriteUpdated={this.props.onObjectUpdated}
             />
             <Column noMargin>
               <ResponsiveLineStackLayout

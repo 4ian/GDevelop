@@ -200,14 +200,19 @@ const LayerEditorDialog = (props: Props) => {
                     b: layer.getAmbientLightColorBlue(),
                   };
                   const newRgbColor = rgbStringAndAlphaToRGBColor(newColor);
-                  if (newRgbColor) {
+                  if (
+                    newRgbColor &&
+                    (newRgbColor.r !== currentRgbColor.r ||
+                      newRgbColor.g !== currentRgbColor.g ||
+                      newRgbColor.b !== currentRgbColor.b)
+                  ) {
                     layer.setAmbientLightColor(
                       newRgbColor.r,
                       newRgbColor.g,
                       newRgbColor.b
                     );
                     forceUpdate();
-                    if (currentRgbColor !== newRgbColor) notifyOfChange();
+                    notifyOfChange();
                   }
                 }}
               />

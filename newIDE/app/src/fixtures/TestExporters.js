@@ -18,7 +18,7 @@ import {
   OnlineGameLink,
 } from '../Export/GenericExporters/OnlineWebExport';
 import { delay } from '../Utils/Delay';
-import { assignIn } from 'lodash';
+import assignIn from 'lodash/assignIn';
 const gd: libGDevelop = global.gd;
 type ExportState = null;
 

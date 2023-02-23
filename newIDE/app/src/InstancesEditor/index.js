@@ -54,6 +54,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
+  onDuplicate: () => void,
   onUndo: () => void,
   onRedo: () => void,
   onZoomOut: () => void,

@@ -29,8 +29,6 @@ namespace gdjs {
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
-    /** Is antialiasing enabled on the object? */
-    antialiasing: boolean;
     /**Quality of the antialiasing filter */
     antialiasingQuality: 'Off' | 'Low' | 'Medium' | 'High';
   };

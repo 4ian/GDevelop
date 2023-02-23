@@ -544,7 +544,7 @@ namespace gdjs {
      * in its onCreate function.
      * The hook must stay forever to avoid side effects like a hooks order
      * change. To handle deactivated behavior, the hook can check that its
-     * behavior is active before doing anything.
+     * behavior is activated before doing anything.
      */
     registerHook(
       hook: gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook

@@ -539,6 +539,13 @@ namespace gdjs {
       return this._stickAngle;
     }
 
+    /**
+     * A hook must typically be registered by a behavior that requires this one
+     * in its onCreate function.
+     * The hook must stay forever to avoid side effects like a hooks order
+     * change. To handle deactivated behavior, the hook can check that its
+     * behavior is active before doing anything.
+     */
     registerHook(
       hook: gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
     ) {

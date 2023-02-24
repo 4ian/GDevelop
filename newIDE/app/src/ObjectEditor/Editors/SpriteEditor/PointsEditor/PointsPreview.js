@@ -4,6 +4,8 @@ import { dataObjectToProps } from '../../../../Utils/HTMLDataset';
 import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
+const circleRadius = 7;
+
 const styles = {
   point: { cursor: 'move' },
   containerStyle: {
@@ -158,24 +160,48 @@ const PointsPreview = (props: Props) => {
       const pointName = getPointName(kind, point);
 
       return (
-        <circle
-          onPointerDown={() => onStartDragPoint(point, kind)}
-          {...dataObjectToProps({ draggable: 'true' })}
-          key={`point-${name}`}
-          fill={
-            pointName === highlightedPointName
-              ? 'rgba(0,0,0,0.75)'
-              : pointName === selectedPointName
-              ? 'rgba(107,175,255,0.75)'
-              : 'rgba(255,133,105,0.75)'
-          }
-          stroke={pointName === highlightedPointName ? 'white' : undefined}
-          strokeWidth={2}
-          cx={x}
-          cy={y}
-          r={7}
-          style={styles.point}
-        />
+        <>
+          <line
+            x1="0"
+            y1={-circleRadius}
+            x2="0"
+            y2={circleRadius}
+            style={{
+              stroke: 'white',
+              strokeWidth: 1,
+              transform: `translate(${x}px, ${y}px)`,
+            }}
+          />
+          <line
+            x1={-circleRadius}
+            y1="0"
+            x2={circleRadius}
+            y2="0"
+            style={{
+              stroke: 'white',
+              strokeWidth: 1,
+              transform: `translate(${x}px, ${y}px)`,
+            }}
+          />
+          <circle
+            onPointerDown={() => onStartDragPoint(point, kind)}
+            {...dataObjectToProps({ draggable: 'true' })}
+            key={`point-${name}`}
+            fill={
+              pointName === highlightedPointName
+                ? 'rgba(0,0,0,0.75)'
+                : pointName === selectedPointName
+                ? 'rgba(107,175,255,0.6)'
+                : 'rgba(255,133,105,0.6)'
+            }
+            stroke={pointName === highlightedPointName ? 'white' : undefined}
+            strokeWidth={2}
+            cx={x}
+            cy={y}
+            r={circleRadius}
+            style={styles.point}
+          />
+        </>
       );
     },
     [highlightedPointName, onStartDragPoint, selectedPointName]

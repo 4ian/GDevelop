@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import { dataObjectToProps } from '../../../../Utils/HTMLDataset';
 import {
   findNearestEdgePoint,
   getMagnetizedVertexForDeletion,
@@ -279,6 +280,7 @@ const CollisionMasksPreview = (props: Props) => {
               onPointerDown={() =>
                 onStartDragVertex(vertex, polygonIndex, vertexIndex)
               }
+              {...dataObjectToProps({ draggable: 'true' })}
               key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
               fill={
                 vertex.ptr === props.highlightedVerticePtr

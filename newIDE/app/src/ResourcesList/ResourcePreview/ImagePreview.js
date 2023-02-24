@@ -29,8 +29,6 @@ import {
 } from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
-const MARGIN = 50;
-
 const styles = {
   previewImagePixelated: {
     imageRendering: getPixelatedImageRendering(),
@@ -203,6 +201,16 @@ const ImagePreview = ({
   );
 
   const handleTouchMove = React.useCallback(async (event: TouchEvent) => {
+    if (
+      event.target &&
+      (event.target instanceof HTMLElement ||
+        // $FlowFixMe - Flow does not know about SVGElement
+        event.target instanceof SVGElement) &&
+      event.target.dataset &&
+      'draggable' in event.target.dataset
+    ) {
+      return;
+    }
     const { clientX, clientY } = event.touches[0];
     event.preventDefault();
     event.stopPropagation();
@@ -297,13 +305,6 @@ const ImagePreview = ({
   // so that the image takes the space of the container whilst being hidden.
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
-  const width = imageWidth ? imageWidth * imageZoomFactor : undefined;
-  const height = imageHeight ? imageHeight * imageZoomFactor : undefined;
-  // console.log(imageZoomFactor);
-  // console.log(xOffset);
-  // console.log(yOffset);
-
-  console.log(imageLoaded)
 
   const imageContainerStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,

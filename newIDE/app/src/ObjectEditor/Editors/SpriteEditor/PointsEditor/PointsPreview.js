@@ -20,12 +20,10 @@ const styles = {
     height: 11,
   },
   highlightedPoint: {
-    outline: '1px solid black',
     backdropFilter: 'brightness(200%)',
     zIndex: highlightedPointZIndex,
   },
   selectedPoint: {
-    outline: '1px solid blue',
     backdropFilter: 'brightness(130%)',
     zIndex: selectedPointZIndex,
   },
@@ -126,7 +124,7 @@ const PointsPreview = (props: Props) => {
    *
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
-  const onMouseMove = (event: any) => {
+  const onPointerMove = (event: any) => {
     const { draggedPoint, draggedPointKind } = state;
     if (!draggedPoint || !frameRef.current) return;
 
@@ -150,24 +148,30 @@ const PointsPreview = (props: Props) => {
     point: gdPoint
   ) => {
     const pointName = getPointName(kind, point);
+    const style = {
+      backgroundImage: `url(${getImageSrc(kind)})`,
+      left: x,
+      top: y,
+      ...styles.point,
+      ...(pointName === highlightedPointName
+        ? styles.highlightedPoint
+        : pointName === selectedPointName
+        ? styles.selectedPoint
+        : null),
+      outline: 'none',
+    };
+    if (pointName === highlightedPointName || pointName === selectedPointName) {
+      style.outline = `${1 / displayImageZoomFactor}px solid ${
+        pointName === highlightedPointName ? 'black' : 'blue'
+      }`;
+    }
     return (
       /* Use div instead of img to prevent dragging issues happening
       with Safari and Firefox that display ghost image of the dragged
       element under the cursor. */
       <div
         title={pointName}
-        style={{
-          backgroundImage: `url(${getImageSrc(kind)})`,
-          left: x,
-          top: y,
-          ...styles.point,
-          ...(pointName === highlightedPointName
-            ? styles.highlightedPoint
-            : pointName === selectedPointName
-            ? styles.selectedPoint
-            : null),
-          outlineWidth: `${1 / displayImageZoomFactor}px`,
-        }}
+        style={style}
         alt=""
         key={name}
         onPointerDown={e => {
@@ -204,7 +208,7 @@ const PointsPreview = (props: Props) => {
   return (
     <div
       style={styles.container}
-      onPointerMove={onMouseMove}
+      onPointerMove={onPointerMove}
       onPointerUp={onEndDragPoint}
     >
       <div style={frameStyle} ref={frameRef}>

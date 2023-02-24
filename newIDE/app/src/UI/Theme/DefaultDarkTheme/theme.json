@@ -655,7 +655,8 @@
         "value": "#3E4452"
       },
       "background-color": {
-        "value": "#21252B"
+        "value": "#25252E",
+        "comment": "Palette/Grey/90"
       }
     },
     "toolbar": {

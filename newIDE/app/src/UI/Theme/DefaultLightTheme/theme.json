@@ -643,7 +643,8 @@
         "value": "#bbbbbb"
       },
       "background-color": {
-        "value": "#e0e0e0"
+        "value": "#FAFAFA",
+        "comment": "Palette/Grey/00"
       }
     },
     "toolbar": {

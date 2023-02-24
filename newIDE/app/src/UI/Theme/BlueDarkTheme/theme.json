@@ -537,8 +537,8 @@
         "value": "#888888"
       },
       "background-color": {
-        "value": "#4d4d4d",
-        "todo": "decide on window-body"
+        "value": "#25252E",
+        "comment": "Palette/Grey/90"
       }
     },
     "toolbar": {

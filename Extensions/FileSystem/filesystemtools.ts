@@ -597,7 +597,7 @@ namespace gdjs {
         : (resultVar.setString('error'), new gdjs.ResolveTask());
 
     /**
-     * Delete a file from the fs.
+     * Delete a file from the filesystem.
      * @param filePath Path to the file
      * @param resultVar The variable where to store the result of the operation
      */

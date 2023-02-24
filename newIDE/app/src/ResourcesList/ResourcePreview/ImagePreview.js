@@ -5,9 +5,9 @@ import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
 import MiniToolbar from '../../UI/MiniToolbar';
-import ZoomIn from '@material-ui/icons/ZoomIn';
-import ZoomOut from '@material-ui/icons/ZoomOut';
-import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
+import ZoomIn from '../../UI/CustomSvgIcons/ZoomIn';
+import ZoomOut from '../../UI/CustomSvgIcons/ZoomOut';
+import Maximize from '../../UI/CustomSvgIcons/Maximize';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -450,7 +450,7 @@ const ImagePreview = ({
                   }}
                   tooltip={t`Fit content to window`}
                 >
-                  <ZoomOutMap />
+                  <Maximize />
                 </IconButton>
               </MiniToolbar>
             )}

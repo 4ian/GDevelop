@@ -22,9 +22,9 @@ gd::MeasurementUnit MeasurementUnit::pixelAcceleration =
     CreatePixelAcceleration();
 gd::MeasurementUnit MeasurementUnit::newton = CreateNewton();
 gd::MeasurementUnit MeasurementUnit::angularSpeed = CreateAngularSpeed();
-std::vector<gd::MeasurementUnit*> MeasurementUnit::defaultMeasurementUnits;
+std::vector<const gd::MeasurementUnit*> MeasurementUnit::defaultMeasurementUnits;
 
-const std::vector<gd::MeasurementUnit*> &
+const std::vector<const gd::MeasurementUnit*> &
 MeasurementUnit::GetDefaultMeasurementUnits() {
   if (defaultMeasurementUnits.size() == 0) {
     defaultMeasurementUnits.push_back(&undefined);
@@ -40,12 +40,12 @@ MeasurementUnit::GetDefaultMeasurementUnits() {
   return defaultMeasurementUnits;
 }
 
-std::size_t MeasurementUnit::GetDefaultMeasurementUnitCount() {
+std::size_t MeasurementUnit::GetDefaultMeasurementUnitsCount() {
   return GetDefaultMeasurementUnits().size();
 }
 
 const gd::MeasurementUnit &
-MeasurementUnit::GetDefaultMeasurementUnitByIndex(std::size_t index) {
+MeasurementUnit::GetDefaultMeasurementUnitAtIndex(std::size_t index) {
   return *GetDefaultMeasurementUnits().at(index);
 }
 

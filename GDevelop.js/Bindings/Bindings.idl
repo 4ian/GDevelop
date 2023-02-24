@@ -873,8 +873,8 @@ interface MeasurementUnit {
   [Const, Ref] MeasurementUnit STATIC_GetPixelAcceleration();
   [Const, Ref] MeasurementUnit STATIC_GetNewton();
 
-  long STATIC_GetDefaultMeasurementUnitCount();
-  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitByIndex(long index);
+  long STATIC_GetDefaultMeasurementUnitsCount();
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitAtIndex(long index);
   [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitByName([Const] DOMString name);
   boolean STATIC_HasDefaultMeasurementUnitNamed([Const] DOMString name);
 };

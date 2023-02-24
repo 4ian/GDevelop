@@ -37,11 +37,11 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   type = element.GetChild("type").GetStringValue();
   if (type == "Number") {
     gd::String unitName = element.GetChild("unit").GetStringValue();
-    if (gd::MeasurementUnit::HasDefaultMeasurementUnitNamed(
-        unitName)) {
-      measurementUnit = gd::MeasurementUnit::GetDefaultMeasurementUnitByName(
-          unitName);
-    }
+    measurementUnit =
+        gd::MeasurementUnit::HasDefaultMeasurementUnitNamed(unitName)
+            ? measurementUnit =
+                  gd::MeasurementUnit::GetDefaultMeasurementUnitByName(unitName)
+            : gd::MeasurementUnit::GetUndefined();
   }
   label = element.GetChild("label").GetStringValue();
   description = element.GetChild("description").GetStringValue();

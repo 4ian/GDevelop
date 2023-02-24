@@ -100,14 +100,14 @@ public:
 
   static const gd::MeasurementUnit &GetNewton() { return newton; }
 
-  static const std::vector<gd::MeasurementUnit*> &GetDefaultMeasurementUnits();
-  static std::size_t GetDefaultMeasurementUnitCount();
-  static const gd::MeasurementUnit &GetDefaultMeasurementUnitByIndex(std::size_t index);
+  static const std::vector<const gd::MeasurementUnit*> &GetDefaultMeasurementUnits();
+  static std::size_t GetDefaultMeasurementUnitsCount();
+  static const gd::MeasurementUnit &GetDefaultMeasurementUnitAtIndex(std::size_t index);
   static bool HasDefaultMeasurementUnitNamed(const gd::String &name);
   static const gd::MeasurementUnit &GetDefaultMeasurementUnitByName(const gd::String &name);
 
 private:
-  static std::vector<gd::MeasurementUnit*> defaultMeasurementUnits;
+  static std::vector<const gd::MeasurementUnit*> defaultMeasurementUnits;
   static gd::MeasurementUnit undefined;
   static gd::MeasurementUnit dimensionless;
   static gd::MeasurementUnit degreeAngle;

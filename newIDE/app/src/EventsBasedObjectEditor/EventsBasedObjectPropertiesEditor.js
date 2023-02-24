@@ -305,9 +305,9 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               >
                                 {mapFor(
                                   0,
-                                  gd.MeasurementUnit.getDefaultMeasurementUnitCount(),
+                                  gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
                                   i => {
-                                    const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitByIndex(
+                                    const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
                                       i
                                     );
                                     const unitShortLabel = getMeasurementUnitShortLabel(

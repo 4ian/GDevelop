@@ -18,8 +18,8 @@ declare class gdMeasurementUnit {
   static getPixelSpeed(): gdMeasurementUnit;
   static getPixelAcceleration(): gdMeasurementUnit;
   static getNewton(): gdMeasurementUnit;
-  static getDefaultMeasurementUnitCount(): number;
-  static getDefaultMeasurementUnitByIndex(index: number): gdMeasurementUnit;
+  static getDefaultMeasurementUnitsCount(): number;
+  static getDefaultMeasurementUnitAtIndex(index: number): gdMeasurementUnit;
   static getDefaultMeasurementUnitByName(name: string): gdMeasurementUnit;
   static hasDefaultMeasurementUnitNamed(name: string): boolean;
   delete(): void;

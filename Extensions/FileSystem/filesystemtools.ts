@@ -619,7 +619,7 @@ namespace gdjs {
     };
 
     /**
-     * Delete a file from the fs, asynchronously.
+     * Delete a file from the filesystem, asynchronously.
      * @param filePath Path to the file
      * @param resultVar The variable where to store the result of the operation
      */

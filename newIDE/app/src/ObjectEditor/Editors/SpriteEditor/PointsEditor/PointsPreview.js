@@ -1,31 +1,15 @@
 // @flow
 import * as React from 'react';
+import { dataObjectToProps } from '../../../../Utils/HTMLDataset';
 import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
-const selectedPointZIndex = 900;
-const highlightedPointZIndex = 1000;
-
 const styles = {
-  container: {
+  point: { cursor: 'move' },
+  containerStyle: {
     position: 'relative',
     width: '100%',
     height: '100%',
-  },
-  point: {
-    position: 'absolute',
-    transform: 'translate(-5px, -5px)',
-    cursor: 'move',
-    width: 11,
-    height: 11,
-  },
-  highlightedPoint: {
-    backdropFilter: 'brightness(200%)',
-    zIndex: highlightedPointZIndex,
-  },
-  selectedPoint: {
-    backdropFilter: 'brightness(130%)',
-    zIndex: selectedPointZIndex,
   },
 };
 
@@ -42,13 +26,6 @@ const getPointName = (kind: PointKind, point: gdPoint): string =>
     : kind === pointKindIdentifiers.CENTER
     ? 'Center'
     : point.getName();
-
-const getImageSrc = (kind: PointKind): string =>
-  kind === pointKindIdentifiers.ORIGIN
-    ? 'res/originPoint.png'
-    : kind === pointKindIdentifiers.CENTER
-    ? 'res/centerPoint.png'
-    : 'res/point.png';
 
 type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
@@ -70,7 +47,7 @@ type State = {|
 |};
 
 const PointsPreview = (props: Props) => {
-  const frameRef = React.useRef<React.ElementRef<'div'> | null>(null);
+  const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedPoint: null,
     draggedPointKind: null,
@@ -89,6 +66,23 @@ const PointsPreview = (props: Props) => {
   } = props;
 
   const forceUpdate = useForceUpdate();
+
+  /**
+   * @returns The cursor position in the frame basis.
+   */
+  const getCursorOnFrame = (event: any): [number, number] | null => {
+    if (!svgRef.current) return null;
+
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const pointOnScreen = svgRef.current.createSVGPoint();
+    pointOnScreen.x = event.clientX;
+    pointOnScreen.y = event.clientY;
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
+    const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
+
+    return [pointOnSvg.x, pointOnSvg.y];
+  };
 
   const onStartDragPoint = (
     draggedPoint: gdPoint,
@@ -125,18 +119,23 @@ const PointsPreview = (props: Props) => {
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
   const onPointerMove = (event: any) => {
+    /** The cursor position in the frame basis. */
+    const cursorOnFrame = getCursorOnFrame(event);
+    if (!cursorOnFrame) {
+      return;
+    }
     const { draggedPoint, draggedPointKind } = state;
-    if (!draggedPoint || !frameRef.current) return;
+    if (!draggedPoint || !draggedPointKind) return;
 
-    const frameBoundingRect = frameRef.current.getBoundingClientRect();
-    const xOnFrame = event.clientX - frameBoundingRect.left;
-    const yOnFrame = event.clientY - frameBoundingRect.top;
+    const cursorX = cursorOnFrame[0] / imageZoomFactor;
+    const cursorY = cursorOnFrame[1] / imageZoomFactor;
 
     if (draggedPointKind === pointKindIdentifiers.CENTER) {
       props.pointsContainer.setDefaultCenterPoint(false);
     }
-    draggedPoint.setX(xOnFrame / imageZoomFactor);
-    draggedPoint.setY(yOnFrame / imageZoomFactor);
+    draggedPoint.setX(cursorX);
+    draggedPoint.setY(cursorY);
+
     forceUpdate();
   };
 
@@ -148,35 +147,25 @@ const PointsPreview = (props: Props) => {
     point: gdPoint
   ) => {
     const pointName = getPointName(kind, point);
-    const style = {
-      backgroundImage: `url(${getImageSrc(kind)})`,
-      left: x,
-      top: y,
-      ...styles.point,
-      ...(pointName === highlightedPointName
-        ? styles.highlightedPoint
-        : pointName === selectedPointName
-        ? styles.selectedPoint
-        : null),
-      outline: 'none',
-    };
-    if (pointName === highlightedPointName || pointName === selectedPointName) {
-      style.outline = `${1 / displayImageZoomFactor}px solid ${
-        pointName === highlightedPointName ? 'black' : 'blue'
-      }`;
-    }
+
     return (
-      /* Use div instead of img to prevent dragging issues happening
-      with Safari and Firefox that display ghost image of the dragged
-      element under the cursor. */
-      <div
-        title={pointName}
-        style={style}
-        alt=""
-        key={name}
-        onPointerDown={e => {
-          onStartDragPoint(point, kind);
-        }}
+      <circle
+        onPointerDown={() => onStartDragPoint(point, kind)}
+        {...dataObjectToProps({ draggable: 'true' })}
+        key={`point-${name}`}
+        fill={
+          pointName === highlightedPointName
+            ? 'rgba(0,0,0,0.75)'
+            : pointName === selectedPointName
+            ? 'rgba(107,175,255,0.75)'
+            : 'rgba(255,133,105,0.75)'
+        }
+        stroke={pointName === highlightedPointName ? 'white' : undefined}
+        strokeWidth={2 / displayImageZoomFactor}
+        cx={x * imageZoomFactor}
+        cy={y * imageZoomFactor}
+        r={5 / displayImageZoomFactor}
+        style={styles.point}
       />
     );
   };
@@ -196,7 +185,7 @@ const PointsPreview = (props: Props) => {
   const centerPoint = pointsContainer.getCenter();
   const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
 
-  const frameStyle = {
+  const svgStyle = {
     position: 'absolute',
     top: offsetTop || 0,
     left: offsetLeft || 0,
@@ -207,11 +196,11 @@ const PointsPreview = (props: Props) => {
 
   return (
     <div
-      style={styles.container}
+      style={styles.containerStyle}
       onPointerMove={onPointerMove}
       onPointerUp={onEndDragPoint}
     >
-      <div style={frameStyle} ref={frameRef}>
+      <svg style={svgStyle} ref={svgRef}>
         {points}
         {renderPoint(
           'Origin',
@@ -222,14 +211,14 @@ const PointsPreview = (props: Props) => {
         )}
         {renderPoint(
           'Center',
-          (!automaticCenterPosition ? centerPoint.getX() : imageWidth / 2) *
+          (automaticCenterPosition ? imageWidth / 2 : centerPoint.getX()) *
             imageZoomFactor,
-          (!automaticCenterPosition ? centerPoint.getY() : imageHeight / 2) *
+          (automaticCenterPosition ? imageHeight / 2 : centerPoint.getY()) *
             imageZoomFactor,
           pointKindIdentifiers.CENTER,
           centerPoint
         )}
-      </div>
+      </svg>
     </div>
   );
 };

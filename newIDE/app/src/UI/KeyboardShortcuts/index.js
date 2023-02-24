@@ -128,7 +128,6 @@ export default class KeyboardShortcuts {
       this._shiftPressed
     );
   }
-  
 
   resetModifiers = () => {
     this._metaPressed = false;

@@ -120,6 +120,15 @@ export default class KeyboardShortcuts {
     }
   }
 
+  resetModifiers = () => {
+    this._metaPressed = false;
+    this._altPressed = false;
+    this._ctrlPressed = false;
+    this._shiftPressed = false;
+    this._mouseMidButtonPressed = false;
+    this._spacePressed = false;
+  };
+
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
     this._metaPressed = evt.metaKey;
     this._altPressed = evt.altKey;

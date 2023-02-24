@@ -222,6 +222,11 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.addEventListener('mouseout', event => {
       this.props.onMouseLeave(event);
     });
+    this.pixiRenderer.view.addEventListener('focusout', event => {
+      if (this.keyboardShortcuts) {
+        this.keyboardShortcuts.resetModifiers();
+      }
+    });
 
     this.pixiContainer = new PIXI.Container();
 

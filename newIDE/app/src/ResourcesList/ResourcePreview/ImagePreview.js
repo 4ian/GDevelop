@@ -22,6 +22,7 @@ import {
   getWheelStepZoomFactor,
   imagePreviewMaxZoom,
   imagePreviewMinZoom,
+  willZoomChange,
   zoomInFactor,
   zoomOutFactor,
   zoomStepBasePower,
@@ -29,7 +30,6 @@ import {
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
-const SPRITE_MARGIN_RATIO = 1.5;
 
 const styles = {
   previewImagePixelated: {
@@ -60,10 +60,7 @@ const styles = {
     // `pointermove` event for "native" behavior like panning the page.
     touchAction: 'none',
   },
-  spriteThumbnailImage: {
-    position: 'relative',
-    pointerEvents: 'none',
-  },
+  spriteThumbnailImage: {},
   sliderContainer: {
     maxWidth: 150,
     width: '100%',
@@ -85,6 +82,7 @@ type Props = {|
     offsetTop: number,
     offsetLeft: number,
     imageZoomFactor: number,
+    displayImageZoomFactor: number,
   |}) => React.Node,
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
@@ -131,8 +129,11 @@ const ImagePreview = ({
   const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
     initialZoom || 1
   );
+  const touchStartClientCoordinates = React.useRef<[number, number]>([0, 0]);
+  const [xOffset, setXOffset] = React.useState<number>(0);
+  const [yOffset, setYOffset] = React.useState<number>(0);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
-
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const handleImageError = () => {
     setErrored(true);
   };
@@ -143,15 +144,93 @@ const ImagePreview = ({
         return false;
       }
       const zoomFactor = clampImagePreviewZoom(
-        Math.min(
-          containerWidth / (imageWidth * SPRITE_MARGIN_RATIO),
-          containerHeight / (imageHeight * SPRITE_MARGIN_RATIO)
-        )
+        Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
       setImageZoomFactor(zoomFactor);
+      setXOffset(0);
+      setYOffset(0);
       return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
+  );
+
+  const zoomTo = React.useCallback(async (factor: number) => {
+    await setImageZoomFactor(clampImagePreviewZoom(factor));
+  }, []);
+
+  const zoomAroundPointBy = React.useCallback(
+    async (imageZoomFactorMultiplier: number, point: [number, number]) => {
+      if (!willZoomChange(imageZoomFactor, imageZoomFactorMultiplier)) {
+        return;
+      }
+      await setXOffset(xOffset => {
+        return xOffset + (point[0] - xOffset) * (1 - imageZoomFactorMultiplier);
+      });
+      await setYOffset(yOffset => {
+        return yOffset + (point[1] - yOffset) * (1 - imageZoomFactorMultiplier);
+      });
+      await zoomTo(imageZoomFactor * imageZoomFactorMultiplier);
+    },
+    [zoomTo, imageZoomFactor]
+  );
+
+  const zoomAroundPointTo = React.useCallback(
+    async (factor: number, point: [number, number]) => {
+      await setXOffset(xOffset => {
+        return xOffset + (point[0] - xOffset) * (1 - factor / imageZoomFactor);
+      });
+      await setYOffset(yOffset => {
+        return yOffset + (point[1] - yOffset) * (1 - factor / imageZoomFactor);
+      });
+      await zoomTo(factor);
+    },
+    [zoomTo, imageZoomFactor]
+  );
+
+  const handleWheel = React.useCallback(
+    (event: WheelEvent) => {
+      const { deltaY, deltaX, offsetX, offsetY } = event;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!hideControls && shouldZoom(event)) {
+        zoomAroundPointBy(getWheelStepZoomFactor(-deltaY), [offsetX, offsetY]);
+      } else {
+        setXOffset(xOffset => xOffset - deltaX / 10);
+        setYOffset(yOffset => yOffset - deltaY / 10);
+      }
+    },
+    [hideControls, zoomAroundPointBy]
+  );
+
+  const handleTouchMove = React.useCallback(async (event: TouchEvent) => {
+    const { clientX, clientY } = event.touches[0];
+    event.preventDefault();
+    event.stopPropagation();
+
+    await setXOffset(
+      xOffset => xOffset + (clientX - touchStartClientCoordinates.current[0])
+    );
+    await setYOffset(
+      yOffset => yOffset + (clientY - touchStartClientCoordinates.current[1])
+    );
+    touchStartClientCoordinates.current = [clientX, clientY];
+  }, []);
+
+  React.useEffect(
+    () => {
+      if (containerRef.current) {
+        containerRef.current.addEventListener('wheel', handleWheel, {
+          passive: false,
+        });
+        return () => {
+          containerRef.current &&
+            containerRef.current.removeEventListener('wheel', handleWheel, {
+              passive: false,
+            });
+        };
+      }
+    },
+    [handleWheel]
   );
 
   // Reset ref to adapt zoom when image changes
@@ -192,33 +271,25 @@ const ImagePreview = ({
     if (onImageLoaded) onImageLoaded();
   };
 
-  const zoomBy = (imageZoomFactorMultiplier: number) => {
-    zoomTo(imageZoomFactor * imageZoomFactorMultiplier);
-  };
-
-  const zoomTo = (imageZoomFactor: number) => {
-    setImageZoomFactor(clampImagePreviewZoom(imageZoomFactor));
-  };
-
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
 
   const containerLoaded = !!containerWidth && !!containerHeight;
   const imageLoaded = !!imageWidth && !!imageHeight && !errored;
 
-  // Centre-align the image and overlays
-  const imagePositionTop = Math.max(
-    0,
-    (containerHeight || 0) / 2 -
-      ((imageHeight || 0) * imageZoomFactor) / 2 -
-      MARGIN
-  );
-  const imagePositionLeft = Math.max(
-    0,
-    (containerWidth || 0) / 2 -
-      ((imageWidth || 0) * imageZoomFactor) / 2 -
-      MARGIN
-  );
+  // // Centre-align the image and overlays
+  // const imagePositionTop = Math.max(
+  //   0,
+  //   (containerHeight || 0) / 2 -
+  //     ((imageHeight || 0) * imageZoomFactor) / 2 -
+  //     MARGIN
+  // );
+  // const imagePositionLeft = Math.max(
+  //   0,
+  //   (containerWidth || 0) / 2 -
+  //     ((imageWidth || 0) * imageZoomFactor) / 2 -
+  //     MARGIN
+  // );
 
   // We display the elements only when the image is loaded and
   // the zoom is applied to avoid a shift in the image.
@@ -228,32 +299,32 @@ const ImagePreview = ({
   const visibility = containerLoaded ? undefined : 'hidden';
   const width = imageWidth ? imageWidth * imageZoomFactor : undefined;
   const height = imageHeight ? imageHeight * imageZoomFactor : undefined;
+  // console.log(imageZoomFactor);
+  // console.log(xOffset);
+  // console.log(yOffset);
+
+  console.log(imageLoaded)
+
+  const imageContainerStyle = {
+    transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
+    boxSizing: 'content-box',
+    pointerEvents: 'none',
+    width: imageWidth,
+    height: imageHeight,
+    transformOrigin: '0 0',
+  };
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     // Apply margin only once the container is loaded, to avoid a shift in the image
-    margin: containerLoaded ? MARGIN : 0,
-    top: imagePositionTop,
-    left: imagePositionLeft,
-    width,
-    height,
+    outline: `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
   };
 
-  const frameStyle = {
-    position: 'absolute',
-    top: imagePositionTop + MARGIN,
-    left: imagePositionLeft + MARGIN,
-    width,
-    height,
-    visibility,
-    border: `1px solid ${frameBorderColor}`,
-    boxSizing: 'border-box',
-  };
-
   const overlayStyle = {
     position: 'absolute',
+    pointerEvents: 'all',
     top: 0,
     left: 0,
     width: '100%',
@@ -275,7 +346,12 @@ const ImagePreview = ({
             {!hideControls && (
               <MiniToolbar noPadding>
                 <IconButton
-                  onClick={() => zoomBy(zoomOutFactor)}
+                  onClick={() =>
+                    zoomAroundPointBy(zoomOutFactor, [
+                      (containerWidth || 0) / 2,
+                      (containerHeight || 0) / 2,
+                    ])
+                  }
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
@@ -287,12 +363,20 @@ const ImagePreview = ({
                     step={zoomStepBasePower * 4}
                     value={Math.log2(imageZoomFactor)}
                     onChange={value => {
-                      zoomTo(Math.pow(2, value));
+                      zoomAroundPointTo(Math.pow(2, value), [
+                        (containerWidth || 0) / 2,
+                        (containerHeight || 0) / 2,
+                      ]);
                     }}
                   />
                 </div>
                 <IconButton
-                  onClick={() => zoomBy(zoomInFactor)}
+                  onClick={() =>
+                    zoomAroundPointBy(zoomInFactor, [
+                      (containerWidth || 0) / 2,
+                      (containerHeight || 0) / 2,
+                    ])
+                  }
                   tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
@@ -321,18 +405,19 @@ const ImagePreview = ({
                 }
                 style={{
                   ...styles.imagePreviewContainer,
-                  overflow: containerLoaded ? 'auto' : 'hidden',
+                  overflow: containerLoaded ? 'unset' : 'hidden',
                 }}
-                ref={measureRef}
-                onWheel={event => {
-                  const { deltaY } = event;
-                  if (!hideControls && shouldZoom(event)) {
-                    zoomBy(getWheelStepZoomFactor(-deltaY));
-                    event.stopPropagation();
-                  } else {
-                    // Let the usual, native vertical or horizontal scrolling happen.
-                  }
+                ref={ref => {
+                  measureRef(ref);
+                  containerRef.current = ref;
                 }}
+                onTouchStart={event => {
+                  touchStartClientCoordinates.current = [
+                    event.touches[0].clientX,
+                    event.touches[0].clientY,
+                  ];
+                }}
+                onTouchMove={handleTouchMove}
               >
                 {!!errored && (
                   <PlaceholderMessage>
@@ -341,35 +426,38 @@ const ImagePreview = ({
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!errored &&
-                  (isImagePrivate ? (
-                    <AuthorizedAssetImage
-                      style={imageStyle}
-                      alt={resourceName}
-                      url={imageResourceSource}
-                      onError={handleImageError}
-                      onLoad={handleImageLoaded}
-                      hideLoader={hideLoader}
-                    />
-                  ) : (
-                    <CorsAwareImage
-                      style={imageStyle}
-                      alt={resourceName}
-                      src={imageResourceSource}
-                      onError={handleImageError}
-                      onLoad={handleImageLoaded}
-                    />
-                  ))}
-                {imageLoaded && renderOverlay && <div style={frameStyle} />}
-                {imageLoaded && renderOverlay && (
-                  <div style={overlayStyle}>
-                    {renderOverlay({
-                      imageWidth: imageWidth || 0,
-                      imageHeight: imageHeight || 0,
-                      offsetTop: imagePositionTop + MARGIN,
-                      offsetLeft: imagePositionLeft + MARGIN,
-                      imageZoomFactor,
-                    })}
+                {!errored && (
+                  <div style={imageContainerStyle}>
+                    {isImagePrivate ? (
+                      <AuthorizedAssetImage
+                        style={imageStyle}
+                        alt={resourceName}
+                        url={imageResourceSource}
+                        onError={handleImageError}
+                        onLoad={handleImageLoaded}
+                        hideLoader={hideLoader}
+                      />
+                    ) : (
+                      <CorsAwareImage
+                        style={imageStyle}
+                        alt={resourceName}
+                        src={imageResourceSource}
+                        onError={handleImageError}
+                        onLoad={handleImageLoaded}
+                      />
+                    )}
+                    {imageLoaded && renderOverlay && (
+                      <div style={overlayStyle}>
+                        {renderOverlay({
+                          imageWidth: imageWidth || 0,
+                          imageHeight: imageHeight || 0,
+                          offsetTop: 0,
+                          offsetLeft: 0,
+                          imageZoomFactor: 1,
+                          displayImageZoomFactor: imageZoomFactor,
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

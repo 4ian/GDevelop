@@ -33,6 +33,7 @@ type Props = {|
   selectedVerticePtr: ?number,
   onClickVertice: (ptr: ?number) => void,
   imageZoomFactor: number,
+  displayImageZoomFactor: number,
   onPolygonsUpdated: () => void,
 |};
 
@@ -49,6 +50,7 @@ const CollisionMasksPreview = (props: Props) => {
 
   const {
     polygons,
+    displayImageZoomFactor,
     imageZoomFactor,
     imageHeight,
     imageWidth,
@@ -240,7 +242,7 @@ const CollisionMasksPreview = (props: Props) => {
       <polygon
         fill="rgba(255,133,105,0.2)"
         stroke="rgba(255,133,105,0.5)"
-        strokeWidth={1}
+        strokeWidth={1 / displayImageZoomFactor}
         fillRule="evenodd"
         points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
           imageZoomFactor},${imageHeight * imageZoomFactor} 0,${imageHeight *
@@ -259,7 +261,7 @@ const CollisionMasksPreview = (props: Props) => {
               key={`polygon-${i}`}
               fill="rgba(255,133,105,0.2)"
               stroke="rgba(255,133,105,0.5)"
-              strokeWidth={2}
+              strokeWidth={2 / displayImageZoomFactor}
               fillRule="evenodd"
               points={mapVector(
                 vertices,
@@ -288,10 +290,10 @@ const CollisionMasksPreview = (props: Props) => {
               stroke={
                 vertex.ptr === props.highlightedVerticePtr ? 'white' : undefined
               }
-              strokeWidth={2}
+              strokeWidth={2 / displayImageZoomFactor}
               cx={vertex.get_x() * imageZoomFactor}
               cy={vertex.get_y() * imageZoomFactor}
-              r={5}
+              r={5 / displayImageZoomFactor}
               style={styles.vertexCircle}
             />
           ));
@@ -302,10 +304,10 @@ const CollisionMasksPreview = (props: Props) => {
             key={`new-vertex`}
             fill={'rgba(0,0,0,0.75)'}
             stroke={'white'}
-            strokeWidth={2}
+            strokeWidth={2 / displayImageZoomFactor}
             cx={newVertexHintPoint.x * imageZoomFactor}
             cy={newVertexHintPoint.y * imageZoomFactor}
-            r={5}
+            r={5 / displayImageZoomFactor}
             style={styles.vertexCircle}
           />
         )}

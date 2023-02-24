@@ -59,6 +59,7 @@ type Props = {|
   offsetTop: number,
   offsetLeft: number,
   imageZoomFactor: number,
+  displayImageZoomFactor: number,
   onPointsUpdated: () => void,
   highlightedPointName: ?string,
   selectedPointName: ?string,
@@ -84,6 +85,7 @@ const PointsPreview = (props: Props) => {
     offsetTop,
     offsetLeft,
     imageZoomFactor,
+    displayImageZoomFactor,
     highlightedPointName,
     selectedPointName,
   } = props;
@@ -164,6 +166,7 @@ const PointsPreview = (props: Props) => {
             : pointName === selectedPointName
             ? styles.selectedPoint
             : null),
+          outlineWidth: `${1 / displayImageZoomFactor}px`,
         }}
         alt=""
         key={name}

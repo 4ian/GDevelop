@@ -63,6 +63,8 @@ const PointsPreview = (props: Props) => {
     displayImageZoomFactor,
     highlightedPointName,
     selectedPointName,
+    onClickPoint,
+    onPointsUpdated,
   } = props;
 
   const forceUpdate = useForceUpdate();
@@ -70,7 +72,9 @@ const PointsPreview = (props: Props) => {
   /**
    * @returns The cursor position in the frame basis.
    */
-  const getCursorOnFrame = (event: any): [number, number] | null => {
+  const getCursorOnFrame = React.useCallback((event: any):
+    | [number, number]
+    | null => {
     if (!svgRef.current) return null;
 
     // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
@@ -82,35 +86,38 @@ const PointsPreview = (props: Props) => {
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
     return [pointOnSvg.x, pointOnSvg.y];
-  };
+  }, []);
 
-  const onStartDragPoint = (
-    draggedPoint: gdPoint,
-    draggedPointKind: PointKind
-  ) => {
-    if (state.draggedPoint) return;
-    setState({
-      draggedPoint,
-      draggedPointKind,
-    });
-  };
+  const onStartDragPoint = React.useCallback(
+    (draggedPoint: gdPoint, draggedPointKind: PointKind) => {
+      if (state.draggedPoint) return;
+      setState({
+        draggedPoint,
+        draggedPointKind,
+      });
+    },
+    [state.draggedPoint]
+  );
 
-  const onEndDragPoint = () => {
-    const draggingWasDone = !!state.draggedPoint;
-    if (draggingWasDone) {
-      props.onPointsUpdated();
-      // Select point at the end of the drag
-      if (state.draggedPointKind && state.draggedPoint) {
-        props.onClickPoint(
-          getPointName(state.draggedPointKind, state.draggedPoint)
-        );
+  const onEndDragPoint = React.useCallback(
+    () => {
+      const draggingWasDone = !!state.draggedPoint;
+      if (draggingWasDone) {
+        onPointsUpdated();
+        // Select point at the end of the drag
+        if (state.draggedPointKind && state.draggedPoint) {
+          onClickPoint(
+            getPointName(state.draggedPointKind, state.draggedPoint)
+          );
+        }
       }
-    }
-    setState({
-      draggedPoint: null,
-      draggedPointKind: null,
-    });
-  };
+      setState({
+        draggedPoint: null,
+        draggedPointKind: null,
+      });
+    },
+    [state.draggedPoint, state.draggedPointKind, onPointsUpdated, onClickPoint]
+  );
 
   /**
    * Move a point with the mouse. A similar dragging implementation is done in
@@ -118,57 +125,69 @@ const PointsPreview = (props: Props) => {
    *
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
-  const onPointerMove = (event: any) => {
-    /** The cursor position in the frame basis. */
-    const cursorOnFrame = getCursorOnFrame(event);
-    if (!cursorOnFrame) {
-      return;
-    }
-    const { draggedPoint, draggedPointKind } = state;
-    if (!draggedPoint || !draggedPointKind) return;
+  const onPointerMove = React.useCallback(
+    (event: any) => {
+      /** The cursor position in the frame basis. */
+      const cursorOnFrame = getCursorOnFrame(event);
+      if (!cursorOnFrame) {
+        return;
+      }
+      const { draggedPoint, draggedPointKind } = state;
+      if (!draggedPoint || !draggedPointKind) return;
 
-    const cursorX = cursorOnFrame[0] / imageZoomFactor;
-    const cursorY = cursorOnFrame[1] / imageZoomFactor;
+      const cursorX = cursorOnFrame[0] / imageZoomFactor;
+      const cursorY = cursorOnFrame[1] / imageZoomFactor;
 
-    if (draggedPointKind === pointKindIdentifiers.CENTER) {
-      props.pointsContainer.setDefaultCenterPoint(false);
-    }
-    draggedPoint.setX(cursorX);
-    draggedPoint.setY(cursorY);
+      if (draggedPointKind === pointKindIdentifiers.CENTER) {
+        props.pointsContainer.setDefaultCenterPoint(false);
+      }
+      draggedPoint.setX(cursorX);
+      draggedPoint.setY(cursorY);
 
-    forceUpdate();
-  };
+      forceUpdate();
+    },
+    [
+      forceUpdate,
+      getCursorOnFrame,
+      imageZoomFactor,
+      props.pointsContainer,
+      state,
+    ]
+  );
 
-  const renderPoint = (
-    name: string,
-    x: number,
-    y: number,
-    kind: PointKind,
-    point: gdPoint
-  ) => {
-    const pointName = getPointName(kind, point);
+  const renderPoint = React.useCallback(
+    (name: string, x: number, y: number, kind: PointKind, point: gdPoint) => {
+      const pointName = getPointName(kind, point);
 
-    return (
-      <circle
-        onPointerDown={() => onStartDragPoint(point, kind)}
-        {...dataObjectToProps({ draggable: 'true' })}
-        key={`point-${name}`}
-        fill={
-          pointName === highlightedPointName
-            ? 'rgba(0,0,0,0.75)'
-            : pointName === selectedPointName
-            ? 'rgba(107,175,255,0.75)'
-            : 'rgba(255,133,105,0.75)'
-        }
-        stroke={pointName === highlightedPointName ? 'white' : undefined}
-        strokeWidth={2 / displayImageZoomFactor}
-        cx={x * imageZoomFactor}
-        cy={y * imageZoomFactor}
-        r={7 / displayImageZoomFactor}
-        style={styles.point}
-      />
-    );
-  };
+      return (
+        <circle
+          onPointerDown={() => onStartDragPoint(point, kind)}
+          {...dataObjectToProps({ draggable: 'true' })}
+          key={`point-${name}`}
+          fill={
+            pointName === highlightedPointName
+              ? 'rgba(0,0,0,0.75)'
+              : pointName === selectedPointName
+              ? 'rgba(107,175,255,0.75)'
+              : 'rgba(255,133,105,0.75)'
+          }
+          stroke={pointName === highlightedPointName ? 'white' : undefined}
+          strokeWidth={2 / displayImageZoomFactor}
+          cx={x * imageZoomFactor}
+          cy={y * imageZoomFactor}
+          r={7 / displayImageZoomFactor}
+          style={styles.point}
+        />
+      );
+    },
+    [
+      displayImageZoomFactor,
+      imageZoomFactor,
+      highlightedPointName,
+      onStartDragPoint,
+      selectedPointName,
+    ]
+  );
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const points = mapVector(nonDefaultPoints, (point, i) =>

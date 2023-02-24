@@ -58,63 +58,19 @@ const CollisionMasksPreview = (props: Props) => {
     offsetTop,
     offsetLeft,
     isDefaultBoundingBox,
+    onPolygonsUpdated,
+    onClickVertice,
   } = props;
 
   const forceUpdate = useForceUpdate();
 
-  const onStartDragVertex = (
-    vertex: gdVector2f,
-    polygonIndex: number,
-    vertexIndex: number
-  ) => {
-    if (draggedVertex) return;
-    setDraggedVertex({ vertex, polygonIndex, vertexIndex });
-  };
-
-  const onEndDragVertex = () => {
-    if (draggedVertex) {
-      if (magnetizeDraggedVertexForDeletion()) {
-        const vertices = props.polygons
-          .at(draggedVertex.polygonIndex)
-          .getVertices();
-        gd.removeFromVectorVector2f(vertices, draggedVertex.vertexIndex);
-        props.onPolygonsUpdated();
-        props.onClickVertice(null);
-      } else {
-        props.onPolygonsUpdated();
-        props.onClickVertice(draggedVertex.vertex.ptr);
-      }
-    }
-    setDraggedVertex(null);
-  };
-
-  const onPointerDown = (event: any) => {
-    const cursorOnFrame = getCursorOnFrame(event);
-    if (!cursorOnFrame) {
-      return;
-    }
-    // Confine vertices to inside the sprite frame
-    const cursorIntoFrame = confinePointIntoFrame(
-      cursorOnFrame[0],
-      cursorOnFrame[1]
-    );
-    const cursorX = cursorIntoFrame.frameX / imageZoomFactor;
-    const cursorY = cursorIntoFrame.frameY / imageZoomFactor;
-
-    const vertexDistanceMin = 20 / imageZoomFactor;
-    const edgeDistanceMax = 10 / imageZoomFactor;
-
-    const nearestEdgePoint = findNearestEdgePoint(
-      props.polygons,
-      cursorX,
-      cursorY,
-      vertexDistanceMin,
-      edgeDistanceMax
-    );
-    if (nearestEdgePoint) {
-      addVertex(nearestEdgePoint);
-    }
-  };
+  const onStartDragVertex = React.useCallback(
+    (vertex: gdVector2f, polygonIndex: number, vertexIndex: number) => {
+      if (draggedVertex) return;
+      setDraggedVertex({ vertex, polygonIndex, vertexIndex });
+    },
+    [draggedVertex]
+  );
 
   /**
    * Move a vertex with the mouse. A similar dragging implementation is done in
@@ -152,7 +108,7 @@ const CollisionMasksPreview = (props: Props) => {
 
       setNewVertexHintPoint(
         findNearestEdgePoint(
-          props.polygons,
+          polygons,
           cursorX,
           cursorY,
           vertexDistanceMin,
@@ -165,7 +121,9 @@ const CollisionMasksPreview = (props: Props) => {
   /**
    * @returns The cursor position in the frame basis.
    */
-  const getCursorOnFrame = (event: any): [number, number] | null => {
+  const getCursorOnFrame = React.useCallback((event: any):
+    | [number, number]
+    | null => {
     if (!svgRef.current) return null;
 
     // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
@@ -177,66 +135,141 @@ const CollisionMasksPreview = (props: Props) => {
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
     return [pointOnSvg.x, pointOnSvg.y];
-  };
+  }, []);
 
   /**
    * Given a point's coordinates, returns new coordinates that
    * are confined inside the sprite frame.
    */
-  const confinePointIntoFrame = (freeX: number, freeY: number) => {
-    const maxX = imageWidth * imageZoomFactor;
-    const maxY = imageHeight * imageZoomFactor;
+  const confinePointIntoFrame = React.useCallback(
+    (freeX: number, freeY: number) => {
+      const maxX = imageWidth * imageZoomFactor;
+      const maxY = imageHeight * imageZoomFactor;
 
-    const frameX = Math.min(maxX, Math.max(freeX, 0));
-    const frameY = Math.min(maxY, Math.max(freeY, 0));
-    return { frameX, frameY };
-  };
+      const frameX = Math.min(maxX, Math.max(freeX, 0));
+      const frameY = Math.min(maxY, Math.max(freeY, 0));
+      return { frameX, frameY };
+    },
+    [imageZoomFactor, imageHeight, imageWidth]
+  );
 
-  const addVertex = (newVertexHintPoint: NewVertexHintPoint) => {
-    const vertices = props.polygons
-      .at(newVertexHintPoint.polygonIndex)
-      .getVertices();
-    const verticesSize = vertices.size();
-    const newVertex = new gd.Vector2f();
-    newVertex.x = newVertexHintPoint.x;
-    newVertex.y = newVertexHintPoint.y;
-    vertices.push_back(newVertex);
-    newVertex.delete();
-    vertices.moveVector2fInVector(verticesSize, newVertexHintPoint.vertexIndex);
-    const vertex = vertices.at(newVertexHintPoint.vertexIndex);
-    setDraggedVertex({
-      vertex,
-      polygonIndex: newVertexHintPoint.polygonIndex,
-      vertexIndex: newVertexHintPoint.vertexIndex,
-    });
-    setNewVertexHintPoint(null);
-    props.onClickVertice(vertex.ptr);
-    props.onPolygonsUpdated();
-  };
+  const addVertex = React.useCallback(
+    (newVertexHintPoint: NewVertexHintPoint) => {
+      const vertices = polygons
+        .at(newVertexHintPoint.polygonIndex)
+        .getVertices();
+      const verticesSize = vertices.size();
+      const newVertex = new gd.Vector2f();
+      newVertex.x = newVertexHintPoint.x;
+      newVertex.y = newVertexHintPoint.y;
+      vertices.push_back(newVertex);
+      newVertex.delete();
+      vertices.moveVector2fInVector(
+        verticesSize,
+        newVertexHintPoint.vertexIndex
+      );
+      const vertex = vertices.at(newVertexHintPoint.vertexIndex);
+      setDraggedVertex({
+        vertex,
+        polygonIndex: newVertexHintPoint.polygonIndex,
+        vertexIndex: newVertexHintPoint.vertexIndex,
+      });
+      setNewVertexHintPoint(null);
+      onClickVertice(vertex.ptr);
+      onPolygonsUpdated();
+    },
+    [onClickVertice, onPolygonsUpdated, polygons]
+  );
 
   /**
    * @returns true if the vertex should be deleted.
    */
-  const magnetizeDraggedVertexForDeletion = (): boolean => {
-    if (!draggedVertex) {
+  const magnetizeDraggedVertexForDeletion = React.useCallback(
+    (): boolean => {
+      if (!draggedVertex) {
+        return false;
+      }
+      const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
+      const vertexDistanceMax = 10 / imageZoomFactor;
+      const edgeDistanceMax = 5 / imageZoomFactor;
+      const magnetedPoint = getMagnetizedVertexForDeletion(
+        vertices,
+        draggedVertex.vertexIndex,
+        vertexDistanceMax,
+        edgeDistanceMax
+      );
+      if (magnetedPoint) {
+        draggedVertex.vertex.set_x(magnetedPoint[0]);
+        draggedVertex.vertex.set_y(magnetedPoint[1]);
+        return true;
+      }
       return false;
-    }
-    const vertices = polygons.at(draggedVertex.polygonIndex).getVertices();
-    const vertexDistanceMax = 10 / imageZoomFactor;
-    const edgeDistanceMax = 5 / imageZoomFactor;
-    const magnetedPoint = getMagnetizedVertexForDeletion(
-      vertices,
-      draggedVertex.vertexIndex,
-      vertexDistanceMax,
-      edgeDistanceMax
-    );
-    if (magnetedPoint) {
-      draggedVertex.vertex.set_x(magnetedPoint[0]);
-      draggedVertex.vertex.set_y(magnetedPoint[1]);
-      return true;
-    }
-    return false;
-  };
+    },
+    [draggedVertex, imageZoomFactor, polygons]
+  );
+
+  const onEndDragVertex = React.useCallback(
+    () => {
+      if (draggedVertex) {
+        if (magnetizeDraggedVertexForDeletion()) {
+          const vertices = polygons
+            .at(draggedVertex.polygonIndex)
+            .getVertices();
+          gd.removeFromVectorVector2f(vertices, draggedVertex.vertexIndex);
+          onPolygonsUpdated();
+          onClickVertice(null);
+        } else {
+          onPolygonsUpdated();
+          onClickVertice(draggedVertex.vertex.ptr);
+        }
+      }
+      setDraggedVertex(null);
+    },
+    [
+      polygons,
+      draggedVertex,
+      onPolygonsUpdated,
+      onClickVertice,
+      magnetizeDraggedVertexForDeletion,
+    ]
+  );
+
+  const onPointerDown = React.useCallback(
+    (event: any) => {
+      const cursorOnFrame = getCursorOnFrame(event);
+      if (!cursorOnFrame) {
+        return;
+      }
+      // Confine vertices to inside the sprite frame
+      const cursorIntoFrame = confinePointIntoFrame(
+        cursorOnFrame[0],
+        cursorOnFrame[1]
+      );
+      const cursorX = cursorIntoFrame.frameX / imageZoomFactor;
+      const cursorY = cursorIntoFrame.frameY / imageZoomFactor;
+
+      const vertexDistanceMin = 20 / imageZoomFactor;
+      const edgeDistanceMax = 10 / imageZoomFactor;
+
+      const nearestEdgePoint = findNearestEdgePoint(
+        polygons,
+        cursorX,
+        cursorY,
+        vertexDistanceMin,
+        edgeDistanceMax
+      );
+      if (nearestEdgePoint) {
+        addVertex(nearestEdgePoint);
+      }
+    },
+    [
+      polygons,
+      addVertex,
+      confinePointIntoFrame,
+      getCursorOnFrame,
+      imageZoomFactor,
+    ]
+  );
 
   const renderBoundingBox = () => {
     return (

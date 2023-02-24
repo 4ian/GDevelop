@@ -52,14 +52,18 @@ MeasurementUnit::GetDefaultMeasurementUnitByIndex(std::size_t index) {
 bool MeasurementUnit::HasDefaultMeasurementUnitNamed(const gd::String &name) {
   auto units = GetDefaultMeasurementUnits();
   return std::find_if(units.begin(), units.end(),
-             [name](const gd::MeasurementUnit* unit) -> bool { return unit->GetName() == name; }) != units.end();
+                      [name](const gd::MeasurementUnit *unit) -> bool {
+                        return unit->GetName() == name;
+                      }) != units.end();
 }
 
 const gd::MeasurementUnit &
 MeasurementUnit::GetDefaultMeasurementUnitByName(const gd::String &name) {
   auto units = GetDefaultMeasurementUnits();
   return **std::find_if(units.begin(), units.end(),
-             [name](const gd::MeasurementUnit* unit) -> bool { return unit->GetName() == name; });
+                        [name](const gd::MeasurementUnit *unit) -> bool {
+                          return unit->GetName() == name;
+                        });
 }
 
 void MeasurementUnit::ApplyTranslation() {

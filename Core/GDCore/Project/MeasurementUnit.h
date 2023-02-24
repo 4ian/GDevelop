@@ -80,25 +80,25 @@ public:
 
   static void ApplyTranslation();
 
-  static gd::MeasurementUnit &GetUndefined() { return undefined; }
+  static const gd::MeasurementUnit &GetUndefined() { return undefined; }
 
-  static gd::MeasurementUnit &GetDimensionless() { return dimensionless; }
+  static const gd::MeasurementUnit &GetDimensionless() { return dimensionless; }
 
-  static gd::MeasurementUnit &GetDegreeAngle() { return degreeAngle; }
+  static const gd::MeasurementUnit &GetDegreeAngle() { return degreeAngle; }
 
-  static gd::MeasurementUnit &GetSecond() { return second; }
+  static const gd::MeasurementUnit &GetSecond() { return second; }
 
-  static gd::MeasurementUnit &GetPixel() { return pixel; }
+  static const gd::MeasurementUnit &GetPixel() { return pixel; }
 
-  static gd::MeasurementUnit &GetPixelSpeed() { return pixelSpeed; }
+  static const gd::MeasurementUnit &GetPixelSpeed() { return pixelSpeed; }
 
-  static gd::MeasurementUnit &GetPixelAcceleration() {
+  static const gd::MeasurementUnit &GetPixelAcceleration() {
     return pixelAcceleration;
   }
 
-  static gd::MeasurementUnit &GetAngularSpeed() { return angularSpeed; }
+  static const gd::MeasurementUnit &GetAngularSpeed() { return angularSpeed; }
 
-  static gd::MeasurementUnit &GetNewton() { return newton; }
+  static const gd::MeasurementUnit &GetNewton() { return newton; }
 
   static const std::vector<gd::MeasurementUnit*> &GetDefaultMeasurementUnits();
   static std::size_t GetDefaultMeasurementUnitCount();

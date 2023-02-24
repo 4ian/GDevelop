@@ -169,7 +169,9 @@ export const allAlertMessages: Array<{
   },
   {
     key: 'p2p-is-networking',
-    label: <Trans>Peer to peer IP address leak warning/THNK recommendation</Trans>,
+    label: (
+      <Trans>Peer to peer IP address leak warning/THNK recommendation</Trans>
+    ),
   },
   {
     key: 'p2p-dataloss',

@@ -34,7 +34,6 @@ type Props = {|
   offsetTop: number,
   offsetLeft: number,
   imageZoomFactor: number,
-  displayImageZoomFactor: number,
   onPointsUpdated: () => void,
   highlightedPointName: ?string,
   selectedPointName: ?string,
@@ -60,7 +59,6 @@ const PointsPreview = (props: Props) => {
     offsetTop,
     offsetLeft,
     imageZoomFactor,
-    displayImageZoomFactor,
     highlightedPointName,
     selectedPointName,
     onClickPoint,
@@ -172,21 +170,15 @@ const PointsPreview = (props: Props) => {
               : 'rgba(255,133,105,0.75)'
           }
           stroke={pointName === highlightedPointName ? 'white' : undefined}
-          strokeWidth={2 / displayImageZoomFactor}
-          cx={x * imageZoomFactor}
-          cy={y * imageZoomFactor}
-          r={7 / displayImageZoomFactor}
+          strokeWidth={2}
+          cx={x}
+          cy={y}
+          r={7}
           style={styles.point}
         />
       );
     },
-    [
-      displayImageZoomFactor,
-      imageZoomFactor,
-      highlightedPointName,
-      onStartDragPoint,
-      selectedPointName,
-    ]
+    [highlightedPointName, onStartDragPoint, selectedPointName]
   );
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();

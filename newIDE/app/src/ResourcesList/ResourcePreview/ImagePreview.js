@@ -80,7 +80,6 @@ type Props = {|
     offsetTop: number,
     offsetLeft: number,
     imageZoomFactor: number,
-    displayImageZoomFactor: number,
   |}) => React.Node,
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
@@ -144,10 +143,10 @@ const ImagePreview = ({
       const zoomFactor = clampImagePreviewZoom(
         Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
-      const zoomFactorWithMargins = zoomFactor * 0.95
+      const zoomFactorWithMargins = zoomFactor * 0.95;
       setImageZoomFactor(zoomFactorWithMargins);
-      setXOffset((containerWidth - imageWidth * (zoomFactorWithMargins)) / 2);
-      setYOffset((containerHeight - imageHeight * (zoomFactorWithMargins)) / 2);
+      setXOffset((containerWidth - imageWidth * zoomFactorWithMargins) / 2);
+      setYOffset((containerHeight - imageHeight * zoomFactorWithMargins) / 2);
       return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
@@ -450,18 +449,17 @@ const ImagePreview = ({
                         onLoad={handleImageLoaded}
                       />
                     )}
-                    {imageLoaded && renderOverlay && (
-                      <div style={overlayStyle}>
-                        {renderOverlay({
-                          imageWidth: imageWidth || 0,
-                          imageHeight: imageHeight || 0,
-                          offsetTop: 0,
-                          offsetLeft: 0,
-                          imageZoomFactor: 1,
-                          displayImageZoomFactor: imageZoomFactor,
-                        })}
-                      </div>
-                    )}
+                  </div>
+                )}
+                {imageLoaded && renderOverlay && (
+                  <div style={overlayStyle}>
+                    {renderOverlay({
+                      imageWidth: imageWidth || 0,
+                      imageHeight: imageHeight || 0,
+                      offsetTop: yOffset,
+                      offsetLeft: xOffset,
+                      imageZoomFactor: imageZoomFactor,
+                    })}
                   </div>
                 )}
               </div>

@@ -335,6 +335,11 @@ const ImagePreview = ({
     [imageResourceSource]
   );
 
+  const containerCenter = React.useMemo(
+    () => [(containerWidth || 0) / 2, (containerHeight || 0) / 2],
+    [containerWidth, containerHeight]
+  );
+
   // A change of adaptZoomFactorToImage means a change in one of its dependencies,
   // so it means the container or image size has changed and we should try to adapt
   // the zoom factor to the image.
@@ -417,10 +422,7 @@ const ImagePreview = ({
               <MiniToolbar noPadding>
                 <IconButton
                   onClick={() =>
-                    zoomAroundPointBy(zoomOutFactor, [
-                      (containerWidth || 0) / 2,
-                      (containerHeight || 0) / 2,
-                    ])
+                    zoomAroundPointBy(zoomOutFactor, containerCenter)
                   }
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
@@ -433,19 +435,13 @@ const ImagePreview = ({
                     step={zoomStepBasePower * 4}
                     value={Math.log2(imageZoomFactor)}
                     onChange={value => {
-                      zoomAroundPointTo(Math.pow(2, value), [
-                        (containerWidth || 0) / 2,
-                        (containerHeight || 0) / 2,
-                      ]);
+                      zoomAroundPointTo(Math.pow(2, value), containerCenter);
                     }}
                   />
                 </div>
                 <IconButton
                   onClick={() =>
-                    zoomAroundPointBy(zoomInFactor, [
-                      (containerWidth || 0) / 2,
-                      (containerHeight || 0) / 2,
-                    ])
+                    zoomAroundPointBy(zoomInFactor, containerCenter)
                   }
                   tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >

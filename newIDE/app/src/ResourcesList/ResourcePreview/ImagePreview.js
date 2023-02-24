@@ -219,8 +219,8 @@ const ImagePreview = ({
       } else {
         setZoomState(zoomState => ({
           ...zoomState,
-          xOffset: zoomState.xOffset - deltaX / 10,
-          yOffset: zoomState.yOffset - deltaY / 10,
+          xOffset: zoomState.xOffset - deltaX / 4,
+          yOffset: zoomState.yOffset - deltaY / 4,
         }));
       }
     },

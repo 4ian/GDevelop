@@ -303,6 +303,9 @@ const ImagePreview = ({
     [zoomAroundPointBy]
   );
 
+  // Add event listener with `passive: false` in order to be able to prevent
+  // the default behavior when swiping from left to right on a trackpad that
+  // triggers a back navigation.
   React.useEffect(
     () => {
       if (containerRef.current) {
@@ -373,7 +376,6 @@ const ImagePreview = ({
 
   const imageContainerStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
-    boxSizing: 'content-box',
     width: imageWidth,
     height: imageHeight,
     transformOrigin: '0 0',

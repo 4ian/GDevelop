@@ -295,7 +295,7 @@ const CollisionMasksPreview = (props: Props) => {
               strokeWidth={2 / displayImageZoomFactor}
               cx={vertex.get_x() * imageZoomFactor}
               cy={vertex.get_y() * imageZoomFactor}
-              r={5 / displayImageZoomFactor}
+              r={7 / displayImageZoomFactor}
               style={styles.vertexCircle}
             />
           ));

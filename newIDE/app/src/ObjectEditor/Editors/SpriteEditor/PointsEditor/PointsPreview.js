@@ -164,7 +164,7 @@ const PointsPreview = (props: Props) => {
         strokeWidth={2 / displayImageZoomFactor}
         cx={x * imageZoomFactor}
         cy={y * imageZoomFactor}
-        r={5 / displayImageZoomFactor}
+        r={7 / displayImageZoomFactor}
         style={styles.point}
       />
     );

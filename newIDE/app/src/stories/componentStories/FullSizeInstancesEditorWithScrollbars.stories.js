@@ -55,6 +55,7 @@ export const Default = () => (
           onCopy: () => {},
           onCut: () => {},
           onPaste: () => {},
+          onDuplicate: () => {},
           onDelete: () => {},
           onUndo: () => {},
           onRedo: () => {},

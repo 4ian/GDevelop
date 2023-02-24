@@ -144,9 +144,10 @@ const ImagePreview = ({
       const zoomFactor = clampImagePreviewZoom(
         Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
-      setImageZoomFactor(zoomFactor);
-      setXOffset(0);
-      setYOffset(0);
+      const zoomFactorWithMargins = zoomFactor * 0.95
+      setImageZoomFactor(zoomFactorWithMargins);
+      setXOffset((containerWidth - imageWidth * (zoomFactorWithMargins)) / 2);
+      setYOffset((containerHeight - imageHeight * (zoomFactorWithMargins)) / 2);
       return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]

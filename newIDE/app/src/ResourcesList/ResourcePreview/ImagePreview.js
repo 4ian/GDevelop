@@ -29,6 +29,13 @@ import {
 } from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
+const getDistanceBetweenPoints = (x1, y1, x2, y2) => {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+};
+const getCenter = (x1, y1, x2, y2) => {
+  return [(x1 + x2) / 2, (y1 + y2) / 2];
+};
+
 const styles = {
   previewImagePixelated: {
     imageRendering: getPixelatedImageRendering(),
@@ -126,7 +133,8 @@ const ImagePreview = ({
   const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
     initialZoom || 1
   );
-  const touchStartClientCoordinates = React.useRef<[number, number]>([0, 0]);
+  const previousDoubleTouchInfo = React.useRef<any>(null);
+  const previousSingleTouchCoordinates = React.useRef<?[number, number]>(null);
   const [xOffset, setXOffset] = React.useState<number>(0);
   const [yOffset, setYOffset] = React.useState<number>(0);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
@@ -204,29 +212,84 @@ const ImagePreview = ({
     [hideControls, zoomAroundPointBy]
   );
 
-  const handleTouchMove = React.useCallback(async (event: TouchEvent) => {
-    if (
-      event.target &&
-      (event.target instanceof HTMLElement ||
-        // $FlowFixMe - Flow does not know about SVGElement
-        event.target instanceof SVGElement) &&
-      event.target.dataset &&
-      'draggable' in event.target.dataset
-    ) {
-      return;
-    }
-    const { clientX, clientY } = event.touches[0];
-    event.preventDefault();
-    event.stopPropagation();
+  const handleTouchMove = React.useCallback(
+    async (event: TouchEvent) => {
+      if (event.touches.length === 2 && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
 
-    await setXOffset(
-      xOffset => xOffset + (clientX - touchStartClientCoordinates.current[0])
-    );
-    await setYOffset(
-      yOffset => yOffset + (clientY - touchStartClientCoordinates.current[1])
-    );
-    touchStartClientCoordinates.current = [clientX, clientY];
-  }, []);
+        event.preventDefault();
+        event.stopPropagation();
+        const {
+          clientX: touch1clientX,
+          clientY: touch1clientY,
+        } = event.touches[0];
+        const {
+          clientX: touch2clientX,
+          clientY: touch2clientY,
+        } = event.touches[1];
+        const newDistance = getDistanceBetweenPoints(
+          touch1clientX,
+          touch1clientY,
+          touch2clientX,
+          touch2clientY
+        );
+        const newCenter = getCenter(
+          touch1clientX - containerRect.left,
+          touch1clientY - containerRect.top,
+          touch2clientX - containerRect.left,
+          touch2clientY - containerRect.top
+        );
+        if (previousDoubleTouchInfo.current) {
+          await setXOffset(
+            xOffset =>
+              xOffset +
+              (newCenter[0] - previousDoubleTouchInfo.current.center[0])
+          );
+          await setYOffset(
+            yOffset =>
+              yOffset +
+              (newCenter[1] - previousDoubleTouchInfo.current.center[1])
+          );
+          zoomAroundPointBy(
+            newDistance / previousDoubleTouchInfo.current.distance,
+            newCenter
+          );
+        }
+        previousDoubleTouchInfo.current = {
+          distance: newDistance,
+          center: newCenter,
+        };
+        return;
+      }
+      if (
+        event.target &&
+        (event.target instanceof HTMLElement ||
+          // $FlowFixMe - Flow does not know about SVGElement
+          event.target instanceof SVGElement) &&
+        event.target.dataset &&
+        'draggable' in event.target.dataset
+      ) {
+        return;
+      }
+      const { clientX, clientY } = event.touches[0];
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (previousSingleTouchCoordinates.current) {
+        const [previousX, previousY] = previousSingleTouchCoordinates.current
+        await setXOffset(
+          xOffset =>
+            xOffset + (clientX - previousX)
+        );
+        await setYOffset(
+          yOffset =>
+            yOffset + (clientY - previousY)
+        );
+      }
+      previousSingleTouchCoordinates.current = [clientX, clientY];
+    },
+    [zoomAroundPointBy]
+  );
 
   React.useEffect(
     () => {
@@ -288,20 +351,6 @@ const ImagePreview = ({
 
   const containerLoaded = !!containerWidth && !!containerHeight;
   const imageLoaded = !!imageWidth && !!imageHeight && !errored;
-
-  // // Centre-align the image and overlays
-  // const imagePositionTop = Math.max(
-  //   0,
-  //   (containerHeight || 0) / 2 -
-  //     ((imageHeight || 0) * imageZoomFactor) / 2 -
-  //     MARGIN
-  // );
-  // const imagePositionLeft = Math.max(
-  //   0,
-  //   (containerWidth || 0) / 2 -
-  //     ((imageWidth || 0) * imageZoomFactor) / 2 -
-  //     MARGIN
-  // );
 
   // We display the elements only when the image is loaded and
   // the zoom is applied to avoid a shift in the image.
@@ -415,12 +464,25 @@ const ImagePreview = ({
                   containerRef.current = ref;
                 }}
                 onTouchStart={event => {
-                  touchStartClientCoordinates.current = [
-                    event.touches[0].clientX,
-                    event.touches[0].clientY,
-                  ];
+                  if (event.touches.length === 1) {
+                    previousSingleTouchCoordinates.current = [
+                      event.touches[0].clientX,
+                      event.touches[0].clientY,
+                    ];
+                  } else if (event.touches.length === 2) {
+                    previousSingleTouchCoordinates.current = null;
+                  }
                 }}
                 onTouchMove={handleTouchMove}
+                onTouchEnd={event => {
+                  if (event.touches.length === 1) {
+                    previousSingleTouchCoordinates.current = [
+                      event.touches[0].clientX,
+                      event.touches[0].clientY,
+                    ];
+                  }
+                  previousDoubleTouchInfo.current = null;
+                }}
               >
                 {!!errored && (
                   <PlaceholderMessage>

@@ -849,6 +849,10 @@ namespace gdjs {
         }
       }
     }
+
+    jumpEmitterForwardInTime(timeSkipped: number): void {
+      this._renderer.update(timeSkipped);
+    }
   }
   gdjs.registerObject(
     'ParticleSystem::ParticleEmitter',

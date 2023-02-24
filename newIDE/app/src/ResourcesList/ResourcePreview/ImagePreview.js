@@ -107,6 +107,12 @@ export const isProjectImageResourceSmooth = (
   return imageResource.isSmooth();
 };
 
+type ZoomState = {
+  factor: number,
+  xOffset: number,
+  yOffset: number,
+};
+
 /**
  * Display the preview for a resource of a project with kind "image".
  */
@@ -130,13 +136,14 @@ const ImagePreview = ({
   const [imageHeight, setImageHeight] = React.useState<?number>(null);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [containerHeight, setContainerHeight] = React.useState<?number>(null);
-  const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
-    initialZoom || 1
-  );
+  const [zoomState, setZoomState] = React.useState<ZoomState>({
+    factor: initialZoom || 1,
+    xOffset: 0,
+    yOffset: 0,
+  });
+  const { xOffset, yOffset, factor: imageZoomFactor } = zoomState;
   const previousDoubleTouchInfo = React.useRef<any>(null);
   const previousSingleTouchCoordinates = React.useRef<?[number, number]>(null);
-  const [xOffset, setXOffset] = React.useState<number>(0);
-  const [yOffset, setYOffset] = React.useState<number>(0);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const handleImageError = () => {
@@ -152,45 +159,49 @@ const ImagePreview = ({
         Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
       const zoomFactorWithMargins = zoomFactor * 0.95;
-      setImageZoomFactor(zoomFactorWithMargins);
-      setXOffset((containerWidth - imageWidth * zoomFactorWithMargins) / 2);
-      setYOffset((containerHeight - imageHeight * zoomFactorWithMargins) / 2);
+      setZoomState({
+        factor: zoomFactorWithMargins,
+        xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
+        yOffset: (containerHeight - imageHeight * zoomFactorWithMargins) / 2,
+      });
       return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
   );
-
-  const zoomTo = React.useCallback(async (factor: number) => {
-    await setImageZoomFactor(clampImagePreviewZoom(factor));
-  }, []);
 
   const zoomAroundPointBy = React.useCallback(
     async (imageZoomFactorMultiplier: number, point: [number, number]) => {
       if (!willZoomChange(imageZoomFactor, imageZoomFactorMultiplier)) {
         return;
       }
-      await setXOffset(xOffset => {
-        return xOffset + (point[0] - xOffset) * (1 - imageZoomFactorMultiplier);
-      });
-      await setYOffset(yOffset => {
-        return yOffset + (point[1] - yOffset) * (1 - imageZoomFactorMultiplier);
-      });
-      await zoomTo(imageZoomFactor * imageZoomFactorMultiplier);
+      setZoomState(zoomState => ({
+        xOffset:
+          zoomState.xOffset +
+          (point[0] - zoomState.xOffset) * (1 - imageZoomFactorMultiplier),
+        yOffset:
+          zoomState.yOffset +
+          (point[1] - zoomState.yOffset) * (1 - imageZoomFactorMultiplier),
+        factor: clampImagePreviewZoom(
+          imageZoomFactor * imageZoomFactorMultiplier
+        ),
+      }));
     },
-    [zoomTo, imageZoomFactor]
+    [imageZoomFactor]
   );
 
   const zoomAroundPointTo = React.useCallback(
     async (factor: number, point: [number, number]) => {
-      await setXOffset(xOffset => {
-        return xOffset + (point[0] - xOffset) * (1 - factor / imageZoomFactor);
-      });
-      await setYOffset(yOffset => {
-        return yOffset + (point[1] - yOffset) * (1 - factor / imageZoomFactor);
-      });
-      await zoomTo(factor);
+      setZoomState(zoomState => ({
+        xOffset:
+          zoomState.xOffset +
+          (point[0] - zoomState.xOffset) * (1 - factor / zoomState.factor),
+        yOffset:
+          zoomState.yOffset +
+          (point[1] - zoomState.yOffset) * (1 - factor / zoomState.factor),
+        factor,
+      }));
     },
-    [zoomTo, imageZoomFactor]
+    []
   );
 
   const handleWheel = React.useCallback(
@@ -205,8 +216,11 @@ const ImagePreview = ({
           clientY - containerRect.top,
         ]);
       } else {
-        setXOffset(xOffset => xOffset - deltaX / 10);
-        setYOffset(yOffset => yOffset - deltaY / 10);
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset - deltaX / 10,
+          yOffset: zoomState.yOffset - deltaY / 10,
+        }));
       }
     },
     [hideControls, zoomAroundPointBy]
@@ -240,16 +254,16 @@ const ImagePreview = ({
           touch2clientY - containerRect.top
         );
         if (previousDoubleTouchInfo.current) {
-          await setXOffset(
-            xOffset =>
-              xOffset +
-              (newCenter[0] - previousDoubleTouchInfo.current.center[0])
-          );
-          await setYOffset(
-            yOffset =>
-              yOffset +
-              (newCenter[1] - previousDoubleTouchInfo.current.center[1])
-          );
+          setZoomState(zoomState => ({
+            ...zoomState,
+            xOffset:
+              zoomState.xOffset +
+              (newCenter[0] - previousDoubleTouchInfo.current.center[0]),
+            yOffset:
+              zoomState.yOffset +
+              (newCenter[1] - previousDoubleTouchInfo.current.center[1]),
+          }));
+
           zoomAroundPointBy(
             newDistance / previousDoubleTouchInfo.current.distance,
             newCenter
@@ -276,15 +290,12 @@ const ImagePreview = ({
       event.stopPropagation();
 
       if (previousSingleTouchCoordinates.current) {
-        const [previousX, previousY] = previousSingleTouchCoordinates.current
-        await setXOffset(
-          xOffset =>
-            xOffset + (clientX - previousX)
-        );
-        await setYOffset(
-          yOffset =>
-            yOffset + (clientY - previousY)
-        );
+        const [previousX, previousY] = previousSingleTouchCoordinates.current;
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset + (clientX - previousX),
+          yOffset: zoomState.yOffset + (clientY - previousY),
+        }));
       }
       previousSingleTouchCoordinates.current = [clientX, clientY];
     },

@@ -4,7 +4,7 @@ import MUITabs from '@material-ui/core/Tabs';
 import MUITab from '@material-ui/core/Tab';
 import { makeStyles } from '@material-ui/core/styles';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 const styles = {
   tabs: {

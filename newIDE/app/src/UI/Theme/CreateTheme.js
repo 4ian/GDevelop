@@ -303,7 +303,75 @@ export function getMuiOverrides({
   };
 }
 
-function getThemeModeFromMainColor(color: string, contrastText: string) {
+export const smallScreenMuiOverrides = {
+  MuiTypography: {
+    h1: {
+      fontSize: '29px',
+      lineHeight: '32px',
+    },
+    h2: {
+      fontSize: '24px',
+      lineHeight: '32px',
+    },
+    h3: {
+      fontSize: '20px',
+      lineHeight: '30px', // Not a multiple of 8, but gives better result in dialog titles.
+    },
+    h4: {
+      fontSize: '16px',
+      lineHeight: '24px',
+    },
+    h5: {
+      fontSize: '14px',
+      lineHeight: '20px',
+    },
+    h6: {
+      // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
+      fontWeight: 600,
+    },
+    body1: {
+      fontSize: '14px',
+      lineHeight: '20px',
+      fontWeight: 400,
+      letterSpacing: '0.01em',
+    },
+    caption: {
+      fontSize: '12px',
+      lineHeight: '16px',
+      fontWeight: 400,
+      letterSpacing: '0.02em',
+    },
+  },
+};
+
+const rtlDirection = { direction: 'rtl' };
+const rtlOrder = { order: 100 };
+
+export const rtlMuiOverrides = {
+  MuiTypography: {
+    root: rtlDirection,
+  },
+  MuiInput: {
+    root: rtlDirection,
+  },
+  MuiTab: {
+    root: rtlDirection,
+  },
+  MuiButton: {
+    label: rtlDirection,
+  },
+  MuiSvgIcon: {
+    root: rtlOrder,
+  },
+  MuiFormControlLabel: {
+    root: rtlDirection,
+  },
+  MuiTextField: {
+    root: rtlDirection,
+  },
+};
+
+function getMuiThemeModeFromMainColor(color: string, contrastText: string) {
   return {
     light: lighten(color, 0.05),
     main: color,
@@ -312,17 +380,17 @@ function getThemeModeFromMainColor(color: string, contrastText: string) {
   };
 }
 
-function getThemeColors(styles: any) {
+function getMuiThemeColors(styles: any) {
   // If there is no dark variant on the primary color, we consider:
   // - light and dark variants have to be computed from the main color
   // - the theme will use Material UI default values for Success, Info, Warning and Error colors.
   if (!styles['ThemePrimaryDark'])
     return {
-      primary: getThemeModeFromMainColor(
+      primary: getMuiThemeModeFromMainColor(
         styles['ThemePrimaryColor'],
         styles['ThemePrimaryTextContrastColor']
       ),
-      secondary: getThemeModeFromMainColor(
+      secondary: getMuiThemeModeFromMainColor(
         styles['ThemeSecondaryColor'],
         styles['ThemeSecondaryTextContrastColor']
       ),
@@ -551,7 +619,7 @@ export function createGdevelopTheme({
           default: styles['ThemeSurfaceWindowBackgroundColor'],
           alternate: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
         },
-        ...getThemeColors(styles),
+        ...getMuiThemeColors(styles),
         text: {
           primary: styles['ThemeTextDefaultColor'],
           secondary: styles['ThemeTextSecondaryColor'],

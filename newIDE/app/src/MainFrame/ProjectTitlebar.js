@@ -1,7 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import ThemeContext from '../UI/Theme/ThemeContext';
+import ThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Window from '../Utils/Window';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import UnsavedChangesContext from './UnsavedChangesContext';

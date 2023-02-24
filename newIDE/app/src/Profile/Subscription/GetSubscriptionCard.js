@@ -7,7 +7,7 @@ import { Column } from '../../UI/Grid';
 import { LineStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
 
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 

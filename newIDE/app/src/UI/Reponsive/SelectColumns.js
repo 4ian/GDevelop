@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Line } from '../Grid';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const styles = {
   columnContainer: {

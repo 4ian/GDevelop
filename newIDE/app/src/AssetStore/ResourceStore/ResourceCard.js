@@ -11,7 +11,7 @@ import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import CheckeredBackground from '../../ResourcesList/CheckeredBackground';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const paddingSize = 10;
 const styles = {

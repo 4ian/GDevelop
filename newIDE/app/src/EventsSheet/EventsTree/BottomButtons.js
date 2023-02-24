@@ -7,7 +7,7 @@ import { enumerateEventsMetadata } from '../EnumerateEventsMetadata';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
 import { type SortableTreeNode } from '.';
 import { moveEventToEventsList } from './helpers';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   addButton: {

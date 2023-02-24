@@ -7,7 +7,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 const styles = {

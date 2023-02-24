@@ -3,7 +3,7 @@
 import * as React from 'react';
 import MUICard from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 

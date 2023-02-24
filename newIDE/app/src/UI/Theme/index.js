@@ -1,13 +1,13 @@
 // @flow
 import { createMuiTheme } from '@material-ui/core/styles';
 import { isLtr } from '../../Utils/i18n/RtlLanguages';
-import memoize from '../../Utils/Memoize';
-
 import DefaultLightTheme from './DefaultLightTheme';
+import { type WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
 import { themes } from './ThemeRegistry';
+import { rtlMuiOverrides, smallScreenMuiOverrides } from './CreateTheme';
 
+// Static stylesheets - always imported.
 import 'react-virtualized/styles.css';
-// Styles
 import './Global/Animation.css';
 import './Global/EventsSheet.css';
 import './Global/Snackbar.css';
@@ -17,22 +17,20 @@ import './Global/Mosaic.css';
 import './Global/Table.css';
 import './Global/Font.css';
 
-export { themes } from './ThemeRegistry';
-
-export type Theme = $Exact<typeof DefaultLightTheme>;
-
+type Theme = $Exact<typeof DefaultLightTheme>;
 export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
-type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};
-type MuiThemeOptions = $PropertyType<Theme, 'muiThemeOptions'>;
+type FullTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};
 const defaultThemeName = 'GDevelop default Dark';
 
-export function getTheme({
+export function getFullTheme({
   themeName,
   language,
+  windowWidth,
 }: {|
   themeName: string,
   language: string,
-|}): ActualTheme {
+  windowWidth: WidthType,
+|}): FullTheme {
   let theme: Theme = themes[themeName];
 
   if (!theme) {
@@ -46,51 +44,14 @@ export function getTheme({
   const { gdevelopTheme, muiThemeOptions } = theme;
   return {
     gdevelopTheme,
-    muiTheme: ltr
-      ? createLtrTheme(muiThemeOptions)
-      : createRtlTheme(muiThemeOptions),
+    muiTheme: createMuiTheme(
+      muiThemeOptions,
+      {
+        ...(windowWidth === 'small'
+          ? { overrides: smallScreenMuiOverrides }
+          : {}),
+      },
+      { ...(ltr ? {} : { overrides: rtlMuiOverrides }) }
+    ),
   };
 }
-
-const createLtrTheme = memoize(
-  (muiThemeOptions: MuiThemeOptions): Object => {
-    return createMuiTheme(muiThemeOptions);
-  }
-);
-
-const createRtlTheme = memoize(
-  (muiThemeOptions: MuiThemeOptions): Object => {
-    return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
-  }
-);
-
-const rtlDirection = { direction: 'rtl' };
-const rtlOrder = { order: 100 };
-const rtlOverrides = {
-  MuiTypography: {
-    root: rtlDirection,
-  },
-  MuiInput: {
-    root: rtlDirection,
-  },
-  MuiTab: {
-    root: rtlDirection,
-  },
-  MuiButton: {
-    label: rtlDirection,
-  },
-  MuiSvgIcon: {
-    root: rtlOrder,
-  },
-  MuiFormControlLabel: {
-    root: rtlDirection,
-  },
-  MuiTextField: {
-    root: rtlDirection,
-  },
-};
-
-export const defaultTheme: ActualTheme = {
-  ...DefaultLightTheme,
-  muiThemeOptions: createLtrTheme(DefaultLightTheme.muiThemeOptions),
-};

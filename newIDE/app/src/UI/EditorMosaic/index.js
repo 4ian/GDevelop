@@ -7,7 +7,7 @@ import {
   getLeaves,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
-import ThemeConsumer from '../Theme/ThemeConsumer';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import debounce from 'lodash/debounce';
 
@@ -239,11 +239,11 @@ export default class EditorMosaic extends React.Component<Props, State> {
   render() {
     const { editors } = this.props;
     return (
-      <ThemeConsumer>
-        {muiTheme => (
+      <GDevelopThemeContext.Consumer>
+        {gdevelopTheme => (
           <MosaicWithoutDragDropContext
             className={`${
-              muiTheme.mosaicRootClassName
+              gdevelopTheme.mosaicRootClassName
             } mosaic-blueprint-theme mosaic-gd-theme`}
             renderTile={(editorName: string, path: string) => {
               const editor = editors[editorName];
@@ -276,7 +276,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
             onChange={this._onChange}
           />
         )}
-      </ThemeConsumer>
+      </GDevelopThemeContext.Consumer>
     );
   }
 }

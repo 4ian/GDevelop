@@ -15,7 +15,7 @@ import Text from '../../UI/Text';
 import InfoBar from '../../UI/Messages/InfoBar';
 import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';

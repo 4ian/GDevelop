@@ -17,7 +17,7 @@ import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
 import EditIcon from '@material-ui/icons/Edit';
 import Badge from '../UI/Badge';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('layers-list');

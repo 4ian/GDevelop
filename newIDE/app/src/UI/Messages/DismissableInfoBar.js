@@ -7,7 +7,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 type Props = {|

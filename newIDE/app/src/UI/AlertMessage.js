@@ -5,7 +5,7 @@ import Warning from '@material-ui/icons/Warning';
 import Error from '@material-ui/icons/Error';
 import { Spacer, Line, Column } from './Grid';
 import Text from './Text';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from './Layout';
 import Close from '@material-ui/icons/Close';
 import IconButton from './IconButton';

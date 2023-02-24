@@ -6,7 +6,7 @@ import IconButton from '../../../../UI/IconButton';
 import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import styles from './styles';
 import { roundTo } from '../../../../Utils/Mathematics';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const VERTEX_COORDINATE_PRECISION = 4;
 

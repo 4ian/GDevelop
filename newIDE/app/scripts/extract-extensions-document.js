@@ -36,7 +36,7 @@ const generateExtensionFooterText = fullName => {
     `
 ---
 
-<tip>Learn [[gdevelop5:extensions:search|how to install new extensions]] by following a step-by-step guide.</tip>
+<note tip>Learn [[gdevelop5:extensions:search|how to install new extensions]] by following a step-by-step guide.</note>
 
 *This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
     ' ' +

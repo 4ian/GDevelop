@@ -1206,7 +1206,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.deleteSelection();
   };
 
-  duplicateSelection = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
+  duplicateSelection = ({
+    useLastCursorPosition,
+  }: CopyCutPasteOptions = {}) => {
     const { editor } = this;
     if (!editor) return;
     const serializedSelection = this.instancesSelection

@@ -174,16 +174,17 @@ const ImagePreview = ({
       if (!willZoomChange(imageZoomFactor, imageZoomFactorMultiplier)) {
         return;
       }
+      const newFactor = clampImagePreviewZoom(
+        imageZoomFactor * imageZoomFactorMultiplier
+      );
       setZoomState(zoomState => ({
         xOffset:
           zoomState.xOffset +
-          (point[0] - zoomState.xOffset) * (1 - imageZoomFactorMultiplier),
+          (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
         yOffset:
           zoomState.yOffset +
-          (point[1] - zoomState.yOffset) * (1 - imageZoomFactorMultiplier),
-        factor: clampImagePreviewZoom(
-          imageZoomFactor * imageZoomFactorMultiplier
-        ),
+          (point[1] - zoomState.yOffset) * (1 - newFactor / zoomState.factor),
+        factor: newFactor,
       }));
     },
     [imageZoomFactor]

@@ -27,6 +27,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/create24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Movement using forces"))
       .SetIcon("res/actions/force24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
+      .SetIcon("res/conditions/var24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Position"))
+      .SetIcon("res/actions/position24_black.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");

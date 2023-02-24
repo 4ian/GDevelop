@@ -160,7 +160,7 @@ const PointsPreview = (props: Props) => {
       const pointName = getPointName(kind, point);
 
       return (
-        <>
+        <React.Fragment key={`point-${name}`}>
           <line
             x1="0"
             y1={-circleRadius}
@@ -186,7 +186,6 @@ const PointsPreview = (props: Props) => {
           <circle
             onPointerDown={() => onStartDragPoint(point, kind)}
             {...dataObjectToProps({ draggable: 'true' })}
-            key={`point-${name}`}
             fill={
               pointName === highlightedPointName
                 ? 'rgba(0,0,0,0.75)'
@@ -201,7 +200,7 @@ const PointsPreview = (props: Props) => {
             r={circleRadius}
             style={styles.point}
           />
-        </>
+        </React.Fragment>
       );
     },
     [highlightedPointName, onStartDragPoint, selectedPointName]

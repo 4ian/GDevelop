@@ -120,6 +120,16 @@ export default class KeyboardShortcuts {
     }
   }
 
+  shouldIgnoreDoubleClick() {
+    return (
+      this._metaPressed ||
+      this._altPressed ||
+      this._ctrlPressed ||
+      this._shiftPressed
+    );
+  }
+  
+
   resetModifiers = () => {
     this._metaPressed = false;
     this._altPressed = false;

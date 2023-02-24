@@ -5,9 +5,9 @@ import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
 import MiniToolbar from '../../UI/MiniToolbar';
-import ZoomIn from '@material-ui/icons/ZoomIn';
-import ZoomOut from '@material-ui/icons/ZoomOut';
-import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
+import ZoomIn from '../../UI/CustomSvgIcons/ZoomIn';
+import ZoomOut from '../../UI/CustomSvgIcons/ZoomOut';
+import Maximize from '../../UI/CustomSvgIcons/Maximize';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
@@ -22,14 +22,21 @@ import {
   getWheelStepZoomFactor,
   imagePreviewMaxZoom,
   imagePreviewMinZoom,
+  willZoomChange,
   zoomInFactor,
   zoomOutFactor,
   zoomStepBasePower,
 } from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
-const MARGIN = 50;
-const SPRITE_MARGIN_RATIO = 1.5;
+type Point = { x: number, y: number };
+
+const getDistanceBetweenPoints = (point1: Point, point2: Point) => {
+  return Math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2);
+};
+const getCenter = (point1: Point, point2: Point) => {
+  return [(point1.x + point2.x) / 2, (point1.y + point2.y) / 2];
+};
 
 const styles = {
   previewImagePixelated: {
@@ -60,10 +67,7 @@ const styles = {
     // `pointermove` event for "native" behavior like panning the page.
     touchAction: 'none',
   },
-  spriteThumbnailImage: {
-    position: 'relative',
-    pointerEvents: 'none',
-  },
+  spriteThumbnailImage: {},
   sliderContainer: {
     maxWidth: 150,
     width: '100%',
@@ -105,6 +109,12 @@ export const isProjectImageResourceSmooth = (
   return imageResource.isSmooth();
 };
 
+type ZoomState = {
+  factor: number,
+  xOffset: number,
+  yOffset: number,
+};
+
 /**
  * Display the preview for a resource of a project with kind "image".
  */
@@ -128,11 +138,16 @@ const ImagePreview = ({
   const [imageHeight, setImageHeight] = React.useState<?number>(null);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [containerHeight, setContainerHeight] = React.useState<?number>(null);
-  const [imageZoomFactor, setImageZoomFactor] = React.useState<number>(
-    initialZoom || 1
-  );
+  const [zoomState, setZoomState] = React.useState<ZoomState>({
+    factor: initialZoom || 1,
+    xOffset: 0,
+    yOffset: 0,
+  });
+  const { xOffset, yOffset, factor: imageZoomFactor } = zoomState;
+  const previousDoubleTouchInfo = React.useRef<any>(null);
+  const previousSingleTouchCoordinates = React.useRef<?[number, number]>(null);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
-
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const handleImageError = () => {
     setErrored(true);
   };
@@ -143,15 +158,173 @@ const ImagePreview = ({
         return false;
       }
       const zoomFactor = clampImagePreviewZoom(
-        Math.min(
-          containerWidth / (imageWidth * SPRITE_MARGIN_RATIO),
-          containerHeight / (imageHeight * SPRITE_MARGIN_RATIO)
-        )
+        Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
-      setImageZoomFactor(zoomFactor);
+      const zoomFactorWithMargins = zoomFactor * 0.95;
+      setZoomState({
+        factor: zoomFactorWithMargins,
+        xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
+        yOffset: (containerHeight - imageHeight * zoomFactorWithMargins) / 2,
+      });
       return true;
     },
     [imageHeight, imageWidth, containerHeight, containerWidth]
+  );
+
+  const zoomAroundPointBy = React.useCallback(
+    async (imageZoomFactorMultiplier: number, point: [number, number]) => {
+      if (!willZoomChange(imageZoomFactor, imageZoomFactorMultiplier)) {
+        return;
+      }
+      const newFactor = clampImagePreviewZoom(
+        imageZoomFactor * imageZoomFactorMultiplier
+      );
+      setZoomState(zoomState => ({
+        xOffset:
+          zoomState.xOffset +
+          (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
+        yOffset:
+          zoomState.yOffset +
+          (point[1] - zoomState.yOffset) * (1 - newFactor / zoomState.factor),
+        factor: newFactor,
+      }));
+    },
+    [imageZoomFactor]
+  );
+
+  const zoomAroundPointTo = React.useCallback(
+    async (factor: number, point: [number, number]) => {
+      setZoomState(zoomState => ({
+        xOffset:
+          zoomState.xOffset +
+          (point[0] - zoomState.xOffset) * (1 - factor / zoomState.factor),
+        yOffset:
+          zoomState.yOffset +
+          (point[1] - zoomState.yOffset) * (1 - factor / zoomState.factor),
+        factor,
+      }));
+    },
+    []
+  );
+
+  const handleWheel = React.useCallback(
+    (event: WheelEvent) => {
+      const { deltaY, deltaX, clientX, clientY } = event;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!hideControls && shouldZoom(event) && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        zoomAroundPointBy(getWheelStepZoomFactor(-deltaY), [
+          clientX - containerRect.left,
+          clientY - containerRect.top,
+        ]);
+      } else {
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset - deltaX / 4,
+          yOffset: zoomState.yOffset - deltaY / 4,
+        }));
+      }
+    },
+    [hideControls, zoomAroundPointBy]
+  );
+
+  const handleTouchMove = React.useCallback(
+    async (event: TouchEvent) => {
+      if (event.touches.length === 2 && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+
+        event.preventDefault();
+        event.stopPropagation();
+        const {
+          clientX: touch1clientX,
+          clientY: touch1clientY,
+        } = event.touches[0];
+        const {
+          clientX: touch2clientX,
+          clientY: touch2clientY,
+        } = event.touches[1];
+        const newDistance = getDistanceBetweenPoints(
+          { x: touch1clientX, y: touch1clientY },
+          { x: touch2clientX, y: touch2clientY }
+        );
+        const newCenter = getCenter(
+          {
+            x: touch1clientX - containerRect.left,
+            y: touch1clientY - containerRect.top,
+          },
+          {
+            x: touch2clientX - containerRect.left,
+            y: touch2clientY - containerRect.top,
+          }
+        );
+        if (previousDoubleTouchInfo.current) {
+          setZoomState(zoomState => ({
+            ...zoomState,
+            xOffset:
+              zoomState.xOffset +
+              (newCenter[0] - previousDoubleTouchInfo.current.center[0]),
+            yOffset:
+              zoomState.yOffset +
+              (newCenter[1] - previousDoubleTouchInfo.current.center[1]),
+          }));
+
+          zoomAroundPointBy(
+            newDistance / previousDoubleTouchInfo.current.distance,
+            newCenter
+          );
+        }
+        previousDoubleTouchInfo.current = {
+          distance: newDistance,
+          center: newCenter,
+        };
+        return;
+      }
+      if (
+        event.target &&
+        (event.target instanceof HTMLElement ||
+          // $FlowFixMe - Flow does not know about SVGElement
+          event.target instanceof SVGElement) &&
+        event.target.dataset &&
+        'draggable' in event.target.dataset
+      ) {
+        return;
+      }
+      const { clientX, clientY } = event.touches[0];
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (previousSingleTouchCoordinates.current) {
+        const [previousX, previousY] = previousSingleTouchCoordinates.current;
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset + (clientX - previousX),
+          yOffset: zoomState.yOffset + (clientY - previousY),
+        }));
+      }
+      previousSingleTouchCoordinates.current = [clientX, clientY];
+    },
+    [zoomAroundPointBy]
+  );
+
+  // Add event listener with `passive: false` in order to be able to prevent
+  // the default behavior when swiping from left to right on a trackpad that
+  // triggers a back navigation.
+  React.useEffect(
+    () => {
+      if (containerRef.current) {
+        containerRef.current.addEventListener('wheel', handleWheel, {
+          passive: false,
+        });
+        return () => {
+          containerRef.current &&
+            containerRef.current.removeEventListener('wheel', handleWheel, {
+              passive: false,
+            });
+        };
+      }
+    },
+    [handleWheel]
   );
 
   // Reset ref to adapt zoom when image changes
@@ -160,6 +333,11 @@ const ImagePreview = ({
       hasZoomBeenAdaptedToImageRef.current = false;
     },
     [imageResourceSource]
+  );
+
+  const containerCenter = React.useMemo(
+    () => [(containerWidth || 0) / 2, (containerHeight || 0) / 2],
+    [containerWidth, containerHeight]
   );
 
   // A change of adaptZoomFactorToImage means a change in one of its dependencies,
@@ -192,33 +370,11 @@ const ImagePreview = ({
     if (onImageLoaded) onImageLoaded();
   };
 
-  const zoomBy = (imageZoomFactorMultiplier: number) => {
-    zoomTo(imageZoomFactor * imageZoomFactorMultiplier);
-  };
-
-  const zoomTo = (imageZoomFactor: number) => {
-    setImageZoomFactor(clampImagePreviewZoom(imageZoomFactor));
-  };
-
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
 
   const containerLoaded = !!containerWidth && !!containerHeight;
   const imageLoaded = !!imageWidth && !!imageHeight && !errored;
-
-  // Centre-align the image and overlays
-  const imagePositionTop = Math.max(
-    0,
-    (containerHeight || 0) / 2 -
-      ((imageHeight || 0) * imageZoomFactor) / 2 -
-      MARGIN
-  );
-  const imagePositionLeft = Math.max(
-    0,
-    (containerWidth || 0) / 2 -
-      ((imageWidth || 0) * imageZoomFactor) / 2 -
-      MARGIN
-  );
 
   // We display the elements only when the image is loaded and
   // the zoom is applied to avoid a shift in the image.
@@ -226,30 +382,20 @@ const ImagePreview = ({
   // so that the image takes the space of the container whilst being hidden.
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
-  const width = imageWidth ? imageWidth * imageZoomFactor : undefined;
-  const height = imageHeight ? imageHeight * imageZoomFactor : undefined;
+
+  const imageContainerStyle = {
+    transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
+    width: imageWidth,
+    height: imageHeight,
+    transformOrigin: '0 0',
+  };
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     // Apply margin only once the container is loaded, to avoid a shift in the image
-    margin: containerLoaded ? MARGIN : 0,
-    top: imagePositionTop,
-    left: imagePositionLeft,
-    width,
-    height,
+    outline: `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
-  };
-
-  const frameStyle = {
-    position: 'absolute',
-    top: imagePositionTop + MARGIN,
-    left: imagePositionLeft + MARGIN,
-    width,
-    height,
-    visibility,
-    border: `1px solid ${frameBorderColor}`,
-    boxSizing: 'border-box',
   };
 
   const overlayStyle = {
@@ -275,7 +421,9 @@ const ImagePreview = ({
             {!hideControls && (
               <MiniToolbar noPadding>
                 <IconButton
-                  onClick={() => zoomBy(zoomOutFactor)}
+                  onClick={() =>
+                    zoomAroundPointBy(zoomOutFactor, containerCenter)
+                  }
                   tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomOut />
@@ -287,12 +435,14 @@ const ImagePreview = ({
                     step={zoomStepBasePower * 4}
                     value={Math.log2(imageZoomFactor)}
                     onChange={value => {
-                      zoomTo(Math.pow(2, value));
+                      zoomAroundPointTo(Math.pow(2, value), containerCenter);
                     }}
                   />
                 </div>
                 <IconButton
-                  onClick={() => zoomBy(zoomInFactor)}
+                  onClick={() =>
+                    zoomAroundPointBy(zoomInFactor, containerCenter)
+                  }
                   tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
                 >
                   <ZoomIn />
@@ -303,7 +453,7 @@ const ImagePreview = ({
                   }}
                   tooltip={t`Fit content to window`}
                 >
-                  <ZoomOutMap />
+                  <Maximize />
                 </IconButton>
               </MiniToolbar>
             )}
@@ -321,17 +471,31 @@ const ImagePreview = ({
                 }
                 style={{
                   ...styles.imagePreviewContainer,
-                  overflow: containerLoaded ? 'auto' : 'hidden',
+                  overflow: containerLoaded ? 'unset' : 'hidden',
                 }}
-                ref={measureRef}
-                onWheel={event => {
-                  const { deltaY } = event;
-                  if (!hideControls && shouldZoom(event)) {
-                    zoomBy(getWheelStepZoomFactor(-deltaY));
-                    event.stopPropagation();
-                  } else {
-                    // Let the usual, native vertical or horizontal scrolling happen.
+                ref={ref => {
+                  measureRef(ref);
+                  containerRef.current = ref;
+                }}
+                onTouchStart={event => {
+                  if (event.touches.length === 1) {
+                    previousSingleTouchCoordinates.current = [
+                      event.touches[0].clientX,
+                      event.touches[0].clientY,
+                    ];
+                  } else if (event.touches.length === 2) {
+                    previousSingleTouchCoordinates.current = null;
                   }
+                }}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={event => {
+                  if (event.touches.length === 1) {
+                    previousSingleTouchCoordinates.current = [
+                      event.touches[0].clientX,
+                      event.touches[0].clientY,
+                    ];
+                  }
+                  previousDoubleTouchInfo.current = null;
                 }}
               >
                 {!!errored && (
@@ -341,34 +505,36 @@ const ImagePreview = ({
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!errored &&
-                  (isImagePrivate ? (
-                    <AuthorizedAssetImage
-                      style={imageStyle}
-                      alt={resourceName}
-                      url={imageResourceSource}
-                      onError={handleImageError}
-                      onLoad={handleImageLoaded}
-                      hideLoader={hideLoader}
-                    />
-                  ) : (
-                    <CorsAwareImage
-                      style={imageStyle}
-                      alt={resourceName}
-                      src={imageResourceSource}
-                      onError={handleImageError}
-                      onLoad={handleImageLoaded}
-                    />
-                  ))}
-                {imageLoaded && renderOverlay && <div style={frameStyle} />}
+                {!errored && (
+                  <div style={imageContainerStyle}>
+                    {isImagePrivate ? (
+                      <AuthorizedAssetImage
+                        style={imageStyle}
+                        alt={resourceName}
+                        url={imageResourceSource}
+                        onError={handleImageError}
+                        onLoad={handleImageLoaded}
+                        hideLoader={hideLoader}
+                      />
+                    ) : (
+                      <CorsAwareImage
+                        style={imageStyle}
+                        alt={resourceName}
+                        src={imageResourceSource}
+                        onError={handleImageError}
+                        onLoad={handleImageLoaded}
+                      />
+                    )}
+                  </div>
+                )}
                 {imageLoaded && renderOverlay && (
                   <div style={overlayStyle}>
                     {renderOverlay({
                       imageWidth: imageWidth || 0,
                       imageHeight: imageHeight || 0,
-                      offsetTop: imagePositionTop + MARGIN,
-                      offsetLeft: imagePositionLeft + MARGIN,
-                      imageZoomFactor,
+                      offsetTop: yOffset,
+                      offsetLeft: xOffset,
+                      imageZoomFactor: imageZoomFactor,
                     })}
                   </div>
                 )}

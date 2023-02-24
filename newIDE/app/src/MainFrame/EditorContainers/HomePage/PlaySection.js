@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import SectionContainer, { SectionRow } from './SectionContainer';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import PlaceHolderLoader from '../../../UI/PlaceholderLoader';
 
 const styles = {

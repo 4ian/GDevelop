@@ -16,7 +16,7 @@ import LinearProgress from '../../UI/LinearProgress';
 import CircularProgress from '../../UI/CircularProgress';
 import { makeStyles } from '@material-ui/styles';
 import { StepIcon } from '@material-ui/core';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   stepper: { flex: 1 },

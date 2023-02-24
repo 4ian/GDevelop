@@ -21,7 +21,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Text from '../UI/Text';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import Lightning from '../UI/CustomSvgIcons/Lightning';

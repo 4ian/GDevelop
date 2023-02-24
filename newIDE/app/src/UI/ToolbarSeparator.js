@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const ToolbarSeparator = () => {
   const theme = React.useContext(GDevelopThemeContext);

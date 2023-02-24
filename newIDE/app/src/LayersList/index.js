@@ -15,7 +15,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const DropTarget = makeDropTarget('layers-list');
 

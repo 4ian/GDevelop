@@ -9,7 +9,7 @@ import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import Text from '../../../../UI/Text';
 import { roundTo } from '../../../../Utils/Mathematics';
 import { Column } from '../../../../UI/Grid';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import styles from './styles';
 
 const POINT_COORDINATE_PRECISION = 4;

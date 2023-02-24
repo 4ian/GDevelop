@@ -21,7 +21,7 @@ import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
 import Search from './CustomSvgIcons/Search';
 import Cross from './CustomSvgIcons/Cross';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from './Theme';
 import { useDebounce } from '../Utils/UseDebounce';
 import { dataObjectToProps } from '../Utils/HTMLDataset';

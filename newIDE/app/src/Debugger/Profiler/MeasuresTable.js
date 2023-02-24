@@ -8,7 +8,7 @@ import { type ProfilerMeasuresSection } from '..';
 import IconButton from '../../UI/IconButton';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ChevronRight from '@material-ui/icons/ChevronRight';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   indent: {

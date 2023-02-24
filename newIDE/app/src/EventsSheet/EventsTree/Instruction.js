@@ -35,7 +35,7 @@ import {
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {

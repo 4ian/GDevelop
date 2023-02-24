@@ -18,7 +18,7 @@ import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { Line, Column } from '../UI/Grid';
 import LinearProgress from '../UI/LinearProgress';
 import Paper from '../UI/Paper';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../UI/RaisedButton';
 
 type FileToCloudProjectResourceUploaderProps = {

@@ -42,11 +42,11 @@
 }
 
 .almost-invisible-scrollbar::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0.07);
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .almost-invisible-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #8d8d8dcc;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .almost-invisible-scrollbar::-webkit-scrollbar-thumb:hover {

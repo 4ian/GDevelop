@@ -15,7 +15,7 @@ import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';

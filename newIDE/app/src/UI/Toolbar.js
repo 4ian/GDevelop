@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 type ToolbarProps = {|
   children: React.Node,
@@ -22,7 +22,7 @@ export const Toolbar = React.memo<ToolbarProps>(
           backgroundColor: gdevelopTheme.toolbar.backgroundColor,
           flexShrink: 0,
           display: 'flex',
-          overflowX: 'auto',
+          overflowX: 'overlay',
           overflowY: 'hidden',
           height: 40,
           paddingLeft: 8,

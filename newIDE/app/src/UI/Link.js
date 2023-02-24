@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import MuiLink from '@material-ui/core/Link';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from './Theme';
 import { makeStyles } from '@material-ui/core/styles';
 

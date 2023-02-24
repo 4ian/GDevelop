@@ -3,7 +3,7 @@ import * as React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from './Theme';
 
 const useFormStyles = makeStyles({

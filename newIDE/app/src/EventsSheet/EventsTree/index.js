@@ -47,7 +47,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 

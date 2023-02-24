@@ -361,7 +361,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                 />
               </SectionRow>
               <SectionRow>
-                <LineStackLayout
+                <ResponsiveLineStackLayout
                   justifyContent="space-between"
                   alignItems="center"
                   noMargin
@@ -373,9 +373,10 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                     </Text>
                   </Column>
                   <Column noMargin>
-                    <ResponsiveLineStackLayout noMargin>
+                    <LineStackLayout noMargin>
                       <RaisedButton
                         primary
+                        fullWidth={!canOpen}
                         label={<Trans>Create a project</Trans>}
                         onClick={() =>
                           onOpenNewProjectSetupDialog(
@@ -387,25 +388,20 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                       />
                       {canOpen && (
                         <>
-                          {isWindowWidthMediumOrLarger && (
-                            <>
-                              <Spacer />
-                              <Text>
-                                <Trans>or</Trans>
-                              </Text>
-                              <Spacer />
-                            </>
-                          )}
+                          <Text>
+                            <Trans>or</Trans>
+                          </Text>
+                          <Spacer />
                           <TextButton
                             primary
-                            label={<Trans>Open an existing project</Trans>}
+                            label={<Trans>Open a project</Trans>}
                             onClick={onChooseProject}
                           />
                         </>
                       )}
-                    </ResponsiveLineStackLayout>
+                    </LineStackLayout>
                   </Column>
-                </LineStackLayout>
+                </ResponsiveLineStackLayout>
                 {cloudProjectsFetchingErrorLabel && (
                   <Line>
                     <PlaceholderError onRetry={onCloudProjectsChanged}>

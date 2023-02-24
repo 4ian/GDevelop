@@ -28,7 +28,7 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
   buildChartData,

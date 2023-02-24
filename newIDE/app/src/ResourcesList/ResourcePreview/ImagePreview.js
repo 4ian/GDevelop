@@ -11,7 +11,7 @@ import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import CheckeredBackground from '../CheckeredBackground';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';

@@ -26,7 +26,7 @@ import FlatButton from '../../../../UI/FlatButton';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu';
 import AlertMessage from '../../../../UI/AlertMessage';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
 import { addVertexOnLongestEdge } from './PolygonHelper';
 

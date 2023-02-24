@@ -1,7 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import ThemeContext from '../UI/Theme/GDevelopThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Window from '../Utils/Window';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import UnsavedChangesContext from './UnsavedChangesContext';
@@ -21,7 +21,7 @@ type Props = {|
  */
 const ProjectTitlebar = React.memo<Props>(
   ({ fileMetadata, storageProvider, projectName, i18n }: Props) => {
-    const gdevelopTheme = React.useContext(ThemeContext);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const unsavedChanges = React.useContext(UnsavedChangesContext);
     const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
     const suffix = hasUnsavedChanges ? ' *' : '';

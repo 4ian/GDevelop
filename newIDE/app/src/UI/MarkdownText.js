@@ -3,7 +3,7 @@ import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import ThemeContext from './Theme/GDevelopThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import classNames from 'classnames';
 
 // Sensible defaults for react-markdown
@@ -40,7 +40,7 @@ type Props = {|
  * Display a markdown text
  */
 export const MarkdownText = (props: Props) => {
-  const gdevelopTheme = React.useContext(ThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const markdownCustomComponents = React.useMemo(
     () =>
       makeMarkdownCustomComponents(

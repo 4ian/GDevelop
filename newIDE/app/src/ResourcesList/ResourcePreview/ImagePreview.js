@@ -187,11 +187,15 @@ const ImagePreview = ({
 
   const handleWheel = React.useCallback(
     (event: WheelEvent) => {
-      const { deltaY, deltaX, offsetX, offsetY } = event;
+      const { deltaY, deltaX, clientX, clientY } = event;
       event.preventDefault();
       event.stopPropagation();
-      if (!hideControls && shouldZoom(event)) {
-        zoomAroundPointBy(getWheelStepZoomFactor(-deltaY), [offsetX, offsetY]);
+      if (!hideControls && shouldZoom(event) && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        zoomAroundPointBy(getWheelStepZoomFactor(-deltaY), [
+          clientX - containerRect.left,
+          clientY - containerRect.top,
+        ]);
       } else {
         setXOffset(xOffset => xOffset - deltaX / 10);
         setYOffset(yOffset => yOffset - deltaY / 10);
@@ -309,7 +313,6 @@ const ImagePreview = ({
   const imageContainerStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
     boxSizing: 'content-box',
-    pointerEvents: 'none',
     width: imageWidth,
     height: imageHeight,
     transformOrigin: '0 0',
@@ -325,7 +328,6 @@ const ImagePreview = ({
 
   const overlayStyle = {
     position: 'absolute',
-    pointerEvents: 'all',
     top: 0,
     left: 0,
     width: '100%',

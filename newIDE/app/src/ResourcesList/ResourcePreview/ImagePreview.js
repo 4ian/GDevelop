@@ -29,11 +29,13 @@ import {
 } from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
-const getDistanceBetweenPoints = (x1, y1, x2, y2) => {
-  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+type Point = { x: number, y: number };
+
+const getDistanceBetweenPoints = (point1: Point, point2: Point) => {
+  return Math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2);
 };
-const getCenter = (x1, y1, x2, y2) => {
-  return [(x1 + x2) / 2, (y1 + y2) / 2];
+const getCenter = (point1: Point, point2: Point) => {
+  return [(point1.x + point2.x) / 2, (point1.y + point2.y) / 2];
 };
 
 const styles = {
@@ -243,16 +245,18 @@ const ImagePreview = ({
           clientY: touch2clientY,
         } = event.touches[1];
         const newDistance = getDistanceBetweenPoints(
-          touch1clientX,
-          touch1clientY,
-          touch2clientX,
-          touch2clientY
+          { x: touch1clientX, y: touch1clientY },
+          { x: touch2clientX, y: touch2clientY }
         );
         const newCenter = getCenter(
-          touch1clientX - containerRect.left,
-          touch1clientY - containerRect.top,
-          touch2clientX - containerRect.left,
-          touch2clientY - containerRect.top
+          {
+            x: touch1clientX - containerRect.left,
+            y: touch1clientY - containerRect.top,
+          },
+          {
+            x: touch2clientX - containerRect.left,
+            y: touch2clientY - containerRect.top,
+          }
         );
         if (previousDoubleTouchInfo.current) {
           setZoomState(zoomState => ({

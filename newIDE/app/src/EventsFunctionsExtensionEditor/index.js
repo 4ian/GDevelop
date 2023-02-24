@@ -1066,7 +1066,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
-              <Background>
+              <Background maxWidth>
                 {selectedEventsFunction &&
                 this._globalObjectsContainer &&
                 this._objectsContainer ? (

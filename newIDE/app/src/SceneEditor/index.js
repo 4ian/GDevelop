@@ -1122,6 +1122,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           click: () => {
             this.duplicateSelection();
           },
+          accelerator: 'CmdOrCtrl+D',
         },
         { type: 'separator' },
         {
@@ -1207,7 +1208,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.deleteSelection();
   };
 
-  duplicateSelection = () => {
+  duplicateSelection = ({
+    useLastCursorPosition,
+  }: CopyCutPasteOptions = {}) => {
     const { editor } = this;
     if (!editor) return;
     const serializedSelection = this.instancesSelection
@@ -1461,6 +1464,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               onCopy: () => this.copySelection({ useLastCursorPosition: true }),
               onCut: () => this.cutSelection({ useLastCursorPosition: true }),
               onPaste: () => this.paste({ useLastCursorPosition: true }),
+              onDuplicate: () =>
+                this.duplicateSelection({ useLastCursorPosition: true }),
               onDelete: this.deleteSelection,
               onUndo: this.undo,
               onRedo: this.redo,

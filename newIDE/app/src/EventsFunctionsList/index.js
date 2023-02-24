@@ -25,6 +25,9 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { Column, Line } from '../UI/Grid';
+import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 const gd: libGDevelop = global.gd;
 
@@ -107,7 +110,6 @@ type Props = {|
     (parameters: ?EventsFunctionCreationParameters) => void
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
-  renderHeader?: () => React.Node,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -432,7 +434,6 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       eventsFunctionsContainer,
       selectedEventsFunction,
       onSelectEventsFunction,
-      renderHeader,
     } = this.props;
     const { searchText } = this.state;
 
@@ -448,7 +449,20 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     return (
       <Background>
-        {renderHeader ? renderHeader() : null}
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search functions`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -460,8 +474,6 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsFunction}
-                    addNewItemLabel={<Trans>Add a new function</Trans>}
                     renderItemLabel={renderEventsFunctionLabel}
                     getItemName={getEventsFunctionName}
                     getItemThumbnail={this._getFunctionThumbnail}
@@ -482,17 +494,16 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search functions`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new function</Trans>}
+              primary
+              onClick={this._addNewEventsFunction}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

@@ -22,6 +22,9 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { Column, Line } from '../UI/Grid';
+import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -297,6 +300,20 @@ export default class EventsBasedObjectsList extends React.Component<
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -308,8 +325,6 @@ export default class EventsBasedObjectsList extends React.Component<
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsBasedObject}
-                    addNewItemLabel={<Trans>Add a new object</Trans>}
                     getItemName={getEventsBasedObjectName}
                     selectedItems={
                       selectedEventsBasedObject
@@ -330,17 +345,16 @@ export default class EventsBasedObjectsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search objects`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new object</Trans>}
+              primary
+              onClick={this._addNewEventsBasedObject}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

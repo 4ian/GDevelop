@@ -443,7 +443,7 @@
       },
       "indicator-color": {
         "value": "#EAE3FF",
-        "comment": "Palette/Purple/10"
+        "comment": "Palette/Purple/05"
       },
       "separator-color": {
         "value": "#606066",
@@ -646,7 +646,8 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "#FFFFFF"
+        "value": "#FAFAFA",
+        "comment": "Palette/Grey/00"
       }
     },
     "layout": {
@@ -659,10 +660,8 @@
     },
     "toolbar": {
       "background-color": {
-        "value": "#4C5361"
-      },
-      "color": {
-        "value": "#D6DEEC"
+        "value": "#32323B",
+        "comment": "Palette/Grey/80"
       },
       "border-color-hover": {
         "value": "#D6DEEC"

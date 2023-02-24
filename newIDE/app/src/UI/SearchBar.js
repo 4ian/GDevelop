@@ -25,6 +25,7 @@ import GDevelopThemeContext from './Theme/ThemeContext';
 import { type GDevelopTheme } from './Theme';
 import { useDebounce } from '../Utils/UseDebounce';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
+import { textEllipsisStyle } from './TextEllipsis';
 
 type TagsHandler = {|
   remove: string => void,
@@ -127,6 +128,7 @@ const getStyles = ({
         : nonEmpty && focused
         ? theme.searchBar.textColor.focused
         : theme.searchBar.textColor.default,
+      ...textEllipsisStyle,
     },
     searchContainer: {
       position: 'relative',

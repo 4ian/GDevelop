@@ -100,6 +100,7 @@ import LeaderboardContext, {
 } from '../Leaderboard/LeaderboardContext';
 import { TutorialContext } from '../Tutorial/TutorialContext';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
+
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -117,6 +118,7 @@ type Props = {|
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
+  settingsIcon?: React.Node,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -333,6 +335,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         undo={this.undo}
         redo={this.redo}
         onOpenSettings={this.props.onOpenSettings}
+        settingsIcon={this.props.settingsIcon}
         onToggleSearchPanel={this._toggleSearchPanel}
       />
     );

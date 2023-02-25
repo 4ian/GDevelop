@@ -339,11 +339,15 @@ namespace gdjs {
         }
       }
 
+      const hookContext =
+        gdjs.TopDownMovementRuntimeBehavior._topDownMovementHookContext;
       for (const topDownMovementHook of this._topDownMovementHooks) {
-        direction = topDownMovementHook.overrideDirection(direction);
+        hookContext._setDirection(direction);
+        direction = topDownMovementHook.overrideDirection(hookContext);
       }
+      hookContext._setDirection(direction);
       for (const topDownMovementHook of this._topDownMovementHooks) {
-        topDownMovementHook.beforeSpeedUpdate(direction);
+        topDownMovementHook.beforeSpeedUpdate(hookContext);
       }
 
       const object = this.owner;
@@ -431,7 +435,7 @@ namespace gdjs {
       this._angularSpeed = this._angularMaxSpeed;
 
       for (const topDownMovementHook of this._topDownMovementHooks) {
-        topDownMovementHook.beforePositionUpdate();
+        topDownMovementHook.beforePositionUpdate(hookContext);
       }
 
       // Position object.
@@ -554,6 +558,30 @@ namespace gdjs {
   }
 
   export namespace TopDownMovementRuntimeBehavior {
+    export class TopDownMovementHookContext {
+      private direction: integer = -1;
+
+      /**
+       * @returns The movement direction from 0 for left to 7 for up-left and
+       * -1 for no direction.
+       */
+      getDirection(): integer {
+        return this.direction;
+      }
+
+      /**
+       * This method won't change the direction used by the top-down movement
+       * behavior.
+       */
+      _setDirection(direction: integer): void {
+        this.direction = direction;
+      }
+    }
+
+    // This should be a static attribute but it's not possible because of
+    // declaration order.
+    export const _topDownMovementHookContext = new gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHookContext();
+
     /**
      * Allow extensions relying on the top-down movement to customize its
      * behavior a bit.
@@ -563,17 +591,17 @@ namespace gdjs {
        * Return the direction to use instead of the direction given in
        * parameter.
        */
-      overrideDirection(direction: integer): integer;
+      overrideDirection(hookContext: TopDownMovementHookContext): integer;
       /**
        * Called before the acceleration and new direction is applied to the
        * velocity.
        */
-      beforeSpeedUpdate(direction: integer): void;
+      beforeSpeedUpdate(hookContext: TopDownMovementHookContext): void;
       /**
        * Called before the velocity is applied to the object position and
        * angle.
        */
-      beforePositionUpdate(): void;
+      beforePositionUpdate(hookContext: TopDownMovementHookContext): void;
     }
 
     export interface BasisTransformation {

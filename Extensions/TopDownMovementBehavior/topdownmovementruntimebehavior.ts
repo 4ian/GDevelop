@@ -343,7 +343,7 @@ namespace gdjs {
         direction = topDownMovementHook.overrideDirection(direction);
       }
       for (const topDownMovementHook of this._topDownMovementHooks) {
-        topDownMovementHook.beforeSpeedUpdate();
+        topDownMovementHook.beforeSpeedUpdate(direction);
       }
 
       const object = this.owner;
@@ -568,7 +568,7 @@ namespace gdjs {
        * Called before the acceleration and new direction is applied to the
        * velocity.
        */
-      beforeSpeedUpdate(): void;
+      beforeSpeedUpdate(direction: integer): void;
       /**
        * Called before the velocity is applied to the object position and
        * angle.

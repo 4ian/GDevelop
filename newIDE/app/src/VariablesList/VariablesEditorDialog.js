@@ -93,7 +93,7 @@ const VariablesEditorDialog = ({
       flexBody
       fullHeight
     >
-      <Column expand noMargin>
+      <Column expand noMargin noOverflowParent>
         {variablesContainer.count() > 0 && DismissableTutorialMessage && (
           <Line>
             <Column expand>{DismissableTutorialMessage}</Column>

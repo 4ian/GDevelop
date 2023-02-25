@@ -5,120 +5,135 @@ import AlertDialog from './AlertDialog';
 import ConfirmDialog from './ConfirmDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import {
-  type ShowAlertDialogOptionsWithCallback,
-  type ShowConfirmDeleteDialogOptionsWithCallback,
-  type ShowConfirmDialogOptionsWithCallback,
+  type ShowAlertDialogOptions,
+  type ShowConfirmDeleteDialogOptions,
+  type ShowConfirmDialogOptions,
 } from './AlertContext';
 
-type Props = {| children: React.Node |};
+type Props = {|
+  children: React.Node,
+|};
 
-function ConfirmProvider({ children }: Props) {
+type ShowAlertDialogState = {|
+  options: ShowAlertDialogOptions,
+  resolve: () => void,
+|};
+type ShowConfirmDeleteDialogState = {|
+  options: ShowConfirmDeleteDialogOptions,
+  resolve: boolean => void,
+|};
+type ShowConfirmDialogState = {|
+  options: ShowConfirmDialogOptions,
+  resolve: boolean => void,
+|};
+
+export default function AlertProvider({ children }: Props) {
   // Alert
-  const [alertDialogOpen, setAlertDialogOpen] = React.useState<boolean>(false);
   const [
-    alertDialogConfig,
-    setAlertDialogConfig,
-  ] = React.useState<?ShowAlertDialogOptionsWithCallback>(null);
-  const openAlertDialog = React.useCallback(
-    (options: ShowAlertDialogOptionsWithCallback) => {
-      setAlertDialogOpen(true);
-      setAlertDialogConfig(options);
+    alertDialogState,
+    setAlertDialogState,
+  ] = React.useState<?ShowAlertDialogState>(null);
+  const showAlertDialog = React.useCallback(
+    async (options: ShowAlertDialogOptions): Promise<void> => {
+      await new Promise(resolve => {
+        setAlertDialogState({ options, resolve });
+      });
+      setAlertDialogState(null);
     },
     []
   );
 
   // Confirm
-  const [confirmDialogOpen, setConfirmDialogOpen] = React.useState<boolean>(
-    false
-  );
   const [
-    confirmDialogConfig,
-    setConfirmDialogConfig,
-  ] = React.useState<?ShowConfirmDialogOptionsWithCallback>(null);
-  const openConfirmDialog = React.useCallback(
-    (options: ShowConfirmDialogOptionsWithCallback) => {
-      setConfirmDialogOpen(true);
-      setConfirmDialogConfig(options);
+    confirmDialogState,
+    setConfirmDialogState,
+  ] = React.useState<?ShowConfirmDialogState>(null);
+  const showConfirmDialog = React.useCallback(
+    async (options: ShowConfirmDialogOptions): Promise<boolean> => {
+      const result = await new Promise(resolve => {
+        setConfirmDialogState({ options, resolve });
+      });
+      setConfirmDialogState(null);
+      return result;
     },
     []
   );
 
   // Confirm Delete
   const [
-    confirmDeleteDialogOpen,
-    setConfirmDeleteDialogOpen,
-  ] = React.useState<boolean>(false);
-  const [
-    confirmDeleteDialogConfig,
-    setConfirmDeleteDialogConfig,
-  ] = React.useState<?ShowConfirmDeleteDialogOptionsWithCallback>(null);
-  const openConfirmDeleteDialog = React.useCallback(
-    (options: ShowConfirmDeleteDialogOptionsWithCallback) => {
-      setConfirmDeleteDialogOpen(true);
-      setConfirmDeleteDialogConfig(options);
+    confirmDeleteDialogState,
+    setConfirmDeleteDialogState,
+  ] = React.useState<?ShowConfirmDeleteDialogState>(null);
+  const showConfirmDeleteDialog = React.useCallback(
+    async (options: ShowConfirmDeleteDialogOptions): Promise<boolean> => {
+      const result = await new Promise(resolve => {
+        setConfirmDeleteDialogState({ options, resolve });
+      });
+      setConfirmDeleteDialogState(null);
+      return result;
     },
     []
   );
 
+  const providerValue = React.useMemo(
+    () => ({
+      showAlertDialog,
+      showConfirmDialog,
+      showConfirmDeleteDialog,
+    }),
+    [showAlertDialog, showConfirmDialog, showConfirmDeleteDialog]
+  );
+
   return (
-    <AlertContext.Provider
-      value={{
-        showAlertDialog: openAlertDialog,
-        showConfirmDialog: openConfirmDialog,
-        showConfirmDeleteDialog: openConfirmDeleteDialog,
-      }}
-    >
+    <AlertContext.Provider value={providerValue}>
       {children}
-      {alertDialogConfig && (
+      {alertDialogState && (
         <AlertDialog
-          open={alertDialogOpen}
+          open
           onDismiss={() => {
-            setAlertDialogOpen(false);
-            alertDialogConfig.callback();
+            alertDialogState.resolve();
           }}
-          dismissButtonLabel={alertDialogConfig.dismissButtonLabel}
-          title={alertDialogConfig.title}
-          message={alertDialogConfig.message}
+          dismissButtonLabel={alertDialogState.options.dismissButtonLabel}
+          title={alertDialogState.options.title}
+          message={alertDialogState.options.message}
         />
       )}
-      {confirmDialogConfig && (
+      {confirmDialogState && (
         <ConfirmDialog
-          open={confirmDialogOpen}
+          open
           onConfirm={() => {
-            setConfirmDialogOpen(false);
-            confirmDialogConfig.callback(true);
+            confirmDialogState.resolve(true);
           }}
-          confirmButtonLabel={confirmDialogConfig.confirmButtonLabel}
+          confirmButtonLabel={confirmDialogState.options.confirmButtonLabel}
           onDismiss={() => {
-            setConfirmDialogOpen(false);
-            confirmDialogConfig.callback(false);
+            confirmDialogState.resolve(false);
           }}
-          dismissButtonLabel={confirmDialogConfig.dismissButtonLabel}
-          title={confirmDialogConfig.title}
-          message={confirmDialogConfig.message}
+          dismissButtonLabel={confirmDialogState.options.dismissButtonLabel}
+          title={confirmDialogState.options.title}
+          message={confirmDialogState.options.message}
         />
       )}
-      {confirmDeleteDialogConfig && (
+      {confirmDeleteDialogState && (
         <ConfirmDeleteDialog
-          open={confirmDeleteDialogOpen}
+          open
           onConfirm={() => {
-            setConfirmDeleteDialogOpen(false);
-            confirmDeleteDialogConfig.callback(true);
+            confirmDeleteDialogState.resolve(true);
           }}
-          confirmButtonLabel={confirmDeleteDialogConfig.confirmButtonLabel}
+          confirmButtonLabel={
+            confirmDeleteDialogState.options.confirmButtonLabel
+          }
           onDismiss={() => {
-            setConfirmDeleteDialogOpen(false);
-            confirmDeleteDialogConfig.callback(false);
+            confirmDeleteDialogState.resolve(false);
           }}
-          dismissButtonLabel={confirmDeleteDialogConfig.dismissButtonLabel}
-          title={confirmDeleteDialogConfig.title}
-          message={confirmDeleteDialogConfig.message}
-          fieldMessage={confirmDeleteDialogConfig.fieldMessage}
-          confirmText={confirmDeleteDialogConfig.confirmText}
+          dismissButtonLabel={
+            confirmDeleteDialogState.options.dismissButtonLabel
+          }
+          title={confirmDeleteDialogState.options.title}
+          message={confirmDeleteDialogState.options.message}
+          fieldMessage={confirmDeleteDialogState.options.fieldMessage}
+          confirmText={confirmDeleteDialogState.options.confirmText}
         />
       )}
     </AlertContext.Provider>
   );
 }
-
-export default ConfirmProvider;

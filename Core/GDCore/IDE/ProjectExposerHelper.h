@@ -46,7 +46,7 @@ public:
                                   gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
-   * \brief Call the specified worker on all events of the events based
+   * \brief Call the specified worker on all events of the event-based
    * behavior
    *
    * This should be the preferred way to traverse all the events of an events

@@ -23,7 +23,7 @@ namespace gd {
 
 void ProjectExposerHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorker &worker) {
-  // See also gd::Project::ExposeResources for a method that traverse the whole
+  // See also gd::Project::ExposeResources for a method that traverses the whole
   // project (this time for resources).
 
   // Add layouts events

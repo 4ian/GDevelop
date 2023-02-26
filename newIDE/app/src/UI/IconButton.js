@@ -61,13 +61,19 @@ type Props = {|
 |};
 
 const useStyles = makeStyles({
-  root: (props) => props.color ? {
-    color: props.color,
-  } : undefined,
-  label: (props) => props.backgroundColor ? {
-    backgroundColor: props.backgroundColor,
-    borderRadius: 4,
-  } : undefined,
+  root: props =>
+    props.color
+      ? {
+          color: props.color,
+        }
+      : undefined,
+  label: props =>
+    props.backgroundColor
+      ? {
+          backgroundColor: props.backgroundColor,
+          borderRadius: 4,
+        }
+      : undefined,
 });
 
 /**
@@ -88,8 +94,10 @@ const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStyles({
     color: selected ? gdevelopTheme.toolbar.backgroundColor : undefined,
-    backgroundColor: selected ? gdevelopTheme.iconButton.selectedBackgroundColor : undefined,
-  })
+    backgroundColor: selected
+      ? gdevelopTheme.iconButton.selectedBackgroundColor
+      : undefined,
+  });
 
   const iconButton = (
     <MUIIconButton

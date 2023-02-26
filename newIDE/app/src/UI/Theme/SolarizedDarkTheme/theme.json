@@ -60,6 +60,13 @@
         }
       }
     },
+    "icon-button": {
+      "selected": {
+        "background-color": {
+          "value": "#2799b9"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#249AC6"

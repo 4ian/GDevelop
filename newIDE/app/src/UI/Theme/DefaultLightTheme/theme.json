@@ -153,6 +153,14 @@
         }
       }
     },
+    "icon-button": {
+      "selected": {
+        "background-color": {
+          "value": "#7046EC",
+          "comment:": "Palette/Purple/40"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#7046EC",

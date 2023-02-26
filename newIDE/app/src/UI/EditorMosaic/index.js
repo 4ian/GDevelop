@@ -157,6 +157,7 @@ type Props = {|
     [string]: Editor,
   },
   limitToOneSecondaryEditor?: boolean,
+  onOpenedEditorsChanged?: () => void,
   onPersistNodes?: EditorMosaicNode => void,
 |};
 
@@ -197,36 +198,61 @@ export default class EditorMosaic extends React.Component<Props, State> {
         editorName => editors[editorName].type === 'secondary'
       );
       if (secondaryEditorName) {
-        this.setState({
-          mosaicNode: replaceNode(
-            this.state.mosaicNode,
-            secondaryEditorName,
-            editorName
-          ),
-        });
+        this.setState(
+          {
+            mosaicNode: replaceNode(
+              this.state.mosaicNode,
+              secondaryEditorName,
+              editorName
+            ),
+          },
+          () => {
+            this._onOpenedEditorsChanged();
+          }
+        );
 
-        this._persistNodes();
         return true;
       }
     }
 
-    // Open a new editor at the indicated position
-    this.setState({
-      mosaicNode: addNode(
-        this.state.mosaicNode,
-        editorName,
-        position,
-        splitPercentage,
-        direction
-      ),
-    });
+    // Open a new editor at the indicated position.
+    this.setState(
+      {
+        mosaicNode: addNode(
+          this.state.mosaicNode,
+          editorName,
+          position,
+          splitPercentage,
+          direction
+        ),
+      },
+      () => {
+        this._onOpenedEditorsChanged();
+      }
+    );
 
-    this._persistNodes();
     return true;
+  };
+
+  getOpenedEditorNames = (): Array<string> => {
+    return getLeaves(this.state.mosaicNode);
   };
 
   _onChange = (mosaicNode: EditorMosaicNode) => {
     this.setState({ mosaicNode });
+  };
+
+  _onChanged = (mosaicNode: EditorMosaicNode) => {
+    this.setState({ mosaicNode }, () => {
+      this._onOpenedEditorsChanged();
+    });
+  };
+
+  _onOpenedEditorsChanged = () => {
+    if (this.props.onOpenedEditorsChanged) {
+      this.props.onOpenedEditorsChanged();
+    }
+
     this._persistNodes();
   };
 
@@ -274,6 +300,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
             }}
             value={this.state.mosaicNode}
             onChange={this._onChange}
+            onRelease={this._onChanged}
           />
         )}
       </GDevelopThemeContext.Consumer>

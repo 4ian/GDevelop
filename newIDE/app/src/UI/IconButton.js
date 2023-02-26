@@ -6,6 +6,8 @@ import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { adaptAcceleratorString } from '../UI/AcceleratorString';
 import { tooltipEnterDelay } from './Tooltip';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import { makeStyles } from '@material-ui/core/styles';
 
 type IconProps =
   | {|
@@ -29,6 +31,7 @@ type Props = {|
   target?: string,
   onContextMenu?: () => void,
   disabled?: boolean,
+  selected?: boolean,
   edge?: 'start' | 'end' | false,
   id?: string,
 
@@ -57,46 +60,67 @@ type Props = {|
   color?: 'default',
 |};
 
+const useStyles = makeStyles({
+  root: (props) => props.color ? {
+    color: props.color,
+  } : undefined,
+  label: (props) => props.backgroundColor ? {
+    backgroundColor: props.backgroundColor,
+    borderRadius: 4,
+  } : undefined,
+});
+
 /**
  * A button showing just an icon, based on Material-UI icon button.
  * Supports displaying a tooltip.
  */
-export default class IconButton extends React.Component<Props, {||}> {
-  render() {
-    const {
-      tooltip,
-      acceleratorString,
-      color,
-      style,
-      ...otherProps
-    } = this.props;
-    const iconButton = (
-      <MUIIconButton
-        {...otherProps}
-        style={style}
-        color={color || 'secondary'}
-      />
-    );
 
-    return tooltip && !this.props.disabled ? (
-      <I18n>
-        {({ i18n }) => (
-          <Tooltip
-            title={
-              i18n._(tooltip) +
-              (acceleratorString
-                ? ' ' + adaptAcceleratorString(acceleratorString)
-                : '')
-            }
-            placement="bottom"
-            enterDelay={tooltipEnterDelay}
-          >
-            {iconButton}
-          </Tooltip>
-        )}
-      </I18n>
-    ) : (
-      iconButton
-    );
-  }
-}
+const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
+  const {
+    selected,
+    tooltip,
+    acceleratorString,
+    color,
+    style,
+    ...otherProps
+  } = props;
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const classes = useStyles({
+    color: selected ? gdevelopTheme.toolbar.backgroundColor : undefined,
+    backgroundColor: selected ? gdevelopTheme.iconButton.selectedBackgroundColor : undefined,
+  })
+
+  const iconButton = (
+    <MUIIconButton
+      {...otherProps}
+      classes={classes}
+      style={style}
+      color={selected ? 'inherit' : color || 'secondary'}
+      ref={ref}
+    />
+  );
+
+  return tooltip && !props.disabled ? (
+    <I18n>
+      {({ i18n }) => (
+        <Tooltip
+          title={
+            i18n._(tooltip) +
+            (acceleratorString
+              ? ' ' + adaptAcceleratorString(acceleratorString)
+              : '')
+          }
+          placement="bottom"
+          enterDelay={tooltipEnterDelay}
+        >
+          {iconButton}
+        </Tooltip>
+      )}
+    </I18n>
+  ) : (
+    iconButton
+  );
+});
+
+export default IconButton;

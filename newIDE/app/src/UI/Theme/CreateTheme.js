@@ -589,6 +589,9 @@ export function createGdevelopTheme({
       emptyMessage: {
         shadowColor: styles['ThemeMessageEmptyShadowColor'],
       },
+      iconButton: {
+        selectedBackgroundColor: styles['ThemeIconButtonSelectedBackgroundColor'],
+      },
       ...getRootClassNames(rootClassNameIdentifier),
       logo: {
         src: 'res/GD-logo-big.png',

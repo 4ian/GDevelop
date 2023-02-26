@@ -5,8 +5,8 @@ type Props = {|
   openObjectsList: () => void,
   openObjectGroupsList: () => void,
   openPropertiesPanel: () => void,
-  toggleInstancesList: () => void,
-  toggleLayersList: () => void,
+  openInstancesList: () => void,
+  openLayersList: () => void,
   undo: () => void,
   canUndo: boolean,
   redo: () => void,
@@ -34,11 +34,11 @@ const ToolbarCommands = (props: Props) => {
   });
 
   useCommand('TOGGLE_INSTANCES_PANEL', true, {
-    handler: props.toggleInstancesList,
+    handler: props.openInstancesList,
   });
 
   useCommand('TOGGLE_LAYERS_PANEL', true, {
-    handler: props.toggleLayersList,
+    handler: props.openLayersList,
   });
 
   useCommand('SCENE_EDITOR_UNDO', props.canUndo, {

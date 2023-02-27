@@ -61,6 +61,9 @@
       }
     },
     "icon-button": {
+      "color": {
+        "value": "#002B36"
+      },
       "selected": {
         "background-color": {
           "value": "#2799b9"

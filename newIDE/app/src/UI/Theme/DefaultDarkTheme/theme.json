@@ -170,9 +170,13 @@
     },
     "icon-button": {
       "selected": {
+        "color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        },
         "background-color": {
-          "value": "#DDD1FF",
-          "comment:": "Palette/Purple/10"
+          "value": "#C9B6FC",
+          "comment:": "Palette/Purple/20"
         }
       }
     },

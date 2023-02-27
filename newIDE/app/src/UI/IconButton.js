@@ -93,7 +93,8 @@ const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStyles({
-    color: selected ? gdevelopTheme.toolbar.backgroundColor : undefined,
+    // Override Material-UI colors only when the button is selected.
+    color: selected ? gdevelopTheme.iconButton.selectedColor : undefined,
     backgroundColor: selected
       ? gdevelopTheme.iconButton.selectedBackgroundColor
       : undefined,

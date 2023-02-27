@@ -8,7 +8,7 @@ import {
   getSelectedInstructionsContexts,
   type InstructionsListContext,
   getLastSelectedEventContext,
-  getLastSelectedInstructionsContext,
+  getLastSelectedInstructionContext,
   getLastSelectedInstructionsListsContext,
 } from './SelectionHandler';
 import {
@@ -158,7 +158,7 @@ export const pasteInstructionsFromClipboardInSelection = (
     project
   );
 
-  const lastSelectedInstructionsContext = getLastSelectedInstructionsContext(
+  const lastSelectedInstructionsContext = getLastSelectedInstructionContext(
     selection
   );
   if (lastSelectedInstructionsContext) {

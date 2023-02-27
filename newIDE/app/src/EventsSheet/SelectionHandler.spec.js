@@ -15,7 +15,7 @@ import {
   getSelectedInstructionsLocatingEvents,
   getLastSelectedEventContext,
   getLastSelectedEventContextWhichCanHaveSubEvents,
-  getLastSelectedInstructionsContext,
+  getLastSelectedInstructionContext,
 } from './SelectionHandler';
 const gd: libGDevelop = global.gd;
 
@@ -456,7 +456,11 @@ describe('SelectionHandler', () => {
 
     // Select a condition of a child event.
     currentSelection = selectInstruction(
-      standardEvent1_2,
+      {
+        event: standardEvent1_2,
+        eventsList: standardEvent1.getSubEvents(),
+        indexInList: 1,
+      },
       currentSelection,
       {
         isCondition: true,
@@ -525,7 +529,7 @@ describe('SelectionHandler', () => {
     expect(getSelectedInstructionsLocatingEvents(currentSelection)).toEqual([
       standardEvent1_2,
     ]);
-    expect(getLastSelectedInstructionsContext(currentSelection)).toEqual({
+    expect(getLastSelectedInstructionContext(currentSelection)).toEqual({
       isCondition: true,
       instrsList: gd.asStandardEvent(standardEvent1_2).getConditions(),
       instruction: gd
@@ -533,12 +537,20 @@ describe('SelectionHandler', () => {
         .getConditions()
         .get(1),
       indexInList: 1,
-      locatingEvent: standardEvent1_2,
+      eventContext: {
+        event: standardEvent1_2,
+        eventsList: standardEvent1.getSubEvents(),
+        indexInList: 1,
+      },
     });
 
     // Select an action of another event.
     currentSelection = selectInstruction(
-      standardEvent1_2_1,
+      {
+        event: standardEvent1_2_1,
+        eventsList: standardEvent1_2.getSubEvents(),
+        indexInList: 0,
+      },
       currentSelection,
       {
         isCondition: false,
@@ -630,7 +642,7 @@ describe('SelectionHandler', () => {
       standardEvent1_2,
       standardEvent1_2_1,
     ]);
-    expect(getLastSelectedInstructionsContext(currentSelection)).toEqual({
+    expect(getLastSelectedInstructionContext(currentSelection)).toEqual({
       isCondition: false,
       instrsList: gd.asStandardEvent(standardEvent1_2_1).getActions(),
       instruction: gd
@@ -638,7 +650,11 @@ describe('SelectionHandler', () => {
         .getActions()
         .get(0),
       indexInList: 0,
-      locatingEvent: standardEvent1_2_1,
+      eventContext: {
+        event: standardEvent1_2_1,
+        eventsList: standardEvent1_2.getSubEvents(),
+        indexInList: 0,
+      },
     });
 
     topEventsList.delete();

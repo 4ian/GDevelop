@@ -219,6 +219,8 @@ export const LayoutPrivateAssetInstallSuccess = () => (
         // Mock a successful installation
         createdObjects: [],
       }),
+      getPrivateAssetPackAudioArchiveUrl: async () =>
+        'https://resources.gevelop.io/path/to/audio/archive',
     }}
   >
     <AssetStoreStateProvider>
@@ -254,6 +256,8 @@ export const LayoutPrivateAssetInstallFailure = () => (
       installPrivateAsset: async () => {
         throw new Error('Fake error during installation of a private asset.');
       },
+      getPrivateAssetPackAudioArchiveUrl: async () =>
+        'https://resources.gevelop.io/path/to/audio/archive',
     }}
   >
     <AssetStoreStateProvider>

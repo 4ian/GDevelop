@@ -393,7 +393,9 @@ const ImagePreview = ({
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     // Apply margin only once the container is loaded, to avoid a shift in the image
-    outline: `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`,
+    outline: renderOverlay
+      ? `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`
+      : undefined,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
   };

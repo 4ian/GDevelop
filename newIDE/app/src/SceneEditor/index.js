@@ -146,11 +146,7 @@ type State = {|
   instancesEditorSettings: Object,
   history: HistoryState,
 
-  showObjectsListInfoBar: boolean,
   layoutVariablesDialogOpen: boolean,
-  showPropertiesInfoBar: boolean,
-  showLayersInfoBar: boolean,
-  showInstancesInfoBar: boolean,
   showAdditionalWorkInfoBar: boolean,
   additionalWorkInfoBar: InfoBarDetails,
 
@@ -204,11 +200,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         historyMaxSize: 50,
       }),
 
-      showObjectsListInfoBar: false,
       layoutVariablesDialogOpen: false,
-      showPropertiesInfoBar: false,
-      showLayersInfoBar: false,
-      showInstancesInfoBar: false,
 
       showAdditionalWorkInfoBar: false,
       additionalWorkInfoBar: {
@@ -234,22 +226,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     return this.state.instancesEditorSettings;
   }
 
-  updateToolbar() {
+  updateToolbar = () => {
+    const openedEditorNames = this.editorMosaic
+      ? this.editorMosaic.getOpenedEditorNames()
+      : [];
     this.props.setToolbar(
       <Toolbar
         instancesSelection={this.instancesSelection}
-        openObjectsList={this.openObjectsList}
-        openObjectGroupsList={this.openObjectGroupsList}
-        openProperties={this.openProperties}
+        toggleObjectsList={this.toggleObjectsList}
+        isObjectsListShown={openedEditorNames.includes('objects-list')}
+        toggleObjectGroupsList={this.toggleObjectGroupsList}
+        isObjectGroupsListShown={openedEditorNames.includes(
+          'object-groups-list'
+        )}
+        toggleProperties={this.toggleProperties}
+        isPropertiesShown={openedEditorNames.includes('properties')}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
+        isInstancesListShown={openedEditorNames.includes('instances-list')}
         toggleLayersList={this.toggleLayersList}
+        isLayersListShown={openedEditorNames.includes('layers-list')}
         toggleWindowMask={this.toggleWindowMask}
-        toggleGrid={this.toggleGrid}
-        isGridShown={() => !!this.state.instancesEditorSettings.grid}
         isWindowMaskShown={() =>
           !!this.state.instancesEditorSettings.windowMask
         }
+        toggleGrid={this.toggleGrid}
+        isGridShown={() => !!this.state.instancesEditorSettings.grid}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
         getContextMenuZoomItems={this.getContextMenuZoomItems}
@@ -263,7 +265,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         onRenameObject={this._startRenamingSelectedObject}
       />
     );
-  }
+  };
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
@@ -279,45 +281,29 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  openObjectsList = () => {
+  toggleObjectsList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('objects-list', 'end', 75, 'column')) {
-      this.setState({
-        showObjectsListInfoBar: true,
-      });
-    }
+    this.editorMosaic.toggleEditor('objects-list', 'end', 75, 'column');
   };
 
-  openProperties = () => {
+  toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 25, 'column')) {
-      this.setState({
-        showPropertiesInfoBar: true,
-      });
-    }
+    this.editorMosaic.toggleEditor('properties', 'start', 25, 'column');
   };
 
-  openObjectGroupsList = () => {
+  toggleObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
+    this.editorMosaic.toggleEditor('object-groups-list', 'end', 75, 'column');
   };
 
   toggleInstancesList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('instances-list', 'end', 75, 'row')) {
-      this.setState({
-        showInstancesInfoBar: true,
-      });
-    }
+    this.editorMosaic.toggleEditor('instances-list', 'end', 75, 'row');
   };
 
   toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('layers-list', 'end', 75, 'row')) {
-      this.setState({
-        showLayersInfoBar: true,
-      });
-    }
+    this.editorMosaic.toggleEditor('layers-list', 'end', 75, 'row');
   };
 
   toggleWindowMask = () => {
@@ -502,7 +488,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
 
     if (this._objectsList) this._objectsList.openNewObjectDialog();
-    else this.openObjectsList();
+    else this.toggleObjectsList();
   };
 
   _onAddInstanceUnderCursor = () => {
@@ -1601,6 +1587,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       : getDefaultEditorMosaicNode('scene-editor') ||
                         initialMosaicEditorNodes
                   }
+                  onOpenedEditorsChanged={this.updateToolbar}
                   onPersistNodes={node =>
                     setDefaultEditorMosaicNode(
                       windowWidth === 'small'
@@ -1708,45 +1695,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             </Trans>
           }
           show={!!this.state.selectedObjectsWithContext.length}
-        />
-        <DismissableInfoBar
-          identifier="objects-panel-explanation"
-          message={
-            <Trans>
-              Objects panel is already opened: use it to add and edit objects.
-            </Trans>
-          }
-          show={!!this.state.showObjectsListInfoBar}
-        />
-        <DismissableInfoBar
-          identifier="instance-properties-panel-explanation"
-          message={
-            <Trans>
-              Properties panel is already opened. After selecting an instance on
-              the scene, inspect and change its properties from this panel.
-            </Trans>
-          }
-          show={!!this.state.showPropertiesInfoBar}
-        />
-        <DismissableInfoBar
-          identifier="layers-panel-explanation"
-          message={
-            <Trans>
-              Layers panel is already opened. You can add new layers and apply
-              effects on them from this panel.
-            </Trans>
-          }
-          show={!!this.state.showLayersInfoBar}
-        />
-        <DismissableInfoBar
-          identifier="instances-panel-explanation"
-          message={
-            <Trans>
-              Instances panel is already opened. You can search instances in the
-              scene and click one to move the view to it.
-            </Trans>
-          }
-          show={!!this.state.showInstancesInfoBar}
         />
         {this.state.setupGridOpen && (
           <SetupGridDialog

@@ -12,14 +12,15 @@ type Props = {|
   onOpenProjectFolder: () => void,
   onDeleteSelection: () => void,
   canDelete: boolean,
-  onOpenProperties: () => void,
+  onToggleProperties: () => void,
+  isPropertiesShown: boolean,
 |};
 
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
   render() {
-    const { canDelete } = this.props;
+    const { canDelete, isPropertiesShown } = this.props;
 
     return (
       <ToolbarGroup lastChild>
@@ -35,8 +36,9 @@ export class Toolbar extends PureComponent<Props, State> {
         <IconButton
           size="small"
           color="default"
-          onClick={this.props.onOpenProperties}
+          onClick={this.props.onToggleProperties}
           tooltip={t`Open the properties panel`}
+          selected={isPropertiesShown}
         >
           <PropertiesPanelIcon />
         </IconButton>

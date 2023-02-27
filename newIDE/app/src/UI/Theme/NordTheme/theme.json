@@ -59,6 +59,16 @@
         }
       }
     },
+    "icon-button": {
+      "selected": {
+        "color": {
+          "value": "#3B4252"
+        },
+        "background-color": {
+          "value": "#88C0D0"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#7EA1CC"

@@ -168,6 +168,18 @@
         }
       }
     },
+    "icon-button": {
+      "selected": {
+        "color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        },
+        "background-color": {
+          "value": "#C9B6FC",
+          "comment:": "Palette/Purple/20"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#DDD1FF",

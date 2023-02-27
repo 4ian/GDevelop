@@ -602,6 +602,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
+  _onEventsBasedBehaviorPasted = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    sourceExtensionName: string
+  ) => {
+    const { project, eventsFunctionsExtension } = this.props;
+    if (eventsFunctionsExtension.getName() === sourceExtensionName) {
+      return;
+    }
+    gd.WholeProjectRefactorer.updateExtensionNameInEventsBasedBehavior(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      sourceExtensionName
+    );
+  };
+
   _onEventsBasedBehaviorRenamed = () => {
     // Name of a behavior changed, so notify parent
     // that a behavior was edited (to trigger reload of extensions)
@@ -1318,6 +1334,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             {({ i18n }) => (
               <EventsBasedBehaviorsList
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedBehaviorsList={eventsFunctionsExtension.getEventsBasedBehaviors()}
                 selectedEventsBasedBehavior={selectedEventsBasedBehavior}
                 onSelectEventsBasedBehavior={this._selectEventsBasedBehavior}
@@ -1328,6 +1345,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onEventsBasedBehaviorRenamed={
                   this._onEventsBasedBehaviorRenamed
                 }
+                onEventsBasedBehaviorPasted={this._onEventsBasedBehaviorPasted}
                 onEditProperties={this._editBehavior}
                 unsavedChanges={this.props.unsavedChanges}
               />

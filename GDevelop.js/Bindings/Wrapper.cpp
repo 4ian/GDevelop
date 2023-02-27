@@ -51,6 +51,7 @@
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
+#include <GDCore/IDE/ProjectBrowserHelper.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/Project/Behavior.h>
@@ -631,6 +632,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
+#define STATIC_UpdateExtensionNameInEventsBasedBehavior UpdateExtensionNameInEventsBasedBehavior
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
 #define STATIC_RenameObjectEventsFunction RenameObjectEventsFunction

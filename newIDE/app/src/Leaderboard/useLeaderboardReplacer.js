@@ -315,7 +315,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
         );
         renamedLeaderboardsMap.delete();
 
-        gd.WholeProjectRefactorer.exposeProjectEvents(
+        gd.ProjectBrowserHelper.exposeProjectEvents(
           project,
           eventsLeaderboardReplacer
         );
@@ -371,10 +371,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
       setGameId(sourceGameId);
 
       const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
-      gd.WholeProjectRefactorer.exposeProjectEvents(
-        project,
-        leaderboardsLister
-      );
+      gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
       const leaderboardIds = leaderboardsLister.getLeaderboardIds();
       setLeaderboardsToReplace(leaderboardIds.toNewVectorString().toJSArray());
       leaderboardsLister.delete();

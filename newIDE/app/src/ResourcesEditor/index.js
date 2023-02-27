@@ -33,7 +33,6 @@ const styles = {
 };
 
 type State = {|
-  showPropertiesInfoBar: boolean,
   selectedResource: ?gdResource,
 |};
 
@@ -66,7 +65,6 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   _resourcesList: ?ResourcesList = null;
   resourcesLoader = ResourcesLoader;
   state = {
-    showPropertiesInfoBar: false,
     selectedResource: null,
   };
 
@@ -74,18 +72,23 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     if (this._resourcesList) this._resourcesList.forceUpdate();
   }
 
-  updateToolbar() {
+  updateToolbar = () => {
+    const openedEditorNames = this.editorMosaic
+      ? this.editorMosaic.getOpenedEditorNames()
+      : [];
+
     this.props.setToolbar(
       <Toolbar
         onOpenProjectFolder={this.openProjectFolder}
-        onOpenProperties={this.openProperties}
+        onToggleProperties={this.toggleProperties}
+        isPropertiesShown={openedEditorNames.includes('properties')}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
           this.deleteResource(this.state.selectedResource)
         }
       />
     );
-  }
+  };
 
   deleteResource = (resource: ?gdResource) => {
     const { project, onDeleteResource } = this.props;
@@ -183,13 +186,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     if (shell) shell.openPath(path.dirname(project.getProjectFile()));
   };
 
-  openProperties = () => {
+  toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 66, 'column')) {
-      this.setState({
-        showPropertiesInfoBar: true,
-      });
-    }
+    this.editorMosaic.toggleEditor('properties', 'start', 66, 'column');
   };
 
   _onResourceSelected = (selectedResource: ?gdResource) => {
@@ -261,22 +260,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
                 getDefaultEditorMosaicNode('resources-editor') ||
                 initialMosaicEditorNodes
               }
+              onOpenedEditorsChanged={this.updateToolbar}
               onPersistNodes={node =>
                 setDefaultEditorMosaicNode('resources-editor', node)
               }
             />
           )}
         </PreferencesContext.Consumer>
-        <DismissableInfoBar
-          message={
-            <Trans>
-              Properties panel is already opened. After selecting a resource,
-              inspect and change its properties from this panel.
-            </Trans>
-          }
-          show={!!this.state.showPropertiesInfoBar}
-          identifier="resource-properties-panel-explanation"
-        />
       </div>
     );
   }

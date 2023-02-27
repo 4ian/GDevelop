@@ -127,6 +127,36 @@ const replaceNode = (
   }
 };
 
+// Remove the specified node (editor).
+const removeNode = (
+  currentNode: ?EditorMosaicNode,
+  oldNode: ?EditorMosaicNode
+): ?EditorMosaicNode => {
+  if (!currentNode) {
+    return currentNode;
+  } else if (typeof currentNode === 'string') {
+    if (currentNode === oldNode) return null;
+
+    return currentNode;
+  } else {
+    if (currentNode === oldNode) return null;
+
+    const first = removeNode(currentNode.first, oldNode);
+    const second = removeNode(currentNode.second, oldNode);
+
+    if (first && second) {
+      return {
+        ...currentNode,
+        first,
+        second,
+      };
+    } else {
+      if (!first) return second;
+      else return first;
+    }
+  }
+};
+
 const defaultToolbarControls = [<CloseButton key="close" />];
 
 const renderMosaicWindowPreview = props => (
@@ -176,6 +206,33 @@ export default class EditorMosaic extends React.Component<Props, State> {
     mosaicNode: this.props.initialNodes,
   };
 
+  toggleEditor = (
+    editorName: string,
+    position: 'start' | 'end',
+    splitPercentage: number,
+    direction: 'row' | 'column'
+  ) => {
+    const editor = this.props.editors[editorName];
+    if (!editor) return false;
+
+    const openedEditorNames = getLeaves(this.state.mosaicNode);
+    if (openedEditorNames.indexOf(editorName) !== -1) {
+      // The editor is already opened: close it.
+      this.setState(
+        {
+          mosaicNode: removeNode(this.state.mosaicNode, editorName),
+        },
+        () => {
+          this._onOpenedEditorsChanged();
+        }
+      );
+
+      return false;
+    }
+
+    return this.openEditor(editorName, position, splitPercentage, direction);
+  };
+
   openEditor = (
     editorName: string,
     position: 'start' | 'end',
@@ -189,6 +246,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
 
     const openedEditorNames = getLeaves(this.state.mosaicNode);
     if (openedEditorNames.indexOf(editorName) !== -1) {
+      // Editor is already opened.
       return false;
     }
 

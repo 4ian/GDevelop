@@ -233,18 +233,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.props.setToolbar(
       <Toolbar
         instancesSelection={this.instancesSelection}
-        openObjectsList={this.openObjectsList}
+        toggleObjectsList={this.toggleObjectsList}
         isObjectsListShown={openedEditorNames.includes('objects-list')}
-        openObjectGroupsList={this.openObjectGroupsList}
+        toggleObjectGroupsList={this.toggleObjectGroupsList}
         isObjectGroupsListShown={openedEditorNames.includes(
           'object-groups-list'
         )}
-        openProperties={this.openProperties}
+        toggleProperties={this.toggleProperties}
         isPropertiesShown={openedEditorNames.includes('properties')}
         deleteSelection={this.deleteSelection}
-        openInstancesList={this.openInstancesList}
+        toggleInstancesList={this.toggleInstancesList}
         isInstancesListShown={openedEditorNames.includes('instances-list')}
-        openLayersList={this.openLayersList}
+        toggleLayersList={this.toggleLayersList}
         isLayersListShown={openedEditorNames.includes('layers-list')}
         toggleWindowMask={this.toggleWindowMask}
         isWindowMaskShown={() =>
@@ -281,29 +281,29 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   }
 
-  openObjectsList = () => {
+  toggleObjectsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('objects-list', 'end', 75, 'column');
+    this.editorMosaic.toggleEditor('objects-list', 'end', 75, 'column');
   };
 
-  openProperties = () => {
+  toggleProperties = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('properties', 'start', 25, 'column');
+    this.editorMosaic.toggleEditor('properties', 'start', 25, 'column');
   };
 
-  openObjectGroupsList = () => {
+  toggleObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('object-groups-list', 'end', 75, 'column');
+    this.editorMosaic.toggleEditor('object-groups-list', 'end', 75, 'column');
   };
 
-  openInstancesList = () => {
+  toggleInstancesList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('instances-list', 'end', 75, 'row');
+    this.editorMosaic.toggleEditor('instances-list', 'end', 75, 'row');
   };
 
-  openLayersList = () => {
+  toggleLayersList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('layers-list', 'end', 75, 'row');
+    this.editorMosaic.toggleEditor('layers-list', 'end', 75, 'row');
   };
 
   toggleWindowMask = () => {
@@ -488,7 +488,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
 
     if (this._objectsList) this._objectsList.openNewObjectDialog();
-    else this.openObjectsList();
+    else this.toggleObjectsList();
   };
 
   _onAddInstanceUnderCursor = () => {

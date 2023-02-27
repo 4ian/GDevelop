@@ -22,11 +22,11 @@ import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
-  openObjectsList: () => void,
+  toggleObjectsList: () => void,
   isObjectsListShown: boolean,
-  openObjectGroupsList: () => void,
+  toggleObjectGroupsList: () => void,
   isObjectGroupsListShown: boolean,
-  openProperties: () => void,
+  toggleProperties: () => void,
   isPropertiesShown: boolean,
   undo: () => void,
   canUndo: boolean,
@@ -34,9 +34,9 @@ type Props = {|
   canRedo: boolean,
   deleteSelection: () => void,
   instancesSelection: InstancesSelection,
-  openInstancesList: () => void,
+  toggleInstancesList: () => void,
   isInstancesListShown: boolean,
-  openLayersList: () => void,
+  toggleLayersList: () => void,
   isLayersListShown: boolean,
   isWindowMaskShown: () => boolean,
   toggleWindowMask: () => void,
@@ -55,11 +55,11 @@ const Toolbar = (props: Props) => {
   return (
     <>
       <ToolbarCommands
-        openObjectsList={props.openObjectsList}
-        openObjectGroupsList={props.openObjectGroupsList}
-        openPropertiesPanel={props.openProperties}
-        openInstancesList={props.openInstancesList}
-        openLayersList={props.openLayersList}
+        toggleObjectsList={props.toggleObjectsList}
+        toggleObjectGroupsList={props.toggleObjectGroupsList}
+        togglePropertiesPanel={props.toggleProperties}
+        toggleInstancesList={props.toggleInstancesList}
+        toggleLayersList={props.toggleLayersList}
         undo={props.undo}
         canUndo={props.canUndo}
         redo={props.redo}
@@ -79,7 +79,7 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-objects-panel-button"
-          onClick={props.openObjectsList}
+          onClick={props.toggleObjectsList}
           selected={props.isObjectsListShown}
           tooltip={t`Open Objects Panel`}
         >
@@ -89,7 +89,7 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-object-groups-panel-button"
-          onClick={props.openObjectGroupsList}
+          onClick={props.toggleObjectGroupsList}
           selected={props.isObjectGroupsListShown}
           tooltip={t`Open Object Groups Panel`}
         >
@@ -99,7 +99,7 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-properties-panel-button"
-          onClick={props.openProperties}
+          onClick={props.toggleProperties}
           selected={props.isPropertiesShown}
           tooltip={t`Open Properties Panel`}
         >
@@ -109,7 +109,7 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-instances-list-panel-button"
-          onClick={props.openInstancesList}
+          onClick={props.toggleInstancesList}
           selected={props.isInstancesListShown}
           tooltip={t`Open Instances List Panel`}
         >
@@ -119,7 +119,7 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-layers-panel-button"
-          onClick={props.openLayersList}
+          onClick={props.toggleLayersList}
           selected={props.isLayersListShown}
           tooltip={t`Open Layers Panel`}
         >

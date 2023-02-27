@@ -48,7 +48,7 @@ type Props = {|
   isLooping: boolean,
   hideCheckeredBackground?: boolean,
   deactivateControls?: boolean,
-  initialZoom?: number,
+  displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
   isAssetPrivate?: boolean,
@@ -65,7 +65,7 @@ const AnimationPreview = ({
   isLooping,
   hideCheckeredBackground,
   deactivateControls,
-  initialZoom,
+  displaySpacedView,
   fixedHeight,
   fixedWidth,
   isAssetPrivate,
@@ -243,7 +243,7 @@ const AnimationPreview = ({
           resourceName={resourceName}
           imageResourceSource={getImageResourceSource(resourceName)}
           isImageResourceSmooth={isImageResourceSmooth(resourceName)}
-          initialZoom={initialZoom}
+          displaySpacedView={displaySpacedView}
           hideCheckeredBackground={hideCheckeredBackground}
           deactivateControls={deactivateControls}
           fixedHeight={fixedHeight}

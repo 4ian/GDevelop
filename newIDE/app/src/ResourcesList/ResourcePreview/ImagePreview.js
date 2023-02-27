@@ -80,7 +80,7 @@ type Props = {|
   resourceName: string,
   imageResourceSource: string,
   isImageResourceSmooth: boolean,
-  initialZoom?: number,
+  displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
   renderOverlay?: ({|
@@ -128,7 +128,7 @@ const ImagePreview = ({
   onSize,
   hideCheckeredBackground,
   deactivateControls,
-  initialZoom,
+  displaySpacedView,
   isImagePrivate,
   onImageLoaded,
   hideLoader,
@@ -139,7 +139,7 @@ const ImagePreview = ({
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [containerHeight, setContainerHeight] = React.useState<?number>(null);
   const [zoomState, setZoomState] = React.useState<ZoomState>({
-    factor: initialZoom || 1,
+    factor: 1,
     xOffset: 0,
     yOffset: 0,
   });
@@ -153,14 +153,14 @@ const ImagePreview = ({
   };
 
   const adaptZoomFactorToImage = React.useCallback(
-    () => {
+    (displaySpacedView?: boolean) => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return false;
       }
       const zoomFactor = clampImagePreviewZoom(
         Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
-      const zoomFactorWithMargins = zoomFactor * 0.95;
+      const zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
       setZoomState({
         factor: zoomFactorWithMargins,
         xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
@@ -346,14 +346,16 @@ const ImagePreview = ({
   // the zoom factor to the image.
   React.useEffect(
     () => {
-      if (hasZoomBeenAdaptedToImageRef.current || initialZoom) {
+      if (hasZoomBeenAdaptedToImageRef.current) {
         // Do not adapt zoom to image if a zoom as been provided in the props
         // or if the zoom has already been adapted.
         return;
       }
-      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
+      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage(
+        displaySpacedView
+      );
     },
-    [adaptZoomFactorToImage, initialZoom]
+    [adaptZoomFactorToImage, displaySpacedView]
   );
 
   const handleImageLoaded = React.useCallback(

@@ -395,7 +395,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         isLooping // Always loop in the asset store.
                         hideCheckeredBackground
                         deactivateControls
-                        initialZoom={140 / Math.max(asset.width, asset.height)}
+                        displaySpacedView
                         fixedHeight={FIXED_HEIGHT}
                         fixedWidth={FIXED_WIDTH}
                         isAssetPrivate={isAssetPrivate}

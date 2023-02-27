@@ -47,7 +47,7 @@ type Props = {|
   onChangeTimeBetweenFrames?: number => void,
   isLooping: boolean,
   hideCheckeredBackground?: boolean,
-  hideControls?: boolean,
+  deactivateControls?: boolean,
   initialZoom?: number,
   fixedHeight?: number,
   fixedWidth?: number,
@@ -64,7 +64,7 @@ const AnimationPreview = ({
   onChangeTimeBetweenFrames,
   isLooping,
   hideCheckeredBackground,
-  hideControls,
+  deactivateControls,
   initialZoom,
   fixedHeight,
   fixedWidth,
@@ -245,7 +245,7 @@ const AnimationPreview = ({
           isImageResourceSmooth={isImageResourceSmooth(resourceName)}
           initialZoom={initialZoom}
           hideCheckeredBackground={hideCheckeredBackground}
-          hideControls={hideControls}
+          deactivateControls={deactivateControls}
           fixedHeight={fixedHeight}
           fixedWidth={fixedWidth}
           onImageLoaded={onImageLoaded}
@@ -258,7 +258,7 @@ const AnimationPreview = ({
           </div>
         )}
       </div>
-      {!hideControls && (
+      {!deactivateControls && (
         // Column used to not have the expand behavior when responsive line stack layout is a column
         <Column noMargin>
           <ResponsiveLineStackLayout alignItems="center">

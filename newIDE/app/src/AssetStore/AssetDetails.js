@@ -394,7 +394,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         timeBetweenFrames={direction.timeBetweenFrames}
                         isLooping // Always loop in the asset store.
                         hideCheckeredBackground
-                        hideControls
+                        deactivateControls
                         initialZoom={140 / Math.max(asset.width, asset.height)}
                         fixedHeight={FIXED_HEIGHT}
                         fixedWidth={FIXED_WIDTH}

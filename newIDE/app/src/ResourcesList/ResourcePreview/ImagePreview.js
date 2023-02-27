@@ -92,7 +92,7 @@ type Props = {|
   |}) => React.Node,
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
-  hideControls?: boolean,
+  deactivateControls?: boolean,
   isImagePrivate?: boolean,
   onImageLoaded?: () => void,
   hideLoader?: boolean,
@@ -127,7 +127,7 @@ const ImagePreview = ({
   renderOverlay,
   onSize,
   hideCheckeredBackground,
-  hideControls,
+  deactivateControls,
   initialZoom,
   isImagePrivate,
   onImageLoaded,
@@ -212,7 +212,7 @@ const ImagePreview = ({
       const { deltaY, deltaX, clientX, clientY } = event;
       event.preventDefault();
       event.stopPropagation();
-      if (!hideControls && shouldZoom(event) && containerRef.current) {
+      if (shouldZoom(event) && containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         zoomAroundPointBy(getWheelStepZoomFactor(-deltaY), [
           clientX - containerRect.left,
@@ -226,7 +226,7 @@ const ImagePreview = ({
         }));
       }
     },
-    [hideControls, zoomAroundPointBy]
+    [zoomAroundPointBy]
   );
 
   const handleTouchMove = React.useCallback(
@@ -312,6 +312,7 @@ const ImagePreview = ({
   // triggers a back navigation.
   React.useEffect(
     () => {
+      if (deactivateControls) return;
       if (containerRef.current) {
         containerRef.current.addEventListener('wheel', handleWheel, {
           passive: false,
@@ -324,7 +325,7 @@ const ImagePreview = ({
         };
       }
     },
-    [handleWheel]
+    [handleWheel, deactivateControls]
   );
 
   // Reset ref to adapt zoom when image changes
@@ -355,20 +356,44 @@ const ImagePreview = ({
     [adaptZoomFactorToImage, initialZoom]
   );
 
-  const handleImageLoaded = (e: any) => {
-    const imgElement = e.target;
+  const handleImageLoaded = React.useCallback(
+    (e: any) => {
+      const imgElement = e.target;
 
-    const newImageWidth = imgElement
-      ? imgElement.naturalWidth || imgElement.clientWidth
-      : 0;
-    const newImageHeight = imgElement
-      ? imgElement.naturalHeight || imgElement.clientHeight
-      : 0;
-    setImageHeight(newImageHeight);
-    setImageWidth(newImageWidth);
-    if (onSize) onSize(newImageWidth, newImageHeight);
-    if (onImageLoaded) onImageLoaded();
-  };
+      const newImageWidth = imgElement
+        ? imgElement.naturalWidth || imgElement.clientWidth
+        : 0;
+      const newImageHeight = imgElement
+        ? imgElement.naturalHeight || imgElement.clientHeight
+        : 0;
+      setImageHeight(newImageHeight);
+      setImageWidth(newImageWidth);
+      if (onSize) onSize(newImageWidth, newImageHeight);
+      if (onImageLoaded) onImageLoaded();
+    },
+    [onImageLoaded, onSize]
+  );
+
+  const onTouchEnd = React.useCallback((event: TouchEvent) => {
+    if (event.touches.length === 1) {
+      previousSingleTouchCoordinates.current = [
+        event.touches[0].clientX,
+        event.touches[0].clientY,
+      ];
+    }
+    previousDoubleTouchInfo.current = null;
+  }, []);
+
+  const onTouchStart = React.useCallback((event: TouchEvent) => {
+    if (event.touches.length === 1) {
+      previousSingleTouchCoordinates.current = [
+        event.touches[0].clientX,
+        event.touches[0].clientY,
+      ];
+    } else if (event.touches.length === 2) {
+      previousSingleTouchCoordinates.current = null;
+    }
+  }, []);
 
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
@@ -420,7 +445,7 @@ const ImagePreview = ({
       {({ measureRef }) => {
         return (
           <div style={styles.container}>
-            {!hideControls && (
+            {!deactivateControls && (
               <MiniToolbar noPadding>
                 <IconButton
                   onClick={() =>
@@ -479,26 +504,9 @@ const ImagePreview = ({
                   measureRef(ref);
                   containerRef.current = ref;
                 }}
-                onTouchStart={event => {
-                  if (event.touches.length === 1) {
-                    previousSingleTouchCoordinates.current = [
-                      event.touches[0].clientX,
-                      event.touches[0].clientY,
-                    ];
-                  } else if (event.touches.length === 2) {
-                    previousSingleTouchCoordinates.current = null;
-                  }
-                }}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={event => {
-                  if (event.touches.length === 1) {
-                    previousSingleTouchCoordinates.current = [
-                      event.touches[0].clientX,
-                      event.touches[0].clientY,
-                    ];
-                  }
-                  previousDoubleTouchInfo.current = null;
-                }}
+                onTouchStart={deactivateControls ? null : onTouchStart}
+                onTouchMove={deactivateControls ? null : handleTouchMove}
+                onTouchEnd={deactivateControls ? null : onTouchEnd}
               >
                 {!!errored && (
                   <PlaceholderMessage>

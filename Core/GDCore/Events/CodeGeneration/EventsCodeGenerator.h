@@ -493,7 +493,7 @@ class GD_CORE_API EventsCodeGenerator {
    * - object : Object name -> string
    * - expression : Mathematical expression -> number (double)
    * - string : %Text expression -> string
-   * - layer, color, file, joyaxis : Same as string
+   * - layer, color, file, stringWithSelector : Same as string
    * - relationalOperator : Used to make a comparison between the function
   resturn value and value of the parameter preceding the relationOperator
   parameter -> string

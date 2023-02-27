@@ -3060,3 +3060,426 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)",
     }
   }
 }
+
+TEST_CASE("RenameExternalEvents", "[common]") {
+  SECTION("Can update an event link to external events") {
+    gd::Project project;
+    gd::Platform platform;
+    project.AddPlatform(platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    auto &externalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    externalEvents.SetAssociatedLayout("My layout");
+
+    auto &events = layout.GetEvents();
+    gd::LinkEvent event;
+    event.SetTarget("My external events");
+    gd::LinkEvent &linkEvent =
+        dynamic_cast<gd::LinkEvent &>(events.InsertEvent(event));
+
+    gd::WholeProjectRefactorer::RenameExternalEvents(
+        project, "My external events", "My renamed external events");
+
+    REQUIRE(linkEvent.GetTarget() == "My renamed external events");
+  }
+}
+
+TEST_CASE("RenameExternalLayout", "[common]") {
+  SECTION("Can update external layout names in parameters") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    auto &externalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    externalEvents.SetAssociatedLayout("My layout");
+
+    auto &events = layout.GetEvents();
+    gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+        events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+    gd::Instruction action;
+    action.SetType("MyExtension::CreateObjectsFromExternalLayout");
+    action.SetParametersCount(2);
+    action.SetParameter(1, gd::Expression("\"My external layout\""));
+    event.GetActions().Insert(action);
+
+    gd::WholeProjectRefactorer::RenameExternalLayout(
+        project, "My external layout", "My renamed external layout");
+
+    REQUIRE(event.GetActions().at(0).GetParameter(1).GetPlainString() ==
+            "\"My renamed external layout\"");
+  }
+}
+
+TEST_CASE("RenameLayout", "[common]") {
+  SECTION("Can update layout names in parameters and external targets") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    auto &externalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    externalEvents.SetAssociatedLayout("My layout");
+
+    auto &events = layout.GetEvents();
+    gd::StandardEvent &event0 = dynamic_cast<gd::StandardEvent &>(
+        events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+    gd::Instruction action;
+    action.SetType("MyExtension::Scene");
+    action.SetParametersCount(2);
+    action.SetParameter(1, gd::Expression("\"My layout\""));
+    event0.GetActions().Insert(action);
+
+    gd::LinkEvent event1;
+    event1.SetTarget("My layout");
+    gd::LinkEvent &linkEvent =
+        dynamic_cast<gd::LinkEvent &>(events.InsertEvent(event1));
+
+    gd::WholeProjectRefactorer::RenameLayout(project, "My layout",
+                                             "My renamed layout");
+
+    REQUIRE(event0.GetActions().at(0).GetParameter(1).GetPlainString() ==
+            "\"My renamed layout\"");
+    REQUIRE(linkEvent.GetTarget() == "My renamed layout");
+    REQUIRE(externalLayout.GetAssociatedLayout() == "My renamed layout");
+    REQUIRE(externalEvents.GetAssociatedLayout() == "My renamed layout");
+  }
+}
+
+namespace {
+const gd::Instruction &CreateActionWithLayerParameter(gd::Project &project,
+                                                      gd::EventsList &events) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction action;
+  action.SetType("MyExtension::SetCameraCenterX");
+  action.SetParametersCount(4);
+  action.SetParameter(3, gd::Expression("\"My layer\""));
+  return event.GetActions().Insert(action);
+}
+
+const gd::Instruction &
+CreateExpressionWithLayerParameter(gd::Project &project,
+                                   gd::EventsList &events) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction action;
+  action.SetType("MyExtension::DoSomething");
+  action.SetParametersCount(1);
+  action.SetParameter(
+      0, gd::Expression("MyExtension::CameraCenterX(\"My layer\") + "
+                        "MyExtension::CameraCenterX(\"My layer\")"));
+  return event.GetActions().Insert(action);
+}
+} // namespace
+
+TEST_CASE("RenameLayer", "[common]") {
+  SECTION("Can update layer names in events") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+    auto &externalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    externalEvents.SetAssociatedLayout("My layout");
+    auto &otherExternalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    otherExternalEvents.SetAssociatedLayout("My other layout");
+
+    auto &layoutAction =
+        CreateActionWithLayerParameter(project, layout.GetEvents());
+    auto &externalAction =
+        CreateActionWithLayerParameter(project, externalEvents.GetEvents());
+    auto &otherLayoutAction =
+        CreateActionWithLayerParameter(project, otherLayout.GetEvents());
+    auto &otherExternalAction = CreateActionWithLayerParameter(
+        project, otherExternalEvents.GetEvents());
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+    auto &externalExpression =
+        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents());
+    auto &otherLayoutExpression =
+        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents());
+    auto &otherExternalExpression = CreateExpressionWithLayerParameter(
+        project, otherExternalEvents.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "My renamed layer");
+
+    REQUIRE(layoutAction.GetParameter(3).GetPlainString() ==
+            "\"My renamed layer\"");
+    REQUIRE(externalAction.GetParameter(3).GetPlainString() ==
+            "\"My renamed layer\"");
+    // The event from the other layout are untouched.
+    REQUIRE(otherLayoutAction.GetParameter(3).GetPlainString() ==
+            "\"My layer\"");
+    REQUIRE(otherExternalAction.GetParameter(3).GetPlainString() ==
+            "\"My layer\"");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My renamed layer\") + "
+            "MyExtension::CameraCenterX(\"My renamed layer\")");
+    REQUIRE(externalExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My renamed layer\") + "
+            "MyExtension::CameraCenterX(\"My renamed layer\")");
+    // The event from the other layout are untouched.
+    REQUIRE(otherLayoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My layer\") + "
+            "MyExtension::CameraCenterX(\"My layer\")");
+    REQUIRE(otherExternalExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My layer\") + "
+            "MyExtension::CameraCenterX(\"My layer\")");
+  }
+
+  SECTION("Can update layer names in expressions with a smaller name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "layerA");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"layerA\") + "
+            "MyExtension::CameraCenterX(\"layerA\")");
+  }
+}
+
+namespace {
+const gd::Instruction &CreateActionWithAnimationParameter(gd::Project &project,
+                                                      gd::EventsList &events,
+                                                      const gd::String &objectName) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction action;
+  action.SetType("MyExtension::SetAnimationName");
+  action.SetParametersCount(2);
+  action.SetParameter(0, objectName);
+  action.SetParameter(1, gd::Expression("\"My animation\""));
+  return event.GetActions().Insert(action);
+}
+
+const gd::Instruction &
+CreateExpressionWithAnimationParameter(gd::Project &project,
+                                   gd::EventsList &events,
+                                   const gd::String &objectName) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction action;
+  action.SetType("MyExtension::DoSomething");
+  action.SetParametersCount(1);
+  action.SetParameter(
+      0, gd::Expression(objectName + ".AnimationFrameCount(\"My animation\") + " +
+                        objectName + ".AnimationFrameCount(\"My animation\")"));
+  return event.GetActions().Insert(action);
+}
+} // namespace
+
+TEST_CASE("RenameObjectAnimation", "[common]") {
+  SECTION("Can update object animation names in event") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+    auto &externalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    externalEvents.SetAssociatedLayout("My layout");
+    auto &otherExternalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    otherExternalEvents.SetAssociatedLayout("My other layout");
+    auto &object = layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
+    layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite2", 1);
+    otherLayout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
+
+    auto &layoutAction =
+        CreateActionWithAnimationParameter(project, layout.GetEvents(), "MySprite");
+    auto &externalAction =
+        CreateActionWithAnimationParameter(project, externalEvents.GetEvents(), "MySprite");
+    auto &otherLayoutAction =
+        CreateActionWithAnimationParameter(project, otherLayout.GetEvents(), "MySprite");
+    auto &otherExternalAction = CreateActionWithAnimationParameter(
+        project, otherExternalEvents.GetEvents(), "MySprite");
+    auto &wrongObjectAction =
+        CreateActionWithAnimationParameter(project, layout.GetEvents(), "MySprite2");
+
+    auto &layoutExpression =
+        CreateExpressionWithAnimationParameter(project, layout.GetEvents(), "MySprite");
+    auto &externalExpression =
+        CreateExpressionWithAnimationParameter(project, externalEvents.GetEvents(), "MySprite");
+    auto &otherLayoutExpression =
+        CreateExpressionWithAnimationParameter(project, otherLayout.GetEvents(), "MySprite");
+    auto &otherExternalExpression = CreateExpressionWithAnimationParameter(
+        project, otherExternalEvents.GetEvents(), "MySprite");
+    auto &wrongObjectExpression =
+        CreateExpressionWithAnimationParameter(project, layout.GetEvents(), "MySprite2");
+
+    gd::WholeProjectRefactorer::RenameObjectAnimation(project, layout, object, "My animation",
+                                            "My renamed animation");
+
+    REQUIRE(layoutAction.GetParameter(1).GetPlainString() ==
+            "\"My renamed animation\"");
+    REQUIRE(externalAction.GetParameter(1).GetPlainString() ==
+            "\"My renamed animation\"");
+    // The event from the other layout are untouched.
+    REQUIRE(otherLayoutAction.GetParameter(1).GetPlainString() ==
+            "\"My animation\"");
+    REQUIRE(otherExternalAction.GetParameter(1).GetPlainString() ==
+            "\"My animation\"");
+    REQUIRE(wrongObjectAction.GetParameter(1).GetPlainString() ==
+            "\"My animation\"");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MySprite.AnimationFrameCount(\"My renamed animation\") + "
+            "MySprite.AnimationFrameCount(\"My renamed animation\")");
+    REQUIRE(externalExpression.GetParameter(0).GetPlainString() ==
+            "MySprite.AnimationFrameCount(\"My renamed animation\") + "
+            "MySprite.AnimationFrameCount(\"My renamed animation\")");
+    // The event from the other layout are untouched.
+    REQUIRE(otherLayoutExpression.GetParameter(0).GetPlainString() ==
+            "MySprite.AnimationFrameCount(\"My animation\") + "
+            "MySprite.AnimationFrameCount(\"My animation\")");
+    REQUIRE(otherExternalExpression.GetParameter(0).GetPlainString() ==
+            "MySprite.AnimationFrameCount(\"My animation\") + "
+            "MySprite.AnimationFrameCount(\"My animation\")");
+    REQUIRE(wrongObjectExpression.GetParameter(0).GetPlainString() ==
+            "MySprite2.AnimationFrameCount(\"My animation\") + "
+            "MySprite2.AnimationFrameCount(\"My animation\")");
+  }
+}
+
+namespace {
+const gd::Instruction &CreateActionWithLayerEffectParameter(gd::Project &project,
+                                                      gd::EventsList &events,
+                                                      const gd::String &layerName) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction action;
+  action.SetType("MyExtension::EnableLayerEffect");
+  action.SetParametersCount(3);
+  action.SetParameter(1, gd::Expression("\"" + layerName + "\""));
+  action.SetParameter(2, gd::Expression("\"My effect\""));
+  return event.GetActions().Insert(action);
+}
+
+const gd::Instruction &
+CreateExpressionWithLayerEffectParameter(gd::Project &project,
+                                   gd::EventsList &events,
+                                   const gd::String &layerName) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
+
+  gd::Instruction action;
+  action.SetType("MyExtension::DoSomething");
+  action.SetParametersCount(1);
+  action.SetParameter(
+      0, gd::Expression("MyExtension::LayerEffectParameter(\"" + layerName + "\", \"My effect\") + "
+                        "MyExtension::LayerEffectParameter(\"" + layerName + "\", \"My effect\")"));
+  return event.GetActions().Insert(action);
+}
+} // namespace
+
+TEST_CASE("RenameLayerEffect", "[common]") {
+  SECTION("Can update layer effect names in event") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    layout.InsertNewLayer("My layer", 0);
+    auto &layer = layout.GetLayer("My layer");
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+    auto &externalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    externalEvents.SetAssociatedLayout("My layout");
+    auto &otherExternalEvents =
+        project.InsertNewExternalEvents("My external events", 0);
+    otherExternalEvents.SetAssociatedLayout("My other layout");
+    auto &object = layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
+    layout.InsertNewObject(project, "MyExtension::Sprite", "MySprite2", 1);
+    otherLayout.InsertNewObject(project, "MyExtension::Sprite", "MySprite", 0);
+
+    auto &layoutAction =
+        CreateActionWithLayerEffectParameter(project, layout.GetEvents(), "My layer");
+    auto &externalAction =
+        CreateActionWithLayerEffectParameter(project, externalEvents.GetEvents(), "My layer");
+    auto &otherLayoutAction =
+        CreateActionWithLayerEffectParameter(project, otherLayout.GetEvents(), "My layer");
+    auto &otherExternalAction = CreateActionWithLayerEffectParameter(
+        project, otherExternalEvents.GetEvents(), "My layer");
+    auto &wrongLayerAction =
+        CreateActionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer");
+    auto &externalExpression =
+        CreateExpressionWithLayerEffectParameter(project, externalEvents.GetEvents(), "My layer");
+    auto &otherLayoutExpression =
+        CreateExpressionWithLayerEffectParameter(project, otherLayout.GetEvents(), "My layer");
+    auto &otherExternalExpression = CreateExpressionWithLayerEffectParameter(
+        project, otherExternalEvents.GetEvents(), "My layer");
+    auto &wrongLayerExpression =
+        CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
+
+    std::cout << "RenameLayerEffect" << std::endl;
+    gd::WholeProjectRefactorer::RenameLayerEffect(project, layout, layer, "My effect",
+                                            "My renamed effect");
+
+    REQUIRE(layoutAction.GetParameter(2).GetPlainString() ==
+            "\"My renamed effect\"");
+    REQUIRE(externalAction.GetParameter(2).GetPlainString() ==
+            "\"My renamed effect\"");
+    // The event from the other layout are untouched.
+    REQUIRE(otherLayoutAction.GetParameter(2).GetPlainString() ==
+            "\"My effect\"");
+    REQUIRE(otherExternalAction.GetParameter(2).GetPlainString() ==
+            "\"My effect\"");
+    REQUIRE(wrongLayerAction.GetParameter(2).GetPlainString() ==
+            "\"My effect\"");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed effect\")");
+    REQUIRE(externalExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My renamed effect\")");
+    // The event from the other layout are untouched.
+    REQUIRE(otherLayoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My effect\")");
+    REQUIRE(otherExternalExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer\", \"My effect\")");
+    REQUIRE(wrongLayerExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
+            "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
+  }
+}

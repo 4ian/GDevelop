@@ -27,6 +27,7 @@ const gd: libGDevelop = global.gd;
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  layout: gdLayout,
   layer: gdLayer,
   initialInstances: gdInitialInstancesContainer,
 
@@ -232,6 +233,15 @@ const LayerEditorDialog = (props: Props) => {
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={layer.getEffects()}
+          onEffectsRenamed={(oldName, newName) =>
+            gd.WholeProjectRefactorer.renameLayerEffect(
+              props.project,
+              props.layout,
+              props.layer,
+              oldName,
+              newName
+            )
+          }
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();

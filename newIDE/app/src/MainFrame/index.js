@@ -1143,6 +1143,7 @@ const MainFrame = (props: Props) => {
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      gd.WholeProjectRefactorer.renameLayout(currentProject, oldName, newName);
       if (inAppTutorialOrchestratorRef.current) {
         inAppTutorialOrchestratorRef.current.changeData(oldName, newName);
       }
@@ -1182,6 +1183,11 @@ const MainFrame = (props: Props) => {
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
       externalLayout.setName(newName);
+      gd.WholeProjectRefactorer.renameExternalLayout(
+        currentProject,
+        oldName,
+        newName
+      );
       _onProjectItemModified();
     });
   };
@@ -1216,6 +1222,11 @@ const MainFrame = (props: Props) => {
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
       externalEvents.setName(newName);
+      gd.WholeProjectRefactorer.renameExternalEvents(
+        currentProject,
+        oldName,
+        newName
+      );
       _onProjectItemModified();
     });
   };

@@ -11,6 +11,8 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "InstructionMetadata.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 
 namespace gd {
 void ParameterMetadataTools::ParametersToObjectsContainer(
@@ -98,6 +100,56 @@ void ParameterMetadataTools::IterateOverParametersWithIndex(
     // convention is enforced.
     if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()))
       lastObjectName = parameterValueOrDefault.GetPlainString();
+  }
+}
+
+void ParameterMetadataTools::IterateOverParametersWithIndex(
+    const gd::Platform &platform,
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer, FunctionCallNode &node,
+    std::function<void(const gd::ParameterMetadata &parameterMetadata,
+                       std::unique_ptr<gd::ExpressionNode> &parameterNode,
+                       size_t parameterIndex, const gd::String &lastObjectName)>
+        fn) {
+  gd::String lastObjectName = node.objectName;
+
+  const bool isObjectFunction = !node.objectName.empty();
+  const gd::ExpressionMetadata &metadata =
+      isObjectFunction ? MetadataProvider::GetObjectAnyExpressionMetadata(
+                             platform,
+                             GetTypeOfObject(globalObjectsContainer,
+                                             objectsContainer, node.objectName),
+                             node.functionName)
+                       : MetadataProvider::GetAnyExpressionMetadata(
+                             platform, node.functionName);
+
+  if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
+    return;
+  }
+
+  size_t parameterIndex = 0;
+  for (size_t metadataIndex = (isObjectFunction ? 1 : 0);
+       metadataIndex < metadata.parameters.size() &&
+       parameterIndex < node.parameters.size();
+       ++metadataIndex) {
+    auto &parameterMetadata = metadata.parameters[metadataIndex];
+    if (parameterMetadata.IsCodeOnly()) {
+      continue;
+    }
+    auto &parameterNode = node.parameters[parameterIndex];
+    ++parameterIndex;
+
+    fn(parameterMetadata, parameterNode, parameterIndex, lastObjectName);
+
+    // Memorize the last object name. By convention, parameters that require
+    // an object (mainly, "objectvar" and "behavior") should be placed after
+    // the object in the list of parameters (if possible, just after).
+    // Search "lastObjectName" in the codebase for other place where this
+    // convention is enforced.
+    if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()))
+      // Object can't be expressions so it should always be the object name.
+      lastObjectName =
+          gd::ExpressionParser2NodePrinter::PrintNode(*parameterNode);
   }
 }
 

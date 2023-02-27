@@ -67,6 +67,38 @@ void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
   }
 }
 
+void ProjectBrowserHelper::ExposeLayoutEvents(
+    gd::Project &project, gd::Layout &layout,
+    gd::ArbitraryEventsWorker &worker) {
+
+  // Add layouts events
+  worker.Launch(layout.GetEvents());
+
+  // Add external events events
+  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
+    auto &externalEvents = project.GetExternalEvents(s);
+    if (externalEvents.GetAssociatedLayout() == layout.GetName()) {
+      worker.Launch(externalEvents.GetEvents());
+    }
+  }
+}
+
+void ProjectBrowserHelper::ExposeLayoutEvents(
+    gd::Project &project, gd::Layout &layout,
+    gd::ArbitraryEventsWorkerWithContext &worker) {
+
+  // Add layouts events
+  worker.Launch(layout.GetEvents(), project, layout);
+
+  // Add external events events
+  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
+    auto &externalEvents = project.GetExternalEvents(s);
+    if (externalEvents.GetAssociatedLayout() == layout.GetName()) {
+      worker.Launch(externalEvents.GetEvents(), project, layout);
+    }
+  }
+}
+
 void ProjectBrowserHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
   // See also gd::Project::ExposeResources for a method that traverse the whole

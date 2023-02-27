@@ -2247,6 +2247,47 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameLayout(
+      [Ref] Project project,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameExternalLayout(
+      [Ref] Project project,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameExternalEvents(
+      [Ref] Project project,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameLayer(
+      [Ref] Project project,
+      [Ref] Layout layout,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameLayerEffect(
+      [Ref] Project project,
+      [Ref] Layout layout,
+      [Ref] Layer layer,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectAnimation(
+      [Ref] Project project,
+      [Ref] Layout layout,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectPoint(
+      [Ref] Project project,
+      [Ref] Layout layout,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameObjectEffect(
+      [Ref] Project project,
+      [Ref] Layout layout,
+      [Ref] gdObject gdObject,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_ObjectOrGroupRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);
     void STATIC_ObjectOrGroupRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     void STATIC_ObjectOrGroupRenamedInEventsFunction([Ref] Project project, [Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer globalObjectsContainer, [Ref] ObjectsContainer objectsContainer, [Const] DOMString oldName, [Const] DOMString newName, boolean isObjectGroup);

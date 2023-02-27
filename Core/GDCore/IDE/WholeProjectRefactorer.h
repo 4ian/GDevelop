@@ -12,6 +12,7 @@ namespace gd {
 class Platform;
 class Project;
 class Layout;
+class Layer;
 class Object;
 class String;
 class EventsFunctionsExtension;
@@ -269,6 +270,58 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newObjectName);
 
   /**
+   * \brief Refactor the project after a layout is renamed.
+   */
+  static void RenameLayout(gd::Project &project, const gd::String &oldName,
+                           const gd::String &newName);
+  /**
+   * \brief Refactor the project after an external layout is renamed.
+   */
+  static void RenameExternalLayout(gd::Project &project,
+                                   const gd::String &oldName,
+                                   const gd::String &newName);
+  /**
+   * \brief Refactor the project after external events are renamed.
+   */
+  static void RenameExternalEvents(gd::Project &project,
+                                   const gd::String &oldName,
+                                   const gd::String &newName);
+  /**
+   * \brief Refactor the project after a layer is renamed.
+   */
+  static void RenameLayer(gd::Project &project, gd::Layout &layout,
+                          const gd::String &oldName, const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after a layer effect is renamed.
+   */
+  static void RenameLayerEffect(gd::Project &project, gd::Layout &layout,
+                                gd::Layer &layer, const gd::String &oldName,
+                                const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after an object animation is renamed.
+   */
+  static void RenameObjectAnimation(gd::Project &project, gd::Layout &layout,
+                                    gd::Object &object,
+                                    const gd::String &oldName,
+                                    const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after an object point is renamed.
+   */
+  static void RenameObjectPoint(gd::Project &project, gd::Layout &layout,
+                                gd::Object &object, const gd::String &oldName,
+                                const gd::String &newName);
+
+  /**
+   * \brief Refactor the project after an object effect is renamed.
+   */
+  static void RenameObjectEffect(gd::Project &project, gd::Layout &layout,
+                                 gd::Object &object, const gd::String &oldName,
+                                 const gd::String &newName);
+
+  /**
    * \brief Refactor the project after an object is renamed in a layout
    *
    * This will update the layout, all external layouts associated with it
@@ -401,6 +454,12 @@ class GD_CORE_API WholeProjectRefactorer {
  private:
   static std::vector<gd::String> GetAssociatedExternalLayouts(
       gd::Project& project, gd::Layout& layout);
+  static std::vector<gd::String>
+  GetAssociatedExternalLayouts(gd::Project &project,
+                               const gd::String &layoutName);
+  static std::vector<gd::String>
+  GetAssociatedExternalEvents(gd::Project &project,
+                               const gd::String &layoutName);
 
   static void DoRenameEventsFunction(gd::Project& project,
                                      const gd::EventsFunction& eventsFunction,

@@ -80,7 +80,7 @@ type Props = {|
   resourceName: string,
   imageResourceSource: string,
   isImageResourceSmooth: boolean,
-  initialZoom?: number,
+  displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
   renderOverlay?: ({|
@@ -92,7 +92,7 @@ type Props = {|
   |}) => React.Node,
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
-  hideControls?: boolean,
+  deactivateControls?: boolean,
   isImagePrivate?: boolean,
   onImageLoaded?: () => void,
   hideLoader?: boolean,
@@ -127,8 +127,8 @@ const ImagePreview = ({
   renderOverlay,
   onSize,
   hideCheckeredBackground,
-  hideControls,
-  initialZoom,
+  deactivateControls,
+  displaySpacedView,
   isImagePrivate,
   onImageLoaded,
   hideLoader,
@@ -139,7 +139,7 @@ const ImagePreview = ({
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [containerHeight, setContainerHeight] = React.useState<?number>(null);
   const [zoomState, setZoomState] = React.useState<ZoomState>({
-    factor: initialZoom || 1,
+    factor: 1,
     xOffset: 0,
     yOffset: 0,
   });
@@ -153,14 +153,15 @@ const ImagePreview = ({
   };
 
   const adaptZoomFactorToImage = React.useCallback(
-    () => {
+    (displaySpacedView?: boolean) => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return false;
       }
       const zoomFactor = clampImagePreviewZoom(
         Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
-      const zoomFactorWithMargins = zoomFactor * 0.95;
+      const zoomFactorWithMargins =
+        zoomFactor * (displaySpacedView ? 0.7 : 0.95);
       setZoomState({
         factor: zoomFactorWithMargins,
         xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
@@ -212,7 +213,7 @@ const ImagePreview = ({
       const { deltaY, deltaX, clientX, clientY } = event;
       event.preventDefault();
       event.stopPropagation();
-      if (!hideControls && shouldZoom(event) && containerRef.current) {
+      if (shouldZoom(event) && containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         zoomAroundPointBy(getWheelStepZoomFactor(-deltaY), [
           clientX - containerRect.left,
@@ -226,7 +227,7 @@ const ImagePreview = ({
         }));
       }
     },
-    [hideControls, zoomAroundPointBy]
+    [zoomAroundPointBy]
   );
 
   const handleTouchMove = React.useCallback(
@@ -312,6 +313,7 @@ const ImagePreview = ({
   // triggers a back navigation.
   React.useEffect(
     () => {
+      if (deactivateControls) return;
       if (containerRef.current) {
         containerRef.current.addEventListener('wheel', handleWheel, {
           passive: false,
@@ -324,7 +326,7 @@ const ImagePreview = ({
         };
       }
     },
-    [handleWheel]
+    [handleWheel, deactivateControls]
   );
 
   // Reset ref to adapt zoom when image changes
@@ -345,30 +347,56 @@ const ImagePreview = ({
   // the zoom factor to the image.
   React.useEffect(
     () => {
-      if (hasZoomBeenAdaptedToImageRef.current || initialZoom) {
+      if (hasZoomBeenAdaptedToImageRef.current) {
         // Do not adapt zoom to image if a zoom as been provided in the props
         // or if the zoom has already been adapted.
         return;
       }
-      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
+      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage(
+        displaySpacedView
+      );
     },
-    [adaptZoomFactorToImage, initialZoom]
+    [adaptZoomFactorToImage, displaySpacedView]
   );
 
-  const handleImageLoaded = (e: any) => {
-    const imgElement = e.target;
+  const handleImageLoaded = React.useCallback(
+    (e: any) => {
+      const imgElement = e.target;
 
-    const newImageWidth = imgElement
-      ? imgElement.naturalWidth || imgElement.clientWidth
-      : 0;
-    const newImageHeight = imgElement
-      ? imgElement.naturalHeight || imgElement.clientHeight
-      : 0;
-    setImageHeight(newImageHeight);
-    setImageWidth(newImageWidth);
-    if (onSize) onSize(newImageWidth, newImageHeight);
-    if (onImageLoaded) onImageLoaded();
-  };
+      const newImageWidth = imgElement
+        ? imgElement.naturalWidth || imgElement.clientWidth
+        : 0;
+      const newImageHeight = imgElement
+        ? imgElement.naturalHeight || imgElement.clientHeight
+        : 0;
+      setImageHeight(newImageHeight);
+      setImageWidth(newImageWidth);
+      if (onSize) onSize(newImageWidth, newImageHeight);
+      if (onImageLoaded) onImageLoaded();
+    },
+    [onImageLoaded, onSize]
+  );
+
+  const onTouchEnd = React.useCallback((event: TouchEvent) => {
+    if (event.touches.length === 1) {
+      previousSingleTouchCoordinates.current = [
+        event.touches[0].clientX,
+        event.touches[0].clientY,
+      ];
+    }
+    previousDoubleTouchInfo.current = null;
+  }, []);
+
+  const onTouchStart = React.useCallback((event: TouchEvent) => {
+    if (event.touches.length === 1) {
+      previousSingleTouchCoordinates.current = [
+        event.touches[0].clientX,
+        event.touches[0].clientY,
+      ];
+    } else if (event.touches.length === 2) {
+      previousSingleTouchCoordinates.current = null;
+    }
+  }, []);
 
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
@@ -393,7 +421,9 @@ const ImagePreview = ({
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     // Apply margin only once the container is loaded, to avoid a shift in the image
-    outline: `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`,
+    outline: renderOverlay
+      ? `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`
+      : undefined,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
   };
@@ -418,7 +448,7 @@ const ImagePreview = ({
       {({ measureRef }) => {
         return (
           <div style={styles.container}>
-            {!hideControls && (
+            {!deactivateControls && (
               <MiniToolbar noPadding>
                 <IconButton
                   onClick={() =>
@@ -477,26 +507,9 @@ const ImagePreview = ({
                   measureRef(ref);
                   containerRef.current = ref;
                 }}
-                onTouchStart={event => {
-                  if (event.touches.length === 1) {
-                    previousSingleTouchCoordinates.current = [
-                      event.touches[0].clientX,
-                      event.touches[0].clientY,
-                    ];
-                  } else if (event.touches.length === 2) {
-                    previousSingleTouchCoordinates.current = null;
-                  }
-                }}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={event => {
-                  if (event.touches.length === 1) {
-                    previousSingleTouchCoordinates.current = [
-                      event.touches[0].clientX,
-                      event.touches[0].clientY,
-                    ];
-                  }
-                  previousDoubleTouchInfo.current = null;
-                }}
+                onTouchStart={deactivateControls ? null : onTouchStart}
+                onTouchMove={deactivateControls ? null : handleTouchMove}
+                onTouchEnd={deactivateControls ? null : onTouchEnd}
               >
                 {!!errored && (
                   <PlaceholderMessage>

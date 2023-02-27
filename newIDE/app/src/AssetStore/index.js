@@ -50,6 +50,8 @@ import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurc
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
 import { isHomePage, isSearchResultPage } from './AssetStoreNavigator';
+import RaisedButton from '../UI/RaisedButton';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 
 type Props = {||};
 
@@ -119,6 +121,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     ] = React.useState<?PrivateAssetPackListingData>(null);
     const { onPurchaseSuccessful, receivedAssetPacks } = React.useContext(
       AuthenticatedUserContext
+    );
+    const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
+      PrivateAssetsAuthorizationContext
     );
 
     // The saved scroll position must not be reset by a scroll event until it
@@ -475,8 +480,30 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                                   : ''}
                               </Text>
                             </Column>
-                            {/* to center the title */}
-                            <Column expand alignItems="flex-end" noMargin />
+                            <Column expand alignItems="flex-end" noMargin justifyContent="center">
+                              {openedAssetPack &&
+                              openedAssetPack.content &&
+                              openedAssetPack.content.audio ? (
+                                <RaisedButton
+                                  primary
+                                  label={<Trans>Download pack sounds</Trans>}
+                                  onClick={async () => {
+                                    const url = await getPrivateAssetPackAudioArchiveUrl(
+                                      openedAssetPack.id
+                                    );
+                                    if (!url) {
+                                      console.error(
+                                        `Could not generate url for premium asset pack with name ${
+                                          openedAssetPack.name
+                                        }`
+                                      );
+                                      return;
+                                    }
+                                    Window.openExternalURL(url);
+                                  }}
+                                />
+                              ) : null}
+                            </Column>
                           </>
                         )}
                       </>

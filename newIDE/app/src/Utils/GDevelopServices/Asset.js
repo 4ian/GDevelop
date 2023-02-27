@@ -215,6 +215,20 @@ export const getPrivateAsset = async (
   return assetResponse.data;
 };
 
+export const getPrivateAssetPackAudioFilesArchiveUrl = (
+  privateAssetPackId: string,
+  authorizationToken: string
+): string => {
+  const assetUrl = `${
+    GDevelopPrivateAssetsStorage.baseUrl
+  }/${privateAssetPackId}/resources/audio.zip`;
+  const authorizedUrl = createProductAuthorizedUrl(
+    assetUrl,
+    authorizationToken
+  );
+  return authorizedUrl;
+};
+
 export const listAllResources = ({
   environment,
 }: {|

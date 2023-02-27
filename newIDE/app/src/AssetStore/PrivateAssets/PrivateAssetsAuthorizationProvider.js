@@ -6,6 +6,7 @@ import {
   type AssetShortHeader,
   type Asset,
   type Environment,
+  getPrivateAssetPackAudioFilesArchiveUrl,
 } from '../../Utils/GDevelopServices/Asset';
 import {
   addAssetToProject,
@@ -131,6 +132,35 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     });
   };
 
+  const getPrivateAssetPackAudioArchiveUrl = async (
+    privateAssetPackId: string
+  ): Promise<string | null> => {
+    if (!profile) return null;
+    const userId = profile.id;
+
+    let token =
+      authorizationToken || (await fetchAuthorizationToken(profile.id));
+
+    try {
+      const url = getPrivateAssetPackAudioFilesArchiveUrl(
+        privateAssetPackId,
+        token
+      );
+      return url;
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // If the token is expired, fetch a new one and try again.
+        token = await fetchAuthorizationToken(userId);
+        const url = getPrivateAssetPackAudioFilesArchiveUrl(
+          privateAssetPackId,
+          token
+        );
+        return url;
+      }
+      throw error;
+    }
+  };
+
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -138,6 +168,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
         updateAuthorizationToken,
         fetchPrivateAsset,
         installPrivateAsset,
+        getPrivateAssetPackAudioArchiveUrl,
       }}
     >
       {children}

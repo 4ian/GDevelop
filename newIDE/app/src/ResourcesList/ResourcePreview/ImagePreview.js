@@ -160,7 +160,8 @@ const ImagePreview = ({
       const zoomFactor = clampImagePreviewZoom(
         Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
       );
-      const zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+      const zoomFactorWithMargins =
+        zoomFactor * (displaySpacedView ? 0.7 : 0.95);
       setZoomState({
         factor: zoomFactorWithMargins,
         xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,

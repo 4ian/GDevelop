@@ -592,8 +592,7 @@ export function createGdevelopTheme({
       iconButton: {
         selectedBackgroundColor:
           styles['ThemeIconButtonSelectedBackgroundColor'],
-        selectedColor:
-          styles['ThemeIconButtonSelectedColor'],
+        selectedColor: styles['ThemeIconButtonSelectedColor'],
       },
       ...getRootClassNames(rootClassNameIdentifier),
       logo: {

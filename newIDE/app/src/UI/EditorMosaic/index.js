@@ -218,14 +218,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
     const openedEditorNames = getLeaves(this.state.mosaicNode);
     if (openedEditorNames.indexOf(editorName) !== -1) {
       // The editor is already opened: close it.
-      this.setState(
-        {
-          mosaicNode: removeNode(this.state.mosaicNode, editorName),
-        },
-        () => {
-          this._onOpenedEditorsChanged();
-        }
-      );
+      this._onChanged(removeNode(this.state.mosaicNode, editorName));
 
       return false;
     }
@@ -256,17 +249,8 @@ export default class EditorMosaic extends React.Component<Props, State> {
         editorName => editors[editorName].type === 'secondary'
       );
       if (secondaryEditorName) {
-        this.setState(
-          {
-            mosaicNode: replaceNode(
-              this.state.mosaicNode,
-              secondaryEditorName,
-              editorName
-            ),
-          },
-          () => {
-            this._onOpenedEditorsChanged();
-          }
+        this._onChanged(
+          replaceNode(this.state.mosaicNode, secondaryEditorName, editorName)
         );
 
         return true;
@@ -274,19 +258,14 @@ export default class EditorMosaic extends React.Component<Props, State> {
     }
 
     // Open a new editor at the indicated position.
-    this.setState(
-      {
-        mosaicNode: addNode(
-          this.state.mosaicNode,
-          editorName,
-          position,
-          splitPercentage,
-          direction
-        ),
-      },
-      () => {
-        this._onOpenedEditorsChanged();
-      }
+    this._onChanged(
+      addNode(
+        this.state.mosaicNode,
+        editorName,
+        position,
+        splitPercentage,
+        direction
+      )
     );
 
     return true;
@@ -300,7 +279,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
     this.setState({ mosaicNode });
   };
 
-  _onChanged = (mosaicNode: EditorMosaicNode) => {
+  _onChanged = (mosaicNode: ?EditorMosaicNode) => {
     this.setState({ mosaicNode }, () => {
       this._onOpenedEditorsChanged();
     });

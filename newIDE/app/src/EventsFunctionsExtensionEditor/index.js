@@ -41,7 +41,7 @@ import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { ToolbarGroup } from '../UI/Toolbar';
 import IconButton from '../UI/IconButton';
-import LightningIcon from '../UI/CustomSvgIcons/Lightning';
+import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -212,7 +212,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             onClick={this._editOptions}
             tooltip={t`Open extension settings`}
           >
-            <LightningIcon />
+            <ExtensionEditIcon />
           </IconButton>
         </ToolbarGroup>
       );
@@ -1159,7 +1159,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
                 onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={this._editOptions}
-                settingsIcon={<LightningIcon />}
+                settingsIcon={<ExtensionEditIcon />}
                 unsavedChanges={this.props.unsavedChanges}
                 isActive={true}
               />

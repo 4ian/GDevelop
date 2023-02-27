@@ -991,7 +991,7 @@ bool Project::ValidateName(const gd::String& name) {
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::ProjectExposerHelper::ExposeProjectEvents for a method that
+  // See also gd::ProjectBrowserHelper::ExposeProjectEvents for a method that
   // traverse the whole project (this time for events) and ExposeProjectEffects
   // (this time for effects). Ideally, this method could be moved outside of
   // gd::Project.

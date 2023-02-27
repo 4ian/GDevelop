@@ -3,10 +3,9 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_BEHAVIORPROJECTEXPOSER_H
-#define GDCORE_BEHAVIORPROJECTEXPOSER_H
+#pragma once
 
-#include "GDCore/IDE/ProjectExposer.h"
+#include "GDCore/IDE/ProjectBrowser.h"
 
 namespace gd {
 class Project;
@@ -17,10 +16,10 @@ class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
-class ArbitraryFunctionsWorker;
+class ArbitraryEventsFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
-class ArbitrarySharedDataWorker;
+class ArbitraryBehaviorSharedDataWorker;
 } // namespace gd
 
 namespace gd {
@@ -28,9 +27,9 @@ namespace gd {
 /**
  * \brief Expose event-based behavior contents to workers.
  */
-class GD_CORE_API EventBasedBehaviorExposer : public ProjectExposer {
+class GD_CORE_API EventBasedBehaviorBrowser : public ProjectBrowser {
 public:
-  EventBasedBehaviorExposer(gd::EventsBasedBehavior &eventsBasedBehavior_)
+  EventBasedBehaviorBrowser(gd::EventsBasedBehavior &eventsBasedBehavior_)
       : eventsBasedBehavior(eventsBasedBehavior_) {}
 
   /**
@@ -59,7 +58,7 @@ public:
    * of an event-based behavior.
    */
   void ExposeFunctions(gd::Project &project,
-                       gd::ArbitraryFunctionsWorker &worker) const override;
+                       gd::ArbitraryEventsFunctionsWorker &worker) const override;
 
   /**
    * \brief Do nothing.
@@ -77,13 +76,11 @@ public:
   /**
    * \brief Do nothing.
    */
-  void ExposeSharedDatas(gd::Project &project,
-                         gd::ArbitrarySharedDataWorker &worker) const override;
+  void ExposeBehaviorSharedDatas(gd::Project &project,
+                         gd::ArbitraryBehaviorSharedDataWorker &worker) const override;
 
 private:
   gd::EventsBasedBehavior &eventsBasedBehavior;
 };
 
 } // namespace gd
-
-#endif // GDCORE_BEHAVIORPROJECTEXPOSER_H

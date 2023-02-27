@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_WHOLEPROJECTREFACTORER_H
-#define GDCORE_WHOLEPROJECTREFACTORER_H
+#pragma once
+
 #include <set>
 #include <unordered_set>
 #include <vector>
@@ -21,14 +21,14 @@ class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryObjectsWorker;
-class ArbitraryFunctionsWorker;
+class ArbitraryEventsFunctionsWorker;
 class ArbitraryEventsWorkerWithContext;
 class ArbitraryEventBasedBehaviorsWorker;
-class ArbitrarySharedDataWorker;
+class ArbitraryBehaviorSharedDataWorker;
 class Behavior;
 class BehaviorMetadata;
 class UnfilledRequiredBehaviorPropertyProblem;
-class ProjectExposer;
+class ProjectBrowser;
 }  // namespace gd
 
 namespace gd {
@@ -406,17 +406,17 @@ class GD_CORE_API WholeProjectRefactorer {
                                      const gd::EventsFunction& eventsFunction,
                                      const gd::String& oldFullType,
                                      const gd::String& newFullType,
-                                     const gd::ProjectExposer& projectExposer);
+                                     const gd::ProjectBrowser& projectBrowser);
 
   static void DoRenameBehavior(gd::Project& project,
                                const gd::String& oldBehaviorType,
                                const gd::String& newBehaviorType,
-                               const gd::ProjectExposer& projectExposer);
+                               const gd::ProjectBrowser& projectBrowser);
 
   static void DoRenameObject(gd::Project& project,
                              const gd::String& oldObjectType,
                              const gd::String& newObjectType,
-                             const gd::ProjectExposer& projectExposer);
+                             const gd::ProjectBrowser& projectBrowser);
 
   /**
    * \brief Refactor the project **before** an events function extension is
@@ -431,7 +431,7 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldName,
       const gd::String& newName,
-      const gd::ProjectExposer& projectExposer);
+      const gd::ProjectBrowser& projectBrowser);
 
   static void FindDependentBehaviorNames(
       const gd::Project& project,
@@ -446,5 +446,3 @@ class GD_CORE_API WholeProjectRefactorer {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_WHOLEPROJECTREFACTORER_H

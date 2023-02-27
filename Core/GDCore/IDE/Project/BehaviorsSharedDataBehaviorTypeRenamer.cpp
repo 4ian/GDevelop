@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GDCore/IDE/Project/SharedDataBehaviorTypeRenamer.h"
+#include "GDCore/IDE/Project/BehaviorsSharedDataBehaviorTypeRenamer.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/String.h"
 #include <map>
@@ -12,13 +12,13 @@
 
 namespace gd {
 
-void SharedDataBehaviorTypeRenamer::DoVisitSharedData(
+void BehaviorsSharedDataBehaviorTypeRenamer::DoVisitSharedData(
     gd::BehaviorsSharedData &sharedData) {
   if (sharedData.GetTypeName() == oldBehaviorType) {
     sharedData.SetTypeName(newBehaviorType);
   }
 }
 
-SharedDataBehaviorTypeRenamer::~SharedDataBehaviorTypeRenamer() {}
+BehaviorsSharedDataBehaviorTypeRenamer::~BehaviorsSharedDataBehaviorTypeRenamer() {}
 
 } // namespace gd

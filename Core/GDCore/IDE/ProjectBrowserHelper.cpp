@@ -3,14 +3,14 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "ProjectExposerHelper.h"
+#include "ProjectBrowserHelper.h"
 
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
-#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventsFunctionsWorker.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
-#include "GDCore/IDE/Project/ArbitrarySharedDataWorker.h"
+#include "GDCore/IDE/Project/ArbitraryBehaviorSharedDataWorker.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -21,7 +21,7 @@
 
 namespace gd {
 
-void ProjectExposerHelper::ExposeProjectEvents(
+void ProjectBrowserHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorker &worker) {
   // See also gd::Project::ExposeResources for a method that traverses the whole
   // project (this time for resources).
@@ -55,7 +55,7 @@ void ProjectExposerHelper::ExposeProjectEvents(
   }
 }
 
-void ProjectExposerHelper::ExposeProjectEventsWithoutExtensions(
+void ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(
     gd::Project& project, gd::ArbitraryEventsWorker& worker) {
   // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
@@ -67,7 +67,7 @@ void ProjectExposerHelper::ExposeProjectEventsWithoutExtensions(
   }
 }
 
-void ProjectExposerHelper::ExposeProjectEvents(
+void ProjectBrowserHelper::ExposeProjectEvents(
     gd::Project &project, gd::ArbitraryEventsWorkerWithContext &worker) {
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources) and ExposeProjectEffects (this time for
@@ -118,7 +118,7 @@ void ProjectExposerHelper::ExposeProjectEvents(
   }
 }
 
-void ProjectExposerHelper::ExposeEventsBasedBehaviorEvents(
+void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
     gd::Project &project, const gd::EventsBasedBehavior &eventsBasedBehavior,
     gd::ArbitraryEventsWorker &worker) {
   auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
@@ -127,7 +127,7 @@ void ProjectExposerHelper::ExposeEventsBasedBehaviorEvents(
   }
 }
 
-void ProjectExposerHelper::ExposeEventsBasedBehaviorEvents(
+void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
     gd::Project &project, const gd::EventsBasedBehavior &eventsBasedBehavior,
     gd::ArbitraryEventsWorkerWithContext &worker) {
   auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
@@ -143,7 +143,7 @@ void ProjectExposerHelper::ExposeEventsBasedBehaviorEvents(
   }
 }
 
-void ProjectExposerHelper::ExposeEventsBasedObjectEvents(
+void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     gd::Project &project, const gd::EventsBasedObject &eventsBasedObject,
     gd::ArbitraryEventsWorkerWithContext &worker) {
   auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
@@ -159,7 +159,7 @@ void ProjectExposerHelper::ExposeEventsBasedObjectEvents(
   }
 }
 
-void ProjectExposerHelper::ExposeProjectObjects(
+void ProjectBrowserHelper::ExposeProjectObjects(
     gd::Project &project, gd::ArbitraryObjectsWorker &worker) {
 
   // Global objects
@@ -183,8 +183,8 @@ void ProjectExposerHelper::ExposeProjectObjects(
   }
 };
 
-void ProjectExposerHelper::ExposeProjectFunctions(
-    gd::Project &project, gd::ArbitraryFunctionsWorker &worker) {
+void ProjectBrowserHelper::ExposeProjectFunctions(
+    gd::Project &project, gd::ArbitraryEventsFunctionsWorker &worker) {
 
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
@@ -204,7 +204,7 @@ void ProjectExposerHelper::ExposeProjectFunctions(
   }
 };
 
-void ProjectExposerHelper::ExposeProjectEventBasedBehaviors(
+void ProjectBrowserHelper::ExposeProjectEventBasedBehaviors(
     gd::Project &project, gd::ArbitraryEventBasedBehaviorsWorker &worker) {
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
@@ -213,8 +213,8 @@ void ProjectExposerHelper::ExposeProjectEventBasedBehaviors(
   }
 }
 
-void ProjectExposerHelper::ExposeProjectSharedDatas(
-    gd::Project &project, gd::ArbitrarySharedDataWorker &worker) {
+void ProjectBrowserHelper::ExposeProjectSharedDatas(
+    gd::Project &project, gd::ArbitraryBehaviorSharedDataWorker &worker) {
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     gd::Layout &layout = project.GetLayout(i);
     worker.Launch(layout.GetAllBehaviorSharedData());

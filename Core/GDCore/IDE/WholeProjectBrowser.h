@@ -3,10 +3,9 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_WHOLEPROJECTEXPOSER_H
-#define GDCORE_WHOLEPROJECTEXPOSER_H
+#pragma once
 
-#include "GDCore/IDE/ProjectExposer.h"
+#include "GDCore/IDE/ProjectBrowser.h"
 
 namespace gd {
 class Project;
@@ -17,10 +16,10 @@ class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
-class ArbitraryFunctionsWorker;
+class ArbitraryEventsFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
-class ArbitrarySharedDataWorker;
+class ArbitraryBehaviorSharedDataWorker;
 } // namespace gd
 
 namespace gd {
@@ -28,7 +27,7 @@ namespace gd {
 /**
  * \brief Expose the whole project to workers.
  */
-class GD_CORE_API WholeProjectExposer : public ProjectExposer {
+class GD_CORE_API WholeProjectBrowser : public ProjectBrowser {
 public:
   /**
    * \brief Call the specified worker on all events of the project (layout,
@@ -66,7 +65,7 @@ public:
    * of a project.
    */
   void ExposeFunctions(gd::Project &project,
-                       gd::ArbitraryFunctionsWorker &worker) const override;
+                       gd::ArbitraryEventsFunctionsWorker &worker) const override;
 
   /**
    * \brief Call the specified worker on all EventBasedBehavior of a project.
@@ -84,10 +83,8 @@ public:
    * This should be the preferred way to traverse all the shared data
    * of a project.
    */
-  void ExposeSharedDatas(gd::Project &project,
-                         gd::ArbitrarySharedDataWorker &worker) const override;
+  void ExposeBehaviorSharedDatas(gd::Project &project,
+                         gd::ArbitraryBehaviorSharedDataWorker &worker) const override;
 };
 
 } // namespace gd
-
-#endif // GDCORE_WHOLEPROJECTEXPOSER_H

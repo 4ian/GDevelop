@@ -3,10 +3,9 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H
-#define GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H
+#pragma once
 
-#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventsFunctionsWorker.h"
 #include "GDCore/String.h"
 #include <map>
 #include <memory>
@@ -26,7 +25,7 @@ namespace gd {
  * \ingroup IDE
  */
 class GD_CORE_API FunctionParameterBehaviorTypeRenamer
-    : public ArbitraryFunctionsWorker {
+    : public ArbitraryEventsFunctionsWorker {
 public:
   FunctionParameterBehaviorTypeRenamer(const gd::String &oldBehaviorType_,
                                        const gd::String &newBehaviorType_)
@@ -34,12 +33,10 @@ public:
   virtual ~FunctionParameterBehaviorTypeRenamer();
 
 private:
-  virtual void DoVisitFunction(gd::EventsFunction &eventsFunction) override;
+  virtual void DoVisitEventsFunction(gd::EventsFunction &eventsFunction) override;
 
   gd::String oldBehaviorType;
   gd::String newBehaviorType;
 };
 
 } // namespace gd
-
-#endif // GDCORE_FUNCTIONPARAMETERBEHAVIORTYPERENAMER_H

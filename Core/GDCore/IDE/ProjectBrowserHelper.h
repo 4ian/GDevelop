@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_PROJECTEXPOSERHELPER_H
-#define GDCORE_PROJECTEXPOSERHELPER_H
+#pragma once
+
 namespace gd {
 class Project;
 class String;
@@ -14,10 +14,10 @@ class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
-class ArbitraryFunctionsWorker;
+class ArbitraryEventsFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
-class ArbitrarySharedDataWorker;
+class ArbitraryBehaviorSharedDataWorker;
 } // namespace gd
 
 namespace gd {
@@ -25,7 +25,7 @@ namespace gd {
 /**
  * \brief Expose a subset of the project to workers.
  */
-class GD_CORE_API ProjectExposerHelper {
+class GD_CORE_API ProjectBrowserHelper {
 public:
   /**
    * \brief Call the specified worker on all events of the project (layout,
@@ -106,7 +106,7 @@ public:
    * of a project.
    */
   static void ExposeProjectFunctions(gd::Project &project,
-                                     gd::ArbitraryFunctionsWorker &worker);
+                                     gd::ArbitraryEventsFunctionsWorker &worker);
 
   /**
    * \brief Call the specified worker on all EventBasedBehavior of a project.
@@ -124,9 +124,7 @@ public:
    * of a project.
    */
   static void ExposeProjectSharedDatas(gd::Project &project,
-                                       gd::ArbitrarySharedDataWorker &worker);
+                                       gd::ArbitraryBehaviorSharedDataWorker &worker);
 };
 
 } // namespace gd
-
-#endif // GDCORE_PROJECTEXPOSERHELPER_H

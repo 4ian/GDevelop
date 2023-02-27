@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_ARBITRARYEVENTBASEDBEHAVIORSWORKER_H
-#define GDCORE_ARBITRARYEVENTBASEDBEHAVIORSWORKER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -21,7 +20,7 @@ class EventsBasedBehavior;
 namespace gd {
 
 /**
- * \brief ArbitraryFunctionsWorker is an abstract class used to browse
+ * \brief ArbitraryEventsFunctionsWorker is an abstract class used to browse
  * event-based behaviors and do some work on them. It can be used to implement
  * refactoring for example.
  *
@@ -58,5 +57,3 @@ class GD_CORE_API ArbitraryEventBasedBehaviorsWorker {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_ARBITRARYEVENTBASEDBEHAVIORSWORKER_H

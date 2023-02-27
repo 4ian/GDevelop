@@ -3,13 +3,15 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_SHAREDDATABEHAVIORTYPERENAMER_H
-#define GDCORE_SHAREDDATABEHAVIORTYPERENAMER_H
+
+#pragma once
+
 #include <map>
 #include <memory>
 #include <vector>
-#include "GDCore/IDE/Project/ArbitrarySharedDataWorker.h"
+#include "GDCore/IDE/Project/ArbitraryBehaviorSharedDataWorker.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class BaseEvent;
 class Project;
@@ -23,12 +25,12 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class GD_CORE_API SharedDataBehaviorTypeRenamer : public ArbitrarySharedDataWorker {
+class GD_CORE_API BehaviorsSharedDataBehaviorTypeRenamer : public ArbitraryBehaviorSharedDataWorker {
  public:
-  SharedDataBehaviorTypeRenamer(const gd::String& oldBehaviorType_,
+  BehaviorsSharedDataBehaviorTypeRenamer(const gd::String& oldBehaviorType_,
                                        const gd::String& newBehaviorType_)
       : oldBehaviorType(oldBehaviorType_), newBehaviorType(newBehaviorType_){};
-  virtual ~SharedDataBehaviorTypeRenamer();
+  virtual ~BehaviorsSharedDataBehaviorTypeRenamer();
 
  private:
   void DoVisitSharedData(gd::BehaviorsSharedData& behavior) override;
@@ -38,5 +40,3 @@ class GD_CORE_API SharedDataBehaviorTypeRenamer : public ArbitrarySharedDataWork
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_SHAREDDATABEHAVIORTYPERENAMER_H

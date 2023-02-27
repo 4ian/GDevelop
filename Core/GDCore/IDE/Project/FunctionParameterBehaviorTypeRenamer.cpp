@@ -13,7 +13,7 @@
 
 namespace gd {
 
-void FunctionParameterBehaviorTypeRenamer::DoVisitFunction(
+void FunctionParameterBehaviorTypeRenamer::DoVisitEventsFunction(
     gd::EventsFunction &eventsFunction) {
   for (auto &&parameter : eventsFunction.GetParameters()) {
     if (gd::ParameterMetadata::IsBehavior(parameter.GetType()) &&

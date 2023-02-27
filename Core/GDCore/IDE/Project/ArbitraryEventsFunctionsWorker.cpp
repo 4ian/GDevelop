@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "ArbitraryFunctionsWorker.h"
+#include "ArbitraryEventsFunctionsWorker.h"
 
 #include <iostream>
 #include <map>
@@ -19,19 +19,19 @@ using namespace std;
 
 namespace gd {
 
-ArbitraryFunctionsWorker::~ArbitraryFunctionsWorker() {}
+ArbitraryEventsFunctionsWorker::~ArbitraryEventsFunctionsWorker() {}
 
-void ArbitraryFunctionsWorker::VisitFunctionContainer(
+void ArbitraryEventsFunctionsWorker::VisitEventsFunctionContainer(
     gd::EventsFunctionsContainer& functions) {
-  DoVisitFunctionsContainer(functions);
+  DoVisitEventsFunctionsContainer(functions);
 
   for (auto&& function : functions.GetInternalVector()) {
-    VisitFunction(*function);
+    VisitEventsFunction(*function);
   }
 }
 
-void ArbitraryFunctionsWorker::VisitFunction(gd::EventsFunction& eventsFunction) {
-  DoVisitFunction(eventsFunction);
+void ArbitraryEventsFunctionsWorker::VisitEventsFunction(gd::EventsFunction& eventsFunction) {
+  DoVisitEventsFunction(eventsFunction);
 }
 
 }  // namespace gd

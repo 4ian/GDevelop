@@ -4,8 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_ARBITRARYSHAREDDATAWORKER_H
-#define GDCORE_ARBITRARYSHAREDDATAWORKER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -21,16 +20,16 @@ class BehaviorsSharedData;
 namespace gd {
 
 /**
- * \brief ArbitrarySharedDataWorker is an abstract class used to browse
+ * \brief ArbitraryBehaviorSharedDataWorker is an abstract class used to browse
  * shared data and do some work on them. It can be used to implement
  * refactoring for example.
  *
  * \ingroup IDE
  */
-class GD_CORE_API ArbitrarySharedDataWorker {
+class GD_CORE_API ArbitraryBehaviorSharedDataWorker {
  public:
-  ArbitrarySharedDataWorker(){};
-  virtual ~ArbitrarySharedDataWorker();
+  ArbitraryBehaviorSharedDataWorker(){};
+  virtual ~ArbitraryBehaviorSharedDataWorker();
 
   /**
    * \brief Launch the worker on the specified shared data.
@@ -54,4 +53,3 @@ class GD_CORE_API ArbitrarySharedDataWorker {
 
 }  // namespace gd
 
-#endif  // GDCORE_ARBITRARYSHAREDDATAWORKER_H

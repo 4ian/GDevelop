@@ -3,10 +3,9 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H
-#define GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H
+#pragma once
 
-#include "GDCore/IDE/Project/ArbitraryFunctionsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventsFunctionsWorker.h"
 #include "GDCore/String.h"
 #include <map>
 #include <memory>
@@ -26,7 +25,7 @@ namespace gd {
  * \ingroup IDE
  */
 class GD_CORE_API FunctionParameterObjectTypeRenamer
-    : public ArbitraryFunctionsWorker {
+    : public ArbitraryEventsFunctionsWorker {
 public:
   FunctionParameterObjectTypeRenamer(const gd::String &oldObjectType_,
                                      const gd::String &newObjectType_)
@@ -34,12 +33,10 @@ public:
   virtual ~FunctionParameterObjectTypeRenamer();
 
 private:
-  virtual void DoVisitFunction(gd::EventsFunction &eventsFunction) override;
+  virtual void DoVisitEventsFunction(gd::EventsFunction &eventsFunction) override;
 
   gd::String oldObjectType;
   gd::String newObjectType;
 };
 
 } // namespace gd
-
-#endif // GDCORE_FUNCTIONPARAMETEROBJECTTYPERENAMER_H

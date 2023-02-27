@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "ArbitrarySharedDataWorker.h"
+#include "ArbitraryBehaviorSharedDataWorker.h"
 
 #include <iostream>
 #include <map>
@@ -17,9 +17,9 @@ using namespace std;
 
 namespace gd {
 
-ArbitrarySharedDataWorker::~ArbitrarySharedDataWorker() {}
+ArbitraryBehaviorSharedDataWorker::~ArbitraryBehaviorSharedDataWorker() {}
 
-void ArbitrarySharedDataWorker::VisitSharedDatas(
+void ArbitraryBehaviorSharedDataWorker::VisitSharedDatas(
     const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>
         &sharedDatas) {
   DoVisitSharedDatas(sharedDatas);
@@ -29,7 +29,7 @@ void ArbitrarySharedDataWorker::VisitSharedDatas(
   }
 }
 
-void ArbitrarySharedDataWorker::VisitSharedData(
+void ArbitraryBehaviorSharedDataWorker::VisitSharedData(
     gd::BehaviorsSharedData &sharedData) {
   DoVisitSharedData(sharedData);
 }

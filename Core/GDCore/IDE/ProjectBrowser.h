@@ -3,8 +3,9 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_PROJECTEXPOSER_H
-#define GDCORE_PROJECTEXPOSER_H
+
+#pragma once
+
 namespace gd {
 class Project;
 class String;
@@ -14,10 +15,10 @@ class EventsBasedBehavior;
 class EventsBasedObject;
 class ArbitraryEventsWorker;
 class ArbitraryEventsWorkerWithContext;
-class ArbitraryFunctionsWorker;
+class ArbitraryEventsFunctionsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventBasedBehaviorsWorker;
-class ArbitrarySharedDataWorker;
+class ArbitraryBehaviorSharedDataWorker;
 } // namespace gd
 
 namespace gd {
@@ -25,7 +26,7 @@ namespace gd {
 /**
  * \brief Expose a subset of the project to workers.
  */
-class GD_CORE_API ProjectExposer {
+class GD_CORE_API ProjectBrowser {
 public:
   /**
    * \brief Call the specified worker on all events of a project subset.
@@ -59,7 +60,7 @@ public:
    * of a project.
    */
   virtual void ExposeFunctions(gd::Project &project,
-                               gd::ArbitraryFunctionsWorker &worker) const = 0;
+                               gd::ArbitraryEventsFunctionsWorker &worker) const = 0;
 
   /**
    * \brief Call the specified worker on all EventBasedBehavior of a project
@@ -79,12 +80,10 @@ public:
    * of a project.
    */
   virtual void
-  ExposeSharedDatas(gd::Project &project,
-                    gd::ArbitrarySharedDataWorker &worker) const = 0;
+  ExposeBehaviorSharedDatas(gd::Project &project,
+                    gd::ArbitraryBehaviorSharedDataWorker &worker) const = 0;
 
-  virtual ~ProjectExposer(){};
+  virtual ~ProjectBrowser(){};
 };
 
 } // namespace gd
-
-#endif // GDCORE_PROJECTEXPOSER_H

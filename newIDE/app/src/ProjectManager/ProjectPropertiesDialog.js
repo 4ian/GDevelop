@@ -27,11 +27,9 @@ import AlertMessage from '../UI/AlertMessage';
 import { Tabs } from '../UI/Tabs';
 import { LoadingScreenEditor } from './LoadingScreenEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import {
-  type HotReloadPreviewButtonProps,
-  NewPreviewIcon,
-} from '../HotReload/HotReloadPreviewButton';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 
 type Props = {|
   project: gdProject,
@@ -277,7 +275,7 @@ function ProjectPropertiesDialog(props: Props) {
               hotReloadPreviewButtonProps ? (
                 <FlatButton
                   key="hot-reload-preview-button"
-                  leftIcon={<NewPreviewIcon />}
+                  leftIcon={<PreviewIcon />}
                   label={<Trans>Run a preview (with loading & branding)</Trans>}
                   onClick={
                     hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview

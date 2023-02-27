@@ -24,7 +24,7 @@ import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Text from '../UI/Text';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
-import Lightning from '../UI/CustomSvgIcons/Lightning';
+import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 
 const styles = {
   noIndentNestedList: {
@@ -387,7 +387,7 @@ export const EventFunctionExtensionItem = ({
           // Use icon placeholder so that the user can drag and drop the
           // item in the project manager.
           <div style={styles.extensionPlaceholderIconContainer}>
-            <Lightning />
+            <ExtensionIcon />
           </div>
         )
       }

@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
@@ -7,7 +6,6 @@ import ResourcesList from '../ResourcesList';
 import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic from '../UI/EditorMosaic';
-import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';

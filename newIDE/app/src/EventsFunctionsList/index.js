@@ -28,6 +28,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Text from '../UI/Text';
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 const gd: libGDevelop = global.gd;
 
@@ -44,43 +45,41 @@ export type EventsFunctionCreationParameters = {|
 |};
 
 const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) => {
-  let label = (
-    <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
+  const label = (
+    <Text noMargin size="body-small">
+      {eventsFunction.getName()}
+    </Text>
   );
 
-  if (eventsFunction.isPrivate())
-    label = (
-      <>
-        <Tooltip
-          title={
-            <Trans>This function won't be visible in the events editor.</Trans>
-          }
-        >
-          <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
-        </Tooltip>
-        {label}
-      </>
-    );
-
-  if (eventsFunction.isAsync())
-    label = (
-      <>
-        <Tooltip
-          title={
-            <Trans>
-              This function is asynchronous - it will only allow subsequent
-              events to run after calling the action "End asynchronous task"
-              within the function.
-            </Trans>
-          }
-        >
-          <AsyncIcon fontSize="small" style={styles.tooltip} />
-        </Tooltip>
-        {label}
-      </>
-    );
-
-  return label;
+  return eventsFunction.isPrivate() ? (
+    <>
+      <Tooltip
+        title={
+          <Trans>This function won't be visible in the events editor.</Trans>
+        }
+      >
+        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+      {label}
+    </>
+  ) : eventsFunction.isAsync() ? (
+    <>
+      <Tooltip
+        title={
+          <Trans>
+            This function is asynchronous - it will only allow subsequent events
+            to run after calling the action "End asynchronous task" within the
+            function.
+          </Trans>
+        }
+      >
+        <AsyncIcon fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+      {label}
+    </>
+  ) : (
+    label
+  );
 };
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>

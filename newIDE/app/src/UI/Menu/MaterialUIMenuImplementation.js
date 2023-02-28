@@ -37,6 +37,8 @@ const styles = {
     // Force every menu item to have the same height, even if it's a submenu
     // or if it has an icon.
     height: 32,
+    paddingLeft: 16, // Increase the default padding from 8 to 16 to be easier to read and match the electron menu.
+    paddingRight: 16,
   },
 };
 

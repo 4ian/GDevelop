@@ -27,6 +27,7 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { Column, Line } from '../UI/Grid';
 import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Text from '../UI/Text';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -39,8 +40,13 @@ const styles = {
 
 const renderEventsBehaviorLabel = (
   eventsBasedBehavior: gdEventsBasedBehavior
-) =>
-  eventsBasedBehavior.isPrivate() ? (
+) => {
+  const label = (
+    <Text noMargin size="body-small">
+      {eventsBasedBehavior.getName()}
+    </Text>
+  );
+  return eventsBasedBehavior.isPrivate() ? (
     <>
       <Tooltip
         title={
@@ -49,13 +55,12 @@ const renderEventsBehaviorLabel = (
       >
         <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
       </Tooltip>
-      <span title={eventsBasedBehavior.getName()}>
-        {eventsBasedBehavior.getName()}
-      </span>
+      {label}
     </>
   ) : (
-    eventsBasedBehavior.getName()
+    label
   );
+};
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,

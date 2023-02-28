@@ -49,9 +49,9 @@ import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
-import Paper from '../UI/Paper';
 import { isHomePage, isSearchResultPage } from './AssetStoreNavigator';
 import RaisedButton from '../UI/RaisedButton';
+import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import Music from '../UI/CustomSvgIcons/Music';
 
@@ -660,17 +660,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       onSuccessfulPurchase={onPurchaseSuccessful}
                     />
                   )}
-                  {isFiltersPanelOpen && canShowFiltersPanel && (
-                    <Paper
-                      style={{
-                        display: 'flex',
-                        width: !isFiltersPanelOpen
-                          ? 50
-                          : windowWidth === 'small'
-                          ? 205
-                          : 250,
-                      }}
-                      background="medium"
+                  {canShowFiltersPanel && (
+                    <ResponsivePaperOrDrawer
+                      onClose={() => setIsFiltersPanelOpen(false)}
+                      open={isFiltersPanelOpen}
                     >
                       <ScrollView>
                         <Column>
@@ -695,7 +688,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                           </Line>
                         </Column>
                       </ScrollView>
-                    </Paper>
+                    </ResponsivePaperOrDrawer>
                   )}
                 </Line>
               </Column>

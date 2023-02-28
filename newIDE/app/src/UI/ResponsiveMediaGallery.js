@@ -268,7 +268,7 @@ const ResponseMediaGallery = ({
               />
             ) : (
               <img
-                src="res/soundicon.png"
+                src="res/audio-placeholder.jpg"
                 style={styles.imageCarouselItem}
                 alt="sound"
               />

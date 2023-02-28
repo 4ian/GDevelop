@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
@@ -76,6 +77,18 @@ const styles = {
   },
 };
 
+// Styles to give a visible hover for the mouse cursor.
+const useStylesForTileHover = makeStyles(theme =>
+  createStyles({
+    tile: {
+      transition: 'transform 0.3s ease-in-out',
+      '&:hover': {
+        transform: 'scale(1.02)',
+      },
+    },
+  })
+);
+
 const ImageOverlay = ({ content }: {| content: React.Node |}) => (
   <div style={styles.overlay}>
     <Typography variant="body1" style={styles.overlayText}>
@@ -106,6 +119,7 @@ const ImageTileGrid = ({
   getLimitFromWidth,
 }: ImageTileGridProps) => {
   const windowWidth = useResponsiveWindowWidth();
+  const tileClasses = useStylesForTileHover();
   const MAX_COLUMNS = getColumnsFromWidth('large');
   const limit = getLimitFromWidth ? getLimitFromWidth(windowWidth) : undefined;
   const itemsToDisplay = limit ? items.slice(0, limit) : items;
@@ -143,7 +157,7 @@ const ImageTileGrid = ({
                 .fill(0)
                 .map((_, index) => (
                   // Display tiles but with skeletons while the data is loading.
-                  <GridListTile key={index}>
+                  <GridListTile key={index} classes={tileClasses}>
                     <Skeleton
                       variant="rect"
                       width="100%"
@@ -153,7 +167,7 @@ const ImageTileGrid = ({
                   </GridListTile>
                 ))
             : itemsToDisplay.map((item, index) => (
-                <GridListTile key={index}>
+                <GridListTile key={index} classes={tileClasses}>
                   <ButtonBase
                     style={styles.buttonStyle}
                     onClick={item.onClick}

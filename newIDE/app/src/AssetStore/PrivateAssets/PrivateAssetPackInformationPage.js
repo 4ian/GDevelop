@@ -147,6 +147,22 @@ const PrivateAssetPackInformationPage = ({
       />
     ) : null;
 
+  const mediaItems = assetPack
+    ? assetPack.previewImageUrls
+        .map(url => ({
+          kind: 'image',
+          url,
+        }))
+        .concat(
+          assetPack.previewSoundUrls
+            ? assetPack.previewSoundUrls.map(url => ({
+                kind: 'audio',
+                url,
+              }))
+            : []
+        )
+    : [];
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -176,9 +192,8 @@ const PrivateAssetPackInformationPage = ({
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
                   <Column useFullHeight expand noMargin noOverflowParent>
                     <ResponsiveMediaGallery
-                      imagesUrls={assetPack.previewImageUrls}
-                      soundsUrls={assetPack.previewSoundUrls}
-                      altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
+                      mediaItems={mediaItems}
+                      altTextTemplate={`Asset pack ${name} preview image or sound {mediaIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
                   </Column>

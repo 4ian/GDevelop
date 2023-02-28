@@ -11,6 +11,8 @@ import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 import { ColumnStackLayout } from './Layout';
 
+type MediaItem = {| kind: 'audio' | 'image', url: string |};
+
 const styles = {
   selectedMedia: {
     width: '100%',
@@ -40,7 +42,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   desktopGallery: {
     flex: 1,
@@ -67,20 +68,18 @@ const styles = {
 const GRID_SPACING = 1;
 
 type Props = {|
-  imagesUrls: Array<string>,
-  soundsUrls: ?Array<string>,
+  mediaItems: Array<MediaItem>,
   /**
    * Alt text inserted for each image tag.
-   * The string `{imageIndex}` will be replaced with image actual index.
-   * For instance: "Asset pack preview image {imageIndex}"
+   * The string `{mediaIndex}` will be replaced with media actual index.
+   * For instance: "Asset pack preview image {mediaIndex}"
    */
   altTextTemplate: string,
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
 const ResponseMediaGallery = ({
-  imagesUrls,
-  soundsUrls,
+  mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
 }: Props) => {
@@ -143,24 +142,7 @@ const ResponseMediaGallery = ({
     [mobileImageWidth, mobileGridScrollX]
   );
 
-  const mediaUrls: Array<{|
-    kind: 'audio' | 'image',
-    url: string,
-  |}> = imagesUrls
-    .map(url => ({
-      kind: 'image',
-      url,
-    }))
-    .concat(
-      soundsUrls
-        ? soundsUrls.map(url => ({
-            kind: 'audio',
-            url,
-          }))
-        : []
-    );
-
-  const selectedMedia = mediaUrls[selectedMediaIndex];
+  const selectedMedia = mediaItems[selectedMediaIndex];
 
   if (isMobile) {
     return (
@@ -193,7 +175,7 @@ const ResponseMediaGallery = ({
                   setMobileGridScrollX(event.currentTarget.scrollLeft)
                 }
               >
-                {mediaUrls.map(({ kind, url }, index) => (
+                {mediaItems.map(({ kind, url }, index) => (
                   <Grid
                     item
                     key={url}
@@ -212,7 +194,7 @@ const ResponseMediaGallery = ({
                             height: mobileImageWidth / (16 / 9),
                           }}
                           alt={altTextTemplate.replace(
-                            /{imageIndex}/g,
+                            /{mediaIndex}/g,
                             String(selectedMediaIndex + 1)
                           )}
                         />
@@ -232,7 +214,7 @@ const ResponseMediaGallery = ({
         </Measure>
         <Line justifyContent="center">
           <Text noMargin size="body2" style={styles.disabledText}>
-            {currentlyViewedImageIndex + 1}/{mediaUrls.length}
+            {currentlyViewedImageIndex + 1}/{mediaItems.length}
           </Text>
         </Line>
       </div>
@@ -245,7 +227,7 @@ const ResponseMediaGallery = ({
           style={styles.selectedMedia}
           src={selectedMedia.url}
           alt={altTextTemplate.replace(
-            /{imageIndex}/g,
+            /{mediaIndex}/g,
             String(selectedMediaIndex + 1)
           )}
         />
@@ -257,7 +239,7 @@ const ResponseMediaGallery = ({
         </div>
       )}
       <div style={styles.desktopGallery}>
-        {mediaUrls.map(({ kind, url }, index) => (
+        {mediaItems.map(({ kind, url }, index) => (
           <div
             key={url}
             onClick={() => setSelectedMediaIndex(index)}
@@ -280,7 +262,7 @@ const ResponseMediaGallery = ({
                 src={url}
                 style={styles.imageCarouselItem}
                 alt={altTextTemplate.replace(
-                  /{imageIndex}/g,
+                  /{mediaIndex}/g,
                   (index + 1).toString()
                 )}
               />

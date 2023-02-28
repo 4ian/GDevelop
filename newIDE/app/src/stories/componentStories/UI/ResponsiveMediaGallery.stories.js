@@ -24,15 +24,38 @@ export const Default = () => (
         </Column>
         <Column expand noOverflowParent noMargin>
           <ResponsiveMediaGallery
-            imagesUrls={[
-              'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
-              'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
-              'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
-              'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
-              'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
-              'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+            mediaItems={[
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+              },
             ]}
-            soundsUrls={undefined}
             altTextTemplate={'Image {imageIndex}'}
           />
         </Column>
@@ -43,15 +66,38 @@ export const Default = () => (
         </Column>
         <Column expand noOverflowParent noMargin>
           <ResponsiveMediaGallery
-            imagesUrls={[
-              'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
-              'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
-              'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
-              'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
-              'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
-              'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+            mediaItems={[
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
+              },
+              {
+                kind: 'image',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+              },
             ]}
-            soundsUrls={undefined}
             altTextTemplate={'Image {imageIndex}'}
             horizontalOuterMarginToEatOnMobile={8}
           />

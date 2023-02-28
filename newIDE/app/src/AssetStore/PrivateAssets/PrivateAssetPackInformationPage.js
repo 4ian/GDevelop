@@ -21,7 +21,7 @@ import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import Cross from '../../UI/CustomSvgIcons/Cross';
-import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
+import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
@@ -174,8 +174,9 @@ const PrivateAssetPackInformationPage = ({
                 </Column>
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
                   <Column useFullHeight expand noMargin noOverflowParent>
-                    <ResponsiveImagesGallery
+                    <ResponsiveMediaGallery
                       imagesUrls={assetPack.previewImageUrls}
+                      soundsUrls={assetPack.previewSoundUrls}
                       altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />

@@ -96,6 +96,7 @@ export type PrivateAssetPack = {|
   id: string,
   name: string,
   previewImageUrls: Array<string>,
+  previewSoundUrls?: Array<string>,
   updatedAt: string,
   createdAt: string,
   tag: string,

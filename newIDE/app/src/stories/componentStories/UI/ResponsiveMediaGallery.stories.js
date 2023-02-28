@@ -3,15 +3,15 @@ import * as React from 'react';
 
 import muiDecorator from '../../ThemeDecorator';
 
-import ResponsiveImagesGallery from '../../../UI/ResponsiveImagesGallery';
+import ResponsiveMediaGallery from '../../../UI/ResponsiveMediaGallery';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import Paper from '../../../UI/Paper';
 
 export default {
-  title: 'UI Building Blocks/ResponsiveImagesGallery',
-  component: ResponsiveImagesGallery,
+  title: 'UI Building Blocks/ResponsiveMediaGallery',
+  component: ResponsiveMediaGallery,
   decorators: [muiDecorator],
 };
 
@@ -23,7 +23,7 @@ export const Default = () => (
           <Text>Default</Text>
         </Column>
         <Column expand noOverflowParent noMargin>
-          <ResponsiveImagesGallery
+          <ResponsiveMediaGallery
             imagesUrls={[
               'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
               'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
@@ -32,6 +32,7 @@ export const Default = () => (
               'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
               'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
             ]}
+            soundsUrls={undefined}
             altTextTemplate={'Image {imageIndex}'}
           />
         </Column>
@@ -41,7 +42,7 @@ export const Default = () => (
           <Text>Eating outer margins on the side on small devices</Text>
         </Column>
         <Column expand noOverflowParent noMargin>
-          <ResponsiveImagesGallery
+          <ResponsiveMediaGallery
             imagesUrls={[
               'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
               'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
@@ -50,6 +51,7 @@ export const Default = () => (
               'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
               'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
             ]}
+            soundsUrls={undefined}
             altTextTemplate={'Image {imageIndex}'}
             horizontalOuterMarginToEatOnMobile={8}
           />

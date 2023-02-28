@@ -139,7 +139,17 @@ export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
-/** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
+export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
+  const contentKeys = Object.keys(assetPack.content);
+  return contentKeys.length === 1 && contentKeys[0] === 'audio';
+};
+export const doesAssetPackContainAudio = (
+  assetPack: PrivateAssetPack
+): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
+
+/**
+ * Check if the IDE version, passed as argument, satisfy the version required by the asset.
+ */
 export const isCompatibleWithAsset = (
   ideVersion: string,
   assetHeader: { gdevelopVersion: string }

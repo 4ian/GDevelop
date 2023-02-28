@@ -130,8 +130,8 @@ export function getMuiOverrides({
         paddingRight: 40,
       },
       gutters: {
-        paddingRight: 8,
-        paddingLeft: 8,
+        paddingRight: 16,
+        paddingLeft: 16,
       },
     },
     MuiListItemSecondaryAction: {

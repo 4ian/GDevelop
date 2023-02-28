@@ -30,7 +30,7 @@ namespace gdjs {
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
     /**Quality of the antialiasing filter */
-    antialiasingQuality: 'Off' | 'Low' | 'Medium' | 'High';
+    antialiasing: 'None' | 'Low' | 'Medium' | 'High';
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -54,7 +54,7 @@ namespace gdjs {
     _outlineSize: float;
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
-    _antialiasingQuality: 'Off' | 'Low' | 'Medium' | 'High';
+    _antialiasing: 'None' | 'Low' | 'Medium' | 'High';
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -89,7 +89,7 @@ namespace gdjs {
       this._outlineSize = shapePainterObjectData.outlineSize;
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
-      this._antialiasingQuality = shapePainterObjectData.antialiasingQuality;
+      this._antialiasing = shapePainterObjectData.antialiasing;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -341,19 +341,19 @@ namespace gdjs {
       return this._clearBetweenFrames;
     }
 
-    setAntialiasingQuality(value: 'Off' | 'Low' | 'Medium' | 'High'): void {
-      this._antialiasingQuality = value;
+    setAntialiasing(value: 'None' | 'Low' | 'Medium' | 'High'): void {
+      this._antialiasing = value;
       this._renderer.updateAntialiasing();
     }
 
-    getAntialiasingQuality(): 'Off' | 'Low' | 'Medium' | 'High' {
-      return this._antialiasingQuality;
+    getAntialiasing(): 'None' | 'Low' | 'Medium' | 'High' {
+      return this._antialiasing;
     }
 
-    checkAntialiasingQuality(
-      valueToCompare: 'Off' | 'Low' | 'Medium' | 'High'
+    checkAntialiasing(
+      valueToCompare: 'None' | 'Low' | 'Medium' | 'High'
     ): boolean {
-      return this._antialiasingQuality === valueToCompare;
+      return this._antialiasing === valueToCompare;
     }
 
     setCoordinatesRelative(value: boolean): void {

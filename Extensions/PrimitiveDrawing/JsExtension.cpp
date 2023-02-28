@@ -26,7 +26,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetObjectMetadata("PrimitiveDrawing::Drawer")
         .SetIncludeFile(
             "Extensions/PrimitiveDrawing/shapepainterruntimeobject.js")
-        .AddIncludeFile("Extensions/PrimitiveDrawing/pixi-graphics-extras/graphics-extras.min.js");
+        .AddIncludeFile("Extensions/PrimitiveDrawing/pixi-graphics-extras/graphics-extras.min.js")
+        .AddIncludeFile("Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js");
 
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Rectangle"]
@@ -228,14 +229,14 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("transformToSceneX");
 
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasingQuality"]
-        .SetFunctionName("setAntialiasingQuality");
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasing"]
+        .SetFunctionName("setAntialiasing");
     GetAllStrExpressionsForObject(
-        "PrimitiveDrawing::Drawer")["GetAntialiasingQuality"]
-        .SetFunctionName("getAntialiasingQuality");
+        "PrimitiveDrawing::Drawer")["GetAntialiasing"]
+        .SetFunctionName("getAntialiasing");
     GetAllConditionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::CheckAntialiasingQuality"]
-        .SetFunctionName("checkAntialiasingQuality");
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::CheckAntialiasing"]
+        .SetFunctionName("checkAntialiasing");
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

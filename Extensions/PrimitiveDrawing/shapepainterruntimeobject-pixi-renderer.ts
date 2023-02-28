@@ -490,14 +490,14 @@ namespace gdjs {
       return point;
     }
     updateAntialiasing(): void {
-      if (this._object.getAntialiasingQuality() != 'Off') {
+      if (this._object.getAntialiasing() != 'None') {
         const antialiasingFilter =
           this._antialiasingFilter ||
           (this._antialiasingFilter = new PIXI.filters.FXAAFilter());
         antialiasingFilter.enabled = true;
         antialiasingFilter.multisample =
           PIXI.MSAA_QUALITY[
-            this._object.getAntialiasingQuality().toUpperCase()
+            this._object.getAntialiasing().toUpperCase()
           ] || PIXI.MSAA_QUALITY.LOW;
 
         if (!this._graphics.filters) {

@@ -60,10 +60,8 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline void SetClearBetweenFrames(bool value) { clearBetweenFrames = value; }
   inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
 
-  inline bool IsAntialiased() { return antialiasing;}
-  inline void SetAntialiased(bool value) { antialiasing = value; }
-  inline gd::String GetAntialiasingQuality() { return antialiasingQuality; }
-  inline void SetAntialiasingQuality(const gd::String& value) { antialiasingQuality = value; }
+  inline gd::String GetAntialiasing() { return antialiasing; }
+  inline void SetAntialiasing(const gd::String& value) { antialiasing = value; }
 
  protected:
   virtual void DoUnserializeFrom(gd::Project& project,
@@ -90,8 +88,7 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   bool clearBetweenFrames;
 
   //Antialiasing
-  bool antialiasing;
-  gd::String antialiasingQuality;
+  gd::String antialiasing;
 };
 
 /**

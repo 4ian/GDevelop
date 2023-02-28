@@ -4,7 +4,6 @@ import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar from '../UI/SearchBar';
-import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
@@ -148,6 +147,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [navigationState]
     );
 
+    const canShowFiltersPanel =
+      !openedAssetShortHeader && // Don't show filters on asset page.
+      !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
+      !(
+        openedAssetPack &&
+        openedAssetPack.content &&
+        // Don't show filters if opened asset pack contains audio only.
+        isAssetPackAudioOnly(openedAssetPack)
+      );
     const assetsHome = React.useRef<?AssetsHomeInterface>(null);
     const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
     const assetDetails = React.useRef<?AssetDetailsInterface>(null);
@@ -471,6 +479,14 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       id="asset-store-search-bar"
                     />
                   </Column>
+                  <IconButton
+                    onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}
+                    disabled={!canShowFiltersPanel}
+                    selected={canShowFiltersPanel && isFiltersPanelOpen}
+                    size="small"
+                  >
+                    <Tune />
+                  </IconButton>
                 </LineStackLayout>
                 <Spacer />
                 <Column noMargin>
@@ -538,71 +554,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
                   }
                 >
-                  {!openedAssetShortHeader && // Don't show filters on asset page.
-                  !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
-                    !(
-                      openedAssetPack &&
-                      openedAssetPack.content &&
-                      // Don't show filters if opened asset pack contains audio only.
-                      isAssetPackAudioOnly(openedAssetPack)
-                    ) && (
-                      <Column noMargin>
-                        <ScrollView>
-                          <Paper
-                            style={{
-                              width: !isFiltersPanelOpen
-                                ? 50
-                                : windowWidth === 'small'
-                                ? 205
-                                : 250,
-                            }}
-                            background="medium"
-                          >
-                            {!isFiltersPanelOpen ? (
-                              <Line justifyContent="center">
-                                <IconButton
-                                  onClick={() => setIsFiltersPanelOpen(true)}
-                                >
-                                  <Tune />
-                                </IconButton>
-                              </Line>
-                            ) : (
-                              <>
-                                <Line
-                                  justifyContent="space-between"
-                                  alignItems="center"
-                                >
-                                  <Column noMargin>
-                                    <Line alignItems="center">
-                                      <Tune />
-                                      <Subheader>
-                                        <Trans>Object filters</Trans>
-                                      </Subheader>
-                                    </Line>
-                                  </Column>
-                                  <IconButton
-                                    onClick={() => setIsFiltersPanelOpen(false)}
-                                  >
-                                    <DoubleChevronArrowLeft />
-                                  </IconButton>
-                                </Line>
-                                <Line
-                                  justifyContent="space-between"
-                                  alignItems="center"
-                                >
-                                  <AssetStoreFilterPanel
-                                    assetFiltersState={assetFiltersState}
-                                    onChoiceChange={() => {
-                                      navigationState.openSearchResultPage();
-                                    }}
-                                  />
-                                </Line>
-                              </>
-                            )}
-                          </Paper>
-                        </ScrollView>
-                      </Column>
-                    )}
                   {isOnHomePage ? (
                     error ? (
                       <PlaceholderError onRetry={fetchAssetsAndFilters}>
@@ -636,6 +587,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       onRetry={fetchAssetsAndFilters}
                       error={error}
                       searchItems={searchResults}
+                      spacing={8}
                       renderSearchItem={(assetShortHeader, size) => (
                         <AssetCard
                           size={size}
@@ -707,6 +659,43 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       }
                       onSuccessfulPurchase={onPurchaseSuccessful}
                     />
+                  )}
+                  {isFiltersPanelOpen && canShowFiltersPanel && (
+                    <Paper
+                      style={{
+                        display: 'flex',
+                        width: !isFiltersPanelOpen
+                          ? 50
+                          : windowWidth === 'small'
+                          ? 205
+                          : 250,
+                      }}
+                      background="medium"
+                    >
+                      <ScrollView>
+                        <Column>
+                          <Column noMargin>
+                            <Line alignItems="center">
+                              <Tune />
+                              <Subheader>
+                                <Trans>Object filters</Trans>
+                              </Subheader>
+                            </Line>
+                          </Column>
+                          <Line
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <AssetStoreFilterPanel
+                              assetFiltersState={assetFiltersState}
+                              onChoiceChange={() => {
+                                navigationState.openSearchResultPage();
+                              }}
+                            />
+                          </Line>
+                        </Column>
+                      </ScrollView>
+                    </Paper>
                   )}
                 </Line>
               </Column>

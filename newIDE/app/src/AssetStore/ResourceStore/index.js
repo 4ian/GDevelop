@@ -88,6 +88,7 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
         </Column>
         <BoxSearchResults
           baseSize={128}
+          spacing={8}
           onRetry={fetchResourcesAndFilters}
           error={error}
           searchItems={searchResultsForResourceKind}

@@ -52,6 +52,7 @@ const contentTypeToMessageDescriptor = {
 
 const styles = {
   disabledText: { opacity: 0.6 },
+  scrollview: { overflowX: 'hidden' },
 };
 
 type Props = {|
@@ -160,7 +161,7 @@ const PrivateAssetPackInformationPage = ({
             </Column>
           ) : assetPack && sellerPublicProfile ? (
             <Column noOverflowParent expand noMargin>
-              <ScrollView autoHideScrollbar>
+              <ScrollView autoHideScrollbar style={styles.scrollview}>
                 <Column noMargin alignItems="flex-end">
                   <Text displayInlineAsSpan size="sub-title">
                     <Trans>by</Trans>{' '}

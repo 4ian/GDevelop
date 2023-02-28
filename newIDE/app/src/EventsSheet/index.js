@@ -33,7 +33,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
-  type InstructionContextWithLocatingEvent,
+  type InstructionContextWithEventContext,
   getInitialSelection,
   selectEvent,
   selectInstruction,
@@ -52,6 +52,8 @@ import {
   getSelectedTopMostOnlyEventContexts,
   getLastSelectedEventContext,
   getLastSelectedEventContextWhichCanHaveSubEvents,
+  getLastSelectedInstructionContext,
+  getLastSelectedInstructionEventContextWhichCanHaveSubEvents,
 } from './SelectionHandler';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
@@ -107,7 +109,7 @@ const zoomLevel = { min: 1, max: 50 };
 
 export type ChangeContext = {|
   events?: Array<EventContext>,
-  instructions?: Array<InstructionContextWithLocatingEvent>,
+  instructions?: Array<InstructionContextWithEventContext>,
 |};
 
 type Props = {|
@@ -147,12 +149,12 @@ type State = {|
   eventsHistory: HistoryState,
 
   editedInstruction: {
-    //TODO: This could be adapted to be a InstructionContext
+    // TODO: This could be adapted to be a InstructionContext
     isCondition: boolean,
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     indexInList: ?number,
-    locatingEvent: ?gdBaseEvent,
+    eventContext: ?EventContext,
   },
   editedParameter: {
     // TODO: This could be adapted to be a ParameterContext
@@ -160,7 +162,7 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     parameterIndex: number,
-    locatingEvent: ?gdBaseEvent,
+    eventContext: ?EventContext,
   },
 
   selection: SelectionState,
@@ -245,14 +247,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       instruction: null,
       instrsList: null,
       indexInList: 0,
-      locatingEvent: null,
+      eventContext: null,
     },
     editedParameter: {
       isCondition: true,
       instruction: null,
       instrsList: null,
       parameterIndex: 0,
-      locatingEvent: null,
+      eventContext: null,
     },
 
     selection: getInitialSelection(),
@@ -311,12 +313,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
+    const canAddSubEvent = this._selectionCanHaveSubEvents();
+
     this.props.setToolbar(
       <Toolbar
         allEventsMetadata={this.state.allEventsMetadata}
         onAddStandardEvent={this._addStandardEvent}
-        onAddSubEvent={this.addSubEvents}
-        canAddSubEvent={hasEventSelected(this.state.selection)}
+        onAddSubEvent={this.addSubEvent}
+        canAddSubEvent={canAddSubEvent}
         canToggleEventDisabled={
           hasEventSelected(this.state.selection) &&
           this._selectionCanToggleDisabled()
@@ -382,20 +386,22 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.setState({ showSearchPanel: false });
   };
 
-  addSubEvents = () => {
+  addSubEvent = () => {
     const { project } = this.props;
 
-    const selectedEventContext = getLastSelectedEventContextWhichCanHaveSubEvents(
-      this.state.selection
-    );
-    if (!selectedEventContext) return;
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
+        this.state.selection
+      );
+    if (!eventContext) return;
 
-    const newSubEvent = selectedEventContext.event
+    const newSubEvent = eventContext.event
       .getSubEvents()
       .insertNewEvent(
         project,
         'BuiltinCommonInstructions::Standard',
-        selectedEventContext.event.getSubEvents().getEventsCount()
+        eventContext.event.getSubEvents().getEventsCount()
       );
 
     this._eventsTree &&
@@ -409,9 +415,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _selectionCanHaveSubEvents = () => {
-    return getSelectedEvents(this.state.selection).some(event => {
-      return event.canHaveSubEvents();
-    });
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
+        this.state.selection
+      );
+    return !!eventContext;
   };
 
   _selectionCanToggleDisabled = () => {
@@ -428,30 +437,41 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const selectedEventContext = getLastSelectedEventContext(
       this.state.selection
     );
+    const selectedInstructionContext = getLastSelectedInstructionContext(
+      this.state.selection
+    );
     let insertTopOfSelection = false;
 
-    // This is not a real hook.
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const screenType = useScreenType();
+    if (
+      type === 'BuiltinCommonInstructions::Comment' ||
+      type === 'BuiltinCommonInstructions::Group'
+    ) {
+      insertTopOfSelection = true;
+    }
 
     let insertion: EventInsertionContext;
     if (context) {
+      // Insert where asked.
       insertion = context;
     } else if (selectedEventContext) {
-      if (
-        type === 'BuiltinCommonInstructions::Comment' ||
-        type === 'BuiltinCommonInstructions::Group'
-      ) {
-        insertTopOfSelection = true;
-      }
-
+      // Insert next to the selected event.
       insertion = {
         eventsList: selectedEventContext.eventsList,
         indexInList: insertTopOfSelection
           ? selectedEventContext.indexInList - 1
           : selectedEventContext.indexInList,
       };
+    } else if (selectedInstructionContext) {
+      // Insert next to the event of the selected instruction.
+      const { eventContext } = selectedInstructionContext;
+      insertion = {
+        eventsList: eventContext.eventsList,
+        indexInList: insertTopOfSelection
+          ? eventContext.indexInList - 1
+          : eventContext.indexInList,
+      };
     } else {
+      // Nothing selected - insert at the end.
       insertion = {
         eventsList: this.props.events,
         indexInList: this.props.events.getEventsCount(),
@@ -477,6 +497,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }
           }
         );
+
+        // This is not a real hook.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const screenType = useScreenType();
         if (
           screenType !== 'touch' &&
           (type === 'BuiltinCommonInstructions::Comment' ||
@@ -573,15 +597,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ];
 
   openAddInstructionContextMenu = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => {
-    this.openInstructionEditor(locatingEvent, instructionsListContext, button);
+    this.openInstructionEditor(eventContext, instructionsListContext, button);
   };
 
   openInstructionEditor = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionContext: InstructionContext | InstructionsListContext,
     inlineInstructionEditorAnchorEl?: ?HTMLButtonElement = null
   ) => {
@@ -604,13 +628,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instructionContext.indexInList !== undefined
             ? instructionContext.indexInList
             : undefined,
-        locatingEvent,
+        eventContext,
       },
     });
   };
 
   closeInstructionEditor(saveChanges: boolean = false) {
-    const { instruction, locatingEvent } = this.state.editedInstruction;
+    const { instruction, eventContext } = this.state.editedInstruction;
 
     this.setState(
       {
@@ -619,7 +643,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instruction: null,
           instrsList: null,
           indexInList: 0,
-          locatingEvent: null,
+          eventContext: null,
         },
       },
       () => {
@@ -629,8 +653,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         if (instruction) {
           instruction.delete();
         }
-        if (saveChanges && locatingEvent) {
-          const positions = this._getChangedEventRows([locatingEvent]);
+        if (saveChanges && eventContext) {
+          const positions = this._getChangedEventRows([eventContext.event]);
           this._saveChangesToHistory('EDIT', {
             positionsBeforeAction: positions,
             positionAfterAction: positions,
@@ -641,11 +665,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   }
 
   moveSelectionToInstruction = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     destinationContext: InstructionContext
   ) => {
     this.moveSelectionToInstructionsList(
-      locatingEvent,
+      eventContext,
       {
         instrsList: destinationContext.instrsList,
         isCondition: destinationContext.isCondition,
@@ -655,7 +679,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   moveSelectionToInstructionsList = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     destinationContext: InstructionsListContext,
     indexInList: ?number = undefined
   ) => {
@@ -684,7 +708,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this.state.selection
     );
     const previousPositions = this._getChangedEventRows(locatingEvents);
-    const nextPositions = this._getChangedEventRows([locatingEvent]);
+    const nextPositions = this._getChangedEventRows([eventContext.event]);
 
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
       this.deleteSelection({ deleteEvents: false, shouldSaveInHistory: false });
@@ -767,7 +791,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
     {
       label: i18n._(t`Add Sub Event`),
-      click: () => this.addSubEvents(),
+      click: () => this.addSubEvent(),
       enabled: this._selectionCanHaveSubEvents(),
     },
     {
@@ -859,7 +883,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   openInstructionContextMenu = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     x: number,
     y: number,
     instructionContext: InstructionContext
@@ -868,7 +892,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.setState(
       {
         selection: selectInstruction(
-          locatingEvent,
+          eventContext,
           this.state.selection,
           instructionContext,
           multiSelect
@@ -882,14 +906,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   selectInstruction = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionContext: InstructionContext
   ) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
         selection: selectInstruction(
-          locatingEvent,
+          eventContext,
           this.state.selection,
           instructionContext,
           multiSelect
@@ -900,13 +924,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   openParameterEditor = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     parameterContext: ParameterContext
   ) => {
     const { instruction, parameterIndex } = parameterContext;
 
     this.setState({
-      editedParameter: { locatingEvent, ...parameterContext },
+      editedParameter: { eventContext, ...parameterContext },
       inlineEditing: true,
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
@@ -921,7 +945,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const {
       instruction,
       parameterIndex,
-      locatingEvent,
+      eventContext,
     } = this.state.editedParameter;
     if (instruction) {
       // If the user canceled, revert the value to the positionsBeforeAction value, if not null.
@@ -939,9 +963,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         !shouldCancel &&
         this.state.inlineEditingPreviousValue !==
           instruction.getParameter(parameterIndex) &&
-        locatingEvent
+        eventContext
       ) {
-        const positions = this._getChangedEventRows([locatingEvent]);
+        const positions = this._getChangedEventRows([eventContext.event]);
         this._saveChangesToHistory('EDIT', {
           positionsBeforeAction: positions,
           positionAfterAction: positions,
@@ -958,7 +982,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instruction: null,
           instrsList: null,
           parameterIndex: 0,
-          locatingEvent: null,
+          eventContext: null,
         },
         inlineEditing: false,
         inlineEditingAnchorEl: null,
@@ -1128,7 +1152,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   pasteInstructionsInInstructionsList = (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionsListContext: InstructionsListContext
   ) => {
     if (
@@ -1139,7 +1163,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     ) {
       return;
     }
-    const positions = this._getChangedEventRows([locatingEvent]);
+    const positions = this._getChangedEventRows([eventContext.event]);
     this._saveChangesToHistory(
       'EDIT',
       {
@@ -1601,12 +1625,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           const {
             instrsList,
             isCondition,
-            locatingEvent,
+            eventContext,
           } = this.state.editedInstruction;
           if (!instrsList) return;
 
-          locatingEvent &&
-            this.pasteInstructionsInInstructionsList(locatingEvent, {
+          eventContext &&
+            this.pasteInstructionsInInstructionsList(eventContext, {
               instrsList,
               isCondition,
             });

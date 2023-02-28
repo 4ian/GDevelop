@@ -54,6 +54,7 @@ import Paper from '../UI/Paper';
 import { isHomePage, isSearchResultPage } from './AssetStoreNavigator';
 import RaisedButton from '../UI/RaisedButton';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import Music from '../UI/CustomSvgIcons/Music';
 
 const capitalize = (str: string) => {
   return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -375,6 +376,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           <RaisedButton
             primary
             label={<Trans>Download pack sounds</Trans>}
+            icon={<Music />}
             onClick={async () => {
               const url = await getPrivateAssetPackAudioArchiveUrl(
                 assetPack.id

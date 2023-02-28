@@ -462,6 +462,23 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Jump forward in time on creation (in seconds)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterConfiguration.getJumpForwardInTime()}
+            onChange={value => {
+              particleEmitterConfiguration.setJumpForwardInTime(
+                parseInt(value, 10) || 0
+              );
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     );
   }

@@ -49,6 +49,9 @@ const styles = {
 
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
+// Duplicate offset before creating the instance
+const DUPLICATE_OFFSET = 25;
+
 export type InstancesEditorShortcutsCallbacks = {|
   onDelete: () => void,
   onCopy: () => void,
@@ -132,6 +135,9 @@ export default class InstancesEditor extends Component<Props> {
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
+  duplicateInstanceLastCursorRetrieved = false;
+  duplicateInstanceLastCursorX = 0;
+  duplicateInstanceLastCursorY = 0;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -719,6 +725,10 @@ export default class InstancesEditor extends Component<Props> {
     }
 
     this.hasCursorMovedSinceItIsDown = false;
+    this.duplicateInstanceLastCursorRetrieved = false;
+    this.duplicateInstanceLastCursorX = 0;
+    this.duplicateInstanceLastCursorY = 0;
+
     this.instancesMover.startMove(sceneX, sceneY);
   };
 
@@ -736,14 +746,36 @@ export default class InstancesEditor extends Component<Props> {
       !this.hasCursorMovedSinceItIsDown &&
       this.keyboardShortcuts.shouldCloneInstances()
     ) {
-      this.hasCursorMovedSinceItIsDown = true;
-
       const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-      for (var i = 0; i < selectedInstances.length; i++) {
-        const instance = selectedInstances[i];
-        this.props.initialInstances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
+
+      // Current cursor position
+      const cursorPosX = this.getLastCursorSceneCoordinates()[0];
+      const cursorPosY = this.getLastCursorSceneCoordinates()[1];
+      if (!this.duplicateInstanceLastCursorRetrieved) {
+        // Initial cursor position
+        const cursorSceneCoords = this.getLastCursorSceneCoordinates();
+        this.duplicateInstanceLastCursorX = cursorSceneCoords[0];
+        this.duplicateInstanceLastCursorY = cursorSceneCoords[1];
+        this.duplicateInstanceLastCursorRetrieved = true;
+      }
+
+      // Compare current cursor position with initial position
+      // If offset is enough, we create the instance
+      if (
+        cursorPosX - this.duplicateInstanceLastCursorX > DUPLICATE_OFFSET ||
+        cursorPosX - this.duplicateInstanceLastCursorX < -DUPLICATE_OFFSET ||
+        cursorPosY - this.duplicateInstanceLastCursorY > DUPLICATE_OFFSET ||
+        cursorPosY - this.duplicateInstanceLastCursorY < -DUPLICATE_OFFSET
+      ) {
+        this.hasCursorMovedSinceItIsDown = true;
+        for (var i = 0; i < selectedInstances.length; i++) {
+          const instance = selectedInstances[i];
+          this.props.initialInstances
+            .insertInitialInstance(instance)
+            .resetPersistentUuid();
+        }
+      } else {
+        return;
       }
     }
 

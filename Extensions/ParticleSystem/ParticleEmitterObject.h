@@ -91,6 +91,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetDestroyWhenNoParticles(bool enable = true) {
     destroyWhenNoParticles = enable;
   };
+  void SetJumpForwardInTimeOnCreation(double newValue) { jumpForwardInTimeOnCreation = newValue; };
 
   double GetRendererParam1() const { return rendererParam1; };
   double GetRendererParam2() const { return rendererParam2; };
@@ -137,6 +138,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   double GetParticleAngleRandomness2() const {
     return particleAngleRandomness2;
   };
+  double GetJumpForwardInTimeOnCreation() const { return jumpForwardInTimeOnCreation; };
 
   enum RendererType { Point, Line, Quad };
   void SetRendererType(RendererType type) { rendererType = type; };

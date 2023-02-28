@@ -470,9 +470,9 @@ export default class ParticleEmitterEditor extends React.Component<
             }
             fullWidth
             type="number"
-            value={particleEmitterConfiguration.getJumpForwardInTime()}
+            value={particleEmitterConfiguration.getJumpForwardInTimeOnCreation()}
             onChange={value => {
-              particleEmitterConfiguration.setJumpForwardInTime(
+              particleEmitterConfiguration.setJumpForwardInTimeOnCreation(
                 parseInt(value, 10) || 0
               );
               this.forceUpdate();

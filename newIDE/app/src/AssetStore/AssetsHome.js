@@ -82,6 +82,7 @@ const styles = {
     aspectRatio: '16 / 9',
     objectFit: 'cover',
     position: 'relative',
+    background: '#7147ed',
   },
   cardContainer: {
     overflow: 'hidden',

@@ -3024,6 +3024,9 @@ interface ShapePainterObject {
     unsigned long GetFillColorR();
     unsigned long GetFillColorG();
     unsigned long GetFillColorB();
+    [Const, Value] DOMString GetAntialiasing();
+    void SetAntialiasing([Const] DOMString value);
+
 };
 ShapePainterObject implements ObjectConfiguration;
 

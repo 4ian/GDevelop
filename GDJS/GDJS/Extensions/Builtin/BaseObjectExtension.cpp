@@ -197,6 +197,9 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["SetEffectBooleanParameter"]
       .SetFunctionName("setEffectBooleanParameter")
       .SetIncludeFile("runtimeobject.js");
+  objectActions["SetIncludedInParentCollisionMask"]
+      .SetFunctionName("setIncludedInParentCollisionMask")
+      .SetIncludeFile("runtimeobject.js");
 
   objectExpressions["X"].SetFunctionName("getX");
   objectExpressions["Y"].SetFunctionName("getY");

@@ -585,20 +585,6 @@ namespace gdjs {
         return count;
       };
 
-      export const setIncludedInParentCollisionMask = (
-        objectsLists: ObjectsLists,
-        isIncluded: boolean
-      ): void => {
-        for (const name in objectsLists.items) {
-          if (objectsLists.items.hasOwnProperty(name)) {
-            const objects = objectsLists.items[name];
-            for (const object of objects) {
-              object.setIncludedInParentCollisionMask(isIncluded);
-            }
-          }
-        }
-      };
-
       /** @deprecated */
       export const pickedObjectsCount = getPickedInstancesCount;
     }

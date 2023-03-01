@@ -177,9 +177,6 @@ AdvancedExtension::AdvancedExtension() {
                parameterNameCode + ") : \"\") " + operatorCode + " " +
                operandCode + ");\n";
       });
-      
-  GetAllActions()["SetIncludedInParentCollisionMask"]
-      .SetFunctionName("gdjs.evtTools.object.setIncludedInParentCollisionMask");
 }
 
 } // namespace gdjs

@@ -195,19 +195,12 @@ export default class SelectedInstances {
     const selection = this.instancesSelection.getSelectedInstances();
     let instanceRect = new Rectangle();
     for (var i = 0; i < selection.length; i++) {
-      if (this.selectedRectangles.length === i) {
-        const newRectangle = new PIXI.Graphics();
-        newRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
-        this.selectedRectangles.push(newRectangle);
-        this.rectanglesContainer.addChild(newRectangle);
-      }
-
       const instance = selection[i];
+
       instanceRect = this.instanceMeasurer.getInstanceAABB(
         instance,
         instanceRect
       );
-
       if (i === 0) {
         selectionAABB.setRectangle(instanceRect);
       } else {

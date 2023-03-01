@@ -325,6 +325,10 @@ const InAppTutorialTooltipDisplayer = ({
               enabled: true,
               offset: '0,10',
             },
+            preventOverflow: {
+              enabled: true,
+              boundariesElement: document.querySelector('.main-frame'),
+            },
           },
         }}
         style={{

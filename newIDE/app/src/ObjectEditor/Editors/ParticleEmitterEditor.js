@@ -473,7 +473,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getJumpForwardInTimeOnCreation()}
             onChange={value => {
               particleEmitterConfiguration.setJumpForwardInTimeOnCreation(
-                parseInt(value, 10) || 0
+                parseFloat(value)
               );
               this.forceUpdate();
             }}

@@ -53,7 +53,7 @@ ParticleEmitterBase::ParticleEmitterBase()
       particleAngleRandomness2(0),
       maxParticleNb(300),
       destroyWhenNoParticles(true),
-      jumpForwardInTimeOnCreation(0) {}
+      jumpForwardInTimeOnCreation(0.0f) {}
 
 ParticleEmitterObject::ParticleEmitterObject() {}
 
@@ -247,7 +247,9 @@ void ParticleEmitterBase::SetParticleColor2(const gd::String& color) {
   SetParticleBlue2(colors[2].To<int>());
 }
 
-void ParticleEmitterBase::SetJumpForwardInTimeOnCreation(double newValue) { jumpForwardInTimeOnCreation = newValue; }
+void ParticleEmitterBase::SetJumpForwardInTimeOnCreation(double newValue) {
+   jumpForwardInTimeOnCreation = newValue;
+}
 
 /**
  * Used by copy constructor and assignment operator.

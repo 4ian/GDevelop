@@ -91,7 +91,9 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetDestroyWhenNoParticles(bool enable = true) {
     destroyWhenNoParticles = enable;
   };
-  void SetJumpForwardInTimeOnCreation(double newValue) { jumpForwardInTimeOnCreation = newValue; };
+  void SetJumpForwardInTimeOnCreation(double newValue) { 
+    jumpForwardInTimeOnCreation = newValue;
+  };
 
   double GetRendererParam1() const { return rendererParam1; };
   double GetRendererParam2() const { return rendererParam2; };
@@ -181,6 +183,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   bool destroyWhenNoParticles;  ///< If set to true, the object will removed
                                 ///< itself from the scene when it has no more
                                 ///< particles.
+  double jumpForwardInTimeOnCreation;
 };
 
 /**

@@ -50,7 +50,7 @@ const styles = {
 const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
 
 // Duplicate offset before creating the instance
-const DUPLICATE_OFFSET = 25;
+const DUPLICATE_OFFSET = 15;
 
 export type InstancesEditorShortcutsCallbacks = {|
   onDelete: () => void,

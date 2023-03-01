@@ -139,7 +139,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "res/function32.png",
           "res/function32.png")
       .SetHelpPath("/events/functions/return")
-      .AddParameter("objectPtr", "Child")
+      .AddParameter("objectList", "Child")
       .AddParameter("yesorno", "Include in parent collision mask")
       .SetRelevantForCustomObjectEventsOnly()
       .MarkAsAdvanced();

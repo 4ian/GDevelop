@@ -586,10 +586,17 @@ namespace gdjs {
       };
 
       export const setIncludedInParentCollisionMask = (
-        child: gdjs.RuntimeObject,
+        objectsLists: ObjectsLists,
         isIncluded: boolean
       ): void => {
-        child.setIncludedInParentCollisionMask(isIncluded);
+        for (const name in objectsLists.items) {
+          if (objectsLists.items.hasOwnProperty(name)) {
+            const objects = objectsLists.items[name];
+            for (const object of objects) {
+              object.setIncludedInParentCollisionMask(isIncluded);
+            }
+          }
+        }
       };
 
       /** @deprecated */

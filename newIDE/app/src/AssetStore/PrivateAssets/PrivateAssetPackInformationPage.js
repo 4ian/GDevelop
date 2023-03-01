@@ -8,6 +8,8 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
+import Grid from '@material-ui/core/Grid';
+import GridList from '@material-ui/core/GridList';
 import { formatPrice } from '../../UI/PriceTag';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -29,6 +31,12 @@ import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
+import { PrivateAssetPackTile } from '../AssetsHome';
+
+const sameCreatorPackCountForSmallWindow = 2;
+const sameCreatorPackCountForMediumWindow = 3;
+const sameCreatorPackCount = 4;
+const cellSpacing = 2;
 
 const sortedContentType = [
   'sprite',
@@ -57,6 +65,7 @@ const styles = {
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
+  privateAssetPacksFromSameCreatorListingData?: ?Array<PrivateAssetPackListingData>,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
   onAssetPackOpen: PrivateAssetPackListingData => void,
@@ -64,6 +73,7 @@ type Props = {|
 
 const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
+  privateAssetPacksFromSameCreatorListingData,
   onOpenPurchaseDialog,
   isPurchaseDialogOpen,
   onAssetPackOpen,
@@ -297,6 +307,43 @@ const PrivateAssetPackInformationPage = ({
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>
+                {privateAssetPacksFromSameCreatorListingData &&
+                // Only display packs if there are at least 2. If there is only one,
+                // it means it's the same as the one currently opened.
+                privateAssetPacksFromSameCreatorListingData.length >= 2 ? (
+                  <>
+                    <Line>
+                      <Text size="block-title">
+                        <Trans>From the same author</Trans>
+                      </Text>
+                    </Line>
+                    <Line>
+                      <GridList
+                        cols={
+                          windowWidth === 'small'
+                            ? sameCreatorPackCountForSmallWindow
+                            : windowWidth === 'medium'
+                            ? sameCreatorPackCountForMediumWindow
+                            : sameCreatorPackCount
+                        }
+                        cellHeight="auto"
+                        spacing={cellSpacing}
+                      >
+                        {privateAssetPacksFromSameCreatorListingData.map(
+                          pack => (
+                            <PrivateAssetPackTile
+                              assetPackListingData={pack}
+                              key={pack.id}
+                              onSelect={() => onAssetPackOpen(pack)}
+                              owned={false}
+                            />
+                          )
+                        )}
+                      </GridList>
+                      <Grid />
+                    </Line>
+                  </>
+                ) : null}
               </ScrollView>
             </Column>
           ) : null}

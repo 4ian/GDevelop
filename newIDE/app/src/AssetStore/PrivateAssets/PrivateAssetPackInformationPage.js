@@ -307,7 +307,10 @@ const PrivateAssetPackInformationPage = ({
                     </Paper>
                   </Column>
                 </ResponsiveLineStackLayout>
-                {privateAssetPacksFromSameCreatorListingData ? (
+                {privateAssetPacksFromSameCreatorListingData &&
+                // Only display packs if there are at least 2. If there is only one,
+                // it means it's the same as the one currently opened.
+                privateAssetPacksFromSameCreatorListingData.length >= 2 ? (
                   <>
                     <Line>
                       <Text size="block-title">

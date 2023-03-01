@@ -190,6 +190,26 @@ export default class SelectedInstances {
     );
   }
 
+  getSelectionAABB(): Rectangle {
+    const selectionAABB = new Rectangle();
+    const selection = this.instancesSelection.getSelectedInstances();
+    let instanceRect = new Rectangle();
+    for (var i = 0; i < selection.length; i++) {
+      const instance = selection[i];
+
+      instanceRect = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        instanceRect
+      );
+      if (i === 0) {
+        selectionAABB.setRectangle(instanceRect);
+      } else {
+        selectionAABB.union(instanceRect);
+      }
+    }
+    return selectionAABB;
+  }
+
   render() {
     const {
       bigButtonSize,

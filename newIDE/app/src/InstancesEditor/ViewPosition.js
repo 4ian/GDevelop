@@ -49,6 +49,16 @@ export default class ViewPosition {
     return this._height;
   }
 
+  containsPoint(x: number, y: number) {
+    const canvasPoint = this.toCanvasCoordinates(x, y);
+    return (
+      0 <= canvasPoint[0] &&
+      canvasPoint[0] <= this._width &&
+      0 <= canvasPoint[1] &&
+      canvasPoint[1] <= this._height
+    );
+  }
+
   /**
    * Convert a point from the canvas coordinates (for example, the mouse position) to the
    * "world" coordinates.

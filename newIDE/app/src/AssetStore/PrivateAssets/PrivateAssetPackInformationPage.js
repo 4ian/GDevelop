@@ -21,7 +21,7 @@ import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import Cross from '../../UI/CustomSvgIcons/Cross';
-import ResponsiveImagesGallery from '../../UI/ResponsiveImagesGallery';
+import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
@@ -52,6 +52,7 @@ const contentTypeToMessageDescriptor = {
 
 const styles = {
   disabledText: { opacity: 0.6 },
+  scrollview: { overflowX: 'hidden' },
 };
 
 type Props = {|
@@ -146,6 +147,22 @@ const PrivateAssetPackInformationPage = ({
       />
     ) : null;
 
+  const mediaItems = assetPack
+    ? assetPack.previewImageUrls
+        .map(url => ({
+          kind: 'image',
+          url,
+        }))
+        .concat(
+          assetPack.previewSoundUrls
+            ? assetPack.previewSoundUrls.map(url => ({
+                kind: 'audio',
+                url,
+              }))
+            : []
+        )
+    : [];
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -160,7 +177,7 @@ const PrivateAssetPackInformationPage = ({
             </Column>
           ) : assetPack && sellerPublicProfile ? (
             <Column noOverflowParent expand noMargin>
-              <ScrollView autoHideScrollbar>
+              <ScrollView autoHideScrollbar style={styles.scrollview}>
                 <Column noMargin alignItems="flex-end">
                   <Text displayInlineAsSpan size="sub-title">
                     <Trans>by</Trans>{' '}
@@ -174,9 +191,9 @@ const PrivateAssetPackInformationPage = ({
                 </Column>
                 <ResponsiveLineStackLayout noColumnMargin noMargin>
                   <Column useFullHeight expand noMargin noOverflowParent>
-                    <ResponsiveImagesGallery
-                      imagesUrls={assetPack.previewImageUrls}
-                      altTextTemplate={`Asset pack ${name} preview image {imageIndex}`}
+                    <ResponsiveMediaGallery
+                      mediaItems={mediaItems}
+                      altTextTemplate={`Asset pack ${name} preview image or sound {mediaIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
                   </Column>

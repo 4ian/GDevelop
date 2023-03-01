@@ -11,14 +11,19 @@ import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 import { ColumnStackLayout } from './Layout';
 
+type MediaItem = {| kind: 'audio' | 'image', url: string |};
+
 const styles = {
-  mainImage: {
+  selectedMedia: {
     width: '100%',
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
     objectFit: 'cover',
     borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   carouselItem: {
     display: 'inline-block',
@@ -33,8 +38,10 @@ const styles = {
   },
   mobileImageCarouselItem: {
     aspectRatio: '16 / 9',
-    display: 'block',
     borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   desktopGallery: {
     flex: 1,
@@ -61,22 +68,22 @@ const styles = {
 const GRID_SPACING = 1;
 
 type Props = {|
-  imagesUrls: Array<string>,
+  mediaItems: Array<MediaItem>,
   /**
    * Alt text inserted for each image tag.
-   * The string `{imageIndex}` will be replaced with image actual index.
-   * For instance: "Asset pack preview image {imageIndex}"
+   * The string `{mediaIndex}` will be replaced with media actual index.
+   * For instance: "Asset pack preview image {mediaIndex}"
    */
   altTextTemplate: string,
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ResponsiveImagesGallery = ({
-  imagesUrls,
+const ResponseMediaGallery = ({
+  mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
 }: Props) => {
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState<number>(0);
+  const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
 
@@ -135,6 +142,8 @@ const ResponsiveImagesGallery = ({
     [mobileImageWidth, mobileGridScrollX]
   );
 
+  const selectedMedia = mediaItems[selectedMediaIndex];
+
   if (isMobile) {
     return (
       <div
@@ -166,7 +175,7 @@ const ResponsiveImagesGallery = ({
                   setMobileGridScrollX(event.currentTarget.scrollLeft)
                 }
               >
-                {imagesUrls.map((url, index) => (
+                {mediaItems.map(({ kind, url }, index) => (
                   <Grid
                     item
                     key={url}
@@ -177,17 +186,25 @@ const ResponsiveImagesGallery = ({
                     }}
                   >
                     <CardMedia>
-                      <CorsAwareImage
-                        src={url}
-                        style={{
-                          ...styles.mobileImageCarouselItem,
-                          height: mobileImageWidth / (16 / 9),
-                        }}
-                        alt={altTextTemplate.replace(
-                          /{imageIndex}/g,
-                          String(selectedImageIndex + 1)
-                        )}
-                      />
+                      {kind === 'image' ? (
+                        <CorsAwareImage
+                          src={url}
+                          style={{
+                            ...styles.mobileImageCarouselItem,
+                            height: mobileImageWidth / (16 / 9),
+                          }}
+                          alt={altTextTemplate.replace(
+                            /{mediaIndex}/g,
+                            String(selectedMediaIndex + 1)
+                          )}
+                        />
+                      ) : (
+                        <div style={styles.mobileImageCarouselItem}>
+                          <audio controls src={url}>
+                            Audio preview is unsupported.
+                          </audio>
+                        </div>
+                      )}
                     </CardMedia>
                   </Grid>
                 ))}
@@ -197,7 +214,7 @@ const ResponsiveImagesGallery = ({
         </Measure>
         <Line justifyContent="center">
           <Text noMargin size="body2" style={styles.disabledText}>
-            {currentlyViewedImageIndex + 1}/{imagesUrls.length}
+            {currentlyViewedImageIndex + 1}/{mediaItems.length}
           </Text>
         </Line>
       </div>
@@ -205,41 +222,57 @@ const ResponsiveImagesGallery = ({
   }
   return (
     <ColumnStackLayout noMargin>
-      <CorsAwareImage
-        style={styles.mainImage}
-        src={imagesUrls[selectedImageIndex]}
-        alt={altTextTemplate.replace(
-          /{imageIndex}/g,
-          String(selectedImageIndex + 1)
-        )}
-      />
+      {selectedMedia.kind === 'image' ? (
+        <CorsAwareImage
+          style={styles.selectedMedia}
+          src={selectedMedia.url}
+          alt={altTextTemplate.replace(
+            /{mediaIndex}/g,
+            String(selectedMediaIndex + 1)
+          )}
+        />
+      ) : (
+        <div style={styles.selectedMedia}>
+          <audio controls src={selectedMedia.url}>
+            Audio preview is unsupported.
+          </audio>
+        </div>
+      )}
       <div style={styles.desktopGallery}>
-        {imagesUrls.map((url, index) => (
+        {mediaItems.map(({ kind, url }, index) => (
           <div
             key={url}
-            onClick={() => setSelectedImageIndex(index)}
+            onClick={() => setSelectedMediaIndex(index)}
             tabIndex={0}
             style={{
               ...styles.carouselItem,
               outline:
-                index === selectedImageIndex ? 'solid 1px white' : undefined,
+                index === selectedMediaIndex ? 'solid 1px white' : undefined,
             }}
             onKeyPress={(
               event: SyntheticKeyboardEvent<HTMLLIElement>
             ): void => {
               if (shouldValidate(event)) {
-                setSelectedImageIndex(index);
+                setSelectedMediaIndex(index);
               }
             }}
           >
-            <CorsAwareImage
-              src={url}
-              style={styles.imageCarouselItem}
-              alt={altTextTemplate.replace(
-                /{imageIndex}/g,
-                (index + 1).toString()
-              )}
-            />
+            {kind === 'image' ? (
+              <CorsAwareImage
+                src={url}
+                style={styles.imageCarouselItem}
+                alt={altTextTemplate.replace(
+                  /{mediaIndex}/g,
+                  (index + 1).toString()
+                )}
+              />
+            ) : (
+              <img
+                src="res/audio-placeholder.jpg"
+                style={styles.imageCarouselItem}
+                alt="sound"
+              />
+            )}
           </div>
         ))}
       </div>
@@ -247,4 +280,4 @@ const ResponsiveImagesGallery = ({
   );
 };
 
-export default ResponsiveImagesGallery;
+export default ResponseMediaGallery;

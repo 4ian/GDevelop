@@ -96,6 +96,7 @@ export type PrivateAssetPack = {|
   id: string,
   name: string,
   previewImageUrls: Array<string>,
+  previewSoundUrls?: Array<string>,
   updatedAt: string,
   createdAt: string,
   tag: string,
@@ -138,7 +139,17 @@ export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
-/** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
+export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
+  const contentKeys = Object.keys(assetPack.content);
+  return contentKeys.length === 1 && contentKeys[0] === 'audio';
+};
+export const doesAssetPackContainAudio = (
+  assetPack: PrivateAssetPack
+): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
+
+/**
+ * Check if the IDE version, passed as argument, satisfy the version required by the asset.
+ */
 export const isCompatibleWithAsset = (
   ideVersion: string,
   assetHeader: { gdevelopVersion: string }
@@ -213,6 +224,20 @@ export const getPrivateAsset = async (
   );
   const assetResponse = await client.get(authorizedUrl);
   return assetResponse.data;
+};
+
+export const getPrivateAssetPackAudioFilesArchiveUrl = (
+  privateAssetPackId: string,
+  authorizationToken: string
+): string => {
+  const assetUrl = `${
+    GDevelopPrivateAssetsStorage.baseUrl
+  }/${privateAssetPackId}/resources/audio.zip`;
+  const authorizedUrl = createProductAuthorizedUrl(
+    assetUrl,
+    authorizationToken
+  );
+  return authorizedUrl;
 };
 
 export const listAllResources = ({

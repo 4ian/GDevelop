@@ -18,6 +18,8 @@ import {
   type PublicAssetPack,
   type PublicAssetPacks,
   type PrivateAssetPack,
+  doesAssetPackContainAudio,
+  isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import {
@@ -50,6 +52,13 @@ import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurc
 import { LineStackLayout } from '../UI/Layout';
 import Paper from '../UI/Paper';
 import { isHomePage, isSearchResultPage } from './AssetStoreNavigator';
+import RaisedButton from '../UI/RaisedButton';
+import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
+import Music from '../UI/CustomSvgIcons/Music';
+
+const capitalize = (str: string) => {
+  return str ? str[0].toUpperCase() + str.substr(1) : '';
+};
 
 type Props = {||};
 
@@ -119,6 +128,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     ] = React.useState<?PrivateAssetPackListingData>(null);
     const { onPurchaseSuccessful, receivedAssetPacks } = React.useContext(
       AuthenticatedUserContext
+    );
+    const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
+      PrivateAssetsAuthorizationContext
     );
 
     // The saved scroll position must not be reset by a scroll event until it
@@ -358,9 +370,32 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       ]
     );
 
-    const capitalize = (str: string) => {
-      return str ? str[0].toUpperCase() + str.substr(1) : '';
-    };
+    const renderPrivateAssetPackAudioFilesDownloadButton = React.useCallback(
+      (assetPack: PrivateAssetPack) => {
+        return (
+          <RaisedButton
+            primary
+            label={<Trans>Download pack sounds</Trans>}
+            icon={<Music />}
+            onClick={async () => {
+              const url = await getPrivateAssetPackAudioArchiveUrl(
+                assetPack.id
+              );
+              if (!url) {
+                console.error(
+                  `Could not generate url for premium asset pack with name ${
+                    assetPack.name
+                  }`
+                );
+                return;
+              }
+              Window.openExternalURL(url);
+            }}
+          />
+        );
+      },
+      [getPrivateAssetPackAudioArchiveUrl]
+    );
 
     React.useEffect(
       () => {
@@ -475,8 +510,21 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                                   : ''}
                               </Text>
                             </Column>
-                            {/* to center the title */}
-                            <Column expand alignItems="flex-end" noMargin />
+                            <Column
+                              expand
+                              alignItems="flex-end"
+                              noMargin
+                              justifyContent="center"
+                            >
+                              {openedAssetPack &&
+                              openedAssetPack.content &&
+                              doesAssetPackContainAudio(openedAssetPack) &&
+                              !isAssetPackAudioOnly(openedAssetPack)
+                                ? renderPrivateAssetPackAudioFilesDownloadButton(
+                                    openedAssetPack
+                                  )
+                                : null}
+                            </Column>
                           </>
                         )}
                       </>
@@ -490,8 +538,14 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
                   }
                 >
-                  {!openedAssetShortHeader &&
-                  !openedPrivateAssetPackListingData && ( // Don't show filters on asset page.
+                  {!openedAssetShortHeader && // Don't show filters on asset page.
+                  !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
+                    !(
+                      openedAssetPack &&
+                      openedAssetPack.content &&
+                      // Don't show filters if opened asset pack contains audio only.
+                      isAssetPackAudioOnly(openedAssetPack)
+                    ) && (
                       <Column noMargin>
                         <ScrollView>
                           <Paper
@@ -590,9 +644,33 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         />
                       )}
                       noResultPlaceholder={
-                        <NoResultPlaceholder
-                          onClear={() => clearAllFilters(assetFiltersState)}
-                        />
+                        openedAssetPack &&
+                        openedAssetPack.content &&
+                        isAssetPackAudioOnly(openedAssetPack) ? (
+                          <Column
+                            expand
+                            justifyContent="center"
+                            alignItems="center"
+                          >
+                            <AlertMessage
+                              kind="info"
+                              renderRightButton={() =>
+                                renderPrivateAssetPackAudioFilesDownloadButton(
+                                  openedAssetPack
+                                )
+                              }
+                            >
+                              <Trans>
+                                Download all the sounds of the asset pack in one
+                                click and use them in your project.
+                              </Trans>
+                            </AlertMessage>
+                          </Column>
+                        ) : (
+                          <NoResultPlaceholder
+                            onClear={() => clearAllFilters(assetFiltersState)}
+                          />
+                        )
                       }
                     />
                   ) : openedAssetShortHeader ? (

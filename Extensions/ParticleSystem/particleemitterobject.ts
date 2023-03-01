@@ -160,7 +160,8 @@ namespace gdjs {
       this.particleRotationMaxSpeed = particleObjectData.particleAngle2;
       this.maxParticlesCount = particleObjectData.maxParticleNb;
       this.additiveRendering = particleObjectData.additive;
-      this.jumpForwardInTimeOnCreation = particleObjectData.jumpForwardInTimeOnCreation;
+      this.jumpForwardInTimeOnCreation =
+        particleObjectData.jumpForwardInTimeOnCreation;
       this._textureDirty = this.texture !== '';
 
       // Jump emitter forward in time

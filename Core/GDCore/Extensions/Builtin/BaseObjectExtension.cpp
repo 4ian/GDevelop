@@ -1325,6 +1325,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple()
       .SetRequiresBaseObjectCapability("effect");
 
+  obj.AddAction("SetIncludedInParentCollisionMask",
+                _("Include in parent collision mask"),
+                _("Include or exclude a child from its parent collision mask."),
+                _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
+                _("Collision"),
+                "res/function32.png",
+                "res/function32.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("yesorno", "Include in parent collision mask")
+      .SetRelevantForCustomObjectEventsOnly();
+
   extension
       .AddAction("Create",
                  _("Create an object"),

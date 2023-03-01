@@ -187,6 +187,7 @@ namespace gdjs {
     protected hitBoxes: gdjs.Polygon[];
     protected hitBoxesDirty: boolean = true;
     protected aabb: AABB = { min: [0, 0], max: [0, 0] };
+    protected _isIncludedInParentCollisionMask = true;
 
     //Variables:
     protected _variables: gdjs.VariablesContainer;
@@ -1564,6 +1565,18 @@ namespace gdjs {
         this.getDrawableX() + centerX,
         this.getDrawableY() + centerY
       );
+    }
+
+    isIncludedInParentCollisionMask(): boolean {
+      return this._isIncludedInParentCollisionMask;
+    }
+
+    setIncludedInParentCollisionMask(isIncluded: boolean): void {
+      const wasIncluded = this._isIncludedInParentCollisionMask;
+      this._isIncludedInParentCollisionMask = isIncluded;
+      if (wasIncluded !== isIncluded) {
+        this._runtimeScene.onChildrenLocationChanged();
+      }
     }
 
     /**

@@ -7,6 +7,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include <vector>
+#include <algorithm>
 
 namespace gd {
 

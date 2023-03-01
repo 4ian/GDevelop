@@ -36,6 +36,7 @@ const styles = {
   cardContainer: {
     overflow: 'hidden',
     position: 'relative',
+    borderRadius: 8,
   },
   titleContainer: {
     position: 'absolute',

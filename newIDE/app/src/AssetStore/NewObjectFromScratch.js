@@ -109,6 +109,7 @@ export const CustomObjectPackResults = ({
           onRetry={fetchAssetsAndFilters}
           error={error}
           searchItems={selectedAssetPackSearchResults}
+          spacing={8}
           renderSearchItem={(assetShortHeader, size) => (
             <AssetCard
               size={size}

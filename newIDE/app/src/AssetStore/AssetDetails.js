@@ -543,6 +543,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                   onRetry={fetchAssetsAndFilters}
                   error={filterError}
                   searchItems={truncatedSearchResults}
+                  spacing={8}
                   renderSearchItem={(assetShortHeader, size) => (
                     <AssetCard
                       size={size}

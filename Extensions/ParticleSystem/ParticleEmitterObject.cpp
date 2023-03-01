@@ -247,10 +247,6 @@ void ParticleEmitterBase::SetParticleColor2(const gd::String& color) {
   SetParticleBlue2(colors[2].To<int>());
 }
 
-void ParticleEmitterBase::SetJumpForwardInTimeOnCreation(double newValue) {
-   jumpForwardInTimeOnCreation = newValue;
-}
-
 /**
  * Used by copy constructor and assignment operator.
  * \warning Do not forget to update me if members were changed!

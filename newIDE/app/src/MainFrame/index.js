@@ -1579,7 +1579,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          icon: <HomeIcon titleAccess="Home" fontSize="small" />,
+          icon: <HomeIcon titleAccess="Home" />,
           label: i18n._(t`Home`),
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,

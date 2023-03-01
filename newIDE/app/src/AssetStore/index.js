@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import shuffle from 'lodash/shuffle';
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import Tune from '@material-ui/icons/Tune';
+import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
+import Tune from '../UI/CustomSvgIcons/Tune';
 import SearchBar from '../UI/SearchBar';
 import { Column, Line, Spacer } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
@@ -43,7 +43,7 @@ import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import Home from '@material-ui/icons/Home';
+import Home from '../UI/CustomSvgIcons/Home';
 import PrivateAssetPackInformationPage from './PrivateAssets/PrivateAssetPackInformationPage';
 import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
@@ -523,7 +523,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       <>
                         <Column expand alignItems="flex-start" noMargin>
                           <TextButton
-                            icon={<ArrowBack />}
+                            icon={<ChevronArrowLeft />}
                             label={<Trans>Back</Trans>}
                             primary={false}
                             onClick={() => {

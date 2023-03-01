@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import shuffle from 'lodash/shuffle';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import Tune from '../UI/CustomSvgIcons/Tune';
 import SearchBar from '../UI/SearchBar';
@@ -438,13 +437,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
         const receivedAssetPackIds = receivedAssetPacks.map(pack => pack.id);
 
-        return shuffle(
-          privateAssetPacks.filter(
+        return privateAssetPacks
+          .filter(
             pack =>
               pack.sellerId === openedPrivateAssetPackListingData.sellerId &&
               !receivedAssetPackIds.includes(pack.sellerId)
           )
-        );
+          .sort((pack1, pack2) => pack1.name.localeCompare(pack2.name));
       },
       [openedPrivateAssetPackListingData, privateAssetPacks, receivedAssetPacks]
     );

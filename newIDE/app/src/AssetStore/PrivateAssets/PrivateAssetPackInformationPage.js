@@ -314,7 +314,7 @@ const PrivateAssetPackInformationPage = ({
                   <>
                     <Line>
                       <Text size="block-title">
-                        <Trans>From the same creator</Trans>
+                        <Trans>From the same author</Trans>
                       </Text>
                     </Line>
                     <Line>

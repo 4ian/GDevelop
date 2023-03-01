@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
+import shuffle from 'lodash/shuffle';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar from '../UI/SearchBar';
@@ -426,6 +427,28 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [isOnHomePage]
     );
 
+    const privateAssetPackFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
+      () => {
+        if (
+          !openedPrivateAssetPackListingData ||
+          !privateAssetPacks ||
+          !receivedAssetPacks
+        )
+          return null;
+
+        const receivedAssetPackIds = receivedAssetPacks.map(pack => pack.id);
+
+        return shuffle(
+          privateAssetPacks.filter(
+            pack =>
+              pack.sellerId === openedPrivateAssetPackListingData.sellerId &&
+              !receivedAssetPackIds.includes(pack.sellerId)
+          )
+        );
+      },
+      [openedPrivateAssetPackListingData, privateAssetPacks, receivedAssetPacks]
+    );
+
     return (
       <>
         <ResponsiveWindowMeasurer>
@@ -647,6 +670,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                         !!purchasingPrivateAssetPackListingData
                       }
                       onAssetPackOpen={selectPrivateAssetPack}
+                      privateAssetPacksFromSameCreatorListingData={
+                        privateAssetPackFromSameCreator
+                      }
                     />
                   ) : null}
                   {!!purchasingPrivateAssetPackListingData && (

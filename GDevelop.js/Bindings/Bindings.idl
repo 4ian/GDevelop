@@ -864,13 +864,19 @@ interface MeasurementUnit {
 
   void STATIC_ApplyTranslation();
 
-  [Ref] MeasurementUnit STATIC_GetDimensionless();
-  [Ref] MeasurementUnit STATIC_GetDegreeAngle();
-  [Ref] MeasurementUnit STATIC_GetSecond();
-  [Ref] MeasurementUnit STATIC_GetPixel();
-  [Ref] MeasurementUnit STATIC_GetPixelSpeed();
-  [Ref] MeasurementUnit STATIC_GetPixelAcceleration();
-  [Ref] MeasurementUnit STATIC_GetNewton();
+  [Const, Ref] MeasurementUnit STATIC_GetUndefined();
+  [Const, Ref] MeasurementUnit STATIC_GetDimensionless();
+  [Const, Ref] MeasurementUnit STATIC_GetDegreeAngle();
+  [Const, Ref] MeasurementUnit STATIC_GetSecond();
+  [Const, Ref] MeasurementUnit STATIC_GetPixel();
+  [Const, Ref] MeasurementUnit STATIC_GetPixelSpeed();
+  [Const, Ref] MeasurementUnit STATIC_GetPixelAcceleration();
+  [Const, Ref] MeasurementUnit STATIC_GetNewton();
+
+  long STATIC_GetDefaultMeasurementUnitsCount();
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitAtIndex(long index);
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitByName([Const] DOMString name);
+  boolean STATIC_HasDefaultMeasurementUnitNamed([Const] DOMString name);
 };
 
 interface MeasurementBaseUnit {

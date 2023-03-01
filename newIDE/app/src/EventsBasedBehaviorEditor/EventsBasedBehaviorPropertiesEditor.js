@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -27,6 +27,7 @@ import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView from '../UI/ScrollView';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -289,6 +290,47 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             />
                           )}
                         </SelectField>
+                        {property.getType() === 'Number' && (
+                          <SelectField
+                            floatingLabelText={<Trans>Measurement unit</Trans>}
+                            value={property.getMeasurementUnit().getName()}
+                            onChange={(e, i, value: string) => {
+                              property.setMeasurementUnit(
+                                gd.MeasurementUnit.getDefaultMeasurementUnitByName(
+                                  value
+                                )
+                              );
+                              this.forceUpdate();
+                              this.props.onPropertiesUpdated &&
+                                this.props.onPropertiesUpdated();
+                            }}
+                            fullWidth
+                          >
+                            {mapFor(
+                              0,
+                              gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
+                              i => {
+                                const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                  i
+                                );
+                                const unitShortLabel = getMeasurementUnitShortLabel(
+                                  measurementUnit
+                                );
+                                const label =
+                                  measurementUnit.getLabel() +
+                                  (unitShortLabel.length > 0
+                                    ? ' — ' + unitShortLabel
+                                    : '');
+                                return (
+                                  <SelectOption
+                                    value={measurementUnit.getName()}
+                                    primaryText={label}
+                                  />
+                                );
+                              }
+                            )}
+                          </SelectField>
+                        )}
                         {(property.getType() === 'String' ||
                           property.getType() === 'Number') && (
                           <SemiControlledTextField

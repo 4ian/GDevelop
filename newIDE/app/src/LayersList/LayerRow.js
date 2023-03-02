@@ -3,24 +3,25 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import Radio from '@material-ui/core/Radio';
-import  Tooltip  from '@material-ui/core/Tooltip';
+import Tooltip from '@material-ui/core/Tooltip';
 import { t, Trans } from '@lingui/macro';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import FlareIcon from '@material-ui/icons/Flare';
 import IconButton from '../UI/IconButton';
-import Delete from '@material-ui/icons/Delete';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
-import EditIcon from '@material-ui/icons/Edit';
 import Badge from '../UI/Badge';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import EditIcon from '../UI/CustomSvgIcons/Edit';
+import LightbulbIcon from '../UI/CustomSvgIcons/Lightbulb';
+import LightModeIcon from '../UI/CustomSvgIcons/LightMode';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('layers-list');
 
@@ -169,8 +170,8 @@ const LayerRow = ({
                         <InlineCheckbox
                           id="layer-visibility"
                           checked={isVisible}
-                          checkedIcon={<Visibility />}
-                          uncheckedIcon={<VisibilityOff />}
+                          checkedIcon={<VisibilityIcon />}
+                          uncheckedIcon={<VisibilityOffIcon />}
                           onCheck={(e, value) => onChangeVisibility(value)}
                           tooltipOrHelperText={
                             isVisible ? (
@@ -186,7 +187,7 @@ const LayerRow = ({
                           tooltip={t`Edit effects (${effectsCount})`}
                         >
                           <Badge badgeContent={effectsCount} color="primary">
-                            <FlareIcon />
+                            <LightModeIcon />
                           </Badge>
                         </IconButton>
                         <IconButton
@@ -198,11 +199,7 @@ const LayerRow = ({
                               : t`Edit properties`
                           }
                         >
-                          {isLightingLayer ? (
-                            <EmojiObjectsIcon />
-                          ) : (
-                            <EditIcon />
-                          )}
+                          {isLightingLayer ? <LightbulbIcon /> : <EditIcon />}
                         </IconButton>
                         <IconButton
                           size="small"
@@ -210,7 +207,7 @@ const LayerRow = ({
                           disabled={isBaseLayer}
                           tooltip={t`Delete the layer`}
                         >
-                          <Delete />
+                          <TrashIcon />
                         </IconButton>
                       </React.Fragment>
                     )}

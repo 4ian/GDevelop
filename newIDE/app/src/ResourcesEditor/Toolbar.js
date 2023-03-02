@@ -3,7 +3,7 @@ import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
-import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
+import EditIcon from '../UI/CustomSvgIcons/Edit';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import IconButton from '../UI/IconButton';
@@ -40,7 +40,7 @@ export class Toolbar extends PureComponent<Props, State> {
           tooltip={t`Open the properties panel`}
           selected={isPropertiesShown}
         >
-          <PropertiesPanelIcon />
+          <EditIcon />
         </IconButton>
         <IconButton
           size="small"

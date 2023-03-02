@@ -283,13 +283,15 @@ const PointsPreview = (props: Props) => {
       onPointerUp={onEndDragPoint}
     >
       <svg style={svgStyle} ref={svgRef}>
+        {/* Z index does not apply in SVG. To display selected and highlighted points
+        above the other points, they must be rendered below the other ones. */}
         {backgroundPointNames.map(pointName =>
           renderPointOrCenterOrOrigin(pointName)
         )}
         {highlightedPointName &&
         selectedPointName &&
         selectedPointName === highlightedPointName
-          ? null
+          ? null // Do no render selected point if it's highlighted.
           : selectedPointName
           ? renderPointOrCenterOrOrigin(selectedPointName)
           : null}

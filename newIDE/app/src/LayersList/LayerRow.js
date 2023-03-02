@@ -3,6 +3,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import Radio from '@material-ui/core/Radio';
+import  Tooltip  from '@material-ui/core/Tooltip';
 import { t, Trans } from '@lingui/macro';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -104,11 +105,19 @@ const LayerRow = ({
                     )}
                   </TreeTableCell>
                   <TreeTableCell>
-                    <Radio
-                      checked={isSelected}
-                      onChange={onSelect}
-                      size="small"
-                    />
+                    <Tooltip
+                      title={
+                        <Trans>
+                          Layer where instances are added by default
+                        </Trans>
+                      }
+                    >
+                      <Radio
+                        checked={isSelected}
+                        onChange={onSelect}
+                        size="small"
+                      />
+                    </Tooltip>
                   </TreeTableCell>
                   <TreeTableCell expand>
                     <SemiControlledTextField

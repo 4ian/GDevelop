@@ -17,12 +17,12 @@ const makeFirstLetterUppercase = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {|
-  codeSizeLevel: string,
+  difficultyLevel: string,
 |};
 
-export const ExampleDifficultyChip = ({ codeSizeLevel }: Props) => {
+export const ExampleDifficultyChip = ({ difficultyLevel }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
-  const color: ?string = theme.example.difficulty.color[codeSizeLevel];
+  const color: ?string = theme.example.difficulty.color[difficultyLevel];
 
   return (
     <Chip
@@ -33,14 +33,14 @@ export const ExampleDifficultyChip = ({ codeSizeLevel }: Props) => {
         border: color ? `1px solid ${color}` : undefined,
       }}
       label={
-        codeSizeLevel === 'simple' ? (
+        difficultyLevel === 'simple' ? (
           <Trans>Simple</Trans>
-        ) : codeSizeLevel === 'advanced' ? (
+        ) : difficultyLevel === 'advanced' ? (
           <Trans>Advanced</Trans>
-        ) : codeSizeLevel === 'expert' ? (
+        ) : difficultyLevel === 'expert' ? (
           <Trans>Expert</Trans>
         ) : (
-          makeFirstLetterUppercase(codeSizeLevel)
+          makeFirstLetterUppercase(difficultyLevel)
         )
       }
       key="example-size-level"

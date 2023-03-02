@@ -150,7 +150,7 @@ export function ExampleDialog({
                 <div style={{ flexWrap: 'wrap' }}>
                   {exampleShortHeader.difficultyLevel && (
                     <ExampleDifficultyChip
-                      codeSizeLevel={exampleShortHeader.difficultyLevel}
+                      difficultyLevel={exampleShortHeader.difficultyLevel}
                     />
                   )}
                   {exampleShortHeader.codeSizeLevel && (

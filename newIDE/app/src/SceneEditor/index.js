@@ -155,6 +155,7 @@ type State = {|
 
   renamedObjectWithContext: ?ObjectWithContext,
   selectedObjectsWithContext: Array<ObjectWithContext>,
+  selectedLayer: string,
 |};
 
 type CopyCutPasteOptions = {|
@@ -213,6 +214,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
+      selectedLayer: '',
     };
   }
 
@@ -1408,6 +1410,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <LayersList
             project={project}
+            selectedLayer={this.state.selectedLayer}
+            onSelectLayer={(layer: string) =>
+              this.setState({ selectedLayer: layer })
+            }
             onEditLayerEffects={this.editLayerEffects}
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}

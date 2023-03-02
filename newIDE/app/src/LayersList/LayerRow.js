@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import Radio from '@material-ui/core/Radio';
 import { t, Trans } from '@lingui/macro';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -31,6 +32,8 @@ export const styles = {
 type Props = {|
   id: string,
   layer: gdLayer,
+  isSelected: boolean,
+  onSelect: string => void,
   nameError: React.Node,
   onBlur: string => void,
   onRemove: () => void,
@@ -47,6 +50,8 @@ type Props = {|
 const LayerRow = ({
   id,
   layer,
+  isSelected,
+  onSelect,
   nameError,
   onBlur,
   onRemove,
@@ -97,6 +102,13 @@ const LayerRow = ({
                         <DragHandle />
                       </span>
                     )}
+                  </TreeTableCell>
+                  <TreeTableCell>
+                    <Radio
+                      checked={isSelected}
+                      onChange={onSelect}
+                      size="small"
+                    />
                   </TreeTableCell>
                   <TreeTableCell expand>
                     <SemiControlledTextField

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Chip from './Chip';
-import HeadphonesIcon from './CustomSvgIcons/Headphones';
+import StairsIcon from './CustomSvgIcons/Stairs';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 const styles = {
@@ -26,7 +26,7 @@ export const ExampleDifficultyChip = ({ difficultyLevel }: Props) => {
 
   return (
     <Chip
-      icon={<HeadphonesIcon style={{ color }} />}
+      icon={<StairsIcon style={{ color }} />}
       size="small"
       style={{
         ...styles.chip,

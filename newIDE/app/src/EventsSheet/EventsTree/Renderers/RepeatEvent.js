@@ -158,6 +158,7 @@ export default class RepeatEvent extends React.Component<
               windowWidth={this.props.windowWidth}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              rowIndex={this.props.rowIndex}
             />
           )}
           renderActionsList={({ className }) => (
@@ -188,6 +189,7 @@ export default class RepeatEvent extends React.Component<
               windowWidth={this.props.windowWidth}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              rowIndex={this.props.rowIndex}
             />
           )}
         />

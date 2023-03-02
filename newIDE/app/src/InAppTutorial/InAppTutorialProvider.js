@@ -1,19 +1,16 @@
 // @flow
 import * as React from 'react';
-import InAppTutorialContext, {
-  type InAppTutorial,
-} from './InAppTutorialContext';
-import onboardingTutorial from './Tutorials/OnboardingTutorial';
+import InAppTutorialContext from './InAppTutorialContext';
+import legacyOnboardingTutorial from './Tutorials/OnboardingTutorial';
 import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
 import {
   fetchInAppTutorial,
   fetchInAppTutorialShortHeaders,
   type InAppTutorialShortHeader,
+  type InAppTutorial,
 } from '../Utils/GDevelopServices/InAppTutorial';
 
 type Props = {| children: React.Node |};
-
-export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 
 const InAppTutorialProvider = (props: Props) => {
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
@@ -36,10 +33,10 @@ const InAppTutorialProvider = (props: Props) => {
     initialStepIndex: number,
     initialProjectData: { [key: string]: string },
   |}) => {
-    if (tutorialId === onboardingTutorial.id) {
+    if (tutorialId === legacyOnboardingTutorial.id) {
       setStartStepIndex(initialStepIndex);
       setStartProjectData(initialProjectData);
-      setTutorial(onboardingTutorial);
+      setTutorial(legacyOnboardingTutorial);
       setCurrentlyRunningInAppTutorial(tutorialId);
       return;
     }

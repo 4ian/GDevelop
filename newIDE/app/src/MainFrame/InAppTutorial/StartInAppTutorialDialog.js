@@ -9,6 +9,10 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 import { getLanguageLabelForLocale } from '../../Utils/i18n/MessageByLocale';
 import Text from '../../UI/Text';
+import {
+  FLING_GAME_IN_APP_TUTORIAL_ID,
+  PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+} from '../../Utils/GDevelopServices/InAppTutorial';
 
 const styles = {
   imgContainer: {
@@ -24,6 +28,55 @@ type Props = {|
   isProjectOpened?: boolean,
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
+
+const titleAndContentByKey = {
+  [FLING_GAME_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's make a Fling Game</Trans>,
+    content: (
+      <>
+        <Text>
+          <Trans>
+            You're about to start the first chapter of our in-app tutorial.
+          </Trans>
+        </Text>
+        <Text>
+          <Trans>
+            GDevelop will save your progress so you can take a break when you
+            need it.
+          </Trans>
+        </Text>
+      </>
+    ),
+  },
+  [PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's improve a scoring system</Trans>,
+    content: (
+      <>
+        <Text>
+          <Trans>You're about to start this in-app tutorial.</Trans>
+        </Text>
+        <Text>
+          <Trans>
+            A new project will be opened, so before beginning please ensure you
+            have closed and saved your current project.
+          </Trans>
+        </Text>
+        <Text>
+          <Trans>In this tutorial you will learn:</Trans>
+        </Text>
+        <Text displayAsListItem noMargin>
+          Making objects disappear or appear when colliding
+        </Text>
+        <Text displayAsListItem noMargin>
+          Creating, modifying and accessing a scene variable
+        </Text>
+        <Text displayAsListItem noMargin>
+          Updating a score accordingly
+        </Text>
+      </>
+    ),
+  },
+};
 
 const StartInAppTutorialDialog = ({
   open,
@@ -51,25 +104,8 @@ const StartInAppTutorialDialog = ({
 
   const dialogContentByCompletionStatus = {
     notStarted: {
-      title: <Trans>Let's make a Fling Game</Trans>,
-      content: (
-        <>
-          <Text>
-            <Trans>
-              You're about to start the first chapter of our in-app tutorial.
-            </Trans>
-          </Text>
-          <Text>
-            <Trans>
-              GDevelop will save your progress so you can take a break when you
-              need it.
-            </Trans>
-          </Text>
-          <Text>
-            <Trans>Are you ready to start?</Trans>
-          </Text>
-        </>
-      ),
+      title: titleAndContentByKey[tutorialId].title,
+      content: titleAndContentByKey[tutorialId].content,
       availableLocalesLabels: availableLocales
         ? availableLocales.map(locale => [
             locale,
@@ -195,6 +231,9 @@ const StartInAppTutorialDialog = ({
             ))}
           </Column>
         ) : null}
+        <Text>
+          <Trans>Are you ready?</Trans>
+        </Text>
       </ColumnStackLayout>
     </Dialog>
   );

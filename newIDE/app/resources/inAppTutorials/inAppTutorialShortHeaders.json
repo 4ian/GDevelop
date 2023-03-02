@@ -1,0 +1,20 @@
+[
+  {
+    "id": "flingGame",
+    "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/flingGame.json",
+    "availableLocales": ["en", "fr-FR"]
+  },
+  {
+    "id": "plinkoMultiplier",
+    "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/plinkoMultiplier.json",
+    "availableLocales": ["en"],
+    "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/plinkoMultiplier/game.json",
+    "initialProjectData": {
+      "gameScene": "GameScene",
+      "multiplier": "Multiplier",
+      "scoreMultiplier": "ScoreMultiplier",
+      "ball": "Ball",
+      "particles": "PegStar_Particle"
+    }
+  }
+]

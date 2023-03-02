@@ -18,6 +18,7 @@ type Props = {|
   onChange: (newVariableType: string) => void,
   isHighlighted?: boolean,
   disabled?: boolean,
+  id?: string,
 |};
 
 let options;
@@ -111,6 +112,7 @@ const VariableTypeSelector = (props: Props) => {
             : undefined
         }
         disabled={props.disabled}
+        id={props.id}
       >
         {getOptions()}
       </SelectField>

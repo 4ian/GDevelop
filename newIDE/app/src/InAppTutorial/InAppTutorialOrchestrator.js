@@ -11,12 +11,16 @@ import {
   type InAppTutorialFlowStepTrigger,
   type TranslatedText,
   type EditorIdentifier,
-} from './InAppTutorialContext';
+  isMiniTutorial,
+} from '../Utils/GDevelopServices/InAppTutorial';
 import InAppTutorialDialog from './InAppTutorialDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
-import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
+import {
+  getInstanceCountInLayoutForObject,
+  getInstancesInLayoutForObject,
+} from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   getMuiCheckboxValue,
@@ -332,7 +336,10 @@ type Props = {|
   tutorial: InAppTutorial,
   startStepIndex: number,
   startProjectData: { [key: string]: string },
-  endTutorial: (shouldCloseProject?: boolean) => void,
+  endTutorial: ({|
+    shouldCloseProject: boolean,
+    shouldWarnAboutUnsavedChanges: boolean,
+  |}) => void,
   project: ?gdProject,
   currentEditor: EditorIdentifier | null,
   currentSceneName: string | null,
@@ -388,14 +395,23 @@ const InAppTutorialOrchestrator = React.forwardRef<
       scene?: string,
     |} | null>(null);
     const [
-      elementWithValueToWatch,
-      setElementWithValueToWatch,
+      elementWithValueToWatchIfChanged,
+      setElementWithValueToWatchIfChanged,
     ] = React.useState<?string>(null);
     const inputInitialValueRef = React.useRef<?string>(null);
     const [
+      elementWithValueToWatchIfEquals,
+      setElementWithValueToWatchIfEquals,
+    ] = React.useState<?string>(null);
+    const inputExpectedValueRef = React.useRef<?string>(null);
+    const [
       objectSceneInstancesToWatch,
       setObjectSceneInstancesToWatch,
-    ] = React.useState<?{ sceneName: ?string, objectName: string }>(null);
+    ] = React.useState<?{
+      sceneName: ?string,
+      objectName: string,
+      count?: number,
+    }>(null);
     const domObserverRef = React.useRef<?MutationObserver>(null);
     const [
       shouldWatchProjectChanges,
@@ -666,7 +682,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
           currentStepFallbackStepIndex.current = currentStepIndex;
         }
         // At each step start, reset change watching logics.
-        setElementWithValueToWatch(null);
+        setElementWithValueToWatchIfChanged(null);
+        setElementWithValueToWatchIfEquals(null);
         setObjectSceneInstancesToWatch(null);
         setShouldWatchProjectChanges(false);
         // If index out of bounds, display end dialog.
@@ -682,14 +699,22 @@ const InAppTutorialOrchestrator = React.forwardRef<
       () => {
         if (!currentStep) return;
         const { nextStepTrigger, elementToHighlightId } = currentStep;
-        if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
+        if (nextStepTrigger && nextStepTrigger.valueEquals) {
+          if (!elementToHighlightId) return;
+          const elementToWatch = document.querySelector(elementToHighlightId);
+
+          if (elementToWatch) {
+            inputExpectedValueRef.current = nextStepTrigger.valueEquals;
+          }
+          setElementWithValueToWatchIfEquals(elementToHighlightId);
+        } else if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
           if (!elementToHighlightId) return;
           const elementToWatch = document.querySelector(elementToHighlightId);
 
           if (elementToWatch) {
             inputInitialValueRef.current = getInputValue(elementToWatch);
           }
-          setElementWithValueToWatch(elementToHighlightId);
+          setElementWithValueToWatchIfChanged(elementToHighlightId);
         } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
           const [
             objectKey,
@@ -698,7 +723,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
           const objectName = data[objectKey];
           if (!objectName) return;
           const sceneName = sceneKey ? data[sceneKey] : undefined;
-          setObjectSceneInstancesToWatch({ objectName, sceneName });
+          setObjectSceneInstancesToWatch({
+            objectName,
+            sceneName,
+            count: nextStepTrigger.instancesCount,
+          });
         }
       },
       [currentStep, data]
@@ -723,20 +752,42 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
     const watchInputChanges = React.useCallback(
       () => {
-        if (!elementWithValueToWatch) return;
-        const elementToWatch = document.querySelector(elementWithValueToWatch);
+        if (!elementWithValueToWatchIfChanged) return;
+        const elementToWatch = document.querySelector(
+          elementWithValueToWatchIfChanged
+        );
+        const inputInitialValue = inputInitialValueRef.current;
 
         if (
           elementToWatch &&
-          // Flow errors on missing value prop in generic type HTMLElement but this
-          // line cannot break.
-          // $FlowFixMe
-          getInputValue(elementToWatch) !== inputInitialValueRef.current
+          getInputValue(elementToWatch) !== inputInitialValue
         ) {
           goToNextStep();
         }
       },
-      [goToNextStep, elementWithValueToWatch]
+      [goToNextStep, elementWithValueToWatchIfChanged]
+    );
+
+    const watchInputEquals = React.useCallback(
+      () => {
+        if (!elementWithValueToWatchIfEquals) return;
+        const elementToWatch = document.querySelector(
+          elementWithValueToWatchIfEquals
+        );
+        const inputExpectedValue = inputExpectedValueRef.current;
+        if (!inputExpectedValue) return;
+
+        // We trim all spaces to not be picky about the user input inside expressions.
+        // Ex: "1 + 1" === "1+1"
+        if (
+          elementToWatch &&
+          getInputValue(elementToWatch).replace(/\s/g, '') ===
+            inputExpectedValue.replace(/\s/g, '')
+        ) {
+          goToNextStep();
+        }
+      },
+      [goToNextStep, elementWithValueToWatchIfEquals]
     );
 
     const watchSceneInstanceChanges = React.useCallback(
@@ -746,21 +797,39 @@ const InAppTutorialOrchestrator = React.forwardRef<
         const {
           objectName,
           sceneName: layoutName,
+          count,
         } = objectSceneInstancesToWatch;
         const layout =
           layoutName && project.hasLayoutNamed(layoutName)
             ? project.getLayout(layoutName)
             : project.getLayoutAt(0);
-        const instances = layout.getInitialInstances();
-        if (instances.hasInstancesOfObject(objectName)) {
-          goToNextStep();
+        if (!count) {
+          // If no count is provided, we just check if there is at least one instance.
+          const instances = layout.getInitialInstances();
+          if (instances.hasInstancesOfObject(objectName)) {
+            goToNextStep();
+          }
+        } else {
+          // Otherwise, we check if there is the expected number of instances.
+          const instancesCount = getInstancesInLayoutForObject(
+            layout,
+            objectName
+          ).length;
+          if (instancesCount >= count) goToNextStep();
         }
       },
       [project, goToNextStep, objectSceneInstancesToWatch]
     );
 
     useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
-    useInterval(watchInputChanges, elementWithValueToWatch ? 1000 : null);
+    useInterval(
+      watchInputChanges,
+      elementWithValueToWatchIfChanged ? 1000 : null
+    );
+    useInterval(
+      watchInputEquals,
+      elementWithValueToWatchIfEquals ? 1000 : null
+    );
     useInterval(
       watchSceneInstanceChanges,
       objectSceneInstancesToWatch ? 500 : null
@@ -769,6 +838,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
       watchDomForNextStepTrigger,
       currentStep && currentStep.isTriggerFlickering ? 500 : null
     );
+
+    const isRunningMiniTutorial = isMiniTutorial(tutorial.id);
 
     const renderStepDisplayer = (i18n: I18nType) => {
       if (!currentStep) return null;
@@ -846,7 +917,14 @@ const InAppTutorialOrchestrator = React.forwardRef<
           goToFallbackStep={() => {
             changeStep(currentStepFallbackStepIndex.current);
           }}
-          endTutorial={() => endTutorial(true)}
+          endTutorial={() =>
+            endTutorial({
+              // Don't close the project if it's a mini tutorial, so that the user can continue playing with the game.
+              shouldCloseProject: !isRunningMiniTutorial,
+              // Don't warn about unsaved changes if it's a mini tutorial.
+              shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,
+            })
+          }
           progress={computeProgress()[currentPhaseIndex]}
           goToNextStep={goToNextStep}
         />
@@ -883,7 +961,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
                 dialogContent={endDialog}
                 endTutorial={() => {
                   setDisplayEndDialog(false);
-                  endTutorial(false);
+                  endTutorial({
+                    shouldCloseProject: false,
+                    shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,
+                  });
                 }}
               />
             )}

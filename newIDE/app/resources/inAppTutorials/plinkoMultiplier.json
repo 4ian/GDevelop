@@ -1,0 +1,883 @@
+{
+  "id": "plinkoMultiplier",
+  "editorSwitches": {
+    "Login": {
+      "editor": "Scene",
+      "scene": "gameScene"
+    },
+    "CreateLeaderboard": {
+      "editor": "Scene",
+      "scene": "gameScene"
+    },
+    "SwitchToEvents1": {
+      "editor": "EventsSheet",
+      "scene": "gameScene"
+    }
+  },
+  "availableLocales": ["en"],
+  "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/plinkoMultiplier/game.json",
+  "initialProjectData": {
+    "gameScene": "GameScene",
+    "multiplier": "Multiplier",
+    "scoreMultiplier": "ScoreMultiplier",
+    "ball": "Ball",
+    "particles": "PegStar_Particle"
+  },
+  "endDialog": {
+    "content": [
+      {
+        "messageByLocale": {
+          "en": "# You've finished adding a score multiplier to your game!"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "Well done, in this tutorial you've learned:"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "- How to create a scene variable"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "- How to update a scene variable"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "- How to use a scene variable in an expression"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "You can keep adding stuff to this example or publish it and share it with your friends to see who gets the highest score!"
+        }
+      }
+    ]
+  },
+  "flow": [
+    {
+      "id": "Login",
+      "nextStepTrigger": {
+        "absenceOfElement": "#login-now"
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "This game uses a leaderboard! let's **login** so we can set it up automatically!"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "id": "CreateLeaderboard",
+      "elementToHighlightId": "#create-and-replace-new-leaderboard",
+      "nextStepTrigger": {
+        "absenceOfElement": "#create-and-replace-new-leaderboard"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "First, let's **create a leaderboard** as this game will need it. You're lucky, everything will be automatically set up for you!"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This game is called Plinko! You let a ball fall inside a maze and gather points depending on how many pegs you hit. Click on the **Preview** button to test it out."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:multiplier",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "multiplier",
+        "instancesCount": 3
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add a few **$(multiplier)** to spice up the game! Drag 3 from the menu to the canvas and place them so they can be collected by the ball through the maze."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:scoreMultiplier",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "scoreMultiplier"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Once you're done, let's position a **$(scoreMultiplier)** to display the current multiplier score. Let's place it just below the score!"
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "id": "OpenPropertiesManagerForScene",
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-scenes"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We now need to store the score somewhere. Let's create a **scene variable**! Open the **Project Manager**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "id": "OpenPropertiesManagerForScene",
+      "elementToHighlightId": "#main-toolbar-project-manager-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-scenes"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We now need to store the score somewhere. Let's create a scene variable! Open the **Project Manager**"
+          }
+        },
+        "placement": "right"
+      }
+    },
+    {
+      "elementToHighlightId": "sceneInProjectManager:gameScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#scene-variables-dialog #add-variable"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "Open the $(gameScene) options and select **Edit scene variables**."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#scene-variables-dialog #add-variable",
+      "nextStepTrigger": {
+        "presenceOfElement": "#variable-0-name"
+      },
+      "tooltip": {
+        "title": {
+          "messageByLocale": {
+            "en": "Let's add our first **variable**!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#scene-variables-dialog #variable-0-name",
+      "nextStepTrigger": {
+        "valueEquals": "Multiplier"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's name this variable `Multiplier`."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#scene-variables-dialog #variable-0-type",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's change its type to **Number**."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#scene-variables-dialog #variable-0-text-value",
+      "nextStepTrigger": {
+        "valueEquals": "1"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "And finally let's change its initial value to **1**."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#scene-variables-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#scene-variables-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "And we're done! Let's close this dialog."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:gameScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#events-editor[data-active]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's make those multipliers active. Let's open the **Events Sheet** of the $(gameScene) scene."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "id": "SwitchToEvents1",
+      "elementToHighlightId": "#events-editor[data-active] #add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "First we will make $(multiplier) disappear when $(ball) hits one. An event is ready for you, let's **add a condition** to it."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:ball",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-CollisionNP"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **$(ball)**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-CollisionNP",
+      "nextStepTrigger": {
+        "presenceOfElement": "#parameter-1-object-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Collision** condition."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-object-selector",
+      "nextStepTrigger": {
+        "valueEquals": "Multiplier"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "And select our **$(multiplier)**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, our **condition** is ready and will be **true** when the **$(ball) touches the $(multiplier)**."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's make our multiplier disappear with an **action** now."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:multiplier",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Delete"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **$(multiplier)**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Delete",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will make **$(multiplier)** disappear on collision."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "It is important to note that only the $(multiplier) that match the condition will be deleted. This is called **Object picking**. Let's close this dialog."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's **play a sound** when it is collected!."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-PlaySound"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **sound**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-PlaySound",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Play a sound** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-audio-field",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Click on the field to see the options, and select **ClickerBeep2.wav**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, now the sound will play when the $(ball) collects a $(multiplier)!"
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's **update our variable** accordingly."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-ModVarScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **scene variable**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-ModVarScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Our multiplier is a number, so let's select **Change number variable** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-0-scene-variable-field",
+      "nextStepTrigger": {
+        "valueEquals": "Multiplier"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the variable we created earlier, **Multiplier**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-operator-field",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We want to increase the multiplier, so let's select **+ (add)**."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-2-expression-field",
+      "nextStepTrigger": {
+        "valueEquals": "1"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's enter **1**."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, now our scene variable **Multiplier** will **increase by 1** every time **$(ball) collects a $(multiplier)**."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's add some juice and **create particles** when the **$(multiplier)** is collected."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-Create"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **Create**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-Create",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will **create some particles** we've prepared for you, pick the **Create an object** action."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-object-selector",
+      "nextStepTrigger": {
+        "valueEquals": "PegStar_Particle"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the particles we've prepared, **$(particles)**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-2-expression-field",
+      "nextStepTrigger": {
+        "valueEquals": "Multiplier.X()"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's make it spawn where the multiplier was, enter `$(multiplier).X()`."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-3-expression-field",
+      "nextStepTrigger": {
+        "valueEquals": "Multiplier.Y()"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "And `$(multiplier).Y()`."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Nice! Our **$(particles)** will be **created** exactly where the **$(multiplier)** was, giving a nice effect!"
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #add-action-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Finally, we need to ensure that the **$(scoreMultiplier)** we've placed on the scene gets updated accordingly!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-TextObject--String"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **Modify**."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-TextObject--String",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will **Modify the text** that we placed on the screen earlier."
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-0-object-selector",
+      "nextStepTrigger": {
+        "valueEquals": "ScoreMultiplier"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the text object **$(scoreMultiplier)**."
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-1-operator-field",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We want to update the text completely, so let's select **= (set to)**."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-2-string-field",
+      "nextStepTrigger": {
+        "valueEquals": "\"x\"+VariableString(Multiplier)"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now, we need to ensure the text displayed will show x1, x2, etc... so let's use our variable to do so. Let's enter `\"x\"+VariableString(Multiplier)`."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Nice! our **$(scoreMultiplier)** will now be updated thanks to the **Multiplier variable** that we converted to a text!"
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[id=\"**Score multiplier-unfolded\"]",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id=\"**Score multiplier-folded\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Finally, we need to take our multiplier into account when calculating the score. Let's **fold the Score multiplier** group with the arrow on the left."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "[id=\"**Hitting pegs-folded\"]",
+      "nextStepTrigger": {
+        "presenceOfElement": "[id=\"**Hitting pegs-unfolded\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "And let's **unfold the Hitting pegs** group with the arrow on the left."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "elementToHighlightId": "#event-3-action-0",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This first event manages the logic when the player hits a peg. Let's modify the score action by **double-clicking on it**!"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#parameter-2-expression-field",
+      "nextStepTrigger": {
+        "valueEquals": "1*Variable(Multiplier)"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We want to multiply the score added by the multiplier, so let's enter `1*Variable(Multiplier)`."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This will make our score update according to the multiplier! Let's save."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#event-7-action-0",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This event here manages the logic when the player hits a bigger peg. Let's modify the score action by **double-clicking on it** again."
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#parameter-2-expression-field",
+      "nextStepTrigger": {
+        "valueEquals": "2*Variable(Multiplier)"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We want to do exactly the same, except that the score given is 2, so let's enter `2 * Variable(Multiplier)`."
+          }
+        },
+        "placement": "left"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's close this!."
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, we're done! Let's test our game to see the changes we've made! Click on the **Preview** button."
+          }
+        },
+        "placement": "bottom"
+      }
+    }
+  ]
+}

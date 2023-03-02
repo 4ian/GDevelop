@@ -10,7 +10,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import { type InAppTutorialFormattedTooltip } from './InAppTutorialContext';
+import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -138,7 +138,7 @@ const TooltipBody = ({
   return (
     <>
       {tooltip.title && (
-        <Typography style={styles.title} variant="subtitle" translate="no">
+        <Typography style={styles.title} variant="subtitle1" translate="no">
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}

@@ -181,6 +181,7 @@ export default class VariableField extends Component<Props, State> {
             dataSource={this.state.autocompletionVariableNames}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
+            id={this.props.id}
           />
         )}
         renderButton={style =>

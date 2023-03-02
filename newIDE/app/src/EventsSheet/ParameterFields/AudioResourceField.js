@@ -38,6 +38,11 @@ export default class AudioResourceField extends Component<
         onRequestClose={this.props.onRequestClose}
         onApply={this.props.onApply}
         ref={field => (this._field = field)}
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-audio-field`
+            : undefined
+        }
       />
     );
   }

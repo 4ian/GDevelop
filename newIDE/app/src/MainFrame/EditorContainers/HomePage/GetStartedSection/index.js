@@ -28,9 +28,14 @@ import Building from './Building';
 import Podium from './Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
-import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../InAppTutorial/InAppTutorialProvider';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import optionalRequire from '../../../../Utils/OptionalRequire';
+import {
+  FLING_GAME_IN_APP_TUTORIAL_ID,
+  isMiniTutorial,
+  PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+} from '../../../../Utils/GDevelopServices/InAppTutorial';
+import MultiplierScore from './MultiplierScore';
 const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
@@ -59,7 +64,6 @@ const styles = {
   bannerContainer: {
     width: '100%',
     maxWidth: MAX_SECTION_WIDTH - 2 * ITEMS_SPACING,
-    marginLeft: ITEMS_SPACING,
   },
   bannerImage: {
     width: '100%',
@@ -135,14 +139,27 @@ const GetStartedSection = ({
     },
   ];
 
-  const userProgress = getTutorialProgress({
+  const flingUserProgress = getTutorialProgress({
     tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
     userId: authenticatedUser.profile
       ? authenticatedUser.profile.id
       : undefined,
   });
 
-  const inAppTutorialCards = [
+  const getFlingTutorialPartProgress = (part: number) => {
+    if (!flingUserProgress || !flingUserProgress.progress) return 0;
+    return flingUserProgress.progress[part];
+  };
+
+  const isFlingTutorialPartComplete = (part: number) => {
+    return getFlingTutorialPartProgress(part) === 100;
+  };
+
+  const isFullTutorialRunning =
+    !!currentlyRunningInAppTutorial &&
+    !isMiniTutorial(currentlyRunningInAppTutorial.id);
+
+  const flingInAppTutorialCards = [
     {
       key: 'create',
       title: t`Start your game`,
@@ -156,13 +173,8 @@ const GetStartedSection = ({
       durationInMinutes: 5,
       locked: false, // First phase is never locked
       // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        (!!userProgress &&
-          !!userProgress.progress &&
-          userProgress.progress[0] === 100),
-      progress:
-        userProgress && userProgress.progress ? userProgress.progress[0] : 0,
+      disabled: isFullTutorialRunning || isFlingTutorialPartComplete(0),
+      progress: getFlingTutorialPartProgress(0),
       renderImage: props => <Unboxing {...props} />,
     },
     {
@@ -177,18 +189,10 @@ const GetStartedSection = ({
       ],
       durationInMinutes: 10,
       // Second phase is locked if first phase is not complete
-      locked:
-        userProgress && userProgress.progress
-          ? userProgress.progress[0] !== 100
-          : true,
+      locked: !isFlingTutorialPartComplete(0),
       // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        (!!userProgress &&
-          !!userProgress.progress &&
-          userProgress.progress[1] === 100),
-      progress:
-        userProgress && userProgress.progress ? userProgress.progress[1] : 0,
+      disabled: isFullTutorialRunning || isFlingTutorialPartComplete(1),
+      progress: getFlingTutorialPartProgress(1),
       renderImage: props => <Building {...props} />,
     },
     {
@@ -202,20 +206,30 @@ const GetStartedSection = ({
         t`Leaderboards`,
       ],
       durationInMinutes: 15,
-      // Second phase is locked if first phase is not complete
-      locked:
-        userProgress && userProgress.progress
-          ? userProgress.progress[1] !== 100
-          : true,
+      // Third phase is locked if second phase is not complete
+      locked: !isFlingTutorialPartComplete(1),
       // Phase is disabled if complete or if there's a running tutorial
-      disabled:
-        !!currentlyRunningInAppTutorial ||
-        (!!userProgress &&
-          !!userProgress.progress &&
-          userProgress.progress[2] === 100),
-      progress:
-        userProgress && userProgress.progress ? userProgress.progress[2] : 0,
+      disabled: isFullTutorialRunning || isFlingTutorialPartComplete(2),
+      progress: getFlingTutorialPartProgress(2),
       renderImage: props => <Podium {...props} />,
+    },
+  ];
+
+  const miniInAppTutorialCards = [
+    {
+      key: 'plinkoMultiplier',
+      title: t`Add score multiplier`,
+      description: t`Learn how to manipulate a score by adding collectibles.`,
+      keyPoints: [
+        t`Create a variable`,
+        t`Use & manipulate a variable`,
+        t`Build an expression`,
+      ],
+      durationInMinutes: 3,
+      locked: false, // Always allow to start or restart the mini tutorial.
+      disabled: isFullTutorialRunning, // Disable the button only if a full tutorial is running.
+      progress: 0,
+      renderImage: props => <MultiplierScore {...props} />,
     },
   ];
 
@@ -237,11 +251,10 @@ const GetStartedSection = ({
     </ResponsiveLineStackLayout>
   );
 
-  const isTutorialComplete =
-    userProgress &&
-    typeof userProgress.progress === 'object' &&
-    userProgress.progress.every &&
-    userProgress.progress.every(item => item === 100);
+  const isFlingTutorialComplete =
+    isFlingTutorialPartComplete(0) &&
+    isFlingTutorialPartComplete(1) &&
+    isFlingTutorialPartComplete(2);
 
   return (
     <SectionContainer
@@ -272,13 +285,15 @@ const GetStartedSection = ({
               ) : (
                 <GridList
                   cols={
-                    isTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
+                    isFlingTutorialComplete
+                      ? 1
+                      : getColumnsFromWidth(windowWidth)
                   }
                   style={styles.grid}
                   cellHeight="auto"
                   spacing={ITEMS_SPACING * 2}
                 >
-                  {isTutorialComplete ? (
+                  {isFlingTutorialComplete ? (
                     <GridListTile>
                       <InAppTutorialPhaseCard
                         title={t`Congratulations! You've finished this tutorial!`}
@@ -299,7 +314,7 @@ const GetStartedSection = ({
                       />
                     </GridListTile>
                   ) : (
-                    inAppTutorialCards.map(item => (
+                    flingInAppTutorialCards.map(item => (
                       <GridListTile key={item.key}>
                         <InAppTutorialPhaseCard
                           {...item}
@@ -310,6 +325,52 @@ const GetStartedSection = ({
                       </GridListTile>
                     ))
                   )}
+                </GridList>
+              )}
+            </div>
+          </Line>
+        </SectionRow>
+      )}
+      {shouldShowInAppTutorialButtons && (
+        <SectionRow>
+          <Text size="title" noMargin>
+            <Trans>Mini tutorials</Trans>
+          </Text>
+          <Text size="body" color="secondary" noMargin>
+            <Trans>Learn game concepts in a few minutes.</Trans>
+          </Text>
+          <Line>
+            <div style={styles.bannerContainer}>
+              {inAppTutorialsFetchingError ? (
+                <PlaceholderError onRetry={fetchInAppTutorials}>
+                  <Trans>
+                    An error occurred when downloading the tutorials.
+                  </Trans>{' '}
+                  <Trans>
+                    Please check your internet connection or try again later.
+                  </Trans>
+                </PlaceholderError>
+              ) : inAppTutorialShortHeaders === null ? (
+                <PlaceholderLoader />
+              ) : (
+                <GridList
+                  cols={getColumnsFromWidth(windowWidth)}
+                  style={styles.grid}
+                  cellHeight="auto"
+                  spacing={ITEMS_SPACING * 2}
+                >
+                  {miniInAppTutorialCards.map(item => (
+                    <GridListTile key={item.key}>
+                      <InAppTutorialPhaseCard
+                        {...item}
+                        onClick={() =>
+                          selectInAppTutorial(
+                            PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID
+                          )
+                        }
+                      />
+                    </GridListTile>
+                  ))}
                 </GridList>
               )}
             </div>

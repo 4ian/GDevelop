@@ -1,7 +1,7 @@
 // @flow
 
 import { t } from '@lingui/macro';
-import { type InAppTutorial } from '../InAppTutorialContext';
+import { type InAppTutorial } from '../../Utils/GDevelopServices/InAppTutorial';
 
 const inAppTutorial: InAppTutorial = {
   id: 'onboarding',

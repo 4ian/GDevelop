@@ -25,7 +25,7 @@ const styles = {
   },
 };
 
-type Props = {
+type Props = {|
   instrsList: gdInstructionsList,
   areConditions: boolean,
   onAddNewInstruction: InstructionsListContext => void,
@@ -55,7 +55,9 @@ type Props = {
 
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-};
+
+  rowIndex: number,
+|};
 
 const DropTarget = makeDropTarget<{
   isCondition: boolean,
@@ -84,6 +86,7 @@ export default function InstructionsList({
   windowWidth,
   globalObjectsContainer,
   objectsContainer,
+  rowIndex,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
 
@@ -155,6 +158,8 @@ export default function InstructionsList({
         windowWidth={windowWidth}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
+        rowIndex={rowIndex}
+        id={`event-${rowIndex}-${areConditions ? 'condition' : 'action'}-${i}`}
       />
     );
   });

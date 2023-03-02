@@ -50,6 +50,7 @@ type Props = {|
   onApply?: () => void,
   margin?: 'none' | 'dense',
   style?: {| alignSelf?: 'center' |},
+  id?: string,
 |};
 
 type State = {|
@@ -302,6 +303,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
                   onRequestClose={this.props.onRequestClose}
                   onApply={this.props.onApply}
                   ref={autoComplete => (this._autoComplete = autoComplete)}
+                  id={this.props.id}
                 />
                 {this.props.canBeReset && (
                   <IconButton

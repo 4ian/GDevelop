@@ -16,6 +16,11 @@ export default class StringField extends Component<ParameterFieldProps, void> {
         expressionType="string"
         ref={field => (this._field = field)}
         {...this.props}
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-string-field`
+            : undefined
+        }
       />
     );
   }

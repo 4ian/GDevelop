@@ -83,6 +83,11 @@ export default class ObjectVariableField extends React.Component<
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
           scope={scope}
+          id={
+            this.props.parameterIndex !== undefined
+              ? `parameter-${this.props.parameterIndex}-object-variable-field`
+              : undefined
+          }
         />
         {this.state.editorOpen && variablesContainer && (
           <VariablesEditorDialog

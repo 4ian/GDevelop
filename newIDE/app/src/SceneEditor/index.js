@@ -493,22 +493,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     else this.toggleObjectsList();
   };
 
-  _onAddInstanceUnderCursor = () => {
-    if (!this.state.selectedObjectsWithContext.length || !this.editor) {
-      return;
-    }
-
-    const selectedObjectWithContext = this.state.selectedObjectsWithContext[0];
-    const cursorPosition = this.editor.getLastCursorSceneCoordinates();
-    this._addInstance(
-      cursorPosition,
-      selectedObjectWithContext.object.getName()
-    );
-    this.setState({
-      selectedObjectsWithContext: [selectedObjectWithContext],
-    });
-  };
-
   addInstanceAtTheCenter = (objectName: string) => {
     const { editor } = this;
     if (editor)

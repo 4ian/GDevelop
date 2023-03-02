@@ -156,11 +156,21 @@ const PointsPreview = (props: Props) => {
   );
 
   const renderPoint = React.useCallback(
-    (name: string, x: number, y: number, kind: PointKind, point: gdPoint) => {
+    ({
+      x,
+      y,
+      kind,
+      point,
+    }: {
+      x: number,
+      y: number,
+      kind: PointKind,
+      point: gdPoint,
+    }) => {
       const pointName = getPointName(kind, point);
 
       return (
-        <React.Fragment key={`point-${name}`}>
+        <React.Fragment key={`point-${pointName}`}>
           <line
             x1="0"
             y1={-circleRadius}
@@ -206,20 +216,49 @@ const PointsPreview = (props: Props) => {
     [highlightedPointName, onStartDragPoint, selectedPointName]
   );
 
-  const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
-  const points = mapVector(nonDefaultPoints, (point, i) =>
-    renderPoint(
-      point.getName(),
-      point.getX() * imageZoomFactor,
-      point.getY() * imageZoomFactor,
-      pointKindIdentifiers.NORMAL,
-      point
-    )
-  );
-
-  const originPoint = pointsContainer.getOrigin();
-  const centerPoint = pointsContainer.getCenter();
   const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
+
+  const renderPointOrCenterOrOrigin = React.useCallback(
+    (pointName: string) => {
+      if (pointName === 'Origin') {
+        const point = pointsContainer.getOrigin();
+        return renderPoint({
+          x: point.getX() * imageZoomFactor,
+          y: point.getY() * imageZoomFactor,
+          kind: pointKindIdentifiers.ORIGIN,
+          point,
+        });
+      }
+      if (pointName === 'Center') {
+        const point = pointsContainer.getCenter();
+        return renderPoint({
+          x:
+            (automaticCenterPosition ? imageWidth / 2 : point.getX()) *
+            imageZoomFactor,
+          y:
+            (automaticCenterPosition ? imageHeight / 2 : point.getY()) *
+            imageZoomFactor,
+          kind: pointKindIdentifiers.CENTER,
+          point,
+        });
+      }
+      const point = pointsContainer.getPoint(pointName);
+      return renderPoint({
+        x: point.getX() * imageZoomFactor,
+        y: point.getY() * imageZoomFactor,
+        kind: pointKindIdentifiers.NORMAL,
+        point,
+      });
+    },
+    [
+      automaticCenterPosition,
+      imageHeight,
+      imageWidth,
+      imageZoomFactor,
+      pointsContainer,
+      renderPoint,
+    ]
+  );
 
   const svgStyle = {
     position: 'absolute',
@@ -230,6 +269,13 @@ const PointsPreview = (props: Props) => {
     overflow: 'visible',
   };
 
+  const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
+  const backgroundPointNames = [
+    ...mapVector(nonDefaultPoints, (point, i) => point.getName()),
+    'Origin',
+    'Center',
+  ].filter(name => name !== selectedPointName && name !== highlightedPointName);
+
   return (
     <div
       style={styles.containerStyle}
@@ -237,23 +283,18 @@ const PointsPreview = (props: Props) => {
       onPointerUp={onEndDragPoint}
     >
       <svg style={svgStyle} ref={svgRef}>
-        {points}
-        {renderPoint(
-          'Origin',
-          originPoint.getX() * imageZoomFactor,
-          originPoint.getY() * imageZoomFactor,
-          pointKindIdentifiers.ORIGIN,
-          originPoint
+        {backgroundPointNames.map(pointName =>
+          renderPointOrCenterOrOrigin(pointName)
         )}
-        {renderPoint(
-          'Center',
-          (automaticCenterPosition ? imageWidth / 2 : centerPoint.getX()) *
-            imageZoomFactor,
-          (automaticCenterPosition ? imageHeight / 2 : centerPoint.getY()) *
-            imageZoomFactor,
-          pointKindIdentifiers.CENTER,
-          centerPoint
-        )}
+        {highlightedPointName &&
+        selectedPointName &&
+        selectedPointName === highlightedPointName
+          ? null
+          : selectedPointName
+          ? renderPointOrCenterOrOrigin(selectedPointName)
+          : null}
+        {highlightedPointName &&
+          renderPointOrCenterOrOrigin(highlightedPointName)}
       </svg>
     </div>
   );

@@ -155,6 +155,7 @@ type State = {|
 
   renamedObjectWithContext: ?ObjectWithContext,
   selectedObjectsWithContext: Array<ObjectWithContext>,
+  selectedLayer: string,
 |};
 
 type CopyCutPasteOptions = {|
@@ -213,6 +214,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
+      selectedLayer: '',
     };
   }
 
@@ -491,22 +493,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     else this.toggleObjectsList();
   };
 
-  _onAddInstanceUnderCursor = () => {
-    if (!this.state.selectedObjectsWithContext.length || !this.editor) {
-      return;
-    }
-
-    const selectedObjectWithContext = this.state.selectedObjectsWithContext[0];
-    const cursorPosition = this.editor.getLastCursorSceneCoordinates();
-    this._addInstance(
-      cursorPosition,
-      selectedObjectWithContext.object.getName()
-    );
-    this.setState({
-      selectedObjectsWithContext: [selectedObjectWithContext],
-    });
-  };
-
   addInstanceAtTheCenter = (objectName: string) => {
     const { editor } = this;
     if (editor)
@@ -519,7 +505,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _addInstance = (pos: [number, number], objectName: string) => {
     if (!objectName || !this.editor) return;
 
-    const instances = this.editor.addInstances(pos, [objectName]);
+    const instances = this.editor.addInstances(
+      pos,
+      [objectName],
+      this.state.selectedLayer
+    );
     this._onInstancesAdded(instances);
   };
 
@@ -1408,6 +1398,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <LayersList
             project={project}
+            selectedLayer={this.state.selectedLayer}
+            onSelectLayer={(layer: string) =>
+              this.setState({ selectedLayer: layer })
+            }
             onEditLayerEffects={this.editLayerEffects}
             onEditLayer={this.editLayer}
             onRemoveLayer={this._onRemoveLayer}
@@ -1439,6 +1433,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           <FullSizeInstancesEditorWithScrollbars
             project={project}
             layout={layout}
+            selectedLayer={this.state.selectedLayer}
             initialInstances={initialInstances}
             instancesEditorSettings={this.state.instancesEditorSettings}
             onInstancesEditorSettingsMutated={

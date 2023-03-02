@@ -11,7 +11,7 @@ import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ObjectIcon from '../UI/CustomSvgIcons/Object';
 import ObjectGroupIcon from '../UI/CustomSvgIcons/ObjectGroup';
-import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
+import EditIcon from '../UI/CustomSvgIcons/Edit';
 import InstancesListIcon from '../UI/CustomSvgIcons/InstancesList';
 import LayersIcon from '../UI/CustomSvgIcons/Layers';
 import UndoIcon from '../UI/CustomSvgIcons/Undo';
@@ -103,7 +103,7 @@ const Toolbar = (props: Props) => {
           selected={props.isPropertiesShown}
           tooltip={t`Open Properties Panel`}
         >
-          <PropertiesPanelIcon />
+          <EditIcon />
         </IconButton>
         <IconButton
           size="small"

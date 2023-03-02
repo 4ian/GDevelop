@@ -42,7 +42,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
       }}
       onClick={() => props.onClick(props.pointName)}
       onPointerEnter={() => props.onPointerEnter(props.pointName)}
-      onPointerLeave={props.onPointerEnter}
+      onPointerLeave={props.onPointerLeave}
     >
       <TableRowColumn style={styles.nameColumn}>
         <SemiControlledTextField

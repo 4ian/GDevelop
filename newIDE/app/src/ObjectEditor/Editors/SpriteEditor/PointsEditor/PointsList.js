@@ -29,7 +29,7 @@ type PointsListBodyProps = {|
 
 const PointsListBody = (props: PointsListBodyProps) => {
   const [nameErrors, setNameErrors] = React.useState({});
-  const { pointsContainer } = props;
+  const { pointsContainer, onHoverPoint } = props;
   const forceUpdate = useForceUpdate();
 
   const onPointsUpdated = () => {
@@ -67,6 +67,10 @@ const PointsListBody = (props: PointsListBodyProps) => {
     onPointsUpdated();
   };
 
+  const onPointerLeave = React.useCallback(() => onHoverPoint(null), [
+    onHoverPoint,
+  ]);
+
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const pointsRows = mapVector(nonDefaultPoints, (point, i) => {
     const pointName = point.getName();
@@ -99,7 +103,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
           setNameErrors(old => ({ ...old, [pointName]: !success }));
         }}
         onPointerEnter={props.onHoverPoint}
-        onPointerLeave={props.onHoverPoint}
+        onPointerLeave={onPointerLeave}
         onClick={props.onSelectPoint}
         onRemove={() => {
           const answer = Window.showConfirmDialog(
@@ -126,7 +130,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
       onChangePointX={updateOriginPointX}
       onChangePointY={updateOriginPointY}
       onPointerEnter={props.onHoverPoint}
-      onPointerLeave={props.onHoverPoint}
+      onPointerLeave={onPointerLeave}
       onClick={props.onSelectPoint}
       selected={'Origin' === props.selectedPointName}
     />
@@ -141,7 +145,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
       onChangePointX={updateCenterPointX}
       onChangePointY={updateCenterPointY}
       onPointerEnter={props.onHoverPoint}
-      onPointerLeave={props.onHoverPoint}
+      onPointerLeave={onPointerLeave}
       onClick={props.onSelectPoint}
       selected={'Center' === props.selectedPointName}
       onEdit={

@@ -1,13 +1,15 @@
 // @flow
 import * as React from 'react';
-import Chip from './Chip';
-import StairesIcon from './CustomSvgIcons/Stairs';
 import { Trans } from '@lingui/macro';
+import Chip from './Chip';
+import HeadphonesIcon from './CustomSvgIcons/Headphones';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 const styles = {
   chip: {
     marginRight: 2,
     marginBottom: 2,
+    background: 'none',
   },
 };
 
@@ -19,11 +21,17 @@ type Props = {|
 |};
 
 export const ExampleDifficultyChip = ({ codeSizeLevel }: Props) => {
+  const theme = React.useContext(GDevelopThemeContext);
+  const color: ?string = theme.example.difficulty.color[codeSizeLevel];
+
   return (
     <Chip
-      icon={<StairesIcon />}
+      icon={<HeadphonesIcon style={{ color }} />}
       size="small"
-      style={styles.chip}
+      style={{
+        ...styles.chip,
+        border: color ? `1px solid ${color}` : undefined,
+      }}
       label={
         codeSizeLevel === 'simple' ? (
           <Trans>Simple</Trans>

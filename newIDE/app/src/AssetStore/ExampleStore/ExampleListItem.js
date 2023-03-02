@@ -116,14 +116,14 @@ export const ExampleListItem = ({
             {
               <Line>
                 <div style={{ flexWrap: 'wrap' }}>
+                  {exampleShortHeader.difficultyLevel && (
+                    <ExampleDifficultyChip
+                      difficultyLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
                   {exampleShortHeader.codeSizeLevel && (
                     <ExampleSizeChip
                       codeSizeLevel={exampleShortHeader.codeSizeLevel}
-                    />
-                  )}
-                  {exampleShortHeader.difficultyLevel && (
-                    <ExampleDifficultyChip
-                      codeSizeLevel={exampleShortHeader.difficultyLevel}
                     />
                   )}
                   {exampleShortHeader.authors &&

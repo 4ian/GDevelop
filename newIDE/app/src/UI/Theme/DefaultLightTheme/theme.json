@@ -431,6 +431,21 @@
         }
       }
     },
+    "example": {
+      "difficulty": {
+        "color": {
+          "simple": {
+            "value": "#00AB6A"
+          },
+          "advanced": {
+            "value": "#FB9600"
+          },
+          "expert": {
+            "value": "#F03F18"
+          }
+        }
+      }
+    },
     "tabs": {
       "text-color": {
         "value": "#7F7F85",

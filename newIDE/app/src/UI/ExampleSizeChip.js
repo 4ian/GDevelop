@@ -28,11 +28,11 @@ export const ExampleSizeChip = ({ codeSizeLevel }: Props) => {
         codeSizeLevel === 'tiny' ? (
           <Trans>Tiny</Trans>
         ) : codeSizeLevel === 'small' ? (
-          <Trans>Small</Trans>
+          <Trans>Short</Trans>
         ) : codeSizeLevel === 'medium' ? (
           <Trans>Medium</Trans>
         ) : codeSizeLevel === 'big' ? (
-          <Trans>Big</Trans>
+          <Trans>Long</Trans>
         ) : codeSizeLevel === 'huge' ? (
           <Trans>Huge</Trans>
         ) : (

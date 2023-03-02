@@ -527,6 +527,15 @@ export function createGdevelopTheme({
         cannotDrop: styles['ThemeDropIndicatorCannotDropColor'],
         border: styles['ThemeDropIndicatorBorderColor'],
       },
+      example: {
+        difficulty: {
+          color: {
+            simple: styles['ThemeExampleDifficultyColorSimple'],
+            advanced: styles['ThemeExampleDifficultyColorAdvanced'],
+            expert: styles['ThemeExampleDifficultyColorExpert'],
+          },
+        },
+      },
       closableTabs: {
         fontFamily: styles['GdevelopModernFontFamily'],
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],

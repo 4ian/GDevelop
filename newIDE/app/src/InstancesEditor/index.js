@@ -582,11 +582,7 @@ export default class InstancesEditor extends Component<Props> {
     objectNames: Array<string>,
     layer: string
   ): Array<gdInitialInstance> => {
-    return this._instancesAdder.addInstances(
-      pos,
-      objectNames,
-      layer
-    );
+    return this._instancesAdder.addInstances(pos, objectNames, layer);
   };
 
   _onMouseMove = (x: number, y: number) => {

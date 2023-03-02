@@ -148,14 +148,14 @@ export function ExampleDialog({
             {
               <Line>
                 <div style={{ flexWrap: 'wrap' }}>
-                  {exampleShortHeader.codeSizeLevel && (
-                    <ExampleSizeChip
-                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
-                    />
-                  )}
                   {exampleShortHeader.difficultyLevel && (
                     <ExampleDifficultyChip
                       codeSizeLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
+                  {exampleShortHeader.codeSizeLevel && (
+                    <ExampleSizeChip
+                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
                     />
                   )}
                   {exampleShortHeader.authors &&

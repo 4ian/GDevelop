@@ -67,6 +67,7 @@ export type InstancesEditorShortcutsCallbacks = {|
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout,
+  selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
   onInstancesEditorSettingsMutated: (
@@ -578,9 +579,14 @@ export default class InstancesEditor extends Component<Props> {
    */
   addInstances = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ): Array<gdInitialInstance> => {
-    return this._instancesAdder.addInstances(pos, objectNames);
+    return this._instancesAdder.addInstances(
+      pos,
+      objectNames,
+      layer
+    );
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -1023,7 +1029,8 @@ export default class InstancesEditor extends Component<Props> {
           );
           _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
             pos,
-            this.props.selectedObjectNames
+            this.props.selectedObjectNames,
+            this.props.selectedLayer
           );
         }}
         drop={monitor => {

@@ -505,7 +505,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _addInstance = (pos: [number, number], objectName: string) => {
     if (!objectName || !this.editor) return;
 
-    const instances = this.editor.addInstances(pos, [objectName]);
+    const instances = this.editor.addInstances(
+      pos,
+      [objectName],
+      this.state.selectedLayer
+    );
     this._onInstancesAdded(instances);
   };
 
@@ -1429,6 +1433,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           <FullSizeInstancesEditorWithScrollbars
             project={project}
             layout={layout}
+            selectedLayer={this.state.selectedLayer}
             initialInstances={initialInstances}
             instancesEditorSettings={this.state.instancesEditorSettings}
             onInstancesEditorSettingsMutated={

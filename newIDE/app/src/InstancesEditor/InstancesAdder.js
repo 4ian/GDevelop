@@ -119,7 +119,8 @@ export default class InstancesAdder {
    */
   addInstances = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ): Array<gdInitialInstance> => {
     this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
@@ -131,6 +132,7 @@ export default class InstancesAdder {
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
+      instance.setLayer(layer);
       instance.setZOrder(zOrder);
 
       return instance;
@@ -145,12 +147,13 @@ export default class InstancesAdder {
    */
   createOrUpdateTemporaryInstancesFromObjectNames = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ) => {
     if (!objectNames.length) return;
 
     if (!this._temporaryInstances.length) {
-      this._createTemporaryInstancesFromObjectNames(pos, objectNames);
+      this._createTemporaryInstancesFromObjectNames(pos, objectNames, layer);
     } else {
       this.updateTemporaryInstancePositions(pos);
     }
@@ -158,7 +161,8 @@ export default class InstancesAdder {
 
   _createTemporaryInstancesFromObjectNames = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ) => {
     this.deleteTemporaryInstances();
 
@@ -172,6 +176,7 @@ export default class InstancesAdder {
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
+      instance.setLayer(layer);
       instance.setZOrder(zOrder);
 
       return instance;

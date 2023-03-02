@@ -31,7 +31,7 @@ const Link = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const linkStyles = useLinkStyles(gdevelopTheme, !!props.disabled);
   const onClick = (event: MouseEvent) => {
-    event.preventDefault(); // Avoid triggering the href.
+    event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
     if (!props.disabled) {
       props.onClick();
     }

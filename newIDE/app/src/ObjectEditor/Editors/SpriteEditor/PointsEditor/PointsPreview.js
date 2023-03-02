@@ -284,7 +284,7 @@ const PointsPreview = (props: Props) => {
     >
       <svg style={svgStyle} ref={svgRef}>
         {/* Z index does not apply in SVG. To display selected and highlighted points
-        above the other points, they must be rendered below the other ones. */}
+        above the other points, they must be rendered after the other ones. */}
         {backgroundPointNames.map(pointName =>
           renderPointOrCenterOrOrigin(pointName)
         )}

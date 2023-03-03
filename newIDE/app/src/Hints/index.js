@@ -138,8 +138,8 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   if (type.indexOf('P2P::') === 0) {
     return {
       kind: 'warning',
-      message: t`P2P is a peer-to-peer networking solution. It leaks IP addresses to other player - it is made to play with friends, and is not suitabale for playing with unknown players.
-P2P also only allows to exchange messages, but leaves implementaion of higher-level tasks, such as synchronizing the game state, to you.
+      message: t`P2P is a peer-to-peer networking solution. It leaks IP addresses to other player - it is made to play with friends, and is not suitable for playing with unknown players.
+P2P also only allows to exchange messages and leaves implementation of higher-level tasks, such as synchronizing the game state, to you.
 
 Use the THNK Framework if you seek an easier, more performant and more flexible solution suitable for playing with strangers.`,
       identifier: 'p2p-is-networking',

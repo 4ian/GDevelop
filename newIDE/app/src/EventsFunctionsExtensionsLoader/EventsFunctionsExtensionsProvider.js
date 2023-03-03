@@ -118,7 +118,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
         });
         showErrorBox({
           message: i18n._(
-            t`An error has occured during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+            t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
           ),
           rawError: eventsFunctionsExtensionsError,
           errorId: 'events-functions-extensions-load-error',

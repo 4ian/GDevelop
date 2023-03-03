@@ -111,6 +111,13 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     return project.getEventsFunctionsExtension(projectItemName);
   }
 
+  getEventsFunctionsExtensionName(): ?string {
+    const { project, projectItemName } = this.props;
+    if (!project || !projectItemName) return null;
+
+    return projectItemName;
+  }
+
   selectEventsFunctionByName(
     eventsFunctionName: string,
     behaviorName: ?string

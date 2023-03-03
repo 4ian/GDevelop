@@ -10,6 +10,11 @@ const styles = {
   container: {
     display: 'flex',
     flex: 1,
+    // In some cases, if some flex children cannot contract to
+    // within the div, it is possible for the div to overflow
+    // outside its parent. Setting min-width to 0 avoids this.
+    // See: https://stackoverflow.com/a/36247448/6199068
+    minWidth: 0,
   },
 };
 

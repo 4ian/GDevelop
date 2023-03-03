@@ -30,6 +30,9 @@
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
 
+// TODO Extract test data in another file to allow to read them side by side
+// with the test cases more easily.
+
 // TODO EBO Add a test where a child is removed form the EventsBasedObject
 // and check the configuration still gives access to other child configuration.
 namespace {
@@ -109,16 +112,27 @@ const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
   auto &scene = project.GetLayout("Scene").GetEvents();
   auto &externalEvents =
       project.GetExternalEvents("ExternalEvents").GetEvents();
+  auto &eventsExtension = project.GetEventsFunctionsExtension("MyEventsExtension");
   auto &objectFunctionEvents =
-      project.GetEventsFunctionsExtension("MyEventsExtension")
+      eventsExtension
           .GetEventsBasedObjects()
           .Get("MyOtherEventsBasedObject")
           .GetEventsFunctions()
           .GetEventsFunction("MyObjectEventsFunction")
           .GetEvents();
+  auto &behaviorFunctionEvents =
+      eventsExtension.GetEventsBasedBehaviors()
+          .Get("MyOtherEventsBasedBehavior")
+          .GetEventsFunctions()
+          .GetEventsFunction("MyBehaviorEventsFunction")
+          .GetEvents();
+  auto &freeFunctionEvents =
+      eventsExtension.GetEventsFunction("MyOtherEventsFunction").GetEvents();
   eventLists.push_back(&scene);
   eventLists.push_back(&externalEvents);
   eventLists.push_back(&objectFunctionEvents);
+  eventLists.push_back(&behaviorFunctionEvents);
+  eventLists.push_back(&freeFunctionEvents);
   return eventLists;
 }
 
@@ -930,6 +944,48 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         .SetType("Number");
   }
 
+  // Add another events based behavior that uses previously defined events based
+  // object and behavior.
+  {
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyOtherEventsBasedBehavior", 0);
+    eventsBasedBehavior.SetFullName("My events based behavior");
+    eventsBasedBehavior.SetDescription("An events based behavior for test");
+    eventsBasedBehavior.SetObjectType("MyEventsExtension::MyEventsBasedObject");
+
+    // Add functions, and parameters that should be there by convention.
+    auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
+    auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
+        "MyBehaviorEventsFunction", 0);
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Object")
+            .SetType("object")
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Behavior")
+            .SetType("behavior")
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    // Define the same objects as in the layout to be consistent with events.
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("ObjectWithMyBehavior")
+            .SetType("object")
+            .SetExtraInfo("MyExtension::Sprite"));
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("MyBehavior")
+            .SetType("behavior")
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("MyCustomObject")
+            .SetType("object")
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+  }
+
   // Add an other events based object that uses previously defined events based
   // object and behavior.
   {
@@ -1001,6 +1057,30 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         .SetGetterName("MyEventsFunctionExpressionAndCondition");
   }
 
+  // Add another free function that uses previously defined events based
+  // object and behavior.
+  {
+    // Add functions, and parameters that should be there by convention.
+    auto &action =
+        eventsExtension.InsertNewEventsFunction("MyOtherEventsFunction", 0);
+    // Define the same objects as in the layout to be consistent with events.
+    action.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("ObjectWithMyBehavior")
+            .SetType("object")
+            .SetExtraInfo("MyExtension::Sprite"));
+    action.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("MyBehavior")
+            .SetType("behavior")
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    action.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("MyCustomObject")
+            .SetType("object")
+            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+  }
+
   // Add some usages in events
   {
     auto &layout = project.InsertNewLayout("Scene", 0);
@@ -1029,6 +1109,13 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
                     .Get("MyOtherEventsBasedObject")
                     .GetEventsFunctions()
                     .GetEventsFunction("MyObjectEventsFunction")
+                    .GetEvents());
+    SetupEvents(eventsExtension.GetEventsBasedBehaviors()
+                    .Get("MyOtherEventsBasedBehavior")
+                    .GetEventsFunctions()
+                    .GetEventsFunction("MyBehaviorEventsFunction")
+                    .GetEvents());
+    SetupEvents(eventsExtension.GetEventsFunction("MyOtherEventsFunction")
                     .GetEvents());
   }
 
@@ -1553,6 +1640,50 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                   eventsList->GetEvent(ObjectExpressionFromExpressionAndCondition)) ==
               "5 + MyCustomObject."
               "MyObjectEventsFunctionExpressionAndCondition(111, 222)");
+    }
+  }
+
+  SECTION("Events extension renamed in instructions scoped to one behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    // A behavior is copied from one extension to another.
+
+    auto &destinationExtension =
+        project.InsertNewEventsFunctionsExtension("DestinationExtension", 0);
+    // Add the function used by the instruction that is checked in this test.
+    // When the function doesn't exist the destination extension, the
+    // instruction keeps pointing to the old extension.
+    destinationExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+
+    auto &copiedBehavior =
+        destinationExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyOtherEventsBasedBehavior", 0);
+    copiedBehavior.SetFullName("My events based behavior");
+    copiedBehavior.SetDescription("An events based behavior for test");
+    copiedBehavior.SetObjectType("MyEventsExtension::MyEventsBasedObject");
+
+    // Add the copied events.
+    auto &behaviorEventsFunctions = copiedBehavior.GetEventsFunctions();
+    auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
+        "MyBehaviorEventsFunction", 0);
+    SetupEvents(behaviorAction.GetEvents());
+
+    gd::WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(
+        project, destinationExtension, copiedBehavior, "MyEventsExtension");
+
+    // Check that events function calls in instructions have been renamed
+    REQUIRE(GetEventFirstActionType(behaviorAction.GetEvents().GetEvent(
+                FreeFunctionAction)) == "DestinationExtension::MyEventsFunction");
+
+    for (auto *eventsList : GetEventsLists(project)) {
+      // Check that events function calls in instructions have NOT been renamed
+      // outside of the copied behavior.
+      REQUIRE(
+          GetEventFirstActionType(eventsList->GetEvent(FreeFunctionAction)) ==
+          "MyEventsExtension::MyEventsFunction");
     }
   }
 

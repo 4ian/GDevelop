@@ -22,7 +22,7 @@ import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDrop
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SemiControlledAutoComplete, {

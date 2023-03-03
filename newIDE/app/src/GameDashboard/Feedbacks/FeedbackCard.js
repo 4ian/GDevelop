@@ -12,7 +12,7 @@ import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Card from '../../UI/Card';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';

@@ -32,10 +32,6 @@ export type AlertMessageIdentifier =
   | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
   | 'instance-drag-n-drop-explanation'
-  | 'objects-panel-explanation'
-  | 'instance-properties-panel-explanation'
-  | 'layers-panel-explanation'
-  | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
@@ -138,22 +134,6 @@ export const allAlertMessages: Array<{
   {
     key: 'instance-drag-n-drop-explanation',
     label: <Trans>Using instance drag'n'drop</Trans>,
-  },
-  {
-    key: 'objects-panel-explanation',
-    label: <Trans>Using the objects panel</Trans>,
-  },
-  {
-    key: 'instance-properties-panel-explanation',
-    label: <Trans>Using the instance properties panel</Trans>,
-  },
-  {
-    key: 'layers-panel-explanation',
-    label: <Trans>Using the layers panel</Trans>,
-  },
-  {
-    key: 'instances-panel-explanation',
-    label: <Trans>Using the instances panel</Trans>,
   },
   {
     key: 'physics2-shape-collisions',

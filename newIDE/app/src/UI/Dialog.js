@@ -17,7 +17,7 @@ import Text from './Text';
 import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
 import { Line } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useWindowControlsOverlayWatcher } from '../Utils/Window';

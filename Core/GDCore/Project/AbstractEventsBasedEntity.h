@@ -151,6 +151,7 @@ class GD_CORE_API AbstractEventsBasedEntity {
   gd::String description;
   gd::EventsFunctionsContainer eventsFunctionsContainer;
   SerializableWithNameList<NamedPropertyDescriptor> propertyDescriptors;
+  gd::String extensionName;
 };
 
 }  // namespace gd

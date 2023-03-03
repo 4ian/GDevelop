@@ -15,6 +15,7 @@ const SPACE_KEY = 32;
 const NUMPAD_ADD = 107;
 const NUMPAD_SUBTRACT = 109;
 const C_KEY = 67;
+const D_KEY = 68;
 const F_KEY = 70;
 const V_KEY = 86;
 const X_KEY = 88;
@@ -36,6 +37,7 @@ type ShortcutCallbacks = {|
   onCopy?: () => void,
   onCut?: () => void,
   onPaste?: () => void,
+  onDuplicate?: () => void,
   onUndo?: () => void,
   onRedo?: () => void,
   onSearch?: () => void,
@@ -118,6 +120,24 @@ export default class KeyboardShortcuts {
     }
   }
 
+  shouldIgnoreDoubleClick() {
+    return (
+      this._metaPressed ||
+      this._altPressed ||
+      this._ctrlPressed ||
+      this._shiftPressed
+    );
+  }
+
+  resetModifiers = () => {
+    this._metaPressed = false;
+    this._altPressed = false;
+    this._ctrlPressed = false;
+    this._shiftPressed = false;
+    this._mouseMidButtonPressed = false;
+    this._spacePressed = false;
+  };
+
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
     this._metaPressed = evt.metaKey;
     this._altPressed = evt.altKey;
@@ -178,6 +198,7 @@ export default class KeyboardShortcuts {
       onCopy,
       onCut,
       onPaste,
+      onDuplicate,
       onUndo,
       onRedo,
       onSearch,
@@ -219,6 +240,10 @@ export default class KeyboardShortcuts {
     if (onPaste && this._isControlOrCmdPressed() && evt.which === V_KEY) {
       evt.preventDefault();
       onPaste();
+    }
+    if (onDuplicate && this._isControlOrCmdPressed() && evt.which === D_KEY) {
+      evt.preventDefault();
+      onDuplicate();
     }
     if (
       (onUndo || onRedo) &&

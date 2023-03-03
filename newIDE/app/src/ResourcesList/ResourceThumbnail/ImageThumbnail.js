@@ -3,7 +3,7 @@ import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import Checkbox from '../../UI/Checkbox';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
 

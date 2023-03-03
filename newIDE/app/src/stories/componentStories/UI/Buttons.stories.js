@@ -213,20 +213,28 @@ export const Default = () => (
           <IconButton>
             <Brush />
           </IconButton>
-          <IconButton>
-            <Brush fontSize="small" />
+          <IconButton selected>
+            <Brush />
           </IconButton>
           <IconButton>
             <Delete />
           </IconButton>
           <IconButton>
-            <Delete fontSize="small" />
-          </IconButton>
-          <IconButton>
             <AddCircle />
           </IconButton>
-          <IconButton>
-            <AddCircle fontSize="small" />
+        </Line>
+        <Line>
+          <IconButton size="small">
+            <Brush />
+          </IconButton>
+          <IconButton size="small" selected>
+            <Brush />
+          </IconButton>
+          <IconButton size="small">
+            <Delete />
+          </IconButton>
+          <IconButton size="small">
+            <AddCircle />
           </IconButton>
         </Line>
       </Column>
@@ -237,19 +245,27 @@ export const Default = () => (
             <Home />
           </IconButton>
           <IconButton>
-            <Home fontSize="small" />
-          </IconButton>
-          <IconButton>
             <Cut />
-          </IconButton>
-          <IconButton>
-            <Cut fontSize="small" />
           </IconButton>
           <IconButton>
             <Crown />
           </IconButton>
-          <IconButton>
-            <Crown fontSize="small" />
+          <IconButton selected>
+            <Crown />
+          </IconButton>
+        </Line>
+        <Line>
+          <IconButton size="small">
+            <Home />
+          </IconButton>
+          <IconButton size="small">
+            <Cut />
+          </IconButton>
+          <IconButton size="small">
+            <Crown />
+          </IconButton>
+          <IconButton size="small" selected>
+            <Crown />
           </IconButton>
         </Line>
       </Column>

@@ -197,6 +197,9 @@ namespace gdjs {
         let maxX = -Number.MAX_VALUE;
         let maxY = -Number.MAX_VALUE;
         for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
+          if (!childInstance.isIncludedInParentCollisionMask()) {
+            continue;
+          }
           Array.prototype.push.apply(
             this._untransformedHitBoxes,
             childInstance.getHitBoxes()

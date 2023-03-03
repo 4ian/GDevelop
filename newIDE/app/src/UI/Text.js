@@ -9,7 +9,8 @@ type TextSize =
   | 'block-title'
   | 'sub-title'
   | 'body'
-  | 'body2';
+  | 'body2'
+  | 'body-small';
 
 type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
@@ -70,6 +71,8 @@ const getVariantFromSize = (size: ?TextSize) => {
       return 'h5';
     case 'body2':
       return 'body2';
+    case 'body-small':
+      return 'caption';
     case 'body':
     default:
       return 'body1';

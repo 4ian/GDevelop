@@ -47,7 +47,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
@@ -226,42 +226,42 @@ type EventsTreeProps = {|
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
   onAddNewInstruction: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     InstructionsListContext
   ) => void,
   onPasteInstructions: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     InstructionsListContext
   ) => void,
   onMoveToInstruction: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     destinationContext: InstructionContext
   ) => void,
   onMoveToInstructionsList: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     destinationContext: InstructionsListContext
   ) => void,
   onInstructionClick: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionContext: InstructionContext
   ) => void,
   onInstructionDoubleClick: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionContext: InstructionContext
   ) => void,
   onInstructionContextMenu: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     x: number,
     y: number,
     InstructionContext
   ) => void,
   onAddInstructionContextMenu: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
   onParameterClick: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     parameterContext: ParameterContext
   ) => void,
 
@@ -717,6 +717,12 @@ export default class ThemableEventsTree extends Component<
         {({ connectDragSource, connectDropTarget, isOverLazy }) => {
           this._temporaryUnfoldNode(isOverLazy, node);
 
+          const eventContext = {
+            eventsList: node.eventsList,
+            event: event,
+            indexInList: node.indexInList,
+          };
+
           const dropTarget = (
             <div
               style={{
@@ -736,25 +742,43 @@ export default class ThemableEventsTree extends Component<
                 selection={this.props.selection}
                 leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
                 onAddNewInstruction={instructionsListContext =>
-                  this.props.onAddNewInstruction(event, instructionsListContext)
+                  this.props.onAddNewInstruction(
+                    eventContext,
+                    instructionsListContext
+                  )
                 }
                 onPasteInstructions={instructionsListContext =>
-                  this.props.onPasteInstructions(event, instructionsListContext)
+                  this.props.onPasteInstructions(
+                    eventContext,
+                    instructionsListContext
+                  )
                 }
                 onMoveToInstruction={instructionContext =>
-                  this.props.onMoveToInstruction(event, instructionContext)
+                  this.props.onMoveToInstruction(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onMoveToInstructionsList={instructionContext =>
-                  this.props.onMoveToInstructionsList(event, instructionContext)
+                  this.props.onMoveToInstructionsList(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onInstructionClick={instructionContext =>
-                  this.props.onInstructionClick(event, instructionContext)
+                  this.props.onInstructionClick(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onInstructionDoubleClick={instructionContext =>
-                  this.props.onInstructionDoubleClick(event, instructionContext)
+                  this.props.onInstructionDoubleClick(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onParameterClick={parameterContext =>
-                  this.props.onParameterClick(event, parameterContext)
+                  this.props.onParameterClick(eventContext, parameterContext)
                 }
                 onEventClick={() =>
                   this.props.onEventClick({
@@ -772,10 +796,10 @@ export default class ThemableEventsTree extends Component<
                   })
                 }
                 onInstructionContextMenu={(...args) =>
-                  this.props.onInstructionContextMenu(event, ...args)
+                  this.props.onInstructionContextMenu(eventContext, ...args)
                 }
                 onAddInstructionContextMenu={(...args) =>
-                  this.props.onAddInstructionContextMenu(event, ...args)
+                  this.props.onAddInstructionContextMenu(eventContext, ...args)
                 }
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
                 onOpenLayout={(name: string) => {

@@ -60,6 +60,16 @@
         }
       }
     },
+    "icon-button": {
+      "color": {
+        "value": "#002B36"
+      },
+      "selected": {
+        "background-color": {
+          "value": "#2799b9"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#249AC6"
@@ -308,6 +318,21 @@
         "incomplete": {
           "value": "#FFA929",
           "comment": "Palette/Yellow/50"
+        }
+      }
+    },
+    "example": {
+      "difficulty": {
+        "color": {
+          "simple": {
+            "value": "#8BE7C4"
+          },
+          "advanced": {
+            "value": "#FFD28F"
+          },
+          "expert": {
+            "value": "#FFA38F"
+          }
         }
       }
     },

@@ -25,3 +25,13 @@ export const imagePreviewMinZoom = 1 / 16;
 
 export const clampImagePreviewZoom = (zoom: number): number =>
   Math.max(Math.min(zoom, imagePreviewMaxZoom), imagePreviewMinZoom);
+
+export const willZoomChange = (
+  currentZoom: number,
+  multiplier: number
+): boolean => {
+  return !(
+    (currentZoom >= imagePreviewMaxZoom && multiplier > 1) ||
+    (currentZoom <= imagePreviewMinZoom && multiplier < 1)
+  );
+};

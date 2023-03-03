@@ -28,9 +28,6 @@ import {
   isObjectLifecycleEventsFunction,
   isExtensionLifecycleEventsFunction,
 } from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
-import FlatButton from '../UI/FlatButton';
-import { Line } from '../UI/Grid';
-import Divider from '@material-ui/core/Divider';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -42,6 +39,9 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import { ToolbarGroup } from '../UI/Toolbar';
+import IconButton from '../UI/IconButton';
+import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -200,9 +200,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   updateToolbar = () => {
     if (this.editor) {
+      // If the scene editor is open, let it handle the toolbar.
       this.editor.updateToolbar();
     } else {
-      this.props.setToolbar(null);
+      // Otherwise, show the extension settings buttons.
+      this.props.setToolbar(
+        <ToolbarGroup lastChild>
+          <IconButton
+            size="small"
+            color="default"
+            onClick={this._editOptions}
+            tooltip={t`Open extension settings`}
+          >
+            <ExtensionEditIcon />
+          </IconButton>
+        </ToolbarGroup>
+      );
     }
   };
 
@@ -587,6 +600,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
 
     done(true);
+  };
+
+  _onEventsBasedBehaviorPasted = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    sourceExtensionName: string
+  ) => {
+    const { project, eventsFunctionsExtension } = this.props;
+    if (eventsFunctionsExtension.getName() === sourceExtensionName) {
+      return;
+    }
+    gd.WholeProjectRefactorer.updateExtensionNameInEventsBasedBehavior(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      sourceExtensionName
+    );
   };
 
   _onEventsBasedBehaviorRenamed = () => {
@@ -1053,7 +1082,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         renderEditor: () => (
           <I18n>
             {({ i18n }) => (
-              <Background>
+              <Background maxWidth>
                 {selectedEventsFunction &&
                 this._globalObjectsContainer &&
                 this._objectsContainer ? (
@@ -1146,6 +1175,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
                 onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={this._editOptions}
+                settingsIcon={<ExtensionEditIcon />}
                 unsavedChanges={this.props.unsavedChanges}
                 isActive={true}
               />
@@ -1186,18 +1216,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 )}
                 onAddEventsFunction={this._onAddFreeEventsFunction}
                 onEventsFunctionAdded={() => {}}
-                renderHeader={() => (
-                  <React.Fragment>
-                    <Line justifyContent="center">
-                      <FlatButton
-                        label={<Trans>Edit extension options</Trans>}
-                        primary
-                        onClick={() => this._editOptions()}
-                      />
-                    </Line>
-                    <Divider />
-                  </React.Fragment>
-                )}
                 unsavedChanges={this.props.unsavedChanges}
               />
             )}
@@ -1249,20 +1267,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       eventsFunction
                     )
                   }
-                  renderHeader={() => (
-                    <React.Fragment>
-                      <Line justifyContent="center">
-                        <FlatButton
-                          label={<Trans>Edit object properties</Trans>}
-                          primary
-                          onClick={() =>
-                            this._editObject(selectedEventsBasedObject)
-                          }
-                        />
-                      </Line>
-                      <Divider />
-                    </React.Fragment>
-                  )}
                   unsavedChanges={this.props.unsavedChanges}
                 />
               )}
@@ -1306,20 +1310,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       eventsFunction
                     )
                   }
-                  renderHeader={() => (
-                    <React.Fragment>
-                      <Line justifyContent="center">
-                        <FlatButton
-                          label={<Trans>Edit behavior properties</Trans>}
-                          primary
-                          onClick={() =>
-                            this._editBehavior(selectedEventsBasedBehavior)
-                          }
-                        />
-                      </Line>
-                      <Divider />
-                    </React.Fragment>
-                  )}
                   unsavedChanges={this.props.unsavedChanges}
                 />
               )}
@@ -1344,6 +1334,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             {({ i18n }) => (
               <EventsBasedBehaviorsList
                 project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedBehaviorsList={eventsFunctionsExtension.getEventsBasedBehaviors()}
                 selectedEventsBasedBehavior={selectedEventsBasedBehavior}
                 onSelectEventsBasedBehavior={this._selectEventsBasedBehavior}
@@ -1354,6 +1345,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onEventsBasedBehaviorRenamed={
                   this._onEventsBasedBehaviorRenamed
                 }
+                onEventsBasedBehaviorPasted={this._onEventsBasedBehaviorPasted}
                 onEditProperties={this._editBehavior}
                 unsavedChanges={this.props.unsavedChanges}
               />

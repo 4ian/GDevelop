@@ -16,7 +16,7 @@ import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Chip from '../../../../UI/Chip';
 import { Trans } from '@lingui/macro';
 import Lock from '../../../../UI/CustomSvgIcons/Lock';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   cardTextContainer: {

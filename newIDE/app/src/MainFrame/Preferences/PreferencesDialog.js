@@ -10,7 +10,7 @@ import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import { themes } from '../../UI/Theme';
+import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';

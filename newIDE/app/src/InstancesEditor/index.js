@@ -54,6 +54,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
+  onDuplicate: () => void,
   onUndo: () => void,
   onRedo: () => void,
   onZoomOut: () => void,
@@ -66,6 +67,7 @@ export type InstancesEditorShortcutsCallbacks = {|
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout,
+  selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
   onInstancesEditorSettingsMutated: (
@@ -130,6 +132,7 @@ export default class InstancesEditor extends Component<Props> {
   _renderingPaused = false;
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
+  hasCursorMovedSinceItIsDown = false;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -220,6 +223,11 @@ export default class InstancesEditor extends Component<Props> {
     );
     this.pixiRenderer.view.addEventListener('mouseout', event => {
       this.props.onMouseLeave(event);
+    });
+    this.pixiRenderer.view.addEventListener('focusout', event => {
+      if (this.keyboardShortcuts) {
+        this.keyboardShortcuts.resetModifiers();
+      }
     });
 
     this.pixiContainer = new PIXI.Container();
@@ -571,9 +579,10 @@ export default class InstancesEditor extends Component<Props> {
    */
   addInstances = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ): Array<gdInitialInstance> => {
-    return this._instancesAdder.addInstances(pos, objectNames);
+    return this._instancesAdder.addInstances(pos, objectNames, layer);
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -679,7 +688,9 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
-    this.props.onInstanceDoubleClicked(instance);
+    if (!this.keyboardShortcuts.shouldIgnoreDoubleClick()) {
+      this.props.onInstanceDoubleClicked(instance);
+    }
   };
 
   _onOverInstance = (instance: gdInitialInstance) => {
@@ -697,28 +708,19 @@ export default class InstancesEditor extends Component<Props> {
       return;
     }
 
-    if (this.keyboardShortcuts.shouldCloneInstances()) {
-      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-      for (var i = 0; i < selectedInstances.length; i++) {
-        const instance = selectedInstances[i];
-        this.props.initialInstances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
-      }
-    } else {
-      this.props.instancesSelection.selectInstance({
-        instance,
-        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-        layersVisibility: this._getLayersVisibility(),
-      });
+    this.props.instancesSelection.selectInstance({
+      instance,
+      multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+      layersVisibility: this._getLayersVisibility(),
+    });
 
-      if (this.props.onInstancesSelected) {
-        this.props.onInstancesSelected(
-          this.props.instancesSelection.getSelectedInstances()
-        );
-      }
+    if (this.props.onInstancesSelected) {
+      this.props.onInstancesSelected(
+        this.props.instancesSelection.getSelectedInstances()
+      );
     }
 
+    this.hasCursorMovedSinceItIsDown = false;
     this.instancesMover.startMove(sceneX, sceneY);
   };
 
@@ -732,6 +734,21 @@ export default class InstancesEditor extends Component<Props> {
     deltaX: number,
     deltaY: number
   ) => {
+    if (
+      !this.hasCursorMovedSinceItIsDown &&
+      this.keyboardShortcuts.shouldCloneInstances()
+    ) {
+      this.hasCursorMovedSinceItIsDown = true;
+
+      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+      for (var i = 0; i < selectedInstances.length; i++) {
+        const instance = selectedInstances[i];
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
+      }
+    }
+
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -1008,7 +1025,8 @@ export default class InstancesEditor extends Component<Props> {
           );
           _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
             pos,
-            this.props.selectedObjectNames
+            this.props.selectedObjectNames,
+            this.props.selectedLayer
           );
         }}
         drop={monitor => {

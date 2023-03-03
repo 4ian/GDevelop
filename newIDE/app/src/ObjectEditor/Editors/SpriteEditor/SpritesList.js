@@ -197,6 +197,7 @@ type Props = {|
   },
   onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
   onReplaceByDirection: (newDirection: gdDirection) => void,
+  onSpriteUpdated?: () => void,
   onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
   objectName: string, // This is used for the default name of images created with Piskel.
   animationName: string, // This is used for the default name of images created with Piskel.
@@ -259,6 +260,9 @@ export default class SpritesList extends Component<Props, State> {
     this.forceUpdate();
 
     await resourceManagementProps.onFetchNewlyAddedResources();
+
+    if (resources.length && this.props.onSpriteUpdated)
+      this.props.onSpriteUpdated();
   };
 
   editWith = async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
@@ -348,6 +352,8 @@ export default class SpritesList extends Component<Props, State> {
         onChangeName(newName);
       }
       newDirection.delete();
+
+      if (this.props.onSpriteUpdated) this.props.onSpriteUpdated();
     } catch (error) {
       this.setState({ externalEditorOpened: false });
       console.error(
@@ -375,6 +381,7 @@ export default class SpritesList extends Component<Props, State> {
               this.props.resourceManagementProps.resourceExternalEditors
             }
             onEditWith={this.editWith}
+            onDirectionUpdated={this.props.onSpriteUpdated}
           />
         </MiniToolbar>
         <SortableList

@@ -30,7 +30,10 @@ import EmailVerificationDialog from './EmailVerificationDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import {
+  listUserCloudProjects,
+  type CloudProjectWithUserAccessInfo,
+} from '../Utils/GDevelopServices/Project';
 import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
 import {
   listReceivedAssetShortHeaders,
@@ -41,6 +44,7 @@ import AdditionalUserInfoDialog, {
 } from './AdditionalUserInfoDialog';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
+import RequestDeduplicator from '../Utils/RequestDeduplicator';
 
 type Props = {|
   authentication: Authentication,
@@ -98,7 +102,15 @@ export default class AuthenticatedUserProvider extends React.Component<
   _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
 
-  componentDidMount() {
+  // Cloud projects are requested in 2 different places at app opening.
+  // - First one comes from user authenticating and automatically fetching
+  //   their cloud projects;
+  // - Second one comes from the homepage fetching the cloud projects regularly.
+  _cloudProjectListingDeduplicator = new RequestDeduplicator<
+    Array<CloudProjectWithUserAccessInfo>
+  >(listUserCloudProjects);
+
+  async componentDidMount() {
     this._resetAuthenticatedUser();
 
     // Listen to when the user log out so that we reset the user profile.
@@ -135,7 +147,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         'Fetching user profile as authenticated user found at startup...'
       );
       this._automaticallyUpdateUserProfile = false;
-      this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
       // Don't do anything. Either no user is logged (nothing to do)
@@ -303,32 +315,34 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
-    listUserCloudProjects(
-      authentication.getAuthorizationHeader,
-      firebaseUser.uid
-    ).then(
-      cloudProjects =>
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjects,
-          },
-        })),
-      error => {
-        console.error('Error while loading user cloud projects:', error);
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjectsFetchingErrorLabel: (
-              <Trans>
-                We couldn't load your cloud projects. Verify your internet
-                connection or try again later.
-              </Trans>
-            ),
-          },
-        }));
-      }
-    );
+    this._cloudProjectListingDeduplicator
+      .launchRequestOrGetOngoingPromise([
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid,
+      ])
+      .then(
+        cloudProjects =>
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjects,
+            },
+          })),
+        error => {
+          console.error('Error while loading user cloud projects:', error);
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjectsFetchingErrorLabel: (
+                <Trans>
+                  We couldn't load your cloud projects. Verify your internet
+                  connection or try again later.
+                </Trans>
+              ),
+            },
+          }));
+        }
+      );
     listReceivedAssetPacks(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
@@ -497,32 +511,34 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
 
-    listUserCloudProjects(
-      authentication.getAuthorizationHeader,
-      firebaseUser.uid
-    ).then(
-      cloudProjects =>
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjects,
-          },
-        })),
-      error => {
-        console.error('Error while loading user cloud projects:', error);
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjectsFetchingErrorLabel: (
-              <Trans>
-                We couldn't load your cloud projects. Verify your internet
-                connection or try again later.
-              </Trans>
-            ),
-          },
-        }));
-      }
-    );
+    this._cloudProjectListingDeduplicator
+      .launchRequestOrGetOngoingPromise([
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid,
+      ])
+      .then(
+        cloudProjects =>
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjects,
+            },
+          })),
+        error => {
+          console.error('Error while loading user cloud projects:', error);
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjectsFetchingErrorLabel: (
+                <Trans>
+                  We couldn't load your cloud projects. Verify your internet
+                  connection or try again later.
+                </Trans>
+              ),
+            },
+          }));
+        }
+      );
   };
 
   _fetchUserBadges = async () => {

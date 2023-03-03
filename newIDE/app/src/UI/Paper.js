@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import MuiPaper from '@material-ui/core/Paper';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 type Props = {|
   children: React.Node,

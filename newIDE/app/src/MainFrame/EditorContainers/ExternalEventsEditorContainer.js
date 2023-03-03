@@ -16,6 +16,7 @@ import { Line } from '../../UI/Grid';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import HelpButton from '../../UI/HelpButton';
 import TutorialButton from '../../UI/TutorialButton';
+import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 
 const styles = {
   container: {
@@ -157,6 +158,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             objectsContainer={layout}
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
+            settingsIcon={<EditSceneIcon />}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
           />

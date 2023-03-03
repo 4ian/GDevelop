@@ -10,6 +10,7 @@ declare class gdMeasurementUnit {
   getElementBaseUnit(elementIndex: number): gdMeasurementBaseUnit;
   isUndefined(): boolean;
   static applyTranslation(): void;
+  static getUndefined(): gdMeasurementUnit;
   static getDimensionless(): gdMeasurementUnit;
   static getDegreeAngle(): gdMeasurementUnit;
   static getSecond(): gdMeasurementUnit;
@@ -17,6 +18,10 @@ declare class gdMeasurementUnit {
   static getPixelSpeed(): gdMeasurementUnit;
   static getPixelAcceleration(): gdMeasurementUnit;
   static getNewton(): gdMeasurementUnit;
+  static getDefaultMeasurementUnitsCount(): number;
+  static getDefaultMeasurementUnitAtIndex(index: number): gdMeasurementUnit;
+  static getDefaultMeasurementUnitByName(name: string): gdMeasurementUnit;
+  static hasDefaultMeasurementUnitNamed(name: string): boolean;
   delete(): void;
   ptr: number;
 };

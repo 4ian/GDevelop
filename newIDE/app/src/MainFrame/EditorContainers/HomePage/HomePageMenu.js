@@ -16,7 +16,7 @@ import Sun from '../../../UI/CustomSvgIcons/Sun';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../UI/Paper';
 
 export const styles = {

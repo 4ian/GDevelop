@@ -25,6 +25,7 @@ import {
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 import ResourcesLoader from '../ResourcesLoader';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { Column, Line } from '../UI/Grid';
 
 const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
@@ -363,6 +364,20 @@ export default class ResourcesList extends React.Component<Props, State> {
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search resources`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -390,17 +405,6 @@ export default class ResourcesList extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          placeholder={t`Search resources`}
-          aspect="integrated-search-bar"
-        />
       </Background>
     );
   }

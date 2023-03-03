@@ -13,12 +13,13 @@ import {
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import Text from '../Text';
 
 const styles = {
   textField: {
     top: noMarginTextFieldInListItemTopOffset,
-    fontSize: 14,
+    fontSize: 12,
   },
 };
 
@@ -118,12 +119,17 @@ function ItemRow<Item>({
         fontWeight: isBold ? 'bold' : 'normal',
       }}
     >
-      {renderItemLabel ? renderItemLabel() : itemName}
+      {renderItemLabel ? (
+        renderItemLabel()
+      ) : (
+        <Text noMargin size="body-small">
+          {itemName}
+        </Text>
+      )}
     </div>
   );
 
   const itemStyle = {
-    borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
     backgroundColor: selected
       ? errorStatus === ''
         ? gdevelopTheme.listItem.selectedBackgroundColor

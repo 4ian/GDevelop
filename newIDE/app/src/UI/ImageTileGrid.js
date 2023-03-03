@@ -14,6 +14,8 @@ import Text from './Text';
 import Skeleton from '@material-ui/lab/Skeleton';
 import Typography from '@material-ui/core/Typography';
 import { shortenString } from '../Utils/StringHelpers';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { useIsMounted } from '../Utils/UseIsMounted';
 
 const MAX_TILE_SIZE = 300;
 const SPACING = 8;
@@ -49,36 +51,39 @@ const styles = {
     minHeight: 2 * 20 + 2 * 6,
   },
   thumbnailImageWithDescription: {
-    objectFit: 'contain',
+    display: 'block', // Display as a block to prevent cumulative layout shift.
+    objectFit: 'cover',
     verticalAlign: 'middle',
-    backgroundColor: 'black',
-    width: 'calc(100% - 2px)', // Not full because of border.
+    width: '100%',
     borderRadius: 8,
     border: '1px solid lightgrey',
+    boxSizing: 'border-box', // Take border in account for sizing to avoid cumulative layout shift.
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
+    transition: 'opacity 0.3s ease-in-out',
   },
-  skeletonTile: { padding: 8, height: 'auto' },
-  skeletonContainer: {
-    padding: 4,
+  dataLoadingSkeleton: {
+    // Display a skeleton with the same aspect and border as the images:
+    borderRadius: 8,
     aspectRatio: '16 / 9',
   },
-  skeleton: { borderRadius: 8 },
+  imageLoadingSkeleton: {
+    // Display a skeleton with the same aspect and border as the images,
+    // and with absolute positioning so that it stays behind the image (until it's loaded).
+    position: 'absolute',
+    borderRadius: 8,
+    aspectRatio: '16 / 9',
+  },
 };
 
-// Styles to give the impression of pressing an element.
-const useStylesForTile = makeStyles(theme =>
+// Styles to give a visible hover for the mouse cursor.
+const useStylesForTileHover = makeStyles(theme =>
   createStyles({
     tile: {
-      borderRadius: 8,
-      padding: 4,
-      height: 'auto',
-      '&:focus': {
-        backgroundColor: theme.palette.action.hover,
-      },
+      transition: 'transform 0.3s ease-in-out',
       '&:hover': {
-        backgroundColor: theme.palette.action.hover,
+        transform: 'scale(1.02)',
       },
     },
   })
@@ -114,10 +119,26 @@ const ImageTileGrid = ({
   getLimitFromWidth,
 }: ImageTileGridProps) => {
   const windowWidth = useResponsiveWindowWidth();
-  const tileClasses = useStylesForTile();
+  const tileClasses = useStylesForTileHover();
   const MAX_COLUMNS = getColumnsFromWidth('large');
   const limit = getLimitFromWidth ? getLimitFromWidth(windowWidth) : undefined;
   const itemsToDisplay = limit ? items.slice(0, limit) : items;
+  const forceUpdate = useForceUpdate();
+  const isMounted = useIsMounted();
+
+  const loadedImageUrls = React.useRef<Set<string>>(new Set<string>());
+  const setImageLoaded = React.useCallback(
+    (loadedImageUrl: string) => {
+      // Give a bit of time to an image to fully render before revealing it.
+      setTimeout(() => {
+        if (!isMounted) return; // Avoid warnings if the component was removed in the meantime.
+
+        loadedImageUrls.current.add(loadedImageUrl);
+        forceUpdate();
+      }, 50);
+    },
+    [forceUpdate, isMounted]
+  );
 
   return (
     <div style={styles.container}>
@@ -135,15 +156,14 @@ const ImageTileGrid = ({
             ? new Array(getColumnsFromWidth(windowWidth))
                 .fill(0)
                 .map((_, index) => (
-                  <GridListTile key={index} style={styles.skeletonTile}>
-                    <div style={styles.skeletonContainer}>
-                      <Skeleton
-                        variant="rect"
-                        width="100%"
-                        height="100%"
-                        style={styles.skeleton}
-                      />
-                    </div>
+                  // Display tiles but with skeletons while the data is loading.
+                  <GridListTile key={index} classes={tileClasses}>
+                    <Skeleton
+                      variant="rect"
+                      width="100%"
+                      height="100%"
+                      style={styles.dataLoadingSkeleton}
+                    />
                   </GridListTile>
                 ))
             : itemsToDisplay.map((item, index) => (
@@ -154,12 +174,28 @@ const ImageTileGrid = ({
                     tabIndex={0}
                     focusRipple
                   >
-                    <Column noMargin>
+                    <Column expand noMargin>
                       <div style={styles.imageContainer}>
+                        {!loadedImageUrls.current.has(item.imageUrl) ? (
+                          // Display a skeleton behind the image while it's loading.
+                          <Skeleton
+                            variant="rect"
+                            width="100%"
+                            height="100%"
+                            style={styles.imageLoadingSkeleton}
+                          />
+                        ) : null}
                         <CorsAwareImage
-                          style={styles.thumbnailImageWithDescription}
+                          style={{
+                            // Once ready, animate the image display.
+                            opacity: loadedImageUrls.current.has(item.imageUrl)
+                              ? 1
+                              : 0,
+                            ...styles.thumbnailImageWithDescription,
+                          }}
                           src={item.imageUrl}
                           alt={`thumbnail ${index}`}
+                          onLoad={() => setImageLoaded(item.imageUrl)}
                         />
                         {item.overlayText && (
                           <ImageOverlay content={item.overlayText} />

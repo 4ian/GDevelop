@@ -11,7 +11,7 @@ import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ObjectIcon from '../UI/CustomSvgIcons/Object';
 import ObjectGroupIcon from '../UI/CustomSvgIcons/ObjectGroup';
-import PropertiesPanelIcon from '../UI/CustomSvgIcons/PropertiesPanel';
+import EditIcon from '../UI/CustomSvgIcons/Edit';
 import InstancesListIcon from '../UI/CustomSvgIcons/InstancesList';
 import LayersIcon from '../UI/CustomSvgIcons/Layers';
 import UndoIcon from '../UI/CustomSvgIcons/Undo';
@@ -22,9 +22,12 @@ import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
-  openObjectsList: () => void,
-  openObjectGroupsList: () => void,
-  openProperties: () => void,
+  toggleObjectsList: () => void,
+  isObjectsListShown: boolean,
+  toggleObjectGroupsList: () => void,
+  isObjectGroupsListShown: boolean,
+  toggleProperties: () => void,
+  isPropertiesShown: boolean,
   undo: () => void,
   canUndo: boolean,
   redo: () => void,
@@ -32,7 +35,9 @@ type Props = {|
   deleteSelection: () => void,
   instancesSelection: InstancesSelection,
   toggleInstancesList: () => void,
+  isInstancesListShown: boolean,
   toggleLayersList: () => void,
+  isLayersListShown: boolean,
   isWindowMaskShown: () => boolean,
   toggleWindowMask: () => void,
   isGridShown: () => boolean,
@@ -41,6 +46,7 @@ type Props = {|
   getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
   setZoomFactor: number => void,
   onOpenSettings?: ?() => void,
+  settingsIcon?: React.Node,
   canRenameObject: boolean,
   onRenameObject: () => void,
 |};
@@ -49,9 +55,9 @@ const Toolbar = (props: Props) => {
   return (
     <>
       <ToolbarCommands
-        openObjectsList={props.openObjectsList}
-        openObjectGroupsList={props.openObjectGroupsList}
-        openPropertiesPanel={props.openProperties}
+        toggleObjectsList={props.toggleObjectsList}
+        toggleObjectGroupsList={props.toggleObjectGroupsList}
+        togglePropertiesPanel={props.toggleProperties}
         toggleInstancesList={props.toggleInstancesList}
         toggleLayersList={props.toggleLayersList}
         undo={props.undo}
@@ -73,7 +79,8 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-objects-panel-button"
-          onClick={props.openObjectsList}
+          onClick={props.toggleObjectsList}
+          selected={props.isObjectsListShown}
           tooltip={t`Open Objects Panel`}
         >
           <ObjectIcon />
@@ -82,7 +89,8 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-object-groups-panel-button"
-          onClick={props.openObjectGroupsList}
+          onClick={props.toggleObjectGroupsList}
+          selected={props.isObjectGroupsListShown}
           tooltip={t`Open Object Groups Panel`}
         >
           <ObjectGroupIcon />
@@ -91,16 +99,18 @@ const Toolbar = (props: Props) => {
           size="small"
           color="default"
           id="toolbar-open-properties-panel-button"
-          onClick={props.openProperties}
+          onClick={props.toggleProperties}
+          selected={props.isPropertiesShown}
           tooltip={t`Open Properties Panel`}
         >
-          <PropertiesPanelIcon />
+          <EditIcon />
         </IconButton>
         <IconButton
           size="small"
           color="default"
           id="toolbar-open-instances-list-panel-button"
           onClick={props.toggleInstancesList}
+          selected={props.isInstancesListShown}
           tooltip={t`Open Instances List Panel`}
         >
           <InstancesListIcon />
@@ -110,6 +120,7 @@ const Toolbar = (props: Props) => {
           color="default"
           id="toolbar-open-layers-panel-button"
           onClick={props.toggleLayersList}
+          selected={props.isLayersListShown}
           tooltip={t`Open Layers Panel`}
         >
           <LayersIcon />
@@ -203,7 +214,7 @@ const Toolbar = (props: Props) => {
             onClick={props.onOpenSettings}
             tooltip={t`Open settings`}
           >
-            <EditSceneIcon />
+            {props.settingsIcon || <EditSceneIcon />}
           </IconButton>
         )}
       </ToolbarGroup>

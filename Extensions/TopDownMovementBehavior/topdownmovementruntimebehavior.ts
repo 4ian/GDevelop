@@ -45,6 +45,10 @@ namespace gdjs {
     private _basisTransformation: gdjs.TopDownMovementRuntimeBehavior.BasisTransformation | null;
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
+    private _topDownMovementHooks: Array<
+      gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    > = [];
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
@@ -335,6 +339,17 @@ namespace gdjs {
         }
       }
 
+      const hookContext =
+        gdjs.TopDownMovementRuntimeBehavior._topDownMovementHookContext;
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        hookContext._setDirection(direction);
+        direction = topDownMovementHook.overrideDirection(hookContext);
+      }
+      hookContext._setDirection(direction);
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        topDownMovementHook.beforeSpeedUpdate(hookContext);
+      }
+
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousVelocityX = this._xVelocity;
@@ -418,6 +433,10 @@ namespace gdjs {
 
       // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
+
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        topDownMovementHook.beforePositionUpdate(hookContext);
+      }
 
       // Position object.
       // This is a Verlet integration considering the acceleration as constant.
@@ -523,8 +542,68 @@ namespace gdjs {
     getLastStickInputAngle() {
       return this._stickAngle;
     }
+
+    /**
+     * A hook must typically be registered by a behavior that requires this one
+     * in its onCreate function.
+     * The hook must stay forever to avoid side effects like a hooks order
+     * change. To handle deactivated behavior, the hook can check that its
+     * behavior is activated before doing anything.
+     */
+    registerHook(
+      hook: gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    ) {
+      this._topDownMovementHooks.push(hook);
+    }
   }
+
   export namespace TopDownMovementRuntimeBehavior {
+    export class TopDownMovementHookContext {
+      private direction: integer = -1;
+
+      /**
+       * @returns The movement direction from 0 for left to 7 for up-left and
+       * -1 for no direction.
+       */
+      getDirection(): integer {
+        return this.direction;
+      }
+
+      /**
+       * This method won't change the direction used by the top-down movement
+       * behavior.
+       */
+      _setDirection(direction: integer): void {
+        this.direction = direction;
+      }
+    }
+
+    // This should be a static attribute but it's not possible because of
+    // declaration order.
+    export const _topDownMovementHookContext = new gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHookContext();
+
+    /**
+     * Allow extensions relying on the top-down movement to customize its
+     * behavior a bit.
+     */
+    export interface TopDownMovementHook {
+      /**
+       * Return the direction to use instead of the direction given in
+       * parameter.
+       */
+      overrideDirection(hookContext: TopDownMovementHookContext): integer;
+      /**
+       * Called before the acceleration and new direction is applied to the
+       * velocity.
+       */
+      beforeSpeedUpdate(hookContext: TopDownMovementHookContext): void;
+      /**
+       * Called before the velocity is applied to the object position and
+       * angle.
+       */
+      beforePositionUpdate(hookContext: TopDownMovementHookContext): void;
+    }
+
     export interface BasisTransformation {
       toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
     }

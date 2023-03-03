@@ -2073,6 +2073,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
           logsManager={consoleTestData}
+          onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2092,6 +2093,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
           logsManager={consoleTestData}
+          onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

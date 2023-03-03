@@ -9,7 +9,7 @@ import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import Text from '../../../../UI/Text';
 import { roundTo } from '../../../../Utils/Mathematics';
 import { Column } from '../../../../UI/Grid';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import styles from './styles';
 
 const POINT_COORDINATE_PRECISION = 4;
@@ -42,7 +42,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
       }}
       onClick={() => props.onClick(props.pointName)}
       onPointerEnter={() => props.onPointerEnter(props.pointName)}
-      onPointerLeave={props.onPointerEnter}
+      onPointerLeave={props.onPointerLeave}
     >
       <TableRowColumn style={styles.nameColumn}>
         <SemiControlledTextField

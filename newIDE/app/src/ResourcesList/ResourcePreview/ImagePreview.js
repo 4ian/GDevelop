@@ -416,6 +416,7 @@ const ImagePreview = ({
     width: imageWidth,
     height: imageHeight,
     transformOrigin: '0 0',
+    display: 'flex',
   };
 
   const imageStyle = {

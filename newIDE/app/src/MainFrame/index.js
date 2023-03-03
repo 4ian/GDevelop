@@ -3280,10 +3280,10 @@ const MainFrame = (props: Props) => {
           endTutorial={({
             shouldCloseProject,
             shouldWarnAboutUnsavedChanges,
-          }: {
+          }: {|
             shouldCloseProject: boolean,
             shouldWarnAboutUnsavedChanges: boolean,
-          }) => {
+          |}) => {
             if (
               shouldWarnAboutUnsavedChanges &&
               currentProject &&

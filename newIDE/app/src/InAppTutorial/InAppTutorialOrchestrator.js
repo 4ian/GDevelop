@@ -17,10 +17,7 @@ import InAppTutorialDialog from './InAppTutorialDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import { sendInAppTutorialProgress } from '../Utils/Analytics/EventSender';
-import {
-  getInstanceCountInLayoutForObject,
-  getInstancesInLayoutForObject,
-} from '../Utils/Layout';
+import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   getMuiCheckboxValue,
@@ -407,11 +404,11 @@ const InAppTutorialOrchestrator = React.forwardRef<
     const [
       objectSceneInstancesToWatch,
       setObjectSceneInstancesToWatch,
-    ] = React.useState<?{
+    ] = React.useState<?{|
       sceneName: ?string,
       objectName: string,
       count?: number,
-    }>(null);
+    |}>(null);
     const domObserverRef = React.useRef<?MutationObserver>(null);
     const [
       shouldWatchProjectChanges,
@@ -811,10 +808,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
           }
         } else {
           // Otherwise, we check if there is the expected number of instances.
-          const instancesCount = getInstancesInLayoutForObject(
+          const instancesCount = getInstanceCountInLayoutForObject(
             layout,
             objectName
-          ).length;
+          );
           if (instancesCount >= count) goToNextStep();
         }
       },
@@ -839,7 +836,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
       currentStep && currentStep.isTriggerFlickering ? 500 : null
     );
 
-    const isRunningMiniTutorial = isMiniTutorial(tutorial.id);
+    const isRunningMiniTutorial = React.useMemo(
+      () => isMiniTutorial(tutorial.id),
+      [tutorial.id]
+    );
 
     const renderStepDisplayer = (i18n: I18nType) => {
       if (!currentStep) return null;

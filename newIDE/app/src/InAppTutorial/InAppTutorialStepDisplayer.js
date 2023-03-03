@@ -25,7 +25,7 @@ const styles = {
     position: 'absolute',
     left: 20,
     bottom: 20,
-    zIndex: aboveMaterialUiMaxZIndex, // Ensure it sits above everything.
+    zIndex: aboveMaterialUiMaxZIndex, // Make sure the avatar is above the dialogs or drawers created by Material UI.
     display: 'flex',
     visibility: 'hidden',
     boxShadow:
@@ -314,7 +314,7 @@ function InAppTutorialStepDisplayer({
                 visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
-              id="tutorial-avatar"
+              id="in-app-tutorial-avatar"
             >
               <img
                 alt="GDevelop mascot red hero"

@@ -36,6 +36,7 @@ import {
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './MultiplierScore';
+import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
@@ -97,6 +98,7 @@ const GetStartedSection = ({
   showGetStartedSection,
   setShowGetStartedSection,
 }: Props) => {
+  const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
@@ -217,7 +219,7 @@ const GetStartedSection = ({
 
   const miniInAppTutorialCards = [
     {
-      key: 'plinkoMultiplier',
+      id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
       title: t`Add score multiplier`,
       description: t`Learn how to manipulate a score by adding collectibles.`,
       keyPoints: [
@@ -226,9 +228,6 @@ const GetStartedSection = ({
         t`Build an expression`,
       ],
       durationInMinutes: 3,
-      locked: false, // Always allow to start or restart the mini tutorial.
-      disabled: isFullTutorialRunning, // Disable the button only if a full tutorial is running.
-      progress: 0,
       renderImage: props => <MultiplierScore {...props} />,
     },
   ];
@@ -260,7 +259,7 @@ const GetStartedSection = ({
     <SectionContainer
       title={
         shouldShowInAppTutorialButtons ? (
-          <Trans>Create and Publish a Fling Game</Trans>
+          <Trans>In app tutorials</Trans>
         ) : (
           <Trans>Get Started!</Trans>
         )
@@ -269,6 +268,58 @@ const GetStartedSection = ({
     >
       {shouldShowInAppTutorialButtons && (
         <SectionRow>
+          <Line>
+            <div style={styles.bannerContainer}>
+              {inAppTutorialsFetchingError ? (
+                <PlaceholderError onRetry={fetchInAppTutorials}>
+                  <Trans>
+                    An error occurred when downloading the tutorials.
+                  </Trans>{' '}
+                  <Trans>
+                    Please check your internet connection or try again later.
+                  </Trans>
+                </PlaceholderError>
+              ) : inAppTutorialShortHeaders === null ? (
+                <PlaceholderLoader />
+              ) : (
+                <GridList
+                  cols={getColumnsFromWidth(windowWidth)}
+                  style={styles.grid}
+                  cellHeight="auto"
+                  spacing={ITEMS_SPACING * 2}
+                >
+                  {miniInAppTutorialCards.map(item => (
+                    <GridListTile key={item.id}>
+                      <InAppTutorialPhaseCard
+                        title={item.title}
+                        description={item.description}
+                        durationInMinutes={item.durationInMinutes}
+                        keyPoints={item.keyPoints}
+                        renderImage={item.renderImage}
+                        progress={0} // Alway start a mini tutorial from the beginning.
+                        onClick={() => selectInAppTutorial(item.id)}
+                        // Phase is disabled if there's a running full tutorial or if offline,
+                        // because we cannot fetch the tutorial.
+                        disabled={isFullTutorialRunning || !isOnline}
+                      />
+                    </GridListTile>
+                  ))}
+                </GridList>
+              )}
+            </div>
+          </Line>
+        </SectionRow>
+      )}
+      {shouldShowInAppTutorialButtons && (
+        <SectionRow>
+          <Text size="title" noMargin>
+            <Trans>Create and Publish a Fling game</Trans>
+          </Text>
+          <Text size="body" color="secondary" noMargin>
+            <Trans>
+              3-part tutorial to creating and publishing a game from scratch.
+            </Trans>
+          </Text>
           <Line>
             <div style={styles.bannerContainer}>
               {inAppTutorialsFetchingError ? (
@@ -325,52 +376,6 @@ const GetStartedSection = ({
                       </GridListTile>
                     ))
                   )}
-                </GridList>
-              )}
-            </div>
-          </Line>
-        </SectionRow>
-      )}
-      {shouldShowInAppTutorialButtons && (
-        <SectionRow>
-          <Text size="title" noMargin>
-            <Trans>Mini tutorials</Trans>
-          </Text>
-          <Text size="body" color="secondary" noMargin>
-            <Trans>Learn game concepts in a few minutes.</Trans>
-          </Text>
-          <Line>
-            <div style={styles.bannerContainer}>
-              {inAppTutorialsFetchingError ? (
-                <PlaceholderError onRetry={fetchInAppTutorials}>
-                  <Trans>
-                    An error occurred when downloading the tutorials.
-                  </Trans>{' '}
-                  <Trans>
-                    Please check your internet connection or try again later.
-                  </Trans>
-                </PlaceholderError>
-              ) : inAppTutorialShortHeaders === null ? (
-                <PlaceholderLoader />
-              ) : (
-                <GridList
-                  cols={getColumnsFromWidth(windowWidth)}
-                  style={styles.grid}
-                  cellHeight="auto"
-                  spacing={ITEMS_SPACING * 2}
-                >
-                  {miniInAppTutorialCards.map(item => (
-                    <GridListTile key={item.key}>
-                      <InAppTutorialPhaseCard
-                        {...item}
-                        onClick={() =>
-                          selectInAppTutorial(
-                            PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID
-                          )
-                        }
-                      />
-                    </GridListTile>
-                  ))}
                 </GridList>
               )}
             </div>

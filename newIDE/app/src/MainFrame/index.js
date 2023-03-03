@@ -979,15 +979,11 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtensionName
       )
     ) {
-      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-        eventsFunctionsExtensionName
-      );
-
       setState(state => ({
         ...state,
         editorTabs: closeEventsFunctionsExtensionTabs(
           state.editorTabs,
-          eventsFunctionsExtension
+          eventsFunctionsExtensionName
         ),
       }));
     }
@@ -1073,16 +1069,16 @@ const MainFrame = (props: Props) => {
     );
     if (!answer) return;
 
+    const extensionName = eventsFunctionsExtension.getName();
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(
         state.editorTabs,
-        eventsFunctionsExtension
+        extensionName
       ),
     })).then(state => {
       // Unload the Platform extension that was generated from the events
       // functions extension.
-      const extensionName = eventsFunctionsExtension.getName();
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
         currentProject,
         extensionName
@@ -1248,26 +1244,25 @@ const MainFrame = (props: Props) => {
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
     );
+
+    // Refactor the project to update the instructions (and later expressions)
+    // of this extension:
+    gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
+      currentProject,
+      eventsFunctionsExtension,
+      oldName,
+      newName
+    );
+    eventsFunctionsExtension.setName(newName);
+    eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
+      currentProject,
+      oldName
+    );
+
     setState(state => ({
       ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(
-        state.editorTabs,
-        eventsFunctionsExtension
-      ),
+      editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
     })).then(state => {
-      // Refactor the project to update the instructions (and later expressions)
-      // of this extension:
-      gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
-        currentProject,
-        eventsFunctionsExtension,
-        oldName,
-        newName
-      );
-      eventsFunctionsExtension.setName(newName);
-      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
-        currentProject,
-        oldName
-      );
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );

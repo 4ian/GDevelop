@@ -120,6 +120,7 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`Read the wiki page for more info about the dataloss mode.`,
+      identifier: 'p2p-dataloss',
     };
   }
   if (type === 'PlatformBehavior::IsObjectOnGivenFloor') {
@@ -131,14 +132,17 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   if (type === 'P2P::OverrideID') {
     return {
       kind: 'warning',
-      message: t`Overriding the ID may have unwanted consequences. Do not use this feature unless you really know what you are doing.`,
+      message: t`Overriding the ID may have unwanted consequences, such as blocking the ability to connect to any peer. Do not use this feature unless you really know what you are doing.`,
     };
   }
   if (type.indexOf('P2P::') === 0) {
     return {
       kind: 'warning',
-      message: t`It is recommended to use your own custom broker server. Read the wiki page for more info.`,
-      identifier: 'p2p-broker-recommendation',
+      message: t`P2P is a peer-to-peer networking solution. It leaks IP addresses to other player - it is made to play with friends, and is not suitabale for playing with unknown players.
+P2P also only allows to exchange messages, but leaves implementaion of higher-level tasks, such as synchronizing the game state, to you.
+
+Use the THNK Framework if you seek an easier, more performant and more flexible solution suitable for playing with strangers.`,
+      identifier: 'p2p-is-networking',
     };
   }
   if (type === 'SystemInfo::IsMobile') {

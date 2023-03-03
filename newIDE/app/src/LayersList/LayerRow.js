@@ -86,7 +86,13 @@ const LayerRow = ({
           canDrop={() => true}
           drop={onDrop}
         >
-          {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+          {({
+            connectDragSource,
+            connectDropTarget,
+            connectDragPreview,
+            isOver,
+            canDrop,
+          }) =>
             connectDropTarget(
               <div>
                 {isOver && (
@@ -121,16 +127,22 @@ const LayerRow = ({
                     </Tooltip>
                   </TreeTableCell>
                   <TreeTableCell expand>
-                    <SemiControlledTextField
-                      margin="none"
-                      value={isBaseLayer ? i18n._(t`Base layer`) : layerName}
-                      id="layer-name"
-                      errorText={nameError}
-                      disabled={isBaseLayer}
-                      onChange={onBlur}
-                      commitOnBlur
-                      fullWidth
-                    />
+                    {connectDragPreview(
+                      <div>
+                        <SemiControlledTextField
+                          margin="none"
+                          value={
+                            isBaseLayer ? i18n._(t`Base layer`) : layerName
+                          }
+                          id="layer-name"
+                          errorText={nameError}
+                          disabled={isBaseLayer}
+                          onChange={onBlur}
+                          commitOnBlur
+                          fullWidth
+                        />
+                      </div>
+                    )}
                   </TreeTableCell>
                   <TreeTableCell>
                     {width < 350 ? (

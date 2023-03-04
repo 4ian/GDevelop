@@ -143,9 +143,7 @@ export default class PanelSpriteEditor extends React.Component<
           <SelectField
             value={shapePainterConfiguration.getAntialiasing()}
             onChange={value => {
-              shapePainterConfiguration.setAntialiasing(
-                value.target.value
-              );
+              shapePainterConfiguration.setAntialiasing(value.target.value);
               this.forceUpdate();
             }}
           >

@@ -29,7 +29,7 @@ namespace gdjs {
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
-    /**The type of antialiasing to apply at rendering */
+    /** The type of anti-aliasing to apply at rendering. */
     antialiasing: 'None' | 'Low' | 'Medium' | 'High';
   };
 

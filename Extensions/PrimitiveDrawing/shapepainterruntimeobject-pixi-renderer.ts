@@ -501,7 +501,7 @@ namespace gdjs {
         if (!this._graphics.filters) {
           this._graphics.filters = [];
         }
-        // Do not apply the filter if already present on the object
+        // Do not apply the filter if it is already present on the object.
         if (this._graphics.filters.indexOf(this._antialiasingFilter) === -1) {
           this._graphics.filters.push(antialiasingFilter);
         }

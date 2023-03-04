@@ -757,6 +757,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
+
   obj.AddAction("SetAntialiasing",
                 _("Anti-aliasing"),
                 _("Anti-aliasing"),
@@ -768,6 +769,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("stringWithSelector",
                     _("Anti-aliasing quality level"),
                     "[\"None\",\"Low\",\"Medium\",\"High\"]");
+
   obj.AddCondition(
          "CheckAntialiasing",
          _("Anti-aliasing type"),
@@ -780,6 +782,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("stringWithSelector",
                     _("Type of anti-aliasing to check the object against"),
                     "[\"None\",\"Low\",\"Medium\",\"High\"]");
+                    
   obj.AddStrExpression(
          "Antialiasing",
          _("Type of anti-aliasing used by a shape painter"),

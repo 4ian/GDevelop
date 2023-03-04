@@ -781,7 +781,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                     _("Type of anti-aliasing to check the object against"),
                     "[\"None\",\"Low\",\"Medium\",\"High\"]");
   obj.AddStrExpression(
-         "GetAntialiasing",
+         "Antialiasing",
          _("Type of anti-aliasing used by a shape painter"),
          _("Gets the type of anti-aliasing in use: None, Low, Medium, or High."),
          _("Setup"),

@@ -193,7 +193,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     gd::String templateSentence = "";
     if (isObjectInstruction || isBehaviorInstruction) {
       if (type == "string") {
-        templateSentence = _("<subject> of _PARAM0_ <operator> <value>, Case insensitive: _PARAM3_");
+        templateSentence = _("<subject> of _PARAM0_ <operator> <value> (case insensitive: _PARAM3_)");
       } else {
         templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
       }
@@ -207,7 +207,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
                               "_PARAM" + gd::String::From(valueParamIndex) + "_");
     } else {
       if (type == "string") {
-        templateSentence = _("<subject> <operator> <value>, Case insensitive: _PARAM3_");
+        templateSentence = _("<subject> <operator> <value> (case insensitive: _PARAM3_)");
       } else {
         templateSentence = _("<subject> <operator> <value>");
       }

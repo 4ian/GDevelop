@@ -60,6 +60,9 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline void SetClearBetweenFrames(bool value) { clearBetweenFrames = value; }
   inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
 
+  inline gd::String GetAntialiasing() { return antialiasing; }
+  inline void SetAntialiasing(const gd::String& value) { antialiasing = value; }
+
  protected:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
@@ -83,6 +86,9 @@ class GD_EXTENSION_API ShapePainterObjectBase {
 
   bool absoluteCoordinates;
   bool clearBetweenFrames;
+
+  //Antialiasing
+  gd::String antialiasing;
 };
 
 /**

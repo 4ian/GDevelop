@@ -496,9 +496,8 @@ namespace gdjs {
           (this._antialiasingFilter = new PIXI.filters.FXAAFilter());
         antialiasingFilter.enabled = true;
         antialiasingFilter.multisample =
-          PIXI.MSAA_QUALITY[
-            this._object.getAntialiasing().toUpperCase()
-          ] || PIXI.MSAA_QUALITY.LOW;
+          PIXI.MSAA_QUALITY[this._object.getAntialiasing().toUpperCase()] ||
+          PIXI.MSAA_QUALITY.LOW;
 
         if (!this._graphics.filters) {
           this._graphics.filters = [];

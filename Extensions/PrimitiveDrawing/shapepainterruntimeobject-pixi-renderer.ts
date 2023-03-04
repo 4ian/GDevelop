@@ -20,6 +20,9 @@ namespace gdjs {
      */
     _transformationIsUpToDate = false;
 
+    /** The antialiasing filter */
+    _antialiasingFilter: null | PIXI.Filter = null;
+
     private static readonly _positionForTransformation: PIXI.IPointData = {
       x: 0,
       y: 0,
@@ -35,6 +38,7 @@ namespace gdjs {
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
+      this.updateAntialiasing();
     }
 
     getRendererObject() {
@@ -484,6 +488,35 @@ namespace gdjs {
       point[0] = position.x;
       point[1] = position.y;
       return point;
+    }
+    updateAntialiasing(): void {
+      if (this._object.getAntialiasing() !== 'None') {
+        const antialiasingFilter =
+          this._antialiasingFilter ||
+          (this._antialiasingFilter = new PIXI.filters.FXAAFilter());
+        antialiasingFilter.enabled = true;
+        antialiasingFilter.multisample =
+          PIXI.MSAA_QUALITY[this._object.getAntialiasing().toUpperCase()] ||
+          PIXI.MSAA_QUALITY.LOW;
+
+        if (!this._graphics.filters) {
+          this._graphics.filters = [];
+        }
+        // Do not apply the filter if it is already present on the object.
+        if (this._graphics.filters.indexOf(this._antialiasingFilter) === -1) {
+          this._graphics.filters.push(antialiasingFilter);
+        }
+      } else if (this._antialiasingFilter !== null) {
+        let antialiasingFilterIndex = this._graphics.filters?.indexOf(
+          this._antialiasingFilter
+        );
+        if (
+          antialiasingFilterIndex !== -1 &&
+          antialiasingFilterIndex !== undefined
+        ) {
+          this._graphics.filters?.splice(antialiasingFilterIndex, 1);
+        }
+      }
     }
   }
 

@@ -20,7 +20,6 @@ namespace gdjs {
      */
     _transformationIsUpToDate = false;
 
-    /** The antialiasing filter */
     _antialiasingFilter: null | PIXI.Filter = null;
 
     private static readonly _positionForTransformation: PIXI.IPointData = {
@@ -490,7 +489,7 @@ namespace gdjs {
       return point;
     }
     updateAntialiasing(): void {
-      if (this._object.getAntialiasing() != 'None') {
+      if (this._object.getAntialiasing() !== 'None') {
         const antialiasingFilter =
           this._antialiasingFilter ||
           (this._antialiasingFilter = new PIXI.filters.FXAAFilter());
@@ -502,17 +501,17 @@ namespace gdjs {
         if (!this._graphics.filters) {
           this._graphics.filters = [];
         }
-        // does not apply filter if it already exists
+        // Do not apply the filter if already present on the object
         if (this._graphics.filters.indexOf(this._antialiasingFilter) === -1) {
           this._graphics.filters.push(antialiasingFilter);
         }
-      } else if (this._antialiasingFilter != null) {
+      } else if (this._antialiasingFilter !== null) {
         let antialiasingFilterIndex = this._graphics.filters?.indexOf(
           this._antialiasingFilter
         );
         if (
-          antialiasingFilterIndex != -1 &&
-          antialiasingFilterIndex != undefined
+          antialiasingFilterIndex !== -1 &&
+          antialiasingFilterIndex !== undefined
         ) {
           this._graphics.filters?.splice(antialiasingFilterIndex, 1);
         }

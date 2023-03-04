@@ -232,7 +232,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetAntialiasing"]
         .SetFunctionName("setAntialiasing");
     GetAllStrExpressionsForObject(
-        "PrimitiveDrawing::Drawer")["GetAntialiasing"]
+        "PrimitiveDrawing::Drawer")["Antialiasing"]
         .SetFunctionName("getAntialiasing");
     GetAllConditionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::CheckAntialiasing"]

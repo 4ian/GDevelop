@@ -1,5 +1,5 @@
 const shell = require('shelljs');
-const { execSync } = require('child_process');
+const { exec, execSync } = require('child_process');
 const path = require('path');
 const {
   getAllInOutFilePaths,
@@ -45,19 +45,22 @@ const fs = require('fs');
 
   for (const inOutFilePath of allInOutFilePaths) {
     const { inPath } = inOutFilePath;
-    shell.echo(`ℹ️ Codemoding ${inPath}... (${doneCount}/${totalCount} done)`);
     try {
-      execSync(
+      exec(
         `node ${path.join(
           __dirname,
           'codemod-file-to-esm.js'
         )} --file ${path.relative(path.join(__dirname, '..'), inPath)}`,
-        { stdio: 'inherit' }
+        {},
+        (err, stdout, stderr) => {
+          console.log(err ? err : stdout + stderr);
+          shell.echo(
+            `ℹ️ Codemoded ${inPath}... (${++doneCount}/${totalCount} done)`
+          );
+        }
       );
     } catch {
       // Already logged by the single-file codemod
     }
-    //shell.rm(inPath);
-    doneCount++;
   }
 })();

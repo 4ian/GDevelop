@@ -48,7 +48,7 @@ namespace gdjs {
    * {@link RuntimeObject.raycastTest} to avoid any allocation.
    */
   const raycastTestStatics: {
-    result: RaycastTestResult;
+    result: gdjs.RaycastTestResult;
   } = {
     result: gdjs.Polygon.makeNewRaycastTestResult(),
   };
@@ -836,7 +836,7 @@ namespace gdjs {
       variable: gdjs.Variable,
       compareWith: boolean
     ): boolean {
-      return gdjs.evtTools.common.getVariableBoolean(variable, compareWith);
+      return gdjs.evtTools.variable.getVariableBoolean(variable, compareWith);
     };
 
     /**
@@ -848,7 +848,7 @@ namespace gdjs {
      * @see {gdjs.evtTools.common.toggleVariableBoolean}
      */
     static toggleVariableBoolean = function (variable: gdjs.Variable) {
-      gdjs.evtTools.common.toggleVariableBoolean(variable);
+      gdjs.evtTools.variable.toggleVariableBoolean(variable);
     };
 
     /**
@@ -2394,7 +2394,7 @@ namespace gdjs {
       endX: float,
       endY: float,
       closest: boolean
-    ): RaycastTestResult {
+    ): gdjs.RaycastTestResult {
       // First check if bounding circles are too far
       const objCenterX = this.getCenterX();
       const objCenterY = this.getCenterY();
@@ -2605,5 +2605,5 @@ namespace gdjs {
      */
     getSqDistanceTo = RuntimeObject.prototype.getSqDistanceToPosition;
   }
-  gdjs.registerObject('', gdjs.RuntimeObject);
+  gdjs.registerObject('', RuntimeObject);
 }

@@ -13,7 +13,7 @@ const runtimePath = path.join(__dirname, '..', 'Runtime');
 async function extractSymbolsFrom(file) {
   const contents = await fs.promises.readFile(file, 'utf-8');
   for (const symbol of contents.matchAll(
-    /export (class|const|let|var|type|interface) ([a-zA-Z\_]*)/gim
+    /export(?: abstract)? (class|const|let|var|type|interface|(?:const )?enum) ([a-zA-Z0-9\_]*)/gim
   )) {
     symbols[symbol[2]] = path.relative(runtimePath, file);
   }

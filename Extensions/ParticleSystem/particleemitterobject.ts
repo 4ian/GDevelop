@@ -53,6 +53,7 @@ namespace gdjs {
     /** Destroy the object when there is no particles? */
     destroyWhenNoParticles: boolean;
     jumpForwardInTimeOnCreation: number;
+    _jumpForwardInTimeCompleted: boolean;
   };
 
   export type ParticleEmitterObjectData = ObjectData &
@@ -96,6 +97,7 @@ namespace gdjs {
     maxParticlesCount: number;
     additiveRendering: boolean;
     jumpForwardInTimeOnCreation: number;
+    _jumpForwardInTimeCompleted: boolean = false;
     _posDirty: boolean = true;
     _angleDirty: boolean = true;
     _forceDirty: boolean = true;
@@ -163,9 +165,6 @@ namespace gdjs {
       this.jumpForwardInTimeOnCreation =
         particleObjectData.jumpForwardInTimeOnCreation;
       this._textureDirty = this.texture !== '';
-
-      // Jump emitter forward in time
-      this._renderer.update(this.jumpForwardInTimeOnCreation);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -397,6 +396,13 @@ namespace gdjs {
         this.destroyWhenNoParticles
       ) {
         this.deleteFromScene(instanceContainer);
+      }
+      if (
+        this.jumpForwardInTimeOnCreation > 0 &&
+        this._jumpForwardInTimeCompleted === false
+      ) {
+        this._renderer.update(this.jumpForwardInTimeOnCreation);
+        this._jumpForwardInTimeCompleted = true;
       }
     }
 

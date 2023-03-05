@@ -3132,6 +3132,9 @@ interface ParticleEmitterObject {
     void SetParticleAngleRandomness2(double newValue);
     double GetParticleAngleRandomness2();
 
+    void SetJumpForwardInTimeOnCreation(double newValue);
+    double GetJumpForwardInTimeOnCreation();
+
 };
 ParticleEmitterObject implements ObjectConfiguration;
 

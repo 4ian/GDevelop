@@ -18,7 +18,10 @@ import Authentication, {
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
-import { sendSignupDone } from '../Utils/Analytics/EventSender';
+import {
+  sendAdditionalUserInfo,
+  sendSignupDone,
+} from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
@@ -749,6 +752,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       // Do not throw error, as this is a best effort call.
       console.error('Error while saving additional user info:', authError);
     } finally {
+      sendAdditionalUserInfo(form);
       // Close anyway.
       this.openAdditionalUserInfoDialog(false);
       this.showUserSnackbar({

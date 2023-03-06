@@ -10,6 +10,7 @@ import {
 import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
+import { type AdditionalUserInfoForm } from '../../Utils/GDevelopServices/Authentication';
 import { getBrowserLanguageOrLocale } from '../Language';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
@@ -354,6 +355,14 @@ export const sendErrorMessage = (
 export const sendSignupDone = (email: string) => {
   recordEvent('signup', {
     email,
+  });
+};
+
+export const sendAdditionalUserInfo = (
+  additionalUserInfo: AdditionalUserInfoForm
+) => {
+  recordEvent('additional_user_info', {
+    ...additionalUserInfo,
   });
 };
 

@@ -46,5 +46,5 @@ export type EventRendererProps = {
   windowWidth: WidthType,
   eventsSheetHeight: number,
 
-  rowIndex: number,
+  idPrefix: string,
 };

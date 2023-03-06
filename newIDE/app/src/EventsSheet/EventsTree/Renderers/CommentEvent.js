@@ -140,6 +140,7 @@ export default class CommentEvent extends React.Component<
           }
         }}
         tabIndex={0}
+        id={`${this.props.idPrefix}-comment`}
       >
         {this.state.editing ? (
           <TextField

@@ -9,7 +9,7 @@ import {
   type WidthType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Checkbox from '../../../../UI/Checkbox';
-import { Line, LargeSpacer } from '../../../../UI/Grid';
+import { Line, LargeSpacer, Spacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import {
   ColumnStackLayout,
@@ -320,6 +320,7 @@ const GetStartedSection = ({
               3-part tutorial to creating and publishing a game from scratch.
             </Trans>
           </Text>
+          <Spacer />
           <Line>
             <div style={styles.bannerContainer}>
               {inAppTutorialsFetchingError ? (

@@ -158,7 +158,7 @@ export default class ForEachEvent extends React.Component<
               windowWidth={this.props.windowWidth}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
-              rowIndex={this.props.rowIndex}
+              idPrefix={this.props.idPrefix}
             />
           )}
           renderActionsList={({ className }) => (
@@ -189,7 +189,7 @@ export default class ForEachEvent extends React.Component<
               windowWidth={this.props.windowWidth}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
-              rowIndex={this.props.rowIndex}
+              idPrefix={this.props.idPrefix}
             />
           )}
         />

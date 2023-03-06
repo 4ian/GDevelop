@@ -98,8 +98,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
-  id?: string,
-  rowIndex: number,
+  id: string,
 |};
 
 const Instruction = (props: Props) => {
@@ -430,7 +429,7 @@ const Instruction = (props: Props) => {
                 windowWidth={props.windowWidth}
                 globalObjectsContainer={props.globalObjectsContainer}
                 objectsContainer={props.objectsContainer}
-                rowIndex={props.rowIndex}
+                idPrefix={props.id}
               />
             )}
           </React.Fragment>

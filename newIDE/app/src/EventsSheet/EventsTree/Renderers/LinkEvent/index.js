@@ -138,6 +138,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               [linkContainer]: true,
             })}
             style={styles.container}
+            id={`${this.props.idPrefix}-link`}
           >
             <span
               style={styles.title}

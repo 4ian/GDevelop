@@ -56,7 +56,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
-  rowIndex: number,
+  idPrefix: string,
 |};
 
 const DropTarget = makeDropTarget<{
@@ -86,7 +86,7 @@ export default function InstructionsList({
   windowWidth,
   globalObjectsContainer,
   objectsContainer,
-  rowIndex,
+  idPrefix,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
 
@@ -158,8 +158,7 @@ export default function InstructionsList({
         windowWidth={windowWidth}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
-        rowIndex={rowIndex}
-        id={`event-${rowIndex}-${areConditions ? 'condition' : 'action'}-${i}`}
+        id={`${idPrefix}-${areConditions ? 'condition' : 'action'}-${i}`}
       />
     );
   });
@@ -203,7 +202,11 @@ export default function InstructionsList({
     >
       {({ connectDropTarget, isOver, canDrop }) =>
         connectDropTarget(
-          <div className={className} style={style}>
+          <div
+            className={className}
+            style={style}
+            id={`${idPrefix}-${areConditions ? 'conditions' : 'actions'}`}
+          >
             {instructions}
             {isOver && <DropIndicator canDrop={canDrop} />}
             <span

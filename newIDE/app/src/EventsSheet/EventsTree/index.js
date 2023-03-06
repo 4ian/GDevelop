@@ -123,7 +123,7 @@ type EventsContainerProps = {|
   connectDragSource: ConnectDragSource,
   windowWidth: WidthType,
 
-  rowIndex: number,
+  idPrefix: string,
 |};
 
 /**
@@ -197,7 +197,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 windowWidth={this.props.windowWidth}
-                rowIndex={this.props.rowIndex}
+                idPrefix={this.props.idPrefix}
               />
             </div>
           </div>
@@ -297,7 +297,7 @@ type EventsTreeProps = {|
 
 // A node displayed by the SortableTree. Almost always represents an
 // event, except for the buttons at the bottom of the sheet and the tutorial.
-export type SortableTreeNode = {
+export type SortableTreeNode = {|
   // Necessary attributes for react-sortable-tree.
   title: (node: { node: SortableTreeNode }) => Node,
   children: Array<any>,
@@ -310,13 +310,14 @@ export type SortableTreeNode = {
   indexInList: number,
   rowIndex: number,
   nodePath: Array<number>,
+  relativeNodePath: Array<number>,
   // Key is event pointer or an identification string.
   key: number | string,
 
   // In case of nodes without event (buttons at the bottom of the sheet),
   // use a fixed height.
   fixedHeight?: ?number,
-};
+|};
 
 type State = {|
   treeData: Array<any>,
@@ -474,7 +475,8 @@ export default class ThemableEventsTree extends Component<
     flatData: Array<gdBaseEvent> = [],
     depth: number = 0,
     parentDisabled: boolean = false,
-    path: Array<number> = []
+    parentAbsolutePath: Array<number> = [],
+    parentRelativePath: ?Array<number> = null
   ) => {
     const treeData = mapFor<SortableTreeNode>(
       0,
@@ -484,14 +486,18 @@ export default class ThemableEventsTree extends Component<
         flatData.push(event);
 
         const disabled = parentDisabled || event.isDisabled();
-        const currentPath = path.concat(flatData.length - 1);
+        const absoluteIndex = flatData.length - 1;
+        const currentAbsolutePath = parentAbsolutePath.concat(
+          flatData.length - 1
+        );
+        const currentRelativePath = [...(parentRelativePath || []), i];
 
         return {
           title: this._renderEvent,
           event,
           eventsList,
           indexInList: i,
-          rowIndex: flatData.length - 1,
+          rowIndex: absoluteIndex,
           expanded: !event.isFolded(),
           disabled,
           depth,
@@ -503,9 +509,11 @@ export default class ThemableEventsTree extends Component<
             !event.isFolded() ? flatData : [],
             depth + 1,
             disabled,
-            currentPath
+            currentAbsolutePath,
+            currentRelativePath
           ).treeData,
-          nodePath: currentPath,
+          nodePath: currentAbsolutePath,
+          relativeNodePath: currentRelativePath,
         };
       }
     );
@@ -816,7 +824,7 @@ export default class ThemableEventsTree extends Component<
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
                 windowWidth={this.props.windowWidth}
-                rowIndex={node.rowIndex}
+                idPrefix={`event-${node.relativeNodePath.join('-')}`}
               />
               {this.state.draggedNode && (
                 <DropContainer

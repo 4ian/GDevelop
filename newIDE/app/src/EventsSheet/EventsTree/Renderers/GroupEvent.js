@@ -95,7 +95,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           }
         }}
         tabIndex={0}
-        id={`group-${this.props.rowIndex}-${
+        id={`${this.props.idPrefix}-group-${
           groupEvent.isFolded() ? 'folded' : 'unfolded'
         }`}
       >

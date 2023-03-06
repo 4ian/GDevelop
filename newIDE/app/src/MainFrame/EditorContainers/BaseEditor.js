@@ -51,6 +51,9 @@ export type RenderEditorContainerProps = {|
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onReloadEventsFunctionsExtensionMetadata: (
+    extension: gdEventsFunctionsExtension
+  ) => Promise<void>,
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction,

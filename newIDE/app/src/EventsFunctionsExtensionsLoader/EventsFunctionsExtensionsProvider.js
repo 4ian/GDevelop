@@ -11,6 +11,7 @@ import {
   type EventsFunctionCodeWriter,
   unloadProjectEventsFunctionsExtensions,
   unloadProjectEventsFunctionsExtension,
+  reloadProjectEventsFunctionsExtensionMetadata,
 } from '.';
 import {
   type EventsFunctionsExtensionWriter,
@@ -62,6 +63,9 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
     reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
       this
     ),
+    reloadProjectEventsFunctionsExtensionMetadata: this._reloadProjectEventsFunctionsExtensionMetadata.bind(
+      this
+    ),
     ensureLoadFinished: this._ensureLoadFinished.bind(this),
     getEventsFunctionsExtensionWriter: () =>
       this.props.eventsFunctionsExtensionWriter,
@@ -111,6 +115,44 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
         this.setState({
           eventsFunctionsExtensionsError: null,
         })
+      )
+      .catch((eventsFunctionsExtensionsError: Error) => {
+        this.setState({
+          eventsFunctionsExtensionsError,
+        });
+        showErrorBox({
+          message: i18n._(
+            t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+          ),
+          rawError: eventsFunctionsExtensionsError,
+          errorId: 'events-functions-extensions-load-error',
+        });
+      })
+      .then(() => {
+        this._lastLoadPromise = null;
+      });
+
+    return this._lastLoadPromise;
+  }
+
+  _reloadProjectEventsFunctionsExtensionMetadata(
+    project: ?gdProject,
+    extension: gdEventsFunctionsExtension
+  ): Promise<void> {
+    const { i18n } = this.props;
+    const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
+    if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
+
+    const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
+
+    this._lastLoadPromise = lastLoadPromise
+      .then(() =>
+        reloadProjectEventsFunctionsExtensionMetadata(
+          project,
+          extension,
+          eventsFunctionCodeWriter,
+          i18n
+        )
       )
       .catch((eventsFunctionsExtensionsError: Error) => {
         this.setState({

@@ -91,6 +91,23 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   };
 
+  _onFunctionEdited = async () => {
+    // Immediately trigger the reload/regeneration of extensions
+    // as a change in the properties of a behavior can create changes
+    // in actions/conditions/expressions to manipulate these properties.
+    try {
+      const extension = this.getEventsFunctionsExtension();
+      if (extension) {
+        await this.props.onReloadEventsFunctionsExtensionMetadata(extension);
+      }
+    } catch (error) {
+      console.warn(
+        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
+        error
+      );
+    }
+  };
+
   previewWillStart = () => {
     // Immediately trigger the reload/regeneration of extensions
     // if a preview is about to start, as changes chan have been made
@@ -156,6 +173,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
           onObjectEdited={this._onObjectEdited}
+          onFunctionEdited={this._onFunctionEdited}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />

@@ -131,6 +131,22 @@ export const loadProjectEventsFunctionsExtensions = (
   );
 };
 
+/**
+ * Load an event-function extension metadata without generating the code.
+ */
+export const reloadProjectEventsFunctionsExtensionMetadata = (
+  project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunctionCodeWriter: EventsFunctionCodeWriter,
+  i18n: I18nType
+): Promise<void> => {
+  return loadProjectEventsFunctionsExtension(
+    project,
+    eventsFunctionsExtension,
+    { skipCodeGeneration: true, eventsFunctionCodeWriter, i18n }
+  );
+};
+
 const loadProjectEventsFunctionsExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,

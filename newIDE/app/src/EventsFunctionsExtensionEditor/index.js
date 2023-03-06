@@ -63,6 +63,7 @@ type Props = {|
   ) => void,
   onBehaviorEdited?: () => Promise<void>,
   onObjectEdited?: () => Promise<void>,
+  onFunctionEdited?: (extension: gdEventsFunctionsExtension) => Promise<void>,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges?: ?UnsavedChanges,
@@ -266,6 +267,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       return;
     }
 
+    // Users may have change a function declaration.
+    // Reload metadata just in case.
+    if (this.props.onFunctionEdited)
+      this.props.onFunctionEdited(this.props.eventsFunctionsExtension);
+
     this._loadEventsFunctionFrom(
       this.props.project,
       selectedEventsFunction,
@@ -328,6 +334,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       newName
     );
+    if (this.props.onFunctionEdited)
+      this.props.onFunctionEdited(eventsFunctionsExtension);
 
     done(true);
   };
@@ -365,6 +373,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       newName
     );
+    if (this.props.onFunctionEdited)
+      this.props.onFunctionEdited(eventsFunctionsExtension);
 
     done(true);
   };
@@ -402,6 +412,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       newName
     );
+    if (this.props.onFunctionEdited)
+      this.props.onFunctionEdited(eventsFunctionsExtension);
 
     done(true);
   };

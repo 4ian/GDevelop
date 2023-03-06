@@ -92,9 +92,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   };
 
   _onFunctionEdited = async () => {
-    // Immediately trigger the reload/regeneration of extensions
-    // as a change in the properties of a behavior can create changes
-    // in actions/conditions/expressions to manipulate these properties.
+    // Immediately trigger the reload/regeneration of the extension
+    // as a change in function declaration must be seen in the instructions
+    // especially renamed functions to avoid to show "unsupported instructions".
     try {
       const extension = this.getEventsFunctionsExtension();
       if (extension) {

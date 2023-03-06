@@ -33,10 +33,8 @@ import optionalRequire from '../../../../Utils/OptionalRequire';
 import {
   FLING_GAME_IN_APP_TUTORIAL_ID,
   isMiniTutorial,
-  PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
-import MultiplierScore from './MultiplierScore';
-import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
+import MiniInAppTutorials from './MiniInAppTutorials';
 const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
@@ -98,7 +96,6 @@ const GetStartedSection = ({
   showGetStartedSection,
   setShowGetStartedSection,
 }: Props) => {
-  const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
@@ -217,21 +214,6 @@ const GetStartedSection = ({
     },
   ];
 
-  const miniInAppTutorialCards = [
-    {
-      id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-      title: t`Add score multiplier`,
-      description: t`Learn how to manipulate a score by adding collectibles.`,
-      keyPoints: [
-        t`Create a variable`,
-        t`Use & manipulate a variable`,
-        t`Build an expression`,
-      ],
-      durationInMinutes: 3,
-      renderImage: props => <MultiplierScore {...props} />,
-    },
-  ];
-
   const Subtitle = () => (
     <ResponsiveLineStackLayout
       justifyContent="space-between"
@@ -259,7 +241,7 @@ const GetStartedSection = ({
     <SectionContainer
       title={
         shouldShowInAppTutorialButtons ? (
-          <Trans>In app tutorials</Trans>
+          <Trans>In-app tutorials</Trans>
         ) : (
           <Trans>Get Started!</Trans>
         )
@@ -268,46 +250,7 @@ const GetStartedSection = ({
     >
       {shouldShowInAppTutorialButtons && (
         <SectionRow>
-          <Line>
-            <div style={styles.bannerContainer}>
-              {inAppTutorialsFetchingError ? (
-                <PlaceholderError onRetry={fetchInAppTutorials}>
-                  <Trans>
-                    An error occurred when downloading the tutorials.
-                  </Trans>{' '}
-                  <Trans>
-                    Please check your internet connection or try again later.
-                  </Trans>
-                </PlaceholderError>
-              ) : inAppTutorialShortHeaders === null ? (
-                <PlaceholderLoader />
-              ) : (
-                <GridList
-                  cols={getColumnsFromWidth(windowWidth)}
-                  style={styles.grid}
-                  cellHeight="auto"
-                  spacing={ITEMS_SPACING * 2}
-                >
-                  {miniInAppTutorialCards.map(item => (
-                    <GridListTile key={item.id}>
-                      <InAppTutorialPhaseCard
-                        title={item.title}
-                        description={item.description}
-                        durationInMinutes={item.durationInMinutes}
-                        keyPoints={item.keyPoints}
-                        renderImage={item.renderImage}
-                        progress={0} // Alway start a mini tutorial from the beginning.
-                        onClick={() => selectInAppTutorial(item.id)}
-                        // Phase is disabled if there's a running full tutorial or if offline,
-                        // because we cannot fetch the tutorial.
-                        disabled={isFullTutorialRunning || !isOnline}
-                      />
-                    </GridListTile>
-                  ))}
-                </GridList>
-              )}
-            </div>
-          </Line>
+          <MiniInAppTutorials selectInAppTutorial={selectInAppTutorial} />
         </SectionRow>
       )}
       {shouldShowInAppTutorialButtons && (

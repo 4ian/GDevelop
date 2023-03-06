@@ -29,6 +29,8 @@ import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import MiniInAppTutorials from '../GetStartedSection/MiniInAppTutorials';
+import { isMiniTutorial } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const useStyles = makeStyles({
   tile: {
@@ -83,6 +85,7 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
+  selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const MainPage = ({
@@ -92,6 +95,7 @@ const MainPage = ({
   onOpenHelpFinder,
   onSelectCategory,
   tutorials,
+  selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
   const { currentlyRunningInAppTutorial } = React.useContext(
@@ -116,7 +120,9 @@ const MainPage = ({
           action: () => {
             onStartTutorial();
           },
-          disabled: !!currentlyRunningInAppTutorial,
+          disabled:
+            !!currentlyRunningInAppTutorial &&
+            !isMiniTutorial(currentlyRunningInAppTutorial.id),
         }
       : undefined,
     {
@@ -198,6 +204,14 @@ const MainPage = ({
           </GridList>
         </Line>
       </SectionRow>
+      {shouldShowInAppTutorialButtons && (
+        <SectionRow>
+          <Text noMargin size="section-title">
+            <Trans>In-app tutorials</Trans>
+          </Text>
+          <MiniInAppTutorials selectInAppTutorial={selectInAppTutorial} />
+        </SectionRow>
+      )}
       <>
         <SectionRow>
           <Line noMargin>

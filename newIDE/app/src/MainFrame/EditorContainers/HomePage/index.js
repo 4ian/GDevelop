@@ -260,6 +260,7 @@ export const HomePage = React.memo<Props>(
                         }
                         onTabChange={setActiveTab}
                         onOpenHelpFinder={onOpenHelpFinder}
+                        selectInAppTutorial={selectInAppTutorial}
                       />
                     )}
                     {activeTab === 'play' && <PlaySection />}

@@ -90,13 +90,13 @@ const StartInAppTutorialDialog = ({
   const startOverTutorial = () => startTutorial('startOver');
   const startTutorialForFirstTime = () => startTutorial('start');
 
-  const { inAppTutorialShortHeaders } = React.useContext(InAppTutorialContext);
+  const { getInAppTutorialShortHeader } = React.useContext(
+    InAppTutorialContext
+  );
 
-  const selectedInAppTutorialShortHeader = inAppTutorialShortHeaders
-    ? inAppTutorialShortHeaders.find(
-        shortHeader => shortHeader.id === tutorialId
-      )
-    : null;
+  const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
+    tutorialId
+  );
 
   const availableLocales = selectedInAppTutorialShortHeader
     ? selectedInAppTutorialShortHeader.availableLocales

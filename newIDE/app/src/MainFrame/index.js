@@ -388,7 +388,7 @@ const MainFrame = (props: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
     currentlyRunningInAppTutorial,
-    inAppTutorialShortHeaders,
+    getInAppTutorialShortHeader,
     endTutorial: doEndTutorial,
     startTutorial,
     startStepIndex,
@@ -2427,13 +2427,9 @@ const MainFrame = (props: Props) => {
       // - With the default login enabled
       // - Empty project
 
-      const selectedInAppTutorialShortHeader =
-        selectedInAppTutorialInfo &&
-        inAppTutorialShortHeaders &&
-        inAppTutorialShortHeaders.find(
-          inAppTutorialShortHeader =>
-            inAppTutorialShortHeader.id === selectedInAppTutorialInfo.tutorialId
-        );
+      const selectedInAppTutorialShortHeader = selectedInAppTutorialInfo
+        ? getInAppTutorialShortHeader(selectedInAppTutorialInfo.tutorialId)
+        : null;
 
       try {
         const source = selectedExampleShortHeader
@@ -2623,7 +2619,7 @@ const MainFrame = (props: Props) => {
       loadFromProject,
       openFromFileMetadata,
       selectedExampleShortHeader,
-      inAppTutorialShortHeaders,
+      getInAppTutorialShortHeader,
       selectedInAppTutorialInfo,
     ]
   );
@@ -2668,9 +2664,8 @@ const MainFrame = (props: Props) => {
         }
       }
 
-      if (!inAppTutorialShortHeaders) return;
-      const selectedInAppTutorialShortHeader = inAppTutorialShortHeaders.find(
-        inAppTutorialShortHeader => inAppTutorialShortHeader.id === tutorialId
+      const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
+        tutorialId
       );
       if (!selectedInAppTutorialShortHeader) return;
 
@@ -2714,7 +2709,7 @@ const MainFrame = (props: Props) => {
     },
     [
       i18n,
-      inAppTutorialShortHeaders,
+      getInAppTutorialShortHeader,
       createProject,
       askToCloseProject,
       startTutorial,

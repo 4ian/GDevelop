@@ -14,6 +14,9 @@ export type InAppTutorialState = {|
   |}) => Promise<void>,
   endTutorial: () => void,
   inAppTutorialShortHeaders: ?Array<InAppTutorialShortHeader>,
+  getInAppTutorialShortHeader: (
+    tutorialId: string
+  ) => ?InAppTutorialShortHeader,
   startStepIndex: number,
   startProjectData: { [key: string]: string },
   inAppTutorialsFetchingError: string | null,
@@ -22,6 +25,7 @@ export type InAppTutorialState = {|
 
 export const initialInAppTutorialState: InAppTutorialState = {
   currentlyRunningInAppTutorial: null,
+  getInAppTutorialShortHeader: (tutorialId: string) => null,
   startTutorial: async () => {},
   endTutorial: () => {},
   inAppTutorialShortHeaders: null,

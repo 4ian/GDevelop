@@ -92,6 +92,11 @@ const WrappedHomePage = ({
               availableLocales: ['en', 'fr-FR'],
             },
           ],
+          getInAppTutorialShortHeader: (tutorialId: string) => ({
+            id: 'flingGame',
+            contentUrl: 'fakeUrl',
+            availableLocales: ['en', 'fr-FR'],
+          }),
           currentlyRunningInAppTutorial: null,
           startTutorial: async () => {
             action('start tutorial');

@@ -24,6 +24,17 @@ const InAppTutorialProvider = (props: Props) => {
     setInAppTutorialShortHeaders,
   ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
+  const getInAppTutorialShortHeader = React.useCallback(
+    (tutorialId: string) => {
+      if (!inAppTutorialShortHeaders) return null;
+      const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
+        shortHeader => shortHeader.id === tutorialId
+      );
+      return inAppTutorialShortHeader;
+    },
+    [inAppTutorialShortHeaders]
+  );
+
   const startTutorial = async ({
     tutorialId,
     initialStepIndex,
@@ -43,9 +54,7 @@ const InAppTutorialProvider = (props: Props) => {
 
     if (!inAppTutorialShortHeaders) return;
 
-    const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
-      shortHeader => shortHeader.id === tutorialId
-    );
+    const inAppTutorialShortHeader = getInAppTutorialShortHeader(tutorialId);
 
     if (!inAppTutorialShortHeader) return;
 
@@ -88,6 +97,7 @@ const InAppTutorialProvider = (props: Props) => {
     <InAppTutorialContext.Provider
       value={{
         inAppTutorialShortHeaders,
+        getInAppTutorialShortHeader,
         currentlyRunningInAppTutorial: tutorial,
         startTutorial,
         startProjectData,

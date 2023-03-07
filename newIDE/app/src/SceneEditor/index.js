@@ -55,6 +55,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import TagsButton from '../UI/EditorMosaic/TagsButton';
 import CloseButton from '../UI/EditorMosaic/CloseButton';
+import InfoBar from '../UI/Messages/InfoBar';
 import {
   type SelectedTags,
   buildTagsMenuTemplate,
@@ -140,6 +141,7 @@ type State = {|
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
   newObjectInstanceSceneCoordinates: ?[number, number],
+  invisibleLayersOnWhichInstancesHaveJustBeenAdded: ?(string[]),
 
   editedGroup: ?gdObjectGroup,
 
@@ -215,6 +217,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
       selectedLayer: '',
+      invisibleLayersOnWhichInstancesHaveJustBeenAdded: null,
     };
   }
 
@@ -514,7 +517,14 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
+    const invisibleLayersOnWhichInstancesHaveJustBeenAdded = [];
     instances.forEach(instance => {
+      const layer = this.props.layout.getLayer(instance.getLayer());
+      if (!layer.getVisibility()) {
+        invisibleLayersOnWhichInstancesHaveJustBeenAdded.push(
+          instance.getLayer()
+        );
+      }
       const infoBarDetails = onInstanceAdded(
         instance,
         this.props.layout,
@@ -527,6 +537,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
       }
     });
+    if (invisibleLayersOnWhichInstancesHaveJustBeenAdded.length > 0) {
+      this.onInstanceAddedOnInvisibleLayer(
+        invisibleLayersOnWhichInstancesHaveJustBeenAdded
+      );
+    }
 
     this.setState(
       {
@@ -538,6 +553,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+  };
+
+  onInstanceAddedOnInvisibleLayer = (layers: ?(string[])) => {
+    this.setState({ invisibleLayersOnWhichInstancesHaveJustBeenAdded: layers });
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
@@ -1825,6 +1844,23 @@ export default class SceneEditor extends React.Component<Props, State> {
             </React.Fragment>
           )}
         </I18n>
+        {this.state.invisibleLayersOnWhichInstancesHaveJustBeenAdded && (
+          <InfoBar
+            message={
+              <Trans>
+                You just added an instance to the layers
+                {this.state.invisibleLayersOnWhichInstancesHaveJustBeenAdded
+                  .map(name => `"${name}"`)
+                  .join(', ')}{' '}
+                which are not visible. Open the layer panel to make them
+                visible.
+              </Trans>
+            }
+            duration={7000}
+            visible
+            hide={() => this.onInstanceAddedOnInvisibleLayer(null)}
+          />
+        )}
       </div>
     );
   }

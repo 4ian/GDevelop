@@ -273,8 +273,6 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 
   if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
-    conditionCode += GenerateReferenceToUpperScopeBoolean(
-        "conditionTrue", returnBoolean, context);
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(
         condition, *this, context);
     maxCustomConditionsDepth =

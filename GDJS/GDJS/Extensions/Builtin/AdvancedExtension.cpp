@@ -83,8 +83,8 @@ AdvancedExtension::AdvancedExtension() {
             "!!eventsFunctionContext.getArgument(" +
             parameterNameCode + ") : false)";
         gd::String outputCode =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val = " + valueCode + ";\n";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context) +
+            " = " + valueCode + ";\n";
         return outputCode;
       });
 
@@ -141,8 +141,7 @@ AdvancedExtension::AdvancedExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
                "Number(eventsFunctionContext.getArgument(" +
@@ -169,8 +168,7 @@ AdvancedExtension::AdvancedExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
                "\"\" + eventsFunctionContext.getArgument(" +

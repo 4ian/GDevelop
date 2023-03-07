@@ -13,10 +13,7 @@ import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
 import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
 import PlaceholderError from '../../../../UI/PlaceholderError';
-import {
-  isMiniTutorial,
-  PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-} from '../../../../Utils/GDevelopServices/InAppTutorial';
+import { PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './MultiplierScore';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 
@@ -54,9 +51,6 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
-  const isFullTutorialRunning =
-    !!currentlyRunningInAppTutorial &&
-    !isMiniTutorial(currentlyRunningInAppTutorial.id);
 
   const miniInAppTutorialCards = [
     {
@@ -102,9 +96,9 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
                   renderImage={item.renderImage}
                   progress={0} // Alway start a mini tutorial from the beginning.
                   onClick={() => selectInAppTutorial(item.id)}
-                  // Phase is disabled if there's a running full tutorial or if offline,
+                  // Phase is disabled if there's a running tutorial or if offline,
                   // because we cannot fetch the tutorial.
-                  disabled={isFullTutorialRunning || !isOnline}
+                  disabled={!!currentlyRunningInAppTutorial || !isOnline}
                 />
               </GridListTile>
             ))}

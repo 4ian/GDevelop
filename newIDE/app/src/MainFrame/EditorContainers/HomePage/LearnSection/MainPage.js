@@ -30,7 +30,6 @@ import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import MiniInAppTutorials from '../GetStartedSection/MiniInAppTutorials';
-import { isMiniTutorial } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const useStyles = makeStyles({
   tile: {
@@ -120,9 +119,7 @@ const MainPage = ({
           action: () => {
             onStartTutorial();
           },
-          disabled:
-            !!currentlyRunningInAppTutorial &&
-            !isMiniTutorial(currentlyRunningInAppTutorial.id),
+          disabled: !!currentlyRunningInAppTutorial,
         }
       : undefined,
     {
@@ -207,7 +204,7 @@ const MainPage = ({
       {shouldShowInAppTutorialButtons && (
         <SectionRow>
           <Text noMargin size="section-title">
-            <Trans>In-app tutorials</Trans>
+            <Trans>Guided lessons</Trans>
           </Text>
           <MiniInAppTutorials selectInAppTutorial={selectInAppTutorial} />
         </SectionRow>

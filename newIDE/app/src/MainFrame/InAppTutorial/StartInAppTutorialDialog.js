@@ -36,7 +36,7 @@ const titleAndContentByKey = {
       <>
         <Text>
           <Trans>
-            You're about to start the first chapter of our in-app tutorial.
+            You're about to start the first chapter of this guided lesson.
           </Trans>
         </Text>
         <Text>
@@ -53,7 +53,7 @@ const titleAndContentByKey = {
     content: (
       <>
         <Text>
-          <Trans>You're about to start this in-app tutorial.</Trans>
+          <Trans>You're about to start this guided lesson.</Trans>
         </Text>
         <Text>
           <Trans>
@@ -148,9 +148,7 @@ const StartInAppTutorialDialog = ({
       content: (
         <>
           <Text>
-            <Trans>
-              You're about to restart our in-app 3-chapter tutorial.
-            </Trans>
+            <Trans>You're about to restart this 3-chapter guided lesson.</Trans>
           </Text>
           <Text>
             <Trans>

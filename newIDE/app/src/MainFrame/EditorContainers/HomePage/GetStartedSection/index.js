@@ -30,10 +30,7 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import optionalRequire from '../../../../Utils/OptionalRequire';
-import {
-  FLING_GAME_IN_APP_TUTORIAL_ID,
-  isMiniTutorial,
-} from '../../../../Utils/GDevelopServices/InAppTutorial';
+import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MiniInAppTutorials from './MiniInAppTutorials';
 const electron = optionalRequire('electron');
 
@@ -154,10 +151,6 @@ const GetStartedSection = ({
     return getFlingTutorialPartProgress(part) === 100;
   };
 
-  const isFullTutorialRunning =
-    !!currentlyRunningInAppTutorial &&
-    !isMiniTutorial(currentlyRunningInAppTutorial.id);
-
   const flingInAppTutorialCards = [
     {
       key: 'create',
@@ -172,7 +165,8 @@ const GetStartedSection = ({
       durationInMinutes: 5,
       locked: false, // First phase is never locked
       // Phase is disabled if complete or if there's a running tutorial
-      disabled: isFullTutorialRunning || isFlingTutorialPartComplete(0),
+      disabled:
+        !!currentlyRunningInAppTutorial || isFlingTutorialPartComplete(0),
       progress: getFlingTutorialPartProgress(0),
       renderImage: props => <Unboxing {...props} />,
     },
@@ -190,7 +184,8 @@ const GetStartedSection = ({
       // Second phase is locked if first phase is not complete
       locked: !isFlingTutorialPartComplete(0),
       // Phase is disabled if complete or if there's a running tutorial
-      disabled: isFullTutorialRunning || isFlingTutorialPartComplete(1),
+      disabled:
+        !!currentlyRunningInAppTutorial || isFlingTutorialPartComplete(1),
       progress: getFlingTutorialPartProgress(1),
       renderImage: props => <Building {...props} />,
     },
@@ -208,7 +203,8 @@ const GetStartedSection = ({
       // Third phase is locked if second phase is not complete
       locked: !isFlingTutorialPartComplete(1),
       // Phase is disabled if complete or if there's a running tutorial
-      disabled: isFullTutorialRunning || isFlingTutorialPartComplete(2),
+      disabled:
+        !!currentlyRunningInAppTutorial || isFlingTutorialPartComplete(2),
       progress: getFlingTutorialPartProgress(2),
       renderImage: props => <Podium {...props} />,
     },
@@ -241,7 +237,7 @@ const GetStartedSection = ({
     <SectionContainer
       title={
         shouldShowInAppTutorialButtons ? (
-          <Trans>In-app tutorials</Trans>
+          <Trans>Guided lessons</Trans>
         ) : (
           <Trans>Get Started!</Trans>
         )

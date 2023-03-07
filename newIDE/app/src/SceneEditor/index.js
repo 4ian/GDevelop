@@ -141,7 +141,7 @@ type State = {|
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
   newObjectInstanceSceneCoordinates: ?[number, number],
-  invisibleLayersOnWhichInstancesHaveJustBeenAdded: ?(string[]),
+  invisibleLayerOnWhichInstancesHaveJustBeenAdded: ?string,
 
   editedGroup: ?gdObjectGroup,
 
@@ -217,7 +217,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
       selectedLayer: '',
-      invisibleLayersOnWhichInstancesHaveJustBeenAdded: null,
+      invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
     };
   }
 
@@ -517,13 +517,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
-    const invisibleLayersOnWhichInstancesHaveJustBeenAdded = [];
+    let invisibleLayerOnWhichInstancesHaveJustBeenAdded = null;
     instances.forEach(instance => {
-      const layer = this.props.layout.getLayer(instance.getLayer());
-      if (!layer.getVisibility()) {
-        invisibleLayersOnWhichInstancesHaveJustBeenAdded.push(
-          instance.getLayer()
-        );
+      if (invisibleLayerOnWhichInstancesHaveJustBeenAdded === null) {
+        const layer = this.props.layout.getLayer(instance.getLayer());
+        if (!layer.getVisibility()) {
+          invisibleLayerOnWhichInstancesHaveJustBeenAdded = instance.getLayer();
+        }
       }
       const infoBarDetails = onInstanceAdded(
         instance,
@@ -537,9 +537,9 @@ export default class SceneEditor extends React.Component<Props, State> {
         });
       }
     });
-    if (invisibleLayersOnWhichInstancesHaveJustBeenAdded.length > 0) {
+    if (invisibleLayerOnWhichInstancesHaveJustBeenAdded !== null) {
       this.onInstanceAddedOnInvisibleLayer(
-        invisibleLayersOnWhichInstancesHaveJustBeenAdded
+        invisibleLayerOnWhichInstancesHaveJustBeenAdded
       );
     }
 
@@ -555,8 +555,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
-  onInstanceAddedOnInvisibleLayer = (layers: ?(string[])) => {
-    this.setState({ invisibleLayersOnWhichInstancesHaveJustBeenAdded: layers });
+  onInstanceAddedOnInvisibleLayer = (layer: ?string) => {
+    this.setState({ invisibleLayerOnWhichInstancesHaveJustBeenAdded: layer });
   };
 
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
@@ -1371,6 +1371,18 @@ export default class SceneEditor extends React.Component<Props, State> {
     const selectedObjectNames = this.state.selectedObjectsWithContext.map(
       objWithContext => objWithContext.object.getName()
     );
+    // Deactivate prettier on this variable to prevent spaces to be added by
+    // line breaks.
+    // prettier-ignore
+    const infoBarMessage =
+      this.state.invisibleLayerOnWhichInstancesHaveJustBeenAdded !== null ? (
+        <Trans>
+          You just added an instance to a hidden layer
+          ("{this.state.invisibleLayerOnWhichInstancesHaveJustBeenAdded || (
+            <Trans>Base layer</Trans>
+          )}"). Open the layer panel to make it visible.
+        </Trans>
+      ) : null;
 
     const editors = {
       properties: {
@@ -1844,23 +1856,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             </React.Fragment>
           )}
         </I18n>
-        {this.state.invisibleLayersOnWhichInstancesHaveJustBeenAdded && (
-          <InfoBar
-            message={
-              <Trans>
-                You just added an instance to the layers
-                {this.state.invisibleLayersOnWhichInstancesHaveJustBeenAdded
-                  .map(name => `"${name}"`)
-                  .join(', ')}{' '}
-                which are not visible. Open the layer panel to make them
-                visible.
-              </Trans>
-            }
-            duration={7000}
-            visible
-            hide={() => this.onInstanceAddedOnInvisibleLayer(null)}
-          />
-        )}
+        <InfoBar
+          message={infoBarMessage}
+          duration={7000}
+          visible={!!infoBarMessage}
+          hide={() => this.onInstanceAddedOnInvisibleLayer(null)}
+        />
       </div>
     );
   }

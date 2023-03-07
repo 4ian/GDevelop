@@ -3039,6 +3039,11 @@ const MainFrame = (props: Props) => {
                       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                         currentProject
                       ),
+                    onReloadEventsFunctionsExtensionMetadata: extension =>
+                      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                        currentProject,
+                        extension
+                      ),
                     onDeleteResource: (
                       resource: gdResource,
                       cb: boolean => void

@@ -82,6 +82,7 @@ const fakeEventsFunctionsExtensionsContext = {
   unloadProjectEventsFunctionsExtensions: project => {},
   unloadProjectEventsFunctionsExtension: (project, extensionName) => {},
   reloadProjectEventsFunctionsExtensions: async project => {},
+  reloadProjectEventsFunctionsExtensionMetadata: (project, extension) => {},
   getEventsFunctionsExtensionWriter: () => LocalEventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => LocalEventsFunctionsExtensionOpener,
   ensureLoadFinished: async () => {},

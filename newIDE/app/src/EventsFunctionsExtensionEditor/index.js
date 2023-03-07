@@ -61,8 +61,9 @@ type Props = {|
       | 'extension-events-editor'
       | 'external-events-editor'
   ) => void,
-  onBehaviorEdited?: () => Promise<void>,
-  onObjectEdited?: () => Promise<void>,
+  onBehaviorEdited?: () => void,
+  onObjectEdited?: () => void,
+  onFunctionEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges?: ?UnsavedChanges,
@@ -266,6 +267,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       return;
     }
 
+    // Users may have change a function declaration.
+    // Reload metadata just in case.
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
+
     this._loadEventsFunctionFrom(
       this.props.project,
       selectedEventsFunction,
@@ -330,6 +337,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
 
     done(true);
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
   };
 
   _makeRenameBehaviorEventsFunction = (i18n: I18nType) => (
@@ -367,6 +377,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
 
     done(true);
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
   };
 
   _makeRenameObjectEventsFunction = (i18n: I18nType) => (
@@ -404,6 +417,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
 
     done(true);
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
   };
 
   _makeMoveFreeEventsParameter = (i18n: I18nType) => (
@@ -621,7 +637,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _onEventsBasedBehaviorRenamed = () => {
     // Name of a behavior changed, so notify parent
     // that a behavior was edited (to trigger reload of extensions)
-    if (this.props.onBehaviorEdited) this.props.onBehaviorEdited();
+    if (this.props.onBehaviorEdited) {
+      this.props.onBehaviorEdited();
+    }
 
     // Reload the selected events function, if any, as the behavior was
     // changed so objects containers need to be re-created (otherwise,
@@ -641,7 +659,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _onEventsBasedObjectRenamed = () => {
     // Name of an object changed, so notify parent
     // that an object was edited (to trigger reload of extensions)
-    if (this.props.onObjectEdited) this.props.onObjectEdited();
+    if (this.props.onObjectEdited) {
+      this.props.onObjectEdited();
+    }
 
     // Reload the selected events function, if any, as the parent-object was
     // changed so child-objects containers need to be re-created (otherwise,

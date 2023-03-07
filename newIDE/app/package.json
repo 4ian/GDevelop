@@ -52,7 +52,6 @@
     "fuse.js": "^6.5.3",
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",
-    "keen-tracking": "1.1.3",
     "lodash": "4.17.4",
     "node-require-function": "^1.2.0",
     "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",

@@ -1,5 +1,4 @@
 // @flow
-import Keen from 'keen-tracking';
 import posthog from 'posthog-js';
 import { getUserUUID, resetUserUUID } from './UserUUID';
 import Authentication from '../GDevelopServices/Authentication';
@@ -7,7 +6,6 @@ import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
-import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { type AdditionalUserInfoForm } from '../../Utils/GDevelopServices/Authentication';
@@ -18,20 +16,17 @@ const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
 const isDev = Window.isDev();
-let startupTimesSummary = null;
 
 let posthogLoaded = false;
 const posthogAliasMade = [];
 let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
 
-let keenClient = null;
-
 export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
   (currentlyRunningInAppTutorial = tutorial);
 
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
-  if (isDev || !keenClient) return;
+  if (isDev) return;
 
   if (!posthogLoaded) {
     console.info(`App analytics not ready for an event - retrying in 2s.`);
@@ -45,7 +40,6 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
     return;
   }
 
-  keenClient.recordEvent(name, metadata);
   posthog.capture(name, {
     ...metadata,
     isInAppTutorialRunning: currentlyRunningInAppTutorial,
@@ -145,111 +139,6 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       updateUserInformation();
     },
     autocapture: false,
-  });
-
-  // Keen.io
-  const sessionCookie = Keen.utils.cookie('visitor-stats');
-  const sessionTimer = Keen.utils.timer();
-  sessionTimer.start();
-
-  keenClient = new Keen({
-    projectId: '593d9f0595cfc907a1f8126a',
-    writeKey:
-      'B917F1DB50EE4C8949DBB374D2962845A22838B425AA43322A37138691A5270EB0358AEE45A4F61AFA7713B9765B4980517A1E276D4973A2E546EA851BF7757523706367ED430C041D2728A63BF61B5D1B2079C75E455DDDFAAC4324128AC2DB',
-  });
-
-  keenClient.extendEvents(function() {
-    // Include the user public profile.
-    const firebaseUser = authentication.getFirebaseUserSync();
-
-    // Compute the startup times (only once to avoid doing this for every event).
-    startupTimesSummary = startupTimesSummary || getStartupTimesSummary();
-
-    const userPreferences = loadPreferencesFromLocalStorage();
-    const appLanguage = userPreferences ? userPreferences.language : undefined;
-    const browserLanguage = getBrowserLanguageOrLocale();
-
-    return {
-      user: {
-        uuid: getUserUUID(),
-        uid: firebaseUser ? firebaseUser.uid : undefined,
-        providerId: firebaseUser ? firebaseUser.providerId : undefined,
-        email: firebaseUser ? firebaseUser.email : undefined,
-        emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
-      },
-      localStats: {
-        programOpeningCount: getProgramOpeningCount(),
-      },
-      tutorials: {
-        // Useful to differentiate if an event is part of a tutorial or not.
-        isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
-        tutorial: currentlyRunningInAppTutorial,
-      },
-      language: {
-        appLanguage,
-        browserLanguage,
-      },
-      versionMetadata: {
-        version,
-        versionWithHash,
-      },
-      startupTimesSummary,
-      page: {
-        title: document.title,
-        url: document.location.href,
-        // info: {} (add-on)
-      },
-      referrer: {
-        url: document.referrer,
-        // info: {} (add-on)
-      },
-      tech: {
-        browser: Keen.helpers.getBrowserProfile(),
-        // info: {} (add-on)
-        ip: '${keen.ip}', // eslint-disable-line
-        ua: '${keen.user_agent}', // eslint-disable-line
-      },
-      time: Keen.helpers.getDatetimeIndex(),
-      visitor: {
-        id: sessionCookie.get('user_id'),
-        time_on_page: sessionTimer.value(),
-      },
-      // geo: {} (add-on)
-      keen: {
-        timestamp: new Date().toISOString(),
-        addons: [
-          {
-            name: 'keen:ip_to_geo',
-            input: {
-              ip: 'tech.ip',
-            },
-            output: 'geo',
-          },
-          {
-            name: 'keen:ua_parser',
-            input: {
-              ua_string: 'tech.ua',
-            },
-            output: 'tech.info',
-          },
-          {
-            name: 'keen:url_parser',
-            input: {
-              url: 'page.url',
-            },
-            output: 'page.info',
-          },
-          {
-            name: 'keen:referrer_parser',
-            input: {
-              page_url: 'page.url',
-              referrer_url: 'referrer.url',
-            },
-            output: 'referrer.info',
-          },
-        ],
-      },
-    };
   });
 };
 

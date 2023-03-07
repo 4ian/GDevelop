@@ -62,39 +62,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  _onBehaviorEdited = async () => {
-    // Immediately trigger the reload/regeneration of extensions
-    // as a change in the properties of a behavior can create changes
-    // in actions/conditions/expressions to manipulate these properties.
-    try {
-      await this.props.onLoadEventsFunctionsExtensions();
-    } catch (error) {
-      console.warn(
-        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
-        error
-      );
-    }
-  };
-
-  // TODO EBO factorize?
-  _onObjectEdited = async () => {
-    // Immediately trigger the reload/regeneration of extensions
-    // as a change in the properties of an object can create changes
-    // in actions/conditions/expressions to manipulate these properties.
-    try {
-      await this.props.onLoadEventsFunctionsExtensions();
-    } catch (error) {
-      console.warn(
-        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
-        error
-      );
-    }
-  };
-
-  _onFunctionEdited = async () => {
+  _reloadExtensionMetadata = async () => {
     // Immediately trigger the reload/regeneration of the extension
     // as a change in function declaration must be seen in the instructions
-    // especially renamed functions to avoid to show "unsupported instructions".
+    // especially to avoid to show "unsupported instructions".
     try {
       const extension = this.getEventsFunctionsExtension();
       if (extension) {
@@ -171,9 +142,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
-          onBehaviorEdited={this._onBehaviorEdited}
-          onObjectEdited={this._onObjectEdited}
-          onFunctionEdited={this._onFunctionEdited}
+          onBehaviorEdited={this._reloadExtensionMetadata}
+          onObjectEdited={this._reloadExtensionMetadata}
+          onFunctionEdited={this._reloadExtensionMetadata}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />

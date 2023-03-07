@@ -18,7 +18,11 @@ import Authentication, {
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
-import { sendSignupDone } from '../Utils/Analytics/EventSender';
+import {
+  onUserLogout,
+  sendSignupDone,
+  identifyUserForAnalytics,
+} from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
@@ -117,6 +121,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.props.authentication.addUserLogoutListener(
       this._fetchUserProfileWithoutThrowingErrors
     );
+    this.props.authentication.addUserLogoutListener(onUserLogout);
 
     // When the authenticated user changes, we need to react accordingly
     // This can happen:
@@ -403,6 +408,9 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
 
+    // We call this function every time the user is fetched, as it will
+    // automatically prevent the event to be sent if the user attributes haven't changed.
+    identifyUserForAnalytics(this.state.authenticatedUser);
     this._notifyUserAboutEmailVerificationAndAdditionalInfo();
   };
 

@@ -105,7 +105,6 @@ export default class AuthenticatedUserProvider extends React.Component<
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
-  _userNeedsIdentificationForAnalytics = true;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -409,11 +408,9 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
 
-    // We use a flag to avoid identifying the user every time the profile is fetched.
-    if (this._userNeedsIdentificationForAnalytics) {
-      identifyUserForAnalytics(this.state.authenticatedUser);
-      this._userNeedsIdentificationForAnalytics = false;
-    }
+    // We call this function every time the user is fetched, as it will
+    // automatically prevent the event to be sent if the user attributes haven't changed.
+    identifyUserForAnalytics(this.state.authenticatedUser);
     this._notifyUserAboutEmailVerificationAndAdditionalInfo();
   };
 
@@ -755,8 +752,6 @@ export default class AuthenticatedUserProvider extends React.Component<
           hearFrom: form.hearFrom,
         }
       );
-      // Set the identification flag to true, so we update the user details when fetched.
-      this._userNeedsIdentificationForAnalytics = true;
       await this._fetchUserProfileWithoutThrowingErrors();
     } catch (authError) {
       // Do not throw error, as this is a best effort call.

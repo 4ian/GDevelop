@@ -9,10 +9,11 @@ import {
   type InAppTutorialFlowFormattedStep,
   type InAppTutorialFormattedTooltip,
   type EditorIdentifier,
-} from './InAppTutorialContext';
+} from '../Utils/GDevelopServices/InAppTutorial';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
 import {
+  aboveMaterialUiMaxZIndex,
   isElementADialog,
   isElementAMuiInput,
 } from '../UI/MaterialUISpecificUtil';
@@ -24,7 +25,7 @@ const styles = {
     position: 'absolute',
     left: 20,
     bottom: 20,
-    zIndex: 5, // Scene editor mosaic z-index is 4
+    zIndex: aboveMaterialUiMaxZIndex, // Make sure the avatar is above the dialogs or drawers created by Material UI.
     display: 'flex',
     visibility: 'hidden',
     boxShadow:
@@ -313,6 +314,7 @@ function InAppTutorialStepDisplayer({
                 visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
+              id="in-app-tutorial-avatar"
             >
               <img
                 alt="GDevelop mascot red hero"

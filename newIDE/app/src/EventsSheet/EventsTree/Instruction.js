@@ -97,6 +97,8 @@ type Props = {|
 
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+
+  id: string,
 |};
 
 const Instruction = (props: Props) => {
@@ -108,6 +110,7 @@ const Instruction = (props: Props) => {
     onContextMenu,
     globalObjectsContainer,
     objectsContainer,
+    id,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -344,6 +347,7 @@ const Instruction = (props: Props) => {
               }
             }}
             tabIndex={0}
+            id={id}
           >
             {instruction.isInverted() && (
               <img
@@ -425,6 +429,7 @@ const Instruction = (props: Props) => {
                 windowWidth={props.windowWidth}
                 globalObjectsContainer={props.globalObjectsContainer}
                 objectsContainer={props.objectsContainer}
+                idPrefix={props.id}
               />
             )}
           </React.Fragment>

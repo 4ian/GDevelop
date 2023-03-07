@@ -35,9 +35,7 @@ export const ReplacePromptDialog = ({
   onClose,
   onTriggerReplace,
 }: ReplacePromptDialogProps) => {
-  const { authenticated, onCreateAccount } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { authenticated, onLogin } = React.useContext(AuthenticatedUserContext);
 
   return (
     <Dialog
@@ -56,6 +54,7 @@ export const ReplacePromptDialog = ({
                 key="register-game-now"
                 label={<Trans>Create new leaderboards now</Trans>}
                 onClick={onTriggerReplace}
+                id="create-and-replace-new-leaderboard"
               />,
             ]
           : [
@@ -68,8 +67,9 @@ export const ReplacePromptDialog = ({
               <DialogPrimaryButton
                 label={<Trans>Login now</Trans>}
                 primary
-                onClick={() => onCreateAccount()}
+                onClick={() => onLogin()}
                 key="login-now"
+                id="login-now"
               />,
             ]
       }

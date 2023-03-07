@@ -262,6 +262,7 @@ export default class JsCodeEvent extends React.Component<
               [largeSelectedArea]: this.props.selected,
             })}
             ref={measureRef}
+            id={`${this.props.idPrefix}-js-code`}
           >
             {functionStart}
             <CodeEditor

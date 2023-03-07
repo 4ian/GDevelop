@@ -35,6 +35,7 @@ const SceneVariablesDialog = (props: Props) => {
           props.layout
         )
       }
+      id="scene-variables-dialog"
     />
   );
 };

@@ -52,6 +52,11 @@ export default class OperatorField extends Component<ParameterFieldProps> {
         onChange={(e, i, value: string) => this.props.onChange(value)}
         ref={field => (this._field = field)}
         translatableHintText={t`Choose an operator`}
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-operator-field`
+            : undefined
+        }
       >
         {operators.map(operator => (
           <SelectOption

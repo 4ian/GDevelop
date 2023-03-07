@@ -18,6 +18,11 @@ export default class ExpressionField extends Component<
       <GenericExpressionField
         expressionType="number"
         ref={field => (this._field = field)}
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-expression-field`
+            : undefined
+        }
         {...this.props}
       />
     );

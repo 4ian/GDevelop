@@ -53,6 +53,11 @@ export default class SceneVariableField extends React.Component<
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
           scope={scope}
+          id={
+            this.props.parameterIndex !== undefined
+              ? `parameter-${this.props.parameterIndex}-scene-variable-field`
+              : undefined
+          }
         />
         {this.state.editorOpen && layout && (
           <VariablesEditorDialog

@@ -53,7 +53,6 @@ export const installAnalyticsEvents = () => {
     return;
   }
 
-  // Posthog
   posthog.init('phc_yjTVz4BMHUOhCLBhVImjk3Jn1AjMCg808bxENY228qu', {
     api_host: 'https://app.posthog.com',
     loaded: () => {

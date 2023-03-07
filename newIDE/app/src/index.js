@@ -68,7 +68,7 @@ class Bootstrapper extends Component<{}, State> {
   authentication = new Authentication();
 
   componentDidMount() {
-    installAnalyticsEvents(this.authentication);
+    installAnalyticsEvents();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.

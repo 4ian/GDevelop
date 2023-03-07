@@ -1,14 +1,13 @@
 // @flow
 import posthog from 'posthog-js';
 import { getUserUUID, resetUserUUID } from './UserUUID';
-import Authentication from '../GDevelopServices/Authentication';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
-import { type AdditionalUserInfoForm } from '../../Utils/GDevelopServices/Authentication';
 import { getBrowserLanguageOrLocale } from '../Language';
 import optionalRequire from '../OptionalRequire';
 import Window from '../Window';
@@ -48,98 +47,109 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   });
 };
 
-export const installAnalyticsEvents = (authentication: Authentication) => {
+export const installAnalyticsEvents = () => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;
   }
-
-  const version = getIDEVersion();
-  const versionWithHash = getIDEVersionWithHash();
-
-  const updateUserInformation = () => {
-    if (!posthogLoaded) {
-      console.info(`App analytics not ready - retrying in 2s.`);
-      setTimeout(() => {
-        console.info(`Retrying to update the user for app analytics.`);
-        updateUserInformation();
-      }, 2000);
-
-      return;
-    }
-
-    const firebaseUser = authentication.getFirebaseUserSync();
-    const userPreferences = loadPreferencesFromLocalStorage();
-    const appLanguage = userPreferences ? userPreferences.language : undefined;
-    const browserLanguage = getBrowserLanguageOrLocale();
-
-    const userProperties = {
-      providerId: firebaseUser ? firebaseUser.providerId : undefined,
-      email: firebaseUser ? firebaseUser.email : undefined,
-      emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
-      // Only keep information useful to generate app usage statistics:
-      uuid: getUserUUID(),
-      version,
-      versionWithHash,
-      appLanguage,
-      browserLanguage,
-      programOpeningCount: getProgramOpeningCount(),
-      themeName: userPreferences ? userPreferences.themeName : 'Unknown',
-      ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
-    };
-
-    // If the user is logged in, alias the user with its firebase id.
-    if (firebaseUser) {
-      const aliasKey = firebaseUser.uid + '#' + getUserUUID();
-      if (!posthogAliasMade.includes(aliasKey)) {
-        // Try to Alias the random UUID to the Firebase ID.
-        // 2 cases:
-        // - Either it's the first time the user logs in and posthog does not know
-        //   about the Firebase ID, in which case we specify the firebaseId as 2nd parameter
-        //   of the alias method.
-        // - Or the user has already logged in and posthog knows about the Firebase ID,
-        //   in which case PostHog will reject the merging of the 2 users.
-        //   We then need to ensure we identify the user by its Firebase ID.
-        posthog.alias(getUserUUID(), firebaseUser.uid);
-        posthogAliasMade.push(aliasKey);
-      }
-    }
-
-    // Identify which user is using the app, after de-duplicating the call to
-    // avoid useless calls.
-    // This is so we can build stats on the used version, languages and usage
-    // of GDevelop features.
-    const stringifiedUserProperties = JSON.stringify(userProperties);
-    if (stringifiedUserProperties !== posthogLastPropertiesSent) {
-      // If the user is not logged in, identify the user by its random UUID.
-      // If the user is logged in, identify the user by its Firebase ID.
-      const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
-      posthog.identify(userId, userProperties);
-      posthogLastPropertiesSent = stringifiedUserProperties;
-    }
-  };
-
-  const onUserLogout = () => {
-    // Reset the UUID to generate a random new one and be sure
-    // we don't count different users as a single one in our stats.
-    resetUserUUID();
-    posthog.reset();
-
-    updateUserInformation();
-  };
-
-  authentication.addUserLogoutListener(onUserLogout);
-  authentication.addUserUpdateListener(updateUserInformation);
 
   // Posthog
   posthog.init('phc_yjTVz4BMHUOhCLBhVImjk3Jn1AjMCg808bxENY228qu', {
     api_host: 'https://app.posthog.com',
     loaded: () => {
       posthogLoaded = true;
-      updateUserInformation();
     },
     autocapture: false,
   });
+};
+
+export const identifyUserForAnalytics = (
+  authenticatedUser: AuthenticatedUser
+) => {
+  if (isDev) {
+    console.info('Development build - Analytics disabled');
+    return;
+  }
+
+  if (!posthogLoaded) {
+    console.info(`App analytics not ready - retrying in 2s.`);
+    setTimeout(() => {
+      console.info(`Retrying to update the user for app analytics.`);
+      identifyUserForAnalytics(authenticatedUser);
+    }, 2000);
+
+    return;
+  }
+
+  const firebaseUser = authenticatedUser.firebaseUser;
+  const profile = authenticatedUser.profile;
+  const userPreferences = loadPreferencesFromLocalStorage();
+  const appLanguage = userPreferences ? userPreferences.language : undefined;
+  const browserLanguage = getBrowserLanguageOrLocale();
+
+  const userProperties = {
+    providerId: firebaseUser ? firebaseUser.providerId : undefined,
+    email: firebaseUser ? firebaseUser.email : undefined,
+    emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
+    // Only keep information useful to generate app usage statistics:
+    uuid: getUserUUID(),
+    version: getIDEVersion(),
+    versionWithHash: getIDEVersionWithHash(),
+    appLanguage,
+    browserLanguage,
+    programOpeningCount: getProgramOpeningCount(),
+    themeName: userPreferences ? userPreferences.themeName : 'Unknown',
+    ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
+    // Additional profile information:
+    gdevelopUsage: profile ? profile.gdevelopUsage : undefined,
+    teamOrCompanySize: profile ? profile.teamOrCompanySize : undefined,
+    companyName: profile ? profile.companyName : undefined,
+    creationExperience: profile ? profile.creationExperience : undefined,
+    creationGoal: profile ? profile.creationGoal : undefined,
+    hearFrom: profile ? profile.hearFrom : undefined,
+  };
+
+  // If the user is logged in, alias the user with its firebase id.
+  if (firebaseUser) {
+    const aliasKey = firebaseUser.uid + '#' + getUserUUID();
+    if (!posthogAliasMade.includes(aliasKey)) {
+      // Try to Alias the random UUID to the Firebase ID.
+      // 2 cases:
+      // - Either it's the first time the user logs in and posthog does not know
+      //   about the Firebase ID, in which case we specify the firebaseId as 2nd parameter
+      //   of the alias method.
+      // - Or the user has already logged in and posthog knows about the Firebase ID,
+      //   in which case PostHog will reject the merging of the 2 users.
+      //   We then need to ensure we identify the user by its Firebase ID.
+      posthog.alias(getUserUUID(), firebaseUser.uid);
+      posthogAliasMade.push(aliasKey);
+    }
+  }
+
+  // Identify which user is using the app, after de-duplicating the call to
+  // avoid useless calls.
+  // This is so we can build stats on the used version, languages and usage
+  // of GDevelop features.
+  const stringifiedUserProperties = JSON.stringify(userProperties);
+  if (stringifiedUserProperties !== posthogLastPropertiesSent) {
+    // If the user is not logged in, identify the user by its random UUID.
+    // If the user is logged in, identify the user by its Firebase ID.
+    const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
+    posthog.identify(userId, userProperties);
+    posthogLastPropertiesSent = stringifiedUserProperties;
+  }
+};
+
+export const onUserLogout = () => {
+  if (isDev) {
+    console.info('Development build - Analytics disabled');
+    return;
+  }
+
+  // Reset the UUID to generate a random new one and be sure
+  // we don't count different users as a single one in our stats.
+  resetUserUUID();
+  posthog.reset();
 };
 
 export const sendProgramOpening = () => {
@@ -244,14 +254,6 @@ export const sendErrorMessage = (
 export const sendSignupDone = (email: string) => {
   recordEvent('signup', {
     email,
-  });
-};
-
-export const sendAdditionalUserInfo = (
-  additionalUserInfo: AdditionalUserInfoForm
-) => {
-  recordEvent('additional_user_info', {
-    ...additionalUserInfo,
   });
 };
 

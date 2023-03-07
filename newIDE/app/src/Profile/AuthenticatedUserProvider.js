@@ -19,8 +19,9 @@ import Authentication, {
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
 import {
-  sendAdditionalUserInfo,
+  onUserLogout,
   sendSignupDone,
+  identifyUserForAnalytics,
 } from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
@@ -104,6 +105,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutAdditionalInfo = false;
   _hasNotifiedUserAboutEmailVerification = false;
+  _userNeedsIdentificationForAnalytics = true;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -120,6 +122,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.props.authentication.addUserLogoutListener(
       this._fetchUserProfileWithoutThrowingErrors
     );
+    this.props.authentication.addUserLogoutListener(onUserLogout);
 
     // When the authenticated user changes, we need to react accordingly
     // This can happen:
@@ -406,6 +409,11 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
 
+    // We use a flag to avoid identifying the user every time the profile is fetched.
+    if (this._userNeedsIdentificationForAnalytics) {
+      identifyUserForAnalytics(this.state.authenticatedUser);
+      this._userNeedsIdentificationForAnalytics = false;
+    }
     this._notifyUserAboutEmailVerificationAndAdditionalInfo();
   };
 
@@ -747,12 +755,13 @@ export default class AuthenticatedUserProvider extends React.Component<
           hearFrom: form.hearFrom,
         }
       );
+      // Set the identification flag to true, so we update the user details when fetched.
+      this._userNeedsIdentificationForAnalytics = true;
       await this._fetchUserProfileWithoutThrowingErrors();
     } catch (authError) {
       // Do not throw error, as this is a best effort call.
       console.error('Error while saving additional user info:', authError);
     } finally {
-      sendAdditionalUserInfo(form);
       // Close anyway.
       this.openAdditionalUserInfoDialog(false);
       this.showUserSnackbar({

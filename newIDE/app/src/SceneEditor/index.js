@@ -141,7 +141,7 @@ type State = {|
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
   newObjectInstanceSceneCoordinates: ?[number, number],
-  invisibleLayerOnWhichInstancesHaveJustBeenAdded: ?string,
+  invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
 
   editedGroup: ?gdObjectGroup,
 

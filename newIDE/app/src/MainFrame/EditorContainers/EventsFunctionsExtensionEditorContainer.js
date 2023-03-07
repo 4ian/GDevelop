@@ -62,14 +62,14 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  _reloadExtensionMetadata = async () => {
+  _reloadExtensionMetadata = () => {
     // Immediately trigger the reload/regeneration of the extension
     // as a change in function declaration must be seen in the instructions
     // especially to avoid to show "unsupported instructions".
     try {
       const extension = this.getEventsFunctionsExtension();
       if (extension) {
-        await this.props.onReloadEventsFunctionsExtensionMetadata(extension);
+        this.props.onReloadEventsFunctionsExtensionMetadata(extension);
       }
     } catch (error) {
       console.warn(

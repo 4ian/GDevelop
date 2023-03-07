@@ -61,9 +61,9 @@ type Props = {|
       | 'extension-events-editor'
       | 'external-events-editor'
   ) => void,
-  onBehaviorEdited?: () => Promise<void>,
-  onObjectEdited?: () => Promise<void>,
-  onFunctionEdited?: () => Promise<void>,
+  onBehaviorEdited?: () => void,
+  onObjectEdited?: () => void,
+  onFunctionEdited?: () => void,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges?: ?UnsavedChanges,
@@ -270,7 +270,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Users may have change a function declaration.
     // Reload metadata just in case.
     if (this.props.onFunctionEdited) {
-      Promise.resolve(this.props.onFunctionEdited());
+      this.props.onFunctionEdited();
     }
 
     this._loadEventsFunctionFrom(
@@ -335,11 +335,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       newName
     );
-    if (this.props.onFunctionEdited) {
-      Promise.resolve(this.props.onFunctionEdited());
-    }
 
     done(true);
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
   };
 
   _makeRenameBehaviorEventsFunction = (i18n: I18nType) => (
@@ -375,11 +375,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       newName
     );
-    if (this.props.onFunctionEdited) {
-      Promise.resolve(this.props.onFunctionEdited());
-    }
 
     done(true);
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
   };
 
   _makeRenameObjectEventsFunction = (i18n: I18nType) => (
@@ -415,11 +415,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsFunction.getName(),
       newName
     );
-    if (this.props.onFunctionEdited) {
-      Promise.resolve(this.props.onFunctionEdited());
-    }
 
     done(true);
+    if (this.props.onFunctionEdited) {
+      this.props.onFunctionEdited();
+    }
   };
 
   _makeMoveFreeEventsParameter = (i18n: I18nType) => (
@@ -638,7 +638,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Name of a behavior changed, so notify parent
     // that a behavior was edited (to trigger reload of extensions)
     if (this.props.onBehaviorEdited) {
-      Promise.resolve(this.props.onBehaviorEdited());
+      this.props.onBehaviorEdited();
     }
 
     // Reload the selected events function, if any, as the behavior was
@@ -660,7 +660,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Name of an object changed, so notify parent
     // that an object was edited (to trigger reload of extensions)
     if (this.props.onObjectEdited) {
-      Promise.resolve(this.props.onObjectEdited());
+      this.props.onObjectEdited();
     }
 
     // Reload the selected events function, if any, as the parent-object was

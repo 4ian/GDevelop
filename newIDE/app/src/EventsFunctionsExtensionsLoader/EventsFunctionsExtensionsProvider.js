@@ -138,39 +138,30 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   _reloadProjectEventsFunctionsExtensionMetadata(
     project: ?gdProject,
     extension: gdEventsFunctionsExtension
-  ): Promise<void> {
+  ): void {
     const { i18n } = this.props;
     const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
-    if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
+    if (!project || !eventsFunctionCodeWriter) return;
 
-    const lastLoadPromise = this._lastLoadPromise || Promise.resolve();
-
-    this._lastLoadPromise = lastLoadPromise
-      .then(() =>
-        reloadProjectEventsFunctionsExtensionMetadata(
-          project,
-          extension,
-          eventsFunctionCodeWriter,
-          i18n
-        )
-      )
-      .catch((eventsFunctionsExtensionsError: Error) => {
-        this.setState({
-          eventsFunctionsExtensionsError,
-        });
-        showErrorBox({
-          message: i18n._(
-            t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
-          ),
-          rawError: eventsFunctionsExtensionsError,
-          errorId: 'events-functions-extensions-load-error',
-        });
-      })
-      .then(() => {
-        this._lastLoadPromise = null;
+    try {
+      reloadProjectEventsFunctionsExtensionMetadata(
+        project,
+        extension,
+        eventsFunctionCodeWriter,
+        i18n
+      );
+    } catch (eventsFunctionsExtensionsError) {
+      this.setState({
+        eventsFunctionsExtensionsError,
       });
-
-    return this._lastLoadPromise;
+      showErrorBox({
+        message: i18n._(
+          t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+        ),
+        rawError: eventsFunctionsExtensionsError,
+        errorId: 'events-functions-extensions-load-error',
+      });
+    }
   }
 
   _unloadProjectEventsFunctionsExtensions(project: gdProject) {

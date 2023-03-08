@@ -261,6 +261,8 @@ namespace gdjs {
         this._lastDirectionIsLeft = this._leftKey;
       }
 
+      const oldState = this._state;
+
       //0.2) Track changes in object size
       this._state.beforeUpdatingObstacles(timeDelta);
       this._onFloor._oldHeight = object.getHeight();
@@ -285,6 +287,7 @@ namespace gdjs {
 
       const oldX = object.getX();
       this._moveX();
+      const mayCollideWall = object.getX() !== oldX + this._requestedDeltaX;
 
       //2) Y axis:
       this._state.checkTransitionBeforeY(timeDelta);
@@ -297,6 +300,23 @@ namespace gdjs {
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
+      }
+
+      // When the character is against a wall and the player hold left or
+      // right, the speed shouldn't stack because starting at full speed when
+      // jumping over the wall would look strange.
+      //
+      // When the state has change, the collision is probably a landing or a
+      // collision from the floor when stating to jump. The speed must not be
+      // lost in these cases.
+      // When the character is on the floor, it will try to walk on the obstacles
+      // and already stop if necessary.
+      if (
+        mayCollideWall &&
+        this._state == oldState &&
+        this._state !== this._onFloor
+      ) {
+        this._currentSpeed = 0;
       }
 
       this._wasLeftKeyPressed = this._leftKey;
@@ -411,15 +431,6 @@ namespace gdjs {
               Math.round(object.getX()) + (this._requestedDeltaX > 0 ? -1 : 1)
             );
           }
-        }
-
-        // When the character is on the floor it will try to walk on the obstacles.
-        // So, it should not be stopped.
-        if (
-          this._state !== this._onFloor &&
-          object.getX() !== oldX + this._requestedDeltaX
-        ) {
-          this._currentSpeed = 0;
         }
       }
     }

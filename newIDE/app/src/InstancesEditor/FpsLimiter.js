@@ -16,6 +16,11 @@ export default class FpsLimiter {
     this._forceUpdate = false;
   }
 
+  updateMaxFps(maxFps: number) {
+    this._interval = 1000 / maxFps;
+    this._forceUpdate = false;
+  }
+
   shouldUpdate() {
     const now = Date.now();
     const delta = now - this._lastFrameTime;

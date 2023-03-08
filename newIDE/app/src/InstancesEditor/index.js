@@ -218,11 +218,15 @@ export default class InstancesEditor extends Component<Props> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
-    this.pixiRenderer.view.addEventListener('mousemove', event =>
-      this.props.onMouseMove(event)
-    );
+    this.pixiRenderer.view.addEventListener('mousemove', event => {
+      this.props.onMouseMove(event);
+    });
     this.pixiRenderer.view.addEventListener('mouseout', event => {
+      this.fpsLimiter.updateMaxFps(15); // Reduce the FPS when the mouse is out of the window.
       this.props.onMouseLeave(event);
+    });
+    this.pixiRenderer.view.addEventListener('mouseover', event => {
+      this.fpsLimiter.updateMaxFps(60); // Restore the FPS when the mouse is back in the window.
     });
     this.pixiRenderer.view.addEventListener('focusout', event => {
       if (this.keyboardShortcuts) {

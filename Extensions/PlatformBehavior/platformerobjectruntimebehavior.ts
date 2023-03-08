@@ -261,8 +261,6 @@ namespace gdjs {
         this._lastDirectionIsLeft = this._leftKey;
       }
 
-      const oldState = this._state;
-
       //0.2) Track changes in object size
       this._state.beforeUpdatingObstacles(timeDelta);
       this._onFloor._oldHeight = object.getHeight();
@@ -276,6 +274,7 @@ namespace gdjs {
       this._updateOverlappedJumpThru();
 
       //1) X axis:
+      const beforeMovingXState = this._state;
       this._state.checkTransitionBeforeX();
       this._state.beforeMovingX();
 
@@ -290,6 +289,7 @@ namespace gdjs {
       const mayCollideWall = object.getX() !== oldX + this._requestedDeltaX;
 
       //2) Y axis:
+      const beforeMovingYState = this._state;
       this._state.checkTransitionBeforeY(timeDelta);
       this._state.beforeMovingY(timeDelta, oldX);
 
@@ -298,6 +298,7 @@ namespace gdjs {
 
       //3) Update the current floor data for the next tick:
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
+      const beforeLastTransitionYState = this._state;
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
       }
@@ -313,7 +314,9 @@ namespace gdjs {
       // and already stop if necessary.
       if (
         mayCollideWall &&
-        this._state == oldState &&
+        this._state === beforeMovingXState &&
+        this._state === beforeMovingYState &&
+        this._state === beforeLastTransitionYState &&
         this._state !== this._onFloor
       ) {
         this._currentSpeed = 0;

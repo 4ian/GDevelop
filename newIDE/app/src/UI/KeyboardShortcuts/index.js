@@ -108,7 +108,10 @@ export default class KeyboardShortcuts {
     return this._spacePressed || this._mouseMidButtonPressed;
   }
 
-  shouldZoom() {
+  shouldZoom(evt: WheelEvent) {
+    // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
+    // does a pinch gesture on a trackpad. If this is the case, we zoom.
+    if (evt.ctrlKey || evt.metaKey) return true;
     if (isMacLike()) {
       return this._isControlOrCmdPressed();
     } else {

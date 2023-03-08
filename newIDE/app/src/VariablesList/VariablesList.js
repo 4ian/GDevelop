@@ -118,7 +118,6 @@ const StyledTreeItem = withStyles(theme => ({
   iconContainer: {
     alignSelf: 'stretch',
     alignItems: 'center',
-    color: 'white',
   },
   root: {
     '&:focus:not(.Mui-selected)': {

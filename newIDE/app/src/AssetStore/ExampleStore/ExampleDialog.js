@@ -11,7 +11,6 @@ import {
 } from '../../Utils/GDevelopServices/Example';
 import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import LeftLoader from '../../UI/LeftLoader';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
@@ -179,7 +178,6 @@ export function ExampleDialog({
             <MarkdownText source={example.description} isStandaloneText />
           </>
         )}
-        {!example && !error && <PlaceholderLoader />}
         {!example && error && (
           <PlaceholderError onRetry={loadExample}>
             <Trans>

@@ -1287,15 +1287,13 @@ module.exports = {
         );
       };
 
-      if (!atlasTexture.valid) {
-        // Wait for the atlas image to load.
-        new Promise((resolve) => {
-          atlasTexture.once('update', () => {
-            resolve(loadTileMap());
-          });
-        });
-      } else {
+      if (atlasTexture.valid) {
         loadTileMap();
+      } else {
+        // Wait for the atlas image to load.
+        atlasTexture.once('update', () => {
+          loadTileMap();
+        });
       }
     };
 

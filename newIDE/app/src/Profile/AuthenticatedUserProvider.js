@@ -19,7 +19,7 @@ import Authentication, {
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
 import {
-  onUserLogout,
+  onUserLogoutForAnalytics,
   sendSignupDone,
   identifyUserForAnalytics,
 } from '../Utils/Analytics/EventSender';
@@ -117,16 +117,19 @@ export default class AuthenticatedUserProvider extends React.Component<
   async componentDidMount() {
     this._resetAuthenticatedUser();
 
-    // Listen to when the user log out so that we reset the user profile.
+    // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
+    // So this is not called at the startup, but only when the user logs in or log out.
+
+    // Listen to when the user logs out.
+    // 1. Send this information to analytics, to reset the user being identified.
+    // 2. Fetch the user profile, which will reset the user to an unauthenticated state.
+    this.props.authentication.addUserLogoutListener(onUserLogoutForAnalytics);
     this.props.authentication.addUserLogoutListener(
       this._fetchUserProfileWithoutThrowingErrors
     );
-    this.props.authentication.addUserLogoutListener(onUserLogout);
 
     // When the authenticated user changes, we need to react accordingly
     // This can happen:
-    // - at the startup, because the authenticated Firebase user was not ready yet
-    //   when this component mounted. So we'll fetch the user profile.
     // - at the login, signup, profile edit. These methods are taking care of
     //   fetching the user profile by themselves, so they will disable the automatic
     //   refresh.
@@ -145,6 +148,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     });
 
+    // At startup, if the provider has mounted too late and the user is already logged in with Firebase,
+    // we fetch the user profile.
     if (this.props.authentication.getFirebaseUserSync()) {
       // The user is logged already: fetch its user profile (because the "user update"
       // won't trigger, as registered too late).
@@ -155,8 +160,9 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
-      // Don't do anything. Either no user is logged (nothing to do)
-      // or is being logged (the "user udpate" callback will trigger later).
+      // If the user is not logged, we still need to identify the user for analytics.
+      // But don't do anything else, the user is already logged or being logged.
+      identifyUserForAnalytics(this.state.authenticatedUser);
     }
   }
 

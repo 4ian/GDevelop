@@ -15,6 +15,7 @@ import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const styles = {
   propertiesContainer: {
@@ -33,141 +34,156 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
 |};
 
-export default class ResourcePropertiesEditor extends React.Component<
+export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
+
+const renderEmpty = () => {
+  return (
+    <EmptyMessage>
+      <Trans>
+        Resources are automatically added to your project whenever you add an
+        image, a font or a video to an object or when you choose an audio file
+        in events. Choose a resource to display its properties.
+      </Trans>
+    </EmptyMessage>
+  );
+};
+
+const ResourcePropertiesEditor = React.forwardRef<
   Props,
-  {}
-> {
-  schema: Schema = [
+  ResourcePropertiesEditorInterface
+>(
+  (
     {
-      name: 'Resource name',
-      valueType: 'string',
-      disabled: true,
-      getValue: (resource: gdResource) => resource.getName(),
-      setValue: (resource: gdResource, newValue: string) =>
-        resource.setName(newValue),
-    },
-    {
-      name: 'File',
-      valueType: 'string',
-      getValue: (resource: gdResource) => resource.getFile(),
-      setValue: (resource: gdResource, newValue: string) =>
-        resource.setFile(newValue),
-      onEditButtonClick: () => {
-        const { resourceManagementProps } = this.props;
-        const storageProvider = resourceManagementProps.getStorageProvider();
-        const resourceSources = resourceManagementProps.resourceSources
-          .filter(source => source.kind === this.props.resources[0].getKind())
-          .filter(
-            ({ onlyForStorageProvider }) =>
-              !onlyForStorageProvider ||
-              onlyForStorageProvider === storageProvider.internalName
-          );
-
-        const firstResourceSource = resourceSources[0];
-        if (firstResourceSource) this._chooseResourcePath(firstResourceSource);
-      },
-      onEditButtonBuildMenuTemplate: (i18n: I18nType) => {
-        const { resourceManagementProps } = this.props;
-        const storageProvider = resourceManagementProps.getStorageProvider();
-        return resourceManagementProps.resourceSources
-          .filter(source => source.kind === this.props.resources[0].getKind())
-          .filter(
-            ({ onlyForStorageProvider }) =>
-              !onlyForStorageProvider ||
-              onlyForStorageProvider === storageProvider.internalName
-          )
-          .map(source => ({
-            label: i18n._(source.displayName),
-            click: () => this._chooseResourcePath(source),
-          }));
-      },
-    },
-  ];
-
-  _renderEmpty() {
-    return (
-      <EmptyMessage>
-        <Trans>
-          Resources are automatically added to your project whenever you add an
-          image, a font or a video to an object or when you choose an audio file
-          in events. Choose a resource to display its properties.
-        </Trans>
-      </EmptyMessage>
-    );
-  }
-
-  _chooseResourcePath = async (resourceSource: ResourceSource) => {
-    const {
+      project,
+      resourcesLoader,
       resources,
       onResourcePathUpdated,
       resourceManagementProps,
-    } = this.props;
-    const resource = resources[0];
+    },
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
 
-    const newResources = await resourceManagementProps.onChooseResource({
-      initialSourceName: resourceSource.name,
-      multiSelection: false,
-      resourceKind: resource.getKind(),
-    });
-    if (!newResources.length) return; // No path was chosen by the user.
-    resource.setFile(newResources[0].getFile());
+    React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
-    // Important, we are responsible for deleting the resources that were given to us.
-    // Otherwise we have a memory leak.
-    newResources.forEach(resource => resource.delete());
+    const chooseResourcePath = React.useCallback(
+      async (resourceSource: ResourceSource) => {
+        const resource = resources[0];
 
-    onResourcePathUpdated();
-    this.forceUpdate();
+        const newResources = await resourceManagementProps.onChooseResource({
+          initialSourceName: resourceSource.name,
+          multiSelection: false,
+          resourceKind: resource.getKind(),
+        });
+        if (!newResources.length) return; // No path was chosen by the user.
+        resource.setFile(newResources[0].getFile());
 
-    await resourceManagementProps.onFetchNewlyAddedResources();
-  };
+        // Important, we are responsible for deleting the resources that were given to us.
+        // Otherwise we have a memory leak.
+        newResources.forEach(resource => resource.delete());
 
-  _renderResourcesProperties() {
-    const { resources } = this.props;
-    //TODO: Multiple resources support
-    const properties = resources[0].getProperties();
-    const resourceSchema = propertiesMapToSchema(
-      properties,
-      resource => resource.getProperties(),
-      (resource, name, value) => resource.updateProperty(name, value)
+        onResourcePathUpdated();
+        forceUpdate();
+
+        await resourceManagementProps.onFetchNewlyAddedResources();
+      },
+      [resourceManagementProps, resources, onResourcePathUpdated, forceUpdate]
     );
 
-    return (
-      <div
-        style={styles.propertiesContainer}
-        key={resources.map(resource => '' + resource.ptr).join(';')}
-      >
-        <PropertiesEditor
-          schema={this.schema.concat(resourceSchema)}
-          instances={resources}
+    const schema: Schema = React.useMemo(
+      () => [
+        {
+          name: 'Resource name',
+          valueType: 'string',
+          disabled: true,
+          getValue: (resource: gdResource) => resource.getName(),
+          setValue: (resource: gdResource, newValue: string) =>
+            resource.setName(newValue),
+        },
+        {
+          name: 'File',
+          valueType: 'string',
+          getValue: (resource: gdResource) => resource.getFile(),
+          setValue: (resource: gdResource, newValue: string) =>
+            resource.setFile(newValue),
+          onEditButtonClick: () => {
+            const storageProvider = resourceManagementProps.getStorageProvider();
+            const resourceSources = resourceManagementProps.resourceSources
+              .filter(source => source.kind === resources[0].getKind())
+              .filter(
+                ({ onlyForStorageProvider }) =>
+                  !onlyForStorageProvider ||
+                  onlyForStorageProvider === storageProvider.internalName
+              );
+
+            const firstResourceSource = resourceSources[0];
+            if (firstResourceSource) chooseResourcePath(firstResourceSource);
+          },
+          onEditButtonBuildMenuTemplate: (i18n: I18nType) => {
+            const storageProvider = resourceManagementProps.getStorageProvider();
+            return resourceManagementProps.resourceSources
+              .filter(source => source.kind === resources[0].getKind())
+              .filter(
+                ({ onlyForStorageProvider }) =>
+                  !onlyForStorageProvider ||
+                  onlyForStorageProvider === storageProvider.internalName
+              )
+              .map(source => ({
+                label: i18n._(source.displayName),
+                click: () => chooseResourcePath(source),
+              }));
+          },
+        },
+      ],
+      [resourceManagementProps, resources, chooseResourcePath]
+    );
+
+    const renderResourcesProperties = React.useCallback(
+      () => {
+        //TODO: Multiple resources support
+        const properties = resources[0].getProperties();
+        const resourceSchema = propertiesMapToSchema(
+          properties,
+          resource => resource.getProperties(),
+          (resource, name, value) => resource.updateProperty(name, value)
+        );
+
+        return (
+          <div
+            style={styles.propertiesContainer}
+            key={resources.map(resource => '' + resource.ptr).join(';')}
+          >
+            <PropertiesEditor
+              schema={schema.concat(resourceSchema)}
+              instances={resources}
+            />
+          </div>
+        );
+      },
+      [resources, schema]
+    );
+
+    const renderPreview = () => {
+      if (!resources || !resources.length) return;
+
+      return (
+        <ResourcePreview
+          resourceName={resources[0].getName()}
+          resourcesLoader={resourcesLoader}
+          project={project}
         />
-      </div>
-    );
-  }
-
-  _renderPreview() {
-    const { resources, project, resourcesLoader } = this.props;
-    if (!resources || !resources.length) return;
-
-    return (
-      <ResourcePreview
-        resourceName={resources[0].getName()}
-        resourcesLoader={resourcesLoader}
-        project={project}
-      />
-    );
-  }
-
-  render() {
-    const { resources } = this.props;
+      );
+    };
 
     return (
       <Background maxWidth>
-        {this._renderPreview()}
+        {renderPreview()}
         {!resources || !resources.length
-          ? this._renderEmpty()
-          : this._renderResourcesProperties()}
+          ? renderEmpty()
+          : renderResourcesProperties()}
       </Background>
     );
   }
-}
+);
+
+export default ResourcePropertiesEditor;

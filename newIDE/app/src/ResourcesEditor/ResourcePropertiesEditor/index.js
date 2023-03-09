@@ -156,7 +156,10 @@ const ResourcePropertiesEditor = React.forwardRef<
         const resourceSchema = propertiesMapToSchema(
           properties,
           resource => resource.getProperties(),
-          (resource, name, value) => resource.updateProperty(name, value)
+          (resource, name, value) => {
+            resource.updateProperty(name, value);
+            forceUpdate();
+          }
         );
 
         return (
@@ -171,7 +174,7 @@ const ResourcePropertiesEditor = React.forwardRef<
           </div>
         );
       },
-      [resources, schema]
+      [resources, schema, forceUpdate]
     );
 
     const renderPreview = () => {

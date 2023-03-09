@@ -55,10 +55,6 @@ export namespace TiledPixiHelper {
     const expectedAtlasHeight =
       tileheight * rows + spacing * (rows - 1) + margin * 2;
 
-    // When users use an atlas images that are not divisible by the tile width,
-    // Tiled automatically chooses a number of column that fit in the atlas for
-    // a given tile size.
-    // So the atlas images can have unused pixels at the right and bottom.
     if (
       atlasTexture.width < expectedAtlasWidth ||
       atlasTexture.height < expectedAtlasHeight
@@ -70,6 +66,16 @@ export namespace TiledPixiHelper {
       );
       return null;
     }
+    // Atlas can be bigger for some valid reasons:
+    // - When users use an atlas images that are not divisible by the tile width,
+    // Tiled automatically chooses a number of column that fit in the atlas for
+    // a given tile size.
+    // So the atlas images can have unused pixels at the right and bottom.
+    // - Artists also sometimes add a banner.
+    // 
+    // It can also be that users rescaled the atlas without adapting the tile set
+    // In this case, having a broken visual can help understand the issue.
+    // Especially since the error can only be found in the logs.
     if (
       atlasTexture.width !== expectedAtlasWidth ||
       atlasTexture.height !== expectedAtlasHeight

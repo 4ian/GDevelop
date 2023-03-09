@@ -76,6 +76,7 @@ import debounce from 'lodash/debounce';
 
 const gd: libGDevelop = global.gd;
 
+const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
 
 const styles = {
@@ -216,7 +217,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       renamedObjectWithContext: null,
       selectedObjectsWithContext: [],
-      selectedLayer: '',
+      selectedLayer: BASE_LAYER_NAME,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
     };
   }
@@ -678,44 +679,47 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
+    const getNewState = (doRemove: boolean) => {
+      const newState: {| layerRemoved: null, selectedLayer?: string |} = {
+        layerRemoved: null,
+      };
+      if (doRemove && layerName === this.state.selectedLayer) {
+        newState.selectedLayer = BASE_LAYER_NAME;
+      }
+      return newState;
+    };
+
     this.setState({
       layerRemoved: layerName,
       onCloseLayerRemoveDialog: (
         doRemove: boolean,
         newLayer: string | null
       ) => {
-        this.setState(
-          {
-            layerRemoved: null,
-          },
-          () => {
-            if (doRemove) {
-              if (newLayer === null) {
-                this.instancesSelection.unselectInstancesOnLayer(layerName);
-                this.props.initialInstances.removeAllInstancesOnLayer(
-                  layerName
-                );
-              } else {
-                // Instances are not invalidated, so we can keep the selection.
-                this.props.initialInstances.moveInstancesToLayer(
-                  layerName,
-                  newLayer
-                );
-              }
+        this.setState(getNewState(doRemove), () => {
+          if (doRemove) {
+            if (newLayer === null) {
+              this.instancesSelection.unselectInstancesOnLayer(layerName);
+              this.props.initialInstances.removeAllInstancesOnLayer(layerName);
+            } else {
+              // Instances are not invalidated, so we can keep the selection.
+              this.props.initialInstances.moveInstancesToLayer(
+                layerName,
+                newLayer
+              );
             }
-
-            done(doRemove);
-            // /!\ Force the instances editor to destroy and mount again the
-            // renderers to avoid keeping any references to existing instances
-            if (this.editor) this.editor.forceRemount();
-
-            this.forceUpdateLayersList();
-
-            // We may have modified the selection, so force an update of editors dealing with it.
-            this.forceUpdatePropertiesEditor();
-            this.updateToolbar();
           }
-        );
+
+          done(doRemove);
+          // /!\ Force the instances editor to destroy and mount again the
+          // renderers to avoid keeping any references to existing instances
+          if (this.editor) this.editor.forceRemount();
+
+          this.forceUpdateLayersList();
+
+          // We may have modified the selection, so force an update of editors dealing with it.
+          this.forceUpdatePropertiesEditor();
+          this.updateToolbar();
+        });
       },
     });
   };

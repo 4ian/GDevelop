@@ -103,7 +103,11 @@ export const ExtensionListItem = ({
                 </div>
               </Line>
             )}
-            <Text noMargin size="body2">
+            <Text
+              noMargin
+              size="body2"
+              displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+            >
               {renderExtensionField('shortDescription')}
             </Text>
           </Column>

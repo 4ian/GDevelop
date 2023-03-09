@@ -453,7 +453,7 @@ namespace gdjs {
       }
     }
 
-    onTouchCanceled(rawIdentifier: number): void {
+    onTouchCancel(rawIdentifier: number): void {
       // Don't do anything specific for canceled touches to avoid to make
       // touches handling more complex for users.
       this.onTouchEnd(rawIdentifier);

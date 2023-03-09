@@ -28,6 +28,15 @@ const openPreviewWindow = ({
   };
 
   let previewWindow = new BrowserWindow(browserWindowOptions);
+  previewWindow.webContents.on('before-input-event', (event, input) => {
+    if (
+      input.key.toLowerCase() === 'w' &&
+      (process.platform === 'win32' ? input.control : input.meta)
+    ) {
+      event.preventDefault();
+      previewWindow.close();
+    }
+  });
 
   previewWindow.setMenuBarVisibility(hideMenuBar);
   previewWindow.webContents.on('devtools-opened', () => {

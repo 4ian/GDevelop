@@ -49,6 +49,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     if (editor) {
       editor.forceUpdateObjectsList();
       editor.forceUpdateObjectGroupsList();
+      editor.forceUpdateLayersList();
     }
   }
 

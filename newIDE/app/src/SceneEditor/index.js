@@ -1304,6 +1304,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   forceUpdateLayersList = () => {
+    // The selected layer could have been deleted when editing a linked external layout.
+    if (!this.props.layout.hasLayerNamed(this.state.selectedLayer)) {
+      this.setState({ selectedLayer: BASE_LAYER_NAME });
+    }
     if (this._layersList) this._layersList.forceUpdate();
   };
 

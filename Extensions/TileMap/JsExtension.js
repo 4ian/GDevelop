@@ -1231,54 +1231,70 @@ module.exports = {
       }
       const mapping = metadata.embeddedResourcesMapping || {};
 
-      /** @type {TileMapHelper.TileMapManager} */
-      const manager = TilemapHelper.TileMapManager.getManager(this._project);
-      manager.getOrLoadTileMap(
-        this._loadTileMapWithCallback.bind(this),
-        tilemapJsonFile,
-        tilesetJsonFile,
-        levelIndex,
-        pako,
-        (tileMap) => {
-          if (!tileMap) {
-            this.onLoadingError();
-            // _loadTileMapWithCallback already log errors
-            return;
-          }
-
-          /** @type {TileMapHelper.TileTextureCache} */
-          const textureCache = manager.getOrLoadTextureCache(
-            this._loadTileMapWithCallback.bind(this),
-            (textureName) =>
-              this._pixiResourcesLoader.getPIXITexture(
-                this._project,
-                mapping[textureName] || textureName
-              ),
-            tilemapAtlasImage,
-            tilemapJsonFile,
-            tilesetJsonFile,
-            levelIndex,
-            (textureCache) => {
-              if (!textureCache) {
-                this.onLoadingError();
-                // getOrLoadTextureCache already log warns and errors.
-                return;
-              }
-              this.onLoadingSuccess();
-
-              this.width = tileMap.getWidth();
-              this.height = tileMap.getHeight();
-              TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                this.tileMapPixiObject,
-                tileMap,
-                textureCache,
-                displayMode,
-                layerIndex
-              );
-            }
-          );
-        }
+      const atlasTexture = this._pixiResourcesLoader.getPIXITexture(
+        this._project,
+        tilemapAtlasImage
       );
+
+      const loadTileMap = () => {
+        /** @type {TileMapHelper.TileMapManager} */
+        const manager = TilemapHelper.TileMapManager.getManager(this._project);
+        manager.getOrLoadTileMap(
+          this._loadTileMapWithCallback.bind(this),
+          tilemapJsonFile,
+          tilesetJsonFile,
+          levelIndex,
+          pako,
+          (tileMap) => {
+            if (!tileMap) {
+              this.onLoadingError();
+              // _loadTileMapWithCallback already log errors
+              return;
+            }
+
+            /** @type {TileMapHelper.TileTextureCache} */
+            const textureCache = manager.getOrLoadTextureCache(
+              this._loadTileMapWithCallback.bind(this),
+              (textureName) =>
+                this._pixiResourcesLoader.getPIXITexture(
+                  this._project,
+                  mapping[textureName] || textureName
+                ),
+              tilemapAtlasImage,
+              tilemapJsonFile,
+              tilesetJsonFile,
+              levelIndex,
+              (textureCache) => {
+                if (!textureCache) {
+                  this.onLoadingError();
+                  // getOrLoadTextureCache already log warns and errors.
+                  return;
+                }
+                this.onLoadingSuccess();
+
+                this.width = tileMap.getWidth();
+                this.height = tileMap.getHeight();
+                TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+                  this.tileMapPixiObject,
+                  tileMap,
+                  textureCache,
+                  displayMode,
+                  layerIndex
+                );
+              }
+            );
+          }
+        );
+      };
+
+      if (atlasTexture.valid) {
+        loadTileMap();
+      } else {
+        // Wait for the atlas image to load.
+        atlasTexture.once('update', () => {
+          loadTileMap();
+        });
+      }
     };
 
     // GDJS doesn't use Promise to avoid allocation.

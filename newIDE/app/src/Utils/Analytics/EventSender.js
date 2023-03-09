@@ -139,7 +139,7 @@ export const identifyUserForAnalytics = (
   }
 };
 
-export const onUserLogout = () => {
+export const onUserLogoutForAnalytics = () => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;

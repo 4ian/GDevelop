@@ -81,7 +81,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   forceUpdateEditor() {
-    // No updates to be done.
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateObjectGroupsList();
+      editor.forceUpdateLayersList();
+    }
   }
 
   getExternalLayout(): ?gdExternalLayout {

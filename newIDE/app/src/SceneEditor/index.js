@@ -226,9 +226,6 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
-    if (!prevProps.isActive && this.props.isActive) {
-      if (this._objectGroupsList) this._objectGroupsList.forceUpdate();
-    }
   }
 
   getInstancesEditorSettings() {
@@ -1296,6 +1293,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   forceUpdateObjectsList = () => {
     if (this._objectsList) this._objectsList.forceUpdateList();
+  };
+
+  forceUpdateObjectGroupsList = () => {
+    if (this._objectGroupsList) this._objectGroupsList.forceUpdate();
   };
 
   forceUpdateLayersList = () => {

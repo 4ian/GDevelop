@@ -45,7 +45,11 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   forceUpdateEditor() {
-    if (this.editor) this.editor.forceUpdateObjectsList();
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateObjectGroupsList();
+    }
   }
 
   getLayout(): ?gdLayout {

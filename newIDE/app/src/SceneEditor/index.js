@@ -175,6 +175,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   editor: ?InstancesEditor;
   contextMenu: ?ContextMenuInterface;
   editorMosaic: ?EditorMosaic;
+  _objectGroupsList: ?ObjectGroupsList;
   _objectsList: ?ObjectsListInterface;
   _layersList: ?LayersListInterface;
   _propertiesEditor: ?InstancePropertiesEditor;
@@ -1298,6 +1299,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this._objectsList) this._objectsList.forceUpdateList();
   };
 
+  forceUpdateObjectGroupsList = () => {
+    if (this._objectGroupsList) this._objectGroupsList.forceUpdate();
+  };
+
   forceUpdateLayersList = () => {
     if (this._layersList) this._layersList.forceUpdate();
   };
@@ -1576,6 +1581,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           <I18n>
             {({ i18n }) => (
               <ObjectGroupsList
+                ref={objectGroupsList =>
+                  (this._objectGroupsList = objectGroupsList)
+                }
                 globalObjectGroups={project.getObjectGroups()}
                 objectGroups={layout.getObjectGroups()}
                 onEditGroup={this.editGroup}
@@ -1591,6 +1599,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         ),
       },
     };
+
     return (
       <div
         style={styles.container}

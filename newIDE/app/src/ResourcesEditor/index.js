@@ -3,7 +3,9 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import ResourcesList from '../ResourcesList';
-import ResourcePropertiesEditor from './ResourcePropertiesEditor';
+import ResourcePropertiesEditor, {
+  type ResourcePropertiesEditorInterface,
+} from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic from '../UI/EditorMosaic';
 import ResourcesLoader from '../ResourcesLoader';
@@ -59,7 +61,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   editorMosaic: ?EditorMosaic = null;
-  _propertiesEditor: ?ResourcePropertiesEditor = null;
+  _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesList = null;
   resourcesLoader = ResourcesLoader;
   state = {

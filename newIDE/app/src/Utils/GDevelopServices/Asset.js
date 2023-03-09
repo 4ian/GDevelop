@@ -181,11 +181,17 @@ export const listAllPublicAssets = ({
         client.get(assetShortHeadersUrl).then(response => response.data),
         client.get(filtersUrl).then(response => response.data),
         client.get(assetPacksUrl).then(response => response.data),
-      ]).then(([publicAssetShortHeaders, publicFilters, publicAssetPacks]) => ({
-        publicAssetShortHeaders,
-        publicFilters,
-        publicAssetPacks,
-      }));
+      ]).then(([publicAssetShortHeaders, publicFilters, publicAssetPacks]) => {
+        if (!publicAssetShortHeaders || !publicFilters || !publicAssetPacks) {
+          throw new Error('Unexpected response from the assets endpoints.');
+        }
+
+        return {
+          publicAssetShortHeaders,
+          publicFilters,
+          publicAssetPacks,
+        };
+      });
     });
 };
 

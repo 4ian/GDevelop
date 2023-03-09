@@ -259,7 +259,7 @@ export const AssetStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              publicAssetShortHeaders.length
+              publicAssetShortHeaders ? publicAssetShortHeaders.length : 0
             } assets from the asset store.`
           );
           setPublicAssetPacks(publicAssetPacks);

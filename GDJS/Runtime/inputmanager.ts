@@ -453,6 +453,12 @@ namespace gdjs {
       }
     }
 
+    onTouchCancel(rawIdentifier: number): void {
+      // Don't do anything specific for canceled touches to avoid to make
+      // touches handling more complex for users.
+      this.onTouchEnd(rawIdentifier);
+    }
+
     _removeTouch(publicIdentifier: number): void {
       this._endedTouches.push(publicIdentifier);
       if (this._mouseOrTouches.containsKey(publicIdentifier)) {

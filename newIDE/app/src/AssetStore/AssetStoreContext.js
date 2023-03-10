@@ -112,8 +112,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   },
   navigationState: {
     getCurrentPage: () => assetStoreHomePageState,
-    backToPreviousPage: () => {},
-    openHome: () => {},
+    backToPreviousPage: () => assetStoreHomePageState,
+    openHome: () => assetStoreHomePageState,
     clearHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},

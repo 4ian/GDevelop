@@ -13,7 +13,7 @@ export default class FpsLimiter {
   _idleFps: number;
   _lastInteractionTime: number;
 
-  constructor({ idleFps, maxFps }: { idleFps: number, maxFps: number }) {
+  constructor({ idleFps, maxFps }: {| idleFps: number, maxFps: number |}) {
     this._maxFps = maxFps;
     this._idleFps = idleFps;
     this._lastFrameTime = Date.now();

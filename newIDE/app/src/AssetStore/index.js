@@ -49,7 +49,11 @@ import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
-import { isHomePage, isSearchResultPage } from './AssetStoreNavigator';
+import {
+  isHomePage,
+  isSearchResultPage,
+  type AssetStorePageState,
+} from './AssetStoreNavigator';
 import RaisedButton from '../UI/RaisedButton';
 import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
@@ -151,10 +155,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const isAssetDetailLoading = React.useRef<boolean>(
       openedAssetShortHeader != null
     );
-    const setScrollUpdateIsNeeded = React.useCallback(page => {
-      hasAppliedSavedScrollPosition.current = false;
-      isAssetDetailLoading.current = page.openedAssetShortHeader !== null;
-    }, []);
+    const setScrollUpdateIsNeeded = React.useCallback(
+      (page: AssetStorePageState) => {
+        hasAppliedSavedScrollPosition.current = false;
+        isAssetDetailLoading.current = page.openedAssetShortHeader !== null;
+      },
+      []
+    );
 
     const canShowFiltersPanel =
       !openedAssetShortHeader && // Don't show filters on asset page.

@@ -104,17 +104,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       assetFiltersState,
       assetPackRandomOrdering,
     } = React.useContext(AssetStoreContext);
+    const currentPage = navigationState.getCurrentPage();
     const {
       openedAssetPack,
       openedAssetShortHeader,
       openedAssetCategory,
       openedPrivateAssetPackListingData,
       filtersState,
-    } = navigationState.getCurrentPage();
-    const isOnHomePage = isHomePage(navigationState.getCurrentPage());
-    const isOnSearchResultPage = isSearchResultPage(
-      navigationState.getCurrentPage()
-    );
+    } = currentPage;
+    const isOnHomePage = isHomePage(currentPage);
+    const isOnSearchResultPage = isSearchResultPage(currentPage);
     const searchBar = React.useRef<?SearchBarInterface>(null);
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
@@ -152,14 +151,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const isAssetDetailLoading = React.useRef<boolean>(
       openedAssetShortHeader != null
     );
-    const setScrollUpdateIsNeeded = React.useCallback(
-      () => {
-        hasAppliedSavedScrollPosition.current = false;
-        isAssetDetailLoading.current =
-          navigationState.getCurrentPage().openedAssetShortHeader != null;
-      },
-      [navigationState]
-    );
+    const setScrollUpdateIsNeeded = React.useCallback(page => {
+      hasAppliedSavedScrollPosition.current = false;
+      isAssetDetailLoading.current = page.openedAssetShortHeader !== null;
+    }, []);
 
     const canShowFiltersPanel =
       !openedAssetShortHeader && // Don't show filters on asset page.
@@ -184,9 +179,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         if (!scrollView) {
           return;
         }
-        navigationState.getCurrentPage().scrollPosition = scrollView.getScrollPosition();
+        currentPage.scrollPosition = scrollView.getScrollPosition();
       },
-      [getScrollView, navigationState]
+      [getScrollView, currentPage]
     );
     // This is also called when the asset detail page has loaded.
     const applyBackScrollPosition = React.useCallback(
@@ -198,7 +193,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         if (!scrollView) {
           return;
         }
-        const scrollPosition = navigationState.getCurrentPage().scrollPosition;
+        const scrollPosition = currentPage.scrollPosition;
         if (scrollPosition) scrollView.scrollToPosition(scrollPosition);
         // If no saved scroll position, force scroll to 0 in case the displayed component
         // is the same as the previous page so the scroll is naturally kept between pages
@@ -206,7 +201,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         else scrollView.scrollToPosition(0);
         hasAppliedSavedScrollPosition.current = true;
       },
-      [getScrollView, navigationState]
+      [getScrollView, currentPage]
     );
 
     React.useImperativeHandle(ref, () => ({
@@ -342,7 +337,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       () => {
         if (!purchasingPrivateAssetPackListingData) return;
         // Ensure the user is not already on the pack page, to trigger the effect only once.
-        const currentPage = navigationState.getCurrentPage();
         const isOnPrivatePackPage =
           currentPage.openedAssetPack &&
           currentPage.openedAssetPack.id &&
@@ -365,6 +359,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         receivedAssetPacks,
         purchasingPrivateAssetPackListingData,
         navigationState,
+        currentPage,
         saveScrollPosition,
         setSearchText,
         openFiltersPanelIfAppropriate,
@@ -483,8 +478,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             tooltip={t`Back to discover`}
             onClick={() => {
               setSearchText('');
-              navigationState.openHome();
-              setScrollUpdateIsNeeded();
+              const page = navigationState.openHome();
+              setScrollUpdateIsNeeded(page);
               clearAllFilters(assetFiltersState);
               setIsFiltersPanelOpen(false);
             }}
@@ -538,8 +533,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     label={<Trans>Back</Trans>}
                     primary={false}
                     onClick={() => {
-                      navigationState.backToPreviousPage();
-                      setScrollUpdateIsNeeded();
+                      const page = navigationState.backToPreviousPage();
+                      setScrollUpdateIsNeeded(page);
                     }}
                   />
                 </Column>

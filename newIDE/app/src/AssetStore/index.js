@@ -145,6 +145,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
+    const [
+      isAudioArchiveUrlLoading,
+      setIsAudioArchiveUrlLoading,
+    ] = React.useState(false);
 
     // The saved scroll position must not be reset by a scroll event until it
     // has been applied.
@@ -410,12 +414,21 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         return (
           <RaisedButton
             primary
-            label={<Trans>Download pack sounds</Trans>}
+            label={
+              isAudioArchiveUrlLoading ? (
+                <Trans>Loading...</Trans>
+              ) : (
+                <Trans>Download pack sounds</Trans>
+              )
+            }
             icon={<Music />}
+            disabled={isAudioArchiveUrlLoading}
             onClick={async () => {
+              setIsAudioArchiveUrlLoading(true);
               const url = await getPrivateAssetPackAudioArchiveUrl(
                 assetPack.id
               );
+              setIsAudioArchiveUrlLoading(false);
               if (!url) {
                 console.error(
                   `Could not generate url for premium asset pack with name ${
@@ -429,7 +442,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           />
         );
       },
-      [getPrivateAssetPackAudioArchiveUrl]
+      [getPrivateAssetPackAudioArchiveUrl, isAudioArchiveUrlLoading]
     );
 
     React.useEffect(

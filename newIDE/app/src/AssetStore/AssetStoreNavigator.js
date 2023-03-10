@@ -20,8 +20,8 @@ export type AssetStorePageState = {|
 
 export type NavigationState = {|
   getCurrentPage: () => AssetStorePageState,
-  backToPreviousPage: () => void,
-  openHome: () => void,
+  backToPreviousPage: () => AssetStorePageState,
+  openHome: () => AssetStorePageState,
   clearHistory: () => void,
   openSearchResultPage: () => void,
   openTagPage: string => void,
@@ -91,13 +91,21 @@ export const useNavigation = (): NavigationState => {
       getCurrentPage: () => previousPages[previousPages.length - 1],
       backToPreviousPage: () => {
         if (previousPages.length > 1) {
+          const newPreviousPages = previousPages.slice(
+            0,
+            previousPages.length - 1
+          );
+          const newCurrentPage = newPreviousPages[newPreviousPages.length - 1];
           setHistory({
             previousPages: previousPages.slice(0, previousPages.length - 1),
           });
+          return newCurrentPage;
         }
+        return previousPages[0];
       },
       openHome: () => {
         setHistory({ previousPages: [assetStoreHomePageState] });
+        return assetStoreHomePageState;
       },
       clearHistory: () => {
         setHistory(previousHistory => {

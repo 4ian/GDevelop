@@ -208,15 +208,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       onClose: saveScrollPosition,
     }));
 
-    React.useLayoutEffect(
-      () => {
-        if (!isAssetDetailLoading.current) {
-          applyBackScrollPosition();
-        }
-      },
-      [applyBackScrollPosition]
-    );
-
     const onOpenDetails = React.useCallback(
       (assetShortHeader: AssetShortHeader) => {
         const assetPackName = openedAssetPack ? openedAssetPack.name : null;
@@ -438,14 +429,22 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     React.useLayoutEffect(
       () => {
-        if (isOnHomePage) {
-          clearAllFilters(assetFiltersState);
-          setIsFiltersPanelOpen(false);
-        }
+        // When going back to the homepage from a page where the asset filters
+        // were open, we must first close the panel and then apply the scroll position.
+        const applyEffect = async () => {
+          if (isOnHomePage) {
+            clearAllFilters(assetFiltersState);
+            await setIsFiltersPanelOpen(false);
+          }
+          if (!isAssetDetailLoading.current) {
+            applyBackScrollPosition();
+          }
+        };
+        applyEffect();
       },
       // assetFiltersState is not stable, so don't list it.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [isOnHomePage]
+      [isOnHomePage, applyBackScrollPosition]
     );
 
     const privateAssetPackFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(

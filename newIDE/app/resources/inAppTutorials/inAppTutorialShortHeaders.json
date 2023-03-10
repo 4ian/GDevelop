@@ -1,5 +1,17 @@
 [
   {
+    "id": "cameraParallax",
+    "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/cameraParallax.json",
+    "availableLocales": ["en", "fr", "es", "pt"],
+    "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/cameraParallax/game.json",
+    "initialProjectData": {
+      "cameraScene": "CameraScene",
+      "player": "PlayerObject",
+      "farBackground": "FarBackground",
+      "midBackground": "MidBackground"
+    }
+  },
+  {
     "id": "flingGame",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/flingGame.json",
     "availableLocales": ["en", "fr-FR"]
@@ -7,7 +19,7 @@
   {
     "id": "plinkoMultiplier",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/plinkoMultiplier.json",
-    "availableLocales": ["en"],
+    "availableLocales": ["en", "fr", "es", "pt"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/plinkoMultiplier/game.json",
     "initialProjectData": {
       "gameScene": "GameScene",

@@ -2,17 +2,18 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
-import FlatButton from '../../UI/FlatButton';
-import { Line, Column } from '../../UI/Grid';
-import { ColumnStackLayout } from '../../UI/Layout';
-import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
-import { getLanguageLabelForLocale } from '../../Utils/i18n/MessageByLocale';
-import Text from '../../UI/Text';
+import Dialog, { DialogPrimaryButton } from '../../../../UI/Dialog';
+import FlatButton from '../../../../UI/FlatButton';
+import { Line, Column } from '../../../../UI/Grid';
+import { ColumnStackLayout } from '../../../../UI/Layout';
+import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import { getLanguageLabelForLocale } from '../../../../Utils/i18n/MessageByLocale';
+import Text from '../../../../UI/Text';
 import {
   FLING_GAME_IN_APP_TUTORIAL_ID,
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-} from '../../Utils/GDevelopServices/InAppTutorial';
+  CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+} from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const styles = {
   imgContainer: {
@@ -29,52 +30,73 @@ type Props = {|
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
 
+const fullTutorialContent = (
+  <>
+    <Text>
+      <Trans>
+        You're about to start the first chapter of this guided lesson.
+      </Trans>
+    </Text>
+    <Text>
+      <Trans>
+        GDevelop will save your progress so you can take a break when you need
+        it.
+      </Trans>
+    </Text>
+  </>
+);
+
+const getGuidedLessonContent = ({
+  learningKeys,
+}: {
+  learningKeys: React.Node[],
+}) => (
+  <>
+    <Text>
+      <Trans>You're about to start this guided lesson.</Trans>
+    </Text>
+    <Text>
+      <Trans>
+        A new project will be opened, so before beginning please ensure you have
+        closed and saved your current project.
+      </Trans>
+    </Text>
+    <Text>
+      <Trans>In this tutorial you will learn:</Trans>
+    </Text>
+    {learningKeys.map((learningKey, index) => (
+      <Text displayAsListItem noMargin key={index}>
+        {learningKey}
+      </Text>
+    ))}
+  </>
+);
+
 const titleAndContentByKey = {
   [FLING_GAME_IN_APP_TUTORIAL_ID]: {
     title: <Trans>Let's make a Fling Game</Trans>,
-    content: (
-      <>
-        <Text>
-          <Trans>
-            You're about to start the first chapter of this guided lesson.
-          </Trans>
-        </Text>
-        <Text>
-          <Trans>
-            GDevelop will save your progress so you can take a break when you
-            need it.
-          </Trans>
-        </Text>
-      </>
-    ),
+    content: fullTutorialContent,
   },
   [PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID]: {
     title: <Trans>Let's improve a scoring system</Trans>,
-    content: (
-      <>
-        <Text>
-          <Trans>You're about to start this guided lesson.</Trans>
-        </Text>
-        <Text>
-          <Trans>
-            A new project will be opened, so before beginning please ensure you
-            have closed and saved your current project.
-          </Trans>
-        </Text>
-        <Text>
-          <Trans>In this tutorial you will learn:</Trans>
-        </Text>
-        <Text displayAsListItem noMargin>
-          Making objects disappear or appear when colliding
-        </Text>
-        <Text displayAsListItem noMargin>
-          Creating, modifying and accessing a scene variable
-        </Text>
-        <Text displayAsListItem noMargin>
-          Updating a score accordingly
-        </Text>
-      </>
-    ),
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Making objects disappear or appear when colliding</Trans>,
+        <Trans>Creating, modifying and accessing a scene variable</Trans>,
+        <Trans>Updating a score accordingly</Trans>,
+      ],
+    }),
+  },
+  [CAMERA_PARALLAX_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's improve the camera and the background</Trans>,
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Add a background with parallax effect</Trans>,
+        <Trans>Add a new layer</Trans>,
+        <Trans>Add an extension</Trans>,
+        <Trans>Use basic camera movements to follow the player</Trans>,
+      ],
+    }),
   },
 };
 

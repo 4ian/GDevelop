@@ -100,7 +100,7 @@ const LayerRow = ({
                 <TreeTableRow id={id}>
                   <TreeTableCell>
                     {connectDragSource(
-                      <span>
+                      <span id="layer-drag-handle">
                         <DragHandle />
                       </span>
                     )}
@@ -117,6 +117,9 @@ const LayerRow = ({
                         checked={isSelected}
                         onChange={onSelect}
                         size="small"
+                        id={`layer-selected-${
+                          isSelected ? 'checked' : 'unchecked'
+                        }`}
                       />
                     </Tooltip>
                   </TreeTableCell>

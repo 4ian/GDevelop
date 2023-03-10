@@ -132,33 +132,17 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     });
   };
 
+  // This URL is only valid for a limited time, so this function needs to be called
+  // every time the user wants to download the audio files.
   const getPrivateAssetPackAudioArchiveUrl = async (
     privateAssetPackId: string
   ): Promise<string | null> => {
     if (!profile) return null;
-    const userId = profile.id;
 
-    let token =
-      authorizationToken || (await fetchAuthorizationToken(profile.id));
+    // Always fetch a new token, as the URL is only valid for a limited time.
+    const token = await fetchAuthorizationToken(profile.id);
 
-    try {
-      const url = getPrivateAssetPackAudioFilesArchiveUrl(
-        privateAssetPackId,
-        token
-      );
-      return url;
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // If the token is expired, fetch a new one and try again.
-        token = await fetchAuthorizationToken(userId);
-        const url = getPrivateAssetPackAudioFilesArchiveUrl(
-          privateAssetPackId,
-          token
-        );
-        return url;
-      }
-      throw error;
-    }
+    return getPrivateAssetPackAudioFilesArchiveUrl(privateAssetPackId, token);
   };
 
   return (

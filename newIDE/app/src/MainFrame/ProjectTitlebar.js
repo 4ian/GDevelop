@@ -42,6 +42,9 @@ const ProjectTitlebar = React.memo<Props>(
     React.useEffect(
       () => {
         const title = [
+          // On desktop app, this title is used to know if the user is focused on the
+          // main window (IDE) or on another window (preview or external editor).
+          // Should this be changed, you should also change ElectronMainMenu.js
           'GDevelop 5',
           projectIdentifier ? `${projectIdentifier}${suffix}` : '',
           storageProviderName,

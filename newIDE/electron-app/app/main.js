@@ -227,7 +227,7 @@ app.on('ready', function() {
       }, 300)
     ).then(
       () => {
-        log.info('Local file upload succesfully done');
+        log.info('Local file upload successfully done');
         event.sender.send('local-file-upload-done', null);
       },
       uploadError => {

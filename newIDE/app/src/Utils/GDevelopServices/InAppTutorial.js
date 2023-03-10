@@ -15,6 +15,7 @@ const app = remote ? remote.app : null;
 export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
 export const CAMERA_PARALLAX_IN_APP_TUTORIAL_ID = 'cameraParallax';
+export const HEALTH_BAR_IN_APP_TUTORIAL_ID = 'healthBar';
 
 export type InAppTutorialShortHeader = {|
   id: string,
@@ -187,4 +188,5 @@ export const isMiniTutorial = (tutorialId: string) =>
   [
     PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
     CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+    HEALTH_BAR_IN_APP_TUTORIAL_ID,
   ].includes(tutorialId);

@@ -293,6 +293,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           });
 
           setSearchText('');
+          saveScrollPosition();
           navigationState.openPrivateAssetPackInformationPage(
             assetPackListingData
           );

@@ -97,7 +97,7 @@ export const useNavigation = (): NavigationState => {
           );
           const newCurrentPage = newPreviousPages[newPreviousPages.length - 1];
           setHistory({
-            previousPages: previousPages.slice(0, previousPages.length - 1),
+            previousPages: newPreviousPages,
           });
           return newCurrentPage;
         }

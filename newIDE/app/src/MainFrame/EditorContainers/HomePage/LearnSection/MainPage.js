@@ -29,7 +29,7 @@ import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import MiniInAppTutorials from '../GetStartedSection/MiniInAppTutorials';
+import GuidedLessons from '../InAppTutorials/GuidedLessons';
 
 const useStyles = makeStyles({
   tile: {
@@ -206,7 +206,7 @@ const MainPage = ({
           <Text noMargin size="section-title">
             <Trans>Guided lessons</Trans>
           </Text>
-          <MiniInAppTutorials selectInAppTutorial={selectInAppTutorial} />
+          <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
         </SectionRow>
       )}
       <>

@@ -13,8 +13,12 @@ import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
 import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
 import PlaceholderError from '../../../../UI/PlaceholderError';
-import { PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
-import MultiplierScore from './MultiplierScore';
+import {
+  PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+} from '../../../../Utils/GDevelopServices/InAppTutorial';
+import MultiplierScore from './Icons/MultiplierScore';
+import Parallax from './Icons/Parallax';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
@@ -52,7 +56,7 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
     InAppTutorialContext
   );
 
-  const miniInAppTutorialCards = [
+  const guidedLessonCards = [
     {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
       title: t`Add score multiplier`,
@@ -64,6 +68,19 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
       ],
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
+    },
+    {
+      id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+      title: t`Improve background and camera`,
+      description: t`Learn how to create a parallax background as well as a camera that follows the player.`,
+      keyPoints: [
+        t`Add an extension`,
+        t`Add a layer`,
+        t`Use a tiled sprite`,
+        t`Control the camera`,
+      ],
+      durationInMinutes: 2,
+      renderImage: props => <Parallax {...props} />,
     },
   ];
 
@@ -86,7 +103,7 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
             cellHeight="auto"
             spacing={ITEMS_SPACING * 2}
           >
-            {miniInAppTutorialCards.map(item => (
+            {guidedLessonCards.map(item => (
               <GridListTile key={item.id}>
                 <InAppTutorialPhaseCard
                   title={item.title}

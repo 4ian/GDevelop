@@ -22,16 +22,16 @@ import Window from '../../../../Utils/Window';
 import { type HomeTab } from '../HomePageMenu';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import { CardWidget, LARGE_WIDGET_SIZE } from '../CardWidget';
-import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
-import Unboxing from './Unboxing';
-import Building from './Building';
-import Podium from './Podium';
+import InAppTutorialPhaseCard from '../InAppTutorials/InAppTutorialPhaseCard';
+import GuidedLessons from '../InAppTutorials/GuidedLessons';
+import Unboxing from '../InAppTutorials/Icons/Unboxing';
+import Building from '../InAppTutorials/Icons/Building';
+import Podium from '../InAppTutorials/Icons/Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import optionalRequire from '../../../../Utils/OptionalRequire';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
-import MiniInAppTutorials from './MiniInAppTutorials';
 const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
@@ -246,7 +246,7 @@ const GetStartedSection = ({
     >
       {shouldShowInAppTutorialButtons && (
         <SectionRow>
-          <MiniInAppTutorials selectInAppTutorial={selectInAppTutorial} />
+          <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
         </SectionRow>
       )}
       {shouldShowInAppTutorialButtons && (

@@ -1938,7 +1938,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
         expect(behavior.isJumping()).to.be(true);
         expect(behavior.getCurrentSpeed()).to.be.greaterThan(100);
-        console.log(object.getX() + ' ' + object.getY());
       }
 
       // Land on the slope and keep the speed.
@@ -1946,7 +1945,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene.renderAndStep(1000 / 60);
       expect(behavior.isOnFloor()).to.be(true);
       expect(behavior.getCurrentSpeed()).to.be.greaterThan(100);
-      console.log(object.getX() + ' ' + object.getY());
     });
   });
 });

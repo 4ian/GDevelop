@@ -297,26 +297,25 @@ namespace gdjs {
       this._moveY();
 
       //3) Update the current floor data for the next tick:
-      //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       const beforeLastTransitionYState = this._state;
+      //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
       }
 
-      // When the character is against a wall and the player hold left or
-      // right, the speed shouldn't stack because starting at full speed when
-      // jumping over the wall would look strange.
-      //
-      // When the state has change, the collision is probably a landing or a
-      // collision from the floor when stating to jump. The speed must not be
-      // lost in these cases.
-      // When the character is on the floor, it will try to walk on the obstacles
-      // and already stop if necessary.
       if (
+        // When the character is against a wall and the player hold left or
+        // right, the speed shouldn't stack because starting at full speed when
+        // jumping over the wall would look strange.
         mayCollideWall &&
+        // Whereas, when the state has change, the collision is probably a
+        // landing or a collision from the floor when stating to jump. The
+        // speed must not be lost in these cases.
         this._state === beforeMovingXState &&
         this._state === beforeMovingYState &&
         this._state === beforeLastTransitionYState &&
+        // When the character is on the floor, it will try to walk on the
+        // obstacles and already stop if necessary.
         this._state !== this._onFloor
       ) {
         this._currentSpeed = 0;

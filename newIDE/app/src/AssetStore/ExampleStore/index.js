@@ -18,9 +18,13 @@ export const prepareExamples = (
   examples: Array<ExampleShortHeader>
 ): Array<ExampleShortHeader> =>
   examples.sort((example1, example2) => {
-    let difference =
-      (example2.tags.includes('Starter') ? 1 : 0) -
-      (example1.tags.includes('Starter') ? 1 : 0);
+    const isExample1Starter = example1.tags.includes('Starter');
+    const isExample2Starter = example2.tags.includes('Starter');
+    // Don't change starters order.
+    if (isExample1Starter && isExample2Starter) {
+      return 0;
+    }
+    let difference = (isExample2Starter ? 1 : 0) - (isExample1Starter ? 1 : 0);
     if (difference) {
       return difference;
     }

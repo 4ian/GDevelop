@@ -622,6 +622,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               spacing={8}
               renderSearchItem={(assetShortHeader, size) => (
                 <AssetCard
+                  id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
                   size={size}
                   onOpenDetails={() => onOpenDetails(assetShortHeader)}
                   assetShortHeader={assetShortHeader}

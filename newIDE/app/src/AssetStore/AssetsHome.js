@@ -384,7 +384,11 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       : null;
 
     return (
-      <ScrollView ref={scrollView}>
+      <ScrollView
+        ref={scrollView}
+        id="asset-store-home"
+        data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
+      >
         {openedAssetCategory ? null : (
           <>
             <Column>

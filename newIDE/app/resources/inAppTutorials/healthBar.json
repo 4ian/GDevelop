@@ -35,8 +35,8 @@
       },
       {
         "messageByLocale": {
-          "en": "- How to create a layer\n\n- How to add a prefab to your scene",
-          "fr": "- Comment créer un calque\n\n- Comment ajouter un objet préfabriqué à votre scène"
+          "en": "- How to create a layer\n\n- How to add and use a prefab object",
+          "fr": "- Comment créer un calque\n\n- Comment ajouter et utiliser un objet préfabriqué"
         }
       },
       {
@@ -101,9 +101,26 @@
       "isOnClosableDialog": true
     },
     {
+      "elementToHighlightId": "#asset-store #home-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#asset-store-home[data-is-filtered=\"false\"]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's go back to the store home page.",
+            "fr-FR": "Retournons à la page d'accueil du magasin."
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
       "elementToHighlightId": "#asset-pack-category-prefab",
       "nextStepTrigger": {
-        "presenceOfElement": "#asset-pack-resource-bars"
+        "presenceOfElement": "#asset-store-home[data-is-filtered=\"true\"] #asset-pack-resource-bars"
       },
       "placement": "bottom",
       "tooltip": {
@@ -117,7 +134,7 @@
       "isOnClosableDialog": true
     },
     {
-      "elementToHighlightId": "#asset-pack-resource-bars",
+      "elementToHighlightId": "#asset-store-home[data-is-filtered=\"true\"] #asset-pack-resource-bars",
       "nextStepTrigger": {
         "presenceOfElement": "#asset-card-Flat-Heart-Bar"
       },

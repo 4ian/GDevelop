@@ -479,6 +479,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
         <LineStackLayout>
           <IconButton
+            id="home-button"
             key="back-discover"
             tooltip={t`Back to discover`}
             onClick={() => {

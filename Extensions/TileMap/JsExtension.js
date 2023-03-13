@@ -81,9 +81,9 @@ const defineTileMap = function (
         .addExtraInfo('json')
         .setLabel(_('Tilemap file (Tiled or LDtk)'))
         .setDescription(
-          _('This is the file that was saved or exported from Tiled/LDtk.')
+          _('This is the file that was saved or exported from Tiled or LDtk.')
         )
-        .setGroup(_('LDtk and Tiled: Tilemap'))
+        .setGroup(_('LDtk or Tiled'))
     );
     objectProperties.set(
       'tilesetJsonFile',
@@ -94,10 +94,10 @@ const defineTileMap = function (
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(
           _(
-            "Tiled only - not useful for LDtk files. Optional: specify this if you've saved the tileset in a different file as the Tiled tilemap."
+            "Optional: specify this if you've saved the tileset in a different file as the Tiled tilemap."
           )
         )
-        .setGroup(_('Tiled only: Tileset and Atlas image'))
+        .setGroup(_('Tiled only'))
     );
     objectProperties.set(
       'tilemapAtlasImage',
@@ -107,10 +107,10 @@ const defineTileMap = function (
         .setLabel(_('Atlas image'))
         .setDescription(
           _(
-            'Tiled only - not useful for LDtk files. The Atlas image containing the tileset.'
+            'The Atlas image containing the tileset.'
           )
         )
-        .setGroup(_('Tiled only: Tileset and Atlas image'))
+        .setGroup(_('Tiled only'))
     );
     objectProperties.set(
       'displayMode',
@@ -656,6 +656,7 @@ const defineCollisionMask = function (
       'tilemapJsonFile',
       new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
         .setType('resource')
+        .addExtraInfo('tilemap')
         .addExtraInfo('json')
         .setLabel(_('Tilemap JSON file'))
         .setDescription(
@@ -668,6 +669,7 @@ const defineCollisionMask = function (
       'tilesetJsonFile',
       new gd.PropertyDescriptor(objectContent.tilesetJsonFile || '')
         .setType('resource')
+        .addExtraInfo('tileset')
         .addExtraInfo('json')
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(

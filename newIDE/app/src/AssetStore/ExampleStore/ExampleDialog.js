@@ -173,10 +173,10 @@ export function ExampleDialog({
         </ResponsiveLineStackLayout>
 
         {example && example.description && (
-          <>
+          <Column>
             <Divider />
             <MarkdownText source={example.description} isStandaloneText />
-          </>
+          </Column>
         )}
         {!example && error && (
           <PlaceholderError onRetry={loadExample}>

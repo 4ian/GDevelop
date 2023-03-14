@@ -43,6 +43,7 @@ namespace gdjs {
 
   /** Base64 encoded logo of GDevelop for the splash screen. */
   export let gdevelopLogo: string = '';
+  export let gdevelopLogoSmall: string = '';
 
   /**
    * Convert a RGB object to a Hex string.

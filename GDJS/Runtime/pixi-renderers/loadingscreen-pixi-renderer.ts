@@ -64,9 +64,13 @@ namespace gdjs {
         this._backgroundSprite.anchor.y = 0.5;
         this._loadingScreenContainer.addChild(this._backgroundSprite);
       }
+      const hasLowResolution =
+        this._pixiRenderer.width < 200 || this._pixiRenderer.height < 200;
 
       if (loadingScreenData.showGDevelopSplash) {
-        this._gdevelopLogoSprite = PIXI.Sprite.from(gdjs.gdevelopLogo);
+        this._gdevelopLogoSprite = hasLowResolution
+          ? PIXI.Sprite.from(gdjs.gdevelopLogoSmall)
+          : PIXI.Sprite.from(gdjs.gdevelopLogo);
         this._gdevelopLogoSprite.alpha = 0;
         this._gdevelopLogoSprite.anchor.x = 0.5;
         this._gdevelopLogoSprite.anchor.y = 0.5;
@@ -122,10 +126,10 @@ namespace gdjs {
         this._gdevelopLogoSprite.scale.x = scale;
         this._gdevelopLogoSprite.scale.y = scale;
 
-        // Give up trying to show the logo if the resolution is really too small.
-        // TODO: use a low resolution logo instead.
-        this._gdevelopLogoSprite.visible =
-          this._pixiRenderer.width > 200 && this._pixiRenderer.height > 200;
+        // // Give up trying to show the logo if the resolution is really too small.
+        // // TODO: use a low resolution logo instead.
+        // this._gdevelopLogoSprite.visible =
+        //   this._pixiRenderer.width > 200 && this._pixiRenderer.height > 200;
       }
     }
 

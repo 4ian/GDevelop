@@ -101,8 +101,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   } else {
     // Most of the time, we skip the logo and minimum duration so that
     // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen().ShowGDevelopLogoDuringLoadingScreen(false).SetMinDuration(
-        0);
+    exportedProject.GetLoadingScreen()
+        .ShowGDevelopLogoDuringLoadingScreen(false)
+        .SetMinDuration(0);
     exportedProject.GetWatermark().ShowGDevelopWatermark(false);
   }
 
@@ -308,16 +309,22 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     }
 
     // Splashscreen icon for Android 12+.
-    gd::String splashScreenIconFilename = getIconFilename("android", "windowSplashScreenAnimatedIcon");
+    gd::String splashScreenIconFilename =
+        getIconFilename("android", "windowSplashScreenAnimatedIcon");
     if (!splashScreenIconFilename.empty())
-      output += "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" value=\""
-        + splashScreenIconFilename + "\" />\n";
+      output +=
+          "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" "
+          "value=\"" +
+          splashScreenIconFilename + "\" />\n";
 
     // Splashscreen "branding" image for Android 12+.
-    gd::String splashScreenBrandingImageFilename = getIconFilename("android", "windowSplashScreenBrandingImage");
+    gd::String splashScreenBrandingImageFilename =
+        getIconFilename("android", "windowSplashScreenBrandingImage");
     if (!splashScreenBrandingImageFilename.empty())
-      output += "<preference name=\"AndroidWindowSplashScreenBrandingImage\" value=\""
-        + splashScreenBrandingImageFilename + "\" />\n";
+      output +=
+          "<preference name=\"AndroidWindowSplashScreenBrandingImage\" "
+          "value=\"" +
+          splashScreenBrandingImageFilename + "\" />\n";
 
     return output;
   };
@@ -621,12 +628,16 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
 
   if (gdevelopLogoStyle == "dark") {
     InsertUnique(includesFiles, "splash/gd-logo-dark.js");
+    InsertUnique(includesFiles, "splash/gd-logo-dark-small.js");
   } else if (gdevelopLogoStyle == "dark-colored") {
     InsertUnique(includesFiles, "splash/gd-logo-dark-colored.js");
+    InsertUnique(includesFiles, "splash/gd-logo-dark-small.js");
   } else if (gdevelopLogoStyle == "light-colored") {
     InsertUnique(includesFiles, "splash/gd-logo-light-colored.js");
+    InsertUnique(includesFiles, "splash/gd-logo-light-small.js");
   } else {
     InsertUnique(includesFiles, "splash/gd-logo-light.js");
+    InsertUnique(includesFiles, "splash/gd-logo-light-small.js");
   }
 
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
@@ -651,10 +662,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/CustomObjectPixiRenderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/DebuggerPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/CustomObjectPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");

@@ -81,7 +81,11 @@ const Toolbar = (props: Props) => {
           id="toolbar-open-objects-panel-button"
           onClick={props.toggleObjectsList}
           selected={props.isObjectsListShown}
-          tooltip={t`Open Objects Panel`}
+          tooltip={
+            props.isObjectGroupsListShown
+              ? t`Close Objects Panel`
+              : t`Open Objects Panel`
+          }
         >
           <ObjectIcon />
         </IconButton>
@@ -91,7 +95,11 @@ const Toolbar = (props: Props) => {
           id="toolbar-open-object-groups-panel-button"
           onClick={props.toggleObjectGroupsList}
           selected={props.isObjectGroupsListShown}
-          tooltip={t`Open Object Groups Panel`}
+          tooltip={
+            props.isObjectGroupsListShown
+              ? t`Close Object Groups Panel`
+              : t`Open Object Groups Panel`
+          }
         >
           <ObjectGroupIcon />
         </IconButton>
@@ -101,7 +109,11 @@ const Toolbar = (props: Props) => {
           id="toolbar-open-properties-panel-button"
           onClick={props.toggleProperties}
           selected={props.isPropertiesShown}
-          tooltip={t`Open Properties Panel`}
+          tooltip={
+            props.isPropertiesShown
+              ? t`Close Properties Panel`
+              : t`Open Properties Panel`
+          }
         >
           <EditIcon />
         </IconButton>
@@ -111,7 +123,11 @@ const Toolbar = (props: Props) => {
           id="toolbar-open-instances-list-panel-button"
           onClick={props.toggleInstancesList}
           selected={props.isInstancesListShown}
-          tooltip={t`Open Instances List Panel`}
+          tooltip={
+            props.isInstancesListShown
+              ? t`Close Instances List Panel`
+              : t`Open Instances List Panel`
+          }
         >
           <InstancesListIcon />
         </IconButton>
@@ -121,7 +137,11 @@ const Toolbar = (props: Props) => {
           id="toolbar-open-layers-panel-button"
           onClick={props.toggleLayersList}
           selected={props.isLayersListShown}
-          tooltip={t`Open Layers Panel`}
+          tooltip={
+            props.isLayersListShown
+              ? t`Close Layers Panel`
+              : t`Open Layers Panel`
+          }
         >
           <LayersIcon />
         </IconButton>

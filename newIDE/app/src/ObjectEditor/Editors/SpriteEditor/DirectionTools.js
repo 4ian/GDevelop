@@ -119,6 +119,7 @@ const DirectionTools = ({
           <ResponsiveLineStackLayout
             alignItems="center"
             justifyContent="flex-end"
+            noColumnMargin
           >
             <LineStackLayout noMargin>
               {!!imageResourceExternalEditors.length && (

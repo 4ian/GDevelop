@@ -5,7 +5,7 @@ import React from 'react';
 import { I18n } from '@lingui/react';
 import Timer from '@material-ui/icons/Timer';
 import TextButton from '../../../UI/TextButton';
-import Checkbox from '../../../UI/Checkbox';
+import InlineCheckbox from '../../../UI/InlineCheckbox';
 import Brush from '@material-ui/icons/Brush';
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import TextField from '../../../UI/TextField';
@@ -13,9 +13,12 @@ import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
-import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { Tooltip } from '@material-ui/core';
+import Text from '../../../UI/Text';
 
 const styles = {
   container: {
@@ -26,6 +29,7 @@ const styles = {
   },
   timeField: {
     width: 75,
+    fontSize: 14,
   },
   timeIcon: {
     paddingLeft: 6,
@@ -106,14 +110,19 @@ const DirectionTools = ({
   );
 
   const hasSprites = direction.getSpritesCount();
+  const windowWidth = useResponsiveWindowWidth();
 
   return (
     <I18n>
       {({ i18n }) => (
-        <div style={styles.container}>
-          <ResponsiveWindowMeasurer>
-            {windowWidth =>
-              !!imageResourceExternalEditors.length && (
+        <>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            justifyContent="flex-end"
+            noColumnMargin
+          >
+            <LineStackLayout noMargin>
+              {!!imageResourceExternalEditors.length && (
                 <TextButton
                   label={i18n._(
                     windowWidth === 'small'
@@ -129,34 +138,43 @@ const DirectionTools = ({
                     onEditWith(i18n, imageResourceExternalEditors[0])
                   }
                 />
-              )
-            }
-          </ResponsiveWindowMeasurer>
-          <TextButton
-            label={<Trans>Preview</Trans>}
-            icon={<PlayArrow />}
-            onClick={() => openPreview(true)}
-          />
-          <Timer style={styles.timeIcon} />
-          <TextField
-            value={timeBetweenFrames}
-            onChange={(e, text) => setTimeBetweenFrames(parseFloat(text) || 0)}
-            onBlur={() => saveTimeBetweenFrames()}
-            id="direction-time-between-frames"
-            margin="none"
-            style={styles.timeField}
-            type="number"
-            step={0.005}
-            precision={2}
-            min={0.01}
-            max={5}
-          />
-          <span style={styles.spacer} />
-          <Checkbox
-            checked={direction.isLooping()}
-            label={<Trans>Loop</Trans>}
-            onCheck={(e, check) => setLooping(check)}
-          />
+              )}
+              <TextButton
+                label={<Trans>Preview</Trans>}
+                icon={<PlayArrow />}
+                onClick={() => openPreview(true)}
+              />
+            </LineStackLayout>
+            <LineStackLayout noMargin alignItems="center">
+              <Tooltip title={<Trans>Time between frames</Trans>}>
+                <Timer style={styles.timeIcon} />
+              </Tooltip>
+              <TextField
+                value={timeBetweenFrames}
+                onChange={(e, text) =>
+                  setTimeBetweenFrames(parseFloat(text) || 0)
+                }
+                onBlur={() => saveTimeBetweenFrames()}
+                id="direction-time-between-frames"
+                margin="none"
+                style={styles.timeField}
+                type="number"
+                step={0.005}
+                precision={2}
+                min={0.01}
+                max={5}
+              />
+              <InlineCheckbox
+                checked={direction.isLooping()}
+                label={
+                  <Text size="body-small">
+                    <Trans>Loop</Trans>
+                  </Text>
+                }
+                onCheck={(e, check) => setLooping(check)}
+              />
+            </LineStackLayout>
+          </ResponsiveLineStackLayout>
           {previewOpen && (
             <Dialog
               title={<Trans>Preview {animationName}</Trans>}
@@ -190,7 +208,7 @@ const DirectionTools = ({
               />
             </Dialog>
           )}
-        </div>
+        </>
       )}
     </I18n>
   );

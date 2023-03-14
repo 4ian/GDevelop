@@ -1141,6 +1141,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         },
         { type: 'separator' },
         {
+          label: i18n._(t`Show/Hide instance properties`),
+          click: () => this.toggleProperties(),
+          enabled: this.instancesSelection.hasSelectedInstances(),
+        },
+        {
           label: i18n._(t`Delete`),
           click: () => this.deleteSelection(),
           enabled: this.instancesSelection.hasSelectedInstances(),

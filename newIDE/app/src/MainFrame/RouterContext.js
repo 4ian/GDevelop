@@ -2,12 +2,18 @@
 import * as React from 'react';
 import Window from '../Utils/Window';
 
-type Route = 'onboarding' | 'subscription' | 'games-dashboard' | 'asset-store';
+type Route =
+  | 'onboarding' // For compatibility when there was only one tutorial.
+  | 'guided-lesson' // New way of opening a tutorial.
+  | 'subscription'
+  | 'games-dashboard'
+  | 'asset-store';
 type RouteKey =
   | 'initial-dialog'
   | 'game-id'
   | 'games-dashboard-tab'
-  | 'asset-pack';
+  | 'asset-pack'
+  | 'tutorial-id';
 type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|

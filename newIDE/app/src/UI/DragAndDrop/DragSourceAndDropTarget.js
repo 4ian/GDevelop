@@ -9,16 +9,18 @@ import {
   type DropTargetMonitor,
   type DropTargetConnector,
   type ConnectDropTarget,
+  type ConnectDragPreview,
 } from 'react-dnd';
 
 type Props<DraggedItemType> = {|
-  children: ({
+  children: ({|
     connectDragSource: ConnectDragSource,
     connectDropTarget: ConnectDropTarget,
+    connectDragPreview: ConnectDragPreview,
     isOver: boolean,
     isOverLazy: boolean,
     canDrop: boolean,
-  }) => ?React.Node,
+  |}) => ?React.Node,
   beginDrag: () => DraggedItemType,
   canDrag?: (item: DraggedItemType) => boolean,
   canDrop: (item: DraggedItemType) => boolean,
@@ -28,6 +30,8 @@ type Props<DraggedItemType> = {|
 
 type DragSourceProps = {|
   connectDragSource: ConnectDragSource,
+  connectDragPreview: ConnectDragPreview,
+  isDragging: boolean,
 |};
 
 type DropTargetProps = {|
@@ -67,6 +71,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
   ): DragSourceProps {
     return {
       connectDragSource: connect.dragSource(),
+      connectDragPreview: connect.dragPreview(),
+      isDragging: monitor.isDragging(),
     };
   }
 
@@ -105,6 +111,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         children,
         connectDragSource,
         connectDropTarget,
+        connectDragPreview,
+        isDragging,
         isOver,
         isOverLazy,
         canDrop,
@@ -112,6 +120,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         return children({
           connectDragSource,
           connectDropTarget,
+          connectDragPreview,
+          isDragging,
           isOver,
           isOverLazy,
           canDrop,

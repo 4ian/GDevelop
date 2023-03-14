@@ -10,6 +10,7 @@ import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer'
 import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
 import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import { type DraggedItem } from '../../UI/DragAndDrop/CustomDragLayer';
 
 type Props<Item> = {|
   height: number,
@@ -118,12 +119,18 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       addNewItemId,
       renamedItem,
       getItemThumbnail,
+      getItemName,
       onAddNewItem,
       onMoveSelectionToItem,
       canMoveSelectionToItem,
       selectedItems,
     } = this.props;
     const { DragSourceAndDropTarget } = this;
+
+    // Create an empty pixel image once to override the default drag preview of all items.
+    const emptyImage = new Image();
+    emptyImage.src =
+      'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
     return (
       <ResponsiveWindowMeasurer>
@@ -168,10 +175,24 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                     <div style={style} key={key}>
                       <DragSourceAndDropTarget
                         beginDrag={() => {
-                          if (!isSelected) this.props.onItemSelected(item);
+                          // Ensure we reselect the item even if it's already selected.
+                          // This prevents a bug where the connected preview is not
+                          // updated when the item is already selected.
+                          this.props.onItemSelected(item);
 
+                          // We return the item name and thumbnail to be used by the
+                          // drag preview. We can't use the item itself because it's
+                          // not serializable and breaks react-dnd.
+                          const draggedItem: DraggedItem = {
+                            name: getItemName(item),
+                            thumbnail:
+                              this.props.reactDndType ===
+                                'GD_OBJECT_WITH_CONTEXT' && getItemThumbnail
+                                ? getItemThumbnail(item)
+                                : undefined,
+                          };
                           // $FlowFixMe
-                          return {};
+                          return draggedItem;
                         }}
                         canDrag={() => !nameBeingEdited}
                         canDrop={() =>
@@ -186,6 +207,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                         {({
                           connectDragSource,
                           connectDropTarget,
+                          connectDragPreview,
                           isOver,
                           canDrop,
                         }) => {
@@ -195,6 +217,12 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           // set the whole item to be draggable.
                           const canDragOnlyIcon =
                             screenType === 'touch' && !isSelected;
+
+                          // Connect the drag preview with an empty image to override the default
+                          // drag preview.
+                          connectDragPreview(emptyImage, {
+                            captureDraggingState: true,
+                          });
 
                           // Add an extra div because connectDropTarget/connectDragSource can
                           // only be used on native elements

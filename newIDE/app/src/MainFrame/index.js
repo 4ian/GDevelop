@@ -171,8 +171,8 @@ import {
 } from '../Utils/UseStableUpToDateCallback';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import {
-  FLING_GAME_IN_APP_TUTORIAL_ID,
   isMiniTutorial,
+  allInAppTutorialIds,
 } from '../Utils/GDevelopServices/InAppTutorial';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -542,8 +542,10 @@ const MainFrame = (props: Props) => {
   );
 
   useOpenInitialDialog({
-    openOnboardingDialog: () => {
-      selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
+    openInAppTutorialDialog: (tutorialId: string) => {
+      if (allInAppTutorialIds.includes(tutorialId)) {
+        selectInAppTutorial(tutorialId);
+      }
     },
     openProfileDialog,
   });

@@ -16,9 +16,11 @@ import PlaceholderError from '../../../../UI/PlaceholderError';
 import {
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+  HEALTH_BAR_IN_APP_TUTORIAL_ID,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
 import Parallax from './Icons/Parallax';
+import HealthBar from './Icons/HealthBar';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
@@ -81,6 +83,14 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
       ],
       durationInMinutes: 2,
       renderImage: props => <Parallax {...props} />,
+    },
+    {
+      id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
+      title: t`Display a Health bar for the player`,
+      description: t`Learn how to display the health of a player on the foreground.`,
+      keyPoints: [t`Add a layer`, t`Download and use a prefab`],
+      durationInMinutes: 2,
+      renderImage: props => <HealthBar {...props} />,
     },
   ];
 

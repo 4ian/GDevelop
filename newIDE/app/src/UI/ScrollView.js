@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import ReactDOM from 'react-dom';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 const styles = {
   container: {
@@ -10,6 +11,8 @@ const styles = {
 
 type Props = {|
   children: React.Node,
+  id?: string,
+  data?: HTMLDataset,
   /**
    * If true, scrollbar won't be shown if the content is not clipped.
    */
@@ -26,7 +29,7 @@ export type ScrollViewInterface = {|
 |};
 
 export default React.forwardRef<Props, ScrollViewInterface>(
-  ({ children, autoHideScrollbar, style, onScroll }: Props, ref) => {
+  ({ id, data, children, autoHideScrollbar, style, onScroll }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
       /**
@@ -97,6 +100,8 @@ export default React.forwardRef<Props, ScrollViewInterface>(
 
     return (
       <div
+        id={id}
+        {...dataObjectToProps(data)}
         style={{
           ...styles.container,
           overflowY: autoHideScrollbar ? 'auto' : 'scroll',

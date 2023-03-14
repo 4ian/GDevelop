@@ -4,6 +4,7 @@ import MuiPaper from '@material-ui/core/Paper';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 type Props = {|
+  id?: string,
   children: React.Node,
   elevation?: number,
   variant?: 'outlined',
@@ -16,6 +17,7 @@ type Props = {|
 |};
 
 const Paper = ({
+  id,
   children,
   background,
   elevation,
@@ -32,6 +34,7 @@ const Paper = ({
       : gdevelopTheme.paper.backgroundColor.light;
   return (
     <MuiPaper
+      id={id}
       variant={variant}
       elevation={elevation || 0}
       style={{

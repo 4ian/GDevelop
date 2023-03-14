@@ -59,6 +59,8 @@ export const getLanguageLabelForLocale = (locale: string): React.Node => {
       return <Trans>Slovene</Trans>;
     case 'si':
       return <Trans>Sinhala</Trans>;
+    case 'th':
+      return <Trans>Thai</Trans>;
     case 'tr':
       return <Trans>Turkish</Trans>;
     case 'uk':

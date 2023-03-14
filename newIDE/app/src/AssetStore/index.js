@@ -494,6 +494,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
         <LineStackLayout>
           <IconButton
+            id="home-button"
             key="back-discover"
             tooltip={t`Back to discover`}
             onClick={() => {
@@ -637,6 +638,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               spacing={8}
               renderSearchItem={(assetShortHeader, size) => (
                 <AssetCard
+                  id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
                   size={size}
                   onOpenDetails={() => onOpenDetails(assetShortHeader)}
                   assetShortHeader={assetShortHeader}

@@ -68,7 +68,11 @@ export const assetCategories = {
 };
 
 const styles = {
-  grid: { margin: '0 10px' },
+  grid: {
+    margin: '0 10px',
+    // Remove the scroll capability of the grid, the scroll view handles it.
+    overflow: 'unset',
+  },
   priceTagContainer: {
     position: 'absolute',
     top: 10,
@@ -132,7 +136,12 @@ const PublicAssetPackTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper elevation={2} style={styles.paper} background="light">
+      <Paper
+        id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
+        elevation={2}
+        style={styles.paper}
+        background="light"
+      >
         <CorsAwareImage
           key={assetPack.name}
           style={styles.previewImage}
@@ -212,12 +221,14 @@ export const PrivateAssetPackTile = ({
 };
 
 export const CategoryTile = ({
+  id,
   title,
   imageSource,
   imageAlt,
   onSelect,
   style,
 }: {|
+  id: string,
   title: React.Node,
   imageSource: string,
   imageAlt: string,
@@ -238,7 +249,7 @@ export const CategoryTile = ({
       style={style}
       onClick={onSelect}
     >
-      <Paper elevation={2} style={styles.paper} background="light">
+      <Paper id={id} elevation={2} style={styles.paper} background="light">
         <CorsAwareImage
           style={styles.previewImage}
           src={imageSource}
@@ -356,6 +367,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       // $FlowExpectedError - Object.entries does not infer well the type of the value.
       ([id, { title, imageSource, imageAlt }]) => (
         <CategoryTile
+          id={`asset-pack-category-${id.replace(/\s/g, '-')}`}
           key={id}
           imageSource={imageSource}
           imageAlt={imageAlt}
@@ -372,7 +384,11 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       : null;
 
     return (
-      <ScrollView ref={scrollView}>
+      <ScrollView
+        ref={scrollView}
+        id="asset-store-home"
+        data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
+      >
         {openedAssetCategory ? null : (
           <>
             <Column>

@@ -13,6 +13,7 @@ import {
   FLING_GAME_IN_APP_TUTORIAL_ID,
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+  HEALTH_BAR_IN_APP_TUTORIAL_ID,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const styles = {
@@ -95,6 +96,17 @@ const titleAndContentByKey = {
         <Trans>Add a new layer</Trans>,
         <Trans>Add an extension</Trans>,
         <Trans>Use basic camera movements to follow the player</Trans>,
+      ],
+    }),
+  },
+  [HEALTH_BAR_IN_APP_TUTORIAL_ID]: {
+    title: (
+      <Trans>Let's communicate to the player the remaining health points</Trans>
+    ),
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Add a new layer</Trans>,
+        <Trans>Use a prefab to display the player's health bar</Trans>,
       ],
     }),
   },

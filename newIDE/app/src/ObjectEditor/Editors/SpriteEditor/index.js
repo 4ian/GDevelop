@@ -38,6 +38,8 @@ import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -456,6 +458,8 @@ export default function SpriteEditor({
   ] = React.useState(false);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const windowWidth = useResponsiveWindowWidth();
+  const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
 
   return (
     <>
@@ -469,30 +473,47 @@ export default function SpriteEditor({
         onSizeUpdated={onSizeUpdated}
         onObjectUpdated={onObjectUpdated}
         extraBottomTools={
-          <ResponsiveLineStackLayout noMargin noColumnMargin>
-            <RaisedButton
-              label={<Trans>Edit collision masks</Trans>}
-              primary={false}
-              onClick={() => setCollisionMasksEditorOpen(true)}
-              disabled={spriteConfiguration.getAnimationsCount() === 0}
-            />
-            {!isAnimationListLocked && (
-              <RaisedButton
-                label={<Trans>Edit points</Trans>}
-                primary={false}
-                onClick={() => setPointsEditorOpen(true)}
-                disabled={spriteConfiguration.getAnimationsCount() === 0}
-              />
-            )}
-            {!isAnimationListLocked && (
+          windowWidth !== 'small' ? (
+            <ResponsiveLineStackLayout noMargin noColumnMargin>
               <FlatButton
-                label={<Trans>Advanced options</Trans>}
-                primary={false}
-                onClick={() => setAdvancedOptionsOpen(true)}
-                disabled={spriteConfiguration.getAnimationsCount() === 0}
+                label={<Trans>Edit collision masks</Trans>}
+                onClick={() => setCollisionMasksEditorOpen(true)}
+                disabled={hasNoAnimations}
               />
-            )}
-          </ResponsiveLineStackLayout>
+              {!isAnimationListLocked && (
+                <FlatButton
+                  label={<Trans>Edit points</Trans>}
+                  onClick={() => setPointsEditorOpen(true)}
+                  disabled={hasNoAnimations}
+                />
+              )}
+              {!isAnimationListLocked && (
+                <FlatButton
+                  label={<Trans>Advanced options</Trans>}
+                  onClick={() => setAdvancedOptionsOpen(true)}
+                  disabled={hasNoAnimations}
+                />
+              )}
+            </ResponsiveLineStackLayout>
+          ) : (
+            <FlatButtonWithSplitMenu
+              label={<Trans>Edit collision masks</Trans>}
+              onClick={() => setCollisionMasksEditorOpen(true)}
+              disabled={hasNoAnimations}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Edit points`),
+                  disabled: hasNoAnimations,
+                  click: () => setPointsEditorOpen(true),
+                },
+                {
+                  label: i18n._(t`Advanced options`),
+                  disabled: hasNoAnimations,
+                  click: () => setAdvancedOptionsOpen(true),
+                },
+              ]}
+            />
+          )
         }
       />
       {advancedOptionsOpen && (

@@ -17,6 +17,8 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { Tooltip } from '@material-ui/core';
+import Text from '../../../UI/Text';
 
 const styles = {
   container: {
@@ -27,6 +29,7 @@ const styles = {
   },
   timeField: {
     width: 75,
+    fontSize: 14,
   },
   timeIcon: {
     paddingLeft: 6,
@@ -141,8 +144,10 @@ const DirectionTools = ({
                 onClick={() => openPreview(true)}
               />
             </LineStackLayout>
-            <LineStackLayout noMargin>
-              <Timer style={styles.timeIcon} />
+            <LineStackLayout noMargin alignItems="center">
+              <Tooltip title={<Trans>Time between frames</Trans>}>
+                <Timer style={styles.timeIcon} />
+              </Tooltip>
               <TextField
                 value={timeBetweenFrames}
                 onChange={(e, text) =>
@@ -160,7 +165,11 @@ const DirectionTools = ({
               />
               <InlineCheckbox
                 checked={direction.isLooping()}
-                label={<Trans>Loop</Trans>}
+                label={
+                  <Text size="body-small">
+                    <Trans>Loop</Trans>
+                  </Text>
+                }
                 onCheck={(e, check) => setLooping(check)}
               />
             </LineStackLayout>

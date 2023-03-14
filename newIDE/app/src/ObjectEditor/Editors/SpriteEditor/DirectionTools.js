@@ -141,7 +141,7 @@ const DirectionTools = ({
                 onClick={() => openPreview(true)}
               />
             </LineStackLayout>
-            <LineStackLayout>
+            <LineStackLayout noMargin>
               <Timer style={styles.timeIcon} />
               <TextField
                 value={timeBetweenFrames}

@@ -27,7 +27,10 @@ import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import { ExternalEditorOpenedDialog } from '../../../UI/ExternalEditorOpenedDialog';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
 import { Column } from '../../../UI/Grid';
 const gd: libGDevelop = global.gd;
 
@@ -353,7 +356,7 @@ const SpritesList = ({
     );
 
   return (
-    <div>
+    <ColumnStackLayout noMargin>
       <DirectionTools
         animationName={animationName}
         direction={direction}
@@ -406,7 +409,7 @@ const SpritesList = ({
         </Column>
       </ResponsiveLineStackLayout>
       {externalEditorOpened && <ExternalEditorOpenedDialog />}
-    </div>
+    </ColumnStackLayout>
   );
 };
 

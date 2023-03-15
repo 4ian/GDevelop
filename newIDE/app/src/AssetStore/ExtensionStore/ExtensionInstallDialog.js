@@ -61,7 +61,7 @@ const ExtensionInstallDialog = ({
     extensionShortHeader.name
   );
   
-  
+  // Test if the local extension comes from the Asset Store
   const fromStore = alreadyInstalled ? project.getEventsFunctionsExtension(extensionShortHeader.name).getOriginName() === "gdevelop-extension-store" : false; 
   
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);

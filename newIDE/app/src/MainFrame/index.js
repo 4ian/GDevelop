@@ -681,6 +681,10 @@ const MainFrame = (props: Props) => {
       setPreviewState(initialPreviewState);
 
       console.info('Closing project...');
+      // TODO Remove this state
+      // Instead:
+      // - Move the EventsFunctionsExtensionsLoader to Core
+      // - Add a dirty flag system to refresh on demand.
       setIsProjectClosed(true);
 
       // While not strictly necessary, use `currentProjectRef` to be 100%

@@ -62,7 +62,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
     }
 
     return (
-      <Column noMargin expand>
+      <Column noMargin expand noOverflowParent>
         {transition && (
           <Background maxWidth noExpand noFullHeight>
             <Column>

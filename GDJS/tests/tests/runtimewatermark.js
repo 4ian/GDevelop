@@ -55,7 +55,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
       )
         throw new Error('Watermark DOM elements could not be found.');
       expect(watermark._linkElement.href).to.be(
-        'https://liluo.io/HelperWesley?utm_source=gdevelop-game&utm_medium=game-watermark&utm_campaign=project-uuid'
+        'https://gd.games/HelperWesley?utm_source=gdevelop-game&utm_medium=game-watermark&utm_campaign=project-uuid'
       );
       expect(watermark._containerElement.style.opacity).to.be('0');
       expect(watermark._backgroundElement.style.opacity).to.be('0');
@@ -146,7 +146,7 @@ describe('gdjs.RuntimeWatermark integration tests', () => {
         throw new Error('Watermark DOM elements could not be found.');
 
       expect(watermark._linkElement.href).to.be(
-        'https://liluo.io/?utm_source=gdevelop-game&utm_medium=game-watermark&utm_campaign=project-uuid'
+        'https://gd.games/?utm_source=gdevelop-game&utm_medium=game-watermark&utm_campaign=project-uuid'
       );
       expect(watermark._containerElement.style.opacity).to.be('0');
       expect(watermark._backgroundElement.style.opacity).to.be('0');

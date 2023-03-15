@@ -12,5 +12,5 @@ export default {
 };
 
 export const DefaultSocialShareButtons = () => (
-  <SocialShareButtons url={'https://liluo.io/username/game-slug'} />
+  <SocialShareButtons url={'https://gd.games/username/game-slug'} />
 );

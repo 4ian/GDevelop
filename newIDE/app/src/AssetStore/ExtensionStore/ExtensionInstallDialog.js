@@ -192,14 +192,16 @@ const ExtensionInstallDialog = ({
               <Trans>Version {' ' + extensionShortHeader.version}</Trans>
             </Text>
             <Line>
-              {extensionShortHeader.authors &&
-                extensionShortHeader.authors.map(author => (
-                  <UserPublicProfileChip
-                    user={author}
-                    key={author.id}
-                    isClickable
-                  />
-                ))}
+              <div style={{ flexWrap: 'wrap' }}>
+                {extensionShortHeader.authors &&
+                  extensionShortHeader.authors.map(author => (
+                    <UserPublicProfileChip
+                      user={author}
+                      key={author.id}
+                      isClickable
+                    />
+                  ))}
+              </div>
             </Line>
           </Column>
         </Line>

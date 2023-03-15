@@ -38,7 +38,7 @@ import { DragHandleIcon } from '../UI/DragHandle';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');

@@ -18,7 +18,11 @@ import Authentication, {
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
-import { sendSignupDone } from '../Utils/Analytics/EventSender';
+import {
+  onUserLogoutForAnalytics,
+  sendSignupDone,
+  identifyUserForAnalytics,
+} from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
@@ -26,11 +30,14 @@ import AuthenticatedUserContext, {
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
 import ChangeEmailDialog from './ChangeEmailDialog';
-import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
+import EmailVerificationDialog from './EmailVerificationDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import {
+  listUserCloudProjects,
+  type CloudProjectWithUserAccessInfo,
+} from '../Utils/GDevelopServices/Project';
 import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
 import {
   listReceivedAssetShortHeaders,
@@ -41,6 +48,7 @@ import AdditionalUserInfoDialog, {
 } from './AdditionalUserInfoDialog';
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
+import RequestDeduplicator from '../Utils/RequestDeduplicator';
 
 type Props = {|
   authentication: Authentication,
@@ -58,7 +66,11 @@ type State = {|
   additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
-  emailVerificationPendingDialogOpen: boolean,
+  emailVerificationDialogOpen: boolean,
+  emailVerificationDialogProps: {|
+    sendEmailAutomatically: boolean,
+    showSendEmailButton: boolean,
+  |},
   forgotPasswordInProgress: boolean,
   changeEmailDialogOpen: boolean,
   changeEmailInProgress: boolean,
@@ -80,7 +92,11 @@ export default class AuthenticatedUserProvider extends React.Component<
     additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
-    emailVerificationPendingDialogOpen: false,
+    emailVerificationDialogOpen: false,
+    emailVerificationDialogProps: {
+      sendEmailAutomatically: false,
+      showSendEmailButton: false,
+    },
     forgotPasswordInProgress: false,
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
@@ -88,19 +104,32 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutAdditionalInfo = false;
+  _hasNotifiedUserAboutEmailVerification = false;
 
-  componentDidMount() {
+  // Cloud projects are requested in 2 different places at app opening.
+  // - First one comes from user authenticating and automatically fetching
+  //   their cloud projects;
+  // - Second one comes from the homepage fetching the cloud projects regularly.
+  _cloudProjectListingDeduplicator = new RequestDeduplicator<
+    Array<CloudProjectWithUserAccessInfo>
+  >(listUserCloudProjects);
+
+  async componentDidMount() {
     this._resetAuthenticatedUser();
 
-    // Listen to when the user log out so that we reset the user profile.
+    // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
+    // So this is not called at the startup, but only when the user logs in or log out.
+
+    // Listen to when the user logs out.
+    // 1. Send this information to analytics, to reset the user being identified.
+    // 2. Fetch the user profile, which will reset the user to an unauthenticated state.
+    this.props.authentication.addUserLogoutListener(onUserLogoutForAnalytics);
     this.props.authentication.addUserLogoutListener(
       this._fetchUserProfileWithoutThrowingErrors
     );
 
     // When the authenticated user changes, we need to react accordingly
     // This can happen:
-    // - at the startup, because the authenticated Firebase user was not ready yet
-    //   when this component mounted. So we'll fetch the user profile.
     // - at the login, signup, profile edit. These methods are taking care of
     //   fetching the user profile by themselves, so they will disable the automatic
     //   refresh.
@@ -119,6 +148,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     });
 
+    // At startup, if the provider has mounted too late and the user is already logged in with Firebase,
+    // we fetch the user profile.
     if (this.props.authentication.getFirebaseUserSync()) {
       // The user is logged already: fetch its user profile (because the "user update"
       // won't trigger, as registered too late).
@@ -126,11 +157,12 @@ export default class AuthenticatedUserProvider extends React.Component<
         'Fetching user profile as authenticated user found at startup...'
       );
       this._automaticallyUpdateUserProfile = false;
-      this._fetchUserProfileWithoutThrowingErrors();
+      await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
-      // Don't do anything. Either no user is logged (nothing to do)
-      // or is being logged (the "user udpate" callback will trigger later).
+      // If the user is not logged, we still need to identify the user for analytics.
+      // But don't do anything else, the user is already logged or being logged.
+      identifyUserForAnalytics(this.state.authenticatedUser);
     }
   }
 
@@ -152,12 +184,25 @@ export default class AuthenticatedUserProvider extends React.Component<
         onSubscriptionUpdated: this._fetchUserSubscriptionLimitsAndUsages,
         onPurchaseSuccessful: this._fetchUserAssets,
         onSendEmailVerification: this._doSendEmailVerification,
+        onOpenEmailVerificationDialog: ({
+          sendEmailAutomatically,
+          showSendEmailButton,
+        }: {|
+          sendEmailAutomatically: boolean,
+          showSendEmailButton: boolean,
+        |}) =>
+          this.openEmailVerificationDialog({
+            open: true,
+            sendEmailAutomatically,
+            showSendEmailButton,
+          }),
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
       },
     }));
     this._hasNotifiedUserAboutAdditionalInfo = false;
+    this._hasNotifiedUserAboutEmailVerification = false;
   }
 
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
@@ -281,32 +326,34 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
-    listUserCloudProjects(
-      authentication.getAuthorizationHeader,
-      firebaseUser.uid
-    ).then(
-      cloudProjects =>
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjects,
-          },
-        })),
-      error => {
-        console.error('Error while loading user cloud projects:', error);
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjectsFetchingErrorLabel: (
-              <Trans>
-                We couldn't load your cloud projects. Verify your internet
-                connection or try again later.
-              </Trans>
-            ),
-          },
-        }));
-      }
-    );
+    this._cloudProjectListingDeduplicator
+      .launchRequestOrGetOngoingPromise([
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid,
+      ])
+      .then(
+        cloudProjects =>
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjects,
+            },
+          })),
+        error => {
+          console.error('Error while loading user cloud projects:', error);
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjectsFetchingErrorLabel: (
+                <Trans>
+                  We couldn't load your cloud projects. Verify your internet
+                  connection or try again later.
+                </Trans>
+              ),
+            },
+          }));
+        }
+      );
     listReceivedAssetPacks(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
@@ -359,17 +406,6 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     }
 
-    // If the user has not filled their additional information, show
-    // the dialog to fill it.
-    // Use a state value to show the dialog only once.
-    if (
-      userProfile &&
-      !this._hasNotifiedUserAboutAdditionalInfo &&
-      shouldAskForAdditionalUserInfo(userProfile)
-    ) {
-      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
-    }
-
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -377,6 +413,11 @@ export default class AuthenticatedUserProvider extends React.Component<
         loginState: 'done',
       },
     }));
+
+    // We call this function every time the user is fetched, as it will
+    // automatically prevent the event to be sent if the user attributes haven't changed.
+    identifyUserForAnalytics(this.state.authenticatedUser);
+    this._notifyUserAboutEmailVerificationAndAdditionalInfo();
   };
 
   _fetchUserSubscriptionLimitsAndUsages = async () => {
@@ -484,32 +525,34 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
 
-    listUserCloudProjects(
-      authentication.getAuthorizationHeader,
-      firebaseUser.uid
-    ).then(
-      cloudProjects =>
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjects,
-          },
-        })),
-      error => {
-        console.error('Error while loading user cloud projects:', error);
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            cloudProjectsFetchingErrorLabel: (
-              <Trans>
-                We couldn't load your cloud projects. Verify your internet
-                connection or try again later.
-              </Trans>
-            ),
-          },
-        }));
-      }
-    );
+    this._cloudProjectListingDeduplicator
+      .launchRequestOrGetOngoingPromise([
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid,
+      ])
+      .then(
+        cloudProjects =>
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjects,
+            },
+          })),
+        error => {
+          console.error('Error while loading user cloud projects:', error);
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              cloudProjectsFetchingErrorLabel: (
+                <Trans>
+                  We couldn't load your cloud projects. Verify your internet
+                  connection or try again later.
+                </Trans>
+              ),
+            },
+          }));
+        }
+      );
   };
 
   _fetchUserBadges = async () => {
@@ -525,6 +568,51 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading user badges:', error);
+    }
+  };
+
+  _notifyUserAboutEmailVerificationAndAdditionalInfo = () => {
+    const { profile } = this.state.authenticatedUser;
+    if (!profile) return;
+    // If the user has not verified their email when logging in we show a dialog to do so.
+    // - If they just registered, we don't send the email again as it will be sent automatically,
+    // nor do we show a button to send again.
+    // - If they are just logging in, we don't send the email but we show a button to send again.
+    // Use a boolean to show the dialog only once.
+    const accountAgeInMs = Date.now() - profile.createdAt;
+    const hasJustCreatedAccount = accountAgeInMs < 1000 * 10; // 10 seconds.
+    if (
+      this.state.authenticatedUser.firebaseUser &&
+      !this.state.authenticatedUser.firebaseUser.emailVerified &&
+      !this._hasNotifiedUserAboutEmailVerification
+    ) {
+      setTimeout(
+        () =>
+          this.openEmailVerificationDialog({
+            open: true,
+            sendEmailAutomatically: false,
+            showSendEmailButton: !hasJustCreatedAccount,
+          }),
+        1000
+      );
+    } else {
+      // If the user has not filled additional info, we show a dialog to do so.
+      this._notifyUserAboutAdditionalInfo();
+    }
+  };
+
+  _notifyUserAboutAdditionalInfo = () => {
+    const profile = this.state.authenticatedUser.profile;
+    if (!profile) return;
+    // If the user has not filled their additional information, show
+    // the dialog to fill it, but ensure they have closed the email verification dialog first.
+    // Use a boolean to show the dialog only once.
+    if (
+      profile &&
+      !this._hasNotifiedUserAboutAdditionalInfo &&
+      shouldAskForAdditionalUserInfo(profile)
+    ) {
+      setTimeout(() => this.openAdditionalUserInfoDialog(true), 1000);
     }
   };
 
@@ -704,7 +792,6 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!authentication) return;
 
     await authentication.sendFirebaseEmailVerification();
-    this.openEmailVerificationPendingDialog(true);
   };
 
   _doAcceptGameStatsEmail = async () => {
@@ -755,10 +842,28 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = true;
   };
 
-  openEmailVerificationPendingDialog = (open: boolean = true) => {
+  openEmailVerificationDialog = ({
+    open = true,
+    sendEmailAutomatically = false,
+    showSendEmailButton = false,
+  }: {|
+    open?: boolean,
+    sendEmailAutomatically?: boolean,
+    showSendEmailButton?: boolean,
+  |}) => {
     this.setState({
-      emailVerificationPendingDialogOpen: open,
+      emailVerificationDialogOpen: open,
+      emailVerificationDialogProps: {
+        sendEmailAutomatically: open ? sendEmailAutomatically : false, // reset to false when closing dialog.
+        showSendEmailButton: open ? showSendEmailButton : false, // reset to false when closing dialog.
+      },
     });
+    // We save the fact that the user has seen the dialog when they close it.
+    // And we show them the additional info dialog if they haven't seen it yet.
+    if (!open) {
+      this._hasNotifiedUserAboutEmailVerification = true;
+      this._notifyUserAboutAdditionalInfo();
+    }
   };
 
   openResetPassword = (open: boolean = true) => {
@@ -787,7 +892,9 @@ export default class AuthenticatedUserProvider extends React.Component<
 
   showUserSnackbar = ({ message }: { message: ?React.Node }) => {
     this.setState({
-      userSnackbarMessage: message,
+      // The message is wrapped here to prevent crashes when Google Translate
+      // translates the website. See https://github.com/4ian/GDevelop/issues/3453.
+      userSnackbarMessage: message ? <span>{message}</span> : null,
     });
   };
 
@@ -875,17 +982,21 @@ export default class AuthenticatedUserProvider extends React.Component<
                   updateInProgress={this.state.editInProgress}
                 />
               )}
-            {this.state.emailVerificationPendingDialogOpen && (
-              <EmailVerificationPendingDialog
+            {this.state.emailVerificationDialogOpen && (
+              <EmailVerificationDialog
                 authenticatedUser={this.state.authenticatedUser}
                 onClose={() => {
-                  this.openEmailVerificationPendingDialog(false);
+                  this.openEmailVerificationDialog({
+                    open: false,
+                  });
                   this.state.authenticatedUser
                     .onRefreshFirebaseProfile()
                     .catch(() => {
                       // Ignore any error, we can't do much.
                     });
                 }}
+                {...this.state.emailVerificationDialogProps}
+                onSendEmail={this._doSendEmailVerification}
               />
             )}
             <Snackbar

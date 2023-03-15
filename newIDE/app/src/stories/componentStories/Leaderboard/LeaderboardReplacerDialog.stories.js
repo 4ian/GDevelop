@@ -9,7 +9,7 @@ import {
   ReplacePromptDialog,
 } from '../../../Leaderboard/useLeaderboardReplacer';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { fakeIndieAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
+import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Leaderboard/LeaderboardReplacerDialog',
@@ -40,7 +40,7 @@ export const WithErrors = () => (
 );
 
 export const ReplacerPromptAuthenticatedUser = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <ReplacePromptDialog
       leaderboardsToReplace={['leadeboard-to-replace']}
       onClose={action('onClose')}
@@ -51,7 +51,7 @@ export const ReplacerPromptAuthenticatedUser = () => (
 
 export const ReplacerPromptNotAuthenticatedUser = () => (
   <AuthenticatedUserContext.Provider
-    value={{ ...fakeIndieAuthenticatedUser, authenticated: false }}
+    value={{ ...fakeSilverAuthenticatedUser, authenticated: false }}
   >
     <ReplacePromptDialog
       leaderboardsToReplace={['leadeboard-to-replace']}

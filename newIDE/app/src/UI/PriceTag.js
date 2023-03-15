@@ -6,6 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import Text from './Text';
 import { makeStyles } from '@material-ui/core';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
   value: number,
@@ -14,6 +15,7 @@ type Props = {|
    * we don't control the background (e.g. an image).
    */
   withOverlay?: boolean,
+  owned?: boolean,
 |};
 
 const useStyles = makeStyles(theme => {
@@ -54,14 +56,14 @@ export const formatPrice = (i18n: I18nType, value: number) =>
     })
     .replace(/\D00$/, '')}`;
 
-function PriceTag({ value, withOverlay }: Props) {
+function PriceTag({ value, withOverlay, owned }: Props) {
   const classes = useStyles({ withOverlay });
   return (
     <I18n>
       {({ i18n }) => (
         <div className={classes.container}>
           <Text noMargin size="sub-title" color="inherit">
-            {formatPrice(i18n, value)}
+            {owned ? <Trans>✅ Owned</Trans> : formatPrice(i18n, value)}
           </Text>
         </div>
       )}

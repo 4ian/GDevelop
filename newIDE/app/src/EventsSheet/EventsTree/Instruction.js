@@ -35,7 +35,7 @@ import {
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -97,6 +97,8 @@ type Props = {|
 
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+
+  id: string,
 |};
 
 const Instruction = (props: Props) => {
@@ -108,6 +110,7 @@ const Instruction = (props: Props) => {
     onContextMenu,
     globalObjectsContainer,
     objectsContainer,
+    id,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -162,7 +165,12 @@ const Instruction = (props: Props) => {
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
-          const parameterType = parameterMetadata.getType();
+          // TODO Remove the ternary when any parameter declaration uses
+          // 'number' instead of 'expression'.
+          const parameterType: string =
+            parameterMetadata.getType() === 'expression'
+              ? 'number'
+              : parameterMetadata.getType();
           let expressionIsValid = true;
           if (
             gd.ParameterMetadata.isExpression('number', parameterType) ||
@@ -339,6 +347,7 @@ const Instruction = (props: Props) => {
               }
             }}
             tabIndex={0}
+            id={id}
           >
             {instruction.isInverted() && (
               <img
@@ -420,6 +429,7 @@ const Instruction = (props: Props) => {
                 windowWidth={props.windowWidth}
                 globalObjectsContainer={props.globalObjectsContainer}
                 objectsContainer={props.objectsContainer}
+                idPrefix={props.id}
               />
             )}
           </React.Fragment>

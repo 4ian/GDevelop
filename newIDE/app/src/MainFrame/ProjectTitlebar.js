@@ -1,7 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import ThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Window from '../Utils/Window';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import UnsavedChangesContext from './UnsavedChangesContext';
@@ -21,7 +21,7 @@ type Props = {|
  */
 const ProjectTitlebar = React.memo<Props>(
   ({ fileMetadata, storageProvider, projectName, i18n }: Props) => {
-    const gdevelopTheme = React.useContext(ThemeContext);
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const unsavedChanges = React.useContext(UnsavedChangesContext);
     const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
     const suffix = hasUnsavedChanges ? ' *' : '';
@@ -42,6 +42,9 @@ const ProjectTitlebar = React.memo<Props>(
     React.useEffect(
       () => {
         const title = [
+          // On desktop app, this title is used to know if the user is focused on the
+          // main window (IDE) or on another window (preview or external editor).
+          // Should this be changed, you should also change ElectronMainMenu.js
           'GDevelop 5',
           projectIdentifier ? `${projectIdentifier}${suffix}` : '',
           storageProviderName,

@@ -15,12 +15,14 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const DropTarget = makeDropTarget('layers-list');
 
 type LayersListBodyProps = {|
   layersContainer: gdLayout,
+  selectedLayer: string,
+  onSelectLayer: string => void,
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
@@ -80,6 +82,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
         key={`layer-${layer.ptr}`}
         id={`layer-${i}`}
         layer={layer}
+        isSelected={props.selectedLayer === layerName}
+        onSelect={() => props.onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
         effectsCount={layer.getEffects().getEffectsCount()}
         onEditEffects={() => onEditEffects(layer)}
@@ -161,6 +165,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
 
 type Props = {|
   project: gdProject,
+  selectedLayer: string,
+  onSelectLayer: string => void,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
@@ -242,6 +248,8 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
               // using SortableVirtualizedItemList.
               <LayersListBody
                 key={listKey}
+                selectedLayer={props.selectedLayer}
+                onSelectLayer={props.onSelectLayer}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}

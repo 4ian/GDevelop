@@ -9,7 +9,7 @@ import {
 } from '../../Utils/BlobDownloader';
 import { makeTestProject } from '../../fixtures/TestProject';
 import { moveUrlResourcesToCloudFilesIfPrivate } from './CloudResourceFetcher';
-import { fakeIndieAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
+import { fakeSilverAuthenticatedUser } from '../../fixtures/GDevelopServicesTestData';
 const gd: libGDevelop = global.gd;
 
 jest.mock('../../Utils/GDevelopServices/Project');
@@ -61,7 +61,7 @@ const makeMoveUrlResourcesToCloudFilesIfPrivateOptions = (
 ) => ({
   project,
   fileMetadata: { fileIdentifier: 'fake-cloud-project-id' },
-  authenticatedUser: fakeIndieAuthenticatedUser,
+  authenticatedUser: fakeSilverAuthenticatedUser,
   onProgress: jest.fn(),
 });
 
@@ -174,11 +174,11 @@ describe('CloudResourceFetcher', () => {
       expect.any(Function) // onError
     );
     expect(getCredentialsForCloudProject).toHaveBeenCalledWith(
-      fakeIndieAuthenticatedUser,
+      fakeSilverAuthenticatedUser,
       'fake-cloud-project-id'
     );
     expect(uploadProjectResourceFiles).toHaveBeenCalledWith(
-      fakeIndieAuthenticatedUser,
+      fakeSilverAuthenticatedUser,
       'fake-cloud-project-id',
       ['some file', 'some other file'],
       expect.any(Function) // onProgress

@@ -27,7 +27,7 @@ import { setupInstructionParameters } from '../../InstructionOrExpression/SetupI
 import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Edit from '@material-ui/icons/Edit';
 import FlatButton from '../../UI/FlatButton';
 

@@ -95,6 +95,9 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           }
         }}
         tabIndex={0}
+        id={`${this.props.idPrefix}-group-${
+          groupEvent.isFolded() ? 'folded' : 'unfolded'
+        }`}
       >
         {this.state.editing ? (
           <TextField
@@ -113,7 +116,6 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               WebkitTextFillColor: textColor,
             }}
             fullWidth
-            id="group-title"
             onKeyUp={event => {
               if (shouldCloseOrCancel(event)) {
                 this.endEditing();

@@ -14,6 +14,7 @@ import {
 } from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Text from '../../UI/Text';
+import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
 
 export type SubscriptionCheckerInterface = {|
   checkUserHasSubscription: () => boolean,
@@ -51,12 +52,9 @@ const SubscriptionChecker = React.forwardRef<
   };
 
   const checkUserHasSubscription = () => {
-    if (authenticatedUser.subscription) {
-      const hasPlan = !!authenticatedUser.subscription.planId;
-      if (hasPlan) {
-        setDialogOpen(false);
-        return true;
-      }
+    if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
+      setDialogOpen(false);
+      return true;
     }
 
     setDialogOpen(true);

@@ -34,7 +34,7 @@ const styles = {
   },
   scrollContainer: {
     flex: 1,
-    overflowY: 'auto',
+    overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
   },
 };
 

@@ -81,9 +81,9 @@ const defineTileMap = function (
         .addExtraInfo('json')
         .setLabel(_('Tilemap file (Tiled or LDtk)'))
         .setDescription(
-          _('This is the file that was saved or exported from Tiled/LDtk.')
+          _('This is the file that was saved or exported from Tiled or LDtk.')
         )
-        .setGroup(_('LDtk and Tiled: Tilemap'))
+        .setGroup(_('LDtk or Tiled'))
     );
     objectProperties.set(
       'tilesetJsonFile',
@@ -94,10 +94,10 @@ const defineTileMap = function (
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(
           _(
-            "Tiled only - not useful for LDtk files. Optional: specify this if you've saved the tileset in a different file as the Tiled tilemap."
+            "Optional: specify this if you've saved the tileset in a different file as the Tiled tilemap."
           )
         )
-        .setGroup(_('Tiled only: Tileset and Atlas image'))
+        .setGroup(_('Tiled only'))
     );
     objectProperties.set(
       'tilemapAtlasImage',
@@ -107,10 +107,10 @@ const defineTileMap = function (
         .setLabel(_('Atlas image'))
         .setDescription(
           _(
-            'Tiled only - not useful for LDtk files. The Atlas image containing the tileset.'
+            'The Atlas image containing the tileset.'
           )
         )
-        .setGroup(_('Tiled only: Tileset and Atlas image'))
+        .setGroup(_('Tiled only'))
     );
     objectProperties.set(
       'displayMode',
@@ -656,6 +656,7 @@ const defineCollisionMask = function (
       'tilemapJsonFile',
       new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
         .setType('resource')
+        .addExtraInfo('tilemap')
         .addExtraInfo('json')
         .setLabel(_('Tilemap JSON file'))
         .setDescription(
@@ -668,6 +669,7 @@ const defineCollisionMask = function (
       'tilesetJsonFile',
       new gd.PropertyDescriptor(objectContent.tilesetJsonFile || '')
         .setType('resource')
+        .addExtraInfo('tileset')
         .addExtraInfo('json')
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(
@@ -1231,54 +1233,70 @@ module.exports = {
       }
       const mapping = metadata.embeddedResourcesMapping || {};
 
-      /** @type {TileMapHelper.TileMapManager} */
-      const manager = TilemapHelper.TileMapManager.getManager(this._project);
-      manager.getOrLoadTileMap(
-        this._loadTileMapWithCallback.bind(this),
-        tilemapJsonFile,
-        tilesetJsonFile,
-        levelIndex,
-        pako,
-        (tileMap) => {
-          if (!tileMap) {
-            this.onLoadingError();
-            // _loadTileMapWithCallback already log errors
-            return;
-          }
-
-          /** @type {TileMapHelper.TileTextureCache} */
-          const textureCache = manager.getOrLoadTextureCache(
-            this._loadTileMapWithCallback.bind(this),
-            (textureName) =>
-              this._pixiResourcesLoader.getPIXITexture(
-                this._project,
-                mapping[textureName] || textureName
-              ),
-            tilemapAtlasImage,
-            tilemapJsonFile,
-            tilesetJsonFile,
-            levelIndex,
-            (textureCache) => {
-              if (!textureCache) {
-                this.onLoadingError();
-                // getOrLoadTextureCache already log warns and errors.
-                return;
-              }
-              this.onLoadingSuccess();
-
-              this.width = tileMap.getWidth();
-              this.height = tileMap.getHeight();
-              TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                this.tileMapPixiObject,
-                tileMap,
-                textureCache,
-                displayMode,
-                layerIndex
-              );
-            }
-          );
-        }
+      const atlasTexture = this._pixiResourcesLoader.getPIXITexture(
+        this._project,
+        tilemapAtlasImage
       );
+
+      const loadTileMap = () => {
+        /** @type {TileMapHelper.TileMapManager} */
+        const manager = TilemapHelper.TileMapManager.getManager(this._project);
+        manager.getOrLoadTileMap(
+          this._loadTileMapWithCallback.bind(this),
+          tilemapJsonFile,
+          tilesetJsonFile,
+          levelIndex,
+          pako,
+          (tileMap) => {
+            if (!tileMap) {
+              this.onLoadingError();
+              // _loadTileMapWithCallback already log errors
+              return;
+            }
+
+            /** @type {TileMapHelper.TileTextureCache} */
+            const textureCache = manager.getOrLoadTextureCache(
+              this._loadTileMapWithCallback.bind(this),
+              (textureName) =>
+                this._pixiResourcesLoader.getPIXITexture(
+                  this._project,
+                  mapping[textureName] || textureName
+                ),
+              tilemapAtlasImage,
+              tilemapJsonFile,
+              tilesetJsonFile,
+              levelIndex,
+              (textureCache) => {
+                if (!textureCache) {
+                  this.onLoadingError();
+                  // getOrLoadTextureCache already log warns and errors.
+                  return;
+                }
+                this.onLoadingSuccess();
+
+                this.width = tileMap.getWidth();
+                this.height = tileMap.getHeight();
+                TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+                  this.tileMapPixiObject,
+                  tileMap,
+                  textureCache,
+                  displayMode,
+                  layerIndex
+                );
+              }
+            );
+          }
+        );
+      };
+
+      if (atlasTexture.valid) {
+        loadTileMap();
+      } else {
+        // Wait for the atlas image to load.
+        atlasTexture.once('update', () => {
+          loadTileMap();
+        });
+      }
     };
 
     // GDJS doesn't use Promise to avoid allocation.
@@ -1294,9 +1312,8 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile
     ) {
-      let tileMapJsonData = null;
       try {
-        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
@@ -1320,6 +1337,7 @@ module.exports = {
       } catch (err) {
         console.error('Unable to load a Tilemap JSON data: ', err);
       }
+      return null;
     };
 
     /**
@@ -1540,34 +1558,38 @@ module.exports = {
     // GDJS doesn't use Promise to avoid allocation.
     RenderedCollisionMaskInstance.prototype._loadTiledMapWithCallback =
       function (tilemapJsonFile, tilesetJsonFile, callback) {
-        this._loadTiledMap(tilemapJsonFile, tilesetJsonFile).then(callback);
+        this._loadTileMap(tilemapJsonFile, tilesetJsonFile).then(callback);
       };
 
-    RenderedCollisionMaskInstance.prototype._loadTiledMap = async function (
+    RenderedCollisionMaskInstance.prototype._loadTileMap = async function (
       tilemapJsonFile,
       tilesetJsonFile
     ) {
-      let tileMapJsonData = null;
       try {
-        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
 
-        const tilesetJsonData = tilesetJsonFile
-          ? await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilesetJsonFile
-            )
-          : null;
+        const tileMap = TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
-        if (tilesetJsonData) {
-          tileMapJsonData.tilesets = [tilesetJsonData];
+        if (tileMap.kind === 'tiled') {
+          const tilesetJsonData = tilesetJsonFile
+            ? await this._pixiResourcesLoader.getResourceJsonData(
+                this._project,
+                tilesetJsonFile
+              )
+            : null;
+
+          if (tilesetJsonData) {
+            tileMapJsonData.tilesets = [tilesetJsonData];
+          }
         }
+        return tileMap;
       } catch (err) {
         console.error('Unable to load a Tilemap JSON data: ', err);
       }
-      return tileMapJsonData;
+      return null;
     };
 
     /**

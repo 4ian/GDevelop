@@ -10,7 +10,7 @@ import { GameMonetization } from '../../../../GameDashboard/Monetization/GameMon
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 import {
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   gameWithDisplayAdsOnGamePageEnabled,
   gameWithDisplayAdsOnGamePageDisabled,
 } from '../../../../fixtures/GDevelopServicesTestData';
@@ -37,7 +37,7 @@ export const AdsEnabled = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameMonetization game={game} onGameUpdated={action('onGameUpdated')} />
     </AuthenticatedUserContext.Provider>
   );
@@ -56,7 +56,7 @@ export const AdsDisabled = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameMonetization game={game} onGameUpdated={action('onGameUpdated')} />
     </AuthenticatedUserContext.Provider>
   );
@@ -75,7 +75,7 @@ export const ErrorWhenUpdatingGame = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameMonetization game={game} onGameUpdated={action('onGameUpdated')} />
     </AuthenticatedUserContext.Provider>
   );

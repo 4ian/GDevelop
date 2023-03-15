@@ -77,7 +77,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

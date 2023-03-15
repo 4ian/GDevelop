@@ -44,8 +44,16 @@ export type ExportDialogWithoutExportsProps = {|
 
 type Props = {|
   ...ExportDialogWithoutExportsProps,
-  automatedExporters: Array<Exporter>,
-  manualExporters: Array<Exporter>,
+  /**
+   * Use `null` to hide automated exporters.
+   * It should be used with manualExporters set to `null` as well.
+   */
+  automatedExporters: ?Array<Exporter>,
+  /**
+   * Use `null` to hide manual exporters.
+   * It should be used with automatedExporters set to `null` as well.
+   */
+  manualExporters: ?Array<Exporter>,
   onlineWebExporter: Exporter,
   allExportersRequireOnline?: boolean,
 |};
@@ -83,7 +91,7 @@ const ExportDialog = ({
   const openBuildDialog = () => {
     if (!game) {
       showWarningBox(
-        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on Liluo.io."
+        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on gd.games."
       );
       return;
     }
@@ -121,8 +129,8 @@ const ExportDialog = ({
 
   if (!project) return null;
   const exporters = [
-    ...automatedExporters,
-    ...manualExporters,
+    ...(automatedExporters || []),
+    ...(manualExporters || []),
     onlineWebExporter,
   ];
 
@@ -132,9 +140,13 @@ const ExportDialog = ({
 
   if (!exporter || !exporter.exportPipeline) return null;
 
+  const shouldShowOnlineWebExporterOnly =
+    !manualExporters && !automatedExporters;
+
   return (
     <Dialog
       id="export-dialog"
+      maxWidth={shouldShowOnlineWebExporterOnly ? 'sm' : 'md'}
       title={
         chosenExporterSection === 'automated' ? (
           <Trans>Publish your game</Trans>
@@ -170,7 +182,7 @@ const ExportDialog = ({
           <TutorialButton
             key="tutorial"
             tutorialId="export-to-itch"
-            label="How to export to Itch.io"
+            label={<Trans>How to export to Itch.io"</Trans>}
           />
         ) : null,
         <FlatButton
@@ -183,40 +195,40 @@ const ExportDialog = ({
       onRequestClose={onClose}
       open
       fixedContent={
-        chosenExporterSection === 'automated' ? (
-          <Tabs
-            value={chosenExporterKey}
-            onChange={setChosenExporterKey}
-            options={automatedExporters.map(exporter => ({
-              value: exporter.key,
-              label: exporter.tabName,
-              disabled: isNavigationDisabled,
-            }))}
-          />
-        ) : chosenExporterSection === 'manual' ? (
-          <Tabs
-            value={chosenExporterKey}
-            onChange={setChosenExporterKey}
-            options={manualExporters.map(exporter => ({
-              value: exporter.key,
-              label: exporter.tabName,
-              disabled: isNavigationDisabled,
-            }))}
-          />
+        automatedExporters && manualExporters ? (
+          chosenExporterSection === 'automated' ? (
+            <Tabs
+              value={chosenExporterKey}
+              onChange={setChosenExporterKey}
+              options={automatedExporters.map(exporter => ({
+                value: exporter.key,
+                label: exporter.tabName,
+                disabled: isNavigationDisabled,
+              }))}
+            />
+          ) : chosenExporterSection === 'manual' ? (
+            <Tabs
+              value={chosenExporterKey}
+              onChange={setChosenExporterKey}
+              options={manualExporters.map(exporter => ({
+                value: exporter.key,
+                label: exporter.tabName,
+                disabled: isNavigationDisabled,
+              }))}
+            />
+          ) : null
         ) : null
       }
     >
-      {cantExportBecauseOffline && (
+      {cantExportBecauseOffline ? (
         <AlertMessage kind="error">
           <Trans>
             You must be online and have a proper internet connection to export
             your game.
           </Trans>
         </AlertMessage>
-      )}
-      {chosenExporterSection === 'home' ? (
+      ) : chosenExporterSection === 'home' ? (
         <ExportHome
-          cantExportBecauseOffline={cantExportBecauseOffline}
           onlineWebExporter={onlineWebExporter}
           setChosenExporterKey={setChosenExporterKey}
           setChosenExporterSection={setChosenExporterSection}
@@ -227,6 +239,7 @@ const ExportDialog = ({
           isNavigationDisabled={isNavigationDisabled}
           setIsNavigationDisabled={setIsNavigationDisabled}
           onGameUpdated={setGame}
+          showOnlineWebExporterOnly={shouldShowOnlineWebExporterOnly}
         />
       ) : (
         <ExportLauncher

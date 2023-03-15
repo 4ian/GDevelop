@@ -864,13 +864,19 @@ interface MeasurementUnit {
 
   void STATIC_ApplyTranslation();
 
-  [Ref] MeasurementUnit STATIC_GetDimensionless();
-  [Ref] MeasurementUnit STATIC_GetDegreeAngle();
-  [Ref] MeasurementUnit STATIC_GetSecond();
-  [Ref] MeasurementUnit STATIC_GetPixel();
-  [Ref] MeasurementUnit STATIC_GetPixelSpeed();
-  [Ref] MeasurementUnit STATIC_GetPixelAcceleration();
-  [Ref] MeasurementUnit STATIC_GetNewton();
+  [Const, Ref] MeasurementUnit STATIC_GetUndefined();
+  [Const, Ref] MeasurementUnit STATIC_GetDimensionless();
+  [Const, Ref] MeasurementUnit STATIC_GetDegreeAngle();
+  [Const, Ref] MeasurementUnit STATIC_GetSecond();
+  [Const, Ref] MeasurementUnit STATIC_GetPixel();
+  [Const, Ref] MeasurementUnit STATIC_GetPixelSpeed();
+  [Const, Ref] MeasurementUnit STATIC_GetPixelAcceleration();
+  [Const, Ref] MeasurementUnit STATIC_GetNewton();
+
+  long STATIC_GetDefaultMeasurementUnitsCount();
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitAtIndex(long index);
+  [Const, Ref] MeasurementUnit STATIC_GetDefaultMeasurementUnitByName([Const] DOMString name);
+  boolean STATIC_HasDefaultMeasurementUnitNamed([Const] DOMString name);
 };
 
 interface MeasurementBaseUnit {
@@ -1257,11 +1263,19 @@ interface InstructionMetadata {
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
+    boolean IsRelevantForLayoutEvents();
+    boolean IsRelevantForFunctionEvents();
+    boolean IsRelevantForAsynchronousFunctionEvents();
+    boolean IsRelevantForCustomObjectEvents();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
     [Ref] InstructionMetadata SetPrivate();
+    [Ref] InstructionMetadata SetRelevantForLayoutEventsOnly();
+    [Ref] InstructionMetadata SetRelevantForFunctionEventsOnly();
+    [Ref] InstructionMetadata SetRelevantForAsynchronousFunctionEventsOnly();
+    [Ref] InstructionMetadata SetRelevantForCustomObjectEventsOnly();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -1310,12 +1324,20 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetHelpPath();
     boolean IsShown();
     boolean IsPrivate();
+    boolean IsRelevantForLayoutEvents();
+    boolean IsRelevantForFunctionEvents();
+    boolean IsRelevantForAsynchronousFunctionEvents();
+    boolean IsRelevantForCustomObjectEvents();
     [Ref] ParameterMetadata GetParameter(unsigned long id);
     unsigned long GetParametersCount();
     [Const, Ref] VectorParameterMetadata GetParameters();
 
     [Ref] ExpressionMetadata SetHidden();
     [Ref] ExpressionMetadata SetPrivate();
+    [Ref] ExpressionMetadata SetRelevantForLayoutEventsOnly();
+    [Ref] ExpressionMetadata SetRelevantForFunctionEventsOnly();
+    [Ref] ExpressionMetadata SetRelevantForAsynchronousFunctionEventsOnly();
+    [Ref] ExpressionMetadata SetRelevantForCustomObjectEventsOnly();
     [Ref] ExpressionMetadata AddParameter(
         [Const] DOMString type,
         [Const] DOMString description,
@@ -2145,13 +2167,21 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
     [Const, Ref] UnfilledRequiredBehaviorPropertyProblem at(unsigned long index);
 };
 
-interface WholeProjectRefactorer {
+interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+};
+
+interface WholeProjectRefactorer {
     void STATIC_RenameEventsFunctionsExtension(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateExtensionNameInEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString sourceExtensionName);
     void STATIC_RenameEventsFunction(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
@@ -2249,6 +2279,10 @@ interface UsedExtensionsResult {
 
 interface UsedExtensionsFinder {
   [Value] UsedExtensionsResult STATIC_ScanProject([Ref] Project project);
+};
+
+interface InstructionsCountEvaluator {
+  long STATIC_ScanProject([Ref] Project project);
 };
 
 interface ExtensionAndBehaviorMetadata {
@@ -3150,6 +3184,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
     [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
     [Ref] PreviewExportOptions SetGDevelopResourceToken([Const] DOMString gdevelopResourceToken);
+    [Ref] PreviewExportOptions SetAllowAuthenticationUsingIframeForPreview(boolean enable);
 };
 
 [Prefix="gdjs::"]

@@ -40,7 +40,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
           "",
           "res/actions/quit24.png",
           "res/actions/quit.png")
-      .AddCodeOnlyParameter("eventsFunctionContext", "");
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
+      .SetRelevantForAsynchronousFunctionEventsOnly();
 }
 
 }  // namespace gd

@@ -38,6 +38,8 @@ import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 
 const gd: libGDevelop = global.gd;
 
@@ -69,6 +71,7 @@ type AnimationProps = {|
   objectName: string,
   onChangeName: string => void,
   isAnimationListLocked: boolean,
+  onSpriteUpdated: () => void,
 |};
 
 class Animation extends React.Component<AnimationProps, void> {
@@ -87,6 +90,7 @@ class Animation extends React.Component<AnimationProps, void> {
       objectName,
       onChangeName,
       isAnimationListLocked,
+      onSpriteUpdated,
     } = this.props;
 
     const animationName = animation.getName();
@@ -137,6 +141,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 objectName={objectName}
                 animationName={animationName}
                 onChangeName={onChangeName}
+                onSpriteUpdated={onSpriteUpdated}
               />
             );
           })}
@@ -164,6 +169,7 @@ const SortableAnimationsList = SortableContainer(
     onSelectSprite,
     onReplaceDirection,
     isAnimationListLocked,
+    onSpriteUpdated,
   }) => {
     // Note that it's important to have <ScrollView> *inside* this
     // component, otherwise the sortable list won't work (because the
@@ -191,6 +197,7 @@ const SortableAnimationsList = SortableContainer(
                 onReplaceDirection(i, directionId, newDirection)
               }
               objectName={objectName}
+              onSpriteUpdated={onSpriteUpdated}
             />
           );
         })}
@@ -257,13 +264,16 @@ class AnimationsListContainer extends React.Component<
   changeAnimationName = (i, newName) => {
     const { spriteConfiguration } = this.props;
 
+    const currentName = spriteConfiguration.getAnimation(i).getName();
+    if (currentName === newName) return;
+
     const otherNames = mapFor(
       0,
       spriteConfiguration.getAnimationsCount(),
       index => {
         return index === i
           ? undefined // Don't check the current animation name as we're changing it.
-          : spriteConfiguration.getAnimation(index).getName();
+          : currentName;
       }
     );
 
@@ -365,6 +375,7 @@ class AnimationsListContainer extends React.Component<
               useDragHandle
               lockAxis="y"
               axis="y"
+              onSpriteUpdated={this.props.onObjectUpdated}
             />
             <Column noMargin>
               <ResponsiveLineStackLayout
@@ -447,6 +458,8 @@ export default function SpriteEditor({
   ] = React.useState(false);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const windowWidth = useResponsiveWindowWidth();
+  const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
 
   return (
     <>
@@ -460,30 +473,47 @@ export default function SpriteEditor({
         onSizeUpdated={onSizeUpdated}
         onObjectUpdated={onObjectUpdated}
         extraBottomTools={
-          <ResponsiveLineStackLayout noMargin noColumnMargin>
-            <RaisedButton
-              label={<Trans>Edit collision masks</Trans>}
-              primary={false}
-              onClick={() => setCollisionMasksEditorOpen(true)}
-              disabled={spriteConfiguration.getAnimationsCount() === 0}
-            />
-            {!isAnimationListLocked && (
-              <RaisedButton
-                label={<Trans>Edit points</Trans>}
-                primary={false}
-                onClick={() => setPointsEditorOpen(true)}
-                disabled={spriteConfiguration.getAnimationsCount() === 0}
-              />
-            )}
-            {!isAnimationListLocked && (
+          windowWidth !== 'small' ? (
+            <ResponsiveLineStackLayout noMargin noColumnMargin>
               <FlatButton
-                label={<Trans>Advanced options</Trans>}
-                primary={false}
-                onClick={() => setAdvancedOptionsOpen(true)}
-                disabled={spriteConfiguration.getAnimationsCount() === 0}
+                label={<Trans>Edit collision masks</Trans>}
+                onClick={() => setCollisionMasksEditorOpen(true)}
+                disabled={hasNoAnimations}
               />
-            )}
-          </ResponsiveLineStackLayout>
+              {!isAnimationListLocked && (
+                <FlatButton
+                  label={<Trans>Edit points</Trans>}
+                  onClick={() => setPointsEditorOpen(true)}
+                  disabled={hasNoAnimations}
+                />
+              )}
+              {!isAnimationListLocked && (
+                <FlatButton
+                  label={<Trans>Advanced options</Trans>}
+                  onClick={() => setAdvancedOptionsOpen(true)}
+                  disabled={hasNoAnimations}
+                />
+              )}
+            </ResponsiveLineStackLayout>
+          ) : (
+            <FlatButtonWithSplitMenu
+              label={<Trans>Edit collision masks</Trans>}
+              onClick={() => setCollisionMasksEditorOpen(true)}
+              disabled={hasNoAnimations}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Edit points`),
+                  disabled: hasNoAnimations,
+                  click: () => setPointsEditorOpen(true),
+                },
+                {
+                  label: i18n._(t`Advanced options`),
+                  disabled: hasNoAnimations,
+                  click: () => setAdvancedOptionsOpen(true),
+                },
+              ]}
+            />
+          )
         }
       />
       {advancedOptionsOpen && (

@@ -8,7 +8,7 @@ import {
   getSelectedInstructionsContexts,
   type InstructionsListContext,
   getLastSelectedEventContext,
-  getLastSelectedInstructionsContext,
+  getLastSelectedInstructionContext,
   getLastSelectedInstructionsListsContext,
 } from './SelectionHandler';
 import {
@@ -158,23 +158,23 @@ export const pasteInstructionsFromClipboardInSelection = (
     project
   );
 
-  const lastSelectedInstructionsContext = getLastSelectedInstructionsContext(
+  const lastSelectedInstructionContext = getLastSelectedInstructionContext(
     selection
   );
-  if (lastSelectedInstructionsContext) {
-    if (lastSelectedInstructionsContext.isCondition) {
-      lastSelectedInstructionsContext.instrsList.insertInstructions(
+  if (lastSelectedInstructionContext) {
+    if (lastSelectedInstructionContext.isCondition) {
+      lastSelectedInstructionContext.instrsList.insertInstructions(
         conditionsList,
         0,
         conditionsList.size(),
-        lastSelectedInstructionsContext.indexInList
+        lastSelectedInstructionContext.indexInList
       );
     } else {
-      lastSelectedInstructionsContext.instrsList.insertInstructions(
+      lastSelectedInstructionContext.instrsList.insertInstructions(
         actionsList,
         0,
         actionsList.size(),
-        lastSelectedInstructionsContext.indexInList
+        lastSelectedInstructionContext.indexInList
       );
     }
   }

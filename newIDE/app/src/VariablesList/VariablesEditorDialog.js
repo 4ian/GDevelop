@@ -25,6 +25,7 @@ type Props = {|
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   onComputeAllVariableNames: () => Array<string>,
   helpPagePath: ?string,
+  id?: string,
 |};
 
 const VariablesEditorDialog = ({
@@ -40,6 +41,7 @@ const VariablesEditorDialog = ({
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
   helpPagePath,
+  id,
 }: Props) => {
   const {
     onCancelChanges,
@@ -66,6 +68,7 @@ const VariablesEditorDialog = ({
           primary
           onClick={onApply}
           key="Apply"
+          id="apply-button"
         />,
       ]}
       secondaryActions={[
@@ -92,8 +95,9 @@ const VariablesEditorDialog = ({
       open={open}
       flexBody
       fullHeight
+      id={id}
     >
-      <Column expand noMargin>
+      <Column expand noMargin noOverflowParent>
         {variablesContainer.count() > 0 && DismissableTutorialMessage && (
           <Line>
             <Column expand>{DismissableTutorialMessage}</Column>

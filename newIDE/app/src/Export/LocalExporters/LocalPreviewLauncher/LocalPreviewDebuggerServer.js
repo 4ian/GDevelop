@@ -21,6 +21,7 @@ const removeServerListeners = () => {
   ipcRenderer.removeAllListeners('debugger-error-received');
   ipcRenderer.removeAllListeners('debugger-connection-closed');
   ipcRenderer.removeAllListeners('debugger-connection-opened');
+  ipcRenderer.removeAllListeners('debugger-connection-errored');
   ipcRenderer.removeAllListeners('debugger-start-server-done');
   ipcRenderer.removeAllListeners('debugger-message-received');
 };
@@ -70,6 +71,18 @@ export const localPreviewDebuggerServer: PreviewDebuggerServer = {
           })
         );
       });
+
+      ipcRenderer.on(
+        'debugger-connection-errored',
+        (event, { id, errorMessage }) => {
+          callbacksList.forEach(({ onConnectionErrored }) =>
+            onConnectionErrored({
+              id,
+              errorMessage,
+            })
+          );
+        }
+      );
 
       ipcRenderer.on('debugger-start-server-done', (event, { address }) => {
         console.info('Local preview debugger started');

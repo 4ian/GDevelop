@@ -725,6 +725,22 @@ namespace gdjs {
         }
         return false;
       });
+      window.addEventListener('touchcancel', function (e) {
+        if (isTargetDomElement(e)) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
+        e.preventDefault();
+        if (e.changedTouches) {
+          for (let i = 0; i < e.changedTouches.length; ++i) {
+            manager.onTouchCancel(e.changedTouches[i].identifier);
+          }
+        }
+        return false;
+      });
     }
 
     setWindowTitle(title): void {

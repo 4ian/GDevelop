@@ -6,7 +6,7 @@ import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
 import MUIAccordionActions from '@material-ui/core/AccordionActions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from './IconButton';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from '../UI/Grid';
 
 const styles = {

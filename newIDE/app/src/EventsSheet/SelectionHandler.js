@@ -14,18 +14,6 @@ export type InstructionContext = {|
   indexInList: number,
 |};
 
-/**
- * Locates the event of the selected element. It will be used to compute the
- * event sheet's row that will be saved in history so that the event can be selected
- * on undo or redo.
- */
-type LocatingEvent = {| locatingEvent: gdBaseEvent |};
-
-export type InstructionContextWithLocatingEvent = {
-  ...InstructionContext,
-  ...LocatingEvent,
-};
-
 export type ParameterContext = {|
   isCondition: boolean,
   instrsList: gdInstructionsList,
@@ -41,9 +29,14 @@ export type EventContext = {|
   indexInList: number,
 |};
 
+export type InstructionContextWithEventContext = {
+  ...InstructionContext,
+  eventContext: EventContext,
+};
+
 export type SelectionState = {|
   // Arrays are in order of selection (last selected element at the last position).
-  selectedInstructions: Array<InstructionContextWithLocatingEvent>,
+  selectedInstructions: Array<InstructionContextWithEventContext>,
   selectedInstructionsLists: Array<InstructionsListContext>,
   selectedEvents: Array<EventContext>,
 |};
@@ -141,7 +134,7 @@ export const getSelectedInstructions = (
   selection: SelectionState
 ): Array<gdInstruction> => {
   return selection.selectedInstructions.map(
-    (instructionContext: InstructionContextWithLocatingEvent) =>
+    (instructionContext: InstructionContextWithEventContext) =>
       instructionContext.instruction
   );
 };
@@ -150,14 +143,14 @@ export const getSelectedInstructionsLocatingEvents = (
   selection: SelectionState
 ): Array<gdBaseEvent> => {
   return selection.selectedInstructions.map(
-    (instructionContext: InstructionContextWithLocatingEvent) =>
-      instructionContext.locatingEvent
+    (instructionContext: InstructionContextWithEventContext) =>
+      instructionContext.eventContext.event
   );
 };
 
 export const getSelectedInstructionsContexts = (
   selection: SelectionState
-): Array<InstructionContextWithLocatingEvent> => {
+): Array<InstructionContextWithEventContext> => {
   return selection.selectedInstructions;
 };
 
@@ -167,13 +160,24 @@ export const getSelectedInstructionsListsContexts = (
   return selection.selectedInstructionsLists;
 };
 
-export const getLastSelectedInstructionsContext = (
+export const getLastSelectedInstructionContext = (
   selection: SelectionState
-): InstructionContextWithLocatingEvent | null => {
+): InstructionContextWithEventContext | null => {
   return (
     selection.selectedInstructions[selection.selectedInstructions.length - 1] ||
     null
   );
+};
+
+export const getLastSelectedInstructionEventContextWhichCanHaveSubEvents = (
+  selection: SelectionState
+): EventContext | null => {
+  const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
+    eventContext.event.canHaveSubEvents()
+  );
+  if (!candidates.length) return null;
+
+  return candidates[candidates.length - 1].eventContext;
 };
 
 export const getLastSelectedInstructionsListsContext = (
@@ -265,7 +269,7 @@ export const selectEvent = (
 };
 
 export const selectInstruction = (
-  event: gdBaseEvent,
+  eventContext: EventContext,
   selection: SelectionState,
   instructionContext: InstructionContext,
   multiSelection: boolean = false
@@ -278,7 +282,7 @@ export const selectInstruction = (
     ...existingSelection,
     selectedInstructions: [
       ...existingSelection.selectedInstructions,
-      { ...instructionContext, locatingEvent: event },
+      { ...instructionContext, eventContext },
     ],
   };
 };

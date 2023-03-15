@@ -14,6 +14,9 @@ jobs:
   update-translations:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - uses: actions/checkout@v2
 
       # Cache npm dependencies to speed up the workflow
@@ -44,7 +47,7 @@ jobs:
       # (Build and) download the most recent translations (PO files) from Crowdin.
       - name: Install Crowdin CLI
         run: npm i -g @crowdin/cli
-        
+
       - name: Download new translations from Crowdin
         run: crowdin download
         env:
@@ -66,8 +69,8 @@ jobs:
           commit-message: Update translations [skip ci]
           branch: chore/update-translations
           delete-branch: true
-          title: '[Auto PR] Update translations'
+          title: "[Auto PR] Update translations"
           body: |
             This updates the translations by downloading them from Crowdin and compiling them for usage by the app.
-            
+
             Please double check the values in `newIDE/app/src/locales/LocalesMetadata.js` to ensure the changes are sensible.

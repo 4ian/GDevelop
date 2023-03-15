@@ -27,6 +27,7 @@ import {
   tuneMatches,
   type SearchResult,
   sharedFuseConfiguration,
+  getFuseSearchQueryForMultipleKeys,
 } from '../../../UI/Search/UseSearchStructuredItem';
 const gd: libGDevelop = global.gd;
 
@@ -107,17 +108,19 @@ export default class InstructionOrExpressionSelector<
     } = this.props;
     const { searchText } = this.state;
 
-    const extendSearchText = `'${searchText
-      .trim()
-      .split(' ')
-      .join(" '")}`;
-
     const displayedInstructionsList: Array<SearchResult<T>> =
-      !!extendSearchText && this.searchApi
-        ? this.searchApi.search(extendSearchText).map(result => ({
-            item: result.item,
-            matches: tuneMatches(result, searchText),
-          }))
+      !!searchText && this.searchApi
+        ? this.searchApi
+            .search(
+              getFuseSearchQueryForMultipleKeys(searchText, [
+                'displayedName',
+                'fullGroupName',
+              ])
+            )
+            .map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
         : [];
     const hasResults = !searchText || !!displayedInstructionsList.length;
 

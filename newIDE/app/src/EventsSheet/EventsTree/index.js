@@ -47,7 +47,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
@@ -122,6 +122,8 @@ type EventsContainerProps = {|
 
   connectDragSource: ConnectDragSource,
   windowWidth: WidthType,
+
+  idPrefix: string,
 |};
 
 /**
@@ -195,6 +197,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 windowWidth={this.props.windowWidth}
+                idPrefix={this.props.idPrefix}
               />
             </div>
           </div>
@@ -226,42 +229,42 @@ type EventsTreeProps = {|
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
   onAddNewInstruction: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     InstructionsListContext
   ) => void,
   onPasteInstructions: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     InstructionsListContext
   ) => void,
   onMoveToInstruction: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     destinationContext: InstructionContext
   ) => void,
   onMoveToInstructionsList: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     destinationContext: InstructionsListContext
   ) => void,
   onInstructionClick: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionContext: InstructionContext
   ) => void,
   onInstructionDoubleClick: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     instructionContext: InstructionContext
   ) => void,
   onInstructionContextMenu: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     x: number,
     y: number,
     InstructionContext
   ) => void,
   onAddInstructionContextMenu: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
   onParameterClick: (
-    locatingEvent: gdBaseEvent,
+    eventContext: EventContext,
     parameterContext: ParameterContext
   ) => void,
 
@@ -294,7 +297,7 @@ type EventsTreeProps = {|
 
 // A node displayed by the SortableTree. Almost always represents an
 // event, except for the buttons at the bottom of the sheet and the tutorial.
-export type SortableTreeNode = {
+export type SortableTreeNode = {|
   // Necessary attributes for react-sortable-tree.
   title: (node: { node: SortableTreeNode }) => Node,
   children: Array<any>,
@@ -307,13 +310,14 @@ export type SortableTreeNode = {
   indexInList: number,
   rowIndex: number,
   nodePath: Array<number>,
+  relativeNodePath: Array<number>,
   // Key is event pointer or an identification string.
   key: number | string,
 
   // In case of nodes without event (buttons at the bottom of the sheet),
   // use a fixed height.
   fixedHeight?: ?number,
-};
+|};
 
 type State = {|
   treeData: Array<any>,
@@ -471,7 +475,8 @@ export default class ThemableEventsTree extends Component<
     flatData: Array<gdBaseEvent> = [],
     depth: number = 0,
     parentDisabled: boolean = false,
-    path: Array<number> = []
+    parentAbsolutePath: Array<number> = [],
+    parentRelativePath: ?Array<number> = null
   ) => {
     const treeData = mapFor<SortableTreeNode>(
       0,
@@ -481,14 +486,18 @@ export default class ThemableEventsTree extends Component<
         flatData.push(event);
 
         const disabled = parentDisabled || event.isDisabled();
-        const currentPath = path.concat(flatData.length - 1);
+        const absoluteIndex = flatData.length - 1;
+        const currentAbsolutePath = parentAbsolutePath.concat(
+          flatData.length - 1
+        );
+        const currentRelativePath = [...(parentRelativePath || []), i];
 
         return {
           title: this._renderEvent,
           event,
           eventsList,
           indexInList: i,
-          rowIndex: flatData.length - 1,
+          rowIndex: absoluteIndex,
           expanded: !event.isFolded(),
           disabled,
           depth,
@@ -500,9 +509,11 @@ export default class ThemableEventsTree extends Component<
             !event.isFolded() ? flatData : [],
             depth + 1,
             disabled,
-            currentPath
+            currentAbsolutePath,
+            currentRelativePath
           ).treeData,
-          nodePath: currentPath,
+          nodePath: currentAbsolutePath,
+          relativeNodePath: currentRelativePath,
         };
       }
     );
@@ -717,6 +728,12 @@ export default class ThemableEventsTree extends Component<
         {({ connectDragSource, connectDropTarget, isOverLazy }) => {
           this._temporaryUnfoldNode(isOverLazy, node);
 
+          const eventContext = {
+            eventsList: node.eventsList,
+            event: event,
+            indexInList: node.indexInList,
+          };
+
           const dropTarget = (
             <div
               style={{
@@ -736,25 +753,43 @@ export default class ThemableEventsTree extends Component<
                 selection={this.props.selection}
                 leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
                 onAddNewInstruction={instructionsListContext =>
-                  this.props.onAddNewInstruction(event, instructionsListContext)
+                  this.props.onAddNewInstruction(
+                    eventContext,
+                    instructionsListContext
+                  )
                 }
                 onPasteInstructions={instructionsListContext =>
-                  this.props.onPasteInstructions(event, instructionsListContext)
+                  this.props.onPasteInstructions(
+                    eventContext,
+                    instructionsListContext
+                  )
                 }
                 onMoveToInstruction={instructionContext =>
-                  this.props.onMoveToInstruction(event, instructionContext)
+                  this.props.onMoveToInstruction(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onMoveToInstructionsList={instructionContext =>
-                  this.props.onMoveToInstructionsList(event, instructionContext)
+                  this.props.onMoveToInstructionsList(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onInstructionClick={instructionContext =>
-                  this.props.onInstructionClick(event, instructionContext)
+                  this.props.onInstructionClick(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onInstructionDoubleClick={instructionContext =>
-                  this.props.onInstructionDoubleClick(event, instructionContext)
+                  this.props.onInstructionDoubleClick(
+                    eventContext,
+                    instructionContext
+                  )
                 }
                 onParameterClick={parameterContext =>
-                  this.props.onParameterClick(event, parameterContext)
+                  this.props.onParameterClick(eventContext, parameterContext)
                 }
                 onEventClick={() =>
                   this.props.onEventClick({
@@ -772,10 +807,10 @@ export default class ThemableEventsTree extends Component<
                   })
                 }
                 onInstructionContextMenu={(...args) =>
-                  this.props.onInstructionContextMenu(event, ...args)
+                  this.props.onInstructionContextMenu(eventContext, ...args)
                 }
                 onAddInstructionContextMenu={(...args) =>
-                  this.props.onAddInstructionContextMenu(event, ...args)
+                  this.props.onAddInstructionContextMenu(eventContext, ...args)
                 }
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
                 onOpenLayout={(name: string) => {
@@ -789,6 +824,7 @@ export default class ThemableEventsTree extends Component<
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
                 windowWidth={this.props.windowWidth}
+                idPrefix={`event-${node.relativeNodePath.join('-')}`}
               />
               {this.state.draggedNode && (
                 <DropContainer

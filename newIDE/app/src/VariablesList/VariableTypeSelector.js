@@ -10,7 +10,7 @@ import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
 import { Line, Spacer } from '../UI/Grid';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 const gd = global.gd;
 
 type Props = {|
@@ -18,6 +18,7 @@ type Props = {|
   onChange: (newVariableType: string) => void,
   isHighlighted?: boolean,
   disabled?: boolean,
+  id?: string,
 |};
 
 let options;
@@ -111,6 +112,7 @@ const VariableTypeSelector = (props: Props) => {
             : undefined
         }
         disabled={props.disabled}
+        id={props.id}
       >
         {getOptions()}
       </SelectField>

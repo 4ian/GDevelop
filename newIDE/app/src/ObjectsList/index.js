@@ -45,6 +45,9 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { Column, Line } from '../UI/Grid';
+import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -730,13 +733,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Tags`),
             submenu: buildTagsMenuTemplate({
-              noTagLabel: 'No tags',
+              noTagLabel: i18n._(t`No tags`),
               getAllTags: getAllObjectTags,
               selectedTags: getTagsFromString(object.getTags()),
               onChange: objectTags => {
                 changeObjectTags(object, objectTags);
               },
-              editTagsLabel: 'Add/edit tags...',
+              editTagsLabel: i18n._(t`Add/edit tags...`),
               onEditTags: () => openEditTagDialog(object),
             }),
           },
@@ -799,6 +802,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     return (
       <Background maxWidth>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text => setSearchText(text)}
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </Line>
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
@@ -827,9 +840,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     onEditItem={objectWithContext =>
                       onEditObject(objectWithContext.object)
                     }
-                    onAddNewItem={onAddNewObject}
-                    addNewItemLabel={<Trans>Add a new object</Trans>}
-                    addNewItemId="add-new-object-button"
                     selectedItems={selectedObjects}
                     onItemSelected={selectObject}
                     renamedItem={displayedRenamedObjectWithContext}
@@ -845,13 +855,17 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text => setSearchText(text)}
-          aspect="integrated-search-bar"
-          placeholder={t`Search objects`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new object</Trans>}
+              primary
+              onClick={onAddNewObject}
+              id="add-new-object-button"
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
         {newObjectDialogOpen && (
           <NewObjectDialog
             onClose={() => setNewObjectDialogOpen(false)}

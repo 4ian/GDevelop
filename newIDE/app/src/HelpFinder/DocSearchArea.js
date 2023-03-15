@@ -194,7 +194,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
           </React.Fragment>
         )}
         <Text align="right">
-          This search is powered by{' '}
+          <Trans>This search is powered by</Trans>{' '}
           <FlatButton
             onClick={() => Window.openExternalURL('http://algolia.com/')}
             label={'Algolia'}

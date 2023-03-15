@@ -82,12 +82,14 @@ type Props = {|
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const LearnSection = ({
   onCreateProject,
   onTabChange,
   onOpenHelpFinder,
+  selectInAppTutorial,
 }: Props) => {
   const {
     tutorials,
@@ -129,6 +131,7 @@ const LearnSection = ({
       onTabChange={onTabChange}
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}
+      selectInAppTutorial={selectInAppTutorial}
     />
   ) : (
     <TutorialsCategoryPage

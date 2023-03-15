@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import EditProfileDialog from '../../../Profile/EditProfileDialog';
@@ -11,8 +12,8 @@ export default {
 };
 
 const defaultProps = {
-  onClose: () => {},
-  onEdit: async () => {},
+  onClose: () => action('onClose')(),
+  onEdit: action('onEdit'),
   updateProfileInProgress: false,
   error: null,
   profile: {
@@ -24,6 +25,9 @@ const defaultProps = {
     getNewsletterEmail: true,
     isCreator: true,
     isPlayer: false,
+    createdAt: 12345,
+    updatedAt: 12345,
+    appLanguage: 'en',
     donateLink: 'https://www.gdevelop-app.com',
   },
 };

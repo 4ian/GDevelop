@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import MuiLinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles } from '@material-ui/core';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 const styles = {
   linearProgress: { flex: 1 },

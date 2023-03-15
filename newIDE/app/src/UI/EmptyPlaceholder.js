@@ -67,7 +67,7 @@ export const EmptyPlaceholder = (props: Props) => (
           {props.tutorialId ? (
             <TutorialButton
               tutorialId={props.tutorialId}
-              label="Watch tutorial"
+              label={<Trans>Watch tutorial</Trans>}
               renderIfNotFound={
                 <DefaultHelpButton helpPagePath={props.helpPagePath} />
               }

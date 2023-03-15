@@ -1037,7 +1037,7 @@ namespace gdjs {
     _hotReloadRuntimeLayer(
       oldLayer: LayerData,
       newLayer: LayerData,
-      runtimeLayer: gdjs.Layer
+      runtimeLayer: gdjs.RuntimeLayer
     ): void {
       // Properties
       if (oldLayer.visibility !== newLayer.visibility) {
@@ -1073,7 +1073,7 @@ namespace gdjs {
     _hotReloadRuntimeLayerEffects(
       oldEffectsData: EffectData[],
       newEffectsData: EffectData[],
-      runtimeLayer: gdjs.Layer
+      runtimeLayer: gdjs.RuntimeLayer
     ): void {
       oldEffectsData.forEach((oldEffectData) => {
         const name = oldEffectData.name;
@@ -1115,7 +1115,7 @@ namespace gdjs {
     _hotReloadRuntimeLayerEffect(
       oldEffectData: EffectData,
       newEffectData: EffectData,
-      runtimeLayer: gdjs.Layer,
+      runtimeLayer: gdjs.RuntimeLayer,
       effectName: string
     ): void {
       // We consider oldEffectData.effectType and newEffectData.effectType

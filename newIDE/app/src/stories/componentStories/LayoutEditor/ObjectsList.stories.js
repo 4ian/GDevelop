@@ -23,6 +23,42 @@ export default {
 
 export const Default = () => (
   <DragAndDropContextProvider>
+    <div style={{ height: 400 }}>
+      <ObjectsList
+        getThumbnail={() => 'res/unknown32.png'}
+        project={testProject.project}
+        objectsContainer={testProject.testLayout}
+        layout={testProject.testLayout}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
+        onEditObject={action('On edit object')}
+        onExportObject={action('On export object')}
+        onAddObjectInstance={action('On add instance to the scene')}
+        onObjectCreated={action('On object created')}
+        selectedObjectNames={[]}
+        selectedObjectTags={[]}
+        onChangeSelectedObjectTags={selectedObjectTags => {}}
+        getAllObjectTags={() => []}
+        canRenameObject={() => true}
+        onDeleteObject={(objectWithContext, cb) => cb(true)}
+        onRenameObjectStart={() => {}}
+        onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
+        onObjectSelected={() => {}}
+        renamedObjectWithContext={null}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        canInstallPrivateAsset={() => false}
+      />
+    </div>
+  </DragAndDropContextProvider>
+);
+
+export const WithSerializedObjectView = () => (
+  <DragAndDropContextProvider>
     <SerializedObjectDisplay object={testProject.testLayout}>
       <div style={{ height: 250 }}>
         <ObjectsList
@@ -61,43 +97,41 @@ export const Default = () => (
 
 export const WithTags = () => (
   <DragAndDropContextProvider>
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout}
-          layout={testProject.testLayout}
-          resourceManagementProps={{
-            getStorageProvider: () => emptyStorageProvider,
-            onFetchNewlyAddedResources: async () => {},
-            resourceSources: [],
-            onChooseResource: () => Promise.reject('Unimplemented'),
-            resourceExternalEditors: fakeResourceExternalEditors,
-          }}
-          onEditObject={action('On edit object')}
-          onExportObject={action('On export object')}
-          onAddObjectInstance={action('On add instance to the scene')}
-          onObjectCreated={action('On object created')}
-          selectedObjectNames={[]}
-          selectedObjectTags={['Tag1', 'Tag2']}
-          onChangeSelectedObjectTags={action('on change selected object tags')}
-          getAllObjectTags={() => [
-            'Tag1',
-            'Tag2',
-            'Looooooooooong Tag 3',
-            'Unselected Tag 4',
-          ]}
-          canRenameObject={() => true}
-          onDeleteObject={(objectWithContext, cb) => cb(true)}
-          onRenameObjectStart={() => {}}
-          onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
-          onObjectSelected={() => {}}
-          renamedObjectWithContext={null}
-          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-          canInstallPrivateAsset={() => false}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <div style={{ height: 250 }}>
+      <ObjectsList
+        getThumbnail={() => 'res/unknown32.png'}
+        project={testProject.project}
+        objectsContainer={testProject.testLayout}
+        layout={testProject.testLayout}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
+        onEditObject={action('On edit object')}
+        onExportObject={action('On export object')}
+        onAddObjectInstance={action('On add instance to the scene')}
+        onObjectCreated={action('On object created')}
+        selectedObjectNames={[]}
+        selectedObjectTags={['Tag1', 'Tag2']}
+        onChangeSelectedObjectTags={action('on change selected object tags')}
+        getAllObjectTags={() => [
+          'Tag1',
+          'Tag2',
+          'Looooooooooong Tag 3',
+          'Unselected Tag 4',
+        ]}
+        canRenameObject={() => true}
+        onDeleteObject={(objectWithContext, cb) => cb(true)}
+        onRenameObjectStart={() => {}}
+        onRenameObjectFinish={(objectWithContext, newName, cb) => cb(true)}
+        onObjectSelected={() => {}}
+        renamedObjectWithContext={null}
+        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+        canInstallPrivateAsset={() => false}
+      />
+    </div>
   </DragAndDropContextProvider>
 );

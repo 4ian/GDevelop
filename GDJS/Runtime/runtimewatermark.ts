@@ -277,8 +277,8 @@ namespace gdjs {
         linkElement.id = 'watermark-link';
 
         let targetUrl = this._authorUsername
-          ? new URL(`https://liluo.io/${this._authorUsername}`)
-          : new URL('https://liluo.io');
+          ? new URL(`https://gd.games/${this._authorUsername}`)
+          : new URL('https://gd.games');
 
         if (this._isDevEnvironment) {
           targetUrl.searchParams.set('dev', 'true');

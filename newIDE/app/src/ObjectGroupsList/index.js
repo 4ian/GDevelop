@@ -25,6 +25,9 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { Column, Line } from '../UI/Grid';
+import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -400,6 +403,20 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search object groups`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -419,9 +436,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     onEditItem={groupWithContext =>
                       this.props.onEditGroup(groupWithContext.group)
                     }
-                    onAddNewItem={this.addGroup}
-                    addNewItemLabel={<Trans>Add a new group</Trans>}
-                    addNewItemId="add-new-group-button"
                     selectedItems={[]}
                     onItemSelected={groupWithContext => {
                       this.setState({
@@ -440,17 +454,17 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search object groups`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new group</Trans>}
+              primary
+              onClick={this.addGroup}
+              id="add-new-group-button"
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

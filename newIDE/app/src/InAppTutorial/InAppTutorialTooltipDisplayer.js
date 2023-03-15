@@ -10,12 +10,12 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import { type InAppTutorialFormattedTooltip } from './InAppTutorialContext';
+import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
@@ -138,13 +138,13 @@ const TooltipBody = ({
   return (
     <>
       {tooltip.title && (
-        <Typography style={styles.title} variant="subtitle">
+        <Typography style={styles.title} variant="subtitle1" translate="no">
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}
       {tooltip.title && tooltip.description && <span style={styles.divider} />}
       {tooltip.description && (
-        <Typography style={styles.description}>
+        <Typography style={styles.description} translate="no">
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}
@@ -205,7 +205,10 @@ const TooltipHeader = ({
       noMargin
       justifyContent={tooltipContent ? undefined : 'space-between'}
     >
-      <Typography style={{ ...styles.headerText, color: progressColor }}>
+      <Typography
+        style={{ ...styles.headerText, color: progressColor }}
+        translate="no"
+      >
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
@@ -222,7 +225,7 @@ const TooltipHeader = ({
               }}
             >
               <Cross />
-              <Typography style={styles.headerText}>
+              <Typography style={styles.headerText} translate="no">
                 <Trans>Quit tutorial</Trans>
               </Typography>
             </div>
@@ -232,6 +235,7 @@ const TooltipHeader = ({
           <Typography
             variant="body2"
             style={{ ...styles.headerContentPreview, ...textEllipsisStyle }}
+            translate="no"
           >
             {tooltipContent}
           </Typography>
@@ -320,6 +324,10 @@ const InAppTutorialTooltipDisplayer = ({
             offset: {
               enabled: true,
               offset: '0,10',
+            },
+            preventOverflow: {
+              enabled: true,
+              boundariesElement: document.querySelector('.main-frame'),
             },
           },
         }}

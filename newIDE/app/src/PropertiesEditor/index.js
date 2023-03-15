@@ -310,6 +310,7 @@ const PropertiesEditor = ({
               )
             }
             key={field.name}
+            id={field.name}
             checked={getFieldValue({ instances, field })}
             onCheck={(event, newValue) => {
               instances.forEach(i => setValue(i, !!newValue));

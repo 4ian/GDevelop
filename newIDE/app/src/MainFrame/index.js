@@ -85,6 +85,7 @@ import PreferencesContext, {
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
 import CreateProjectDialog, {
+  createNewProjectFromTutorialTemplate,
   createNewProjectWithDefaultLogin,
   type NewProjectSetup,
 } from '../ProjectCreation/CreateProjectDialog';
@@ -139,7 +140,7 @@ import {
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import StartInAppTutorialDialog from './InAppTutorial/StartInAppTutorialDialog';
+import StartInAppTutorialDialog from './EditorContainers/HomePage/InAppTutorials/StartInAppTutorialDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import {
   sendInAppTutorialStarted,
@@ -161,7 +162,6 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { useOpenInitialDialog } from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
-import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
 import TabsTitlebar from './TabsTitlebar';
 import { registerGame } from '../Utils/GDevelopServices/Game';
 import RouterContext from './RouterContext';
@@ -169,6 +169,11 @@ import {
   useStableUpToDateCallback,
   useStableUpToDateRef,
 } from '../Utils/UseStableUpToDateCallback';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import {
+  isMiniTutorial,
+  allInAppTutorialIds,
+} from '../Utils/GDevelopServices/InAppTutorial';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -383,6 +388,7 @@ const MainFrame = (props: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
     currentlyRunningInAppTutorial,
+    getInAppTutorialShortHeader,
     endTutorial: doEndTutorial,
     startTutorial,
     startStepIndex,
@@ -536,8 +542,10 @@ const MainFrame = (props: Props) => {
   );
 
   useOpenInitialDialog({
-    openOnboardingDialog: () => {
-      selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
+    openInAppTutorialDialog: (tutorialId: string) => {
+      if (allInAppTutorialIds.includes(tutorialId)) {
+        selectInAppTutorial(tutorialId);
+      }
     },
     openProfileDialog,
   });
@@ -669,34 +677,41 @@ const MainFrame = (props: Props) => {
   useDiscordRichPresence(currentProject);
 
   const closeProject = React.useCallback(
-    (): Promise<void> => {
+    async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
-      return setState(state => {
-        if (!currentProject) {
-          // It's important to return a new object to ensure that the promise
-          // will be fired.
-          return { ...state };
-        }
 
-        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-          currentProject
-        );
-        currentProject.delete();
-        if (unsavedChanges.hasUnsavedChanges) {
-          unsavedChanges.sealUnsavedChanges();
-        }
+      console.info('Closing project...');
 
-        return {
-          ...state,
-          currentProject: null,
-          currentFileMetadata: null,
-          editorTabs: closeProjectTabs(state.editorTabs, currentProject),
-        };
-      }).then(() => {});
+      // While not strictly necessary, use `currentProjectRef` to be 100%
+      // sure to have the latest project (avoid risking any stale variable to an old
+      // `currentProject` from the state in case someone kept an old reference to `closeProject`
+      // somewhere).
+      const currentProject = currentProjectRef.current;
+      if (!currentProject) return;
+
+      // Close the editors related to this project.
+      await setState(state => ({
+        ...state,
+        currentProject: null,
+        currentFileMetadata: null,
+        editorTabs: closeProjectTabs(state.editorTabs, currentProject),
+      }));
+
+      // Delete the project from memory. All references to it have been dropped previously
+      // by the setState.
+      console.info('Deleting project from memory...');
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      currentProject.delete();
+      if (unsavedChanges.hasUnsavedChanges) {
+        unsavedChanges.sealUnsavedChanges();
+      }
+      console.info('Project closed.');
     },
     [
-      currentProject,
+      currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
@@ -875,21 +890,26 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       try {
         await delay(150);
-        const autoSavefileMetadata = await checkForAutosave();
+        const autoSaveFileMetadata = await checkForAutosave();
         let content;
         try {
           const result = await onOpen(
-            autoSavefileMetadata,
+            autoSaveFileMetadata,
             setLoaderModalProgress
           );
           content = result.content;
         } catch (error) {
-          // onOpen failed, tried to find again an autosave
-          const autoSaveAfterFailurefileMetadata = await checkForAutosaveAfterFailure();
-          if (autoSaveAfterFailurefileMetadata) {
-            const result = await onOpen(autoSaveAfterFailurefileMetadata);
+          // onOpen failed, try to find again an autosave.
+          const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
+          if (autoSaveAfterFailureFileMetadata) {
+            const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        }
+        if (!content) {
+          throw new Error(
+            'The project file content could not be read. It might be corrupted/malformed.'
+          );
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
@@ -967,15 +987,11 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtensionName
       )
     ) {
-      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-        eventsFunctionsExtensionName
-      );
-
       setState(state => ({
         ...state,
         editorTabs: closeEventsFunctionsExtensionTabs(
           state.editorTabs,
-          eventsFunctionsExtension
+          eventsFunctionsExtensionName
         ),
       }));
     }
@@ -1061,16 +1077,16 @@ const MainFrame = (props: Props) => {
     );
     if (!answer) return;
 
+    const extensionName = eventsFunctionsExtension.getName();
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(
         state.editorTabs,
-        eventsFunctionsExtension
+        extensionName
       ),
     })).then(state => {
       // Unload the Platform extension that was generated from the events
       // functions extension.
-      const extensionName = eventsFunctionsExtension.getName();
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
         currentProject,
         extensionName
@@ -1236,26 +1252,25 @@ const MainFrame = (props: Props) => {
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
     );
+
+    // Refactor the project to update the instructions (and later expressions)
+    // of this extension:
+    gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
+      currentProject,
+      eventsFunctionsExtension,
+      oldName,
+      newName
+    );
+    eventsFunctionsExtension.setName(newName);
+    eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
+      currentProject,
+      oldName
+    );
+
     setState(state => ({
       ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(
-        state.editorTabs,
-        eventsFunctionsExtension
-      ),
+      editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
     })).then(state => {
-      // Refactor the project to update the instructions (and later expressions)
-      // of this extension:
-      gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
-        currentProject,
-        eventsFunctionsExtension,
-        oldName,
-        newName
-      );
-      eventsFunctionsExtension.setName(newName);
-      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
-        currentProject,
-        oldName
-      );
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
@@ -1567,7 +1582,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          icon: <HomeIcon titleAccess="Home" fontSize="small" />,
+          icon: <HomeIcon titleAccess="Home" />,
           label: i18n._(t`Home`),
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,
@@ -2030,6 +2045,7 @@ const MainFrame = (props: Props) => {
         preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
         if (
           currentlyRunningInAppTutorial &&
+          !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
           inAppTutorialOrchestratorRef.current
         ) {
           preferences.saveTutorialProgress({
@@ -2292,16 +2308,14 @@ const MainFrame = (props: Props) => {
   };
 
   const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
-    setState(state => {
-      return {
-        ...state,
-        editorTabs: moveTabToTheRightOfHoveredTab(
-          state.editorTabs,
-          fromIndex,
-          toHoveredIndex
-        ),
-      };
-    });
+    setState(state => ({
+      ...state,
+      editorTabs: moveTabToTheRightOfHoveredTab(
+        state.editorTabs,
+        fromIndex,
+        toHoveredIndex
+      ),
+    }));
   };
 
   const endTutorial = React.useCallback(
@@ -2328,68 +2342,6 @@ const MainFrame = (props: Props) => {
       setSelectedInAppTutorialInfo({ tutorialId, userProgress });
     },
     [preferences, authenticatedUser.profile]
-  );
-
-  const startSelectedTutorial = React.useCallback(
-    async (scenario: 'resume' | 'startOver' | 'start') => {
-      if (!selectedInAppTutorialInfo) return;
-      const { userProgress, tutorialId } = selectedInAppTutorialInfo;
-      if (userProgress && scenario === 'resume') {
-        if (currentProject) {
-          // If there's a project opened, check if this is the one we should open
-          // for the stored tutorial userProgress.
-          if (
-            currentFileMetadata &&
-            currentFileMetadata.fileIdentifier !==
-              userProgress.fileMetadataAndStorageProviderName.fileMetadata
-                .fileIdentifier
-          ) {
-            const projectIsClosed = await askToCloseProject();
-            if (!projectIsClosed) {
-              return;
-            }
-            openFromFileMetadataWithStorageProvider(
-              userProgress.fileMetadataAndStorageProviderName,
-              { openAllScenes: true }
-            );
-          } else {
-            // If the current project is the same stored for the tutorial,
-            // open all scenes.
-            openAllScenes({ currentProject, editorTabs: state.editorTabs });
-          }
-        } else {
-          openFromFileMetadataWithStorageProvider(
-            userProgress.fileMetadataAndStorageProviderName,
-            { openAllScenes: true }
-          );
-        }
-      } else {
-        const projectIsClosed = await askToCloseProject();
-        if (!projectIsClosed) {
-          return;
-        }
-      }
-
-      await startTutorial({
-        tutorialId,
-        initialStepIndex:
-          userProgress && scenario === 'resume' ? userProgress.step : 0,
-        initialProjectData:
-          userProgress && scenario === 'resume' ? userProgress.projectData : {},
-      });
-      sendInAppTutorialStarted({ tutorialId, scenario });
-      setSelectedInAppTutorialInfo(null);
-    },
-    [
-      askToCloseProject,
-      startTutorial,
-      selectedInAppTutorialInfo,
-      openFromFileMetadataWithStorageProvider,
-      state.editorTabs,
-      currentProject,
-      currentFileMetadata,
-      openAllScenes,
-    ]
   );
 
   const onChangeProjectName = async (newName: string): Promise<void> => {
@@ -2462,176 +2414,310 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const createProject = async (
-    i18n: I18n,
-    newProjectSetup: NewProjectSetup
-  ) => {
-    setIsProjectOpening(true);
+  const createProject = React.useCallback(
+    async (i18n: I18n, newProjectSetup: NewProjectSetup) => {
+      setIsProjectOpening(true);
 
-    try {
-      const source = selectedExampleShortHeader
-        ? await createNewProjectFromExampleShortHeader({
-            i18n,
-            exampleShortHeader: selectedExampleShortHeader,
-          })
-        : newProjectSetup.allowPlayersToLogIn
-        ? await createNewProjectWithDefaultLogin()
-        : await createNewProject();
+      // 4 cases when creating a project:
+      // - From an example
+      // - From an in-app tutorial
+      // - With the default login enabled
+      // - Empty project
 
-      if (!source) return; // New project creation aborted.
-
-      let state: ?State;
-      const sourceStorageProvider = source.storageProvider;
-      const sourceStorageProviderOperations = sourceStorageProvider
-        ? getStorageProviderOperations(source.storageProvider)
+      const selectedInAppTutorialShortHeader = selectedInAppTutorialInfo
+        ? getInAppTutorialShortHeader(selectedInAppTutorialInfo.tutorialId)
         : null;
-      if (source.project) {
-        state = await loadFromProject(source.project, null);
-      } else if (source.fileMetadata && sourceStorageProvider) {
-        state = await openFromFileMetadata(source.fileMetadata);
-      }
 
-      if (!state) {
-        throw new Error(
-          'Neither a project nor a file metadata to load was provided for the new project'
-        );
-      }
+      try {
+        const source = selectedExampleShortHeader
+          ? await createNewProjectFromExampleShortHeader({
+              i18n,
+              exampleShortHeader: selectedExampleShortHeader,
+            })
+          : selectedInAppTutorialShortHeader &&
+            selectedInAppTutorialShortHeader.initialTemplateUrl
+          ? await createNewProjectFromTutorialTemplate(
+              selectedInAppTutorialShortHeader.initialTemplateUrl
+            )
+          : newProjectSetup.allowPlayersToLogIn
+          ? await createNewProjectWithDefaultLogin()
+          : await createNewProject();
 
-      const { currentProject, editorTabs } = state;
-      if (!currentProject) {
-        throw new Error('The new project could not be opened.');
-      }
+        if (!source) return; // New project creation aborted.
 
-      const oldProjectId = currentProject.getProjectUuid();
-      currentProject.resetProjectUuid();
-
-      currentProject.setVersion('1.0.0');
-      currentProject.getAuthorIds().clear();
-      currentProject.setAuthor('');
-      if (selectedExampleShortHeader) {
-        // Use the project settings of the example and add template slug to project
-        currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
-      } else {
-        // Use the project settings requested by the user
-        currentProject.setGameResolutionSize(
-          newProjectSetup.width,
-          newProjectSetup.height
-        );
-        currentProject.setOrientation(newProjectSetup.orientation);
-        if (newProjectSetup.optimizeForPixelArt) {
-          currentProject.setPixelsRounding(true);
-          currentProject.setScaleMode('nearest');
+        let state: ?State;
+        const sourceStorageProvider = source.storageProvider;
+        const sourceStorageProviderOperations = sourceStorageProvider
+          ? getStorageProviderOperations(source.storageProvider)
+          : null;
+        if (source.project) {
+          state = await loadFromProject(source.project, null);
+        } else if (source.fileMetadata && sourceStorageProvider) {
+          state = await openFromFileMetadata(source.fileMetadata);
         }
-      }
 
-      if (newProjectSetup.projectName) {
-        currentProject.setName(newProjectSetup.projectName);
-      }
+        if (!state) {
+          throw new Error(
+            'Neither a project nor a file metadata to load was provided for the new project'
+          );
+        }
 
-      if (authenticatedUser.profile) {
-        // if the user is connected, try to register the game to avoid
-        // any gdevelop services to ask the user to register the game.
-        // (for instance, leaderboards, player authentication, ...)
-        try {
-          await registerGame(
-            authenticatedUser.getAuthorizationHeader,
-            authenticatedUser.profile.id,
+        const { currentProject, editorTabs } = state;
+        if (!currentProject) {
+          throw new Error('The new project could not be opened.');
+        }
+
+        const oldProjectId = currentProject.getProjectUuid();
+        currentProject.resetProjectUuid();
+
+        currentProject.setVersion('1.0.0');
+        currentProject.getAuthorIds().clear();
+        currentProject.setAuthor('');
+        if (selectedExampleShortHeader) {
+          // Use the project settings of the example and add template slug to project
+          currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
+        } else if (selectedInAppTutorialShortHeader) {
+          // Don't do anything, the project settings are already set by the tutorial.
+        } else {
+          // Use the project settings requested by the user
+          if (newProjectSetup.width && newProjectSetup.height) {
+            currentProject.setGameResolutionSize(
+              newProjectSetup.width,
+              newProjectSetup.height
+            );
+          }
+          if (newProjectSetup.orientation)
+            currentProject.setOrientation(newProjectSetup.orientation);
+          if (newProjectSetup.optimizeForPixelArt) {
+            currentProject.setPixelsRounding(true);
+            currentProject.setScaleMode('nearest');
+          }
+        }
+
+        if (!selectedInAppTutorialShortHeader) {
+          // If the project is a tutorial, keep the project name.
+          currentProject.setName(newProjectSetup.projectName || 'New game');
+        }
+
+        if (authenticatedUser.profile) {
+          // if the user is connected, try to register the game to avoid
+          // any gdevelop services to ask the user to register the game.
+          // (for instance, leaderboards, player authentication, ...)
+          try {
+            await registerGame(
+              authenticatedUser.getAuthorizationHeader,
+              authenticatedUser.profile.id,
+              {
+                gameId: currentProject.getProjectUuid(),
+                authorName:
+                  currentProject.getAuthor() || 'Unspecified publisher',
+                gameName: currentProject.getName() || 'Untitled game',
+                templateSlug: currentProject.getTemplateSlug(),
+              }
+            );
+          } catch (error) {
+            // Do not prevent the user from opening the game if the registration failed.
+            console.error(
+              'Unable to register the game to the user profile, the game will not be listed in the user profile.',
+              error
+            );
+          }
+        }
+
+        const destinationStorageProviderOperations = getStorageProviderOperations(
+          newProjectSetup.storageProvider
+        );
+
+        const { onSaveProjectAs } = destinationStorageProviderOperations;
+
+        if (onSaveProjectAs) {
+          const { wasSaved, fileMetadata } = await onSaveProjectAs(
+            currentProject,
+            newProjectSetup.saveAsLocation,
             {
-              gameId: currentProject.getProjectUuid(),
-              authorName: currentProject.getAuthor() || 'Unspecified publisher',
-              gameName: currentProject.getName() || 'Untitled game',
-              templateSlug: currentProject.getTemplateSlug(),
+              onStartSaving: () => {
+                console.log('Start saving as the new project...');
+              },
+              onMoveResources: async ({ newFileMetadata }) => {
+                if (
+                  !sourceStorageProvider ||
+                  !sourceStorageProviderOperations ||
+                  !source.fileMetadata
+                ) {
+                  console.log(
+                    'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
+                  );
+                  return;
+                }
+
+                await ensureResourcesAreMoved({
+                  project: currentProject,
+                  newFileMetadata,
+                  newStorageProvider: newProjectSetup.storageProvider,
+                  newStorageProviderOperations: destinationStorageProviderOperations,
+                  oldFileMetadata: source.fileMetadata,
+                  oldStorageProvider: sourceStorageProvider,
+                  oldStorageProviderOperations: sourceStorageProviderOperations,
+                  authenticatedUser,
+                });
+              },
             }
           );
-        } catch (error) {
-          // Do not prevent the user from opening the game if the registration failed.
-          console.error(
-            'Unable to register the game to the user profile, the game will not be listed in the user profile.',
-            error
+
+          if (wasSaved) {
+            setState(state => ({
+              ...state,
+              currentFileMetadata: fileMetadata,
+            }));
+            unsavedChanges.sealUnsavedChanges();
+            if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
+              preferences.setHasProjectOpened(true);
+            }
+          }
+        }
+
+        // We were able to load and then save the project. We can now close the dialog,
+        // open the project editors and check if leaderboards must be replaced.
+        setNewProjectSetupDialogOpen(false);
+        setSelectedExampleShortHeader(null);
+        await setState(state => ({ ...state, createDialogOpen: false }));
+        findLeaderboardsToReplace(currentProject, oldProjectId);
+        openSceneOrProjectManager({
+          currentProject: currentProject,
+          editorTabs: editorTabs,
+        });
+      } catch (rawError) {
+        const { getWriteErrorMessage } = getStorageProviderOperations();
+        const errorMessage = getWriteErrorMessage
+          ? getWriteErrorMessage(rawError)
+          : t`An error occurred when opening or saving the project. Try again later or choose another location to save the project to.`;
+
+        showErrorBox({
+          message: i18n._(errorMessage),
+          rawError,
+          errorId: 'project-creation-save-as-error',
+        });
+      } finally {
+        // Stop the loading when we're successful or have failed.
+        setIsProjectOpening(false);
+        setIsLoadingProject(false);
+        setLoaderModalProgress(null, null);
+      }
+    },
+    [
+      ensureResourcesAreMoved,
+      findLeaderboardsToReplace,
+      getStorageProviderOperations,
+      openSceneOrProjectManager,
+      preferences,
+      setState,
+      unsavedChanges,
+      authenticatedUser,
+      loadFromProject,
+      openFromFileMetadata,
+      selectedExampleShortHeader,
+      getInAppTutorialShortHeader,
+      selectedInAppTutorialInfo,
+    ]
+  );
+
+  const startSelectedTutorial = React.useCallback(
+    async (scenario: 'resume' | 'startOver' | 'start') => {
+      if (!selectedInAppTutorialInfo) return;
+      const { userProgress, tutorialId } = selectedInAppTutorialInfo;
+      if (userProgress && scenario === 'resume') {
+        if (currentProject) {
+          // If there's a project opened, check if this is the one we should open
+          // for the stored tutorial userProgress.
+          if (
+            currentFileMetadata &&
+            currentFileMetadata.fileIdentifier !==
+              userProgress.fileMetadataAndStorageProviderName.fileMetadata
+                .fileIdentifier
+          ) {
+            const projectIsClosed = await askToCloseProject();
+            if (!projectIsClosed) {
+              return;
+            }
+            openFromFileMetadataWithStorageProvider(
+              userProgress.fileMetadataAndStorageProviderName,
+              { openAllScenes: true }
+            );
+          } else {
+            // If the current project is the same stored for the tutorial,
+            // open all scenes.
+            openAllScenes({ currentProject, editorTabs: state.editorTabs });
+          }
+        } else {
+          openFromFileMetadataWithStorageProvider(
+            userProgress.fileMetadataAndStorageProviderName,
+            { openAllScenes: true }
           );
         }
-      }
-
-      const destinationStorageProviderOperations = getStorageProviderOperations(
-        newProjectSetup.storageProvider
-      );
-
-      const { onSaveProjectAs } = destinationStorageProviderOperations;
-
-      if (onSaveProjectAs) {
-        const { wasSaved, fileMetadata } = await onSaveProjectAs(
-          currentProject,
-          newProjectSetup.saveAsLocation,
-          {
-            onStartSaving: () => {
-              console.log('Start saving as the new project...');
-            },
-            onMoveResources: async ({ newFileMetadata }) => {
-              if (
-                !sourceStorageProvider ||
-                !sourceStorageProviderOperations ||
-                !source.fileMetadata
-              ) {
-                console.log(
-                  'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
-                );
-                return;
-              }
-
-              await ensureResourcesAreMoved({
-                project: currentProject,
-                newFileMetadata,
-                newStorageProvider: newProjectSetup.storageProvider,
-                newStorageProviderOperations: destinationStorageProviderOperations,
-                oldFileMetadata: source.fileMetadata,
-                oldStorageProvider: sourceStorageProvider,
-                oldStorageProviderOperations: sourceStorageProviderOperations,
-                authenticatedUser,
-              });
-            },
-          }
-        );
-
-        if (wasSaved) {
-          setState(state => ({
-            ...state,
-            currentFileMetadata: fileMetadata,
-          }));
-          unsavedChanges.sealUnsavedChanges();
-          if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
-            preferences.setHasProjectOpened(true);
-          }
+      } else {
+        const projectIsClosed = await askToCloseProject();
+        if (!projectIsClosed) {
+          return;
         }
       }
 
-      // We were able to load and then save the project. We can now close the dialog,
-      // open the project editors and check if leaderboards must be replaced.
-      setNewProjectSetupDialogOpen(false);
-      setSelectedExampleShortHeader(null);
-      await setState(state => ({ ...state, createDialogOpen: false }));
-      findLeaderboardsToReplace(currentProject, oldProjectId);
-      openSceneOrProjectManager({
-        currentProject: currentProject,
-        editorTabs: editorTabs,
-      });
-    } catch (rawError) {
-      const { getWriteErrorMessage } = getStorageProviderOperations();
-      const errorMessage = getWriteErrorMessage
-        ? getWriteErrorMessage(rawError)
-        : t`An error occurred when opening or saving the project. Try again later or choose another location to save the project to.`;
+      const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
+        tutorialId
+      );
+      if (!selectedInAppTutorialShortHeader) return;
 
-      showErrorBox({
-        message: i18n._(errorMessage),
-        rawError,
-        errorId: 'project-creation-save-as-error',
+      // If the tutorial has a template, create a new project from it.
+      const initialTemplateUrl =
+        selectedInAppTutorialShortHeader.initialTemplateUrl;
+      if (initialTemplateUrl) {
+        try {
+          await createProject(i18n, {
+            storageProvider: emptyStorageProvider,
+            saveAsLocation: null,
+            // Remaining will be set by the template.
+          });
+        } catch (error) {
+          showErrorBox({
+            message: i18n._(
+              t`Unable to create a new project for the tutorial. Try again later.`
+            ),
+            rawError: new Error(
+              `Can't create project from template "${initialTemplateUrl}"`
+            ),
+            errorId: 'cannot-create-project-from-template',
+          });
+          return;
+        }
+      }
+
+      const initialStepIndex = userProgress && scenario === 'resume' ? 1 : 0;
+      const initialProjectData =
+        userProgress && scenario === 'resume'
+          ? userProgress.projectData
+          : selectedInAppTutorialShortHeader.initialProjectData || {};
+
+      await startTutorial({
+        tutorialId,
+        initialStepIndex,
+        initialProjectData,
       });
-    } finally {
-      // Stop the loading when we're successful or have failed.
-      setIsProjectOpening(false);
-      setIsLoadingProject(false);
-      setLoaderModalProgress(null, null);
-    }
-  };
+      sendInAppTutorialStarted({ tutorialId, scenario });
+      setSelectedInAppTutorialInfo(null);
+    },
+    [
+      i18n,
+      getInAppTutorialShortHeader,
+      createProject,
+      askToCloseProject,
+      startTutorial,
+      selectedInAppTutorialInfo,
+      openFromFileMetadataWithStorageProvider,
+      state.editorTabs,
+      currentProject,
+      currentFileMetadata,
+      openAllScenes,
+    ]
+  );
 
   const fetchNewlyAddedResources = React.useCallback(
     async (): Promise<void> => {
@@ -2897,7 +2983,10 @@ const MainFrame = (props: Props) => {
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
-                <ErrorBoundary>
+                <ErrorBoundary
+                  title="This editor encountered a problem"
+                  scope="mainframe"
+                >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
@@ -2951,6 +3040,11 @@ const MainFrame = (props: Props) => {
                     onLoadEventsFunctionsExtensions: () =>
                       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                         currentProject
+                      ),
+                    onReloadEventsFunctionsExtensionMetadata: extension =>
+                      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                        currentProject,
+                        extension
                       ),
                     onDeleteResource: (
                       resource: gdResource,
@@ -3180,8 +3274,15 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
-          endTutorial={(shouldCloseProject?: boolean) => {
+          endTutorial={({
+            shouldCloseProject,
+            shouldWarnAboutUnsavedChanges,
+          }: {|
+            shouldCloseProject: boolean,
+            shouldWarnAboutUnsavedChanges: boolean,
+          |}) => {
             if (
+              shouldWarnAboutUnsavedChanges &&
               currentProject &&
               (!currentFileMetadata || unsavedChanges.hasUnsavedChanges)
             ) {

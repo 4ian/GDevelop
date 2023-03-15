@@ -18,6 +18,8 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
+import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -111,14 +113,31 @@ export const ExampleListItem = ({
           )}
           <Column expand>
             <Text noMargin>{renderExampleField('name')} </Text>
-            {exampleShortHeader.authors && (
+            {
               <Line>
-                {exampleShortHeader.authors.map(author => (
-                  <UserPublicProfileChip user={author} key={author.id} />
-                ))}
+                <div style={{ flexWrap: 'wrap' }}>
+                  {exampleShortHeader.difficultyLevel && (
+                    <ExampleDifficultyChip
+                      difficultyLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
+                  {exampleShortHeader.codeSizeLevel && (
+                    <ExampleSizeChip
+                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                    />
+                  )}
+                  {exampleShortHeader.authors &&
+                    exampleShortHeader.authors.map(author => (
+                      <UserPublicProfileChip user={author} key={author.id} />
+                    ))}
+                </div>
               </Line>
-            )}
-            <Text noMargin size="body2">
+            }
+            <Text
+              noMargin
+              size="body2"
+              displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+            >
               {renderExampleField('shortDescription')}
             </Text>
           </Column>

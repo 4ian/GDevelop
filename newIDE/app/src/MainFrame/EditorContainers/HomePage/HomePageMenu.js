@@ -16,7 +16,7 @@ import Sun from '../../../UI/CustomSvgIcons/Sun';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../UI/Paper';
 
 export const styles = {
@@ -40,6 +40,13 @@ export const styles = {
     overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column',
+  },
+  drawerTopButtonsContainer: {
+    flex: 1,
+    marginTop: 'env(safe-area-inset-top)',
+  },
+  bottomButtonsContainer: {
+    marginBottom: 'env(safe-area-inset-bottom)',
   },
 };
 
@@ -165,19 +172,22 @@ export const HomePageMenu = ({
             />
           ))}
         </Column>
-        <Column>
-          {buttons.map(({ label, getIcon, onClick, id }) => (
-            <VerticalTabButton
-              key={id}
-              label={label}
-              onClick={onClick}
-              getIcon={getIcon}
-              isActive={false}
-              hideLabel={windowWidth !== 'large'}
-              id={id}
-            />
-          ))}
-        </Column>
+
+        <div style={styles.bottomButtonsContainer}>
+          <Column>
+            {buttons.map(({ label, getIcon, onClick, id }) => (
+              <VerticalTabButton
+                key={id}
+                label={label}
+                onClick={onClick}
+                getIcon={getIcon}
+                isActive={false}
+                hideLabel={windowWidth !== 'large'}
+                id={id}
+              />
+            ))}
+          </Column>
+        </div>
       </Paper>
       <Drawer
         open={isHomePageMenuDrawerOpen}
@@ -197,41 +207,45 @@ export const HomePageMenu = ({
       >
         <Line expand>
           <Column expand>
-            <Column noMargin expand>
-              <Line noMargin justifyContent="flex-end">
-                <IconButton
-                  onClick={() => {
-                    setIsHomePageMenuDrawerOpen(false);
-                  }}
-                  size="small"
-                >
-                  <DoubleChevronArrowLeft />
-                </IconButton>
-              </Line>
-              {tabs.map(({ label, tab, getIcon }, index) => (
-                <VerticalTabButton
-                  key={index}
-                  label={label}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setIsHomePageMenuDrawerOpen(false);
-                  }}
-                  getIcon={getIcon}
-                  isActive={activeTab === tab}
-                />
-              ))}
-            </Column>
-            <Column noMargin>
-              {buttons.map(({ label, getIcon, onClick, id }) => (
-                <VerticalTabButton
-                  key={id}
-                  label={label}
-                  onClick={onClick}
-                  getIcon={getIcon}
-                  isActive={false}
-                />
-              ))}
-            </Column>
+            <div style={styles.drawerTopButtonsContainer}>
+              <Column noMargin expand>
+                <Line noMargin justifyContent="flex-end">
+                  <IconButton
+                    onClick={() => {
+                      setIsHomePageMenuDrawerOpen(false);
+                    }}
+                    size="small"
+                  >
+                    <DoubleChevronArrowLeft />
+                  </IconButton>
+                </Line>
+                {tabs.map(({ label, tab, getIcon }, index) => (
+                  <VerticalTabButton
+                    key={index}
+                    label={label}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      setIsHomePageMenuDrawerOpen(false);
+                    }}
+                    getIcon={getIcon}
+                    isActive={activeTab === tab}
+                  />
+                ))}
+              </Column>
+            </div>
+            <div style={styles.bottomButtonsContainer}>
+              <Column noMargin>
+                {buttons.map(({ label, getIcon, onClick, id }) => (
+                  <VerticalTabButton
+                    key={id}
+                    label={label}
+                    onClick={onClick}
+                    getIcon={getIcon}
+                    isActive={false}
+                  />
+                ))}
+              </Column>
+            </div>
           </Column>
         </Line>
       </Drawer>

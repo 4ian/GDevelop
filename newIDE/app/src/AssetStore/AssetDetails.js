@@ -394,8 +394,8 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         timeBetweenFrames={direction.timeBetweenFrames}
                         isLooping // Always loop in the asset store.
                         hideCheckeredBackground
-                        hideControls
-                        initialZoom={140 / Math.max(asset.width, asset.height)}
+                        deactivateControls
+                        displaySpacedView
                         fixedHeight={FIXED_HEIGHT}
                         fixedWidth={FIXED_WIDTH}
                         isAssetPrivate={isAssetPrivate}
@@ -543,6 +543,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                   onRetry={fetchAssetsAndFilters}
                   error={filterError}
                   searchItems={truncatedSearchResults}
+                  spacing={8}
                   renderSearchItem={(assetShortHeader, size) => (
                     <AssetCard
                       size={size}

@@ -4,9 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_RESOURCESRENAMER_H
-#define GDCORE_RESOURCESRENAMER_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -72,6 +70,3 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_RESOURCESRENAMER_H
-#endif

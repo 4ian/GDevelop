@@ -7,10 +7,17 @@ type Props = {|
   message: React.Node,
   touchScreenMessage?: React.Node,
   visible: boolean,
+  duration?: number,
   hide: () => void,
 |};
 
-const InfoBar = ({ visible, touchScreenMessage, message, hide }: Props) => {
+const InfoBar = ({
+  visible,
+  touchScreenMessage,
+  message,
+  hide,
+  duration = 3000,
+}: Props) => {
   const screenType = useScreenType();
 
   React.useEffect(
@@ -18,11 +25,11 @@ const InfoBar = ({ visible, touchScreenMessage, message, hide }: Props) => {
       if (visible) {
         const timeout = setTimeout(() => {
           hide();
-        }, 3000);
+        }, duration);
         return () => clearTimeout(timeout);
       }
     },
-    [visible, hide]
+    [visible, hide, duration]
   );
 
   return (

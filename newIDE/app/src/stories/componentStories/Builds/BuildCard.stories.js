@@ -15,7 +15,7 @@ import {
   completeElectronBuild,
   completeWebBuild,
   game1,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -32,7 +32,7 @@ export const WebBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
 
@@ -47,7 +47,7 @@ export const WebCurrentlyOnlineBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
 
@@ -59,7 +59,7 @@ export const ElectronBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
 export const PendingElectronBuildCard = () => (
@@ -70,7 +70,7 @@ export const PendingElectronBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
 export const CordovaBuildCard = () => (
@@ -81,7 +81,7 @@ export const CordovaBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
 export const pendingCordovaBuildCard = () => (
@@ -92,7 +92,7 @@ export const pendingCordovaBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );
 export const ErroredCordovaBuildCard = () => (
@@ -103,6 +103,6 @@ export const ErroredCordovaBuildCard = () => (
     setGameUpdating={action('setGameUpdating')}
     onBuildUpdated={action('onBuildUpdated')}
     onBuildDeleted={action('onBuildDeleted')}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
   />
 );

@@ -31,6 +31,9 @@ const fakeEditorToolbar = (
     <IconButton size="small" tooltip={'Test tooltip'} color="default">
       <DebugIcon />
     </IconButton>
+    <IconButton size="small" tooltip={'Test tooltip'} color="default" selected>
+      <DebugIcon />
+    </IconButton>
     <IconButton size="small" tooltip={'Test tooltip'} disabled color="default">
       <DebugIcon />
     </IconButton>

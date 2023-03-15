@@ -7,7 +7,7 @@ import {
   getLeaves,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
-import ThemeConsumer from '../Theme/ThemeConsumer';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import debounce from 'lodash/debounce';
 
@@ -127,6 +127,36 @@ const replaceNode = (
   }
 };
 
+// Remove the specified node (editor).
+const removeNode = (
+  currentNode: ?EditorMosaicNode,
+  oldNode: ?EditorMosaicNode
+): ?EditorMosaicNode => {
+  if (!currentNode) {
+    return currentNode;
+  } else if (typeof currentNode === 'string') {
+    if (currentNode === oldNode) return null;
+
+    return currentNode;
+  } else {
+    if (currentNode === oldNode) return null;
+
+    const first = removeNode(currentNode.first, oldNode);
+    const second = removeNode(currentNode.second, oldNode);
+
+    if (first && second) {
+      return {
+        ...currentNode,
+        first,
+        second,
+      };
+    } else {
+      if (!first) return second;
+      else return first;
+    }
+  }
+};
+
 const defaultToolbarControls = [<CloseButton key="close" />];
 
 const renderMosaicWindowPreview = props => (
@@ -157,6 +187,7 @@ type Props = {|
     [string]: Editor,
   },
   limitToOneSecondaryEditor?: boolean,
+  onOpenedEditorsChanged?: () => void,
   onPersistNodes?: EditorMosaicNode => void,
 |};
 
@@ -175,6 +206,26 @@ export default class EditorMosaic extends React.Component<Props, State> {
     mosaicNode: this.props.initialNodes,
   };
 
+  toggleEditor = (
+    editorName: string,
+    position: 'start' | 'end',
+    splitPercentage: number,
+    direction: 'row' | 'column'
+  ) => {
+    const editor = this.props.editors[editorName];
+    if (!editor) return false;
+
+    const openedEditorNames = getLeaves(this.state.mosaicNode);
+    if (openedEditorNames.indexOf(editorName) !== -1) {
+      // The editor is already opened: close it.
+      this._onChanged(removeNode(this.state.mosaicNode, editorName));
+
+      return false;
+    }
+
+    return this.openEditor(editorName, position, splitPercentage, direction);
+  };
+
   openEditor = (
     editorName: string,
     position: 'start' | 'end',
@@ -188,6 +239,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
 
     const openedEditorNames = getLeaves(this.state.mosaicNode);
     if (openedEditorNames.indexOf(editorName) !== -1) {
+      // Editor is already opened.
       return false;
     }
 
@@ -197,36 +249,47 @@ export default class EditorMosaic extends React.Component<Props, State> {
         editorName => editors[editorName].type === 'secondary'
       );
       if (secondaryEditorName) {
-        this.setState({
-          mosaicNode: replaceNode(
-            this.state.mosaicNode,
-            secondaryEditorName,
-            editorName
-          ),
-        });
+        this._onChanged(
+          replaceNode(this.state.mosaicNode, secondaryEditorName, editorName)
+        );
 
-        this._persistNodes();
         return true;
       }
     }
 
-    // Open a new editor at the indicated position
-    this.setState({
-      mosaicNode: addNode(
+    // Open a new editor at the indicated position.
+    this._onChanged(
+      addNode(
         this.state.mosaicNode,
         editorName,
         position,
         splitPercentage,
         direction
-      ),
-    });
+      )
+    );
 
-    this._persistNodes();
     return true;
+  };
+
+  getOpenedEditorNames = (): Array<string> => {
+    return getLeaves(this.state.mosaicNode);
   };
 
   _onChange = (mosaicNode: EditorMosaicNode) => {
     this.setState({ mosaicNode });
+  };
+
+  _onChanged = (mosaicNode: ?EditorMosaicNode) => {
+    this.setState({ mosaicNode }, () => {
+      this._onOpenedEditorsChanged();
+    });
+  };
+
+  _onOpenedEditorsChanged = () => {
+    if (this.props.onOpenedEditorsChanged) {
+      this.props.onOpenedEditorsChanged();
+    }
+
     this._persistNodes();
   };
 
@@ -239,11 +302,11 @@ export default class EditorMosaic extends React.Component<Props, State> {
   render() {
     const { editors } = this.props;
     return (
-      <ThemeConsumer>
-        {muiTheme => (
+      <GDevelopThemeContext.Consumer>
+        {gdevelopTheme => (
           <MosaicWithoutDragDropContext
             className={`${
-              muiTheme.mosaicRootClassName
+              gdevelopTheme.mosaicRootClassName
             } mosaic-blueprint-theme mosaic-gd-theme`}
             renderTile={(editorName: string, path: string) => {
               const editor = editors[editorName];
@@ -274,9 +337,10 @@ export default class EditorMosaic extends React.Component<Props, State> {
             }}
             value={this.state.mosaicNode}
             onChange={this._onChange}
+            onRelease={this._onChanged}
           />
         )}
-      </ThemeConsumer>
+      </GDevelopThemeContext.Consumer>
     );
   }
 }

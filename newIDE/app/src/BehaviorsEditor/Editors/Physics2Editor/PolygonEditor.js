@@ -13,7 +13,7 @@ import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
 import AddCircle from '@material-ui/icons/AddCircle';
 import Delete from '@material-ui/icons/Delete';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 
 export type Vertex = {|
   x: number,

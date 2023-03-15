@@ -47,7 +47,8 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       usageComplexity(5),
       isPrivate(false),
       isObjectInstruction(false),
-      isBehaviorInstruction(false) {}
+      isBehaviorInstruction(false),
+      relevantContext("Any") {}
 
 InstructionMetadata& InstructionMetadata::AddParameter(
     const gd::String& type,

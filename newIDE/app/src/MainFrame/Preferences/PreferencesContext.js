@@ -32,14 +32,11 @@ export type AlertMessageIdentifier =
   | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
   | 'instance-drag-n-drop-explanation'
-  | 'objects-panel-explanation'
-  | 'instance-properties-panel-explanation'
-  | 'layers-panel-explanation'
-  | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
   | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
-  | 'p2p-broker-recommendation'
+  | 'p2p-is-networking'
+  | 'p2p-dataloss'
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
@@ -139,22 +136,6 @@ export const allAlertMessages: Array<{
     label: <Trans>Using instance drag'n'drop</Trans>,
   },
   {
-    key: 'objects-panel-explanation',
-    label: <Trans>Using the objects panel</Trans>,
-  },
-  {
-    key: 'instance-properties-panel-explanation',
-    label: <Trans>Using the instance properties panel</Trans>,
-  },
-  {
-    key: 'layers-panel-explanation',
-    label: <Trans>Using the layers panel</Trans>,
-  },
-  {
-    key: 'instances-panel-explanation',
-    label: <Trans>Using the instances panel</Trans>,
-  },
-  {
     key: 'physics2-shape-collisions',
     label: <Trans>Collisions handling with the Physics engine</Trans>,
   },
@@ -167,8 +148,14 @@ export const allAlertMessages: Array<{
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
   },
   {
-    key: 'p2p-broker-recommendation',
-    label: <Trans>Peer to peer broker server recommendation</Trans>,
+    key: 'p2p-is-networking',
+    label: (
+      <Trans>Peer to peer IP address leak warning/THNK recommendation</Trans>
+    ),
+  },
+  {
+    key: 'p2p-dataloss',
+    label: <Trans>Peer to peer data-loss notice</Trans>,
   },
   {
     key: 'command-palette-shortcut',

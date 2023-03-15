@@ -336,10 +336,10 @@ function LeaderboardAppearanceDialog({
                       </Trans>
                     </Text>
                     <Link
-                      href="https://liluo.io/playground/test-leaderboard"
+                      href="https://gd.games/playground/test-leaderboard"
                       onClick={() =>
                         Window.openExternalURL(
-                          'https://liluo.io/playground/test-leaderboard'
+                          'https://gd.games/playground/test-leaderboard'
                         )
                       }
                     >

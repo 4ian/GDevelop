@@ -112,11 +112,12 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   },
   navigationState: {
     getCurrentPage: () => assetStoreHomePageState,
-    backToPreviousPage: () => {},
-    openHome: () => {},
+    backToPreviousPage: () => assetStoreHomePageState,
+    openHome: () => assetStoreHomePageState,
     clearHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},
+    openAssetCategoryPage: category => {},
     openPackPage: assetPack => {},
     openDetailPage: assetShortHeader => {},
     openPrivateAssetPackInformationPage: privateAssetPackListingData => {},
@@ -258,7 +259,7 @@ export const AssetStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              publicAssetShortHeaders.length
+              publicAssetShortHeaders ? publicAssetShortHeaders.length : 0
             } assets from the asset store.`
           );
           setPublicAssetPacks(publicAssetPacks);

@@ -22,7 +22,7 @@ import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDrop
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SemiControlledAutoComplete, {
@@ -118,7 +118,6 @@ const StyledTreeItem = withStyles(theme => ({
   iconContainer: {
     alignSelf: 'stretch',
     alignItems: 'center',
-    color: 'white',
   },
   root: {
     '&:focus:not(.Mui-selected)': {
@@ -830,12 +829,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       parentNodeId,
       parentVariable,
       isInherited,
+      index,
     }: {|
       name: string,
       variable: gdVariable,
       parentNodeId?: string,
       parentVariable?: gdVariable,
       isInherited: boolean,
+      index: number,
     |},
     i18n: I18nType
   ) => {
@@ -1010,6 +1011,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           }
                           forceUpdate();
                         }}
+                        id={`variable-${index}-name`}
                       />
                       <Spacer />
                     </Line>
@@ -1024,6 +1026,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             }}
                             isHighlighted={isSelected}
                             disabled={isInherited}
+                            id={`variable-${index}-type`}
                           />
                         </Column>
                         <Column expand>
@@ -1107,6 +1110,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                   : variable.getValue().toString()
                               }
                               commitOnBlur={props.commitChangesOnBlur}
+                              id={`variable-${index}-text-value`}
                             />
                           )}
                         </Column>
@@ -1190,6 +1194,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         parentNodeId: nodeId,
                         parentVariable: variable,
                         isInherited,
+                        index,
                       },
                       i18n
                     );
@@ -1203,6 +1208,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       parentNodeId: nodeId,
                       parentVariable: variable,
                       isInherited,
+                      index,
                     },
                     i18n
                   );
@@ -1405,6 +1411,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
             name,
             variable,
             isInherited,
+            index,
           },
           i18n
         );
@@ -1468,6 +1475,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           helpPagePath={props.helpPagePath || undefined}
                           tutorialId="intermediate-advanced-variables"
                           onAction={onAdd}
+                          actionButtonId="add-variable"
                         />
                       ) : null}
                     </Column>

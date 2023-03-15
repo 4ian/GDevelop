@@ -11,7 +11,6 @@ import {
 } from '../../Utils/GDevelopServices/Example';
 import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import LeftLoader from '../../UI/LeftLoader';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Text from '../../UI/Text';
@@ -25,6 +24,8 @@ import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
+import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
 const isDev = Window.isDev();
 
 const electron = optionalRequire('electron');
@@ -143,17 +144,30 @@ export function ExampleDialog({
             <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
           <Column>
-            {exampleShortHeader.authors && (
+            {
               <Line>
-                {exampleShortHeader.authors.map(author => (
-                  <UserPublicProfileChip
-                    user={author}
-                    key={author.id}
-                    isClickable
-                  />
-                ))}
+                <div style={{ flexWrap: 'wrap' }}>
+                  {exampleShortHeader.difficultyLevel && (
+                    <ExampleDifficultyChip
+                      difficultyLevel={exampleShortHeader.difficultyLevel}
+                    />
+                  )}
+                  {exampleShortHeader.codeSizeLevel && (
+                    <ExampleSizeChip
+                      codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                    />
+                  )}
+                  {exampleShortHeader.authors &&
+                    exampleShortHeader.authors.map(author => (
+                      <UserPublicProfileChip
+                        user={author}
+                        key={author.id}
+                        isClickable
+                      />
+                    ))}
+                </div>
               </Line>
-            )}
+            }
             <Text noMargin>{exampleShortHeader.shortDescription}</Text>
           </Column>
         </ResponsiveLineStackLayout>
@@ -164,7 +178,6 @@ export function ExampleDialog({
             <MarkdownText source={example.description} isStandaloneText />
           </>
         )}
-        {!example && !error && <PlaceholderLoader />}
         {!example && error && (
           <PlaceholderError onRetry={loadExample}>
             <Trans>

@@ -24,6 +24,10 @@ import {
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import Tooltip from '@material-ui/core/Tooltip';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import { Column, Line } from '../UI/Grid';
+import Add from '@material-ui/icons/Add';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Text from '../UI/Text';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -36,8 +40,13 @@ const styles = {
 
 const renderEventsBehaviorLabel = (
   eventsBasedBehavior: gdEventsBasedBehavior
-) =>
-  eventsBasedBehavior.isPrivate() ? (
+) => {
+  const label = (
+    <Text noMargin size="body-small">
+      {eventsBasedBehavior.getName()}
+    </Text>
+  );
+  return eventsBasedBehavior.isPrivate() ? (
     <>
       <Tooltip
         title={
@@ -46,13 +55,12 @@ const renderEventsBehaviorLabel = (
       >
         <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
       </Tooltip>
-      <span title={eventsBasedBehavior.getName()}>
-        {eventsBasedBehavior.getName()}
-      </span>
+      {label}
     </>
   ) : (
-    eventsBasedBehavior.getName()
+    label
   );
+};
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -65,6 +73,7 @@ const getEventsBasedBehaviorName = (
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
   onSelectEventsBasedBehavior: (
@@ -81,6 +90,10 @@ type Props = {|
   ) => void,
   onEventsBasedBehaviorRenamed: (
     eventsBasedBehavior: gdEventsBasedBehavior
+  ) => void,
+  onEventsBasedBehaviorPasted: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    sourceExtensionName: string
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -205,6 +218,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
       eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),
       name: eventsBasedBehavior.getName(),
+      extensionName: this.props.eventsFunctionsExtension.getName(),
     });
   };
 
@@ -246,6 +260,17 @@ export default class EventsBasedBehaviorsList extends React.Component<
       project
     );
     newEventsBasedBehavior.setName(newName);
+
+    const sourceExtensionName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'extensionName'
+    );
+    if (sourceExtensionName) {
+      this.props.onEventsBasedBehaviorPasted(
+        newEventsBasedBehavior,
+        sourceExtensionName
+      );
+    }
 
     this._onEventsBasedBehaviorModified();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
@@ -343,6 +368,20 @@ export default class EventsBasedBehaviorsList extends React.Component<
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search behaviors`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -354,8 +393,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsBasedBehavior}
-                    addNewItemLabel={<Trans>Add a new behavior</Trans>}
                     renderItemLabel={renderEventsBehaviorLabel}
                     getItemName={getEventsBasedBehaviorName}
                     selectedItems={
@@ -377,17 +414,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search behaviors`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new behavior</Trans>}
+              primary
+              onClick={this._addNewEventsBasedBehavior}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

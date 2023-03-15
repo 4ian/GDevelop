@@ -2,7 +2,7 @@
 import React from 'react';
 import { Column } from '../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const ExportHomeSeparator = () => {
   const windowWidth = useResponsiveWindowWidth();

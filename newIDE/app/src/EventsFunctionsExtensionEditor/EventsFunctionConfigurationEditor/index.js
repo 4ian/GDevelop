@@ -178,9 +178,9 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      <Column expand useFullHeight>
+      <Column expand useFullHeight noOverflowParent>
         <Line>
-          <Column noMargin expand>
+          <Column noMargin expand noOverflowParent>
             <Tabs
               value={this.state.currentTab}
               onChange={this._chooseTab}

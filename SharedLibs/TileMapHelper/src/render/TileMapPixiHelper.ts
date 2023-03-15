@@ -6,7 +6,7 @@ import {
 } from "../model/TileMapModel";
 import { TiledPixiHelper } from "./tiled/TiledPixiHelper";
 import { LDtkPixiHelper } from "./ldtk/LDtkPixiHelper";
-import { TileMap } from "../types";
+import { TileMapFileContent } from "../load/TileMapFileContent";
 import { TileTextureCache } from "./TileTextureCache";
 import { FlippingHelper, getPixiRotate } from "../model/GID";
 
@@ -23,7 +23,7 @@ export namespace PixiTileMapHelper {
    * @returns A textures cache.
    */
   export function parseAtlas(
-    tileMap: TileMap,
+    tileMap: TileMapFileContent,
     levelIndex: number,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>

@@ -98,12 +98,18 @@ export const ExtensionListItem = ({
             </LineStackLayout>
             {extensionShortHeader.authors && (
               <Line>
-                {extensionShortHeader.authors.map(author => (
-                  <UserPublicProfileChip user={author} key={author.id} />
-                ))}
+                <div style={{ flexWrap: 'wrap' }}>
+                  {extensionShortHeader.authors.map(author => (
+                    <UserPublicProfileChip user={author} key={author.id} />
+                  ))}
+                </div>
               </Line>
             )}
-            <Text noMargin size="body2">
+            <Text
+              noMargin
+              size="body2"
+              displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+            >
               {renderExtensionField('shortDescription')}
             </Text>
           </Column>

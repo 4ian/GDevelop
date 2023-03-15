@@ -8,7 +8,7 @@ import { type PlanDetails } from '../../Utils/GDevelopServices/Usage';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { LineStackLayout } from '../../UI/Layout';
 
 const styles = {

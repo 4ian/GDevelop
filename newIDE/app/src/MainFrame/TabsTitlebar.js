@@ -3,7 +3,7 @@ import * as React from 'react';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import ThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import { isMacLike } from '../Utils/Platform';
 import Window, { useWindowControlsOverlayWatcher } from '../Utils/Window';
@@ -30,7 +30,7 @@ const styles = {
  */
 export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
   const forceUpdate = useForceUpdate();
-  const gdevelopTheme = React.useContext(ThemeContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
   React.useEffect(
     () => {

@@ -2,9 +2,10 @@
 import * as React from 'react';
 import RouterContext from '../MainFrame/RouterContext';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { FLING_GAME_IN_APP_TUTORIAL_ID } from './GDevelopServices/InAppTutorial';
 
 type Props = {|
-  openOnboardingDialog: boolean => void,
+  openInAppTutorialDialog: (tutorialId: string) => void,
   openProfileDialog: boolean => void,
 |};
 
@@ -13,7 +14,7 @@ type Props = {|
  * This corresponds to when a user opens the app on web, with a parameter in the URL.
  */
 export const useOpenInitialDialog = ({
-  openOnboardingDialog,
+  openInAppTutorialDialog,
   openProfileDialog,
 }: Props) => {
   const { routeArguments, removeRouteArguments } = React.useContext(
@@ -31,8 +32,15 @@ export const useOpenInitialDialog = ({
           removeRouteArguments(['initial-dialog']);
           break;
         case 'onboarding':
-          openOnboardingDialog(true);
-          removeRouteArguments(['initial-dialog']);
+        case 'guided-lesson':
+          const tutorialId = routeArguments['tutorial-id'];
+          if (tutorialId) {
+            openInAppTutorialDialog(tutorialId);
+          } else {
+            // backward compatibility, open the fling game tutorial.
+            openInAppTutorialDialog(FLING_GAME_IN_APP_TUTORIAL_ID);
+          }
+          removeRouteArguments(['initial-dialog', 'tutorial-id']);
           break;
         case 'games-dashboard':
           openProfileDialog(true);
@@ -45,7 +53,7 @@ export const useOpenInitialDialog = ({
     },
     [
       routeArguments,
-      openOnboardingDialog,
+      openInAppTutorialDialog,
       openProfileDialog,
       removeRouteArguments,
       openSubscriptionDialog,

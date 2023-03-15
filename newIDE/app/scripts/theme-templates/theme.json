@@ -241,6 +241,21 @@
         }
       }
     },
+    "example": {
+      "difficulty": {
+        "color": {
+          "simple": {
+            "value": "#8BE7C4"
+          },
+          "advanced": {
+            "value": "#FFD28F"
+          },
+          "expert": {
+            "value": "#FFA38F"
+          }
+        }
+      }
+    },
     "tabs": {
       "text-color": {
         "value": "#7F7F85"
@@ -365,7 +380,7 @@
           "value": "#93e500"
         }
       },
-      "expression": {
+      "number": {
         "color": {
           "value": "#e8dc59"
         }

@@ -26,7 +26,7 @@ import FlatButton from '../../../../UI/FlatButton';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu';
 import AlertMessage from '../../../../UI/AlertMessage';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
 import { addVertexOnLongestEdge } from './PolygonHelper';
 
@@ -167,9 +167,11 @@ const PolygonSection = (props: PolygonSectionProps) => {
     <Accordion defaultExpanded>
       <AccordionHeader actions={polygonActions}>
         <Text displayInlineAsSpan>
-          {verticesCount === 3 && `Triangle`}
-          {verticesCount === 4 && `Quadrilateral`}
-          {verticesCount >= 5 && `Polygon with ${verticesCount} vertices`}
+          {verticesCount === 3 && <Trans>Triangle</Trans>}
+          {verticesCount === 4 && <Trans>Quadrilateral</Trans>}
+          {verticesCount >= 5 && (
+            <Trans>Polygon with ${verticesCount} vertices</Trans>
+          )}
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>

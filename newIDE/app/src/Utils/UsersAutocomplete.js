@@ -154,6 +154,7 @@ export const UsersAutocomplete = ({
       loading={loading || disabled}
       fullWidth
       error={getErrorMessage(error)}
+      disableAutoTranslate
     />
   );
 };

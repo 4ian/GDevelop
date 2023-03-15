@@ -29,6 +29,7 @@ import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ArrowRight from '@material-ui/icons/ArrowRight';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import GuidedLessons from '../InAppTutorials/GuidedLessons';
 
 const useStyles = makeStyles({
   tile: {
@@ -83,6 +84,7 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
+  selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const MainPage = ({
@@ -92,6 +94,7 @@ const MainPage = ({
   onOpenHelpFinder,
   onSelectCategory,
   tutorials,
+  selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
   const { currentlyRunningInAppTutorial } = React.useContext(
@@ -198,6 +201,14 @@ const MainPage = ({
           </GridList>
         </Line>
       </SectionRow>
+      {shouldShowInAppTutorialButtons && (
+        <SectionRow>
+          <Text noMargin size="section-title">
+            <Trans>Guided lessons</Trans>
+          </Text>
+          <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+        </SectionRow>
+      )}
       <>
         <SectionRow>
           <Line noMargin>

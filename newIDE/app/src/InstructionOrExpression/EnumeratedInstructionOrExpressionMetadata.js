@@ -16,6 +16,10 @@ export type EnumeratedInstructionMetadata = {|
   metadata: gdInstructionMetadata,
   scope: InstructionOrExpressionScope,
   isPrivate: boolean,
+  isRelevantForLayoutEvents: boolean,
+  isRelevantForFunctionEvents: boolean,
+  isRelevantForAsynchronousFunctionEvents: boolean,
+  isRelevantForCustomObjectEvents: boolean,
 |};
 
 export type EnumeratedExpressionMetadata = {|
@@ -26,6 +30,10 @@ export type EnumeratedExpressionMetadata = {|
   metadata: gdExpressionMetadata,
   scope: InstructionOrExpressionScope,
   isPrivate: boolean,
+  isRelevantForLayoutEvents: boolean,
+  isRelevantForFunctionEvents: boolean,
+  isRelevantForAsynchronousFunctionEvents: boolean,
+  isRelevantForCustomObjectEvents: boolean,
   name: string,
   /** Represents only the visible parameters in the parentheses of the expression. */
   parameters: Array<gdParameterMetadata>,
@@ -56,16 +64,37 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   list: Array<T>,
   scope: EventsScope
 ): Array<T> => {
-  return list.filter(enumeratedInstructionOrExpressionMetadata => {
-    const {
-      behaviorMetadata,
-      extension,
-    } = enumeratedInstructionOrExpressionMetadata.scope;
-    const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
+  return list.filter(enumeratedInstructionOrExpressionMetadata =>
+    isFunctionVisibleInGivenScope(
+      enumeratedInstructionOrExpressionMetadata,
+      scope
+    )
+  );
+};
 
-    return (
-      (!enumeratedInstructionOrExpressionMetadata.isPrivate &&
-        (!behaviorMetadata || !behaviorMetadata.isPrivate())) ||
+const isFunctionVisibleInGivenScope = (
+  enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
+  scope: EventsScope
+): boolean => {
+  const {
+    behaviorMetadata,
+    extension,
+  } = enumeratedInstructionOrExpressionMetadata.scope;
+  const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
+
+  return !!(
+    ((enumeratedInstructionOrExpressionMetadata.isRelevantForLayoutEvents &&
+      (scope.layout || scope.externalEvents)) ||
+      (enumeratedInstructionOrExpressionMetadata.isRelevantForFunctionEvents &&
+        scope.eventsFunction) ||
+      (enumeratedInstructionOrExpressionMetadata.isRelevantForAsynchronousFunctionEvents &&
+        scope.eventsFunction &&
+        scope.eventsFunction.isAsync()) ||
+      (enumeratedInstructionOrExpressionMetadata.isRelevantForCustomObjectEvents &&
+        scope.eventsBasedObject)) &&
+    // Check visibility.
+    ((!enumeratedInstructionOrExpressionMetadata.isPrivate &&
+      (!behaviorMetadata || !behaviorMetadata.isPrivate())) ||
       // The instruction or expression is marked as "private":
       // we now compare its scope (where it was declared) and the current scope
       // (where we are) to see if we should filter it or not.
@@ -84,7 +113,6 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
         // ...show public functions of a private behavior
         (!enumeratedInstructionOrExpressionMetadata.isPrivate ||
           // ...show private non-behavior functions
-          !behaviorMetadata))
-    );
-  });
+          !behaviorMetadata)))
+  );
 };

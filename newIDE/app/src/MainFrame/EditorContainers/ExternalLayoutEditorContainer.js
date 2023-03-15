@@ -81,7 +81,12 @@ export class ExternalLayoutEditorContainer extends React.Component<
   }
 
   forceUpdateEditor() {
-    // No updates to be done.
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateObjectGroupsList();
+      editor.forceUpdateLayersList();
+    }
   }
 
   getExternalLayout(): ?gdExternalLayout {
@@ -208,7 +213,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             <Line justifyContent="flex-start" noMargin>
               <TutorialButton
                 tutorialId="Intermediate-externals"
-                label="Watch the tutorial"
+                label={<Trans>Watch tutorial</Trans>}
                 renderIfNotFound={
                   <HelpButton helpPagePath="/interface/events-editor/external-events" />
                 }

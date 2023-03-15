@@ -6,6 +6,7 @@ import {
   type AssetShortHeader,
   type Asset,
   type Environment,
+  getPrivateAssetPackAudioFilesArchiveUrl,
 } from '../../Utils/GDevelopServices/Asset';
 import {
   addAssetToProject,
@@ -131,6 +132,19 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     });
   };
 
+  // This URL is only valid for a limited time, so this function needs to be called
+  // every time the user wants to download the audio files.
+  const getPrivateAssetPackAudioArchiveUrl = async (
+    privateAssetPackId: string
+  ): Promise<string | null> => {
+    if (!profile) return null;
+
+    // Always fetch a new token, as the URL is only valid for a limited time.
+    const token = await fetchAuthorizationToken(profile.id);
+
+    return getPrivateAssetPackAudioFilesArchiveUrl(privateAssetPackId, token);
+  };
+
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -138,6 +152,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
         updateAuthorizationToken,
         fetchPrivateAsset,
         installPrivateAsset,
+        getPrivateAssetPackAudioArchiveUrl,
       }}
     >
       {children}

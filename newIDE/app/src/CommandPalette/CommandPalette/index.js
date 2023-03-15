@@ -7,11 +7,21 @@ import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandsContext';
 import {
   type NamedCommand,
+  type GoToWikiCommand,
   type NamedCommandWithOptions,
   type CommandOption,
 } from '../CommandManager';
 import AutocompletePicker from './AutocompletePicker';
 import commandsList, { type CommandName } from '../CommandsList';
+import algoliasearch from 'algoliasearch/lite';
+import Window from '../../Utils/Window';
+import {
+  InstantSearch,
+  useInstantSearch,
+  useSearchBox,
+} from 'react-instantsearch-hooks';
+import { useDebounce } from '../../Utils/UseDebounce';
+const indexName = 'gdevelop';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -38,17 +48,19 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
+    const [value, setValue] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
     const [
       selectedCommand,
       selectCommand,
     ] = React.useState<null | NamedCommandWithOptions>(null);
-
+    const { results } = useInstantSearch();
+    const { refine } = useSearchBox();
     // Takes a command and if simple command, executes handler
     // If command with options, opens options of the palette
     const handleCommandChoose = React.useCallback(
-      (command: NamedCommand) => {
+      (command: NamedCommand | GoToWikiCommand) => {
         if (command.handler) {
           // Simple command
           command.handler();
@@ -93,6 +105,33 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       launchCommand,
     }));
 
+    const launchSearch = useDebounce(() => {
+      if (value) {
+        refine(value);
+      }
+    }, 200);
+
+    React.useEffect(launchSearch, [value, launchSearch]);
+
+    const allCommands: Array<NamedCommand | GoToWikiCommand> = React.useMemo(
+      () => {
+        const namedCommands: Array<NamedCommand> = commandManager
+          .getAllNamedCommands()
+          .filter(command => !commandsList[command.name].ghost);
+        const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
+          hit => {
+            return {
+              hit,
+              handler: () => Window.openExternalURL(hit.url),
+            };
+          }
+        );
+        console.log(results.hits)
+        return namedCommands.concat(algoliaCommands);
+      },
+      [commandManager, results.hits]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -111,13 +150,8 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
               // Command picker
               <AutocompletePicker
                 i18n={i18n}
-                items={
-                  (commandManager
-                    .getAllNamedCommands()
-                    .filter(
-                      command => !commandsList[command.name].ghost
-                    ): Array<NamedCommand>)
-                }
+                onInputChange={setValue}
+                items={allCommands}
                 placeholder={t`Start typing a command...`}
                 onClose={() => setMode('closed')}
                 onSelect={handleCommandChoose}
@@ -139,5 +173,19 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     );
   }
 );
+
+const searchClient = algoliasearch(
+  'RC2XAJAUNE',
+  '7853cc8136c930e6c7b8f68238eea179'
+);
+
+export const CommandPaletteWithAlgoliaSearch = React.forwardRef<
+  {},
+  CommandPaletteInterface
+>((props, ref) => (
+  <InstantSearch searchClient={searchClient} indexName={indexName}>
+    <CommandPalette ref={ref} />
+  </InstantSearch>
+));
 
 export default CommandPalette;

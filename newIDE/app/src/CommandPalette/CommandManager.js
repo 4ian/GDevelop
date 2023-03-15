@@ -19,6 +19,8 @@ export type CommandWithOptions = {|
 
 export type Command = SimpleCommand | CommandWithOptions;
 
+export type GoToWikiCommand = {| hit: any, handler: CommandHandler |};
+
 export type NamedCommand = {|
   name: CommandName,
   ...Command,

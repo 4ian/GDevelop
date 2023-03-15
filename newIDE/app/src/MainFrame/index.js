@@ -116,7 +116,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette, {
+import {
+  CommandPaletteWithAlgoliaSearch,
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
@@ -3073,7 +3074,7 @@ const MainFrame = (props: Props) => {
           );
         })}
       </LeaderboardProvider>
-      <CommandPalette ref={commandPaletteRef} />
+      <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}

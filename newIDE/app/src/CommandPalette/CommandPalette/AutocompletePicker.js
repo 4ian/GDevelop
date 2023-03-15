@@ -14,9 +14,14 @@ import TextField from '@material-ui/core/TextField';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
-import { type NamedCommand, type CommandOption } from '../CommandManager';
+import {
+  type NamedCommand,
+  type CommandOption,
+  type GoToWikiCommand,
+} from '../CommandManager';
 import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
+import Book from '../../UI/CustomSvgIcons/Book';
 
 const useStyles = makeStyles({
   listItemContainer: {
@@ -32,16 +37,77 @@ const styles = {
 
 type Item = NamedCommand | CommandOption;
 
+const getHierarchyAsArray = (hierarchy: {
+  lvl0: string,
+  lvl1: string,
+  lvl2: string,
+  lvl3: string,
+  lvl4: string,
+  lvl5: string,
+  lvl6: string,
+}) =>
+  Object.entries(hierarchy)
+    .reduce((acc, [level, content]) => {
+      if (content) {
+        acc.push([Number(level.replace('lvl', '')), content]);
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => a[0] - b[0])
+    .map(item => item[1]);
+
+const getHitLastHierarchyLevel = (hit: any) => {
+  const hierarchyArray = getHierarchyAsArray(hit.hierarchy);
+  return hierarchyArray[hierarchyArray.length - 1];
+};
+const getHitHierarchySerialized = (
+  hit: any,
+  { removeLastLevel }: { removeLastLevel: boolean }
+) => {
+  const hierarchyArray = getHierarchyAsArray(hit.hierarchy);
+
+  return hierarchyArray
+    .slice(0, hierarchyArray.length - (removeLastLevel ? 1 : 0))
+    .join(' > ');
+};
+
 type Props<T> = {|
   onClose: () => void,
   onSelect: (item: T) => void,
+  onInputChange?: (value: string) => void,
   items: Array<T>,
   placeholder: MessageDescriptor,
   i18n: I18nType,
 |};
 
+const Hit = ({ hit }: {| hit: any |}) => {
+  const classes = useStyles();
+  let primaryText;
+  let removeLastLevel = false;
+  if (hit.content) {
+    primaryText = hit.content;
+  } else {
+    removeLastLevel = true;
+    primaryText = getHitLastHierarchyLevel(hit);
+  }
+  const secondaryText = getHitHierarchySerialized(hit, { removeLastLevel });
+  return (
+    <ListItem
+      dense
+      component="div"
+      ContainerComponent="div"
+      classes={{ container: classes.listItemContainer }}
+    >
+      <ListItemIcon>
+        <Book />
+      </ListItemIcon>
+      <ListItemText primary={primaryText} secondary={secondaryText} />
+    </ListItem>
+  );
+};
+
 const AutocompletePicker = (
-  props: Props<NamedCommand> | Props<CommandOption>
+  props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
@@ -93,6 +159,9 @@ const AutocompletePicker = (
       options={props.items}
       getOptionLabel={getItemText}
       onChange={handleSelect}
+      onInputChange={(e, value) => {
+        if (props.onInputChange) props.onInputChange(value);
+      }}
       openOnFocus
       autoHighlight
       filterOptions={filterOptions}
@@ -104,18 +173,23 @@ const AutocompletePicker = (
           autoFocus
         />
       )}
-      renderOption={item => (
-        <ListItem
-          dense
-          component="div"
-          ContainerComponent="div"
-          classes={{ container: classes.listItemContainer }}
-        >
-          <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
-          <ListItemText primary={getItemText(item)} />
-          {getItemHint(item)}
-        </ListItem>
-      )}
+      renderOption={item => {
+        if (item.hit) {
+          return <Hit hit={item.hit} />;
+        }
+        return (
+          <ListItem
+            dense
+            component="div"
+            ContainerComponent="div"
+            classes={{ container: classes.listItemContainer }}
+          >
+            <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
+            <ListItemText primary={getItemText(item)} />
+            {getItemHint(item)}
+          </ListItem>
+        );
+      }}
     />
   );
 };

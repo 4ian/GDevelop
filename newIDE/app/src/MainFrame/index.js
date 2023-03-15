@@ -704,6 +704,7 @@ const MainFrame = (props: Props) => {
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
+      await eventsFunctionsExtensionsState.ensureLoadFinished();
       currentProject.delete();
       if (unsavedChanges.hasUnsavedChanges) {
         unsavedChanges.sealUnsavedChanges();

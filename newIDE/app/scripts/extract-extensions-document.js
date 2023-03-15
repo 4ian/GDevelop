@@ -12,7 +12,6 @@ const {
   getExtensionFolderName,
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
-const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
 const shell = require('shelljs');
 
 /** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
@@ -22,12 +21,10 @@ const extensionShortHeadersUrl =
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
-const extensionsFilePath = path.join(outputRootPath, 'extensions.txt');
+const extensionsFilePath = path.join(extensionsRootPath, 'index.md');
 
 const generateSvgImageIcon = iconUrl => {
-  // Use the `&.png?` syntax to force Dokuwiki to display the image.
-  // See https://www.dokuwiki.org/images.
-  return `{{${iconUrl}?&.png?nolink&48x48 |}}`;
+  return `<img src="${iconUrl}" class="extension-icon"></img>`;
 };
 
 /** @returns {string} */
@@ -36,11 +33,13 @@ const generateExtensionFooterText = fullName => {
     `
 ---
 
-<note tip>Learn [[gdevelop5:extensions:search|how to install new extensions]] by following a step-by-step guide.</note>
+!!! tip
 
-*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
+    Learn [how to install new extensions](/gdevelop5/extensions/search) by following a step-by-step guide.
+
+*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
     ' ' +
-    'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].'
+    'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).'
   );
 };
 
@@ -135,25 +134,25 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
     (isCommunity
-      ? `<note important>
-This is an extension made by a community member — but not reviewed
-by the GDevelop extension team. As such, we can't guarantee it
-meets all the quality standards of official extensions. In case of
-doubt, contact the author to know more about what the extension
-does or inspect its content before using it.
-</note>\n\n`
+      ? `!!! warning
+    This is an extension made by a community member — but not reviewed
+    by the GDevelop extension team. As such, we can't guarantee it
+    meets all the quality standards of official extensions. In case of
+    doubt, contact the author to know more about what the extension
+    does or inspect its content before using it.
+\n\n`
       : '') +
     '---\n' +
     '\n' +
-    convertMarkdownToDokuWikiMarkdown(extensionHeader.description) +
+    extensionHeader.description +
     '\n' +
-    (extensionHeader.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
+    (extensionHeader.helpPath ? `\n[Read more...](${helpPageUrl})\n` : ``) +
     generateExtensionFooterText(extensionHeader.fullName);
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
     folderName,
-    'reference.txt'
+    'reference.md'
   );
   await fs.mkdir(path.dirname(extensionReferenceFilePath), {
     recursive: true,
@@ -180,9 +179,9 @@ const generateExtensionSection = extensionHeader => {
     extensionHeader.shortDescription +
     '\n\n' +
     // Link to help page or to reference if none.
-    `[[${helpPageUrl}|Read more...]]` +
+    `[Read more...](${helpPageUrl})` +
     (helpPageUrl !== referencePageUrl
-      ? ` ([[${referencePageUrl}|reference]])`
+      ? ` ([reference](${referencePageUrl}))`
       : '') +
     '\n\n'
   );
@@ -214,9 +213,9 @@ const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
 
     let indexPageContent = `# Extensions
 
-GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|core features]], new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
+GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
 
-[[gdevelop5:extensions:search|Directly from GDevelop]], you have access to a collection of community created extensions, listed here. You can also [[gdevelop5:extensions:create|create]], directly in your project, new behaviors, actions, conditions or expressions for your game.
+[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, listed here. You can also [create](/gdevelop5/extensions/create), directly in your project, new behaviors, actions, conditions or expressions for your game.
 
 `;
 
@@ -256,9 +255,9 @@ It's easy to create, directly in your project, new behaviors, actions, condition
 
 Read more about this:
 
-* [[gdevelop5:extensions:create|Create your own extensions]]
-* [[gdevelop5:extensions:share|Share extensions with the community]]
-* [[gdevelop5:extensions:extend-gdevelop|Extend GDevelop with JavaScript or C++]]`;
+* [Create your own extensions](/gdevelop5/extensions/create)
+* [Share extensions with the community](/gdevelop5/extensions/share)
+* [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)`;
 
     try {
       await fs.mkdir(path.dirname(extensionsFilePath), { recursive: true });

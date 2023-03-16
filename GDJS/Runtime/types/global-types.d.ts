@@ -13,7 +13,7 @@ declare type float = number;
 /** A point in cartesian space. */
 declare type FloatPoint = [number, number];
 
-/** A Hastable with the picked objects lists. */
+/** A Hashtable with the picked objects lists. */
 declare type ObjectsLists = Hashtable<gdjs.RuntimeObject[]>;
 
 /**

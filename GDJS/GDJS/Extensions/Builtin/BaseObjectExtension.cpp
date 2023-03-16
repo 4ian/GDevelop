@@ -267,6 +267,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.createObjectOnScene");
   GetAllActions()["CreateByName"].SetFunctionName(
       "gdjs.evtTools.object.createObjectFromGroupOnScene");
+  GetAllActions()["CreateRandomObjectFromGroup"].SetFunctionName(
+      "gdjs.evtTools.object.createRandomlyChosenObjectFromGroupOnScene");
 
   GetAllExpressions()["Count"].SetFunctionName(
       "gdjs.evtTools.object.pickedObjectsCount");  // Deprecated

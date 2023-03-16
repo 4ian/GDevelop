@@ -1379,6 +1379,27 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddAction("CreateRandomObjectFromGroup",
+                 _("Create a new object randomly chosen in a group"),
+                 _("Among the objects of the specified group, this action will "
+                   "create a randomly chosen object."),
+                 _("Among objects _PARAM1_, create object at "
+                   "position _PARAM2_;_PARAM3_ (layer: _PARAM4_)"),
+                 "",
+                 "res/actions/create24.png",
+                 "res/actions/create24.png")
+      .AddCodeOnlyParameter("objectsContext", "")
+      .AddParameter("objectListOrEmptyIfJustDeclared",
+                    _("Group of potential objects"))
+      .SetParameterLongDescription(
+          _("Group containing objects that can be created by the action."))
+      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .MarkAsSimple();
+
+  extension
       .AddAction("AjoutObjConcern",
                  _("Pick all instances"),
                  _("Pick all instances of the specified object(s). When you "

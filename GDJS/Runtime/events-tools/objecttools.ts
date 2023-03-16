@@ -529,7 +529,7 @@ namespace gdjs {
       };
 
       /**
-       * Allows events to create a new object on a scene picked from a group by its name.
+       * Allows events to create a new object on a scene by its name picked from a group.
        */
       export const createObjectFromGroupOnScene = function (
         objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
@@ -550,7 +550,7 @@ namespace gdjs {
       };
 
       /**
-       * Allows events to create a new object on a scene picked from a group by its name.
+       * Allows events to create a new object on a scene randomly chosen from a group.
        */
       export const createRandomlyChosenObjectFromGroupOnScene = function (
         objectsContext: EventsFunctionContext | gdjs.RuntimeScene,

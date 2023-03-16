@@ -354,7 +354,7 @@ namespace gdjs {
         }
 
         // Pick one random object
-        let index = Math.floor(Math.random() * objectsCount);
+        let index = gdjs.random(objectsCount - 1);
         if (index >= objectsCount) {
           index = objectsCount - 1;
         }

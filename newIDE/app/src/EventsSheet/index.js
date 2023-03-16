@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -86,7 +85,6 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
@@ -1892,21 +1890,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     onClose={this.closeEventTextDialog}
                   />
                 )}
-                <DismissableInfoBar
-                  identifier="edit-instruction-explanation"
-                  message={
-                    <Trans>
-                      Double click on a condition or action to edit it.
-                    </Trans>
-                  }
-                  touchScreenMessage={
-                    <Trans>
-                      Double tap a condition or action to edit it. Long press to
-                      show more options.
-                    </Trans>
-                  }
-                  show={hasInstructionSelected(this.state.selection)}
-                />
               </div>
             )}
           </EventsSearcher>

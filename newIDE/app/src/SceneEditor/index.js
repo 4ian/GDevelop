@@ -1735,22 +1735,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editGroup(null)}
           />
         )}
-        <DismissableInfoBar
-          identifier="instance-drag-n-drop-explanation"
-          message={
-            <Trans>
-              Drag and Drop the object to the scene or use the right click menu
-              to add an instance of it.
-            </Trans>
-          }
-          touchScreenMessage={
-            <Trans>
-              Drag and Drop the object icon to the scene or long press to show
-              options to edit the object.
-            </Trans>
-          }
-          show={!!this.state.selectedObjectsWithContext.length}
-        />
         {this.state.setupGridOpen && (
           <SetupGridDialog
             instancesEditorSettings={this.state.instancesEditorSettings}

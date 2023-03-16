@@ -351,7 +351,10 @@ const MainFrame = (props: Props) => {
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
   );
-  const [isProjectClosed, setIsProjectClosed] = React.useState<boolean>(false);
+  const [
+    isProjectClosedSoAvoidReloadingExtensions,
+    setIsProjectClosedSoAvoidReloadingExtensions,
+  ] = React.useState<boolean>(false);
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
@@ -685,7 +688,7 @@ const MainFrame = (props: Props) => {
       // Instead:
       // - Move the EventsFunctionsExtensionsLoader to Core
       // - Add a dirty flag system to refresh on demand.
-      setIsProjectClosed(true);
+      setIsProjectClosedSoAvoidReloadingExtensions(true);
 
       // While not strictly necessary, use `currentProjectRef` to be 100%
       // sure to have the latest project (avoid risking any stale variable to an old
@@ -2422,7 +2425,7 @@ const MainFrame = (props: Props) => {
   const createProject = React.useCallback(
     async (i18n: I18n, newProjectSetup: NewProjectSetup) => {
       setIsProjectOpening(true);
-      setIsProjectClosed(false);
+      setIsProjectClosedSoAvoidReloadingExtensions(false);
 
       // 4 cases when creating a project:
       // - From an example
@@ -2603,7 +2606,7 @@ const MainFrame = (props: Props) => {
           rawError,
           errorId: 'project-creation-save-as-error',
         });
-        setIsProjectClosed(true);
+        setIsProjectClosedSoAvoidReloadingExtensions(true);
       } finally {
         // Stop the loading when we're successful or have failed.
         setIsProjectOpening(false);
@@ -2911,7 +2914,7 @@ const MainFrame = (props: Props) => {
             }
             eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
             onReloadEventsFunctionsExtensions={() => {
-              if (isProjectClosed) {
+              if (isProjectClosedSoAvoidReloadingExtensions) {
                 return;
               }
               // Check if load is sufficient
@@ -3048,7 +3051,7 @@ const MainFrame = (props: Props) => {
                     onOpenAbout: () => openAboutDialog(true),
                     selectInAppTutorial: selectInAppTutorial,
                     onLoadEventsFunctionsExtensions: () => {
-                      if (isProjectClosed) {
+                      if (isProjectClosedSoAvoidReloadingExtensions) {
                         return Promise.resolve();
                       }
                       return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
@@ -3056,7 +3059,7 @@ const MainFrame = (props: Props) => {
                       );
                     },
                     onReloadEventsFunctionsExtensionMetadata: extension => {
-                      if (isProjectClosed) {
+                      if (isProjectClosedSoAvoidReloadingExtensions) {
                         return;
                       }
                       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(

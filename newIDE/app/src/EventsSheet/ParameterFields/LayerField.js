@@ -1,19 +1,24 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { mapFor } from '../../Utils/MapFor';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
-export default class LayerField extends Component<ParameterFieldProps, {||}> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function LayerField(props, ref) {
+    const fieldRef = React.useRef<?GenericExpressionField>(null);
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
+    React.useImperativeHandle(ref, () => ({
+      focus: (selectAll: boolean = false) => {
+        if (fieldRef.current) fieldRef.current.focus(selectAll);
+      },
+    }));
 
-  render() {
-    const { layout } = this.props.scope;
+    const { layout } = props.scope;
     const layerNames: Array<ExpressionAutocompletion> = layout
       ? mapFor(0, layout.getLayersCount(), i => {
           const layer = layout.getLayerAt(i);
@@ -24,8 +29,8 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
     return (
       <GenericExpressionField
         id={
-          this.props.parameterIndex !== undefined
-            ? `parameter-${this.props.parameterIndex}-layer-field`
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-layer-field`
             : undefined
         }
         expressionType="string"
@@ -34,9 +39,9 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
-        {...this.props}
+        ref={fieldRef}
+        {...props}
       />
     );
   }
-}
+);

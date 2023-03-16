@@ -3329,7 +3329,7 @@ const MainFrame = (props: Props) => {
           endTutorial={() => endTutorial(true)}
         />
       )}
-      {currentProject && <CustomDragLayer />}
+      <CustomDragLayer />
     </div>
   );
 };

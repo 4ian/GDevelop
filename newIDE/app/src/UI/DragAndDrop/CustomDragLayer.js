@@ -3,6 +3,7 @@ import * as React from 'react';
 import { DragLayer } from 'react-dnd';
 import { Identifier } from 'dnd-core';
 import Text from '../Text';
+import { instancesEditorId } from '../../InstancesEditor';
 
 const layerStyles = {
   position: 'fixed',
@@ -14,18 +15,16 @@ const layerStyles = {
   height: '100%',
 };
 
-const THUMBNAIL_SIZE = 32;
+const THUMBNAIL_SIZE = 48;
 
-function getItemStyles({
-  initialOffset,
+const getItemStyles = ({
   clientOffset,
   previewPosition,
-}: {
-  initialOffset: ?{ x: number, y: number },
+}: {|
   clientOffset: ?{ x: number, y: number },
   previewPosition: 'center' | 'aboveRight',
-}) {
-  if (!initialOffset || !clientOffset) {
+|}) => {
+  if (!clientOffset) {
     return {
       display: 'none',
     };
@@ -47,9 +46,8 @@ function getItemStyles({
     transform,
     WebkitTransform: transform,
   };
-}
+};
 
-// This interface is supposed to be available in react-dnd, but flow complains.
 type XYCoord = {|
   x: number,
   y: number,
@@ -77,36 +75,41 @@ const CustomDragLayer = ({
   currentOffset,
   clientOffset,
 }: InternalCustomDragLayerProps) => {
-  const itemThumbnail = React.useMemo(
+  const renderedItem = React.useMemo(
     () => {
-      if (!item) return null;
-      return item.thumbnail;
-    },
-    [item]
-  );
+      if (!item || !clientOffset) return null;
 
-  const itemName = React.useMemo(
-    () => {
-      if (!item) return null;
-      return item.name;
-    },
-    [item]
-  );
+      const { x, y } = clientOffset;
+      const activeCanvas = document.querySelector(
+        `#scene-editor[data-active=true] #${instancesEditorId}`
+      );
+      if (activeCanvas) {
+        const canvasRect = activeCanvas.getBoundingClientRect();
+        if (
+          x >= canvasRect.left &&
+          x <= canvasRect.right &&
+          y >= canvasRect.top &&
+          y <= canvasRect.bottom
+        ) {
+          return null;
+        }
+      }
 
-  function renderItem() {
-    return itemThumbnail ? (
-      <img
-        alt={itemName}
-        src={itemThumbnail}
-        style={{
-          maxWidth: THUMBNAIL_SIZE,
-          maxHeight: THUMBNAIL_SIZE,
-        }}
-      />
-    ) : (
-      <Text>{itemName}</Text>
-    );
-  }
+      return item.thumbnail ? (
+        <img
+          alt={item.name}
+          src={item.thumbnail}
+          style={{
+            maxWidth: THUMBNAIL_SIZE,
+            maxHeight: THUMBNAIL_SIZE,
+          }}
+        />
+      ) : (
+        <Text>{item.name}</Text>
+      );
+    },
+    [item, clientOffset]
+  );
 
   if (!isDragging) {
     return null;
@@ -116,12 +119,11 @@ const CustomDragLayer = ({
     <div style={layerStyles}>
       <div
         style={getItemStyles({
-          initialOffset,
           clientOffset,
-          previewPosition: !itemThumbnail ? 'aboveRight' : 'center',
+          previewPosition: item && !item.thumbnail ? 'aboveRight' : 'center',
         })}
       >
-        {renderItem()}
+        {renderedItem}
       </div>
     </div>
   );

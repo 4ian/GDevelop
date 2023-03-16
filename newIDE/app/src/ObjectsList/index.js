@@ -230,13 +230,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         object.setTags(getStringFromTags(selectedObjectTags));
 
+        const objectWithContext: ObjectWithContext = {
+          object,
+          global: false, // A new object is always added to the scene (layout) by default.
+        };
+
+        // Scroll to the new object.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(objectWithContext);
+        }, 100); // A few ms is enough for a new render to be done.
+
         setNewObjectDialogOpen(false);
         // TODO Should it be called later?
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          // For now, a new object is always added to the scene (layout)
-          onObjectSelected(/* objectWithContext= */ { object, global: false });
+          onObjectSelected(objectWithContext);
         }
       },
       [
@@ -463,6 +475,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFinish,
       ]
     );
+
+    const scrollToItem = (objectWithContext: ObjectWithContext) => {
+      if (sortableList.current) {
+        sortableList.current.scrollToItem(objectWithContext);
+      }
+    };
 
     const lists = enumerateObjects(project, objectsContainer);
     const displayedObjectWithContextsList = filterObjectsList(

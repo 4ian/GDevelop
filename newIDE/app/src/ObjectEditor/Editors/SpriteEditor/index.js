@@ -33,7 +33,7 @@ import { type EditorProps } from '../EditorProps.flow';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
-import ScrollView from '../../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
@@ -170,12 +170,13 @@ const SortableAnimationsList = SortableContainer(
     onReplaceDirection,
     isAnimationListLocked,
     onSpriteUpdated,
+    scrollViewRef,
   }) => {
     // Note that it's important to have <ScrollView> *inside* this
     // component, otherwise the sortable list won't work (because the
     // SortableContainer would not find a root div to use).
     return (
-      <ScrollView>
+      <ScrollView ref={scrollViewRef}>
         {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
           const animation = spriteConfiguration.getAnimation(i);
           return (
@@ -232,6 +233,7 @@ class AnimationsListContainer extends React.Component<
     selectedSprites: {},
   };
   spriteContextMenu: ?ContextMenuInterface;
+  _scrollView = React.createRef<ScrollViewInterface>();
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.spriteConfiguration.moveAnimation(oldIndex, newIndex);
@@ -246,6 +248,16 @@ class AnimationsListContainer extends React.Component<
     this.forceUpdate();
     this.props.onSizeUpdated();
     if (this.props.onObjectUpdated) this.props.onObjectUpdated();
+
+    // Scroll to the bottom of the list.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      if (this._scrollView.current) {
+        this._scrollView.current.scrollToBottom();
+      }
+    }, 100); // A few ms is enough for a new render to be done.
   };
 
   removeAnimation = i => {
@@ -376,6 +388,7 @@ class AnimationsListContainer extends React.Component<
               lockAxis="y"
               axis="y"
               onSpriteUpdated={this.props.onObjectUpdated}
+              scrollViewRef={this._scrollView}
             />
             <Column noMargin>
               <ResponsiveLineStackLayout

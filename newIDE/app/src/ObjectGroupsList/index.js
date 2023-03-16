@@ -128,8 +128,21 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       this.props.onGroupAdded();
     }
 
-    // A new group is not global by default. We focus it so the user can edit the name directly.
-    this._onEditName({ group: newObjectGroup, global: false });
+    const groupWithContext: GroupWithContext = {
+      group: newObjectGroup,
+      global: false, // A new group is not global by default.
+    };
+
+    // Scroll to the new group.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(groupWithContext);
+    }, 100); // A few ms is enough for a new render to be done.
+
+    // We focus it so the user can edit the name directly.
+    this._onEditName(groupWithContext);
   };
 
   _onDelete = (groupWithContext: GroupWithContext) => {
@@ -365,6 +378,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       click: this.addGroup,
     },
   ];
+
+  scrollToItem = (groupWithContext: GroupWithContext) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(groupWithContext);
+    }
+  };
 
   render() {
     const { globalObjectGroups, objectGroups } = this.props;

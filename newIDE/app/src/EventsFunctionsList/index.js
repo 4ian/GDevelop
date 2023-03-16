@@ -416,15 +416,30 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           );
         }
 
+        // Scroll to the new function.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          this.scrollToItem(eventsFunction);
+        }, 100); // A few ms is enough for a new render to be done.
+
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();
 
+        // We focus it so the user can edit the name directly.
         this.props.onSelectEventsFunction(eventsFunction);
         if (this.props.canRename(eventsFunction)) {
           this._editName(eventsFunction);
         }
       }
     );
+  };
+
+  scrollToItem = (eventsFunction: gdEventsFunction) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(eventsFunction);
+    }
   };
 
   render() {

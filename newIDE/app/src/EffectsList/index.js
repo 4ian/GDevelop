@@ -26,7 +26,7 @@ import {
   setEffectDefaultParameters,
 } from './EnumerateEffects';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import ScrollView from '../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import {
   addCreateBadgePreHookIfNotClaimed,
@@ -80,6 +80,7 @@ const getEnumeratedEffectMetadata = (
  */
 export default function EffectsList(props: Props) {
   const { effectsContainer, onEffectsUpdated } = props;
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
   const draggedEffect = React.useRef<?gdEffect>(null);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -110,6 +111,16 @@ export default function EffectsList(props: Props) {
 
     forceUpdate();
     onEffectsUpdated();
+
+    // A gdEffect is always added at the end of the list.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      if (scrollView.current) {
+        scrollView.current.scrollToBottom();
+      }
+    }, 100); // A few ms is enough for a new render to be done.
   };
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(
@@ -190,7 +201,7 @@ export default function EffectsList(props: Props) {
         <Column noMargin expand useFullHeight>
           {effectsContainer.getEffectsCount() !== 0 ? (
             <React.Fragment>
-              <ScrollView>
+              <ScrollView ref={scrollView}>
                 {effectsContainer.getEffectsCount() > 3 && (
                   <Line>
                     <Column>

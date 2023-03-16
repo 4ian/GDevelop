@@ -337,8 +337,23 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
     this._onEventsBasedBehaviorModified();
 
+    // Scroll to the new behavior.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(newEventsBasedBehavior);
+    }, 100); // A few ms is enough for a new render to be done.
+
+    // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
     this._editName(newEventsBasedBehavior);
+  };
+
+  scrollToItem = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(eventsBasedBehavior);
+    }
   };
 
   _onEventsBasedBehaviorModified() {

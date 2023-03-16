@@ -269,8 +269,23 @@ export default class EventsBasedObjectsList extends React.Component<
     );
     this._onEventsBasedObjectModified();
 
+    // Scroll to the new function.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(newEventsBasedObject);
+    }, 100); // A few ms is enough for a new render to be done.
+
+    // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedObject(newEventsBasedObject);
     this._editName(newEventsBasedObject);
+  };
+
+  scrollToItem = (eventsBasedObject: gdEventsBasedObject) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(eventsBasedObject);
+    }
   };
 
   _onEventsBasedObjectModified() {

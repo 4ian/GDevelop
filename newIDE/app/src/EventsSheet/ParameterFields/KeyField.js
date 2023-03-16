@@ -1,9 +1,14 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import React, { Component } from 'react';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import * as React from 'react';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../../UI/SemiControlledAutoComplete';
 
 const keyNames = [
   'a',
@@ -118,14 +123,15 @@ const keyNames = [
 
 const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 
-export default class KeyField extends Component<ParameterFieldProps, {||}> {
-  _field: ?any;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function KeyField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        if (field.current) field.current.focus({ selectAll });
+      },
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
     const {
       value,
       onChange,
@@ -133,11 +139,11 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
       parameterMetadata,
       onRequestClose,
       onApply,
-    } = this.props;
+    } = props;
 
     return (
       <SemiControlledAutoComplete
-        margin={this.props.isInline ? 'none' : 'dense'}
+        margin={props.isInline ? 'none' : 'dense'}
         floatingLabelText={
           parameterMetadata ? parameterMetadata.getDescription() : undefined
         }
@@ -154,7 +160,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
         openOnFocus={!isInline}
         onRequestClose={onRequestClose}
         onApply={onApply}
-        ref={field => (this._field = field)}
+        ref={field}
         errorText={
           !value ? (
             <Trans>You must select a key.</Trans>
@@ -167,7 +173,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
       />
     );
   }
-}
+);
 
 export const renderInlineKey = ({
   value,

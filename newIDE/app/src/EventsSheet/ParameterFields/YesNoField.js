@@ -1,10 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
+  type ParameterFieldInterface,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
@@ -20,15 +21,16 @@ const styles = {
   },
 };
 
-export default class YesNoField extends Component<ParameterFieldProps, void> {
-  _yesButton = React.createRef<Button>();
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function TilesetResourceField(props: ParameterFieldProps, ref) {
+    const button = React.useRef<?Button>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        if (button.current) focusButton(button.current);
+      },
+    }));
 
-  focus() {
-    focusButton(this._yesButton);
-  }
-
-  render() {
-    const { parameterMetadata, value } = this.props;
+    const { parameterMetadata, value } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : null;
@@ -50,8 +52,8 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
               data-effective={isYes ? 'true' : undefined}
               variant={isYes ? 'contained' : 'outlined'}
               color={isYes ? 'secondary' : 'default'}
-              onClick={() => this.props.onChange('yes')}
-              ref={this._yesButton}
+              onClick={() => props.onChange('yes')}
+              ref={button}
             >
               <Trans>Yes</Trans>
             </Button>
@@ -60,7 +62,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
               data-effective={!isYes ? 'true' : undefined}
               variant={!isYes ? 'contained' : 'outlined'}
               color={!isYes ? 'secondary' : 'default'}
-              onClick={() => this.props.onChange('no')}
+              onClick={() => props.onChange('no')}
             >
               <Trans>No</Trans>
             </Button>
@@ -74,7 +76,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
       </Column>
     );
   }
-}
+);
 
 export const renderInlineYesNo = ({
   value,

@@ -14,6 +14,7 @@ import ObjectField from '../../ParameterFields/ObjectField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
@@ -34,7 +35,7 @@ export default class ForEachEvent extends React.Component<
   EventRendererProps,
   *
 > {
-  _objectField: ?ObjectField = null;
+  _objectField: ?ParameterFieldInterface = null;
   state = {
     editing: false,
     editingPreviousValue: null,

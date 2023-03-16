@@ -1349,7 +1349,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectListOrEmptyIfJustDeclared", _("Object to create"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .MarkAsSimple();
 
@@ -1374,7 +1374,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "with this name are found in the group, no object will be created."))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 

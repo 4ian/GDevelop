@@ -19,7 +19,9 @@ const useSelectStyles = textAlign =>
     },
   })();
 
-export type SelectFieldInterface = {| focus: () => void |};
+export type SelectFieldInterface = {|
+  focus: ({| selectAll?: boolean |}) => void,
+|};
 
 type ValueProps = {|
   value: number | string,
@@ -66,7 +68,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
   (props, ref) => {
     const inputRef = React.useRef<?HTMLInputElement>(null);
 
-    const focus = () => {
+    const focus = ({ selectAll = false }: {| selectAll?: boolean |}) => {
       if (inputRef.current) inputRef.current.focus();
     };
 

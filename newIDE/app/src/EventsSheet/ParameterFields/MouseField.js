@@ -1,36 +1,40 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import React, { Component } from 'react';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
-export default class MouseField extends Component<ParameterFieldProps> {
-  _field: ?SelectFieldInterface;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function MouseField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?SelectFieldInterface>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        if (field.current) field.current.focus({ selectAll });
+      },
+    }));
 
-  focus() {
-    if (this._field) this._field.focus();
-  }
-
-  render() {
-    const { parameterMetadata, value } = this.props;
+    const { parameterMetadata, value } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
 
     return (
       <SelectField
-        margin={this.props.isInline ? 'none' : 'dense'}
+        margin={props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
         helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         value={value}
-        ref={field => (this._field = field)}
-        onChange={(e, i, value) => this.props.onChange(value)}
+        ref={field}
+        onChange={(e, i, value) => props.onChange(value)}
       >
         <SelectOption value="Left" primaryText={t`Left (primary)`} />
         <SelectOption value="Right" primaryText={t`Right (secondary)`} />
@@ -41,7 +45,7 @@ export default class MouseField extends Component<ParameterFieldProps> {
       </SelectField>
     );
   }
-}
+);
 
 export const renderInlineMouse = ({
   value,

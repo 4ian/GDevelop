@@ -10,7 +10,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function StringField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
         if (field.current) field.current.focus({ selectAll });
       },
     }));

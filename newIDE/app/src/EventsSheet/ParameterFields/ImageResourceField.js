@@ -15,7 +15,7 @@ const ImageResourceField = React.forwardRef<
 >((props, ref) => {
   const fieldRef = React.useRef<?ResourceSelector>(null);
 
-  const focus = ({ selectAll = false }: { selectAll?: boolean }) => {
+  const focus = ({ selectAll = false }: {| selectAll?: boolean |}) => {
     if (fieldRef.current) fieldRef.current.focus({ selectAll });
   };
 

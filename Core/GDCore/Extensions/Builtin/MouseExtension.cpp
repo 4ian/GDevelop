@@ -163,7 +163,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "res/conditions/mouse24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
@@ -185,7 +185,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "res/conditions/mouse24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
@@ -206,7 +206,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                                  "res/conditions/mouse24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
@@ -223,7 +223,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                                  "res/conditions/mouse24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
@@ -317,7 +317,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
@@ -333,7 +333,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");

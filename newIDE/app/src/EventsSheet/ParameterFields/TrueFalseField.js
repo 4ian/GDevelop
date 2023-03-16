@@ -1,10 +1,11 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
+  type ParameterFieldInterface,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
@@ -20,18 +21,16 @@ const styles = {
   },
 };
 
-export default class TrueFalseField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _trueButton = React.createRef<Button>();
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function TrueFalseField(props: ParameterFieldProps, ref) {
+    const button = React.useRef<?Button>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        if (button.current) focusButton(button.current);
+      },
+    }));
 
-  focus() {
-    focusButton(this._trueButton);
-  }
-
-  render() {
-    const { parameterMetadata, value } = this.props;
+    const { parameterMetadata, value } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -50,15 +49,15 @@ export default class TrueFalseField extends Component<
             <Button
               variant={effectiveValue === 'True' ? 'contained' : 'outlined'}
               color={effectiveValue === 'True' ? 'secondary' : 'default'}
-              onClick={() => this.props.onChange('True')}
-              ref={this._trueButton}
+              onClick={() => props.onChange('True')}
+              ref={button}
             >
               <Trans>True</Trans>
             </Button>
             <Button
               variant={effectiveValue !== 'True' ? 'contained' : 'outlined'}
               color={effectiveValue !== 'True' ? 'secondary' : 'default'}
-              onClick={() => this.props.onChange('False')}
+              onClick={() => props.onChange('False')}
             >
               <Trans>False</Trans>
             </Button>
@@ -72,7 +71,7 @@ export default class TrueFalseField extends Component<
       </Column>
     );
   }
-}
+);
 
 export const renderInlineTrueFalse = ({
   value,

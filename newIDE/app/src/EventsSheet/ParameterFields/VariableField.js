@@ -1,10 +1,13 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import OpenInNew from '@material-ui/icons/OpenInNew';
-import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 import classNames from 'classnames';
 import {
   icon,
@@ -27,11 +30,12 @@ type Props = {
   onOpenDialog: ?() => void,
 };
 
-type State = {|
-  autocompletionVariableNames: DataSource,
-|};
-
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3;
+
+export type VariableFieldInterface = {|
+  ...ParameterFieldInterface,
+  updateAutocompletions: () => void,
+|};
 
 export const VariableNameQuickAnalyzeResults = {
   OK: 0,
@@ -66,64 +70,53 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
-export default class VariableField extends Component<Props, State> {
-  _field: ?SemiControlledAutoCompleteInterface;
-
-  static contextType = PreferencesContext;
-
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      autocompletionVariableNames: [],
+export default React.forwardRef<Props, VariableFieldInterface>(
+  function VariableField(props: Props, ref) {
+    const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
+    /**
+     * Can be called to set up or force updating the variables list.
+     */
+    const updateAutocompletions = () => {
+      const definedVariableNames = enumerateVariables(props.variablesContainer)
+        .map(({ name, isValidName }) =>
+          isValidName
+            ? name
+            : // Hide invalid variable names - they would not
+              // be parsed correctly anyway.
+              null
+        )
+        .filter(Boolean);
+      const newAutocompletionVariableNames = preferences.values
+        .useUndefinedVariablesInAutocompletion
+        ? uniq([...definedVariableNames, ...props.onComputeAllVariableNames()])
+        : definedVariableNames;
+      setAutocompletionVariableNames(
+        newAutocompletionVariableNames.map(name => ({
+          text: name,
+          value: name,
+        }))
+      );
     };
-  }
 
-  componentDidMount() {
-    this.updateAutocompletions();
-  }
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        if (field.current) field.current.focus({ selectAll });
+      },
+      updateAutocompletions,
+    }));
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.variablesContainer !== this.props.variablesContainer) {
-      this.updateAutocompletions();
-    }
-  }
+    const preferences = React.useContext(PreferencesContext);
+    const [
+      autocompletionVariableNames,
+      setAutocompletionVariableNames,
+    ] = React.useState<DataSource>([]);
 
-  /**
-   * Can be called to set up or force updating the variables list.
-   */
-  updateAutocompletions() {
-    const definedVariableNames = enumerateVariables(
-      this.props.variablesContainer
-    )
-      .map(({ name, isValidName }) =>
-        isValidName
-          ? name
-          : // Hide invalid variable names - they would not
-            // be parsed correctly anyway.
-            null
-      )
-      .filter(Boolean);
-    const preferences = this.context;
-    const autocompletionVariableNames = preferences.values
-      .useUndefinedVariablesInAutocompletion
-      ? uniq([
-          ...definedVariableNames,
-          ...this.props.onComputeAllVariableNames(),
-        ])
-      : definedVariableNames;
-    this.setState({
-      autocompletionVariableNames: autocompletionVariableNames.map(name => ({
-        text: name,
-        value: name,
-      })),
+    React.useEffect(() => {
+      if (props.variablesContainer) {
+        updateAutocompletions();
+      }
     });
-  }
 
-  focus = ({ selectAll = false }: { selectAll?: boolean }) => {
-    if (this._field) this._field.focus({ selectAll });
-  };
-
-  render() {
     const {
       value,
       onChange,
@@ -132,7 +125,7 @@ export default class VariableField extends Component<Props, State> {
       parameterMetadata,
       onRequestClose,
       onApply,
-    } = this.props;
+    } = props;
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -165,7 +158,7 @@ export default class VariableField extends Component<Props, State> {
       <TextFieldWithButtonLayout
         renderTextField={() => (
           <SemiControlledAutoComplete
-            margin={this.props.isInline ? 'none' : 'dense'}
+            margin={props.isInline ? 'none' : 'dense'}
             floatingLabelText={description}
             helperMarkdownText={
               parameterMetadata
@@ -178,17 +171,17 @@ export default class VariableField extends Component<Props, State> {
             onChange={onChange}
             onRequestClose={onRequestClose}
             onApply={onApply}
-            dataSource={this.state.autocompletionVariableNames}
+            dataSource={autocompletionVariableNames}
             openOnFocus={!isInline}
-            ref={field => (this._field = field)}
-            id={this.props.id}
+            ref={field}
+            id={props.id}
           />
         )}
         renderButton={style =>
           onOpenDialog && !isInline ? (
             <RaisedButton
               icon={<OpenInNew />}
-              disabled={!this.props.variablesContainer}
+              disabled={!props.variablesContainer}
               primary
               style={style}
               onClick={onOpenDialog}
@@ -198,7 +191,7 @@ export default class VariableField extends Component<Props, State> {
       />
     );
   }
-}
+);
 
 export const renderVariableWithIcon = (
   {

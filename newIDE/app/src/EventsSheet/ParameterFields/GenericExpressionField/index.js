@@ -188,9 +188,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus = ({ selectAll = false }: { selectAll?: boolean }) => {
+  focus = ({ selectAll = false }: {| selectAll?: boolean |}) => {
     if (this._field) {
-      this._field.focus();
+      this._field.focus({ selectAll });
       if (selectAll) {
         if (this._inputElement) {
           this._inputElement.setSelectionRange(
@@ -327,7 +327,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     // Focus again and select what was just added.
     setTimeout(() => {
-      if (this._field) this._field.focus();
+      if (this._field) this._field.focus({ selectAll: false });
 
       setTimeout(() => {
         if (this._inputElement) {

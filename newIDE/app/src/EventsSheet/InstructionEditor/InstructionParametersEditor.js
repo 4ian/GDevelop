@@ -125,7 +125,7 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
-    const focus = ({ selectAll = false }: { selectAll?: boolean }) => {
+    const focus = ({ selectAll = false }: {| selectAll?: boolean |}) => {
       // Verify that there is a field to focus.
       if (
         getVisibleParametersCount(

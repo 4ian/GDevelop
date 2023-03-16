@@ -50,7 +50,7 @@ type Props = {|
 |};
 
 export type SemiControlledTextFieldInterface = {|
-  focus: () => void,
+  focus: ({| selectAll?: boolean |}) => void,
   forceSetValue: (text: string) => void,
   forceSetSelection: (start: number, end: number) => void,
   getInputNode: () => ?HTMLInputElement,
@@ -83,8 +83,8 @@ const SemiControlledTextField = React.forwardRef<
     }
   };
 
-  const focus = () => {
-    if (textFieldRef.current) textFieldRef.current.focus();
+  const focus = ({ selectAll }: {| selectAll?: boolean |}) => {
+    if (textFieldRef.current) textFieldRef.current.focus({ selectAll });
   };
 
   const getInputNode = (): ?HTMLInputElement => {

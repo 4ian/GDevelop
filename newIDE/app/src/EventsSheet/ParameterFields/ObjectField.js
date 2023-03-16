@@ -3,94 +3,88 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
-export default class ObjectField extends React.Component<
-  ParameterFieldProps,
-  {||}
-> {
-  static contextType = InAppTutorialContext;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function ObjectField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?ObjectSelector>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        // Prevent focus of field if an in-app tutorial is running because
+        // the popper of the tooltip and the popper of the semi controlled
+        // autocomplete's dropdown are conflicting.
+        if (field.current && !currentlyRunningInAppTutorial)
+          field.current.focus({ selectAll });
+      },
+    }));
 
-  _description: ?string;
-  _longDescription: ?string;
-  _allowedObjectType: ?string;
-  _field: ?ObjectSelector;
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
 
-  constructor(props: ParameterFieldProps) {
-    super(props);
+    const { parameterMetadata } = props;
 
-    const { parameterMetadata } = this.props;
-
-    this._description = parameterMetadata
+    const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
 
-    this._longDescription = parameterMetadata
+    const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
 
-    this._allowedObjectType = parameterMetadata
+    const allowedObjectType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : undefined;
-  }
 
-  focus({ selectAll = false }: { selectAll?: boolean }) {
-    const { currentlyRunningInAppTutorial } = this.context;
-    // Prevent focus of field if an in-app tutorial is running because
-    // the popper of the tooltip and the popper of the semi controlled
-    // autocomplete's dropdown are conflicting.
-    if (this._field && !currentlyRunningInAppTutorial)
-      this._field.focus({ selectAll });
-  }
-
-  render() {
     return (
       <ObjectSelector
-        margin={this.props.isInline ? 'none' : 'dense'}
-        project={this.props.project}
-        value={this.props.value}
-        onChange={this.props.onChange}
-        onRequestClose={this.props.onRequestClose}
-        onApply={this.props.onApply}
-        allowedObjectType={this._allowedObjectType}
+        margin={props.isInline ? 'none' : 'dense'}
+        project={props.project}
+        value={props.value}
+        onChange={props.onChange}
+        onRequestClose={props.onRequestClose}
+        onApply={props.onApply}
+        allowedObjectType={allowedObjectType}
         requiredObjectCapability={
           // Some instructions apply to all objects BUT not some objects
           // lacking a specific capability usually offered by all objects.
-          this.props.instructionMetadata
-            ? this.props.instructionMetadata.getRequiredBaseObjectCapability()
-            : this.props.expressionMetadata
-            ? this.props.expressionMetadata.getRequiredBaseObjectCapability()
+          props.instructionMetadata
+            ? props.instructionMetadata.getRequiredBaseObjectCapability()
+            : props.expressionMetadata
+            ? props.expressionMetadata.getRequiredBaseObjectCapability()
             : undefined
         }
-        globalObjectsContainer={this.props.globalObjectsContainer}
-        objectsContainer={this.props.objectsContainer}
-        floatingLabelText={this._description}
-        helperMarkdownText={this._longDescription}
+        globalObjectsContainer={props.globalObjectsContainer}
+        objectsContainer={props.objectsContainer}
+        floatingLabelText={description}
+        helperMarkdownText={longDescription}
         id={
-          this.props.parameterIndex !== undefined
-            ? `parameter-${this.props.parameterIndex}-object-selector`
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-object-selector`
             : undefined
         }
         fullWidth
         errorTextIfInvalid={
-          this._allowedObjectType ? (
+          allowedObjectType ? (
             <Trans>The object does not exist or can't be used here.</Trans>
           ) : (
             <Trans>Enter the name of an object.</Trans>
           )
         }
         openOnFocus={
-          !this.props
-            .value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */
+          !props.value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */
         }
-        ref={field => (this._field = field)}
+        ref={field}
       />
     );
   }
-}
+);
 
 export const renderInlineObjectWithThumbnail = ({
   value,

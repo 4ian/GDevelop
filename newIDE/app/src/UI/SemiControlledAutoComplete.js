@@ -257,7 +257,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
         const { current } = input;
         if (current) {
           current.focus();

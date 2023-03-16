@@ -1,5 +1,7 @@
 // @flow
 import React from 'react';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { mapFor } from '../../Utils/MapFor';
 import {
   type ParameterFieldProps,
@@ -8,7 +10,11 @@ import {
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 
 import GenericExpressionField from './GenericExpressionField';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
+import SelectOption from '../../UI/SelectOption';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import RaisedButton from '../../UI/RaisedButton';
+import Functions from '@material-ui/icons/Functions';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
@@ -18,35 +24,104 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     )>(null);
 
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
+        console.log('focus', selectAll);
         if (inputFieldRef.current) inputFieldRef.current.focus({ selectAll });
       },
     }));
 
     const { layout } = props.scope;
-    const layerNames: Array<ExpressionAutocompletion> = layout
+    const layerNames = layout
       ? mapFor(0, layout.getLayersCount(), i => {
           const layer = layout.getLayerAt(i);
-          return { kind: 'Text', completion: `"${layer.getName()}"` };
+          return layer.getName();
         })
       : [];
 
-    return (
-      <GenericExpressionField
-        id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-layer-field`
-            : undefined
-        }
-        expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
-          layerNames.filter(
-            ({ completion }) => completion.indexOf(expression) === 0
-          )
-        }
-        ref={inputFieldRef}
-        {...props}
+    const isCurrentValueInLayersList = !!layerNames.find(
+      layerName => `"${layerName}"` === props.value
+    );
+
+    // If the current value is not in the list of layers, display an expression field.
+    const [isExpressionField, setIsExpressionField] = React.useState(
+      !!props.value && !isCurrentValueInLayersList
+    );
+
+    const onChangeSelectValue = (event, value) => {
+      props.onChange(event.target.value);
+    };
+
+    const onChangeTextValue = (value: string) => {
+      props.onChange(value);
+    };
+
+    const fieldLabel = props.parameterMetadata
+      ? props.parameterMetadata.getDescription()
+      : undefined;
+
+    const selectOptions = layerNames.map(layerName => (
+      <SelectOption
+        key={layerName === '' ? 'Base layer' : layerName}
+        value={layerName === '' ? '' : `"${layerName}"`}
+        primaryText={layerName === '' ? t`Base layer` : layerName}
       />
+    ));
+
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <>
+            <TextFieldWithButtonLayout
+              renderTextField={() =>
+                !isExpressionField ? (
+                  <SelectField
+                    ref={inputFieldRef}
+                    value={props.value}
+                    onChange={onChangeSelectValue}
+                    margin={props.isInline ? 'none' : 'dense'}
+                    fullWidth
+                    floatingLabelText={fieldLabel}
+                    translatableHintText={t`Choose a layer`}
+                    helperMarkdownText={
+                      (props.parameterMetadata &&
+                        props.parameterMetadata.getLongDescription()) ||
+                      null
+                    }
+                  >
+                    {selectOptions}
+                  </SelectField>
+                ) : (
+                  <GenericExpressionField
+                    ref={inputFieldRef}
+                    id={
+                      props.parameterIndex !== undefined
+                        ? `parameter-${props.parameterIndex}-layer-field`
+                        : undefined
+                    }
+                    expressionType="string"
+                    {...props}
+                    onChange={onChangeTextValue}
+                  />
+                )
+              }
+              renderButton={style => (
+                <RaisedButton
+                  id="switch-expression-select"
+                  icon={isExpressionField ? <OpenInNew /> : <Functions />}
+                  style={style}
+                  primary
+                  label={
+                    isExpressionField
+                      ? i18n._(t`Select`)
+                      : i18n._(t`Expression`)
+                  }
+                  onClick={() => setIsExpressionField(!isExpressionField)}
+                />
+              )}
+            />
+          </>
+        )}
+      </I18n>
     );
   }
 );

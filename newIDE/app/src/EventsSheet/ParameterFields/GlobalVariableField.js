@@ -2,7 +2,10 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, { renderVariableWithIcon } from './VariableField';
+import VariableField, {
+  renderVariableWithIcon,
+  type VariableFieldInterface,
+} from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import {
   type ParameterFieldProps,
@@ -12,10 +15,10 @@ import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?VariableField>(null);
+    const field = React.useRef<?VariableFieldInterface>(null);
     const [editorOpen, setEditorOpen] = React.useState(false);
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
         if (field.current) field.current.focus({ selectAll });
       },
     }));

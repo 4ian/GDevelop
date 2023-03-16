@@ -147,7 +147,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
   // Don't add a componentWillUnmount that would call onChange. This can lead to
   // calling callbacks that would then update a deleted instruction parameters.
 
-  focus = ({ selectAll = false }: { selectAll?: boolean }) => {
+  focus = ({ selectAll = false }: {| selectAll?: boolean |}) => {
     if (this._field) this._field.focus({ selectAll });
   };
 

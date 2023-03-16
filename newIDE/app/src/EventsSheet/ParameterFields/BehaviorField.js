@@ -79,7 +79,7 @@ export default class BehaviorField extends React.Component<
       });
   }
 
-  focus({ selectAll = false }: { selectAll: boolean }) {
+  focus({ selectAll = false }: { selectAll?: boolean }) {
     if (this._field) this._field.focus({ selectAll });
   }
 

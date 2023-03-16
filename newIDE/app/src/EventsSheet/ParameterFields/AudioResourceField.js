@@ -12,7 +12,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function AudioResourceField(props, ref) {
     const fieldRef = React.useRef<?ResourceSelector>(null);
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
         if (fieldRef.current) fieldRef.current.focus({ selectAll });
       },
     }));

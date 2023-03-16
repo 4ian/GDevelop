@@ -101,27 +101,76 @@ class TaskGroup {
   }
 }
 
-class VariablesContainer {
+class Variable {
   constructor() {
-    this._variables = {};
+    this._value = 0;
+    this._children = {};
   }
 
-  get(variableName) {
-    return {
-      add: (value) => {
-        this._variables[variableName] =
-          (this._variables[variableName] || 0) + value;
-      },
-      setNumber: (value) => {
-        this._variables[variableName] = value;
-      },
-      getAsNumber: () => {
-        return this._variables[variableName] || 0;
-      },
-    };
+  add(value) {
+    this._value = this.getAsNumber() + value;
   }
+
+  setNumber(value) {
+    this._value = value;
+  }
+
+  getAsNumber() {
+    return this._value || 0;
+  }
+
+  getValue() {
+    return this.getAsNumber();
+  }
+
+  setValue(value) {
+    this.setNumber(value);
+  }
+
+  getChild(childName) {
+    if (
+      this._children[childName] === undefined ||
+      this._children[childName] === null
+    )
+      this._children[childName] = new Variable();
+    return this._children[childName];
+  }
+
+  getAllChildren() {
+    return this._children;
+  }
+
+  getAllChildrenArray() {
+    return Object.values(this._children);
+  }
+
+  castTo() {}
+
+  isPrimitive() {
+    return this.getAllChildrenArray().length === 0;
+  }
+
+  getType() {
+    return this.isPrimitive() ? 'number' : 'structure';
+  }
+}
+
+class VariablesContainer {
+  constructor() {
+    this._variables = new Hashtable();
+  }
+
+  get(name) {
+    let variable = this._variables.get(name);
+    if (!variable) {
+      variable = new Variable();
+      this._variables.put(name, variable);
+    }
+    return variable;
+  }
+
   has(variableName) {
-    return this._variables.hasOwnProperty(variableName);
+    return this._variables.containsKey(variableName);
   }
 }
 
@@ -145,6 +194,10 @@ class RuntimeObject {
 
   returnVariable(variable) {
     return variable;
+  }
+
+  static getVariableNumber(variable) {
+    return variable.getAsNumber();
   }
 
   getVariableNumber(variable) {
@@ -550,6 +603,7 @@ function makeMinimalGDJSMock() {
       copyArray,
       objectsListsToArray,
       RuntimeBehavior,
+      RuntimeObject,
       OnceTriggers,
       Hashtable,
       LongLivedObjectsList,

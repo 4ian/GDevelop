@@ -247,19 +247,60 @@ function generateCompiledEventsForSerializedEventsBasedExtension(
   return generatedExtensionModule;
 }
 
-/** Helper to create compiled events from serialized events, creating a project and the events function. */
+/**
+ * Helper to create compiled events from serialized events, creating a project and the events function.
+ * @param {*} gd 
+ * @param {gdSerializerElement} eventsSerializerElement 
+ * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean}?} configuration 
+ * @returns 
+ */
 function generateCompiledEventsFromSerializedEvents(
   gd,
-  eventsSerializerElement
+  eventsSerializerElement,
+  configuration
 ) {
   const project = new gd.ProjectHelper.createNewGDJSProject();
   const eventsFunction = new gd.EventsFunction();
   eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
+  
+  if (configuration) {
+    const {
+      parameterTypes,
+      groups
+      } = configuration;
+    if (groups) {
+      for (const groupName in groups) {
+        if (Object.hasOwnProperty.call(groups, groupName)) {
+          const objectsNames = groups[groupName];
+
+          const group = eventsFunction.getObjectGroups().insertNew(groupName, 0);
+          for (const objectName of objectsNames) {
+            group.addObject(objectName);
+          }
+        }
+      }
+    }
+
+    if (parameterTypes) {
+      for (const parameterName in parameterTypes) {
+        if (Object.hasOwnProperty.call(parameterTypes, parameterName)) {
+          const parameterType = parameterTypes[parameterName];
+          
+          const parameter = new gd.ParameterMetadata();
+          parameter.setType(parameterType);
+          parameter.setName(parameterName);
+          eventsFunction.getParameters().push_back(parameter);
+          parameter.delete();
+        }
+      }
+    }
+}
 
   const runCompiledEvents = generateCompiledEventsForEventsFunction(
     gd,
     project,
-    eventsFunction
+    eventsFunction,
+    configuration && configuration.logCode
   );
 
   eventsFunction.delete();

@@ -26,7 +26,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     eventsBasedBehavior.delete();
     project.delete();
 
-    // Instanciate the behavior
+    // Instantiate the behavior
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     const CompiledRuntimeBehavior = makeCompiledRuntimeBehavior(gdjs);
     const behaviorData = {};
@@ -74,7 +74,7 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
 
-    // Instanciate the behavior twice
+    // Instantiate the behavior twice
     const makeCompiledRuntimeBehavior = generateCompiledRuntimeBehaviorMaker(
       gd,
       project,

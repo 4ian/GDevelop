@@ -31,9 +31,7 @@ export type AlertMessageIdentifier =
   | 'effects-usage'
   | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
-  | 'instance-drag-n-drop-explanation'
   | 'physics2-shape-collisions'
-  | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
   | 'p2p-is-networking'
   | 'p2p-dataloss'
@@ -132,16 +130,8 @@ export const allAlertMessages: Array<{
     label: <Trans>Using the resource properties panel</Trans>,
   },
   {
-    key: 'instance-drag-n-drop-explanation',
-    label: <Trans>Using instance drag'n'drop</Trans>,
-  },
-  {
     key: 'physics2-shape-collisions',
     label: <Trans>Collisions handling with the Physics engine</Trans>,
-  },
-  {
-    key: 'edit-instruction-explanation',
-    label: <Trans>How to edit instructions</Trans>,
   },
   {
     key: 'lifecycle-events-function-included-only-if-extension-used',

@@ -22,7 +22,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import ScrollView from '../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 import {
@@ -50,6 +50,26 @@ type Props = {|
 |};
 
 const BehaviorsEditor = (props: Props) => {
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
+  const justAddedBehaviorName = React.useRef((null: ?string));
+  const justAddedBeaviorAccordionElement = React.useRef(
+    (null: ?React$Component<any, any>)
+  );
+
+  React.useEffect(
+    () => {
+      if (scrollView.current && justAddedBeaviorAccordionElement.current) {
+        scrollView.current.scrollTo(justAddedBeaviorAccordionElement.current);
+        justAddedBehaviorName.current = null;
+        justAddedBeaviorAccordionElement.current = null;
+      }
+    },
+    // We only want to trigger the scroll when justAddedBeaviorAccordionElement.current or
+    // justAddedBehaviorName.current are set
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [justAddedBeaviorAccordionElement.current, justAddedBehaviorName.current]
+  );
+
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );
@@ -74,6 +94,7 @@ const BehaviorsEditor = (props: Props) => {
         behaviorType: type,
         parentEditor: 'behaviors-editor',
       });
+      justAddedBehaviorName.current = defaultName;
     }
 
     forceUpdate();
@@ -155,7 +176,7 @@ const BehaviorsEditor = (props: Props) => {
         </Column>
       ) : (
         <React.Fragment>
-          <ScrollView>
+          <ScrollView ref={scrollView}>
             {allBehaviorNames.map((behaviorName, index) => {
               const behavior = object.getBehavior(behaviorName);
               const behaviorTypeName = behavior.getTypeName();
@@ -217,11 +238,17 @@ const BehaviorsEditor = (props: Props) => {
               );
               const iconUrl = behaviorMetadata.getIconFilename();
 
+              const ref =
+                justAddedBehaviorName.current === behaviorName
+                  ? justAddedBeaviorAccordionElement
+                  : null;
+
               return (
                 <Accordion
                   key={behaviorName}
                   defaultExpanded
                   id={`behavior-parameters-${behaviorName}`}
+                  ref={ref}
                 >
                   <AccordionHeader
                     actions={[

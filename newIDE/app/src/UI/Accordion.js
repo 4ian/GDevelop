@@ -131,21 +131,24 @@ type AccordionProps = {|
  * and accordion-specific actions.
  * Based on Material-UI Accordion.
  */
-export const Accordion = (props: AccordionProps) => {
-  const { costlyBody, ...otherProps } = props;
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
+  (props, ref) => {
+    const { costlyBody, ...otherProps } = props;
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  return (
-    <MUIAccordion
-      {...otherProps}
-      square
-      elevation={0}
-      style={{
-        border: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
-        backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
-        marginLeft: 0,
-      }}
-      TransitionProps={{ unmountOnExit: !!costlyBody }}
-    />
-  );
-};
+    return (
+      <MUIAccordion
+        {...otherProps}
+        ref={ref}
+        square
+        elevation={0}
+        style={{
+          border: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+          backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+          marginLeft: 0,
+        }}
+        TransitionProps={{ unmountOnExit: !!costlyBody }}
+      />
+    );
+  }
+);

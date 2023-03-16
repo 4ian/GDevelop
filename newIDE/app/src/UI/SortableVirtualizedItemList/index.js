@@ -54,8 +54,8 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       listItem =>
         this.props.getItemName(listItem) === this.props.getItemName(item)
     );
-    if (this._list) {
-      if (index !== -1) this._list.scrollToRow(index);
+    if (this._list && index !== -1) {
+      this._list.scrollToRow(index);
     }
   }
 

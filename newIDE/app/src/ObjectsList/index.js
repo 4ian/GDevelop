@@ -230,8 +230,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         object.setTags(getStringFromTags(selectedObjectTags));
 
-        // A new object is always added to the scene (layout) by default.
-        const objectWithContext = { object, global: false };
+        const objectWithContext: ObjectWithContext = {
+          object,
+          global: false, // A new object is always added to the scene (layout) by default.
+        };
 
         // Scroll to the new object.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -239,7 +241,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // to be done.
         setTimeout(() => {
           scrollToItem(objectWithContext);
-        }, 100); // A few ms seems to be enough to wait for the list to be updated.
+        }, 100); // A few ms is enough for a new render to be done.
 
         setNewObjectDialogOpen(false);
         // TODO Should it be called later?

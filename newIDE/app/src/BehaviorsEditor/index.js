@@ -51,23 +51,27 @@ type Props = {|
 
 const BehaviorsEditor = (props: Props) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
-  const justAddedBehaviorName = React.useRef((null: ?string));
-  const justAddedBeaviorAccordionElement = React.useRef(
+  const [
+    justAddedBehaviorName,
+    setJustAddedBehaviorName,
+  ] = React.useState<?string>(null);
+  const justAddedBehaviorAccordionElement = React.useRef(
     (null: ?React$Component<any, any>)
   );
 
   React.useEffect(
     () => {
-      if (scrollView.current && justAddedBeaviorAccordionElement.current) {
-        scrollView.current.scrollTo(justAddedBeaviorAccordionElement.current);
-        justAddedBehaviorName.current = null;
-        justAddedBeaviorAccordionElement.current = null;
+      if (
+        scrollView.current &&
+        justAddedBehaviorAccordionElement.current &&
+        justAddedBehaviorName
+      ) {
+        scrollView.current.scrollTo(justAddedBehaviorAccordionElement.current);
+        setJustAddedBehaviorName(null);
+        justAddedBehaviorAccordionElement.current = null;
       }
     },
-    // We only want to trigger the scroll when justAddedBeaviorAccordionElement.current or
-    // justAddedBehaviorName.current are set
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [justAddedBeaviorAccordionElement.current, justAddedBehaviorName.current]
+    [justAddedBehaviorName]
   );
 
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
@@ -94,7 +98,7 @@ const BehaviorsEditor = (props: Props) => {
         behaviorType: type,
         parentEditor: 'behaviors-editor',
       });
-      justAddedBehaviorName.current = defaultName;
+      setJustAddedBehaviorName(defaultName);
     }
 
     forceUpdate();
@@ -239,8 +243,8 @@ const BehaviorsEditor = (props: Props) => {
               const iconUrl = behaviorMetadata.getIconFilename();
 
               const ref =
-                justAddedBehaviorName.current === behaviorName
-                  ? justAddedBeaviorAccordionElement
+                justAddedBehaviorName === behaviorName
+                  ? justAddedBehaviorAccordionElement
                   : null;
 
               return (

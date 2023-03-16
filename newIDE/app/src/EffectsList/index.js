@@ -112,12 +112,15 @@ export default function EffectsList(props: Props) {
     forceUpdate();
     onEffectsUpdated();
 
-    // An effect is always added at the end.
+    // A gdEffect is always added at the end of the list.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
     setTimeout(() => {
       if (scrollView.current) {
         scrollView.current.scrollToBottom();
       }
-    }, 100); // Wait for the list to be updated before scrolling.
+    }, 100); // A few ms is enough for a new render to be done.
   };
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(

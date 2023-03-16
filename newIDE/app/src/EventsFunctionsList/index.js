@@ -422,7 +422,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         // to be done.
         setTimeout(() => {
           this.scrollToItem(eventsFunction);
-        }, 100); // A few ms seems to be enough to wait for the list to be updated.
+        }, 100); // A few ms is enough for a new render to be done.
 
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();

@@ -249,12 +249,15 @@ class AnimationsListContainer extends React.Component<
     this.props.onSizeUpdated();
     if (this.props.onObjectUpdated) this.props.onObjectUpdated();
 
-    // Scroll to the bottom of the list
+    // Scroll to the bottom of the list.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
     setTimeout(() => {
       if (this._scrollView.current) {
         this._scrollView.current.scrollToBottom();
       }
-    }, 100); // Wait for the list to be updated.
+    }, 100); // A few ms is enough for a new render to be done.
   };
 
   removeAnimation = i => {

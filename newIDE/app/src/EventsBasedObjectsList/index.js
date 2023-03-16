@@ -275,7 +275,7 @@ export default class EventsBasedObjectsList extends React.Component<
     // to be done.
     setTimeout(() => {
       this.scrollToItem(newEventsBasedObject);
-    }, 100); // A few ms seems to be enough to wait for the list to be updated.
+    }, 100); // A few ms is enough for a new render to be done.
 
     // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedObject(newEventsBasedObject);

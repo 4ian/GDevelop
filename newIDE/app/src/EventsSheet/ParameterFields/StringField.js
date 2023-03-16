@@ -1,27 +1,31 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import GenericExpressionField from './GenericExpressionField';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 
-export default class StringField extends Component<ParameterFieldProps, void> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function StringField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?GenericExpressionField>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+        if (field.current) field.current.focus({ selectAll });
+      },
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
     return (
       <GenericExpressionField
         expressionType="string"
-        ref={field => (this._field = field)}
-        {...this.props}
+        ref={field}
+        {...props}
         id={
-          this.props.parameterIndex !== undefined
-            ? `parameter-${this.props.parameterIndex}-string-field`
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-string-field`
             : undefined
         }
       />
     );
   }
-}
+);

@@ -62,10 +62,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       | SelectFieldInterface
     )>(null);
     React.useImperativeHandle(ref, () => ({
-      focus: () => {
-        if (inputFieldRef.current) {
-          inputFieldRef.current.focus();
-        }
+      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+        if (inputFieldRef.current) inputFieldRef.current.focus({ selectAll });
       },
     }));
 

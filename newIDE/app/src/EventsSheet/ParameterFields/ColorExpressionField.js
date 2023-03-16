@@ -1,29 +1,33 @@
 // @flow
-import React, { Component } from 'react';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import * as React from 'react';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
 
-export default class ParameterColorField extends Component<ParameterFieldProps> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function ParameterColorField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?GenericExpressionField>(null);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+        if (field.current) field.current.focus({ selectAll });
+      },
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
     return (
       <GenericExpressionField
         expressionType="string"
-        ref={field => (this._field = field)}
+        ref={field}
         renderExtraButton={({ style }) => (
           <ColorPicker
             style={style}
             disableAlpha
-            color={rgbStringAndAlphaToRGBColor(this.props.value)}
+            color={rgbStringAndAlphaToRGBColor(props.value)}
             onChangeComplete={color => {
-              this.props.onChange(
+              props.onChange(
                 '"' + color.rgb.r + ';' + color.rgb.g + ';' + color.rgb.b + '"'
               );
             }}
@@ -39,8 +43,8 @@ export default class ParameterColorField extends Component<ParameterFieldProps> 
 
           return null;
         }}
-        {...this.props}
+        {...props}
       />
     );
   }
-}
+);

@@ -54,7 +54,9 @@ export type ParameterFieldProps = {|
 |};
 
 export type ParameterFieldInterface = {|
-  focus: () => void,
+  focus: ({|
+    selectAll?: boolean,
+  |}) => void,
 |};
 
 export const getParameterValueOrDefault = (

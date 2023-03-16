@@ -5,16 +5,21 @@ import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
 } from './ParameterFieldCommons';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
+
 import GenericExpressionField from './GenericExpressionField';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
-    const fieldRef = React.useRef<?GenericExpressionField>(null);
+    const inputFieldRef = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
 
     React.useImperativeHandle(ref, () => ({
-      focus: (selectAll: boolean = false) => {
-        if (fieldRef.current) fieldRef.current.focus(selectAll);
+      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+        if (inputFieldRef.current) inputFieldRef.current.focus({ selectAll });
       },
     }));
 
@@ -39,7 +44,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={fieldRef}
+        ref={inputFieldRef}
         {...props}
       />
     );

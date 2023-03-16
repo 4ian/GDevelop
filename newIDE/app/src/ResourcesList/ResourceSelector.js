@@ -79,8 +79,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
   autoCompleteData: DataSource;
   _autoComplete: ?SemiControlledAutoCompleteInterface;
 
-  focus(selectAll: boolean = false) {
-    if (this._autoComplete) this._autoComplete.focus(selectAll);
+  focus({ selectAll = false }: {| selectAll?: boolean |}) {
+    if (this._autoComplete) this._autoComplete.focus({ selectAll });
   }
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
@@ -326,7 +326,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
                 )
               }
               onClick={() => {
-                this._autoComplete && this._autoComplete.focus();
+                this._autoComplete &&
+                  this._autoComplete.focus({ selectAll: false });
               }}
               primary
             />

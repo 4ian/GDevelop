@@ -4,28 +4,23 @@ import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+} from './ParameterFieldCommons';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
-type State = {|
-  editorOpen: boolean,
-|};
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function GlobalVariableField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?VariableField>(null);
+    const [editorOpen, setEditorOpen] = React.useState(false);
+    React.useImperativeHandle(ref, () => ({
+      focus: ({ selectAll = false }: { selectAll?: boolean }) => {
+        if (field.current) field.current.focus({ selectAll });
+      },
+    }));
 
-export default class GlobalVariableField extends React.Component<
-  ParameterFieldProps,
-  State
-> {
-  _field: ?VariableField;
-  state = {
-    editorOpen: false,
-  };
-
-  focus() {
-    if (this._field) this._field.focus();
-  }
-
-  render() {
-    const { project, scope } = this.props;
+    const { project, scope } = props;
 
     const onComputeAllVariableNames = () =>
       project
@@ -40,27 +35,27 @@ export default class GlobalVariableField extends React.Component<
         <VariableField
           variablesContainer={project ? project.getVariables() : null}
           onComputeAllVariableNames={onComputeAllVariableNames}
-          parameterMetadata={this.props.parameterMetadata}
-          value={this.props.value}
-          onChange={this.props.onChange}
-          isInline={this.props.isInline}
-          onRequestClose={this.props.onRequestClose}
-          onApply={this.props.onApply}
-          ref={field => (this._field = field)}
-          onOpenDialog={() => this.setState({ editorOpen: true })}
-          globalObjectsContainer={this.props.globalObjectsContainer}
-          objectsContainer={this.props.objectsContainer}
+          parameterMetadata={props.parameterMetadata}
+          value={props.value}
+          onChange={props.onChange}
+          isInline={props.isInline}
+          onRequestClose={props.onRequestClose}
+          onApply={props.onApply}
+          ref={field}
+          onOpenDialog={() => setEditorOpen(true)}
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
           scope={scope}
         />
-        {this.state.editorOpen && project && (
+        {editorOpen && project && (
           <VariablesEditorDialog
             title={<Trans>Global Variables</Trans>}
-            open={this.state.editorOpen}
+            open={editorOpen}
             variablesContainer={project.getVariables()}
-            onCancel={() => this.setState({ editorOpen: false })}
+            onCancel={() => setEditorOpen(false)}
             onApply={() => {
-              this.setState({ editorOpen: false });
-              if (this._field) this._field.updateAutocompletions();
+              setEditorOpen(false);
+              if (field.current) field.current.updateAutocompletions();
             }}
             emptyPlaceholderTitle={
               <Trans>Add your first global variable</Trans>
@@ -77,14 +72,9 @@ export default class GlobalVariableField extends React.Component<
       </React.Fragment>
     );
   }
-}
+);
 
 export const renderInlineGlobalVariable = (
   props: ParameterInlineRendererProps
-) => {
-  return renderVariableWithIcon(
-    props,
-    'res/types/globalvar.png',
-    'global variable'
-  );
-};
+) =>
+  renderVariableWithIcon(props, 'res/types/globalvar.png', 'global variable');

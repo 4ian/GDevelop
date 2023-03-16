@@ -188,7 +188,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus = (selectAll: boolean = false) => {
+  focus = ({ selectAll = false }: { selectAll?: boolean }) => {
     if (this._field) {
       this._field.focus();
       if (selectAll) {
@@ -650,7 +650,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       this._insertAutocompletion(expressionAutocompletion);
 
                       setTimeout(
-                        this.focus,
+                        () => this.focus({ selectAll: false }),
                         50 /* Give back the focus to the field after a completion is inserted */
                       );
                     }}

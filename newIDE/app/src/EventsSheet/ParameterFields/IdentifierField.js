@@ -79,7 +79,7 @@ export const IdentifierField = (props: Props) => {
 
   React.useEffect(() => {
     if (field.current) {
-      field.current.focus();
+      field.current.focus({ selectAll: false });
     }
   }, []);
 

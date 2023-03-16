@@ -204,7 +204,7 @@ export default function InstructionEditorDialog({
     () => {
       if (shouldAutofocusInput && step === 'parameters') {
         if (instructionParametersEditor.current) {
-          instructionParametersEditor.current.focus();
+          instructionParametersEditor.current.focus({ selectAll: false });
         }
       }
     },

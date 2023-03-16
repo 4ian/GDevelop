@@ -59,7 +59,7 @@ const styles = {
 };
 
 export type InstructionParametersEditorInterface = {|
-  focus: () => void,
+  focus: ({| selectAll?: boolean |}) => void,
 |};
 
 type Props = {|
@@ -115,7 +115,9 @@ const InstructionParametersEditor = React.forwardRef<
     },
     ref
   ) => {
-    const firstVisibleField = React.useRef<?{ +focus?: () => void }>(null);
+    const firstVisibleField = React.useRef<?{
+      +focus?: ({| selectAll?: boolean |}) => void,
+    }>(null);
     const [isDirty, setIsDirty] = React.useState<boolean>(false);
     const {
       palette: { type: paletteType },
@@ -123,7 +125,7 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
-    const focus = () => {
+    const focus = ({ selectAll = false }: { selectAll?: boolean }) => {
       // Verify that there is a field to focus.
       if (
         getVisibleParametersCount(
@@ -136,7 +138,7 @@ const InstructionParametersEditor = React.forwardRef<
         ) !== 0
       ) {
         if (firstVisibleField.current && firstVisibleField.current.focus) {
-          firstVisibleField.current.focus();
+          firstVisibleField.current.focus({ selectAll });
         }
       }
     };
@@ -197,7 +199,7 @@ const InstructionParametersEditor = React.forwardRef<
       () => {
         if (focusOnMount) {
           const timeoutId = setTimeout(() => {
-            focus();
+            focus({ selectAll: false });
           }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
           return () => clearTimeout(timeoutId);
         }

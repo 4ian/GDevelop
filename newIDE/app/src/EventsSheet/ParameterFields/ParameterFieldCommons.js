@@ -53,10 +53,15 @@ export type ParameterFieldProps = {|
   parameterIndex?: number,
 |};
 
-export type ParameterFieldInterface = {|
-  focus: ({|
+export type FieldFocusFunction = (
+  ?{|
     selectAll?: boolean,
-  |}) => void,
+    caretPosition?: 'end',
+  |}
+) => void;
+
+export type ParameterFieldInterface = {|
+  focus: FieldFocusFunction,
 |};
 
 export const getParameterValueOrDefault = (

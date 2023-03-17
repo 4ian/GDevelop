@@ -30,6 +30,10 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Edit from '@material-ui/icons/Edit';
 import FlatButton from '../../UI/FlatButton';
+import {
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from '../ParameterFields/ParameterFieldCommons';
 
 const gd: libGDevelop = global.gd;
 
@@ -59,7 +63,7 @@ const styles = {
 };
 
 export type InstructionParametersEditorInterface = {|
-  focus: ({| selectAll?: boolean |}) => void,
+  focus: FieldFocusFunction,
 |};
 
 type Props = {|
@@ -115,9 +119,7 @@ const InstructionParametersEditor = React.forwardRef<
     },
     ref
   ) => {
-    const firstVisibleField = React.useRef<?{
-      +focus?: ({| selectAll?: boolean |}) => void,
-    }>(null);
+    const firstVisibleField = React.useRef<?ParameterFieldInterface>(null);
     const [isDirty, setIsDirty] = React.useState<boolean>(false);
     const {
       palette: { type: paletteType },
@@ -125,7 +127,7 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
-    const focus = ({ selectAll = false }: {| selectAll?: boolean |}) => {
+    const focus: FieldFocusFunction = options => {
       // Verify that there is a field to focus.
       if (
         getVisibleParametersCount(
@@ -138,7 +140,7 @@ const InstructionParametersEditor = React.forwardRef<
         ) !== 0
       ) {
         if (firstVisibleField.current && firstVisibleField.current.focus) {
-          firstVisibleField.current.focus({ selectAll });
+          firstVisibleField.current.focus(options);
         }
       }
     };
@@ -199,7 +201,7 @@ const InstructionParametersEditor = React.forwardRef<
       () => {
         if (focusOnMount) {
           const timeoutId = setTimeout(() => {
-            focus({ selectAll: false });
+            focus();
           }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
           return () => clearTimeout(timeoutId);
         }

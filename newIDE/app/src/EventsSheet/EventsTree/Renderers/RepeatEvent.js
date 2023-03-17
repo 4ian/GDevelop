@@ -63,7 +63,7 @@ export default class RepeatEvent extends React.Component<
           () => {
             // Give a bit of time for the popover to mount itself
             setTimeout(() => {
-              if (this._field) this._field.focus({ selectAll: false });
+              if (this._field) this._field.focus();
             }, 10);
           }
         ),

@@ -6,6 +6,7 @@ import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
@@ -14,14 +15,15 @@ import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ObjectSelector>(null);
+    const focus: FieldFocusFunction = options => {
+      // Prevent focus of field if an in-app tutorial is running because
+      // the popper of the tooltip and the popper of the semi controlled
+      // autocomplete's dropdown are conflicting.
+      if (field.current && !currentlyRunningInAppTutorial)
+        field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        // Prevent focus of field if an in-app tutorial is running because
-        // the popper of the tooltip and the popper of the semi controlled
-        // autocomplete's dropdown are conflicting.
-        if (field.current && !currentlyRunningInAppTutorial)
-          field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     const { currentlyRunningInAppTutorial } = React.useContext(

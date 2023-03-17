@@ -7,15 +7,17 @@ import ResourcesLoader from '../../ResourcesLoader';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function ObjectEffectNameField(props: ParameterFieldProps, ref) {
+  function VideoResourceField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ResourceSelector>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     if (!props.resourceManagementProps || !props.project) {

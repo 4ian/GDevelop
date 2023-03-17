@@ -5,6 +5,7 @@ import * as React from 'react';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
@@ -126,10 +127,11 @@ const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function KeyField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     const {

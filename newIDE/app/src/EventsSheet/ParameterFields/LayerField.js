@@ -6,6 +6,7 @@ import { mapFor } from '../../Utils/MapFor';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 
@@ -18,16 +19,16 @@ import Functions from '@material-ui/icons/Functions';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
-    const inputFieldRef = React.useRef<?(
+    const field = React.useRef<?(
       | GenericExpressionField
       | SelectFieldInterface
     )>(null);
 
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        console.log('focus', selectAll);
-        if (inputFieldRef.current) inputFieldRef.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     const { layout } = props.scope;
@@ -75,7 +76,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               renderTextField={() =>
                 !isExpressionField ? (
                   <SelectField
-                    ref={inputFieldRef}
+                    ref={field}
                     value={props.value}
                     onChange={onChangeSelectValue}
                     margin={props.isInline ? 'none' : 'dense'}
@@ -92,7 +93,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   </SelectField>
                 ) : (
                   <GenericExpressionField
-                    ref={inputFieldRef}
+                    ref={field}
                     id={
                       props.parameterIndex !== undefined
                         ? `parameter-${props.parameterIndex}-layer-field`

@@ -5,6 +5,7 @@ import GenericExpressionField from './GenericExpressionField';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -18,10 +19,11 @@ const gd: libGDevelop = global.gd;
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectPointNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     const getPointNames = (): Array<ExpressionAutocompletion> => {

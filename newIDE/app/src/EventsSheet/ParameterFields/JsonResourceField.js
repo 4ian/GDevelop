@@ -6,16 +6,17 @@ import ResourcesLoader from '../../ResourcesLoader';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function JsonResourceField(props, ref) {
-    const fieldRef = React.useRef<?ResourceSelector>(null);
-
+    const field = React.useRef<?ResourceSelector>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (fieldRef.current) fieldRef.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     if (!props.resourceManagementProps || !props.project) {
@@ -38,7 +39,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         floatingLabelText={<Trans>Choose the json file to use</Trans>}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
-        ref={fieldRef}
+        ref={field}
       />
     );
   }

@@ -10,6 +10,7 @@ import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
@@ -18,10 +19,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [editorOpen, setEditorOpen] = React.useState(false);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     const {

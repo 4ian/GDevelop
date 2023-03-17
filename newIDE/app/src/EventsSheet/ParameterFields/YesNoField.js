@@ -6,6 +6,7 @@ import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
@@ -24,10 +25,11 @@ const styles = {
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function TilesetResourceField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?Button>(null);
+    const focus: FieldFocusFunction = options => {
+      if (button.current) focusButton(button.current);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (button.current) focusButton(button.current);
-      },
+      focus,
     }));
 
     const { parameterMetadata, value } = props;

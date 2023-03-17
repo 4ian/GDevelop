@@ -106,7 +106,7 @@ export default class ForEachChildVariableEvent extends React.Component<
                   : variable === 'iteratorValue'
                   ? this._valueIteratorField
                   : this._keyIteratorField;
-              if (field) field.focus({ selectAll: false });
+              if (field) field.focus();
             }, 10);
           }
         ),

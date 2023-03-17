@@ -172,6 +172,7 @@ const Instruction = (props: Props) => {
               ? 'number'
               : parameterMetadata.getType();
           let expressionIsValid = true;
+          console.log('parameterType', parameterType);
           if (
             gd.ParameterMetadata.isExpression('number', parameterType) ||
             gd.ParameterMetadata.isExpression('string', parameterType) ||

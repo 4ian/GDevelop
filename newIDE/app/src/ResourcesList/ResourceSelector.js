@@ -14,6 +14,7 @@ import {
   type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
@@ -79,9 +80,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
   autoCompleteData: DataSource;
   _autoComplete: ?SemiControlledAutoCompleteInterface;
 
-  focus({ selectAll = false }: {| selectAll?: boolean |}) {
-    if (this._autoComplete) this._autoComplete.focus({ selectAll });
-  }
+  focus: FieldFocusFunction = options => {
+    if (this._autoComplete) this._autoComplete.focus(options);
+  };
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
@@ -326,8 +327,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
                 )
               }
               onClick={() => {
-                this._autoComplete &&
-                  this._autoComplete.focus({ selectAll: false });
+                this._autoComplete && this._autoComplete.focus();
               }}
               primary
             />

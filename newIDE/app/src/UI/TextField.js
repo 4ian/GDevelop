@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import Visibility from '@material-ui/icons/Visibility';
 import IconButton from '@material-ui/core/IconButton';
 import MUITextField from '@material-ui/core/TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
@@ -170,7 +171,7 @@ export const computeTextFieldStyleProps = (props: {
 };
 
 export type TextFieldInterface = {|
-  focus: (?{ caretPosition?: 'end', selectAll?: boolean }) => void,
+  focus: FieldFocusFunction,
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
@@ -186,7 +187,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     false
   );
 
-  const focus = (options: ?{ caretPosition?: 'end', selectAll?: boolean }) => {
+  const focus: FieldFocusFunction = options => {
     const { current: input } = inputRef;
     if (input) {
       input.focus();

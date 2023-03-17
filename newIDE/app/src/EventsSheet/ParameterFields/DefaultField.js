@@ -6,16 +6,18 @@ import SemiControlledTextField, {
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledTextFieldInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     const { parameterMetadata } = props;

@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
@@ -11,10 +12,11 @@ import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ParameterColorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
     }));
 
     return (

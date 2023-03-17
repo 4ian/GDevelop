@@ -117,8 +117,7 @@ export default class JsCodeEvent extends React.Component<
           () => {
             // Give a bit of time for the popover to mount itself
             setTimeout(() => {
-              if (this._objectField)
-                this._objectField.focus({ selectAll: false });
+              if (this._objectField) this._objectField.focus();
             }, 10);
           }
         ),

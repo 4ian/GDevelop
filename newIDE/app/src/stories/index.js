@@ -326,7 +326,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
         </p>
         <RaisedButton
           onClick={() => {
-            field.current && field.current.focus({ selectAll: false });
+            field.current && field.current.focus();
             setTimeout(
               () =>
                 field.current &&
@@ -338,7 +338,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
         />
         <RaisedButton
           onClick={() => {
-            field.current && field.current.focus({ selectAll: false });
+            field.current && field.current.focus();
             setTimeout(
               () => field.current && field.current.forceSetSelection(2, 4),
               1000

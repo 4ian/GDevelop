@@ -223,7 +223,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         const inputRef =
           topLevelVariableNameInputRefs.current[variablePtrToFocus];
         if (inputRef) {
-          inputRef.focus({ selectAll: false });
+          inputRef.focus();
           setVariablePtrToFocus(null);
         }
       }

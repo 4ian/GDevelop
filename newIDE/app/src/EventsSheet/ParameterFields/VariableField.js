@@ -7,6 +7,7 @@ import { enumerateVariables } from './EnumerateVariables';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import classNames from 'classnames';
 import {
@@ -98,10 +99,11 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       );
     };
 
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: ({ selectAll = false }: {| selectAll?: boolean |}) => {
-        if (field.current) field.current.focus({ selectAll });
-      },
+      focus,
       updateAutocompletions,
     }));
 

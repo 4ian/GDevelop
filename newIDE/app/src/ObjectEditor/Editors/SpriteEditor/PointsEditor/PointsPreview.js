@@ -101,8 +101,7 @@ const PointsPreview = (props: Props) => {
 
   const onEndDragPoint = React.useCallback(
     () => {
-      const draggingWasDone = !!state.draggedPoint;
-      if (draggingWasDone) {
+      if (state.draggedPoint) {
         state.draggedPoint.setX(Math.round(state.draggedPoint.getX()));
         state.draggedPoint.setY(Math.round(state.draggedPoint.getY()));
         onPointsUpdated();

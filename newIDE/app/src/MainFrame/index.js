@@ -174,6 +174,7 @@ import {
   isMiniTutorial,
   allInAppTutorialIds,
 } from '../Utils/GDevelopServices/InAppTutorial';
+import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -3328,6 +3329,7 @@ const MainFrame = (props: Props) => {
           endTutorial={() => endTutorial(true)}
         />
       )}
+      <CustomDragLayer />
     </div>
   );
 };

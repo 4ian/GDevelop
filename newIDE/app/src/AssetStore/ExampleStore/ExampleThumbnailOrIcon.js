@@ -17,8 +17,7 @@ const styles = {
   },
 };
 
-const ICON_HEIGHT = 120;
-const SMALL_WINDOW_ICON_HEIGHT = 50;
+const ICON_DESKTOP_HEIGHT = 120;
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
@@ -28,13 +27,13 @@ export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
-  const height =
-    windowWidth === 'small' ? SMALL_WINDOW_ICON_HEIGHT : ICON_HEIGHT;
+  const height = windowWidth === 'small' ? undefined : ICON_DESKTOP_HEIGHT;
+  const width = windowWidth === 'small' ? '100%' : undefined;
 
   return (
     <div style={styles.iconBackground}>
       <CorsAwareImage
-        style={{ ...styles.icon, height, aspectRatio }}
+        style={{ ...styles.icon, height, width, aspectRatio }}
         src={iconUrl}
         alt={exampleShortHeader.name}
       />

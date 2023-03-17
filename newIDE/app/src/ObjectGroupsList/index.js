@@ -295,6 +295,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     return false;
   };
 
+  _selectGroup = (groupWithContext: ?GroupWithContext) => {
+    this.setState({
+      selectedGroupWithContext: groupWithContext,
+    });
+  };
+
   _moveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
     const { selectedGroupWithContext } = this.state;
     if (!selectedGroupWithContext) return;
@@ -455,12 +461,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     onEditItem={groupWithContext =>
                       this.props.onEditGroup(groupWithContext.group)
                     }
-                    selectedItems={[]}
-                    onItemSelected={groupWithContext => {
-                      this.setState({
-                        selectedGroupWithContext: groupWithContext,
-                      });
-                    }}
+                    selectedItems={
+                      this.state.selectedGroupWithContext
+                        ? [this.state.selectedGroupWithContext]
+                        : []
+                    }
+                    onItemSelected={this._selectGroup}
                     renamedItem={renamedGroupWithContext}
                     onRename={this._onRename}
                     buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}

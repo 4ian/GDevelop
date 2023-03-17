@@ -1,6 +1,7 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
 import classNames from 'classnames';
@@ -101,6 +102,27 @@ type Props = {|
   id: string,
 |};
 
+const shouldNotBeValidated = ({
+  value,
+  parameterType,
+}: {|
+  value: string,
+  parameterType: string,
+|}) => parameterType === 'layer' && value === '';
+
+const formatValue = ({
+  value,
+  parameterType,
+  i18n,
+}: {|
+  value: string,
+  parameterType: string,
+  i18n: I18nType,
+|}) =>
+  (value === '' || value === '""') && parameterType === 'layer'
+    ? i18n._(t`Base layer`)
+    : value;
+
 const Instruction = (props: Props) => {
   const {
     instruction,
@@ -130,7 +152,10 @@ const Instruction = (props: Props) => {
    * Parameter can have formatting, be hovered and clicked. The rest
    * has not particular styling.
    */
-  const renderInstructionText = (metadata: gdInstructionMetadata) => {
+  const renderInstructionText = (
+    metadata: gdInstructionMetadata,
+    i18n: I18nType
+  ) => {
     const { instruction, disabled, renderObjectThumbnail } = props;
     const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,
@@ -150,18 +175,13 @@ const Instruction = (props: Props) => {
       >
         {mapFor(0, formattedTexts.size(), i => {
           const formatting = formattedTexts.getTextFormatting(i);
+          const value = formattedTexts.getString(i);
           const parameterIndex = formatting.getUserData();
           const isParameter =
             parameterIndex >= 0 && parameterIndex < parametersCount;
 
           if (!isParameter) {
-            return (
-              <span key={i}>
-                {i === 0
-                  ? capitalize(formattedTexts.getString(i))
-                  : formattedTexts.getString(i)}
-              </span>
-            );
+            return <span key={i}>{i === 0 ? capitalize(value) : value}</span>;
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
@@ -172,43 +192,50 @@ const Instruction = (props: Props) => {
               ? 'number'
               : parameterMetadata.getType();
           let expressionIsValid = true;
-          console.log('parameterType', parameterType);
-          if (
-            gd.ParameterMetadata.isExpression('number', parameterType) ||
-            gd.ParameterMetadata.isExpression('string', parameterType) ||
-            gd.ParameterMetadata.isExpression('variable', parameterType)
-          ) {
-            const expressionNode = instruction
-              .getParameter(parameterIndex)
-              .getRootNode();
-            const expressionValidator = new gd.ExpressionValidator(
-              gd.JsPlatform.get(),
-              globalObjectsContainer,
-              objectsContainer,
-              parameterType
-            );
-            expressionNode.visit(expressionValidator);
-            expressionIsValid = expressionValidator.getErrors().size() === 0;
-            expressionValidator.delete();
-          } else if (gd.ParameterMetadata.isObject(parameterType)) {
-            const objectOrGroupName = instruction
-              .getParameter(parameterIndex)
-              .getPlainString();
-            expressionIsValid =
-              (globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
-                objectsContainer.hasObjectNamed(objectOrGroupName) ||
-                globalObjectsContainer
-                  .getObjectGroups()
-                  .has(objectOrGroupName) ||
-                objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
-              (!parameterMetadata.getExtraInfo() ||
-                gd.getTypeOfObject(
-                  globalObjectsContainer,
-                  objectsContainer,
-                  objectOrGroupName,
-                  /*searchInGroups=*/ true
-                ) === parameterMetadata.getExtraInfo());
+          if (!shouldNotBeValidated({ value, parameterType })) {
+            if (
+              gd.ParameterMetadata.isExpression('number', parameterType) ||
+              gd.ParameterMetadata.isExpression('string', parameterType) ||
+              gd.ParameterMetadata.isExpression('variable', parameterType)
+            ) {
+              const expressionNode = instruction
+                .getParameter(parameterIndex)
+                .getRootNode();
+              const expressionValidator = new gd.ExpressionValidator(
+                gd.JsPlatform.get(),
+                globalObjectsContainer,
+                objectsContainer,
+                parameterType
+              );
+              expressionNode.visit(expressionValidator);
+              expressionIsValid = expressionValidator.getErrors().size() === 0;
+              expressionValidator.delete();
+            } else if (gd.ParameterMetadata.isObject(parameterType)) {
+              const objectOrGroupName = instruction
+                .getParameter(parameterIndex)
+                .getPlainString();
+              expressionIsValid =
+                (globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
+                  objectsContainer.hasObjectNamed(objectOrGroupName) ||
+                  globalObjectsContainer
+                    .getObjectGroups()
+                    .has(objectOrGroupName) ||
+                  objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
+                (!parameterMetadata.getExtraInfo() ||
+                  gd.getTypeOfObject(
+                    globalObjectsContainer,
+                    objectsContainer,
+                    objectOrGroupName,
+                    /*searchInGroups=*/ true
+                  ) === parameterMetadata.getExtraInfo());
+            }
           }
+
+          const formattedValue = formatValue({
+            value,
+            parameterType,
+            i18n,
+          });
 
           return (
             <span
@@ -237,7 +264,7 @@ const Instruction = (props: Props) => {
               tabIndex={0}
             >
               {ParameterRenderingService.renderInlineParameter({
-                value: formattedTexts.getString(i),
+                value: formattedValue,
                 expressionIsValid,
                 parameterMetadata,
                 renderObjectThumbnail,
@@ -268,175 +295,180 @@ const Instruction = (props: Props) => {
   );
 
   return (
-    <DragSourceAndDropTarget
-      beginDrag={() => {
-        onClick(); // Select the dragged instruction
+    <I18n>
+      {({ i18n }) => (
+        <DragSourceAndDropTarget
+          beginDrag={() => {
+            onClick(); // Select the dragged instruction
 
-        // No need to save here what is being dragged,
-        // as its the entire selection that is considered to be dragged.
-        return {
-          isCondition,
-        };
-      }}
-      canDrag={() => dragAllowed}
-      canDrop={draggedItem => draggedItem.isCondition === isCondition}
-      drop={() => {
-        onMoveToInstruction();
-      }}
-    >
-      {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
-        // /!\ It's important to get the metadata now so that we're sure they
-        // are valid.
-        // If the metadata is retrieved outside of the closure, it's possible
-        // that the metadata is changed in the meantime (especially on behavior
-        // properties it seems).
-        const metadata = isCondition
-          ? gd.MetadataProvider.getConditionMetadata(
-              gd.JsPlatform.get(),
-              instruction.getType()
-            )
-          : gd.MetadataProvider.getActionMetadata(
-              gd.JsPlatform.get(),
-              instruction.getType()
-            );
+            // No need to save here what is being dragged,
+            // as its the entire selection that is considered to be dragged.
+            return {
+              isCondition,
+            };
+          }}
+          canDrag={() => dragAllowed}
+          canDrop={draggedItem => draggedItem.isCondition === isCondition}
+          drop={() => {
+            onMoveToInstruction();
+          }}
+        >
+          {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
+            // /!\ It's important to get the metadata now so that we're sure they
+            // are valid.
+            // If the metadata is retrieved outside of the closure, it's possible
+            // that the metadata is changed in the meantime (especially on behavior
+            // properties it seems).
+            const metadata = isCondition
+              ? gd.MetadataProvider.getConditionMetadata(
+                  gd.JsPlatform.get(),
+                  instruction.getType()
+                )
+              : gd.MetadataProvider.getActionMetadata(
+                  gd.JsPlatform.get(),
+                  instruction.getType()
+                );
 
-        const smallIconFilename = metadata.getSmallIconFilename();
-        // The instruction itself can be dragged and is a target for
-        // another instruction to be dropped. It's IMPORTANT NOT to have
-        // the subinstructions list inside the connectDropTarget/connectDragSource
-        // as otherwise this can confuse react-dnd ("Expected to find a valid target")
-        // (surely due to components re-mounting/rerendering ?).
-        const isBlackIcon =
-          smallIconFilename.startsWith('data:image/svg+xml') ||
-          smallIconFilename.includes('_black');
+            const smallIconFilename = metadata.getSmallIconFilename();
+            // The instruction itself can be dragged and is a target for
+            // another instruction to be dropped. It's IMPORTANT NOT to have
+            // the subinstructions list inside the connectDropTarget/connectDragSource
+            // as otherwise this can confuse react-dnd ("Expected to find a valid target")
+            // (surely due to components re-mounting/rerendering ?).
+            const isBlackIcon =
+              smallIconFilename.startsWith('data:image/svg+xml') ||
+              smallIconFilename.includes('_black');
 
-        const instructionDragSourceElement = connectDragSource(
-          <div
-            style={styles.container}
-            className={classNames({
-              [selectableArea]: true,
-              [selectedArea]: props.selected,
-            })}
-            onClick={e => {
-              e.stopPropagation();
-
-              if (props.screenType === 'touch' && props.selected) {
-                // On touch screens, tapping again a selected instruction should edit it.
-                props.onDoubleClick();
-              } else {
-                props.onClick();
-              }
-            }}
-            onDoubleClick={e => {
-              e.stopPropagation();
-              props.onDoubleClick();
-            }}
-            onContextMenu={e => {
-              e.stopPropagation();
-              onContextMenu(e.clientX, e.clientY);
-            }}
-            {...longTouchForContextMenuProps}
-            onKeyPress={event => {
-              if (shouldValidate(event)) {
-                props.onDoubleClick();
-                event.stopPropagation();
-                event.preventDefault();
-              } else if (shouldActivate(event)) {
-                props.onClick();
-                event.stopPropagation();
-                event.preventDefault();
-              }
-            }}
-            tabIndex={0}
-            id={id}
-          >
-            {instruction.isInverted() && (
-              <img
+            const instructionDragSourceElement = connectDragSource(
+              <div
+                style={styles.container}
                 className={classNames({
-                  [icon]: true,
+                  [selectableArea]: true,
+                  [selectedArea]: props.selected,
                 })}
-                src="res/contraire.png"
-                alt="Condition is negated"
-              />
-            )}
-            {metadata.isAsync() &&
-              (!metadata.isOptionallyAsync() || instruction.isAwaited()) && (
-                <Tooltip
-                  title={
-                    <Trans>
-                      Next actions (and sub-events) will wait for this action to
-                      be finished before running.
-                    </Trans>
+                onClick={e => {
+                  e.stopPropagation();
+
+                  if (props.screenType === 'touch' && props.selected) {
+                    // On touch screens, tapping again a selected instruction should edit it.
+                    props.onDoubleClick();
+                  } else {
+                    props.onClick();
                   }
-                  placement="top"
-                >
-                  <AsyncIcon
+                }}
+                onDoubleClick={e => {
+                  e.stopPropagation();
+                  props.onDoubleClick();
+                }}
+                onContextMenu={e => {
+                  e.stopPropagation();
+                  onContextMenu(e.clientX, e.clientY);
+                }}
+                {...longTouchForContextMenuProps}
+                onKeyPress={event => {
+                  if (shouldValidate(event)) {
+                    props.onDoubleClick();
+                    event.stopPropagation();
+                    event.preventDefault();
+                  } else if (shouldActivate(event)) {
+                    props.onClick();
+                    event.stopPropagation();
+                    event.preventDefault();
+                  }
+                }}
+                tabIndex={0}
+                id={id}
+              >
+                {instruction.isInverted() && (
+                  <img
                     className={classNames({
                       [icon]: true,
                     })}
+                    src="res/contraire.png"
+                    alt="Condition is negated"
                   />
-                </Tooltip>
-              )}
-            <img
-              className={classNames({
-                [icon]: true,
-              })}
-              src={smallIconFilename}
-              alt=""
-              style={{
-                filter:
-                  type === 'dark' && isBlackIcon
-                    ? 'grayscale(1) invert(1)'
-                    : undefined,
-              }}
-            />
-            {renderInstructionText(metadata)}
-          </div>
-        );
+                )}
+                {metadata.isAsync() &&
+                  (!metadata.isOptionallyAsync() ||
+                    instruction.isAwaited()) && (
+                    <Tooltip
+                      title={
+                        <Trans>
+                          Next actions (and sub-events) will wait for this
+                          action to be finished before running.
+                        </Trans>
+                      }
+                      placement="top"
+                    >
+                      <AsyncIcon
+                        className={classNames({
+                          [icon]: true,
+                        })}
+                      />
+                    </Tooltip>
+                  )}
+                <img
+                  className={classNames({
+                    [icon]: true,
+                  })}
+                  src={smallIconFilename}
+                  alt=""
+                  style={{
+                    filter:
+                      type === 'dark' && isBlackIcon
+                        ? 'grayscale(1) invert(1)'
+                        : undefined,
+                  }}
+                />
+                {renderInstructionText(metadata, i18n)}
+              </div>
+            );
 
-        const instructionDragSourceDropTargetElement = instructionDragSourceElement
-          ? connectDropTarget(instructionDragSourceElement)
-          : null;
+            const instructionDragSourceDropTargetElement = instructionDragSourceElement
+              ? connectDropTarget(instructionDragSourceElement)
+              : null;
 
-        return (
-          <React.Fragment>
-            {isOver && <DropIndicator canDrop={canDrop} />}
-            {instructionDragSourceDropTargetElement}
-            {metadata.canHaveSubInstructions() && (
-              <InstructionsList
-                style={
-                  {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
-                }
-                className={subInstructionsContainer}
-                instrsList={instruction.getSubInstructions()}
-                areConditions={props.isCondition}
-                selection={props.selection}
-                onAddNewInstruction={props.onAddNewSubInstruction}
-                onPasteInstructions={props.onPasteSubInstructions}
-                onMoveToInstruction={props.onMoveToSubInstruction}
-                onMoveToInstructionsList={props.onMoveToSubInstructionsList}
-                onInstructionClick={props.onSubInstructionClick}
-                onInstructionDoubleClick={props.onSubInstructionDoubleClick}
-                onInstructionContextMenu={props.onSubInstructionContextMenu}
-                onAddInstructionContextMenu={
-                  props.onAddSubInstructionContextMenu
-                }
-                onParameterClick={props.onSubParameterClick}
-                addButtonLabel={<Trans>Add a sub-condition</Trans>}
-                addButtonId="add-sub-condition-button"
-                disabled={props.disabled}
-                renderObjectThumbnail={props.renderObjectThumbnail}
-                screenType={props.screenType}
-                windowWidth={props.windowWidth}
-                globalObjectsContainer={props.globalObjectsContainer}
-                objectsContainer={props.objectsContainer}
-                idPrefix={props.id}
-              />
-            )}
-          </React.Fragment>
-        );
-      }}
-    </DragSourceAndDropTarget>
+            return (
+              <React.Fragment>
+                {isOver && <DropIndicator canDrop={canDrop} />}
+                {instructionDragSourceDropTargetElement}
+                {metadata.canHaveSubInstructions() && (
+                  <InstructionsList
+                    style={
+                      {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
+                    }
+                    className={subInstructionsContainer}
+                    instrsList={instruction.getSubInstructions()}
+                    areConditions={props.isCondition}
+                    selection={props.selection}
+                    onAddNewInstruction={props.onAddNewSubInstruction}
+                    onPasteInstructions={props.onPasteSubInstructions}
+                    onMoveToInstruction={props.onMoveToSubInstruction}
+                    onMoveToInstructionsList={props.onMoveToSubInstructionsList}
+                    onInstructionClick={props.onSubInstructionClick}
+                    onInstructionDoubleClick={props.onSubInstructionDoubleClick}
+                    onInstructionContextMenu={props.onSubInstructionContextMenu}
+                    onAddInstructionContextMenu={
+                      props.onAddSubInstructionContextMenu
+                    }
+                    onParameterClick={props.onSubParameterClick}
+                    addButtonLabel={<Trans>Add a sub-condition</Trans>}
+                    addButtonId="add-sub-condition-button"
+                    disabled={props.disabled}
+                    renderObjectThumbnail={props.renderObjectThumbnail}
+                    screenType={props.screenType}
+                    windowWidth={props.windowWidth}
+                    globalObjectsContainer={props.globalObjectsContainer}
+                    objectsContainer={props.objectsContainer}
+                    idPrefix={props.id}
+                  />
+                )}
+              </React.Fragment>
+            );
+          }}
+        </DragSourceAndDropTarget>
+      )}
+    </I18n>
   );
 };
 

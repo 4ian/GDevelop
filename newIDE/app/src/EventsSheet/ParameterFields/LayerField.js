@@ -48,6 +48,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       !!props.value && !isCurrentValueInLayersList
     );
 
+    const switchFieldType = () => {
+      // If the user had entered `""` (double quotes) we change the value to `` (empty string)
+      // so that the dropdown detects it as the base layer.
+      if (props.value === '""') props.onChange('');
+      setIsExpressionField(!isExpressionField);
+    };
+
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
@@ -116,7 +123,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                       ? i18n._(t`Select`)
                       : i18n._(t`Expression`)
                   }
-                  onClick={() => setIsExpressionField(!isExpressionField)}
+                  onClick={switchFieldType}
                 />
               )}
             />

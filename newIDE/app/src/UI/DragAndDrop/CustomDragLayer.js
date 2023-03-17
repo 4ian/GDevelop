@@ -16,6 +16,7 @@ const layerStyles = {
 };
 
 const THUMBNAIL_SIZE = 48;
+const TEXT_SHIFT = 16;
 
 const getItemStyles = ({
   clientOffset,
@@ -32,13 +33,10 @@ const getItemStyles = ({
 
   const { x, y } = clientOffset;
 
-  const previewX = previewPosition === 'center' ? x - THUMBNAIL_SIZE / 2 : x;
+  const previewX =
+    previewPosition === 'center' ? x - THUMBNAIL_SIZE / 2 : x + TEXT_SHIFT;
   const previewY =
-    previewPosition === 'center'
-      ? y - THUMBNAIL_SIZE / 2
-      : previewPosition === 'aboveRight'
-      ? y - THUMBNAIL_SIZE
-      : y;
+    previewPosition === 'center' ? y - THUMBNAIL_SIZE / 2 : y - TEXT_SHIFT;
 
   const transform = `translate(${previewX}px, ${previewY}px)`;
 
@@ -67,6 +65,27 @@ type InternalCustomDragLayerProps = {|
   isDragging?: boolean,
 |};
 
+const shouldHidePreviewBecauseDraggingOnSceneEditorCanvas = ({
+  x,
+  y,
+}: XYCoord) => {
+  const activeCanvas = document.querySelector(
+    `#scene-editor[data-active=true] #${instancesEditorId}`
+  );
+  if (activeCanvas) {
+    const canvasRect = activeCanvas.getBoundingClientRect();
+    if (
+      x >= canvasRect.left &&
+      x <= canvasRect.right &&
+      y >= canvasRect.top &&
+      y <= canvasRect.bottom
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const CustomDragLayer = ({
   item,
   itemType,
@@ -79,20 +98,8 @@ const CustomDragLayer = ({
     () => {
       if (!item || !clientOffset) return null;
 
-      const { x, y } = clientOffset;
-      const activeCanvas = document.querySelector(
-        `#scene-editor[data-active=true] #${instancesEditorId}`
-      );
-      if (activeCanvas) {
-        const canvasRect = activeCanvas.getBoundingClientRect();
-        if (
-          x >= canvasRect.left &&
-          x <= canvasRect.right &&
-          y >= canvasRect.top &&
-          y <= canvasRect.bottom
-        ) {
-          return null;
-        }
+      if (shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)) {
+        return null;
       }
 
       return item.thumbnail ? (

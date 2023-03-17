@@ -143,7 +143,7 @@ export function ExampleDialog({
           {hasIcon ? (
             <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
-          <Column>
+          <Column noMargin>
             {
               <Line>
                 <div style={{ flexWrap: 'wrap' }}>
@@ -173,9 +173,11 @@ export function ExampleDialog({
         </ResponsiveLineStackLayout>
 
         {example && example.description && (
-          <Column>
+          <Column noMargin>
             <Divider />
-            <MarkdownText source={example.description} isStandaloneText />
+            <Text size="body" displayInlineAsSpan>
+              <MarkdownText source={example.description} />
+            </Text>
           </Column>
         )}
         {!example && error && (

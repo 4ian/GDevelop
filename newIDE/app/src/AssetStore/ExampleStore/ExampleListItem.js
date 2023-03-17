@@ -110,13 +110,13 @@ export const ExampleListItem = ({
         <ButtonBase style={styles.button} onClick={onChoose} focusRipple>
           <ResponsiveLineStackLayout noMargin expand>
             {!!exampleShortHeader.previewImageUrls.length && (
-              <Column>
+              <Column noMargin>
                 <ExampleThumbnailOrIcon
                   exampleShortHeader={exampleShortHeader}
                 />
               </Column>
             )}
-            <Column expand>
+            <Column expand noMargin>
               <Text noMargin>{renderExampleField('name')} </Text>
               {
                 <Line>

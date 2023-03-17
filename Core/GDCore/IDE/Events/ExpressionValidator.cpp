@@ -99,20 +99,19 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     return returnType;
   }
 
-  if (!function.objectName.empty()) {
+  if (!function.objectName.empty() &&
     // If the function needs a capability on the object that may not be covered
     // by all objects, check it now.
-    if (!metadata.GetRequiredBaseObjectCapability().empty()) {
-      const gd::ObjectMetadata &objectMetadata =
-          MetadataProvider::GetObjectMetadata(platform, objectType);
+  !metadata.GetRequiredBaseObjectCapability().empty()) {
+    const gd::ObjectMetadata &objectMetadata =
+        MetadataProvider::GetObjectMetadata(platform, objectType);
 
-      if (objectMetadata.IsUnsupportedBaseObjectCapability(
-              metadata.GetRequiredBaseObjectCapability())) {
-        RaiseTypeError(
-            _("This expression exists, but it can't be used on this object."),
-            function.objectNameLocation);
-        return returnType;
-      }
+    if (objectMetadata.IsUnsupportedBaseObjectCapability(
+            metadata.GetRequiredBaseObjectCapability())) {
+      RaiseTypeError(
+          _("This expression exists, but it can't be used on this object."),
+          function.objectNameLocation);
+      return returnType;
     }
   }
 

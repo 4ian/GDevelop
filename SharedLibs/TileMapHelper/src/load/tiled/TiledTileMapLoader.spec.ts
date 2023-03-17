@@ -147,7 +147,7 @@ describe("TiledTileMapLoader", function () {
                     id: 1,
                     name: "",
                     rotation: 0,
-                    class: "",
+                    type: "",
                     visible: true,
                     width: 8,
                     x: 0,
@@ -160,7 +160,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
-              class: "obstacle",
+              type: "obstacle",
             },
 
             // The tile with id == 1 is missing
@@ -192,7 +192,7 @@ describe("TiledTileMapLoader", function () {
                       },
                     ],
                     rotation: 0,
-                    class: "",
+                    type: "",
                     visible: true,
                     width: 0,
                     x: 0,
@@ -205,7 +205,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
-              class: "obstacle",
+              type: "obstacle",
             },
             // Contains 2 polygons, one is a rotated.
             {
@@ -234,7 +234,7 @@ describe("TiledTileMapLoader", function () {
                       },
                     ],
                     rotation: 0,
-                    class: "",
+                    type: "",
                     visible: true,
                     width: 0,
                     x: 0,
@@ -259,7 +259,7 @@ describe("TiledTileMapLoader", function () {
                       },
                     ],
                     rotation: 180,
-                    class: "",
+                    type: "",
                     visible: true,
                     width: 0,
                     x: 8,
@@ -272,7 +272,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
-              class: "obstacle",
+              type: "obstacle",
             },
             // Contains hitboxes for obstacle and lava.
             {
@@ -301,7 +301,7 @@ describe("TiledTileMapLoader", function () {
                       },
                     ],
                     rotation: 0,
-                    class: "obstacle",
+                    type: "obstacle",
                     visible: true,
                     width: 0,
                     x: 0,
@@ -326,7 +326,7 @@ describe("TiledTileMapLoader", function () {
                       },
                     ],
                     rotation: 180,
-                    class: "lava",
+                    type: "lava",
                     visible: true,
                     width: 0,
                     x: 8,
@@ -353,7 +353,7 @@ describe("TiledTileMapLoader", function () {
                     id: 1,
                     name: "",
                     rotation: 0,
-                    class: "lava",
+                    type: "lava",
                     visible: true,
                     width: 8,
                     x: 0,
@@ -366,7 +366,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
-              class: "lava",
+              type: "lava",
             },
           ],
           tilewidth: 8,
@@ -566,7 +566,7 @@ describe("TiledTileMapLoader", function () {
           tileheight: 8,
           tiles: [
             {
-              class: "obstacle",
+              type: "obstacle",
               id: 2,
               objectgroup: {
                 draworder: "index",
@@ -574,7 +574,7 @@ describe("TiledTileMapLoader", function () {
                 name: "",
                 objects: [
                   {
-                    class: "",
+                    type: "",
                     height: 0,
                     id: 9,
                     name: "",

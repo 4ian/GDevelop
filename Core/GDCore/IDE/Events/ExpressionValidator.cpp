@@ -88,12 +88,12 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   }
 
   if (!function.behaviorName.empty() &&
-      (globalObjectsContainer.HasObjectNamed(function.objectName) &&
-           !globalObjectsContainer.GetObject(function.objectName)
-                .HasBehaviorNamed(function.behaviorName) ||
-       objectsContainer.HasObjectNamed(function.objectName) &&
-           !objectsContainer.GetObject(function.objectName)
-                .HasBehaviorNamed(function.behaviorName))) {
+      ((globalObjectsContainer.HasObjectNamed(function.objectName) &&
+        !globalObjectsContainer.GetObject(function.objectName)
+             .HasBehaviorNamed(function.behaviorName)) ||
+       (objectsContainer.HasObjectNamed(function.objectName) &&
+        !objectsContainer.GetObject(function.objectName)
+             .HasBehaviorNamed(function.behaviorName)))) {
     RaiseTypeError(_("This behavior is not attached to this object."),
                    function.behaviorNameLocation);
     return returnType;

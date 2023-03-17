@@ -72,7 +72,7 @@ export namespace TiledPixiHelper {
     // a given tile size.
     // So the atlas images can have unused pixels at the right and bottom.
     // - Artists also sometimes add a banner.
-    // 
+    //
     // It can also be that users rescaled the atlas without adapting the tile set
     // In this case, having a broken visual can help understand the issue.
     // Especially since the error can only be found in the logs.

@@ -10,7 +10,7 @@ import {
 } from './ParameterFieldCommons';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function FontResourceField(props: ParameterFieldProps, ref) {
+  function BitmapFontResourceField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ResourceSelector>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);

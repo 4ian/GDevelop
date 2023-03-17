@@ -8,7 +8,7 @@ import {
 } from './ParameterFieldCommons';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function EpressionField(props: ParameterFieldProps, ref) {
+  function ExpressionField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);

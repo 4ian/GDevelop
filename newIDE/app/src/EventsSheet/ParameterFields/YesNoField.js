@@ -23,7 +23,7 @@ const styles = {
 };
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function TilesetResourceField(props: ParameterFieldProps, ref) {
+  function YesNoField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?Button>(null);
     const focus: FieldFocusFunction = options => {
       if (button.current) focusButton(button.current);

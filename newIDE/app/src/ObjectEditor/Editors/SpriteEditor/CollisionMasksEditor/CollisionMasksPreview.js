@@ -217,6 +217,8 @@ const CollisionMasksPreview = (props: Props) => {
           onPolygonsUpdated();
           onClickVertice(null);
         } else {
+          draggedVertex.vertex.set_x(Math.round(draggedVertex.vertex.get_x()));
+          draggedVertex.vertex.set_y(Math.round(draggedVertex.vertex.get_y()));
           onPolygonsUpdated();
           onClickVertice(draggedVertex.vertex.ptr);
         }

@@ -103,6 +103,8 @@ const PointsPreview = (props: Props) => {
     () => {
       const draggingWasDone = !!state.draggedPoint;
       if (draggingWasDone) {
+        state.draggedPoint.setX(Math.round(state.draggedPoint.getX()));
+        state.draggedPoint.setY(Math.round(state.draggedPoint.getY()));
         onPointsUpdated();
         // Select point at the end of the drag
         if (state.draggedPointKind && state.draggedPoint) {

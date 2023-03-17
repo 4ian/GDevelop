@@ -77,6 +77,28 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       MetadataProvider::GetBehaviorAnyExpressionMetadata(
             platform, behaviorType, function.functionName);
 
+  Type returnType = StringToType(metadata.GetReturnType());
+
+  if (!function.objectName.empty() &&
+      !globalObjectsContainer.HasObjectNamed(function.objectName) &&
+      !objectsContainer.HasObjectNamed(function.objectName)) {
+    RaiseTypeError(_("This object doesn't exist."),
+                   function.objectNameLocation);
+    return returnType;
+  }
+
+  if (!function.behaviorName.empty() &&
+      (globalObjectsContainer.HasObjectNamed(function.objectName) &&
+           !globalObjectsContainer.GetObject(function.objectName)
+                .HasBehaviorNamed(function.behaviorName) ||
+       objectsContainer.HasObjectNamed(function.objectName) &&
+           !objectsContainer.GetObject(function.objectName)
+                .HasBehaviorNamed(function.behaviorName))) {
+    RaiseTypeError(_("This behavior is not attached to this object."),
+                   function.behaviorNameLocation);
+    return returnType;
+  }
+
   if (!function.objectName.empty()) {
     // If the function needs a capability on the object that may not be covered
     // by all objects, check it now.
@@ -89,12 +111,10 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
         RaiseTypeError(
             _("This expression exists, but it can't be used on this object."),
             function.objectNameLocation);
-        return StringToType(metadata.GetReturnType());
+        return returnType;
       }
     }
   }
-
-  Type returnType = StringToType(metadata.GetReturnType());
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     RaiseError(

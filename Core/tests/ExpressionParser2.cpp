@@ -20,11 +20,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
+  auto &myObject = layout1.InsertNewObject(project, "BuiltinObject", "MyObject", 0);
+  myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   layout1.InsertNewObject(project,
                           "MyExtension::FakeObjectWithUnsupportedCapability",
                           "MyFakeObjectWithUnsupportedCapability",
-                          1);
+                          2);
 
   gd::ExpressionParser2 parser;
 
@@ -1272,6 +1274,98 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "check that you've not made any typo in the name.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 14);
+    }
+    SECTION("the object doesn't exist") {
+      SECTION("but the function does") {
+        auto node = parser.ParseExpression(
+            "MyInexistentObject.GetFromBaseExpression()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 18);
+      }
+      SECTION("and the neither does the function") {
+        auto node = parser.ParseExpression("MyInexistentObject.Idontexist()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 18);
+      }
+      SECTION("and the expression is invalid") {
+        auto node = parser.ParseExpression("MyInexistentObject.Idontexist(");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 2);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "The list of parameters is not terminated. Add a closing "
+                "parenthesis to end the parameters.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 30);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 30);
+        REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[1]->GetEndPosition() == 18);
+      }
+    }
+    SECTION("the behavior doesn't exist") {
+      SECTION("and the object neither") {
+        auto node = parser.ParseExpression(
+            "MyInexistentObject.MyMaybeInexistentBehavior::MyMaybeExistingFunction()");
+        REQUIRE(node != nullptr);
+
+        // There should be no error on the behavior because it's not possible
+        // to know if it exist or not.
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 18);
+      }
+      SECTION("and the expression is valid") {
+        auto node = parser.ParseExpression(
+            "MyObject.MyInexistentBehavior::MyMaybeExistingFunction()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "This behavior is not attached to this object.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 9);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 29);
+      }
+      SECTION("and the expression is invalid") {
+        auto node = parser.ParseExpression(
+            "MyObject.MyInexistentBehavior::Idontexist(");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 2);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "The list of parameters is not terminated. Add a closing "
+                "parenthesis to end the parameters.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 42);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 42);
+        REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+                "This behavior is not attached to this object.");
+        REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 9);
+        REQUIRE(validator.GetErrors()[1]->GetEndPosition() == 29);
+      }
     }
     SECTION("too much parameters") {
       SECTION("on a free function") {

@@ -1080,21 +1080,24 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
         "isConditionTrue", context);
 
   for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
+    if (cId != 0) {
+      outputCode += "if (" +
+                    GenerateBooleanFullName("isConditionTrue", context) +
+                    ") {\n";
+    }
     gd::String conditionCode =
         GenerateConditionCode(conditions[cId],
                               "isConditionTrue",
                               context);
     if (!conditions[cId].GetType().empty()) {
-      if (cId > 0) {
-        outputCode +=
-            "if (" + GenerateBooleanFullName("isConditionTrue", context) + ") ";
-      }
-      outputCode += "{\n";
       outputCode +=
           GenerateBooleanFullName("isConditionTrue", context) + " = false;\n";
       outputCode += conditionCode;
-      outputCode += "}\n";
     }
+  }
+  // Close nested "if".
+  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
+    if (cId != 0) outputCode += "}\n";
   }
 
   maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());

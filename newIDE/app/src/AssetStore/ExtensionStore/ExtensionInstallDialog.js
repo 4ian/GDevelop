@@ -61,7 +61,7 @@ const ExtensionInstallDialog = ({
     extensionShortHeader.name
   );
   
-  // Test if the local extension comes from the Asset Store
+  
   const fromStore = alreadyInstalled ? project.getEventsFunctionsExtension(extensionShortHeader.name).getOriginName() === "gdevelop-extension-store" : false; 
   
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
@@ -101,7 +101,7 @@ const ExtensionInstallDialog = ({
         if (alreadyInstalled) {
 			let dialogText = 'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
 			if (!fromStore)
-				dialogText = 'An other extension with the same name is already in your project, but does not come from the Asset Store. Installing this extension will overwrite your current extension. Do you want to continue?';
+				dialogText = 'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
           
 		  const answer = Window.showConfirmDialog(dialogText);
           if (!answer) return;
@@ -144,7 +144,7 @@ const ExtensionInstallDialog = ({
 					  <Trans>Re-install</Trans>
 					)
 				) : (
-					<Trans>Override</Trans>
+					<Trans>Replace existing extension</Trans>
 				)
 			  ) : (
 				<Trans>Install in project</Trans>

@@ -206,7 +206,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
   extension
 	  .AddExpression("Maximum",
 		  _("Item maximum"),
-		  _("Get the maximum of an item in the inventory, or 0 if it unlimited"),
+		  _("Get the maximum of an item in the inventory, or 0 if it is unlimited"),
 		  "",
 		  "CppPlatform/Extensions/Inventoryicon.png")
 	  .AddCodeOnlyParameter("currentScene", "")

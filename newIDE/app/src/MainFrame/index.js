@@ -800,6 +800,8 @@ const MainFrame = (props: Props) => {
           storageProviderOperations,
           authenticatedUser,
         }));
+
+        setIsProjectClosedSoAvoidReloadingExtensions(false);
       }
 
       return state;

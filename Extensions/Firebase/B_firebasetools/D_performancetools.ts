@@ -6,6 +6,7 @@ namespace gdjs {
        * @namespace
        */
       export namespace performance {
+        const logger = new gdjs.Logger('Firebase Performance Measuring');
         const tracers = new Map<string, firebase.performance.Trace>();
 
         /**
@@ -26,7 +27,13 @@ namespace gdjs {
          * @param tracerName - The name of the tracer.
          */
         export const startTracer = (tracerName: string) => {
-          getTracer(tracerName).start();
+          try {
+            getTracer(tracerName).start();
+          } catch {
+            logger.error(
+              `Could not start tracer "${tracerName}". Make sure it is not already running!`
+            );
+          }
         };
 
         /**
@@ -35,7 +42,7 @@ namespace gdjs {
          */
         export const stopTracer = (tracerName: string) => {
           getTracer(tracerName).stop();
-          delete tracers[tracerName];
+          tracers.delete(tracerName);
         };
 
         /**

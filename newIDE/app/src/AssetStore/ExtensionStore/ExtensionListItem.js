@@ -43,9 +43,13 @@ export const ExtensionListItem = ({
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
-  
+
   // Test if the local extension comes from the Asset Store
-  const fromStore = alreadyInstalled ? project.getEventsFunctionsExtension(extensionShortHeader.name).getOriginName() === "gdevelop-extension-store" : false; 
+  const fromStore = alreadyInstalled
+    ? project
+        .getEventsFunctionsExtension(extensionShortHeader.name)
+        .getOriginName() === 'gdevelop-extension-store'
+    : false;
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -84,7 +88,13 @@ export const ExtensionListItem = ({
               {alreadyInstalled && (
                 <Chip
                   size="small"
-                  label={fromStore ? <Trans>Already installed</Trans> : <Trans>Already in project</Trans>}
+                  label={
+                    fromStore ? (
+                      <Trans>Already installed</Trans>
+                    ) : (
+                      <Trans>Already in project</Trans>
+                    )
+                  }
                   color="secondary"
                   variant="outlined"
                 />

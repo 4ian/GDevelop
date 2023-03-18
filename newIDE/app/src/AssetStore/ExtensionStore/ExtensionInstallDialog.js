@@ -60,10 +60,13 @@ const ExtensionInstallDialog = ({
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
-  
-  
-  const fromStore = alreadyInstalled ? project.getEventsFunctionsExtension(extensionShortHeader.name).getOriginName() === "gdevelop-extension-store" : false; 
-  
+
+  const fromStore = alreadyInstalled
+    ? project
+        .getEventsFunctionsExtension(extensionShortHeader.name)
+        .getOriginName() === 'gdevelop-extension-store'
+    : false;
+
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
 
   const [error, setError] = React.useState<?Error>(null);
@@ -99,11 +102,13 @@ const ExtensionInstallDialog = ({
     () => {
       if (canInstallExtension) {
         if (alreadyInstalled) {
-			let dialogText = 'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
-			if (!fromStore)
-				dialogText = 'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
-          
-		  const answer = Window.showConfirmDialog(dialogText);
+          let dialogText =
+            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
+          if (!fromStore)
+            dialogText =
+              'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
+
+          const answer = Window.showConfirmDialog(dialogText);
           if (!answer) return;
           onInstall();
         } else {
@@ -133,21 +138,21 @@ const ExtensionInstallDialog = ({
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
               ) : alreadyInstalled ? (
-				fromStore ? (
-					extensionUpdate ? (
-					  extensionShortHeader.tier === 'community' ? (
-						<Trans>Update (could break the project)</Trans>
-					  ) : (
-						<Trans>Update</Trans>
-					  )
-					) : (
-					  <Trans>Re-install</Trans>
-					)
-				) : (
-					<Trans>Replace existing extension</Trans>
-				)
-			  ) : (
-				<Trans>Install in project</Trans>
+                fromStore ? (
+                  extensionUpdate ? (
+                    extensionShortHeader.tier === 'community' ? (
+                      <Trans>Update (could break the project)</Trans>
+                    ) : (
+                      <Trans>Update</Trans>
+                    )
+                  ) : (
+                    <Trans>Re-install</Trans>
+                  )
+                ) : (
+                  <Trans>Replace existing extension</Trans>
+                )
+              ) : (
+                <Trans>Install in project</Trans>
               )
             }
             primary

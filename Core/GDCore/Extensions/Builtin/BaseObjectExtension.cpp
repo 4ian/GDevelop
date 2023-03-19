@@ -1404,7 +1404,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Objects"),
           "res/actions/ajouthasard24.png",
           "res/actions/ajouthasard.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
 
@@ -1463,7 +1463,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Objects"),
           "res/conditions/add24.png",
           "res/conditions/add.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsAdvanced();
 
@@ -1478,7 +1478,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Objects"),
           "res/conditions/ajouthasard24.png",
           "res/conditions/ajouthasard.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
 

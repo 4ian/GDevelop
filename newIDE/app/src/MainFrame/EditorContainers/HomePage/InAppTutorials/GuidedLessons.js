@@ -22,9 +22,21 @@ import {
 import MultiplierScore from './Icons/MultiplierScore';
 import Parallax from './Icons/Parallax';
 import HealthBar from './Icons/HealthBar';
+import Joystick from './Icons/Joystick';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 
-const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
+const getColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    default:
+      return 1;
+  }
+};
 
 const MAX_COLUMNS = getColumnsFromWidth('large');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
@@ -70,7 +82,7 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
         t`Use a behavior`,
       ],
       durationInMinutes: 1,
-      renderImage: props => <HealthBar {...props} />,
+      renderImage: props => <Joystick {...props} />,
     },
     {
       id: HEALTH_BAR_IN_APP_TUTORIAL_ID,

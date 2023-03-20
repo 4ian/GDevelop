@@ -2,12 +2,7 @@
   {
     "id": "cameraParallax",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/cameraParallax.json",
-    "availableLocales": [
-      "en",
-      "fr",
-      "es",
-      "pt"
-    ],
+    "availableLocales": ["en", "fr", "es", "pt", "th"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/cameraParallax/game.json",
     "initialProjectData": {
       "cameraScene": "CameraScene",
@@ -19,33 +14,29 @@
   {
     "id": "flingGame",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/flingGame.json",
-    "availableLocales": [
-      "en",
-      "fr-FR"
-    ]
+    "availableLocales": ["en", "fr-FR", "th-TH"]
   },
   {
     "id": "healthBar",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/healthBar.json",
-    "availableLocales": [
-      "en",
-      "fr"
-    ],
+    "availableLocales": ["en", "fr", "es", "pt", "th"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/healthBar/game.json",
+    "initialProjectData": { "level": "Level", "player": "Player" }
+  },
+  {
+    "id": "joystick",
+    "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/joystick.json",
+    "availableLocales": ["en", "fr", "es", "pt", "th"],
+    "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/joystick/game.json",
     "initialProjectData": {
-      "player": "Player",
-      "level": "Level"
+      "gameScene": "GameScene",
+      "ship": "OrangePlayerShip3"
     }
   },
   {
     "id": "plinkoMultiplier",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/plinkoMultiplier.json",
-    "availableLocales": [
-      "en",
-      "fr",
-      "es",
-      "pt"
-    ],
+    "availableLocales": ["en", "fr", "es", "pt", "th"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/plinkoMultiplier/game.json",
     "initialProjectData": {
       "gameScene": "GameScene",

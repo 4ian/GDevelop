@@ -469,6 +469,7 @@ const PropertiesEditor = ({
           <SelectField
             value={getFieldValue({ instances, field })}
             key={field.name}
+            id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
@@ -491,6 +492,7 @@ const PropertiesEditor = ({
               defaultValue: '(Multiple values)',
             })}
             key={field.name}
+            id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {

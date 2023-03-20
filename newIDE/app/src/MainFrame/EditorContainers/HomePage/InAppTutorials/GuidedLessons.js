@@ -17,6 +17,7 @@ import {
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
+  JOYSTICK_IN_APP_TUTORIAL_ID,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
 import Parallax from './Icons/Parallax';
@@ -60,16 +61,24 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
 
   const guidedLessonCards = [
     {
-      id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-      title: t`Add score multiplier`,
-      description: t`Learn how to manipulate a score by adding collectibles.`,
+      id: JOYSTICK_IN_APP_TUTORIAL_ID,
+      title: t`Add Joystick controls`,
+      description: t`Learn how to add a joystick to control the player.`,
       keyPoints: [
-        t`Create a variable`,
-        t`Use & manipulate a variable`,
-        t`Build an expression`,
+        t`Add a layer`,
+        t`Download and use a prefab`,
+        t`Use a behavior`,
       ],
-      durationInMinutes: 3,
-      renderImage: props => <MultiplierScore {...props} />,
+      durationInMinutes: 1,
+      renderImage: props => <HealthBar {...props} />,
+    },
+    {
+      id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
+      title: t`Display a Health bar for the player`,
+      description: t`Learn how to display the health of a player on the foreground.`,
+      keyPoints: [t`Add a layer`, t`Download and use a prefab`],
+      durationInMinutes: 2,
+      renderImage: props => <HealthBar {...props} />,
     },
     {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
@@ -85,12 +94,16 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
       renderImage: props => <Parallax {...props} />,
     },
     {
-      id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
-      title: t`Display a Health bar for the player`,
-      description: t`Learn how to display the health of a player on the foreground.`,
-      keyPoints: [t`Add a layer`, t`Download and use a prefab`],
-      durationInMinutes: 2,
-      renderImage: props => <HealthBar {...props} />,
+      id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+      title: t`Add score multiplier`,
+      description: t`Learn how to manipulate a score by adding collectibles.`,
+      keyPoints: [
+        t`Create a variable`,
+        t`Use & manipulate a variable`,
+        t`Build an expression`,
+      ],
+      durationInMinutes: 3,
+      renderImage: props => <MultiplierScore {...props} />,
     },
   ];
 

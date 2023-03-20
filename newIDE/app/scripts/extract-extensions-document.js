@@ -151,7 +151,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
-    'Existing extensions',
+    'existing-extensions',
     folderName,
     'index.md'
   );

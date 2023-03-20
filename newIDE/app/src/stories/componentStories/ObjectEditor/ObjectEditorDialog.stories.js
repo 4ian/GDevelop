@@ -26,6 +26,7 @@ export const CustomObject = () => (
     onRename={() => action('Rename object')}
     canRenameObject={name => true}
     project={testProject.project}
+    layout={testProject.testLayout}
     resourceManagementProps={{
       getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},
@@ -54,6 +55,7 @@ export const StandardObject = () => (
     onRename={() => action('Rename object')}
     canRenameObject={name => true}
     project={testProject.project}
+    layout={testProject.testLayout}
     resourceManagementProps={{
       getStorageProvider: () => emptyStorageProvider,
       onFetchNewlyAddedResources: async () => {},

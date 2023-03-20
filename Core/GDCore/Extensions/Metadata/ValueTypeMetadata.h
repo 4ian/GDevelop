@@ -163,7 +163,6 @@ class GD_CORE_API ValueTypeMetadata {
     } else if (type == "string") {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
-             parameterType == "joyaxis" ||
              parameterType == "stringWithSelector" ||
              parameterType == "sceneName" ||
              parameterType == "layerEffectName" ||

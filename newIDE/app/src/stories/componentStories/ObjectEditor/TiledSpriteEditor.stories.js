@@ -23,6 +23,7 @@ export const Default = () => (
     <TiledSpriteEditor
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}
       project={testProject.project}
+      layout={testProject.testLayout}
       resourceManagementProps={{
         getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
@@ -31,6 +32,8 @@ export const Default = () => (
         resourceExternalEditors: fakeResourceExternalEditors,
       }}
       onSizeUpdated={() => {}}
+      // It would be used for refactoring but this kind of object has none.
+      object={testProject.spriteObject}
       objectName="FakeObjectName"
     />
   </SerializedObjectDisplay>

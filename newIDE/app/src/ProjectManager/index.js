@@ -831,7 +831,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         }
                         onEdit={() => this.props.onOpenLayout(name)}
                         onDelete={() => this.props.onDeleteLayout(layout)}
-                        addLabel={t`Add a New Scene`}
+                        addLabel={t`Add a new scene`}
                         onAdd={() => this._addLayout(i, i18n)}
                         onRename={newName => {
                           this.props.onRenameLayout(name, newName);
@@ -858,12 +858,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                         }}
                         buildExtraMenuTemplate={(i18n: I18nType) => [
                           {
-                            label: i18n._(t`Edit Scene Properties`),
+                            label: i18n._(t`Edit scene properties`),
                             enabled: true,
                             click: () => this._onOpenLayoutProperties(layout),
                           },
                           {
-                            label: i18n._(t`Edit Scene Variables`),
+                            label: i18n._(t`Edit scene variables`),
                             enabled: true,
                             click: () => this._onOpenLayoutVariables(layout),
                           },
@@ -1011,7 +1011,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onDelete={() =>
                           this.props.onDeleteExternalEvents(externalEvents)
                         }
-                        addLabel={t`Add New External Events`}
+                        addLabel={t`Add new external events`}
                         onAdd={() => this._addExternalEvents(i, i18n)}
                         onRename={newName => {
                           this.props.onRenameExternalEvents(name, newName);
@@ -1082,7 +1082,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         onDelete={() =>
                           this.props.onDeleteExternalLayout(externalLayout)
                         }
-                        addLabel={t`Add a New External Layout`}
+                        addLabel={t`Add a new external layout`}
                         onAdd={() => this._addExternalLayout(i, i18n)}
                         onRename={newName => {
                           this.props.onRenameExternalLayout(name, newName);

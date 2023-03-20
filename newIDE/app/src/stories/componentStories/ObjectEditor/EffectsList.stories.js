@@ -25,6 +25,7 @@ export const withSomeEffectsForALayer = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         effectsContainer={testProject.layerWithEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
     </FixedHeightFlexContainer>
@@ -45,6 +46,7 @@ export const withSomeEffectsForAnObject = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
     </FixedHeightFlexContainer>
@@ -65,6 +67,7 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
     </FixedHeightFlexContainer>
@@ -85,6 +88,7 @@ export const withoutEffectsForALayer = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
     </FixedHeightFlexContainer>
@@ -105,6 +109,7 @@ export const withoutEffectsForAnObject = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
     </FixedHeightFlexContainer>

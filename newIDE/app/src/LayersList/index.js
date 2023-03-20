@@ -17,9 +17,12 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
+const gd: libGDevelop = global.gd;
+
 const DropTarget = makeDropTarget('layers-list');
 
 type LayersListBodyProps = {|
+  project: gdProject,
   layersContainer: gdLayout,
   selectedLayer: string,
   onSelectLayer: string => void,
@@ -44,6 +47,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
   const draggedLayerIndexRef = React.useRef<number | null>(null);
 
   const {
+    project,
     layersContainer,
     onEditEffects,
     onEdit,
@@ -110,6 +114,12 @@ const LayersListBody = (props: LayersListBodyProps) => {
             onRenameLayer(layerName, newName, doRename => {
               if (doRename)
                 layersContainer.getLayer(layerName).setName(newName);
+              gd.WholeProjectRefactorer.renameLayer(
+                project,
+                layersContainer,
+                layerName,
+                newName
+              );
             });
           }
         }}
@@ -250,6 +260,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 key={listKey}
                 selectedLayer={props.selectedLayer}
                 onSelectLayer={props.onSelectLayer}
+                project={props.project}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}

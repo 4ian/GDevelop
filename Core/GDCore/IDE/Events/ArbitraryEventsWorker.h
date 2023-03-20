@@ -9,10 +9,12 @@
 #include <memory>
 #include <vector>
 #include "GDCore/Events/InstructionsList.h"
+#include "GDCore/Events/EventVisitor.h"
 #include "GDCore/String.h"
 namespace gd {
 class Instruction;
 class BaseEvent;
+class LinkEvent;
 class EventsList;
 class ObjectsContainer;
 }  // namespace gd
@@ -28,7 +30,7 @@ namespace gd {
  *
  * \ingroup IDE
  */
-class GD_CORE_API ArbitraryEventsWorker {
+class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
  public:
   ArbitraryEventsWorker(){};
   virtual ~ArbitraryEventsWorker();
@@ -40,7 +42,8 @@ class GD_CORE_API ArbitraryEventsWorker {
 
  private:
   void VisitEventList(gd::EventsList& events);
-  bool VisitEvent(gd::BaseEvent& event);
+  bool VisitEvent(gd::BaseEvent& event) override;
+  bool VisitLinkEvent(gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(gd::InstructionsList& instructions,
                             bool areConditions);
   bool VisitInstruction(gd::Instruction& instruction, bool isCondition);
@@ -52,10 +55,20 @@ class GD_CORE_API ArbitraryEventsWorker {
 
   /**
    * Called to do some work on an event
-   * \return true if the instruction must be deleted from the events list, false
+   * \return true if the event must be deleted from the events list, false
    * otherwise (default).
    */
   virtual bool DoVisitEvent(gd::BaseEvent& event) { return false; };
+
+  /**
+   * Called to do some work on a link event.
+   * 
+   * Note that DoVisitEvent is also called with this event.
+   * 
+   * \return true if the event must be deleted from the events list, false
+   * otherwise (default).
+   */
+  virtual bool DoVisitLinkEvent(gd::LinkEvent& event) { return false; };
 
   /**
    * Called to do some work on an instruction list
@@ -129,7 +142,7 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
  *
  * \ingroup IDE
  */
-class GD_CORE_API ReadOnlyArbitraryEventsWorker {
+class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
  public:
   ReadOnlyArbitraryEventsWorker(){};
   virtual ~ReadOnlyArbitraryEventsWorker();
@@ -141,7 +154,8 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker {
 
  private:
   void VisitEventList(const gd::EventsList& events);
-  void VisitEvent(const gd::BaseEvent& event);
+  void VisitEvent(const gd::BaseEvent& event) override;
+  void VisitLinkEvent(const gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(const gd::InstructionsList& instructions,
                             bool areConditions);
   void VisitInstruction(const gd::Instruction& instruction, bool isCondition);
@@ -155,6 +169,13 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker {
    * Called to do some work on an event
    */
   virtual void DoVisitEvent(const gd::BaseEvent& event) {};
+
+  /**
+   * Called to do some work on a link event.
+   * 
+   * Note that DoVisitEvent is also called with this event.
+   */
+  virtual void DoVisitLinkEvent(const gd::LinkEvent& linkEvent) {};
 
   /**
    * Called to do some work on an instruction list

@@ -13,6 +13,7 @@
 namespace gd {
 class Instruction;
 class Project;
+class EventVisitor;
 }
 class EventsCodeGenerationContext;
 

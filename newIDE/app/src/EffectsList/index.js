@@ -61,6 +61,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
+  onEffectsRenamed: (oldName: string, newName: string) => void,
   target: 'object' | 'layer',
 |};
 
@@ -79,7 +80,7 @@ const getEnumeratedEffectMetadata = (
  * All available effects are fetched from the project's platform.
  */
 export default function EffectsList(props: Props) {
-  const { effectsContainer, onEffectsUpdated } = props;
+  const { effectsContainer, onEffectsUpdated, onEffectsRenamed } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const draggedEffect = React.useRef<?gdEffect>(null);
 
@@ -175,8 +176,10 @@ export default function EffectsList(props: Props) {
       });
       return;
     }
+    const oldName = effect.getName();
     effect.setName(newName);
     forceUpdate();
+    onEffectsRenamed(oldName, newName);
     onEffectsUpdated();
   };
 

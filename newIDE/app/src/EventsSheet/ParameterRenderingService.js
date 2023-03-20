@@ -94,7 +94,6 @@ const components = {
   fontResource: FontResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
-  joyaxis: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
   layerEffectName: LayerEffectNameField,

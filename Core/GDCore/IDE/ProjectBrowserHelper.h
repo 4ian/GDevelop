@@ -7,6 +7,7 @@
 
 namespace gd {
 class Project;
+class Layout;
 class String;
 class EventsFunctionsExtension;
 class EventsFunction;
@@ -54,6 +55,19 @@ public:
   static void
   ExposeProjectEventsWithoutExtensions(gd::Project &project,
                                        gd::ArbitraryEventsWorker &worker);
+
+  /**
+   * \brief Call the specified worker on all events of a layout and
+   * its external events.
+   */
+  static void ExposeLayoutEvents(gd::Project &project, gd::Layout &layout,
+                                 gd::ArbitraryEventsWorker &worker);
+  /**
+   * \brief Call the specified worker on all events of a layout and
+   * its external events.
+   */
+  static void ExposeLayoutEvents(gd::Project &project, gd::Layout &layout,
+                                 gd::ArbitraryEventsWorkerWithContext &worker);
 
   /**
    * \brief Call the specified worker on all events of the event-based

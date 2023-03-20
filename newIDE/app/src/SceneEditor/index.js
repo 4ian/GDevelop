@@ -1666,6 +1666,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   object={this.state.editedObjectWithContext.object}
                   initialTab={this.state.editedObjectInitialTab}
                   project={project}
+                  layout={layout}
                   resourceManagementProps={resourceManagementProps}
                   onComputeAllVariableNames={() => {
                     const { editedObjectWithContext } = this.state;
@@ -1809,6 +1810,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           <LayerEditorDialog
             project={project}
             resourceManagementProps={this.props.resourceManagementProps}
+            layout={layout}
             layer={this.state.editedLayer}
             initialInstances={initialInstances}
             initialTab={this.state.editedLayerInitialTab}

@@ -13,6 +13,8 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/ParameterOptions.h"
 #include "catch.hpp"
 
 // TODO Remove these 2 classes and write the test with events based behaviors.
@@ -289,6 +291,21 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("objectPtr", _("Object parameter"))
       .SetFunctionName("getObjectStringWith2ObjectParam");
 
+  // Actions and expressions with several parameter types.
+  object
+      .AddAction("SetAnimationName", _("Change the animation (by name)"),
+                 _("Change the animation of the object, using the name of the "
+                   "animation."),
+                 _("Set animation of _PARAM0_ to _PARAM1_"),
+                 _("Animations and images"), "", "")
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("objectAnimationName", _("Animation name"));
+  object
+      .AddExpression("AnimationFrameCount", _("Animation frame count"),
+                 _("Return the number of frame in the animation."),
+                 _("Animations and images"), "")
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("objectAnimationName", _("Animation name"));
   {
     auto& behavior =
         extension->AddBehavior("MyBehavior",
@@ -387,6 +404,65 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                            "This is FakeObjectWithUnsupportedCapability",
                            "")
                        .AddUnsupportedBaseObjectCapability("effect");
+  }
+
+  // Actions and expressions with several parameter types.
+  {
+    extension
+        ->AddAction("CreateObjectsFromExternalLayout",
+                    _("Create objects from an external layout"),
+                    _("Create objects from an external layout."),
+                    _("Create objects from the external layout named _PARAM1_"),
+                    "", "", "")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("externalLayoutName", _("Name of the external layout"))
+        .AddParameter("expression", _("X position of the origin"), "", true)
+        .SetDefaultValue("0")
+        .AddParameter("expression", _("Y position of the origin"), "", true)
+        .SetDefaultValue("0");
+
+    extension
+        ->AddAction("Scene", _("Change the scene"),
+                    _("Stop this scene and start the specified one instead."),
+                    _("Change to scene _PARAM1_"), "", "", "")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("sceneName", _("Name of the new scene"))
+        .AddParameter("yesorno", _("Stop any other paused scenes?"))
+        .SetDefaultValue("true");
+
+    extension
+        ->AddExpressionAndConditionAndAction(
+            "number", "CameraCenterX", _("Camera center X position"),
+            _("the X position of the center of a camera"),
+            _("the X position of camera _PARAM4_ (layer: _PARAM3_)"), "", "")
+        .AddCodeOnlyParameter("currentScene", "")
+        .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
+        .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+        .SetDefaultValue("\"\"");
+
+    extension
+        ->AddAction("EnableLayerEffect", _("Enable layer effect"),
+                    _("Enable an effect on a layer"),
+                    _("Enable effect _PARAM2_ on layer _PARAM1_: _PARAM3_"),
+                    _("Effects"), "", "")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+        .SetDefaultValue("\"\"")
+        .AddParameter("layerEffectName", _("Effect name"))
+        .AddParameter("yesorno", _("Enable"), "", true);
+
+  extension
+      ->AddExpression(
+          "LayerEffectParameter",
+          _("Effect parameter (number)"),
+          _("Return the value of a parameter of an effect."),
+          _("Effects"),
+          "")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("layerEffectName", _("Effect name"))
+      .AddParameter("layerEffectParameterName", _("Parameter name"));
   }
 
   platform.AddExtension(commonInstructionsExtension);

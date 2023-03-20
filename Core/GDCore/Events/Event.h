@@ -24,6 +24,8 @@ class EventsCodeGenerationContext;
 class Platform;
 class SerializerElement;
 class Instruction;
+class EventVisitor;
+class ReadOnlyEventVisitor;
 }  // namespace gd
 
 namespace gd {
@@ -238,6 +240,9 @@ class GD_CORE_API BaseEvent {
    */
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element){};
+  
+  virtual bool AcceptVisitor(gd::EventVisitor& eventVisitor);
+  virtual void AcceptVisitor(gd::ReadOnlyEventVisitor& eventVisitor) const;
   ///@}
 
   /** \name Common properties

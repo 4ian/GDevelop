@@ -21,7 +21,7 @@ const extensionShortHeadersUrl =
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
-const extensionsFilePath = path.join(extensionsRootPath, 'index.md');
+const extensionsIndexFilePath = path.join(extensionsRootPath, 'index.md');
 
 const generateSvgImageIcon = iconUrl => {
   return `<img src="${iconUrl}" class="extension-icon"></img>`;
@@ -151,6 +151,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
+    'Existing extensions',
     folderName,
     'index.md'
   );
@@ -255,9 +256,9 @@ Read more about this:
 * [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)`;
 
     try {
-      await fs.mkdir(path.dirname(extensionsFilePath), { recursive: true });
-      await fs.writeFile(extensionsFilePath, indexPageContent);
-      console.info(`✅ Done. File generated: ${extensionsFilePath}`);
+      await fs.mkdir(path.dirname(extensionsIndexFilePath), { recursive: true });
+      await fs.writeFile(extensionsIndexFilePath, indexPageContent);
+      console.info(`✅ Done. File generated: ${extensionsIndexFilePath}`);
     } catch (err) {
       console.error('❌ Error while writing output', err);
       shell.exit(1);

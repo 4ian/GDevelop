@@ -118,7 +118,7 @@ const sortKeys = table => {
  */
 const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
     extensionHeader.authors || []
@@ -152,7 +152,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
     folderName,
-    'reference.md'
+    'index.md'
   );
   await fs.mkdir(path.dirname(extensionReferenceFilePath), {
     recursive: true,
@@ -167,7 +167,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
  */
 const generateExtensionSection = extensionHeader => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
   return `|${generateSvgImageIcon(extensionHeader.previewIconUrl)}|**${
@@ -236,8 +236,8 @@ doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 
 `;
-    for (const extensiontHeader of communityExtensionHeaders) {
-      await createExtensionReferencePage(extensiontHeader, true);
+    for (const extensionHeader of communityExtensionHeaders) {
+      await createExtensionReferencePage(extensionHeader, true);
     }
     indexPageContent += generateAllExtensionsSections(
       communityExtensionHeaders

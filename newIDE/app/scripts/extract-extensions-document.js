@@ -170,21 +170,12 @@ const generateExtensionSection = extensionHeader => {
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
-  return (
-    `#### ${extensionHeader.fullName}\n` +
-    // Use the `&.png?` syntax to force Dokuwiki to display the image.
-    // See https://www.dokuwiki.org/images.
-    generateSvgImageIcon(extensionHeader.previewIconUrl) +
-    '\n' +
-    extensionHeader.shortDescription +
-    '\n\n' +
-    // Link to help page or to reference if none.
-    `[Read more...](${helpPageUrl})` +
+  return `|${generateSvgImageIcon(extensionHeader.previewIconUrl)}|**${
+    extensionHeader.fullName
+  }**|${extensionHeader.shortDescription}|${`[Read more...](${helpPageUrl})` +
     (helpPageUrl !== referencePageUrl
       ? ` ([reference](${referencePageUrl}))`
-      : '') +
-    '\n\n'
-  );
+      : '')}|\n`;
 };
 
 const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
@@ -199,9 +190,13 @@ const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
     const extensions = extensionsByCategory[category];
 
     extensionSectionsContent += `### ${category}\n\n`;
+    extensionSectionsContent += '||Name|Description||\n';
+    extensionSectionsContent += '|---|---|---|---|\n';
+
     for (const extensionHeader of extensions) {
       extensionSectionsContent += generateExtensionSection(extensionHeader);
     }
+    extensionSectionsContent += '\n';
   }
   return extensionSectionsContent;
 };

@@ -4,6 +4,10 @@ import { DragLayer } from 'react-dnd';
 import { Identifier } from 'dnd-core';
 import Text from '../Text';
 import { instancesEditorId } from '../../InstancesEditor';
+import {
+  useScreenType,
+  type ScreenType,
+} from '../Reponsive/ScreenTypeMeasurer';
 
 const layerStyles = {
   position: 'fixed',
@@ -16,14 +20,17 @@ const layerStyles = {
 };
 
 const THUMBNAIL_SIZE = 48;
+const THUMBNAIL_SIZE_TOUCHSCREEN = 80; // Bigger thumbnail on touch screen, so the finger doesn't cover it.
 const TEXT_SHIFT = 16;
 
 const getItemStyles = ({
   clientOffset,
   previewPosition,
+  screenType,
 }: {|
   clientOffset: ?{ x: number, y: number },
   previewPosition: 'center' | 'aboveRight',
+  screenType: ScreenType,
 |}) => {
   if (!clientOffset) {
     return {
@@ -32,11 +39,13 @@ const getItemStyles = ({
   }
 
   const { x, y } = clientOffset;
+  const thumbnailSize =
+    screenType === 'touch' ? THUMBNAIL_SIZE_TOUCHSCREEN : THUMBNAIL_SIZE;
 
   const previewX =
-    previewPosition === 'center' ? x - THUMBNAIL_SIZE / 2 : x + TEXT_SHIFT;
+    previewPosition === 'center' ? x - thumbnailSize / 2 : x + TEXT_SHIFT;
   const previewY =
-    previewPosition === 'center' ? y - THUMBNAIL_SIZE / 2 : y - TEXT_SHIFT;
+    previewPosition === 'center' ? y - thumbnailSize / 2 : y - TEXT_SHIFT;
 
   const transform = `translate(${previewX}px, ${previewY}px)`;
 
@@ -94,6 +103,7 @@ const CustomDragLayer = ({
   currentOffset,
   clientOffset,
 }: InternalCustomDragLayerProps) => {
+  const screenType = useScreenType();
   const renderedItem = React.useMemo(
     () => {
       if (!item || !clientOffset) return null;
@@ -102,20 +112,23 @@ const CustomDragLayer = ({
         return null;
       }
 
+      const thumbnailSize =
+        screenType === 'touch' ? THUMBNAIL_SIZE_TOUCHSCREEN : THUMBNAIL_SIZE;
+
       return item.thumbnail ? (
         <img
           alt={item.name}
           src={item.thumbnail}
           style={{
-            maxWidth: THUMBNAIL_SIZE,
-            maxHeight: THUMBNAIL_SIZE,
+            maxWidth: thumbnailSize,
+            maxHeight: thumbnailSize,
           }}
         />
       ) : (
         <Text>{item.name}</Text>
       );
     },
-    [item, clientOffset]
+    [item, clientOffset, screenType]
   );
 
   if (!isDragging) {
@@ -128,6 +141,7 @@ const CustomDragLayer = ({
         style={getItemStyles({
           clientOffset,
           previewPosition: item && !item.thumbnail ? 'aboveRight' : 'center',
+          screenType,
         })}
       >
         {renderedItem}

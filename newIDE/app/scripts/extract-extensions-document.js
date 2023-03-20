@@ -21,7 +21,11 @@ const extensionShortHeadersUrl =
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
-const extensionsIndexFilePath = path.join(extensionsRootPath, 'index.md');
+const extensionsIndexFilePath = path.join(
+  extensionsRootPath,
+  'existing-extensions'
+);
+const extensionsMainFilePath = path.join(extensionsRootPath, 'index.md');
 
 const generateSvgImageIcon = iconUrl => {
   return `<img src="${iconUrl}" class="extension-icon"></img>`;
@@ -150,8 +154,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
     generateExtensionFooterText(extensionHeader.fullName);
 
   const extensionReferenceFilePath = path.join(
-    extensionsRootPath,
-    'existing-extensions',
+    extensionsIndexFilePath,
     folderName,
     'index.md'
   );
@@ -179,13 +182,10 @@ const generateExtensionSection = extensionHeader => {
       : '')}|\n`;
 };
 
-const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
+const generateAllExtensionsSections = extensionShortHeaders => {
   let extensionSectionsContent = '';
   const extensionsByCategory = sortKeys(
-    groupBy(
-      extensionsAndExtensionShortHeaders,
-      pair => pair.category || 'General'
-    )
+    groupBy(extensionShortHeaders, pair => pair.category || 'General')
   );
   for (const category in extensionsByCategory) {
     const extensions = extensionsByCategory[category];
@@ -202,33 +202,32 @@ const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
   return extensionSectionsContent;
 };
 
-(async () => {
-  try {
-    console.info(`ℹ️ Loading all community extensions...`);
-    const extensionHeaders = await getAllExtensionHeaders();
+const generateExtensionsListPage = async extensionShortHeaders => {
+  let indexPageContent = `---
+title: Existing extensions
+---
 
-    let indexPageContent = `# Extensions
+This pages lists all extensions that you can [install directly from GDevelop](/gdevelop5/extensions/search).
 
-GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
-
-[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, listed here. You can also [create](/gdevelop5/extensions/create), directly in your project, new behaviors, actions, conditions or expressions for your game.
-
+The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
+- [Reviewed extensions](#reviewed-extensions)
+- [Community extensions](#community-extensions)
 `;
+  const extensionHeaders = await getAllExtensionHeaders();
+  const reviewedExtensionHeaders = extensionHeaders.filter(
+    pair => pair.tier !== 'community'
+  );
+  const communityExtensionHeaders = extensionHeaders.filter(
+    pair => pair.tier === 'community'
+  );
 
-    const reviewedExtensionHeaders = extensionHeaders.filter(
-      pair => pair.tier !== 'community'
-    );
-    const communityExtensionHeaders = extensionHeaders.filter(
-      pair => pair.tier === 'community'
-    );
+  indexPageContent += '## Reviewed extensions\n\n';
+  for (const extensionHeader of reviewedExtensionHeaders) {
+    await createExtensionReferencePage(extensionHeader, false);
+  }
+  indexPageContent += generateAllExtensionsSections(reviewedExtensionHeaders);
 
-    indexPageContent += '## Reviewed extensions\n\n';
-    for (const extensionHeader of reviewedExtensionHeaders) {
-      await createExtensionReferencePage(extensionHeader, false);
-    }
-    indexPageContent += generateAllExtensionsSections(reviewedExtensionHeaders);
-
-    indexPageContent += `## Community extensions
+  indexPageContent += `## Community extensions
 
 The following extensions are made by community members — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
@@ -237,17 +236,34 @@ doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 
 `;
-    for (const extensionHeader of communityExtensionHeaders) {
-      await createExtensionReferencePage(extensionHeader, true);
-    }
-    indexPageContent += generateAllExtensionsSections(
-      communityExtensionHeaders
+  for (const extensionHeader of communityExtensionHeaders) {
+    await createExtensionReferencePage(extensionHeader, true);
+  }
+  indexPageContent += generateAllExtensionsSections(communityExtensionHeaders);
+
+  try {
+    await fs.mkdir(extensionsIndexFilePath, { recursive: true });
+    await fs.writeFile(
+      path.join(extensionsIndexFilePath, 'index.md'),
+      indexPageContent
     );
+    console.info(`✅ Done. File generated: ${extensionsIndexFilePath}`);
+  } catch (err) {
+    console.error('❌ Error while writing output', err);
+    shell.exit(1);
+  }
+};
 
-    indexPageContent += `
-## Make your own extension
+(async () => {
+  try {
+    console.info(`ℹ️ Loading all community extensions...`);
 
-It's easy to create, directly in your project, new behaviors, actions, conditions or expressions for your game.
+    let indexPageContent = `# Extensions
+
+GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
+
+[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, [listed here](/gdevelop5/extensions/existing-extensions/).
+You can also [create](/gdevelop5/extensions/create) directly in your project new behaviors, actions, conditions or expressions for your game.
 
 Read more about this:
 
@@ -255,10 +271,12 @@ Read more about this:
 * [Share extensions with the community](/gdevelop5/extensions/share)
 * [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)`;
 
+    await generateExtensionsListPage();
+
     try {
-      await fs.mkdir(path.dirname(extensionsIndexFilePath), { recursive: true });
-      await fs.writeFile(extensionsIndexFilePath, indexPageContent);
-      console.info(`✅ Done. File generated: ${extensionsIndexFilePath}`);
+      await fs.mkdir(path.dirname(extensionsMainFilePath), { recursive: true });
+      await fs.writeFile(extensionsMainFilePath, indexPageContent);
+      console.info(`✅ Done. File generated: ${extensionsMainFilePath}`);
     } catch (err) {
       console.error('❌ Error while writing output', err);
       shell.exit(1);

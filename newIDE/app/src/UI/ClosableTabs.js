@@ -78,6 +78,7 @@ type ClosableTabsProps = {|
 |};
 
 export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {
     maxWidth: '100%', // Tabs should take all width
     display: hideLabels ? 'none' : 'flex',
@@ -87,8 +88,20 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
     marginTop: 6,
   };
 
+  const onScroll = React.useCallback((event: WheelEvent) => {
+    const divElement = containerRef.current;
+    if (divElement) {
+      divElement.scrollLeft += event.deltaY;
+    }
+  }, []);
+
   return (
-    <div className="almost-invisible-scrollbar" style={tabItemContainerStyle}>
+    <div
+      ref={containerRef}
+      className="almost-invisible-scrollbar"
+      style={tabItemContainerStyle}
+      onWheel={onScroll}
+    >
       {children}
     </div>
   );

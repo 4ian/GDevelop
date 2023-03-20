@@ -29,6 +29,11 @@ const getPointName = (kind: PointKind, point: gdPoint): string =>
     ? 'Center'
     : point.getName();
 
+const roundPointToHalfPixel = (point: gdPoint) => {
+  point.setX(Math.round(point.getX() * 2) / 2);
+  point.setY(Math.round(point.getY() * 2) / 2);
+};
+
 type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
   imageWidth: number,
@@ -101,8 +106,8 @@ const PointsPreview = (props: Props) => {
 
   const onEndDragPoint = React.useCallback(
     () => {
-      const draggingWasDone = !!state.draggedPoint;
-      if (draggingWasDone) {
+      if (state.draggedPoint) {
+        roundPointToHalfPixel(state.draggedPoint);
         onPointsUpdated();
         // Select point at the end of the drag
         if (state.draggedPointKind && state.draggedPoint) {

@@ -122,7 +122,7 @@ const sortKeys = table => {
  */
 const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/existing-extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
     extensionHeader.authors || []
@@ -171,7 +171,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
  */
 const generateExtensionSection = extensionHeader => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/existing-extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
   return `|${generateSvgImageIcon(extensionHeader.previewIconUrl)}|**${

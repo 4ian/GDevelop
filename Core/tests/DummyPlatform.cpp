@@ -122,14 +122,6 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("expression", _("Number parameter"))
       .SetRequiresBaseObjectCapability("effect")
       .SetFunctionName("getSomethingRequiringEffectCapability");
-  baseObject
-      .AddExpression("GetFromBaseExpression",
-                     "This works on any object.",
-                     "",
-                     "",
-                     "")
-      .AddParameter("object", _("Object"), "")
-      .SetFunctionName("getFromBaseExpression");
 
   // Create an extension with various stuff inside.
   std::shared_ptr<gd::PlatformExtension> extension =

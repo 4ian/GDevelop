@@ -14,6 +14,7 @@ import {
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
+  JOYSTICK_IN_APP_TUTORIAL_ID,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const styles = {
@@ -107,6 +108,16 @@ const titleAndContentByKey = {
       learningKeys: [
         <Trans>Add a new layer</Trans>,
         <Trans>Use a prefab to display the player's health bar</Trans>,
+      ],
+    }),
+  },
+  [JOYSTICK_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's add mobile controls to our game</Trans>,
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Add a new layer</Trans>,
+        <Trans>Add a joystick prefab</Trans>,
+        <Trans>Add a behavior</Trans>,
       ],
     }),
   },

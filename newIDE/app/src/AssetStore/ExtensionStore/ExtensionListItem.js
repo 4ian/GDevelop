@@ -82,7 +82,7 @@ export const ExtensionListItem = ({
                 allowBrowserAutoTranslate={false}
                 displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
               >
-                {renderExtensionField('fullName')}{' '}
+                {renderExtensionField('fullName')}
               </Text>
               {alreadyInstalled && (
                 <Chip

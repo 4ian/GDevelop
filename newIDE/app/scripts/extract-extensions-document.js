@@ -21,10 +21,6 @@ const extensionShortHeadersUrl =
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
-const extensionsIndexFilePath = path.join(
-  extensionsRootPath,
-  'existing-extensions'
-);
 const extensionsMainFilePath = path.join(extensionsRootPath, 'index.md');
 
 const generateSvgImageIcon = iconUrl => {
@@ -122,7 +118,7 @@ const sortKeys = table => {
  */
 const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/existing-extensions/${folderName}`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
     extensionHeader.authors || []
@@ -154,7 +150,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
     generateExtensionFooterText(extensionHeader.fullName);
 
   const extensionReferenceFilePath = path.join(
-    extensionsIndexFilePath,
+    extensionsRootPath,
     folderName,
     'index.md'
   );
@@ -171,7 +167,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
  */
 const generateExtensionSection = extensionHeader => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/existing-extensions/${folderName}`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
   return `|${generateSvgImageIcon(extensionHeader.previewIconUrl)}|**${
@@ -204,12 +200,13 @@ const generateAllExtensionsSections = extensionShortHeaders => {
 
 const generateExtensionsListPage = async extensionShortHeaders => {
   let indexPageContent = `---
-title: Existing extensions
+title: Index
 ---
 
 This pages lists all extensions that you can [install directly from GDevelop](/gdevelop5/extensions/search).
 
 The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
+
 - [Reviewed extensions](#reviewed-extensions)
 - [Community extensions](#community-extensions)
 `;
@@ -242,12 +239,12 @@ does or inspect its content before using it.
   indexPageContent += generateAllExtensionsSections(communityExtensionHeaders);
 
   try {
-    await fs.mkdir(extensionsIndexFilePath, { recursive: true });
+    await fs.mkdir(extensionsRootPath, { recursive: true });
     await fs.writeFile(
-      path.join(extensionsIndexFilePath, 'index.md'),
+      path.join(extensionsRootPath, 'extensions-list.md'),
       indexPageContent
     );
-    console.info(`✅ Done. File generated: ${extensionsIndexFilePath}`);
+    console.info(`✅ Done. File generated: ${extensionsRootPath}`);
   } catch (err) {
     console.error('❌ Error while writing output', err);
     shell.exit(1);
@@ -262,7 +259,7 @@ does or inspect its content before using it.
 
 GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
 
-[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, [listed here](/gdevelop5/extensions/existing-extensions/).
+[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, [listed here](/gdevelop5/extensions/extensions-list).
 You can also [create](/gdevelop5/extensions/create) directly in your project new behaviors, actions, conditions or expressions for your game.
 
 Read more about this:

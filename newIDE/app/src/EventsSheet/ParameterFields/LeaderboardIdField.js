@@ -12,13 +12,13 @@ import {
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
-import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 
 const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
@@ -170,7 +170,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 )
               }
               renderButton={style => (
-                <RaisedButtonWithSplitMenu
+                <FlatButtonWithSplitMenu
                   id="open-leaderboard-admin-button"
                   icon={<OpenInNew />}
                   style={style}

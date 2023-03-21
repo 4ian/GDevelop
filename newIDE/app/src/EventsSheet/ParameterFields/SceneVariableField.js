@@ -28,14 +28,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const { project, scope } = props;
     const { layout } = scope;
 
-    const onComputeAllVariableNames = () =>
-      project && layout
-        ? EventsRootVariablesFinder.findAllLayoutVariables(
-            project.getCurrentPlatform(),
-            project,
-            layout
-          )
-        : [];
+    const onComputeAllVariableNames = React.useCallback(
+      () =>
+        project && layout
+          ? EventsRootVariablesFinder.findAllLayoutVariables(
+              project.getCurrentPlatform(),
+              project,
+              layout
+            )
+          : [],
+      [project, layout]
+    );
 
     return (
       <React.Fragment>

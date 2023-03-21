@@ -13,9 +13,10 @@ import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import GenericExpressionField from './GenericExpressionField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import RaisedButton from '../../UI/RaisedButton';
 import Functions from '@material-ui/icons/Functions';
+import FlatButton from '../../UI/FlatButton';
+import Layers from '../../UI/CustomSvgIcons/Layers';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
@@ -112,20 +113,27 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   />
                 )
               }
-              renderButton={style => (
-                <RaisedButton
-                  id="switch-expression-select"
-                  icon={isExpressionField ? <OpenInNew /> : <Functions />}
-                  style={style}
-                  primary
-                  label={
-                    isExpressionField
-                      ? i18n._(t`Select`)
-                      : i18n._(t`Expression`)
-                  }
-                  onClick={switchFieldType}
-                />
-              )}
+              renderButton={style =>
+                isExpressionField ? (
+                  <FlatButton
+                    id="switch-expression-select"
+                    leftIcon={<Layers />}
+                    style={style}
+                    primary
+                    label={i18n._(t`Select a Layer`)}
+                    onClick={switchFieldType}
+                  />
+                ) : (
+                  <RaisedButton
+                    id="switch-expression-select"
+                    icon={<Functions />}
+                    style={style}
+                    primary
+                    label={i18n._(t`Use an Expression`)}
+                    onClick={switchFieldType}
+                  />
+                )
+              }
             />
           </>
         )}

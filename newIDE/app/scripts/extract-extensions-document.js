@@ -198,17 +198,14 @@ const generateAllExtensionsSections = extensionShortHeaders => {
   return extensionSectionsContent;
 };
 
-const generateExtensionsListPage = async extensionShortHeaders => {
-  let indexPageContent = `---
-title: Index
----
+const generateExtensionsList = async extensionShortHeaders => {
+  let content = `## Extensions list
 
-This pages lists all extensions that you can [install directly from GDevelop](/gdevelop5/extensions/search).
-
-The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
+Here are listed all the extensions available in GDevelop. The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
 
 - [Reviewed extensions](#reviewed-extensions)
 - [Community extensions](#community-extensions)
+
 `;
   const extensionHeaders = await getAllExtensionHeaders();
   const reviewedExtensionHeaders = extensionHeaders.filter(
@@ -218,13 +215,13 @@ The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
     pair => pair.tier === 'community'
   );
 
-  indexPageContent += '## Reviewed extensions\n\n';
+  content += '## Reviewed extensions\n\n';
   for (const extensionHeader of reviewedExtensionHeaders) {
     await createExtensionReferencePage(extensionHeader, false);
   }
-  indexPageContent += generateAllExtensionsSections(reviewedExtensionHeaders);
+  content += generateAllExtensionsSections(reviewedExtensionHeaders);
 
-  indexPageContent += `## Community extensions
+  content += `## Community extensions
 
 The following extensions are made by community members — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
@@ -236,19 +233,8 @@ does or inspect its content before using it.
   for (const extensionHeader of communityExtensionHeaders) {
     await createExtensionReferencePage(extensionHeader, true);
   }
-  indexPageContent += generateAllExtensionsSections(communityExtensionHeaders);
-
-  try {
-    await fs.mkdir(extensionsRootPath, { recursive: true });
-    await fs.writeFile(
-      path.join(extensionsRootPath, 'extensions-list.md'),
-      indexPageContent
-    );
-    console.info(`✅ Done. File generated: ${extensionsRootPath}`);
-  } catch (err) {
-    console.error('❌ Error while writing output', err);
-    shell.exit(1);
-  }
+  content += generateAllExtensionsSections(communityExtensionHeaders);
+  return content;
 };
 
 (async () => {
@@ -266,9 +252,11 @@ Read more about this:
 
 * [Create your own extensions](/gdevelop5/extensions/create)
 * [Share extensions with the community](/gdevelop5/extensions/share)
-* [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)`;
+* [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)
 
-    await generateExtensionsListPage();
+`;
+
+    indexPageContent += await generateExtensionsList();
 
     try {
       await fs.mkdir(path.dirname(extensionsMainFilePath), { recursive: true });

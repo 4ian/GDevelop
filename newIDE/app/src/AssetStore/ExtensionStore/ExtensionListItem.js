@@ -77,7 +77,13 @@ export const ExtensionListItem = ({
           />
           <Column expand>
             <LineStackLayout noMargin alignItems="baseline">
-              <Text noMargin>{renderExtensionField('fullName')} </Text>
+              <Text
+                noMargin
+                allowBrowserAutoTranslate={false}
+                displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+              >
+                {renderExtensionField('fullName')}{' '}
+              </Text>
               {alreadyInstalled && (
                 <Chip
                   size="small"
@@ -106,6 +112,7 @@ export const ExtensionListItem = ({
             <Text
               noMargin
               size="body2"
+              allowBrowserAutoTranslate={false}
               displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
             >
               {renderExtensionField('shortDescription')}

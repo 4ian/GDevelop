@@ -118,7 +118,7 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={getVariantFromSize(size)}
       ref={ref}
-      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+      translate={allowBrowserAutoTranslate ? undefined : 'no'}
       color={getTextColorFromColor(color)}
       component={
         displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined

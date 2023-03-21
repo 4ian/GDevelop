@@ -97,6 +97,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-identifier`
+            : undefined
+        }
         ref={field}
         {...props}
       />

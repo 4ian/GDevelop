@@ -1,0 +1,669 @@
+{
+  "id": "timer",
+  "editorSwitches": {
+    "Start": {
+      "editor": "Scene",
+      "scene": "gameScene"
+    },
+    "SwitchToEvents1": {
+      "editor": "EventsSheet",
+      "scene": "gameScene"
+    }
+  },
+  "availableLocales": ["en", "fr", "es", "pt", "th"],
+  "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/timer/game.json",
+  "initialProjectData": {
+    "gameScene": "GameScene"
+  },
+  "endDialog": {
+    "content": [
+      {
+        "messageByLocale": {
+          "en": "# You've finished this lesson!",
+          "fr": "# Vous avez terminé cette leçon !",
+          "es": "# ¡Has terminado esta lección!",
+          "pt": "# Você terminou esta lição!",
+          "th": "# คุณเรียนบทเรียนนี้จบแล้ว!"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "Well done, in this tutorial you've learned:",
+          "fr": "Bien joué, dans ce tutoriel vous avez appris :",
+          "es": "¡Bien hecho, en este tutorial aprendiste:",
+          "pt": "Bem feito, neste tutorial você aprendeu:",
+          "th": "ทำได้ดีเยี่ยม, สิ่งที่คุณได้เรียนรู้จากบทเรียนนี้:"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "- Create a text\n\n- Create and start a timer\n\n- Use a timer's value to update a text",
+          "fr": "- Créer un texte\n\n- Créer et démarrer un chronomètre\n\n- Utiliser la valeur d'un chronomètre pour mettre à jour un texte",
+          "es": "- Crear un texto\n\n- Crear y comenzar un temporizador\n\n- Utilizar el valor de un temporizador para actualizar un texto",
+          "pt": "- Crie um texto\n\n- Crie e inicie um cronômetro\n\n- Use o valor de um cronômetro para atualizar um texto",
+          "th": "- สร้างข้อความ\n\n- สร้างและเริ่มต้นตัวจับเวลา\n\n- ใช้ค่าของตัวจับเวลาเพื่ออัปเดตข้อความ"
+        }
+      },
+      {
+        "messageByLocale": {
+          "en": "You can keep adding stuff to this game or publish it!",
+          "fr": "Vous pouvez continuer à ajouter des choses à ce jeu ou le publier !",
+          "es": "¡Puedes seguir agregando cosas a este juego o publicarlo !",
+          "pt": "Você pode continuar adicionando coisas a este jogo ou publicá-lo!",
+          "th": "คุณสามารถพัฒนาเกมนี้ต่อไปหรือจะเผยแพร่เลยก็ได้!"
+        }
+      }
+    ]
+  },
+  "flow": [
+    {
+      "id": "Start",
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "Let's go!",
+            "fr": "C'est parti !",
+            "es": "¡Vamos!",
+            "pt": "Vamos lá!",
+            "th": "ไปกันเลย!"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "This game is quite simple! Use your mouse to drag the key to the keyhole, whilst staying inside the pathway! Click on the **preview** button to try it out.\n\nOnce you're done, click on this button to continue.",
+            "fr": "Ce jeu est assez simple ! Utilisez votre souris pour faire glisser la clé dans la serrure, tout en restant dans le chemin ! Cliquez sur le bouton **aperçu** pour l'essayer.\n\nUne fois que vous avez terminé, cliquez sur ce bouton pour continuer.",
+            "es": "¡Este juego es bastante simple! ¡Utiliza tu ratón para arrastrar la llave al agujero de la llave, mientras te mantienes dentro del camino! Haz clic en el botón **vista previa** para probarlo.\n\nUna vez que hayas terminado, haz clic en este botón para continuar.",
+            "pt": "Este jogo é bastante simples! Use o mouse para arrastar a chave para o buraco da chave, enquanto permanece dentro do caminho! Clique no botão **visualizar** para experimentá-lo.\n\nUma vez que você terminou, clique neste botão para continuar.",
+            "th": "เกมนี้เป็นเกมง่ายๆ ใช้เมาส์เพื่อลากกุญแจไปยังช่องกุญแจ โดยต้องอยู่ในเส้นทางเท่านั้น! คลิกที่ปุ่ม **ดูตัวอย่าง** เพื่อลองเล่น\n\nเมื่อคุณเสร็จแล้ว คลิกที่ปุ่มนี้เพื่อดำเนินการต่อ"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#add-new-object-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#new-object-dialog"
+      },
+      "tooltip": {
+        "placement": "left",
+        "description": {
+          "messageByLocale": {
+            "en": "First, let's create some text to display the time spent playing the level. Click on the **Add new object** button.",
+            "fr": "Tout d'abord, créons du texte pour afficher le temps passé à jouer au niveau. Cliquez sur le bouton **Ajouter un nouvel objet**.",
+            "es": "Primero, creemos un texto para mostrar el tiempo que se ha pasado jugando al nivel. Haga clic en el botón **Agregar nuevo objeto**.",
+            "pt": "Primeiro, vamos criar um texto para exibir o tempo gasto jogando o nível. Clique no botão **Adicionar novo objeto**.",
+            "th": "เริ่มต้นกันด้วยการสร้างข้อความเพื่อแสดงเวลาที่ใช้ในการเล่นเกม คลิกที่ปุ่ม **เพิ่มวัตถุใหม่**"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#new-object-from-scratch-tab",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-category-TextObject--Text"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We'll create a text from scratch.",
+            "fr": "Nous allons créer un texte à partir de zéro.",
+            "es": "Vamos a crear un texto desde cero.",
+            "pt": "Vamos criar um texto do zero.",
+            "th": "เราจะสร้างข้อความใหม่"
+          }
+        },
+        "placement": "bottom"
+      },
+      "skippable": true,
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-category-TextObject--Text",
+      "nextStepTrigger": {
+        "presenceOfElement": "#object-name"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Text** object",
+            "fr": "Sélectionnez l'objet **Texte**",
+            "es": "Seleccione el objeto **Texto**",
+            "pt": "Selecione o objeto **Texto**",
+            "th": "เลือกวัตถุ **ข้อความ**"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-name",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the object name to **Score**.",
+            "fr": "Utilisez **Score** comme nom d'objet.",
+            "es": "Cambie el nombre del objeto a **Score**.",
+            "pt": "Mude o nome do objeto para **Score**.",
+            "th": "เปลี่ยนชื่อวัตถุเป็น **Score**"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-font-size",
+      "nextStepTrigger": {
+        "valueEquals": "50"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the font size to **50**.",
+            "fr": "Utilisez une taille de **50**.",
+            "es": "Cambie el tamaño de fuente a **50**.",
+            "pt": "Mude o tamanho da fonte para **50**.",
+            "th": "เปลี่ยนขนาดตัวอักษรเป็น **50**"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#text-object-initial-text",
+      "nextStepTrigger": {
+        "valueEquals": "0"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Change the initial text to **0**, and we'll update it later!",
+            "fr": "Changeons la valeur initiale à **0**, et nous allons le mettre à jour ensuite !",
+            "es": "Cambie el texto inicial a **0**, ¡y lo actualizaremos más tarde!",
+            "pt": "Mude o texto inicial para **0**, e atualizaremos mais tarde!",
+            "th": "เปลี่ยนข้อความเริ่มต้นเป็น **0** และเราจะอัปเดตมันในภายหลัง!"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#object-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#object-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done.",
+            "fr": "Nous avons terminé.",
+            "es": "Hemos terminado.",
+            "pt": "Terminamos.",
+            "th": "เราเสร็จแล้ว"
+          }
+        }
+      },
+      "mapProjectData": {
+        "scoreText": "sceneLastObjectName:gameScene"
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectsList:scoreText",
+      "nextStepTrigger": {
+        "instanceAddedOnScene": "scoreText"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Drag $(scoreText) into the **scene**.",
+            "fr": "Faites glisser $(scoreText) du menu au canvas.",
+            "es": "Arrastre $(scoreText) al **escenario**.",
+            "pt": "Arraste $(scoreText) para a **cena**.",
+            "th": "ลาก $(scoreText) ไปยัง **ฉาก**"
+          }
+        },
+        "placement": "left"
+      }
+    },
+    {
+      "nextStepTrigger": {
+        "clickOnTooltipButton": {
+          "messageByLocale": {
+            "en": "I'm done",
+            "fr": "J'ai terminé",
+            "es": "He terminado",
+            "pt": "Terminei",
+            "th": "เสร็จแล้ว"
+          }
+        }
+      },
+      "tooltip": {
+        "standalone": true,
+        "description": {
+          "messageByLocale": {
+            "en": "Place the $(scoreText) at the top right of the screen, so that the player can see their score while they play.\n\nWhen you're done, click on the button below.",
+            "fr": "Placez $(scoreText) en haut à droite de l'écran, de sorte que le joueur puisse voir son score pendant qu'il joue.\n\nQuand vous avez terminé, cliquez sur le bouton ci-dessous.",
+            "es": "Coloque $(scoreText) en la parte superior derecha de la pantalla, para que el jugador pueda ver su puntuación mientras juega.\n\nCuando hayas terminado, haz clic en el botón de abajo.",
+            "pt": "Coloque $(scoreText) no canto superior direito da tela, para que o jogador possa ver sua pontuação enquanto joga.\n\nQuando terminar, clique no botão abaixo.",
+            "th": "วาง $(scoreText) ที่ด้านบนขวาของหน้าจอ เพื่อให้ผู้เล่นสามารถเห็นคะแนนของตนเองขณะเล่นได้\n\nเมื่อคุณเสร็จแล้ว ให้คลิกที่ปุ่มด้านล่าง"
+          }
+        },
+        "placement": "top",
+        "image": {
+          "dataUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNC43MTQgMzEuMjkyIDQ3Mi43MTEgMzMwLjAzMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB4PSIxNC43MTQiIHk9IjMxLjI5MiIgd2lkdGg9IjQ3Mi43MTEiIGhlaWdodD0iMzMwLjAzMyIgc3R5bGU9ImZpbGw6IHJnYigyMTYsIDIxNiwgMjE2KTsgc3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGwtb3BhY2l0eTogMDsiLz4KICA8cmVjdCB4PSI0Mi40ODIiIHk9Ijg3LjA4MSIgd2lkdGg9IjQwMS40MDIiIGhlaWdodD0iMTkwLjYxMiIgc3R5bGU9ImZpbGw6IHJnYigyMTYsIDIxNiwgMjE2KTsgc3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGwtb3BhY2l0eTogMDsiLz4KICA8cmVjdCB4PSI4Mi4zMTgiIHk9IjEyMy41NTIiIHdpZHRoPSIzMjkuMDgxIiBoZWlnaHQ9IjE1LjE4MiIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiByZ2IoMTA0LCAxNjEsIDIxMCk7Ii8+CiAgPHJlY3QgeD0iMzk2LjcxMSIgeT0iMTI0LjAxMSIgd2lkdGg9IjE1LjE2NSIgaGVpZ2h0PSI0My4zNTEiIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogcmdiKDEwNCwgMTYxLCAyMTApOyIvPgogIDxyZWN0IHg9IjI0NC41ODIiIHk9IjE1My40NDgiIHdpZHRoPSIxNjcuMzUzIiBoZWlnaHQ9IjE1LjE0OSIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiByZ2IoMTA0LCAxNjEsIDIxMCk7Ii8+CiAgPHJlY3QgeD0iMjI5LjEwMiIgeT0iMTUzLjU3IiB3aWR0aD0iMTQuOTM5IiBoZWlnaHQ9IjM1LjMwMyIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiByZ2IoMTA0LCAxNjEsIDIxMCk7Ii8+CiAgPHJlY3QgeD0iODMuMzc2IiB5PSIxODkuNDk0IiB3aWR0aD0iMTYwLjA4NCIgaGVpZ2h0PSIxMi4wMDkiIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogcmdiKDEwNCwgMTYxLCAyMTApOyIvPgogIDxyZWN0IHg9IjgyLjk1OCIgeT0iMjAxLjgxMSIgd2lkdGg9IjEzLjQ4OCIgaGVpZ2h0PSIyMi41IiBzdHlsZT0ic3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGw6IHJnYigxMDQsIDE2MSwgMjEwKTsiLz4KICA8cmVjdCB4PSI5Ni40NzQiIHk9IjIxMC4wNDIiIHdpZHRoPSIxNDcuOTE4IiBoZWlnaHQ9IjE0LjM1IiBzdHlsZT0ic3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGw6IHJnYigxMDQsIDE2MSwgMjEwKTsiLz4KICA8cmVjdCB4PSIyMjkuNjQ1IiB5PSIyMjQuNDg2IiB3aWR0aD0iMTQuMzI2IiBoZWlnaHQ9IjE5Ljc1OSIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiByZ2IoMTA0LCAxNjEsIDIxMCk7Ii8+CiAgPHJlY3QgeD0iMjQ0LjE2NiIgeT0iMjMyLjI1NSIgd2lkdGg9IjE1MS43MSIgaGVpZ2h0PSIxMi4wODEiIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogcmdiKDEwNCwgMTYxLCAyMTApOyIvPgogIDxyZWN0IHg9IjM4My43NzUiIHk9IjIwOC41NDgiIHdpZHRoPSIxMi44MiIgaGVpZ2h0PSIyMy43NzUiIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogcmdiKDEwNCwgMTYxLCAyMTApOyIvPgogIDxlbGxpcHNlIHN0eWxlPSJzdHJva2U6IHJnYigwLCAwLCAwKTsgZmlsbDogcmdiKDIxMCwgMTYxLCAxMDQpOyIgY3g9IjM5MC4xNiIgY3k9IjIwMS41MzUiIHJ4PSIxNC40MjIiIHJ5PSIxNC4yNjIiLz4KICA8ZWxsaXBzZSBzdHlsZT0ic3Ryb2tlOiByZ2IoMCwgMCwgMCk7IGZpbGw6IHJnYigyMTAsIDE2MSwgMTA0KTsiIGN4PSI3Ni41MDQiIGN5PSIxMjkuNzA3IiByeD0iMTUuNjY0IiByeT0iMTUuNTM4Ii8+CiAgPHJlY3QgeD0iMzkwLjQ1OCIgeT0iOTAuNzk0IiB3aWR0aD0iNDguMzY1IiBoZWlnaHQ9IjI2LjA4NSIgc3R5bGU9InN0cm9rZTogcmdiKDAsIDAsIDApOyBmaWxsOiByZ2IoNiwgMjMyLCAzNik7Ii8+Cjwvc3ZnPg=="
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "editorTab:gameScene:EventsSheet",
+      "nextStepTrigger": {
+        "presenceOfElement": "#events-editor[data-active]"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's **update this text with a timer**! Let's **open the Events Sheet** of your scene $(gameScene).",
+            "fr": "Maintenant, **mettons à jour ce texte avec un chronomètre** ! **Ouvrons la feuille d'événements** de votre scène $(gameScene).",
+            "es": "¡Ahora, **actualicemos este texto con un temporizador**! **Abramos la hoja de eventos** de su escena $(gameScene).",
+            "pt": "Agora, **atualizemos este texto com um temporizador**! **Abra a Planilha de Eventos** de sua cena $(gameScene).",
+            "th": "ตอนนี้ **อัปเดตข้อความนี้ด้วยตัวจับเวลา**! **เปิดแผ่นงานเหตุการณ์** ของฉากของคุณ $(gameScene)"
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
+      "id": "SwitchToEvents1",
+      "elementToHighlightId": "#events-editor[data-active] #event-1-conditions #add-condition-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's **add a condition** to detect when the game starts.",
+            "fr": "Ajoutons une **condition** pour détecter quand le jeu commence.",
+            "es": "Agreguemos una **condición** para detectar cuando comienza el juego.",
+            "pt": "Vamos **adicionar uma condição** para detectar quando o jogo começa.",
+            "th": "เพิ่ม **เงื่อนไข** เพื่อตรวจสอบเมื่อเกมเริ่มต้น"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-DepartScene"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **Scene**.",
+            "fr": "Cherchez **Scène**.",
+            "es": "Busque **Escena**.",
+            "pt": "Procure por **Cena**.",
+            "th": "ค้นหา **ฉาก**"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-DepartScene",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will start our timer when the scene starts, thanks to the **At the beginning of the scene** condition.",
+            "fr": "Nous allons démarrer notre chronomètre quand la scène commence, grâce à la condition **Au début de la scène**.",
+            "es": "Comenzaremos nuestro temporizador cuando comience la escena, gracias a la condición **Al comienzo de la escena**.",
+            "pt": "Vamos iniciar nosso temporizador quando a cena começar, graças à condição **No início da cena**.",
+            "th": "เราจะเริ่มต้นตัวจับเวลาเมื่อฉากเริ่มต้น โดยขอบคุณเงื่อนไข **เริ่มต้นฉาก**"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Let's create the timer now.",
+            "fr": "Nous allons maintenant créer le chronomètre.",
+            "es": "Ahora creemos el temporizador.",
+            "pt": "Vamos criar o temporizador agora.",
+            "th": "เราจะสร้างตัวจับเวลาตอนนี้"
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #event-1-actions #add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Create an **action**.",
+            "fr": "Créez une **action**.",
+            "es": "Crea una **acción**.",
+            "pt": "Crie uma **ação**.",
+            "th": "สร้าง **การกระทำ**"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #search-bar",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-ResetTimer"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **Scene timer**.",
+            "fr": "Cherchez **chrono**.",
+            "es": "Busque **temporizador**.",
+            "pt": "Procure por **Cronômetro**.",
+            "th": "ค้นหา **ตัวจับเวลาฉาก**"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-ResetTimer",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the **Start (or reset) a scene timer** action.",
+            "fr": "Cliquez sur l'action **Démarrer (ou réinitialiser) un chronomètre de scène**.",
+            "es": "Seleccione la acción **Iniciar (o reiniciar) un temporizador de escena**.",
+            "pt": "Selecione a ação **Iniciar (ou reiniciar) um cronômetro de cena**.",
+            "th": "เลือก **เริ่มต้น (หรือรีเซ็ต) ตัวจับเวลาฉาก**"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container textarea",
+      "nextStepTrigger": {
+        "valueEquals": "\"GameTimer\""
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "This timer will be created, let's name it **\"GameTimer\"** (in quotations).",
+            "fr": "Ce chronomètre sera créé, nommons-le **\"GameTimer\"** (entre guillemets).",
+            "es": "Este temporizador se creará, llamémoslo **\"GameTimer\"** (entre comillas).",
+            "pt": "Este cronômetro será criado, vamos chamá-lo de **\"GameTimer\"** (entre aspas).",
+            "th": "ตัวจับเวลานี้จะถูกสร้าง ให้เราตั้งชื่อว่า **\"GameTimer\"** (ในเครื่องหมายคำพูด)"
+          }
+        }
+      },
+      "isOnClosableDialog": true,
+      "placement": "top"
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're done! Our timer will start when the scene starts.",
+            "fr": "Nous avons terminé ! Notre chronomètre démarrera lorsque la scène commencera.",
+            "es": "¡Hemos terminado! Nuestro temporizador comenzará cuando comience la escena.",
+            "pt": "Terminamos! Nosso cronômetro começará quando a cena começar.",
+            "th": "เราจบแล้ว! ตัวจับเวลาของเราจะเริ่มต้นเมื่อฉากเริ่มต้น"
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "[data-active=\"true\"] #event-3-actions #add-action-button-empty",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now let's update the score thanks to the timer.",
+            "fr": "Maintenant, mettons à jour le score grâce au chronomètre.",
+            "es": "Ahora actualicemos la puntuación gracias al temporizador.",
+            "pt": "Agora vamos atualizar a pontuação graças ao cronômetro.",
+            "th": "ตอนนี้เราจะอัปเดตคะแนนของเราโดยใช้ตัวจับเวลา"
+          }
+        }
+      }
+    },
+    {
+      "elementToHighlightId": "objectInObjectOrResourceSelector:scoreText",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-item-TextObject--String"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select $(scoreText).",
+            "fr": "Cliquez sur $(scoreText).",
+            "es": "Seleccione $(scoreText).",
+            "pt": "Selecione $(scoreText).",
+            "th": "เลือก $(scoreText)"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-item-TextObject--String",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-parameters-container"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We will change the text.",
+            "fr": "Nous allons changer le contenu du texte.",
+            "es": "Cambiamos el texto.",
+            "pt": "Vamos alterar o texto.",
+            "th": "เราจะเปลี่ยนข้อความ"
+          }
+        }
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-parameters-container select",
+      "nextStepTrigger": {
+        "valueHasChanged": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **= (set to)**.",
+            "fr": "Cliquez sur **= (définir à)**.",
+            "es": "Seleccione **= (establecer en)**.",
+            "pt": "Selecione **= (definir como)**.",
+            "th": "เลือก **= (ตั้งค่าเป็น)**"
+          }
+        }
+      },
+      "placement": "left",
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#open-string-expression-popover-button",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-selector"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Now, let's use the value of the timer.",
+            "fr": "Maintenant, utilisons la valeur du chronomètre.",
+            "es": "Ahora, usemos el valor del temporizador.",
+            "pt": "Agora, vamos usar o valor do cronômetro.",
+            "th": "ตอนนี้เราจะใช้ค่าของตัวจับเวลา"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-selector input",
+      "nextStepTrigger": {
+        "presenceOfElement": "#instruction-or-expression-TimerElapsedTime"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Search for **Timer**",
+            "fr": "Recherchez **Chrono**",
+            "es": "Busque **Temporizador**",
+            "pt": "Procure por **Cronômetro**",
+            "th": "ค้นหา **ตัวจับเวลา**"
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-or-expression-TimerElapsedTime",
+      "nextStepTrigger": {
+        "presenceOfElement": "#expression-parameters-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select **Value of a scene timer**.",
+            "fr": "Sélectionnez **Valeur d'un chronomètre de scène**.",
+            "es": "Seleccione **Valor de un temporizador de escena**.",
+            "pt": "Selecione **Valor de um cronômetro de cena**.",
+            "th": "เลือก **ค่าของตัวจับเวลาของฉาก**"
+          }
+        },
+        "placement": "bottom"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-parameters-editor-dialog #parameter-1-identifier",
+      "nextStepTrigger": {
+        "valueEquals": "\"GameTimer\""
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Select the timer we just created, **\"GameTimer\"**.",
+            "fr": "Sélectionnez le chronomètre que nous venons de créer, **\"GameTimer\"**.",
+            "es": "Seleccione el temporizador que acabamos de crear, **\"GameTimer\"**.",
+            "pt": "Selecione o cronômetro que acabamos de criar, **\"GameTimer\"**.",
+            "th": "เลือกตัวจับเวลาที่เราสร้างไว้เมื่อสักครู่ที่แล้ว **\"GameTimer\"**"
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#expression-parameters-editor-dialog #apply-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#expression-parameters-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're good.",
+            "fr": "On est bon.",
+            "es": "Estamos bien.",
+            "pt": "Estamos bem.",
+            "th": "เรียบร้อยแล้ว"
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#parameter-2-string-field",
+      "nextStepTrigger": {
+        "valueEquals": "ToString(round(TimerElapsedTime(\"GameTimer\")))"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, final detail! If we leave it like this, the score text will display the decimals of our timer and we only want the seconds!\n\nLet's **round** that number.\n\nLet's add use the function `round()` around the value so that we round the timer value. The result will look like this:\n\n`ToString(round( TimerElapsedTime(\"GameTimer\")))`",
+            "fr": "Bien, dernier détail ! Si nous laissons comme ça, le texte du score affichera les décimales de notre chronomètre et nous ne voulons que les secondes !\n\n**Arrondissons** ce nombre.\n\nAjoutons la fonction `round()` autour de la valeur afin que nous puissions arrondir la valeur du chronomètre. Le résultat ressemblera à ceci :\n\n`ToString(round( TimerElapsedTime(\"GameTimer\")))`",
+            "es": "¡Bien, detalle final! Si lo dejamos así, el texto de la puntuación mostrará los decimales de nuestro temporizador y solo queremos los segundos.\n\n¡**Redondeemos** ese número!\n\nAgreguemos la función `round()` alrededor del valor para que podamos redondear el valor del temporizador. El resultado se verá así:\n\n`\"ToString(round( TimerElapsedTime(\"GameTimer\")))`",
+            "pt": "Bem, detalhe final! Se deixarmos assim, o texto da pontuação exibirá os decimais do nosso cronômetro e só queremos os segundos!\n\nVamos **arredondar** esse número.\n\nVamos adicionar a função `round()` ao redor do valor para que possamos arredondar o valor do cronômetro. O resultado será assim:\n\n`ToString(round( TimerElapsedTime(\"GameTimer\")))`",
+            "th": "ดี รายละเอียดสุดท้าย! ถ้าเราเหลืออย่างนี้ ข้อความคะแนนจะแสดงทศนิยมของตัวจับเวลาของเราและเราต้องการเฉพาะวินาที!\n\nเราจะ **ปัดเศษ** ตัวเลขนั้น\n\nเราจะเพิ่มการใช้ฟังก์ชัน `round()` รอบค่าเพื่อที่เราจะปัดเศษค่าของตัวจับเวลา ผลลัพธ์จะเป็นแบบนี้\n\n`ToString(round(TimerElapsedTime(\"GameTimer\")))`"
+          }
+        },
+        "placement": "top"
+      },
+      "isOnClosableDialog": true
+    },
+    {
+      "elementToHighlightId": "#instruction-editor-dialog #ok-button",
+      "nextStepTrigger": {
+        "absenceOfElement": "#instruction-editor-dialog"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "We're all set.",
+            "fr": "On est tout bon.",
+            "es": "Estamos listos.",
+            "pt": "Estamos prontos.",
+            "th": "เราพร้อมแล้ว"
+          }
+        },
+        "placement": "top"
+      }
+    },
+    {
+      "elementToHighlightId": "#toolbar-preview-button",
+      "nextStepTrigger": {
+        "previewLaunched": true
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Alright, we're done! Let's test our game to see the changes we've made! Click on the **Preview** button.",
+            "fr": "Bien, nous avons terminé ! Testons notre jeu pour voir les changements que nous avons apportés ! Cliquez sur le bouton **Aperçu**.",
+            "es": "¡Bien, hemos terminado! ¡Probemos nuestro juego para ver los cambios que hemos hecho! Haga clic en el botón **Vista previa**.",
+            "pt": "Bem, terminamos! Vamos testar nosso jogo para ver as mudanças que fizemos! Clique no botão **Visualizar**.",
+            "th": "เอาล่ะ เสร็จแล้ว! มาทดสอบเกมของเราเพื่อดูการเปลี่ยนแปลงที่เราทำกันดีกว่า! คลิกที่ปุ่ม **ดูตัวอย่าง**"
+          }
+        },
+        "placement": "bottom"
+      }
+    }
+  ]
+}

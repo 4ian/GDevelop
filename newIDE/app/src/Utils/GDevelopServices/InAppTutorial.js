@@ -17,10 +17,12 @@ export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
 export const CAMERA_PARALLAX_IN_APP_TUTORIAL_ID = 'cameraParallax';
 export const HEALTH_BAR_IN_APP_TUTORIAL_ID = 'healthBar';
 export const JOYSTICK_IN_APP_TUTORIAL_ID = 'joystick';
+export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
 
 export const allInAppTutorialIds = [
   FLING_GAME_IN_APP_TUTORIAL_ID,
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  TIMER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
@@ -196,6 +198,7 @@ export const fetchInAppTutorial = async (
 export const isMiniTutorial = (tutorialId: string) =>
   [
     PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+    TIMER_IN_APP_TUTORIAL_ID,
     CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
     HEALTH_BAR_IN_APP_TUTORIAL_ID,
     JOYSTICK_IN_APP_TUTORIAL_ID,

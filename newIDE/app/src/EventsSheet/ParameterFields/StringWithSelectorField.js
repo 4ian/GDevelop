@@ -27,6 +27,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         ref={field}
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-string-with-selector`
+            : undefined
+        }
         {...props}
       />
     );

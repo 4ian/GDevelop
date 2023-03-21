@@ -15,6 +15,7 @@ import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import {
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  TIMER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
@@ -104,6 +105,18 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
       ],
       durationInMinutes: 2,
       renderImage: props => <Parallax {...props} />,
+    },
+    {
+      id: TIMER_IN_APP_TUTORIAL_ID,
+      title: t`Use a timer`,
+      description: t`Learn how to use a timer to count a score.`,
+      keyPoints: [
+        t`Create and use a timer`,
+        t`Create and modify a text`,
+        t`Build an expression`,
+      ],
+      durationInMinutes: 2,
+      renderImage: props => <MultiplierScore {...props} />,
     },
     {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,

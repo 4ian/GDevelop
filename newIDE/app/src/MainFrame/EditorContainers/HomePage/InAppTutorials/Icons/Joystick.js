@@ -41,12 +41,12 @@ export default React.memo(props => (
     <path
       d="M25.7 63.1269L27.9219 65.2478L24.5891 68.4292L27.9219 71.6106L25.7 73.7314L20.1452 68.4292L25.7 63.1269Z"
       fill="#9A977E"
-      fill-opacity="0.2"
+      fillOpacity="0.2"
     />
     <path
       d="M12.0024 61.0057L15.0322 63.9749L10.4875 68.4289L15.0322 72.8828L12.0024 75.8521L4.42768 68.4289L12.0024 61.0057Z"
       fill="#CFD166"
-      fill-opacity="0.2"
+      fillOpacity="0.2"
     />
     <defs>
       <filter
@@ -56,9 +56,9 @@ export default React.memo(props => (
         width="81"
         height="80"
         filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB"
+        colorInterpolationFilters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feBlend
           mode="normal"
           in="SourceGraphic"

@@ -80,7 +80,9 @@ import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtracto
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
@@ -308,7 +310,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('forceSetValue and forceSetSelection', () => {
     const [value, setValue] = React.useState('Hello World!');
-    const field = React.useRef(null);
+    const field = React.useRef<?SemiControlledTextFieldInterface>(null);
 
     return (
       <React.Fragment>

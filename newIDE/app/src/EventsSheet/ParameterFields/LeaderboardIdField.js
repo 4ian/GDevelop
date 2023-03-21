@@ -7,17 +7,18 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
-import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 
 const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
@@ -57,16 +58,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
-    const inputFieldRef = React.useRef<?(
+    const field = React.useRef<?(
       | GenericExpressionField
       | SelectFieldInterface
     )>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: () => {
-        if (inputFieldRef.current) {
-          inputFieldRef.current.focus();
-        }
-      },
+      focus,
     }));
 
     const isCurrentValueInLeaderboardList =
@@ -124,7 +124,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               renderTextField={() =>
                 !isExpressionField ? (
                   <SelectField
-                    ref={inputFieldRef}
+                    ref={field}
                     value={props.value}
                     onChange={onChangeSelectValue}
                     margin={props.isInline ? 'none' : 'dense'}
@@ -152,7 +152,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   </SelectField>
                 ) : (
                   <GenericExpressionField
-                    ref={inputFieldRef}
+                    ref={field}
                     expressionType="string"
                     {...props}
                     onChange={onChangeTextValue}
@@ -170,7 +170,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 )
               }
               renderButton={style => (
-                <RaisedButtonWithSplitMenu
+                <FlatButtonWithSplitMenu
                   id="open-leaderboard-admin-button"
                   icon={<OpenInNew />}
                   style={style}

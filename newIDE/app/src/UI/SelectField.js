@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { computeTextFieldStyleProps } from './TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import { MarkdownText } from './MarkdownText';
 import { makeStyles } from '@material-ui/core';
 
@@ -19,7 +20,9 @@ const useSelectStyles = textAlign =>
     },
   })();
 
-export type SelectFieldInterface = {| focus: () => void |};
+export type SelectFieldInterface = {|
+  focus: FieldFocusFunction,
+|};
 
 type ValueProps = {|
   value: number | string,
@@ -66,7 +69,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
   (props, ref) => {
     const inputRef = React.useRef<?HTMLInputElement>(null);
 
-    const focus = () => {
+    const focus: FieldFocusFunction = options => {
       if (inputRef.current) inputRef.current.focus();
     };
 

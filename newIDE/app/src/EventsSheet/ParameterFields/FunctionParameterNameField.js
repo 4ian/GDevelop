@@ -1,32 +1,34 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import GenericExpressionField from './GenericExpressionField';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParameters';
 
-export default class FunctionParameterNameField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function FunctionParameterNameField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
     const eventsBasedEntity =
-      this.props.scope.eventsBasedBehavior ||
-      this.props.scope.eventsBasedObject;
+      props.scope.eventsBasedBehavior || props.scope.eventsBasedObject;
     const functionsContainer = eventsBasedEntity
       ? eventsBasedEntity.getEventsFunctions()
-      : this.props.scope.eventsFunctionsExtension;
+      : props.scope.eventsFunctionsExtension;
     const parameterNames: Array<ExpressionAutocompletion> =
-      this.props.scope.eventsFunction && functionsContainer
+      props.scope.eventsFunction && functionsContainer
         ? enumerateParametersUsableInExpressions(
             functionsContainer,
-            this.props.scope.eventsFunction
+            props.scope.eventsFunction
           ).map(parameterMetadata => ({
             kind: 'Text',
             completion: `"${parameterMetadata.getName()}"`,
@@ -41,9 +43,9 @@ export default class FunctionParameterNameField extends Component<
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
-        {...this.props}
+        ref={field}
+        {...props}
       />
     );
   }
-}
+);

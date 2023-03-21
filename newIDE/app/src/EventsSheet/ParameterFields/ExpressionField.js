@@ -1,30 +1,33 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import GenericExpressionField from './GenericExpressionField';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 
-export default class ExpressionField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function ExpressionField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
     return (
       <GenericExpressionField
         expressionType="number"
-        ref={field => (this._field = field)}
+        ref={field}
         id={
-          this.props.parameterIndex !== undefined
-            ? `parameter-${this.props.parameterIndex}-expression-field`
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-expression-field`
             : undefined
         }
-        {...this.props}
+        {...props}
       />
     );
   }
-}
+);

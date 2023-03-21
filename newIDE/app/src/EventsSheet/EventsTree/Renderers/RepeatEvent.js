@@ -11,6 +11,7 @@ import {
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ExpressionField from '../../ParameterFields/ExpressionField';
+import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
@@ -35,7 +36,7 @@ export default class RepeatEvent extends React.Component<
   EventRendererProps,
   *
 > {
-  _field: ?ExpressionField = null;
+  _field: ?ParameterFieldInterface = null;
   state = {
     editing: false,
     editingPreviousValue: null,

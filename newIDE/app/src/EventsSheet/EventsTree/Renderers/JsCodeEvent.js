@@ -16,6 +16,7 @@ import { type EventRendererProps } from './EventRenderer';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
@@ -69,7 +70,7 @@ export default class JsCodeEvent extends React.Component<
   EventRendererProps,
   State
 > {
-  _objectField: ?ObjectField = null;
+  _objectField: ?ParameterFieldInterface = null;
   state = {
     editingObject: false,
     editingPreviousValue: null,

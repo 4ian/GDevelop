@@ -60,7 +60,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import LeaderboardIdField, {
   renderInlineLeaderboardIdField,
 } from './ParameterFields/LeaderboardIdField';
-import { IdentifierField } from './ParameterFields/IdentifierField';
+import IdentifierField from './ParameterFields/IdentifierField';
 import TilemapResourceField from './ParameterFields/TilemapResourceField';
 import TilesetResourceField from './ParameterFields/TilesetResourceField';
 

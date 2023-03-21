@@ -30,6 +30,10 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Edit from '@material-ui/icons/Edit';
 import FlatButton from '../../UI/FlatButton';
+import {
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from '../ParameterFields/ParameterFieldCommons';
 
 const gd: libGDevelop = global.gd;
 
@@ -59,7 +63,7 @@ const styles = {
 };
 
 export type InstructionParametersEditorInterface = {|
-  focus: () => void,
+  focus: FieldFocusFunction,
 |};
 
 type Props = {|
@@ -115,7 +119,7 @@ const InstructionParametersEditor = React.forwardRef<
     },
     ref
   ) => {
-    const firstVisibleField = React.useRef<?{ +focus?: () => void }>(null);
+    const firstVisibleField = React.useRef<?ParameterFieldInterface>(null);
     const [isDirty, setIsDirty] = React.useState<boolean>(false);
     const {
       palette: { type: paletteType },
@@ -123,7 +127,7 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
-    const focus = () => {
+    const focus: FieldFocusFunction = options => {
       // Verify that there is a field to focus.
       if (
         getVisibleParametersCount(
@@ -136,7 +140,7 @@ const InstructionParametersEditor = React.forwardRef<
         ) !== 0
       ) {
         if (firstVisibleField.current && firstVisibleField.current.focus) {
-          firstVisibleField.current.focus();
+          firstVisibleField.current.focus(options);
         }
       }
     };

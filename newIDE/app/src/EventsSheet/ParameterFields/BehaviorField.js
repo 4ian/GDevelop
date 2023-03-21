@@ -1,7 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
@@ -79,9 +82,9 @@ export default class BehaviorField extends React.Component<
       });
   }
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
+  focus: FieldFocusFunction = options => {
+    if (this._field) this._field.focus(options);
+  };
 
   _getError = (value?: string) => {
     if (!value && !this.props.value) return null;

@@ -1,31 +1,34 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import GenericExpressionField from './GenericExpressionField';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { getParameterChoices } from './ParameterMetadataTools';
 
-export default class StringWithSelectorField extends Component<
-  ParameterFieldProps,
-  {||}
-> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function StringWithSelectorField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
     return (
       <GenericExpressionField
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
-          getParameterChoices(this.props.parameterMetadata).filter(
+          getParameterChoices(props.parameterMetadata).filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
-        {...this.props}
+        ref={field}
+        {...props}
       />
     );
   }
-}
+);

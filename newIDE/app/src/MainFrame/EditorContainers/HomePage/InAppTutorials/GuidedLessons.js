@@ -24,6 +24,7 @@ import MultiplierScore from './Icons/MultiplierScore';
 import Parallax from './Icons/Parallax';
 import HealthBar from './Icons/HealthBar';
 import Joystick from './Icons/Joystick';
+import Timer from './Icons/Timer';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -31,11 +32,10 @@ const getColumnsFromWidth = (width: WidthType) => {
     case 'small':
       return 1;
     case 'medium':
-      return 3;
+      return 2;
     case 'large':
-      return 4;
     default:
-      return 1;
+      return 3;
   }
 };
 
@@ -116,7 +116,7 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
         t`Build an expression`,
       ],
       durationInMinutes: 2,
-      renderImage: props => <MultiplierScore {...props} />,
+      renderImage: props => <Timer {...props} />,
     },
     {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,

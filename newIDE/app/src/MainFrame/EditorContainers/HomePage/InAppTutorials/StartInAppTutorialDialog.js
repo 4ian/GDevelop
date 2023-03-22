@@ -12,6 +12,7 @@ import Text from '../../../../UI/Text';
 import {
   FLING_GAME_IN_APP_TUTORIAL_ID,
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  TIMER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
@@ -86,6 +87,16 @@ const titleAndContentByKey = {
         <Trans>Making objects disappear or appear when colliding</Trans>,
         <Trans>Creating, modifying and accessing a scene variable</Trans>,
         <Trans>Updating a score accordingly</Trans>,
+      ],
+    }),
+  },
+  [TIMER_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's use time to measure a score</Trans>,
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Create and modify a text</Trans>,
+        <Trans>Start a timer</Trans>,
+        <Trans>Use the timer to display a score</Trans>,
       ],
     }),
   },

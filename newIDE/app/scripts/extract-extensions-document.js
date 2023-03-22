@@ -12,6 +12,9 @@ const {
   getExtensionFolderName,
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
+const {
+  convertCommonMarkdownToPythonMarkdown,
+} = require('./lib/PythonMarkdownHelper');
 const shell = require('shelljs');
 
 /** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
@@ -144,7 +147,7 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
       : '') +
     '---\n' +
     '\n' +
-    extensionHeader.description +
+    convertCommonMarkdownToPythonMarkdown(extensionHeader.description) +
     '\n' +
     (extensionHeader.helpPath ? `\n[Read more...](${helpPageUrl})\n` : ``) +
     generateExtensionFooterText(extensionHeader.fullName);

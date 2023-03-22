@@ -15,6 +15,8 @@ import AutocompletePicker from './AutocompletePicker';
 import commandsList, { type CommandName } from '../CommandsList';
 import algoliasearch from 'algoliasearch/lite';
 import Window from '../../Utils/Window';
+import Command from '../../UI/CustomSvgIcons/Command';
+
 import {
   InstantSearch,
   useInstantSearch,
@@ -117,7 +119,9 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       () => {
         const namedCommands: Array<NamedCommand> = commandManager
           .getAllNamedCommands()
-          .filter(command => !commandsList[command.name].ghost);
+          .filter(command => !commandsList[command.name].ghost)
+          // $FlowFixMe[incompatible-type]
+          .map(command => ({ ...command, icon: <Command /> }));
         const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
           hit => {
             return {
@@ -126,7 +130,6 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
             };
           }
         );
-        console.log(results.hits)
         return namedCommands.concat(algoliaCommands);
       },
       [commandManager, results.hits]

@@ -11,7 +11,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Chip from '../../UI/Chip';
 import TextField from '@material-ui/core/TextField';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import ChevronRightIcon from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import filterOptions from './FilterOptions';
 import {
@@ -148,7 +148,8 @@ const AutocompletePicker = (
   const getItemIcon = (item: Item) => {
     if (item.text && item.iconSrc) {
       return <ListIcon iconSize={20} src={item.iconSrc} />;
-    } else return <ChevronRightIcon />;
+    } else if (item.icon) return item.icon;
+    else return <ChevronRightIcon />;
   };
 
   return (

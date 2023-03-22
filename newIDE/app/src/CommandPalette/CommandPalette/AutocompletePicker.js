@@ -23,11 +23,17 @@ import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
 import Book from '../../UI/CustomSvgIcons/Book';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   listItemContainer: {
     width: '100%',
   },
-});
+  wikiPrimaryTextHierarchy: {
+    color: theme.palette.text.secondary,
+  },
+  wikiSecondaryText: {
+    color: theme.palette.text.primary,
+  },
+}));
 
 const styles = {
   chip: {
@@ -45,7 +51,7 @@ const getHierarchyAsArray = (hierarchy: {
   lvl4: string,
   lvl5: string,
   lvl6: string,
-}) =>
+}): Array<string> =>
   Object.entries(hierarchy)
     .reduce((acc, [level, content]) => {
       if (content) {
@@ -54,21 +60,37 @@ const getHierarchyAsArray = (hierarchy: {
       return acc;
     }, [])
     .sort((a, b) => a[0] - b[0])
+    // $FlowFixMe[incompatible-return] - Object.entries does not keep values types.
     .map(item => item[1]);
 
 const getHitLastHierarchyLevel = (hit: any) => {
   const hierarchyArray = getHierarchyAsArray(hit.hierarchy);
   return hierarchyArray[hierarchyArray.length - 1];
 };
-const getHitHierarchySerialized = (
+
+const HitPrimaryText = (
   hit: any,
   { removeLastLevel }: { removeLastLevel: boolean }
 ) => {
-  const hierarchyArray = getHierarchyAsArray(hit.hierarchy);
+  const classes = useStyles();
 
-  return hierarchyArray
-    .slice(0, hierarchyArray.length - (removeLastLevel ? 1 : 0))
-    .join(' > ');
+  let hierarchyArray = getHierarchyAsArray(hit.hierarchy);
+
+  hierarchyArray = hierarchyArray.slice(
+    0,
+    hierarchyArray.length - (removeLastLevel ? 1 : 0)
+  );
+
+  const lastElement = hierarchyArray.pop();
+
+  return (
+    <>
+      <span className={classes.wikiPrimaryTextHierarchy}>
+        {hierarchyArray.map(item => `${item} > `)}
+      </span>{' '}
+      <span>{lastElement}</span>
+    </>
+  );
 };
 
 type Props<T> = {|
@@ -82,15 +104,15 @@ type Props<T> = {|
 
 const Hit = ({ hit }: {| hit: any |}) => {
   const classes = useStyles();
-  let primaryText;
+  let secondaryText;
   let removeLastLevel = false;
   if (hit.content) {
-    primaryText = hit.content;
+    secondaryText = hit.content;
   } else {
     removeLastLevel = true;
-    primaryText = getHitLastHierarchyLevel(hit);
+    secondaryText = getHitLastHierarchyLevel(hit);
   }
-  const secondaryText = getHitHierarchySerialized(hit, { removeLastLevel });
+  const primaryText = HitPrimaryText(hit, { removeLastLevel });
   return (
     <ListItem
       dense
@@ -101,7 +123,12 @@ const Hit = ({ hit }: {| hit: any |}) => {
       <ListItemIcon>
         <Book />
       </ListItemIcon>
-      <ListItemText primary={primaryText} secondary={secondaryText} />
+      <ListItemText
+        primary={primaryText}
+        secondary={
+          <span className={classes.wikiSecondaryText}>{secondaryText}</span>
+        }
+      />
     </ListItem>
   );
 };

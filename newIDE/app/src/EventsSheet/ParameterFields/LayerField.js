@@ -85,6 +85,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 !isExpressionField ? (
                   <SelectField
                     ref={field}
+                    id={
+                      props.parameterIndex !== undefined
+                        ? `parameter-${props.parameterIndex}-layer-field`
+                        : undefined
+                    }
                     value={props.value}
                     onChange={onChangeSelectValue}
                     margin={props.isInline ? 'none' : 'dense'}

@@ -24,6 +24,7 @@ import {
   useSearchBox,
 } from 'react-instantsearch-hooks';
 import { useDebounce } from '../../Utils/UseDebounce';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 const indexName = 'gdevelop';
 
 // Show the command palette dialog at the top of the screen
@@ -51,6 +52,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
+    const windowWidth = useResponsiveWindowWidth();
     const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
@@ -184,7 +186,11 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 i18n={i18n}
                 onInputChange={setSearchText}
                 items={allCommands}
-                placeholder={t`Start typing a command or searching something...`}
+                placeholder={
+                  windowWidth === 'small'
+                    ? t`Search`
+                    : t`Start typing a command or searching something...`
+                }
                 onClose={closeDialog}
                 onSelect={handleCommandChoose}
               />

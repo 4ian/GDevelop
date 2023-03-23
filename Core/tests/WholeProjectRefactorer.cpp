@@ -56,6 +56,12 @@ GetEventFirstActionFirstParameterString(const gd::BaseEvent &event) {
   return actions.Get(0).GetParameter(0).GetPlainString();
 }
 
+bool
+IsActionsEmpty(const gd::BaseEvent &event) {
+  auto &actions = EnsureStandardEvent(event).GetActions();
+  return actions.IsEmpty();
+}
+
 const gd::String &GetEventFirstConditionType(const gd::BaseEvent &event) {
   auto &conditions = EnsureStandardEvent(event).GetConditions();
   REQUIRE(conditions.IsEmpty() == false);
@@ -1229,6 +1235,49 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(externalLayout2.GetInitialInstances().HasInstancesOfObject(
                   "GlobalObject1") == false);
     }
+
+    SECTION("Events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+      auto &layout = project.GetLayout("Scene");
+
+      // Trigger the refactoring after removing an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout, "ObjectWithMyBehavior", /* isObjectGroup=*/false);
+
+      // Check actions with the object in parameters have been removed.
+      REQUIRE(
+          IsActionsEmpty(layout.GetEvents().GetEvent(FreeFunctionWithObjects)));
+
+      // Check actions with the object in expressions have been removed.
+      REQUIRE(IsActionsEmpty(
+          layout.GetEvents().GetEvent(FreeFunctionWithObjectExpression)));
+    }
+
+    SECTION("External events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+      auto &layout = project.GetLayout("Scene");
+
+      // Trigger the refactoring after removing an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout, "ObjectWithMyBehavior", /* isObjectGroup=*/false);
+
+      auto &externalEvents = project.GetExternalEvents("ExternalEvents");
+      // Check actions with the object in parameters have been removed.
+      REQUIRE(IsActionsEmpty(
+          externalEvents.GetEvents().GetEvent(FreeFunctionWithObjects)));
+
+      // Check actions with the object in expressions have been removed.
+      REQUIRE(IsActionsEmpty(externalEvents.GetEvents().GetEvent(
+          FreeFunctionWithObjectExpression)));
+    }
   }
 
   SECTION("Object renamed (in layout)") {
@@ -1370,6 +1419,34 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(GetEventFirstActionFirstParameterString(
                   layout.GetEvents().GetEvent(FreeFunctionWithObjectExpression)) ==
                 "RenamedObjectWithMyBehavior.GetObjectNumber()");
+    }
+
+    SECTION("External events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+      auto &layout = project.GetLayout("Scene");
+
+      // Trigger the refactoring after the renaming of an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout, "ObjectWithMyBehavior",
+          "RenamedObjectWithMyBehavior",
+          /* isObjectGroup=*/false);
+
+      auto &externalEvents = project.GetExternalEvents("ExternalEvents");
+      // Check object name has been renamed in action parameters.
+      REQUIRE(
+          GetEventFirstActionFirstParameterString(
+              externalEvents.GetEvents().GetEvent(FreeFunctionWithObjects)) ==
+          "RenamedObjectWithMyBehavior");
+
+      // Check object name has been renamed in expressions.
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  externalEvents.GetEvents().GetEvent(
+                      FreeFunctionWithObjectExpression)) ==
+              "RenamedObjectWithMyBehavior.GetObjectNumber()");
     }
   }
 

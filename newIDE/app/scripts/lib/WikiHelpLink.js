@@ -45,7 +45,7 @@ const generateReadMoreLink = helpPagePath => {
   const url = getHelpLink(helpPagePath);
   if (!url) return '';
 
-  return `[[${url}|Read more explanations about it.]]`;
+  return `[Read more explanations about it.](${url})`;
 };
 
 const renamedExtensionNames = {

@@ -41,7 +41,6 @@ import {
   notifyPreviewWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
-import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
 import { renderExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
@@ -326,9 +325,6 @@ const MainFrame = (props: Props) => {
     false
   );
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
-    false
-  );
-  const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
     false
   );
   const [
@@ -2757,6 +2753,12 @@ const MainFrame = (props: Props) => {
       : () => {}
   );
 
+  const openCommandPalette = React.useCallback(() => {
+    if (commandPaletteRef.current) {
+      commandPaletteRef.current.open();
+    }
+  }, []);
+
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
@@ -2787,9 +2789,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
-    onOpenCommandPalette: commandPaletteRef.current
-      ? commandPaletteRef.current.open
-      : () => {},
+    onOpenCommandPalette: openCommandPalette,
     onOpenProfile: () => openProfileDialog(true),
     onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
   });
@@ -3033,7 +3033,7 @@ const MainFrame = (props: Props) => {
                     onCreateProject: exampleShortHeader =>
                       openCreateProjectDialog(true, exampleShortHeader),
                     onOpenProfile: () => openProfileDialog(true),
-                    onOpenHelpFinder: () => openHelpFinderDialog(true),
+                    onOpenHelpFinder: openCommandPalette,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3079,10 +3079,6 @@ const MainFrame = (props: Props) => {
         show={showLoader}
         progress={fileMetadataOpeningProgress}
         message={fileMetadataOpeningMessage}
-      />
-      <HelpFinder
-        open={helpFinderDialogOpen}
-        onClose={() => openHelpFinderDialog(false)}
       />
       <Snackbar
         open={state.snackMessageOpen}

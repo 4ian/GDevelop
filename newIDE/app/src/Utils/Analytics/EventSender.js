@@ -221,10 +221,6 @@ export const sendAssetPackInformationOpened = (options: {|
   recordEvent('asset_pack_information_opened', options);
 };
 
-export const sendHelpFinderOpened = () => {
-  recordEvent('help_finder_opened', {});
-};
-
 export const sendHelpSearch = (searchText: string) => {
   recordEvent('help_search', {
     searchText,

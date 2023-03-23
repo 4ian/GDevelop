@@ -12,6 +12,7 @@ export type AlgoliaSearchHit = {|
   content: string | null,
   url: string,
   hierarchy: AlgoliaSearchHitHierarchy,
+  objectID: string,
 |};
 
 export const getHierarchyAsArray = (

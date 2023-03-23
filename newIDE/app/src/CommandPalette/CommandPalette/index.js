@@ -180,7 +180,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 i18n={i18n}
                 onInputChange={setSearchText}
                 items={allCommands}
-                placeholder={t`Start typing a command...`}
+                placeholder={t`Start typing a command or searching something...`}
                 onClose={() => setMode('closed')}
                 onSelect={handleCommandChoose}
               />

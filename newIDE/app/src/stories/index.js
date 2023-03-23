@@ -17,7 +17,6 @@ import HelpIcon from '../UI/HelpIcon';
 import AboutDialog from '../MainFrame/AboutDialog';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
-import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
@@ -1338,11 +1337,6 @@ storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
-
-storiesOf('HelpFinder', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)

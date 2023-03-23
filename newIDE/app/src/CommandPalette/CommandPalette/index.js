@@ -16,6 +16,7 @@ import commandsList, { type CommandName } from '../CommandsList';
 import algoliasearch from 'algoliasearch/lite';
 import Window from '../../Utils/Window';
 import Command from '../../UI/CustomSvgIcons/Command';
+import { type AlgoliaSearchHit } from '../../Utils/AlgoliaSearch';
 
 import {
   InstantSearch,
@@ -50,7 +51,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
-    const [value, setValue] = React.useState<string>('');
+    const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
     const [
@@ -59,8 +60,12 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     ] = React.useState<null | NamedCommandWithOptions>(null);
     const { results } = useInstantSearch();
     const { refine } = useSearchBox();
-    // Takes a command and if simple command, executes handler
-    // If command with options, opens options of the palette
+    const isSearching = !!searchText;
+
+    /**
+     * Takes a command and if simple command, executes handler.
+     * If command with options, opens options of the palette.
+     */
     const handleCommandChoose = React.useCallback(
       (command: NamedCommand | GoToWikiCommand) => {
         if (command.handler) {
@@ -79,20 +84,23 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       [selectCommand, setMode]
     );
 
-    // Executes handler of a command option and closes palette
+    /**
+     * Executes handler of a command option and closes palette
+     */
     const handleOptionChoose = (option: CommandOption) => {
       option.handler();
       setMode('closed');
     };
 
-    // Opens the palette in command mode
     const openPalette = React.useCallback((open? = true) => {
       if (open) setMode('command');
       else setMode('closed');
     }, []);
 
-    // Takes command name, gets command object from
-    // manager and launches command accordingly
+    /**
+     * Takes command name, gets command object from
+     * manager and launches command accordingly
+     */
     const launchCommand = React.useCallback(
       commandName => {
         const command = commandManager.getNamedCommand(commandName);
@@ -108,22 +116,24 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     }));
 
     const launchSearch = useDebounce(() => {
-      if (value) {
-        refine(value);
+      if (searchText) {
+        refine(searchText);
       }
     }, 200);
 
-    React.useEffect(launchSearch, [value, launchSearch]);
+    React.useEffect(launchSearch, [searchText, launchSearch]);
 
     const allCommands: Array<NamedCommand | GoToWikiCommand> = React.useMemo(
       () => {
-        const namedCommands: Array<NamedCommand> = commandManager
+        const namedCommands = commandManager
           .getAllNamedCommands()
           .filter(command => !commandsList[command.name].ghost)
           // $FlowFixMe[incompatible-type]
           .map(command => ({ ...command, icon: <Command /> }));
+        if (!isSearching) return namedCommands;
+
         const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
-          hit => {
+          (hit: AlgoliaSearchHit) => {
             return {
               hit,
               handler: () => Window.openExternalURL(hit.url),
@@ -132,7 +142,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
         );
         return namedCommands.concat(algoliaCommands);
       },
-      [commandManager, results.hits]
+      [commandManager, results.hits, isSearching]
     );
 
     return (
@@ -153,7 +163,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
               // Command picker
               <AutocompletePicker
                 i18n={i18n}
-                onInputChange={setValue}
+                onInputChange={setSearchText}
                 items={allCommands}
                 placeholder={t`Start typing a command...`}
                 onClose={() => setMode('closed')}

@@ -22,6 +22,11 @@ import {
 import commandsList, { commandAreas } from '../CommandsList';
 import { getShortcutDisplayName } from '../../KeyboardShortcuts';
 import Book from '../../UI/CustomSvgIcons/Book';
+import {
+  getHierarchyAsArray,
+  getHitLastHierarchyLevel,
+  type AlgoliaSearchHit as AlgoliaSearchHitType,
+} from '../../Utils/AlgoliaSearch';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
@@ -41,32 +46,7 @@ const styles = {
   },
 };
 
-type Item = NamedCommand | CommandOption;
-
-const getHierarchyAsArray = (hierarchy: {
-  lvl0: string,
-  lvl1: string,
-  lvl2: string,
-  lvl3: string,
-  lvl4: string,
-  lvl5: string,
-  lvl6: string,
-}): Array<string> =>
-  Object.entries(hierarchy)
-    .reduce((acc, [level, content]) => {
-      if (content) {
-        acc.push([Number(level.replace('lvl', '')), content]);
-      }
-      return acc;
-    }, [])
-    .sort((a, b) => a[0] - b[0])
-    // $FlowFixMe[incompatible-return] - Object.entries does not keep values types.
-    .map(item => item[1]);
-
-const getHitLastHierarchyLevel = (hit: any) => {
-  const hierarchyArray = getHierarchyAsArray(hit.hierarchy);
-  return hierarchyArray[hierarchyArray.length - 1];
-};
+type Item = NamedCommand | CommandOption | AlgoliaSearchHitType;
 
 const HitPrimaryText = (
   hit: any,
@@ -102,7 +82,9 @@ type Props<T> = {|
   i18n: I18nType,
 |};
 
-const Hit = ({ hit }: {| hit: any |}) => {
+type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
+
+const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -149,35 +131,62 @@ const AutocompletePicker = (
     props.onSelect(item);
   };
 
-  const getItemHint = (item: Item) => {
-    if (item.text) return null;
-    else if (item.name) {
-      const shortcutString = shortcutMap[item.name];
-      if (!shortcutString) return null;
-      const shortcutDisplayName = getShortcutDisplayName(shortcutString);
-      return (
-        <ListItemSecondaryAction>
-          <Chip label={shortcutDisplayName} style={styles.chip} />
-        </ListItemSecondaryAction>
-      );
-    }
-  };
+  const getItemHint = React.useCallback(
+    (item: Item) => {
+      if (item.text) return null;
+      else if (item.name) {
+        const shortcutString = shortcutMap[item.name];
+        if (!shortcutString) return null;
+        const shortcutDisplayName = getShortcutDisplayName(shortcutString);
+        return (
+          <ListItemSecondaryAction>
+            <Chip label={shortcutDisplayName} style={styles.chip} />
+          </ListItemSecondaryAction>
+        );
+      }
+    },
+    [shortcutMap]
+  );
 
-  const getItemText = (item: Item) => {
-    if (item.text) return item.text;
-    else if (item.name) {
-      const { area, displayText } = commandsList[item.name];
-      const areaText = commandAreas[area];
-      return props.i18n._(areaText) + ' 〉' + props.i18n._(displayText);
-    }
-  };
+  const getItemText = React.useCallback(
+    (item: Item) => {
+      if (item.text) return item.text;
+      else if (item.name) {
+        const { area, displayText } = commandsList[item.name];
+        const areaText = commandAreas[area];
+        return props.i18n._(areaText) + ' 〉' + props.i18n._(displayText);
+      }
+    },
+    [props.i18n]
+  );
 
-  const getItemIcon = (item: Item) => {
+  const getItemIcon = React.useCallback((item: Item) => {
     if (item.text && item.iconSrc) {
       return <ListIcon iconSize={20} src={item.iconSrc} />;
     } else if (item.icon) return item.icon;
     else return <ChevronRightIcon />;
-  };
+  }, []);
+
+  const renderOption = React.useCallback(
+    (item: Item) => {
+      if (item.hit) {
+        return <AlgoliaSearchHit hit={item.hit} />;
+      }
+      return (
+        <ListItem
+          dense
+          component="div"
+          ContainerComponent="div"
+          classes={{ container: classes.listItemContainer }}
+        >
+          <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
+          <ListItemText primary={getItemText(item)} />
+          {getItemHint(item)}
+        </ListItem>
+      );
+    },
+    [classes.listItemContainer, getItemText, getItemHint, getItemIcon]
+  );
 
   return (
     <Autocomplete
@@ -201,23 +210,7 @@ const AutocompletePicker = (
           autoFocus
         />
       )}
-      renderOption={item => {
-        if (item.hit) {
-          return <Hit hit={item.hit} />;
-        }
-        return (
-          <ListItem
-            dense
-            component="div"
-            ContainerComponent="div"
-            classes={{ container: classes.listItemContainer }}
-          >
-            <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
-            <ListItemText primary={getItemText(item)} />
-            {getItemHint(item)}
-          </ListItem>
-        );
-      }}
+      renderOption={renderOption}
     />
   );
 };

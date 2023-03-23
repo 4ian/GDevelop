@@ -58,10 +58,25 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       selectedCommand,
       selectCommand,
     ] = React.useState<null | NamedCommandWithOptions>(null);
-    const { results } = useInstantSearch();
+    const { results, status } = useInstantSearch();
     const { refine } = useSearchBox();
-    const isSearching = !!searchText;
+    const [
+      algoliaSearchStableStatus,
+      setAlgoliaSearchStableStatus,
+    ] = React.useState<'error' | 'ok'>('ok');
 
+    React.useEffect(
+      () => {
+        if (algoliaSearchStableStatus === 'ok' && status === 'error') {
+          setAlgoliaSearchStableStatus('error');
+        } else if (algoliaSearchStableStatus === 'error' && status === 'idle') {
+          setAlgoliaSearchStableStatus('ok');
+        }
+      },
+      [status, algoliaSearchStableStatus]
+    );
+    const shouldHideAlgoliaSearchResults =
+      !searchText || algoliaSearchStableStatus === 'error';
     /**
      * Takes a command and if simple command, executes handler.
      * If command with options, opens options of the palette.
@@ -130,7 +145,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
           .filter(command => !commandsList[command.name].ghost)
           // $FlowFixMe[incompatible-type]
           .map(command => ({ ...command, icon: <Command /> }));
-        if (!isSearching) return namedCommands;
+        if (shouldHideAlgoliaSearchResults) return namedCommands;
 
         const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
           (hit: AlgoliaSearchHit) => {
@@ -142,7 +157,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
         );
         return namedCommands.concat(algoliaCommands);
       },
-      [commandManager, results.hits, isSearching]
+      [commandManager, results.hits, shouldHideAlgoliaSearchResults]
     );
 
     return (

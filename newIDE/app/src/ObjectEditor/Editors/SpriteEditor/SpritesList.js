@@ -154,8 +154,10 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   };
 };
 
-const removeExtensionFromFileName = fileName =>
-  fileName.substring(0, fileName.lastIndexOf('.'));
+const removeExtensionFromFileName = fileName => {
+  const dotIndex = fileName.lastIndexOf('.');
+  return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
+};
 
 type Props = {|
   direction: gdDirection,

@@ -18,6 +18,7 @@ import {
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
 import Add from '@material-ui/icons/Add';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   project: gdProject,
@@ -37,6 +38,7 @@ export default function ExtensionsSearchDialog({
   onExtensionInstalled,
   onCreateNew,
 }: Props) {
+  const windowWidth = useResponsiveWindowWidth();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -112,7 +114,13 @@ export default function ExtensionsSearchDialog({
               <FlatButton
                 leftIcon={<CloudDownload />}
                 key="import"
-                label={<Trans>Import extension</Trans>}
+                label={
+                  windowWidth === 'small' ? (
+                    <Trans>Import</Trans>
+                  ) : (
+                    <Trans>Import extension</Trans>
+                  )
+                }
                 onClick={() => {
                   installOrImportExtension(i18n);
                 }}
@@ -123,7 +131,13 @@ export default function ExtensionsSearchDialog({
               <FlatButton
                 key="create-new"
                 onClick={onCreateNew}
-                label={<Trans>Create a new extension</Trans>}
+                label={
+                  windowWidth === 'small' ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create a new extension</Trans>
+                  )
+                }
                 leftIcon={<Add />}
               />
             ) : null,

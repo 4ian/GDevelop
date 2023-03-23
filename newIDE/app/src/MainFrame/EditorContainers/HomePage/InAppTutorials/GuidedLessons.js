@@ -32,6 +32,7 @@ import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserConte
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
 import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
+import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -175,9 +176,13 @@ const GuidedLessons = ({ selectInAppTutorial }: Props) => {
           <ColumnStackLayout noMargin>
             <Column>
               <LineStackLayout alignItems="center">
-                <Text displayInlineAsSpan noMargin size="body2">
-                  {lessonsProgress}%
-                </Text>
+                {lessonsProgress !== 100 ? (
+                  <Text displayInlineAsSpan noMargin size="body2">
+                    {lessonsProgress}%
+                  </Text>
+                ) : (
+                  <Trophy />
+                )}
                 <ColoredLinearProgress value={lessonsProgress} />
               </LineStackLayout>
             </Column>

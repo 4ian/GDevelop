@@ -8,7 +8,7 @@ import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';

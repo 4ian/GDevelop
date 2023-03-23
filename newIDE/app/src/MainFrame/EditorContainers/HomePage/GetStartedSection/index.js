@@ -30,9 +30,7 @@ import Podium from '../InAppTutorials/Icons/Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
-import optionalRequire from '../../../../Utils/OptionalRequire';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
-const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 

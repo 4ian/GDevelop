@@ -25,7 +25,6 @@ import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/Announcemen
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import RouterContext from '../../RouterContext';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   project: ?gdProject,
@@ -107,7 +106,6 @@ export const HomePage = React.memo<Props>(
         values: { showGetStartedSection },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
-      const windowWidth = useResponsiveWindowWidth();
       const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
 
       // Load everything when the user opens the home page, to avoid future loading times.

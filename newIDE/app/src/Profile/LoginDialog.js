@@ -19,10 +19,10 @@ import HelpButton from '../UI/HelpButton';
 import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   formContainer: {
-    width: '60%',
     marginTop: 20,
   },
 };
@@ -44,6 +44,7 @@ const LoginDialog = ({
   loginInProgress,
   error,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [
@@ -122,7 +123,12 @@ const LoginDialog = ({
             </Text>
           </Link>
         </Column>
-        <div style={styles.formContainer}>
+        <div
+          style={{
+            ...styles.formContainer,
+            width: windowWidth === 'small' ? '100%' : '60%',
+          }}
+        >
           <form
             onSubmit={event => {
               // Prevent browser to navigate on form submission.

@@ -2209,6 +2209,7 @@ const MainFrame = (props: Props) => {
           );
           if (
             currentlyRunningInAppTutorial &&
+            !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
             inAppTutorialOrchestratorRef.current
           ) {
             preferences.saveTutorialProgress({
@@ -2351,8 +2352,10 @@ const MainFrame = (props: Props) => {
       } else {
         doEndTutorial();
       }
+      // Open the homepage, so that the user can start a new tutorial.
+      openHomePage();
     },
-    [doEndTutorial, closeProject]
+    [doEndTutorial, closeProject, openHomePage]
   );
 
   const selectInAppTutorial = React.useCallback(
@@ -2651,22 +2654,28 @@ const MainFrame = (props: Props) => {
     async (scenario: 'resume' | 'startOver' | 'start') => {
       if (!selectedInAppTutorialInfo) return;
       const { userProgress, tutorialId } = selectedInAppTutorialInfo;
-      if (userProgress && scenario === 'resume') {
+      const fileMetadataAndStorageProviderName = userProgress
+        ? userProgress.fileMetadataAndStorageProviderName
+        : null;
+      if (
+        userProgress &&
+        scenario === 'resume' &&
+        fileMetadataAndStorageProviderName // The user can only resume if the project was saved to a storage provider.
+      ) {
         if (currentProject) {
           // If there's a project opened, check if this is the one we should open
           // for the stored tutorial userProgress.
           if (
             currentFileMetadata &&
             currentFileMetadata.fileIdentifier !==
-              userProgress.fileMetadataAndStorageProviderName.fileMetadata
-                .fileIdentifier
+              fileMetadataAndStorageProviderName.fileMetadata.fileIdentifier
           ) {
             const projectIsClosed = await askToCloseProject();
             if (!projectIsClosed) {
               return;
             }
             openFromFileMetadataWithStorageProvider(
-              userProgress.fileMetadataAndStorageProviderName,
+              fileMetadataAndStorageProviderName,
               { openAllScenes: true }
             );
           } else {
@@ -2676,7 +2685,7 @@ const MainFrame = (props: Props) => {
           }
         } else {
           openFromFileMetadataWithStorageProvider(
-            userProgress.fileMetadataAndStorageProviderName,
+            fileMetadataAndStorageProviderName,
             { openAllScenes: true }
           );
         }
@@ -2900,6 +2909,7 @@ const MainFrame = (props: Props) => {
             state.currentProject ? state.currentProject.getName() : 'No project'
           }
           onClose={toggleProjectManager}
+          id="project-manager-drawer"
         />
         {currentProject && (
           <ProjectManager

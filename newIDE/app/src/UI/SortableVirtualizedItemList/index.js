@@ -12,6 +12,8 @@ import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../../UI/DragAndDrop/CustomDragLayer';
 
+const OVERSCAN_CELLS_COUNT = 20;
+
 type Props<Item> = {|
   height: number,
   width: number,
@@ -136,6 +138,24 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
             {screenType => (
               <List
                 ref={list => (this._list = list)}
+                // We override this function to avoid a bug in react-virtualized
+                // where the overscanCellsCount is not taken into account after a scroll
+                // see https://github.com/bvaughn/react-virtualized/issues/1582#issuecomment-785073746
+                overscanIndicesGetter={({
+                  cellCount,
+                  overscanCellsCount,
+                  startIndex,
+                  stopIndex,
+                }) => ({
+                  overscanStartIndex: Math.max(
+                    0,
+                    startIndex - OVERSCAN_CELLS_COUNT
+                  ),
+                  overscanStopIndex: Math.min(
+                    cellCount - 1,
+                    stopIndex + OVERSCAN_CELLS_COUNT
+                  ),
+                })}
                 height={height}
                 rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
                 rowHeight={

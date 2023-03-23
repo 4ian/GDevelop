@@ -123,7 +123,13 @@ const InAppTutorialPhaseCard = ({
                   <Line noMargin justifyContent="center">
                     <Chip
                       size="small"
-                      label={<Trans>{durationInMinutes} minutes</Trans>}
+                      label={
+                        durationInMinutes === 1 ? (
+                          <Trans>1 minute</Trans>
+                        ) : (
+                          <Trans>{durationInMinutes} minutes</Trans>
+                        )
+                      }
                     />
                   </Line>
                 ) : (

@@ -149,17 +149,13 @@ const Physics2Editor = (props: Props) => {
             <SelectOption
               key={'dynamic'}
               value={'Dynamic'}
-              primaryText={t`Dynamic`}
+              label={t`Dynamic`}
             />,
-            <SelectOption
-              key={'static'}
-              value={'Static'}
-              primaryText={t`Static`}
-            />,
+            <SelectOption key={'static'} value={'Static'} label={t`Static`} />,
             <SelectOption
               key={'kinematic'}
               value={'Kinematic'}
-              primaryText={t`Kinematic`}
+              label={t`Kinematic`}
             />,
           ]}
         </SelectField>
@@ -211,18 +207,10 @@ const Physics2Editor = (props: Props) => {
             updateBehaviorProperty('shape', newValue)
           }
         >
-          <SelectOption key={'box'} value={'Box'} primaryText={t`Box`} />
-          <SelectOption
-            key={'circle'}
-            value={'Circle'}
-            primaryText={t`Circle`}
-          />
-          <SelectOption key={'edge'} value={'Edge'} primaryText={t`Edge`} />
-          <SelectOption
-            key={'polygon'}
-            value={'Polygon'}
-            primaryText={t`Polygon`}
-          />
+          <SelectOption key={'box'} value={'Box'} label={t`Box`} />
+          <SelectOption key={'circle'} value={'Circle'} label={t`Circle`} />
+          <SelectOption key={'edge'} value={'Edge'} label={t`Edge`} />
+          <SelectOption key={'polygon'} value={'Polygon'} label={t`Polygon`} />
         </SelectField>
       </Line>
       <ResponsiveLineStackLayout>
@@ -277,17 +265,17 @@ const Physics2Editor = (props: Props) => {
               <SelectOption
                 key={'center'}
                 value={'Center'}
-                primaryText={t`Center`}
+                label={t`Center`}
               />,
               <SelectOption
                 key={'origin'}
                 value={'Origin'}
-                primaryText={t`Origin`}
+                label={t`Origin`}
               />,
               <SelectOption
                 key={'topLeft'}
                 value={'TopLeft'}
-                primaryText={t`Top-Left`}
+                label={t`Top-Left`}
               />,
             ]}
           </SelectField>

@@ -323,9 +323,7 @@ export default function EffectsList(props: Props) {
                                               <SelectOption
                                                 key={effectMetadata.type}
                                                 value={effectMetadata.type}
-                                                primaryText={
-                                                  effectMetadata.fullName
-                                                }
+                                                label={effectMetadata.fullName}
                                                 disabled={
                                                   props.target === 'object' &&
                                                   effectMetadata.isMarkedAsNotWorkingForObjects

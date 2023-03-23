@@ -30,27 +30,23 @@ const getOptions = () => {
     options = [
       <SelectOption
         key="string"
-        primaryText={t`String`}
+        label={t`String`}
         value={gd.Variable.String}
       />,
       <SelectOption
         key="number"
-        primaryText={t`Number`}
+        label={t`Number`}
         value={gd.Variable.Number}
       />,
       <SelectOption
         key="boolean"
-        primaryText={t`Boolean`}
+        label={t`Boolean`}
         value={gd.Variable.Boolean}
       />,
-      <SelectOption
-        key="array"
-        primaryText={t`Array`}
-        value={gd.Variable.Array}
-      />,
+      <SelectOption key="array" label={t`Array`} value={gd.Variable.Array} />,
       <SelectOption
         key="structure"
-        primaryText={t`Structure`}
+        label={t`Structure`}
         value={gd.Variable.Structure}
       />,
     ];

@@ -157,11 +157,8 @@ export const ExtensionDependenciesEditor = ({
                         }}
                         margin="none"
                       >
-                        <SelectOption value="npm" primaryText={t`NPM`} />
-                        <SelectOption
-                          value="cordova"
-                          primaryText={t`Cordova`}
-                        />
+                        <SelectOption value="npm" label={t`NPM`} />
+                        <SelectOption value="cordova" label={t`Cordova`} />
                       </SelectField>
                     </TableRowColumn>
                     <TableRowColumn>

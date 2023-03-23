@@ -66,7 +66,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <SelectOption
             key={operator}
             value={operator}
-            primaryText={operatorLabels[operator]}
+            label={operatorLabels[operator]}
           />
         ))}
       </SelectField>

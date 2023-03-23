@@ -62,8 +62,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <SelectOption
         key={layoutName}
         value={`"${layoutName}"`}
-        primaryText={layoutName}
-        primaryTextIsUserDefined
+        label={layoutName}
+        shouldNotTranslate
       />
     ));
 

@@ -850,17 +850,17 @@ export const LeaderboardAdmin = ({
           <SelectOption
             key={'free'}
             value={'FREE'}
-            primaryText={i18n._(t`Let the user select`)}
+            label={t`Let the user select`}
           />
           <SelectOption
             key={'prefer-unique'}
             value={'PREFER_UNIQUE'}
-            primaryText={i18n._(t`Only best entry`)}
+            label={t`Only best entry`}
           />
           <SelectOption
             key={'prefer-non-unique'}
             value={'PREFER_NON_UNIQUE'}
-            primaryText={i18n._(t`All entries`)}
+            label={t`All entries`}
           />
         </SelectField>
       ),
@@ -920,12 +920,12 @@ export const LeaderboardAdmin = ({
                             <SelectOption
                               key={leaderboard.id}
                               value={leaderboard.id}
-                              primaryText={
+                              label={
                                 leaderboard.primary
                                   ? t`${leaderboard.name} (default)`
                                   : leaderboard.name
                               }
-                              primaryTextIsUserDefined={!leaderboard.primary}
+                              shouldNotTranslate={!leaderboard.primary}
                             />
                           ))}
                         </SelectField>

@@ -57,15 +57,12 @@ export default class ParticleEmitterEditor extends React.Component<
         >
           <SelectOption
             value={gd.ParticleEmitterObject.Point}
-            primaryText={t`Circle`}
+            label={t`Circle`}
           />
-          <SelectOption
-            value={gd.ParticleEmitterObject.Line}
-            primaryText={t`Line`}
-          />
+          <SelectOption value={gd.ParticleEmitterObject.Line} label={t`Line`} />
           <SelectOption
             value={gd.ParticleEmitterObject.Quad}
-            primaryText={t`Image`}
+            label={t`Image`}
           />
         </SelectField>
         {particleEmitterConfiguration.getRendererType() ===

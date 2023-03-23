@@ -250,15 +250,15 @@ export function PublicGameProperties({
                   {profile && profile.username && (
                     <SelectOption
                       value={profile.username}
-                      primaryText={profile.username}
-                      primaryTextIsUserDefined
+                      label={profile.username}
+                      shouldNotTranslate
                     />
                   )}
                   {userSlug && (!profile || userSlug !== profile.username) && (
                     <SelectOption
                       value={userSlug}
-                      primaryText={userSlug}
-                      primaryTextIsUserDefined
+                      label={userSlug}
+                      shouldNotTranslate
                     />
                   )}
                 </SelectField>
@@ -330,9 +330,9 @@ export function PublicGameProperties({
             onChange={(e, i, value: string) => setOrientation(value)}
             disabled={disabled}
           >
-            <SelectOption value="default" primaryText={t`Platform default`} />
-            <SelectOption value="landscape" primaryText={t`Landscape`} />
-            <SelectOption value="portrait" primaryText={t`Portrait`} />
+            <SelectOption value="default" label={t`Platform default`} />
+            <SelectOption value="landscape" label={t`Landscape`} />
+            <SelectOption value="portrait" label={t`Portrait`} />
           </SelectField>
           {setPlayableWithKeyboard &&
             setPlayableWithGamepad &&

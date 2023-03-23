@@ -458,8 +458,8 @@ const PropertiesEditor = ({
           <SelectOption
             key={value}
             value={value}
-            primaryText={label}
-            primaryTextIsUserDefined={labelIsUserDefined}
+            label={label}
+            shouldNotTranslate={labelIsUserDefined}
           />
         ));
 

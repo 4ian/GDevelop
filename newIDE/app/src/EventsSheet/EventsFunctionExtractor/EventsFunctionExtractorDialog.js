@@ -204,7 +204,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                   <SelectOption
                     key={eventsFunctionsExtension.getName()}
                     value={eventsFunctionsExtension.getName()}
-                    primaryText={
+                    label={
                       eventsFunctionsExtension.getFullName() ||
                       eventsFunctionsExtension.getName()
                     }
@@ -212,7 +212,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                 ))}
                 <SelectOption
                   value={CREATE_NEW_EXTENSION_PLACEHOLDER}
-                  primaryText={t`<Create a New Extension>`}
+                  label={t`<Create a New Extension>`}
                 />
               </SelectField>
               {createNewExtension ? (

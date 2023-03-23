@@ -7,7 +7,7 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { Line } from '../../../../UI/Grid';
+import { Column, Line } from '../../../../UI/Grid';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
@@ -19,6 +19,7 @@ import {
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
+  guidedLessonsIds,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 import MultiplierScore from './Icons/MultiplierScore';
 import Parallax from './Icons/Parallax';
@@ -26,6 +27,11 @@ import HealthBar from './Icons/HealthBar';
 import Joystick from './Icons/Joystick';
 import Timer from './Icons/Timer';
 import { useOnlineStatus } from '../../../../Utils/OnlineStatus';
+import PreferencesContext from '../../../Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
+import Text from '../../../../UI/Text';
+import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
@@ -60,16 +66,37 @@ type Props = {|
   selectInAppTutorial: (tutorialId: string) => void,
 |};
 
-const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
+const GuidedLessons = ({ selectInAppTutorial }: Props) => {
   const isOnline = useOnlineStatus();
   const {
     inAppTutorialShortHeaders,
     inAppTutorialsFetchingError,
     fetchInAppTutorials,
   } = React.useContext(InAppTutorialContext);
+  const { getTutorialProgress } = React.useContext(PreferencesContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
+  );
+
+  const getTutorialPartProgress = ({ tutorialId }: { tutorialId: string }) => {
+    const tutorialProgress = getTutorialProgress({
+      tutorialId,
+      userId: authenticatedUser.profile
+        ? authenticatedUser.profile.id
+        : undefined,
+    });
+    if (!tutorialProgress || !tutorialProgress.progress) return 0;
+    return tutorialProgress.progress[0]; // guided lessons only have one part.
+  };
+
+  const lessonsCompleted = guidedLessonsIds.reduce((acc, tutorialId) => {
+    const tutorialProgress = getTutorialPartProgress({ tutorialId }) || 0;
+    return tutorialProgress === 100 ? acc + 1 : acc;
+  }, 0);
+  const lessonsProgress = Math.round(
+    (lessonsCompleted / guidedLessonsIds.length) * 100
   );
 
   const guidedLessonCards = [
@@ -145,33 +172,43 @@ const MiniInAppTutorials = ({ selectInAppTutorial }: Props) => {
         ) : inAppTutorialShortHeaders === null ? (
           <PlaceholderLoader />
         ) : (
-          <GridList
-            cols={getColumnsFromWidth(windowWidth)}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={ITEMS_SPACING * 2}
-          >
-            {guidedLessonCards.map(item => (
-              <GridListTile key={item.id}>
-                <InAppTutorialPhaseCard
-                  title={item.title}
-                  description={item.description}
-                  durationInMinutes={item.durationInMinutes}
-                  keyPoints={item.keyPoints}
-                  renderImage={item.renderImage}
-                  progress={0} // Alway start a mini tutorial from the beginning.
-                  onClick={() => selectInAppTutorial(item.id)}
-                  // Phase is disabled if there's a running tutorial or if offline,
-                  // because we cannot fetch the tutorial.
-                  disabled={!!currentlyRunningInAppTutorial || !isOnline}
-                />
-              </GridListTile>
-            ))}
-          </GridList>
+          <ColumnStackLayout noMargin>
+            <Column>
+              <LineStackLayout alignItems="center">
+                <Text displayInlineAsSpan noMargin size="body2">
+                  {lessonsProgress}%
+                </Text>
+                <ColoredLinearProgress value={lessonsProgress} />
+              </LineStackLayout>
+            </Column>
+            <GridList
+              cols={getColumnsFromWidth(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={ITEMS_SPACING * 2}
+            >
+              {guidedLessonCards.map((item, index) => (
+                <GridListTile key={item.id}>
+                  <InAppTutorialPhaseCard
+                    title={item.title}
+                    description={item.description}
+                    durationInMinutes={item.durationInMinutes}
+                    keyPoints={item.keyPoints}
+                    renderImage={item.renderImage}
+                    progress={getTutorialPartProgress({ tutorialId: item.id })}
+                    onClick={() => selectInAppTutorial(item.id)}
+                    // Phase is disabled if there's a running tutorial or if offline,
+                    // because we cannot fetch the tutorial.
+                    disabled={!!currentlyRunningInAppTutorial || !isOnline}
+                  />
+                </GridListTile>
+              ))}
+            </GridList>
+          </ColumnStackLayout>
         )}
       </div>
     </Line>
   );
 };
 
-export default MiniInAppTutorials;
+export default GuidedLessons;

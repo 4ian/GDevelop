@@ -7,7 +7,7 @@ import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
 } from '../../../ProjectsStorage';
-import GetStartedSection, { canShowInAppTutorials } from './GetStartedSection';
+import GetStartedSection from './GetStartedSection';
 import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
@@ -202,9 +202,7 @@ export const HomePage = React.memo<Props>(
       );
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(
-        showGetStartedSection && canShowInAppTutorials(windowWidth)
-          ? 'get-started'
-          : 'build'
+        showGetStartedSection ? 'get-started' : 'build'
       );
 
       return (

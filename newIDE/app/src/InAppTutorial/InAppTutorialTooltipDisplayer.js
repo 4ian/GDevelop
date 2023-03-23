@@ -8,7 +8,7 @@ import Fade from '@material-ui/core/Fade';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
-import { Column, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
 import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
@@ -20,6 +20,7 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -135,8 +136,9 @@ const TooltipBody = ({
   buttonLabel,
   goToNextStep,
 }: TooltipBodyProps) => {
-  return (
-    <>
+  const screenWidth = useResponsiveWindowWidth();
+  const titleAndDescription = (
+    <Column noMargin>
       {tooltip.title && (
         <Typography style={styles.title} variant="subtitle1" translate="no">
           <MarkdownText source={tooltip.title} allowParagraphs />
@@ -148,23 +150,44 @@ const TooltipBody = ({
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}
-      {tooltip.image && (
-        <img
-          src={tooltip.image.dataUrl}
-          alt="Tutorial helper"
-          style={{
-            ...styles.descriptionImage,
-            width: tooltip.image.width || '100%',
-          }}
-        />
-      )}
-      {buttonLabel && (
-        <>
-          {tooltip.image ? <Spacer /> : null}
-          <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
-        </>
-      )}
-    </>
+    </Column>
+  );
+  const image = tooltip.image && (
+    <img
+      src={tooltip.image.dataUrl}
+      alt="Tutorial helper"
+      style={{
+        ...styles.descriptionImage,
+        width: tooltip.image.width || '100%',
+        maxWidth: screenWidth === 'small' ? 150 : '100%',
+        maxHeight: screenWidth === 'small' ? 150 : '100%',
+      }}
+    />
+  );
+  const button = buttonLabel && (
+    <Column noMargin expand>
+      {tooltip.image ? <Spacer /> : null}
+      <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
+    </Column>
+  );
+  const imageAndButton =
+    screenWidth === 'small' ? (
+      <LineStackLayout noMargin alignItems="center">
+        {image}
+        {button}
+      </LineStackLayout>
+    ) : (
+      <Column noMargin alignItems="center">
+        {image}
+        {button}
+      </Column>
+    );
+
+  return (
+    <Column noMargin>
+      {titleAndDescription}
+      {imageAndButton}
+    </Column>
   );
 };
 
@@ -276,6 +299,7 @@ const InAppTutorialTooltipDisplayer = ({
   endTutorial,
   goToNextStep,
 }: Props) => {
+  const screenWidth = useResponsiveWindowWidth();
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -333,13 +357,20 @@ const InAppTutorialTooltipDisplayer = ({
         }}
         style={{
           zIndex: getDisplayZIndexForHighlighter(anchorElement),
-          maxWidth: 300,
+          maxWidth: 'min(90%, 300px)',
+          width: screenWidth === 'small' ? '100%' : undefined,
         }}
       >
         {({ TransitionProps }) => (
           <>
             <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
-              <Paper style={{ ...styles.paper, backgroundColor }} elevation={4}>
+              <Paper
+                style={{
+                  ...styles.paper,
+                  backgroundColor,
+                }}
+                elevation={4}
+              >
                 <Column noMargin>
                   <TooltipHeader
                     paletteType={paletteType}

@@ -14,6 +14,7 @@ const appBarHeight = 32;
 type Props = {|
   title: React.Node,
   onClose: () => void,
+  id: string,
 |};
 
 const styles = {
@@ -62,6 +63,7 @@ const DrawerTopBar = (props: Props) => {
             edge="end"
             color="inherit"
             size="small"
+            id={`${props.id}-close`}
           >
             <Close />
           </IconButton>

@@ -51,7 +51,7 @@ export type InAppTutorialUserProgress = {|
   step: number,
   /** Rounded progress in percentage */
   progress: Array<number>,
-  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+  fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
   projectData: {| [key: string]: string |},
 |};
 

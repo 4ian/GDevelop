@@ -16,6 +16,7 @@ import {
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
+  isMiniTutorial,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const styles = {
@@ -32,22 +33,6 @@ type Props = {|
   isProjectOpened?: boolean,
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
-
-const fullTutorialContent = (
-  <>
-    <Text>
-      <Trans>
-        You're about to start the first chapter of this guided lesson.
-      </Trans>
-    </Text>
-    <Text>
-      <Trans>
-        GDevelop will save your progress so you can take a break when you need
-        it.
-      </Trans>
-    </Text>
-  </>
-);
 
 const getGuidedLessonContent = ({
   learningKeys,
@@ -78,7 +63,21 @@ const getGuidedLessonContent = ({
 const titleAndContentByKey = {
   [FLING_GAME_IN_APP_TUTORIAL_ID]: {
     title: <Trans>Let's make a Fling Game</Trans>,
-    content: fullTutorialContent,
+    content: (
+      <>
+        <Text>
+          <Trans>
+            You're about to start the first chapter of this guided lesson.
+          </Trans>
+        </Text>
+        <Text>
+          <Trans>
+            GDevelop will save your progress so you can take a break when you
+            need it.
+          </Trans>
+        </Text>
+      </>
+    ),
   },
   [PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID]: {
     title: <Trans>Let's improve a scoring system</Trans>,
@@ -221,7 +220,10 @@ const StartInAppTutorialDialog = ({
   };
 
   const dialogContent =
-    dialogContentByCompletionStatus[tutorialCompletionStatus];
+    dialogContentByCompletionStatus[
+      // Always show the "not started" dialog for the mini tutorials.
+      isMiniTutorial(tutorialId) ? 'notStarted' : tutorialCompletionStatus
+    ];
   const {
     title,
     content,

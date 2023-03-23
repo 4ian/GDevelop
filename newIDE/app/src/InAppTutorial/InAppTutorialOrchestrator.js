@@ -23,6 +23,9 @@ import {
   getMuiCheckboxValue,
   isMuiCheckbox,
 } from '../UI/MaterialUISpecificUtil';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 const textInterpolationProjectDataAccessors = {
   instancesCount: 'instancesCount:',
@@ -414,6 +417,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
       shouldWatchProjectChanges,
       setShouldWatchProjectChanges,
     ] = React.useState<boolean>(false);
+    const preferences = React.useContext(PreferencesContext);
+    const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
     const { flow, endDialog, editorSwitches, id: tutorialId } = tutorial;
     const stepCount = flow.length;
@@ -841,6 +846,8 @@ const InAppTutorialOrchestrator = React.forwardRef<
       [tutorial.id]
     );
 
+    const isTouchScreen = useScreenType() === 'touch';
+
     const renderStepDisplayer = (i18n: I18nType) => {
       if (!currentStep) return null;
       const stepTooltip = currentStep.tooltip;
@@ -853,7 +860,10 @@ const InAppTutorialOrchestrator = React.forwardRef<
           project,
         });
         const description = translateAndInterpolateText({
-          text: stepTooltip.description,
+          text:
+            isTouchScreen && stepTooltip.touchDescription
+              ? stepTooltip.touchDescription
+              : stepTooltip.description,
           data,
           i18n,
           project,
@@ -961,6 +971,17 @@ const InAppTutorialOrchestrator = React.forwardRef<
                 dialogContent={endDialog}
                 endTutorial={() => {
                   setDisplayEndDialog(false);
+                  if (isRunningMiniTutorial) {
+                    // If running a mini tutorial, we save the progress to indicate that the user has finished this lesson.
+                    preferences.saveTutorialProgress({
+                      tutorialId: tutorial.id,
+                      userId: authenticatedUser.profile
+                        ? authenticatedUser.profile.id
+                        : undefined,
+                      ...getProgress(),
+                      // We do not specify a storage provider, as we don't need to reload the project.
+                    });
+                  }
                   endTutorial({
                     shouldCloseProject: false,
                     shouldWarnAboutUnsavedChanges: !isRunningMiniTutorial,

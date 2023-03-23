@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
@@ -11,6 +11,9 @@ import {
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import Text from '../../UI/Text';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -132,6 +135,39 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout alignItems="center" noMargin>
+          <Text>
+            <Trans>Anti-aliasing:</Trans>
+          </Text>
+          <SelectField
+            value={shapePainterConfiguration.getAntialiasing()}
+            onChange={(e, i, valueString: string) => {
+              shapePainterConfiguration.setAntialiasing(valueString);
+              this.forceUpdate();
+            }}
+          >
+            <SelectOption
+              key="none"
+              value="None"
+              primaryText={t`No anti-aliasing`}
+            />
+            <SelectOption
+              key="low"
+              value="Low"
+              primaryText={t`Low quality anti-aliasing`}
+            />
+            <SelectOption
+              key="medium"
+              value="Medium"
+              primaryText={t`Medium quality anti-aliasing`}
+            />
+            <SelectOption
+              key="high"
+              value="High"
+              primaryText={t`High quality anti-aliasing`}
+            />
+          </SelectField>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     );

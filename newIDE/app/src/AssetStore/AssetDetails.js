@@ -466,6 +466,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                               makeFirstLetterUppercase(animation.name) ||
                               t`Default` // Display default for animations with no name.
                             }
+                            primaryTextIsUserDefined={!!animation.name}
                           />
                         ))}
                       </SelectField>

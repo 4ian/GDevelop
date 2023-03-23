@@ -61,7 +61,7 @@ export const TextFieldWithButtonLayout = ({
   renderButton,
 }: TextFieldWithButtonLayoutProps) => {
   return (
-    <div style={textFieldWithButtonLayoutStyles.container}>
+    <ResponsiveLineStackLayout alignItems="flex-start" expand noMargin>
       {renderTextField()}
       {renderButton(
         margin === 'none'
@@ -72,7 +72,7 @@ export const TextFieldWithButtonLayout = ({
           ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
           : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
       )}
-    </div>
+    </ResponsiveLineStackLayout>
   );
 };
 

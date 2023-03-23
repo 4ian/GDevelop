@@ -251,10 +251,15 @@ export function PublicGameProperties({
                     <SelectOption
                       value={profile.username}
                       primaryText={profile.username}
+                      primaryTextIsUserDefined
                     />
                   )}
                   {userSlug && (!profile || userSlug !== profile.username) && (
-                    <SelectOption value={userSlug} primaryText={userSlug} />
+                    <SelectOption
+                      value={userSlug}
+                      primaryText={userSlug}
+                      primaryTextIsUserDefined
+                    />
                   )}
                 </SelectField>
                 <Spacer />

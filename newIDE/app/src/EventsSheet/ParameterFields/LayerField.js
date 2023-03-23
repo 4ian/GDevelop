@@ -73,6 +73,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         key={layerName === '' ? 'Base layer' : layerName}
         value={layerName === '' ? '' : `"${layerName}"`}
         primaryText={layerName === '' ? t`Base layer` : layerName}
+        primaryTextIsUserDefined={layerName !== ''}
       />
     ));
 

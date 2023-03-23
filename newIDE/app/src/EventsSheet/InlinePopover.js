@@ -12,6 +12,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { doesPathContainDialog } from '../UI/MaterialUISpecificUtil';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   popover: {
@@ -24,8 +25,6 @@ const styles = {
     // Restrict size in case of extra small or large popover (though this should not happen)
     minHeight: 30,
     maxHeight: 400,
-    maxWidth: 600,
-    minWidth: 300, // Avoid extra small popover for some parameters like relational operator
 
     // When displayed in an events sheet that has Mosaic windows (see `EditorMosaic`) next to it,
     // it could be displayed behind them, because they have a z-index of 1, and 4 for the window titles :/
@@ -51,6 +50,7 @@ type Props = {|
 export default function InlinePopover(props: Props) {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
+  const windowWidth = useResponsiveWindowWidth();
 
   return (
     <ClickAwayListener
@@ -89,7 +89,14 @@ export default function InlinePopover(props: Props) {
       <Popper
         open={props.open}
         anchorEl={props.anchorEl}
-        style={styles.popover}
+        style={{
+          ...styles.popover,
+          // On mobile, make it take full screen width, but not too much for large mobile phones.
+          // On desktop, make it take a min width, to ensure most fields with translations are well displayed.
+          width: windowWidth === 'small' ? '100%' : 'auto',
+          minWidth: windowWidth === 'small' ? 'auto' : 320,
+          maxWidth: windowWidth === 'small' ? 320 : 600,
+        }}
         placement="bottom-start"
         onKeyDown={event => {
           // Much like a dialog, offer a way to close the popover

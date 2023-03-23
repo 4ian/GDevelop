@@ -103,6 +103,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                     ? `(${shortenUuidForDisplay(leaderboard.id)})`
                     : ''
                 }`}
+                primaryTextIsUserDefined
               />
             ))
           : [

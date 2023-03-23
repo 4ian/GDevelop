@@ -925,6 +925,7 @@ export const LeaderboardAdmin = ({
                                   ? t`${leaderboard.name} (default)`
                                   : leaderboard.name
                               }
+                              primaryTextIsUserDefined={!leaderboard.primary}
                             />
                           ))}
                         </SelectField>

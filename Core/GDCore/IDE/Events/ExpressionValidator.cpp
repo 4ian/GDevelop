@@ -90,8 +90,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   }
 
   if (!function.behaviorName.empty() &&
-      globalObjectsContainer.HasObjectNamed(function.objectName) &&
-      gd::HasBehaviorInObjectOrGroup(globalObjectsContainer, objectsContainer,
+      !gd::HasBehaviorInObjectOrGroup(globalObjectsContainer, objectsContainer,
                                      function.objectName,
                                      function.behaviorName)) {
     RaiseTypeError(_("This behavior is not attached to this object."),

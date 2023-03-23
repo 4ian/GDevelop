@@ -512,8 +512,6 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::String &objectOrGroupName,
                                             const gd::String &behaviorName,
                                             bool searchInGroups) {
-  gd::String type;
-
   // Search in objects
   if (layout.HasObjectNamed(objectOrGroupName)) {
     return layout.GetObject(objectOrGroupName).HasBehaviorNamed(behaviorName);

@@ -20,8 +20,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
+
   auto &myObject = layout1.InsertNewObject(project, "BuiltinObject", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+  auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
+  myGroup.AddObject(myObject.GetName());
+  
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   layout1.InsertNewObject(project,
                           "MyExtension::FakeObjectWithUnsupportedCapability",
@@ -749,7 +754,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Numbers and texts mismatchs") {
+  SECTION("Numbers and texts mismatches") {
     {
       auto node = parser.ParseExpression("123 + \"hello world\"");
       REQUIRE(node != nullptr);
@@ -775,7 +780,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
     }
   }
-  SECTION("Numbers and texts mismatchs ('number|string' type)") {
+  SECTION("Numbers and texts mismatches ('number|string' type)") {
     {
       auto node =
           parser.ParseExpression("123 + \"hello world\"");
@@ -803,7 +808,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
     }
   }
-  SECTION("Numbers and texts mismatchs with parenthesis") {
+  SECTION("Numbers and texts mismatches with parenthesis") {
     {
       auto node =
           parser.ParseExpression("((123)) + (\"hello world\")");
@@ -959,14 +964,44 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    SECTION("behavior function call") {
-      auto node = parser.ParseExpression(
-          "WhateverObject.WhateverBehavior::WhateverFunction()");
+    SECTION("object function call on group") {
+      auto node =
+          parser.ParseExpression("MyGroup.GetFromBaseExpression()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
-      REQUIRE(functionNode.functionName == "WhateverFunction");
-      REQUIRE(functionNode.objectName == "WhateverObject");
-      REQUIRE(functionNode.behaviorName == "WhateverBehavior");
+      REQUIRE(functionNode.functionName == "GetFromBaseExpression");
+      REQUIRE(functionNode.objectName == "MyGroup");
+      REQUIRE(functionNode.behaviorName == "");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+    SECTION("behavior function call") {
+      auto node = parser.ParseExpression(
+          "MyObject.MyBehavior::GetBehaviorNumberWith1Param(0)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "GetBehaviorNumberWith1Param");
+      REQUIRE(functionNode.objectName == "MyObject");
+      REQUIRE(functionNode.behaviorName == "MyBehavior");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+    SECTION("behavior function call on group") {
+      auto node = parser.ParseExpression(
+          "MyGroup.MyBehavior::GetBehaviorNumberWith1Param(0)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "GetBehaviorNumberWith1Param");
+      REQUIRE(functionNode.objectName == "MyGroup");
+      REQUIRE(functionNode.behaviorName == "MyBehavior");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     SECTION("identifier parameter") {
       auto node = parser.ParseExpression(

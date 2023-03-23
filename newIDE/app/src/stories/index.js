@@ -17,7 +17,6 @@ import HelpIcon from '../UI/HelpIcon';
 import AboutDialog from '../MainFrame/AboutDialog';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
-import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
@@ -119,11 +118,6 @@ import {
   makeFakeExpressionAutocompletions,
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
-import AutocompletePicker from '../CommandPalette/CommandPalette/AutocompletePicker';
-import {
-  type NamedCommand,
-  type CommandOption,
-} from '../CommandPalette/CommandManager';
 import HotReloadPreviewButton from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import ScrollView from '../UI/ScrollView';
@@ -1345,11 +1339,6 @@ storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
-
-storiesOf('HelpFinder', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)
@@ -2794,68 +2783,6 @@ storiesOf('ObjectTypeSelector', module)
       floatingLabelText="Choose the object type to use"
       onChange={action('change')}
     />
-  ));
-
-storiesOf('CommandPalette', module)
-  .addDecorator(muiDecorator)
-  .add('commands', () => (
-    <I18n>
-      {({ i18n }) => (
-        <AutocompletePicker
-          i18n={i18n}
-          items={
-            ([
-              {
-                name: 'OPEN_PROJECT',
-                handler: () => {},
-              },
-              {
-                name: 'OPEN_PROJECT_PROPERTIES',
-                handler: () => {},
-              },
-              {
-                name: 'EDIT_OBJECT',
-                handler: () => {},
-              },
-            ]: Array<NamedCommand>)
-          }
-          onClose={() => {}}
-          onSelect={action('Open command')}
-          placeholder="Start typing a command..."
-        />
-      )}
-    </I18n>
-  ))
-  .add('command options', () => (
-    <I18n>
-      {({ i18n }) => (
-        <AutocompletePicker
-          i18n={i18n}
-          items={
-            ([
-              {
-                text: 'Player',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-              {
-                text: 'Platform',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-              {
-                text: 'Enemy',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-            ]: Array<CommandOption>)
-          }
-          onClose={() => {}}
-          onSelect={action('Select command option')}
-          placeholder="Edit object..."
-        />
-      )}
-    </I18n>
   ));
 
 storiesOf('HotReloadPreviewButton', module)

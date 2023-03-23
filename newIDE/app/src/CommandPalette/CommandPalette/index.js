@@ -160,11 +160,15 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       [commandManager, results.hits, shouldHideAlgoliaSearchResults]
     );
 
+    const closeDialog = React.useCallback(() => {
+      setMode('closed');
+    }, []);
+
     return (
       <I18n>
         {({ i18n }) => (
           <Dialog
-            onClose={() => setMode('closed')}
+            onClose={closeDialog}
             aria-label="command-palette"
             open={mode !== 'closed'}
             fullWidth
@@ -181,7 +185,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 onInputChange={setSearchText}
                 items={allCommands}
                 placeholder={t`Start typing a command or searching something...`}
-                onClose={() => setMode('closed')}
+                onClose={closeDialog}
                 onSelect={handleCommandChoose}
               />
             )}
@@ -191,7 +195,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 i18n={i18n}
                 items={selectedCommand.generateOptions()}
                 placeholder={commandsList[selectedCommand.name]}
-                onClose={() => setMode('closed')}
+                onClose={closeDialog}
                 onSelect={handleOptionChoose}
               />
             )}

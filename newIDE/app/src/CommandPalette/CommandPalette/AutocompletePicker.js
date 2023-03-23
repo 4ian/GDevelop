@@ -123,7 +123,7 @@ const AutocompletePicker = (
   const classes = useStyles();
 
   const handleClose = (_, reason) => {
-    if (reason === 'select-option') return;
+    if (reason === 'select-option' || reason === 'toggleInput') return;
     props.onClose();
   };
 

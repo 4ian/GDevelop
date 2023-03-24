@@ -28,7 +28,7 @@ ShapePainterObjectBase::ShapePainterObjectBase()
       outlineOpacity(255),
       clearBetweenFrames(true),
       absoluteCoordinates(false),
-      antialiasing("None") {}
+      antialiasing("none") {}
 
 ShapePainterObject::ShapePainterObject() {}
 
@@ -67,7 +67,7 @@ void ShapePainterObjectBase::DoUnserializeFrom(
 
   antialiasing = element.HasChild("antialiasing")
                      ? element.GetChild("antialiasing").GetValue().GetString()
-                     : "None";
+                     : "none";
 }
 
 void ShapePainterObject::DoUnserializeFrom(

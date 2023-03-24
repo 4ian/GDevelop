@@ -28,6 +28,7 @@ import { Tabs } from '../UI/Tabs';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import Cross from '../UI/CustomSvgIcons/Cross';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -192,8 +193,14 @@ const SearchPanel = (
             <LineStackLayout alignItems="baseline" noMargin>
               <TextField
                 ref={searchTextField}
-                type="search"
                 margin="dense"
+                endAdornment={
+                  searchText ? (
+                    <IconButton onClick={() => setSearchText('')} edge="end">
+                      <Cross fontSize="small" />
+                    </IconButton>
+                  ) : null
+                }
                 translatableHintText={
                   isSearchAndReplaceTab()
                     ? t`Text to search in parameters`
@@ -237,8 +244,14 @@ const SearchPanel = (
             {isSearchAndReplaceTab() && (
               <LineStackLayout alignItems="baseline" noMargin>
                 <TextField
-                  type="search"
                   margin="dense"
+                  endAdornment={
+                    replaceText ? (
+                      <IconButton onClick={() => setReplaceText('')} edge="end">
+                        <Cross fontSize="small" />
+                      </IconButton>
+                    ) : null
+                  }
                   translatableHintText={t`Text to replace in parameters`}
                   onChange={(e, replaceText) => {
                     setReplaceText(replaceText);

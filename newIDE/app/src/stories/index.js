@@ -166,10 +166,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -185,10 +185,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
           floatingLabelText="This is a floating label"
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -203,10 +203,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />

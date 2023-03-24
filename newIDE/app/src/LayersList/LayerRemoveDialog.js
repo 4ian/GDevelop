@@ -89,8 +89,8 @@ export default class LayerRemoveDialog extends Component<Props, State> {
         <SelectOption
           key={value}
           value={value}
-          primaryText={label}
-          primaryTextIsUserDefined={labelIsUserDefined}
+          label={label}
+          shouldNotTranslate={labelIsUserDefined}
         />
       ));
 

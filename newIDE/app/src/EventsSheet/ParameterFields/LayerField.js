@@ -68,13 +68,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = layerNames.map(layerName => (
-      <SelectOption
-        key={layerName === '' ? 'Base layer' : layerName}
-        value={layerName === '' ? '' : `"${layerName}"`}
-        primaryText={layerName === '' ? t`Base layer` : layerName}
-      />
-    ));
+    const selectOptions = layerNames.map(layerName => {
+      const isBaseLayer = layerName === '';
+      return (
+        <SelectOption
+          key={isBaseLayer ? 'Base layer' : layerName}
+          value={isBaseLayer ? '' : `"${layerName}"`}
+          label={isBaseLayer ? t`Base layer` : layerName}
+          shouldNotTranslate={!isBaseLayer}
+        />
+      );
+    });
 
     return (
       <I18n>

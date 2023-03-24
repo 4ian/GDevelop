@@ -38,11 +38,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         ref={field}
         onChange={(e, i, value) => props.onChange(value)}
       >
-        <SelectOption value="Left" primaryText={t`Left (primary)`} />
-        <SelectOption value="Right" primaryText={t`Right (secondary)`} />
+        <SelectOption value="Left" label={t`Left (primary)`} />
+        <SelectOption value="Right" label={t`Right (secondary)`} />
         <SelectOption
           value="Middle"
-          primaryText={t`Middle (Auxiliary button, usually the wheel button)`}
+          label={t`Middle (Auxiliary button, usually the wheel button)`}
         />
       </SelectField>
     );

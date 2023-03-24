@@ -264,25 +264,19 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               }}
                               fullWidth
                             >
-                              <SelectOption
-                                value="Number"
-                                primaryText={t`Number`}
-                              />
-                              <SelectOption
-                                value="String"
-                                primaryText={t`String`}
-                              />
+                              <SelectOption value="Number" label={t`Number`} />
+                              <SelectOption value="String" label={t`String`} />
                               <SelectOption
                                 value="Boolean"
-                                primaryText={t`Boolean (checkbox)`}
+                                label={t`Boolean (checkbox)`}
                               />
                               <SelectOption
                                 value="Choice"
-                                primaryText={t`String from a list of options (text)`}
+                                label={t`String from a list of options (text)`}
                               />
                               <SelectOption
                                 value="Color"
-                                primaryText={t`Color (text)`}
+                                label={t`Color (text)`}
                               />
                             </SelectField>
                             {property.getType() === 'Number' && (
@@ -321,7 +315,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                     return (
                                       <SelectOption
                                         value={measurementUnit.getName()}
-                                        primaryText={label}
+                                        label={label}
                                       />
                                     );
                                   }
@@ -366,11 +360,11 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               >
                                 <SelectOption
                                   value="true"
-                                  primaryText={t`True (checked)`}
+                                  label={t`True (checked)`}
                                 />
                                 <SelectOption
                                   value="false"
-                                  primaryText={t`False (not checked)`}
+                                  label={t`False (not checked)`}
                                 />
                               </SelectField>
                             )}
@@ -391,7 +385,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                     <SelectOption
                                       key={index}
                                       value={choice}
-                                      primaryText={choice}
+                                      label={choice}
                                     />
                                   )
                                 )}

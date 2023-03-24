@@ -7,11 +7,21 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
+import FlatButton from '../../UI/FlatButton';
+import Scene from '../../UI/CustomSvgIcons/Scene';
+import { t, Trans } from '@lingui/macro';
+import Functions from '@material-ui/icons/Functions';
+import RaisedButton from '../../UI/RaisedButton';
+import SelectOption from '../../UI/SelectOption';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneNameField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?GenericExpressionField>(null);
+    const field = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
@@ -19,29 +29,107 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const layoutNames: Array<ExpressionAutocompletion> = props.project
-      ? enumerateLayouts(props.project).map(layout => ({
-          kind: 'Text',
-          completion: `"${layout.getName()}"`,
-        }))
+    const layoutNames = props.project
+      ? enumerateLayouts(props.project).map(layout => layout.getName())
       : [];
 
-    return (
-      <GenericExpressionField
-        id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-scene-field`
-            : undefined
-        }
-        expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
-          layoutNames.filter(
-            ({ completion }) => completion.indexOf(expression) === 0
-          )
-        }
-        ref={field}
-        {...props}
+    const isCurrentValueInLayoutsList = !!layoutNames.find(
+      layoutName => `"${layoutName}"` === props.value
+    );
+
+    // If the current value is not in the list of layouts, display an expression field.
+    const [isExpressionField, setIsExpressionField] = React.useState(
+      !!props.value && !isCurrentValueInLayoutsList
+    );
+
+    const switchFieldType = () => {
+      setIsExpressionField(!isExpressionField);
+    };
+
+    const onChangeSelectValue = (event, value) => {
+      props.onChange(event.target.value);
+    };
+
+    const onChangeTextValue = (value: string) => {
+      props.onChange(value);
+    };
+
+    const fieldLabel = props.parameterMetadata
+      ? props.parameterMetadata.getDescription()
+      : undefined;
+
+    const selectOptions = layoutNames.map(layoutName => (
+      <SelectOption
+        key={layoutName}
+        value={`"${layoutName}"`}
+        label={layoutName}
+        shouldNotTranslate
       />
+    ));
+
+    return (
+      <>
+        <TextFieldWithButtonLayout
+          renderTextField={() =>
+            !isExpressionField ? (
+              <SelectField
+                ref={field}
+                id={
+                  props.parameterIndex !== undefined
+                    ? `parameter-${props.parameterIndex}-scene-field`
+                    : undefined
+                }
+                value={props.value}
+                onChange={onChangeSelectValue}
+                margin={props.isInline ? 'none' : 'dense'}
+                fullWidth
+                floatingLabelText={fieldLabel}
+                translatableHintText={t`Choose a scene`}
+                helperMarkdownText={
+                  (props.parameterMetadata &&
+                    props.parameterMetadata.getLongDescription()) ||
+                  null
+                }
+              >
+                {selectOptions}
+              </SelectField>
+            ) : (
+              <GenericExpressionField
+                ref={field}
+                id={
+                  props.parameterIndex !== undefined
+                    ? `parameter-${props.parameterIndex}-scene-field`
+                    : undefined
+                }
+                expressionType="string"
+                {...props}
+                onChange={onChangeTextValue}
+              />
+            )
+          }
+          renderButton={style =>
+            isExpressionField ? (
+              <FlatButton
+                id="switch-expression-select"
+                leftIcon={<Scene />}
+                style={style}
+                primary
+                label={<Trans>Select a Scene</Trans>}
+                onClick={switchFieldType}
+              />
+            ) : (
+              <RaisedButton
+                id="switch-expression-select"
+                icon={<Functions />}
+                style={style}
+                primary
+                label={<Trans>Use an Expression</Trans>}
+                onClick={switchFieldType}
+              />
+            )
+          }
+        />
+      </>
     );
   }
 );

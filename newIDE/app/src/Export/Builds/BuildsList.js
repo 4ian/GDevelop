@@ -36,30 +36,30 @@ type BuildFilter = BuildType | 'all-build';
 const buildFilterOptions: Array<{
   key: BuildFilter,
   value: BuildFilter,
-  primaryText: React.Node,
+  label: React.Node,
 }> = [
   {
     key: 'all-build',
     value: 'all-build',
-    primaryText: t`All builds`,
+    label: t`All builds`,
   },
 
   {
     key: 'web-build',
     value: 'web-build',
-    primaryText: t`Web builds`,
+    label: t`Web builds`,
   },
 
   {
     key: 'cordova-build',
     value: 'cordova-build',
-    primaryText: t`Mobile builds`,
+    label: t`Mobile builds`,
   },
 
   {
     key: 'electron-build',
     value: 'electron-build',
-    primaryText: t`Desktop builds`,
+    label: t`Desktop builds`,
   },
 ];
 
@@ -125,8 +125,8 @@ const BuildsList = ({
               setBuildFilter(value);
             }}
           >
-            {buildFilterOptions.map(({ key, value, primaryText }) => (
-              <SelectOption key={key} value={value} primaryText={primaryText} />
+            {buildFilterOptions.map(({ key, value, label }) => (
+              <SelectOption key={key} value={value} label={label} />
             ))}
           </SelectField>
         </Column>

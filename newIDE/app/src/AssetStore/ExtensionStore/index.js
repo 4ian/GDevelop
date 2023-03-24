@@ -108,12 +108,12 @@ export const ExtensionStore = ({
                     setChosenCategory(value);
                   }}
                 >
-                  <SelectOption value="" primaryText={t`All categories`} />
+                  <SelectOption value="" label={t`All categories`} />
                   {allCategories.map(category => (
                     <SelectOption
                       key={category}
                       value={category}
-                      primaryText={category}
+                      label={category}
                     />
                   ))}
                 </SearchBarSelectField>

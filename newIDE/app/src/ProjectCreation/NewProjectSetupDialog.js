@@ -293,7 +293,7 @@ const NewProjectSetupDialog = ({
               <SelectOption
                 key={storageProvider.internalName}
                 value={storageProvider.internalName}
-                primaryText={storageProvider.name}
+                label={storageProvider.name}
                 disabled={storageProvider.disabled}
               />
             ))}
@@ -303,7 +303,7 @@ const NewProjectSetupDialog = ({
             // when they want to add their own resources or use external editors.
             <SelectOption
               value={emptyStorageProvider.internalName}
-              primaryText={t`Don't save this project now`}
+              label={t`Don't save this project now`}
             />
           )}
         </SelectField>
@@ -342,7 +342,7 @@ const NewProjectSetupDialog = ({
             >
               {Object.entries(resolutionOptions).map(([id, option]) => (
                 // $FlowFixMe - Object.entries does not keep types.
-                <SelectOption key={id} value={id} primaryText={option.label} />
+                <SelectOption key={id} value={id} label={option.label} />
               ))}
             </SelectField>
             <Checkbox

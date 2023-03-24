@@ -350,19 +350,19 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                           <SelectOption
                             key={'all'}
                             value={''}
-                            primaryText={t`All builds`}
+                            label={t`All builds`}
                           />
                           <SelectOption
                             key={'game-only'}
                             value={'game-only'}
-                            primaryText={t`On game page only`}
+                            label={t`On game page only`}
                           />
                           {Object.keys(buildsByIds).map(buildId => {
                             return (
                               <SelectOption
                                 key={buildId}
                                 value={buildId}
-                                primaryText={getBuildNameOption(buildId)}
+                                label={getBuildNameOption(buildId)}
                               />
                             );
                           })}

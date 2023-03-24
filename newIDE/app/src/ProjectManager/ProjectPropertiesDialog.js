@@ -502,15 +502,15 @@ function ProjectPropertiesDialog(props: Props) {
                 >
                   <SelectOption
                     value=""
-                    primaryText={t`No changes to the game size`}
+                    label={t`No changes to the game size`}
                   />
                   <SelectOption
                     value="adaptWidth"
-                    primaryText={t`Change width to fit the screen or window size`}
+                    label={t`Change width to fit the screen or window size`}
                   />
                   <SelectOption
                     value="adaptHeight"
-                    primaryText={t`Change height to fit the screen or window size`}
+                    label={t`Change height to fit the screen or window size`}
                   />
                 </SelectField>
                 <Checkbox
@@ -605,11 +605,11 @@ function ProjectPropertiesDialog(props: Props) {
                 >
                   <SelectOption
                     value="linear"
-                    primaryText={t`Linear (antialiased rendering, good for most games)`}
+                    label={t`Linear (antialiased rendering, good for most games)`}
                   />
                   <SelectOption
                     value="nearest"
-                    primaryText={t`Nearest (no antialiasing, good for pixel perfect games)`}
+                    label={t`Nearest (no antialiasing, good for pixel perfect games)`}
                   />
                 </SelectField>
                 <Checkbox
@@ -671,11 +671,11 @@ function ProjectPropertiesDialog(props: Props) {
                 >
                   <SelectOption
                     value={'single-file'}
-                    primaryText={t`Single file (default)`}
+                    label={t`Single file (default)`}
                   />
                   <SelectOption
                     value={'folder-project'}
-                    primaryText={t`Multiple files, saved in folder next to the main file`}
+                    label={t`Multiple files, saved in folder next to the main file`}
                   />
                 </SelectField>
                 <ExtensionsProperties project={project} />

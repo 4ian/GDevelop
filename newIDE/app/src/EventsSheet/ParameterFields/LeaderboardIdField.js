@@ -98,21 +98,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               <SelectOption
                 key={leaderboard.id}
                 value={`"${leaderboard.id}"`}
-                primaryText={`${leaderboard.name} ${
+                label={`${leaderboard.name} ${
                   leaderboard.id
                     ? `(${shortenUuidForDisplay(leaderboard.id)})`
                     : ''
                 }`}
+                shouldNotTranslate
               />
             ))
-          : [
-              <SelectOption
-                disabled
-                key="empty"
-                value="empty"
-                primaryText={''}
-              />,
-            ],
+          : [<SelectOption disabled key="empty" value="empty" label={''} />],
       [leaderboards, gameHasLeaderboards]
     );
 

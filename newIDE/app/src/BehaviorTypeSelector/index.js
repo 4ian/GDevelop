@@ -55,14 +55,14 @@ export default class BehaviorTypeSelector extends React.Component<
           <SelectOption
             key={metadata.type}
             value={metadata.type}
-            primaryText={metadata.fullName}
+            label={metadata.fullName}
             disabled={
               metadata.objectType !== '' && metadata.objectType !== objectType
             }
           />
         ))}
         {!valueIsListed && value && (
-          <SelectOption value={value} primaryText={value} />
+          <SelectOption value={value} label={value} />
         )}
       </SelectField>
     );

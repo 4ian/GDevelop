@@ -458,16 +458,21 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         textAlign="center"
                         disableUnderline
                       >
-                        {assetAnimations.map(animation => (
-                          <SelectOption
-                            key={animation.name}
-                            value={animation.name}
-                            primaryText={
-                              makeFirstLetterUppercase(animation.name) ||
-                              t`Default` // Display default for animations with no name.
-                            }
-                          />
-                        ))}
+                        {assetAnimations.map(animation => {
+                          const isAnimationNameEmpty = !animation.name;
+                          return (
+                            <SelectOption
+                              key={animation.name}
+                              value={animation.name}
+                              label={
+                                !isAnimationNameEmpty
+                                  ? makeFirstLetterUppercase(animation.name)
+                                  : t`Default` // Display default for animations with no name.
+                              }
+                              shouldNotTranslate={!isAnimationNameEmpty}
+                            />
+                          );
+                        })}
                       </SelectField>
                       <div style={styles.arrowContainer}>
                         <IconButton

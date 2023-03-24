@@ -193,16 +193,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   }}
                   disableUnderline
                 >
-                  <SelectOption
-                    key="month"
-                    value="month"
-                    primaryText={i18n._(t`Month`)}
-                  />
-                  <SelectOption
-                    key="year"
-                    value="year"
-                    primaryText={i18n._(t`Year`)}
-                  />
+                  <SelectOption key="month" value="month" label={t`Month`} />
+                  <SelectOption key="year" value="year" label={t`Year`} />
                 </SelectField>
               </Line>
               {!isGameMetricsLoading &&

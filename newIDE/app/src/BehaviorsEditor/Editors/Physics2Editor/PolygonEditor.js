@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import {
   Table,
   TableRow,
@@ -14,6 +15,7 @@ import IconButton from '../../../UI/IconButton';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import AddCircle from '../../../UI/CustomSvgIcons/AddCircle';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export type Vertex = {|
   x: number,
@@ -107,7 +109,11 @@ const PolygonEditor = ({
               }}
             >
               <TableRowColumn>
-                {!isPolygonConvex(vertices) && <Warning />}
+                {!isPolygonConvex(vertices) && (
+                  <Tooltip title={<Trans>The polygon is not convex</Trans>}>
+                    <Warning />
+                  </Tooltip>
+                )}
               </TableRowColumn>
               <TableRowColumn>
                 <SemiControlledTextField

@@ -6,7 +6,6 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import { Chip } from '@material-ui/core';
 import CardHeader from '@material-ui/core/CardHeader';
-import ShareIcon from '@material-ui/icons/Share';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -33,6 +32,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import Share from '../UI/CustomSvgIcons/Share';
 
 type Props = {|
   game: Game,
@@ -49,7 +49,7 @@ type TogglableProperties =
 const confirmationMessage = {
   discoverable: {
     true: t`
-        You are about to make this game discoverable on gd.games categories pages. 
+        You are about to make this game discoverable on gd.games categories pages.
         Do you want to continue?
       `,
     false: t`
@@ -292,7 +292,7 @@ export const GameCard = ({
                           onClick={() => setShowShareDialog(true)}
                           tooltip={t`Share`}
                         >
-                          <ShareIcon />
+                          <Share />
                         </IconButton>
                       </LineStackLayout>
                     </ResponsiveLineStackLayout>

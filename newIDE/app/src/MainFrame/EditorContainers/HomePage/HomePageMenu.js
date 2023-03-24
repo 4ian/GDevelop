@@ -13,7 +13,7 @@ import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
 import WebIcon from '../../../UI/CustomSvgIcons/Web';
 import Sun from '../../../UI/CustomSvgIcons/Sun';
-import StorefrontIcon from '@material-ui/icons/Storefront';
+import Store from '../../../UI/CustomSvgIcons/Store';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -80,7 +80,7 @@ const tabs: {
     label: <Trans>Shop</Trans>,
     tab: 'shop',
     id: 'home-shop-tab',
-    getIcon: color => <StorefrontIcon fontSize="small" color={color} />,
+    getIcon: color => <Store fontSize="small" color={color} />,
   },
   {
     label: <Trans>Learn</Trans>,

@@ -20,6 +20,8 @@ declare class gdShapePainterObject extends gdObjectConfiguration {
   getFillColorR(): number;
   getFillColorG(): number;
   getFillColorB(): number;
+  getAntialiasing(): string;
+  setAntialiasing(value: string): void;
   delete(): void;
   ptr: number;
 };

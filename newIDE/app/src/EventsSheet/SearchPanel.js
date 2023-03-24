@@ -29,6 +29,7 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -62,6 +63,7 @@ const SearchPanel = (
 ) => {
   const windowWidth = useResponsiveWindowWidth();
   const searchTextField = React.useRef<?TextFieldInterface>(null);
+  const replaceTextField = React.useRef<?TextFieldInterface>(null);
 
   const [searchText, setSearchText] = React.useState<string>('');
   const [replaceText, setReplaceText] = React.useState<string>('');
@@ -92,8 +94,13 @@ const SearchPanel = (
     [searchText, searchResultsDirty]
   );
 
+  const shouldAutofocusInput = useShouldAutofocusInput();
+
   const focusSearchField = React.useCallback((): void => {
     if (searchTextField.current) searchTextField.current.focus();
+  }, []);
+  const focusReplaceField = React.useCallback((): void => {
+    if (replaceTextField.current) replaceTextField.current.focus();
   }, []);
 
   const markSearchResultsDirty = React.useCallback((): void => {
@@ -119,11 +126,13 @@ const SearchPanel = (
     ]
   );
 
-  // Note: might be worth fixing these warnings:
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(focusSearchField, [currentTab]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(markSearchResultsDirty, [currentTab]);
+  React.useEffect(
+    () => {
+      if (shouldAutofocusInput) focusSearchField();
+    },
+    [currentTab, focusSearchField, shouldAutofocusInput]
+  );
+  React.useEffect(markSearchResultsDirty, [currentTab, markSearchResultsDirty]);
 
   const launchSearch = () => {
     onSearchInEvents({
@@ -196,7 +205,13 @@ const SearchPanel = (
                 margin="dense"
                 endAdornment={
                   searchText ? (
-                    <IconButton onClick={() => setSearchText('')} edge="end">
+                    <IconButton
+                      onClick={() => {
+                        setSearchText('');
+                        if (shouldAutofocusInput) focusSearchField();
+                      }}
+                      edge="end"
+                    >
                       <Cross fontSize="small" />
                     </IconButton>
                   ) : null
@@ -245,9 +260,16 @@ const SearchPanel = (
               <LineStackLayout alignItems="baseline" noMargin>
                 <TextField
                   margin="dense"
+                  ref={replaceTextField}
                   endAdornment={
                     replaceText ? (
-                      <IconButton onClick={() => setReplaceText('')} edge="end">
+                      <IconButton
+                        onClick={() => {
+                          setReplaceText('');
+                          if (shouldAutofocusInput) focusReplaceField();
+                        }}
+                        edge="end"
+                      >
                         <Cross fontSize="small" />
                       </IconButton>
                     ) : null

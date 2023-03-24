@@ -24,8 +24,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const { parameterMetadata } = props;
 
-    console.log(props);
-
     const [errorText, setErrorText] = React.useState<?string>(null);
     const [behaviorNames, setBehaviorNames] = React.useState<Array<string>>([]);
 
@@ -43,8 +41,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const updateBehaviorsList = React.useCallback(
       () => {
-        console.log('updateBehaviorsList');
-        console.log(props);
         const {
           instructionMetadata,
           instruction,
@@ -118,6 +114,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
         }
       },
+      // Ensure that we re-run this function everytime the props change.
+      // This allows to recalculate the behaviorNames based on the new object selected
+      // (which is not in the props)
       [behaviorNames, props]
     );
 

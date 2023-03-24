@@ -13,25 +13,23 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import Add from '@material-ui/icons/Add';
-import Brush from '@material-ui/icons/Brush';
+import Add from '../../UI/CustomSvgIcons/Add';
 import TextFormat from '@material-ui/icons/TextFormat';
-import Save from '@material-ui/icons/Save';
-import Cancel from '@material-ui/icons/Cancel';
-import Edit from '@material-ui/icons/Edit';
-import Label from '@material-ui/icons/Label';
-import Fingerprint from '@material-ui/icons/Fingerprint';
-import Update from '@material-ui/icons/Update';
-import Today from '@material-ui/icons/Today';
-import Sort from '@material-ui/icons/Sort';
-import PeopleAlt from '@material-ui/icons/PeopleAlt';
-import Refresh from '@material-ui/icons/Refresh';
-import Delete from '@material-ui/icons/Delete';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Loop from '@material-ui/icons/Loop';
-
+import Save from '../../UI/CustomSvgIcons/Floppy';
+import Cross from '../../UI/CustomSvgIcons/Cross';
+import Edit from '../../UI/CustomSvgIcons/Edit';
+import EditFile from '../../UI/CustomSvgIcons/EditFile';
+import Tag from '../../UI/CustomSvgIcons/Tag';
+import AtSign from '../../UI/CustomSvgIcons/AtSign';
+import Calendar from '../../UI/CustomSvgIcons/Calendar';
+import Sort from '../../UI/CustomSvgIcons/Sort';
+import Users from '../../UI/CustomSvgIcons/Users';
+import Refresh from '../../UI/CustomSvgIcons/Refresh';
+import Trash from '../../UI/CustomSvgIcons/Trash';
+import Visibility from '../../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
 import Copy from '../../UI/CustomSvgIcons/Copy';
+
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
@@ -578,7 +576,7 @@ export const LeaderboardAdmin = ({
   ) => [
     {
       key: 'name',
-      avatar: <Label />,
+      avatar: <Tag />,
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
           <TextField
@@ -607,7 +605,7 @@ export const LeaderboardAdmin = ({
                   setIsEditingName(false);
                 }}
               >
-                <Cancel />
+                <Cross />
               </IconButton>
             </>
           )}
@@ -654,7 +652,7 @@ export const LeaderboardAdmin = ({
     },
     {
       key: 'id',
-      avatar: <Fingerprint />,
+      avatar: <AtSign />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
           <Text size="body2">
@@ -671,7 +669,7 @@ export const LeaderboardAdmin = ({
     },
     {
       key: 'startDatetime',
-      avatar: <Today />,
+      avatar: <Calendar />,
       text: currentLeaderboard.resetLaunchedAt ? (
         <Text size="body2">
           <Trans>
@@ -717,7 +715,7 @@ export const LeaderboardAdmin = ({
             !!currentLeaderboard.resetLaunchedAt
           }
         >
-          <Update />
+          <Refresh />
         </IconButton>
       ),
     },
@@ -738,7 +736,7 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Brush />
+          <Edit />
         </IconButton>
       ),
     },
@@ -791,7 +789,7 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Loop />
+          <Refresh />
         </IconButton>
       ),
     },
@@ -816,13 +814,13 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Brush />
+          <EditFile />
         </IconButton>
       ),
     },
     {
       key: 'playerUnicityDisplayChoice',
-      avatar: <PeopleAlt />,
+      avatar: <Users />,
       text: (
         <SelectField
           fullWidth
@@ -971,7 +969,7 @@ export const LeaderboardAdmin = ({
                         </List>
                         <Line justifyContent="space-between">
                           <FlatButton
-                            leftIcon={<Delete />}
+                            leftIcon={<Trash />}
                             label={<Trans>Delete</Trans>}
                             disabled={isRequestPending || isEditingName}
                             onClick={() => onDeleteLeaderboard(i18n)}

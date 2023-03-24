@@ -11,9 +11,9 @@ import {
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
-import AddCircle from '@material-ui/icons/AddCircle';
-import Delete from '@material-ui/icons/Delete';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import AddCircle from '../../../UI/CustomSvgIcons/AddCircle';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
 
 export type Vertex = {|
   x: number,
@@ -133,7 +133,7 @@ const PolygonEditor = ({
               </TableRowColumn>
               <TableRowColumn>
                 <IconButton size="small" onClick={() => onRemove(index)}>
-                  <Delete />
+                  <Trash />
                 </IconButton>
               </TableRowColumn>
             </TableRow>
@@ -144,7 +144,7 @@ const PolygonEditor = ({
           <TableRowColumn />
           <TableRowColumn />
           <TableRowColumn>
-            <IconButton onClick={onAdd}>
+            <IconButton onClick={onAdd} size="small">
               <AddCircle />
             </IconButton>
           </TableRowColumn>

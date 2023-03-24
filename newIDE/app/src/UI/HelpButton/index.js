@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react';
 import TextButton from '../TextButton';
-import HelpOutline from '@material-ui/icons/HelpOutline';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';
 import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import HelpIcon from '../HelpIcon';
+import Help from '../CustomSvgIcons/Help';
 
 type PropsType = {
   helpPagePath: ?string,
@@ -34,7 +34,7 @@ const HelpButton = (props: PropsType) => {
       onClick={onClick}
       target="_blank"
       label={props.label || <Trans>Help</Trans>}
-      icon={<HelpOutline />}
+      icon={<Help />}
     />
   ) : (
     <HelpIcon size="small" helpPagePath={props.helpPagePath} />

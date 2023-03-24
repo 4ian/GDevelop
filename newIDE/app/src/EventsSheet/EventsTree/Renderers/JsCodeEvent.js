@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 import classNames from 'classnames';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import ExpandLess from '@material-ui/icons/ExpandLess';
 import Button from '@material-ui/core/Button';
 import InlinePopover from '../../InlinePopover';
 import ObjectField from '../../ParameterFields/ObjectField';
@@ -18,6 +16,8 @@ import { CodeEditor } from '../../../CodeEditor';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { Trans } from '@lingui/macro';
+import ChevronArrowTop from '../../../UI/CustomSvgIcons/ChevronArrowTop';
+import ChevronArrowBottom from '../../../UI/CustomSvgIcons/ChevronArrowBottom';
 const gd: libGDevelop = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -246,9 +246,9 @@ export default class JsCodeEvent extends React.Component<
     const expandIcon = (
       <div style={styles.expandIcon}>
         {jsCodeEvent.isEventsSheetExpanded() ? (
-          <ExpandLess fontSize="small" color="inherit" />
+          <ChevronArrowTop fontSize="small" color="inherit" />
         ) : (
-          <ExpandMore fontSize="small" color="inherit" />
+          <ChevronArrowBottom fontSize="small" color="inherit" />
         )}
       </div>
     );

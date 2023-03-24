@@ -2,13 +2,13 @@
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Spacer } from './Grid';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
+import Cross from './CustomSvgIcons/Cross';
 
 const styles = {
   tabContentContainer: {
@@ -233,7 +233,7 @@ export function ClosableTab({
             {...longTouchForContextMenuProps}
             focusRipple
           >
-            <Close
+            <Cross
               style={{
                 ...styles.closeButton,
                 width: gdevelopTheme.closableTabs.height / 2,

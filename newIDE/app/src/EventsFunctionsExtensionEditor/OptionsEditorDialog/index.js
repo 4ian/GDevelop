@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import CloudUpload from '@material-ui/icons/CloudUpload';
 import HelpButton from '../../UI/HelpButton';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { ExtensionOptionsEditor } from './ExtensionOptionsEditor';
@@ -11,6 +10,7 @@ import { Tabs } from '../../UI/Tabs';
 import { ExtensionDependenciesEditor } from './ExtensionDependenciesEditor';
 import ExtensionExporterDialog from './ExtensionExporterDialog';
 import { Line } from '../../UI/Grid';
+import Upload from '../../UI/CustomSvgIcons/Upload';
 
 type TabName = 'options' | 'dependencies';
 
@@ -41,7 +41,7 @@ export default function OptionsEditorDialog({
         <HelpButton key="help" helpPagePath="/extensions/create" />,
         eventsFunctionsExtensionWriter ? (
           <FlatButton
-            leftIcon={<CloudUpload />}
+            leftIcon={<Upload />}
             key="export"
             label={<Trans>Export extension</Trans>}
             onClick={() => {

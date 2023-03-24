@@ -6,8 +6,6 @@ import { I18n } from '@lingui/react';
 import Timer from '@material-ui/icons/Timer';
 import TextButton from '../../../UI/TextButton';
 import InlineCheckbox from '../../../UI/InlineCheckbox';
-import Brush from '@material-ui/icons/Brush';
-import PlayArrow from '@material-ui/icons/PlayArrow';
 import TextField from '../../../UI/TextField';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
@@ -19,6 +17,8 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../../UI/Text';
+import Edit from '../../../UI/CustomSvgIcons/Edit';
+import Play from '../../../UI/CustomSvgIcons/Play';
 
 const styles = {
   container: {
@@ -133,7 +133,7 @@ const DirectionTools = ({
                       ? imageResourceExternalEditors[0].editDisplayName
                       : imageResourceExternalEditors[0].createDisplayName
                   )}
-                  icon={<Brush />}
+                  icon={<Edit />}
                   onClick={() =>
                     onEditWith(i18n, imageResourceExternalEditors[0])
                   }
@@ -141,7 +141,7 @@ const DirectionTools = ({
               )}
               <TextButton
                 label={<Trans>Preview</Trans>}
-                icon={<PlayArrow />}
+                icon={<Play />}
                 onClick={() => openPreview(true)}
               />
             </LineStackLayout>

@@ -5,8 +5,6 @@ import * as React from 'react';
 import Background from '../UI/Background';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
 import { Column, Line } from '../UI/Grid';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -28,6 +26,8 @@ import {
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Tabs } from '../UI/Tabs';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
+import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -334,7 +334,7 @@ const SearchPanel = (
                     onGoToPreviousSearchResult();
                   }}
                 >
-                  <ChevronLeft />
+                  <ChevronArrowLeft />
                 </IconButton>
                 <IconButton
                   disabled={!resultsCount}
@@ -342,7 +342,7 @@ const SearchPanel = (
                     onGoToNextSearchResult();
                   }}
                 >
-                  <ChevronRight />
+                  <ChevronArrowRight />
                 </IconButton>
                 <FlatButton
                   key="close"

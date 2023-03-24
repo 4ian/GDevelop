@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -17,6 +16,7 @@ import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
 import PointRow from './PointRow';
 import styles from './styles';
+import Add from '../../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 type PointsListBodyProps = {|
@@ -213,7 +213,7 @@ const PointsList = (props: PointsListProps) => {
       <Line alignItems="center" justifyContent="center">
         <RaisedButton
           primary
-          icon={<AddIcon />}
+          icon={<Add />}
           label={<Trans>Add a point</Trans>}
           onClick={() => {
             const name = newNameGenerator('Point', name =>

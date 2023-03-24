@@ -19,9 +19,9 @@ import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 import { AssetCard } from './AssetCard';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import TextButton from '../UI/TextButton';
-import ArrowBack from '@material-ui/icons/ArrowBack';
 import { t, Trans } from '@lingui/macro';
 import LoaderModal from '../UI/LoaderModal';
+import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 
 const ObjectListItem = ({
   enumeratedObjectMetadata,
@@ -97,7 +97,7 @@ export const CustomObjectPackResults = ({
       <Column noMargin expand>
         <Line>
           <TextButton
-            icon={<ArrowBack />}
+            icon={<ChevronArrowLeft />}
             label={<Trans>Back</Trans>}
             primary={false}
             onClick={onBack}

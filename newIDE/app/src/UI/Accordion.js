@@ -4,10 +4,10 @@ import MUIAccordion from '@material-ui/core/Accordion';
 import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
 import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
 import MUIAccordionActions from '@material-ui/core/AccordionActions';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from './IconButton';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from '../UI/Grid';
+import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 const styles = {
   bodyRoot: {
@@ -49,7 +49,7 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
             expandIcon={
               props.expandIcon || (
                 <IconButton size="small">
-                  <ExpandMoreIcon />
+                  <ChevronArrowBottom />
                 </IconButton>
               )
             }

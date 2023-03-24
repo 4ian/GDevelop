@@ -6,7 +6,6 @@ import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
@@ -16,6 +15,7 @@ import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 

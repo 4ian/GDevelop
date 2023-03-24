@@ -23,11 +23,11 @@ import {
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import Tooltip from '@material-ui/core/Tooltip';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Text from '../UI/Text';
+import Add from '../UI/CustomSvgIcons/Add';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -53,7 +53,7 @@ const renderEventsBehaviorLabel = (
           <Trans>This behavior won't be visible in the events editor.</Trans>
         }
       >
-        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
+        <VisibilityOff fontSize="small" style={styles.tooltip} />
       </Tooltip>
       {label}
     </>

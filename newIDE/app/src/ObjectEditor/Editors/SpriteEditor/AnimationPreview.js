@@ -6,14 +6,14 @@ import { Column } from '../../../UI/Grid';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
-import PlayArrow from '@material-ui/icons/PlayArrow';
-import Pause from '@material-ui/icons/Pause';
 import Timer from '@material-ui/icons/Timer';
 import TextField from '../../../UI/TextField';
 import FlatButton from '../../../UI/FlatButton';
 import Text from '../../../UI/Text';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
+import Play from '../../../UI/CustomSvgIcons/Play';
+import Pause from '../../../UI/CustomSvgIcons/Pause';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -330,7 +330,7 @@ const AnimationPreview = ({
                 onClick={replay}
               />
               <FlatButton
-                leftIcon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
+                leftIcon={!!pausedRef.current ? <Play /> : <Pause />}
                 label={!!pausedRef.current ? 'Play' : 'Pause'}
                 onClick={() => {
                   pausedRef.current = !pausedRef.current;

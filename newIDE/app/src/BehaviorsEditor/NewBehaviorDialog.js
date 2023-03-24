@@ -11,9 +11,6 @@ import Subheader from '../UI/Subheader';
 import ListIcon from '../UI/ListIcon';
 import { Tabs } from '../UI/Tabs';
 import { List, ListItem } from '../UI/List';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Create from '@material-ui/icons/Create';
 import { Column, Line } from '../UI/Grid';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
@@ -40,6 +37,9 @@ import {
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import Visibility from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import Edit from '../UI/CustomSvgIcons/Edit';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -340,7 +340,7 @@ export default function NewBehaviorDialog({
                 </Line>
                 <Line justifyContent="center" alignItems="center">
                   <FlatButton
-                    leftIcon={<Create />}
+                    leftIcon={<Edit />}
                     primary={false}
                     onClick={() =>
                       Window.openExternalURL(

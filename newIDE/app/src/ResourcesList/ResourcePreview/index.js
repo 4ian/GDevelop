@@ -4,10 +4,10 @@ import ResourcesLoader from '../../ResourcesLoader';
 import { type ResourceKind } from '../ResourceSource';
 import ImagePreview, { isProjectImageResourceSmooth } from './ImagePreview';
 import GenericIconPreview from './GenericIconPreview';
-import Audiotrack from '@material-ui/icons/Audiotrack';
-import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
-import VideoLibrary from '@material-ui/icons/VideoLibrary';
 import FontDownload from '@material-ui/icons/FontDownload';
+import File from '../../UI/CustomSvgIcons/File';
+import Video from '../../UI/CustomSvgIcons/Video';
+import Music from '../../UI/CustomSvgIcons/Music';
 
 type Props = {|
   project: gdProject,
@@ -70,20 +70,20 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
         );
       case 'audio':
         return (
-          <GenericIconPreview renderIcon={props => <Audiotrack {...props} />} />
+          <GenericIconPreview renderIcon={props => <Music {...props} />} />
         );
       case 'json':
       case 'tilemap':
       case 'tileset':
         return (
           <GenericIconPreview
-            renderIcon={props => <InsertDriveFile {...props} />}
+            renderIcon={props => <File {...props} />}
           />
         );
       case 'video':
         return (
           <GenericIconPreview
-            renderIcon={props => <VideoLibrary {...props} />}
+            renderIcon={props => <Video {...props} />}
           />
         );
       case 'font':

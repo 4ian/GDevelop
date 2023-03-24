@@ -3,7 +3,6 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import Add from '@material-ui/icons/Add';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
@@ -40,6 +39,7 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
 

@@ -26,8 +26,8 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 

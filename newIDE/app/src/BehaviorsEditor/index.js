@@ -4,8 +4,6 @@ import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import TextField from '../UI/TextField';
-import Add from '@material-ui/icons/Add';
-import Delete from '@material-ui/icons/Delete';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { MiniToolbarText } from '../UI/MiniToolbar';
@@ -32,6 +30,8 @@ import {
 import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import Trash from '../UI/CustomSvgIcons/Trash';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 
@@ -205,7 +205,7 @@ const BehaviorsEditor = (props: Props) => {
                             onRemoveBehavior(behaviorName);
                           }}
                         >
-                          <Delete />
+                          <Trash />
                         </IconButton>,
                       ]}
                     >

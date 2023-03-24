@@ -322,7 +322,7 @@ module.exports = {
     extension
       .addAction(
         'ProviderAccountSignIn',
-        _('Sign into an account via an externa provider'),
+        _('Sign into an account via an external provider'),
         _(
           "Signs into an account using an external provider's system. " +
             'The available providers are: "google", "facebook", "github" and "twitter".\n' +

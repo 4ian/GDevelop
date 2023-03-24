@@ -8,6 +8,7 @@ import {
   useScreenType,
   type ScreenType,
 } from '../Reponsive/ScreenTypeMeasurer';
+import { CorsAwareImage } from '../CorsAwareImage';
 
 const layerStyles = {
   position: 'fixed',
@@ -116,7 +117,7 @@ const CustomDragLayer = ({
         screenType === 'touch' ? THUMBNAIL_SIZE_TOUCHSCREEN : THUMBNAIL_SIZE;
 
       return item.thumbnail ? (
-        <img
+        <CorsAwareImage
           alt={item.name}
           src={item.thumbnail}
           style={{

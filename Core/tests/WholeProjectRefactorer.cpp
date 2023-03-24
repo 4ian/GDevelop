@@ -84,6 +84,8 @@ enum TestEvent {
   FreeActionWithOperator,
   FreeFunctionWithObjects,
   FreeFunctionWithObjectExpression,
+  FreeFunctionWithGroup,
+  FreeFunctionWithObjectExpressionOnGroup,
 
   BehaviorAction,
   BehaviorPropertyAction,
@@ -113,11 +115,18 @@ enum TestEvent {
   ObjectActionWithOperator,
 };
 
-const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
+const std::vector<const gd::EventsList *> GetLayerScopeEventsLists(gd::Project &project) {
   std::vector<const gd::EventsList *> eventLists;
   auto &scene = project.GetLayout("Scene").GetEvents();
   auto &externalEvents =
       project.GetExternalEvents("ExternalEvents").GetEvents();
+  eventLists.push_back(&scene);
+  eventLists.push_back(&externalEvents);
+  return eventLists;
+}
+
+const std::vector<const gd::EventsList *> GetLayerOutOfScopeEventsLists(gd::Project &project) {
+  std::vector<const gd::EventsList *> eventLists;
   auto &eventsExtension = project.GetEventsFunctionsExtension("MyEventsExtension");
   auto &objectFunctionEvents =
       eventsExtension
@@ -134,11 +143,21 @@ const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
           .GetEvents();
   auto &freeFunctionEvents =
       eventsExtension.GetEventsFunction("MyOtherEventsFunction").GetEvents();
-  eventLists.push_back(&scene);
-  eventLists.push_back(&externalEvents);
   eventLists.push_back(&objectFunctionEvents);
   eventLists.push_back(&behaviorFunctionEvents);
   eventLists.push_back(&freeFunctionEvents);
+  return eventLists;
+}
+
+const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
+  std::vector<const gd::EventsList *> eventLists;
+
+  for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+    eventLists.push_back(eventsList);
+  }
+  for (auto *eventsList : GetLayerOutOfScopeEventsLists(project)) {
+    eventLists.push_back(eventsList);
+  }
   return eventLists;
 }
 
@@ -288,6 +307,38 @@ const void SetupEvents(gd::EventsList &eventList) {
           0,
           gd::Expression(
               "ObjectWithMyBehavior.GetObjectNumber()"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != FreeFunctionWithGroup) {
+      throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
+    }
+    // Create an event referring to objects
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomethingWithObjects");
+      action.SetParametersCount(2);
+      action.SetParameter(0, gd::Expression("GroupWithMyBehavior"));
+      action.SetParameter(1, gd::Expression("MyCustomObject"));
+      event.GetActions().Insert(action);
+      eventList.InsertEvent(event);
+    }
+
+    if (eventList.GetEventsCount() != FreeFunctionWithObjectExpressionOnGroup) {
+      throw std::logic_error("Invalid events setup: " + std::to_string(eventList.GetEventsCount()));
+    }
+    // Create an event referring to objects in an expression
+    {
+      gd::StandardEvent event;
+      gd::Instruction action;
+      action.SetType("MyExtension::DoSomething");
+      action.SetParametersCount(1);
+      action.SetParameter(
+          0,
+          gd::Expression(
+              "GroupWithMyBehavior.GetObjectNumber()"));
       event.GetActions().Insert(action);
       eventList.InsertEvent(event);
     }
@@ -827,7 +878,7 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
             .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
     behaviorAction.GetParameters().push_back(
         gd::ParameterMetadata()
-            .SetName("OtherObject")
+            .SetName("ObjectWithMyBehavior")
             .SetType("object")
             .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
     behaviorAction.GetParameters().push_back(
@@ -835,6 +886,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
             .SetName("OtherBehavior")
             .SetType("behavior")
             .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
+    auto &group = behaviorAction.GetObjectGroups().InsertNew("GroupWithMyBehavior");
+    group.AddObject("ObjectWithMyBehavior");
 
     auto &behaviorExpression =
         behaviorEventsFunctions
@@ -1015,6 +1068,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &childObject = eventsBasedObject.InsertNewObject(
         project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
     childObject.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    auto &group = eventsBasedObject.GetObjectGroups().InsertNew("GroupWithMyBehavior");
+    group.AddObject(childObject.GetName());
 
     eventsBasedObject.InsertNewObject(
         project, "MyEventsExtension::MyEventsBasedObject", "MyCustomObject", 1);
@@ -1085,6 +1140,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
             .SetName("MyCustomObject")
             .SetType("object")
             .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    auto &group = action.GetObjectGroups().InsertNew("GroupWithMyBehavior");
+    group.AddObject("ObjectWithMyBehavior");
   }
 
   // Add some usages in events
@@ -1097,6 +1154,8 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &object = layout.InsertNewObject(project, "MyExtension::Sprite",
                                           "ObjectWithMyBehavior", 0);
     object.AddNewBehavior(project, "MyEventsExtension::MyEventsBasedBehavior", "MyBehavior");
+    auto &group = layout.GetObjectGroups().InsertNew("GroupWithMyBehavior", 0);
+    group.AddObject("ObjectWithMyBehavior");
 
     auto &globalObject = project.InsertNewObject(
         project, "MyExtension::Sprite", "GlobalObjectWithMyBehavior", 0);
@@ -1248,35 +1307,15 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
           project, layout, "ObjectWithMyBehavior", /* isObjectGroup=*/false);
 
+      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
       // Check actions with the object in parameters have been removed.
       REQUIRE(
-          IsActionsEmpty(layout.GetEvents().GetEvent(FreeFunctionWithObjects)));
+          IsActionsEmpty(eventsList->GetEvent(FreeFunctionWithObjects)));
 
       // Check actions with the object in expressions have been removed.
       REQUIRE(IsActionsEmpty(
-          layout.GetEvents().GetEvent(FreeFunctionWithObjectExpression)));
-    }
-
-    SECTION("External events") {
-      gd::Project project;
-      gd::Platform platform;
-      SetupProjectWithDummyPlatform(project, platform);
-      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-
-      auto &layout = project.GetLayout("Scene");
-
-      // Trigger the refactoring after removing an object
-      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout, "ObjectWithMyBehavior", /* isObjectGroup=*/false);
-
-      auto &externalEvents = project.GetExternalEvents("ExternalEvents");
-      // Check actions with the object in parameters have been removed.
-      REQUIRE(IsActionsEmpty(
-          externalEvents.GetEvents().GetEvent(FreeFunctionWithObjects)));
-
-      // Check actions with the object in expressions have been removed.
-      REQUIRE(IsActionsEmpty(externalEvents.GetEvents().GetEvent(
-          FreeFunctionWithObjectExpression)));
+          eventsList->GetEvent(FreeFunctionWithObjectExpression)));
+      }
     }
   }
 
@@ -1396,32 +1435,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       REQUIRE(externalLayout2.GetInitialInstances().HasInstancesOfObject(
                   "GlobalObject3") == true);
     }
-    
+
     SECTION("Events") {
-      gd::Project project;
-      gd::Platform platform;
-      SetupProjectWithDummyPlatform(project, platform);
-      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-
-      auto &layout = project.GetLayout("Scene");
-
-      // Trigger the refactoring after the renaming of an object
-      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
-          project, layout, "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
-          /* isObjectGroup=*/false);
-
-      // Check object name has been renamed in action parameters.
-      REQUIRE(GetEventFirstActionFirstParameterString(
-                  layout.GetEvents().GetEvent(FreeFunctionWithObjects)) ==
-              "RenamedObjectWithMyBehavior");
-
-      // Check object name has been renamed in expressions.
-      REQUIRE(GetEventFirstActionFirstParameterString(
-                  layout.GetEvents().GetEvent(FreeFunctionWithObjectExpression)) ==
-                "RenamedObjectWithMyBehavior.GetObjectNumber()");
-    }
-
-    SECTION("External events") {
       gd::Project project;
       gd::Platform platform;
       SetupProjectWithDummyPlatform(project, platform);
@@ -1435,57 +1450,141 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
 
-      auto &externalEvents = project.GetExternalEvents("ExternalEvents");
-      // Check object name has been renamed in action parameters.
-      REQUIRE(
-          GetEventFirstActionFirstParameterString(
-              externalEvents.GetEvents().GetEvent(FreeFunctionWithObjects)) ==
-          "RenamedObjectWithMyBehavior");
+      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+        // Check object name has been renamed in action parameters.
+        REQUIRE(GetEventFirstActionFirstParameterString(eventsList->GetEvent(
+                    FreeFunctionWithObjects)) == "RenamedObjectWithMyBehavior");
 
-      // Check object name has been renamed in expressions.
-      REQUIRE(GetEventFirstActionFirstParameterString(
-                  externalEvents.GetEvents().GetEvent(
-                      FreeFunctionWithObjectExpression)) ==
-              "RenamedObjectWithMyBehavior.GetObjectNumber()");
+        // Check object name has been renamed in expressions.
+        REQUIRE(GetEventFirstActionFirstParameterString(
+                    eventsList->GetEvent(FreeFunctionWithObjectExpression)) ==
+                "RenamedObjectWithMyBehavior.GetObjectNumber()");
+      }
+    }
+  }
+
+  SECTION("Group deleted (in layout)") {
+    SECTION("Events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+      auto &layout = project.GetLayout("Scene");
+
+      // Trigger the refactoring after removing an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
+          project, layout, "GroupWithMyBehavior", /* isObjectGroup=*/false);
+
+      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+        // Check actions with the object in parameters have been removed.
+        REQUIRE(IsActionsEmpty(eventsList->GetEvent(FreeFunctionWithGroup)));
+
+        // Check actions with the object in expressions have been removed.
+        REQUIRE(IsActionsEmpty(
+            eventsList->GetEvent(FreeFunctionWithObjectExpressionOnGroup)));
+      }
+    }
+  }
+
+  SECTION("Group renamed (in layout)") {
+    SECTION("Events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+      auto &layout = project.GetLayout("Scene");
+
+      // Trigger the refactoring after the renaming of an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
+          project, layout, "GroupWithMyBehavior", "RenamedGroupWithMyBehavior",
+          /* isObjectGroup=*/false);
+
+      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+        // Check object name has been renamed in action parameters.
+        REQUIRE(GetEventFirstActionFirstParameterString(eventsList->GetEvent(
+                    FreeFunctionWithGroup)) == "RenamedGroupWithMyBehavior");
+
+        // Check object name has been renamed in expressions.
+        REQUIRE(GetEventFirstActionFirstParameterString(eventsList->GetEvent(
+                    FreeFunctionWithObjectExpressionOnGroup)) ==
+                "RenamedGroupWithMyBehavior.GetObjectNumber()");
+      }
     }
   }
 
   SECTION("Object renamed (in events function)") {
-    gd::Project project;
-    gd::Platform platform;
-    SetupProjectWithDummyPlatform(project, platform);
-    auto &eventsExtension =
-        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    SECTION("Group") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension =
+          project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
 
-    // Add a (free) function with an object group
-    gd::EventsFunction &eventsFunction =
-        eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
-    gd::ObjectGroup &objectGroup =
-        eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
-    objectGroup.AddObject("Object1");
-    objectGroup.AddObject("Object2");
-    // In theory, we would add the object parameters, but we're not testing
-    // events in this test.
+      // Add a (free) function with an object group
+      gd::EventsFunction &eventsFunction =
+          eventsExtension.InsertNewEventsFunction("MyEventsFunction", 0);
+      gd::ObjectGroup &objectGroup =
+          eventsFunction.GetObjectGroups().InsertNew("MyGroup", 0);
+      objectGroup.AddObject("Object1");
+      objectGroup.AddObject("Object2");
+      // In theory, we would add the object parameters, but we're not testing
+      // events in this test.
 
-    // Create the objects container for the events function
-    gd::ObjectsContainer globalObjectsContainer;
-    gd::ObjectsContainer objectsContainer;
-    gd::ParameterMetadataTools::ParametersToObjectsContainer(
-        project, eventsFunction.GetParameters(), objectsContainer);
-    // (this is strictly not necessary because we're not testing events in this
-    // test)
+      // Create the objects container for the events function
+      gd::ObjectsContainer globalObjectsContainer;
+      gd::ObjectsContainer objectsContainer;
+      gd::ParameterMetadataTools::ParametersToObjectsContainer(
+          project, eventsFunction.GetParameters(), objectsContainer);
+      // (this is strictly not necessary because we're not testing events in
+      // this test)
 
-    // Trigger the refactoring after the renaming of an object
-    gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
-        project, eventsFunction, globalObjectsContainer, objectsContainer,
-        "Object1", "RenamedObject1",
-        /* isObjectGroup=*/false);
+      // Trigger the refactoring after the renaming of an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
+          project, eventsFunction, globalObjectsContainer, objectsContainer,
+          "Object1", "RenamedObject1",
+          /* isObjectGroup=*/false);
 
-    REQUIRE(objectGroup.Find("Object1") == false);
-    REQUIRE(objectGroup.Find("RenamedObject1") == true);
-    REQUIRE(objectGroup.Find("Object2") == true);
+      REQUIRE(objectGroup.Find("Object1") == false);
+      REQUIRE(objectGroup.Find("RenamedObject1") == true);
+      REQUIRE(objectGroup.Find("Object2") == true);
 
-    // Events are not tested
+      // Events are not tested
+    }
+
+    SECTION("Events") {
+      gd::Project project;
+      gd::Platform platform;
+      SetupProjectWithDummyPlatform(project, platform);
+      auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+      auto &eventsFunction =
+          eventsExtension.GetEventsFunction("MyOtherEventsFunction");
+
+      // Create the objects container for the events function
+      gd::ObjectsContainer globalObjectsContainer;
+      gd::ObjectsContainer objectsContainer;
+      gd::ParameterMetadataTools::ParametersToObjectsContainer(
+          project, eventsFunction.GetParameters(), objectsContainer);
+
+      // Trigger the refactoring after the renaming of an object
+      gd::WholeProjectRefactorer::ObjectOrGroupRenamedInEventsFunction(
+          project, eventsFunction, globalObjectsContainer, objectsContainer,
+          "ObjectWithMyBehavior", "RenamedObjectWithMyBehavior",
+          /* isObjectGroup=*/false);
+
+      // Check object name has been renamed in action parameters.
+      REQUIRE(
+          GetEventFirstActionFirstParameterString(
+              eventsFunction.GetEvents().GetEvent(FreeFunctionWithObjects)) ==
+          "RenamedObjectWithMyBehavior");
+
+      // Check object name has been renamed in expressions.
+      REQUIRE(GetEventFirstActionFirstParameterString(
+                  eventsFunction.GetEvents().GetEvent(
+                      FreeFunctionWithObjectExpression)) ==
+              "RenamedObjectWithMyBehavior.GetObjectNumber()");
+    }
   }
 
   SECTION("Object renamed (in events-based object)") {

@@ -14,6 +14,9 @@ import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
     const field = React.useRef<?ObjectSelector>(null);
     const focus: FieldFocusFunction = options => {
       // Prevent focus of field if an in-app tutorial is running because
@@ -25,10 +28,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     React.useImperativeHandle(ref, () => ({
       focus,
     }));
-
-    const { currentlyRunningInAppTutorial } = React.useContext(
-      InAppTutorialContext
-    );
 
     const { parameterMetadata } = props;
 

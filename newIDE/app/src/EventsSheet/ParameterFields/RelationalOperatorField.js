@@ -29,7 +29,7 @@ const mapTypeToOperators: { [string]: Array<string> } = {
 };
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function GlobalVariableField(props: ParameterFieldProps, ref) {
+  function RelationalOperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);

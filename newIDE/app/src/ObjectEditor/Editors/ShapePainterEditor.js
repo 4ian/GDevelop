@@ -144,18 +144,14 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           >
-            <SelectOption key="none" value="none" primaryText={t`None`} />
-            <SelectOption key="low" value="low" primaryText={t`Low quality`} />
+            <SelectOption key="none" value="none" label={t`None`} />
+            <SelectOption key="low" value="low" label={t`Low quality`} />
             <SelectOption
               key="medium"
               value="medium"
-              primaryText={t`Medium quality`}
+              label={t`Medium quality`}
             />
-            <SelectOption
-              key="high"
-              value="high"
-              primaryText={t`High quality`}
-            />
+            <SelectOption key="high" value="high" label={t`High quality`} />
           </SelectField>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>

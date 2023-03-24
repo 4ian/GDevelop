@@ -39,9 +39,7 @@ const TutorialMessage = ({ tutorial }: Props) => {
           )}
           renderRightButton={() => (
             <RaisedButton
-              icon={
-                tutorial.type === 'video' ? <Video /> : <Book />
-              }
+              icon={tutorial.type === 'video' ? <Video /> : <Book />}
               label={
                 tutorial.type === 'video' ? (
                   <Trans>Watch the tutorial</Trans>

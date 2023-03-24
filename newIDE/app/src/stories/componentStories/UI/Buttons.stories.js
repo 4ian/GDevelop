@@ -67,11 +67,7 @@ export const Default = () => (
         primary
         onClick={action('onClick')()}
       />
-      <RaisedButton
-        icon={<Download />}
-        primary
-        onClick={action('onClick')()}
-      />
+      <RaisedButton icon={<Download />} primary onClick={action('onClick')()} />
       <RaisedButton icon={<Download />} onClick={action('onClick')()} />
     </LineStackLayout>
     <LineStackLayout noMargin>

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import IconButton from '../IconButton';
-import Cross from "../CustomSvgIcons/Cross"
+import Cross from '../CustomSvgIcons/Cross';
 import { MosaicWindowContext, MosaicContext } from 'react-mosaic-component';
 
 const styles = {

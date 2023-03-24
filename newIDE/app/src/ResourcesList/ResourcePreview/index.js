@@ -75,16 +75,10 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
       case 'json':
       case 'tilemap':
       case 'tileset':
-        return (
-          <GenericIconPreview
-            renderIcon={props => <File {...props} />}
-          />
-        );
+        return <GenericIconPreview renderIcon={props => <File {...props} />} />;
       case 'video':
         return (
-          <GenericIconPreview
-            renderIcon={props => <Video {...props} />}
-          />
+          <GenericIconPreview renderIcon={props => <Video {...props} />} />
         );
       case 'font':
       case 'bitmapFont':

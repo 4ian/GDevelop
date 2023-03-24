@@ -105,7 +105,11 @@ const MeasuresTable = (props: Props) => {
         <div style={{ width: rowData.depth * 8 }} />
         {rowData.hasSubsections ? (
           <IconButton onClick={() => toggleSection(rowData.path)}>
-            {rowData.isCollapsed ? <ChevronArrowRight /> : <ChevronArrowBottom />}
+            {rowData.isCollapsed ? (
+              <ChevronArrowRight />
+            ) : (
+              <ChevronArrowBottom />
+            )}
           </IconButton>
         ) : (
           <div style={{ width: 24 }} />

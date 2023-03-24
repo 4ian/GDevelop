@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
-import HelpOutline from '@material-ui/icons/HelpOutline';
 import IconButton from '../IconButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
+import Help from '../CustomSvgIcons/Help';
 
 type PropsType = {|
   helpPagePath: ?string,
@@ -40,7 +40,7 @@ const HelpIcon = (props: PropsType) => {
       style={props.style}
       size={props.size}
     >
-      <HelpOutline />
+      <Help />
     </IconButton>
   );
 };

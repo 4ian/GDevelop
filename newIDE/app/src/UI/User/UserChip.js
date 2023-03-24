@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { makeStyles } from '@material-ui/core';
-import Person from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
 import { getGravatarUrl } from '../GravatarUrl';
 import DotBadge from '../DotBadge';
@@ -14,6 +13,7 @@ import FlatButton from '../FlatButton';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { hasPendingNotifications } from '../../Utils/Notification';
 import CircularProgress from '../CircularProgress';
+import User from '../CustomSvgIcons/User';
 
 const useStyles = makeStyles({
   root: { flexDirection: 'column' },
@@ -70,7 +70,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
             </span>
           }
           onClick={onLogin}
-          leftIcon={<Person fontSize="small" />}
+          leftIcon={<User fontSize="small" />}
         />
         <RaisedButton
           label={
@@ -80,7 +80,7 @@ const UserChip = ({ onOpenProfile }: Props) => {
           }
           onClick={onCreateAccount}
           primary
-          icon={<Person fontSize="small" />}
+          icon={<User fontSize="small" />}
         />
       </LineStackLayout>
     </div>

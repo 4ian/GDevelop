@@ -17,15 +17,15 @@ import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
+import Visibility from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 

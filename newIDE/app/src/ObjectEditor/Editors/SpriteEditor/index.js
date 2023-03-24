@@ -5,8 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
-import Add from '@material-ui/icons/Add';
-import Delete from '@material-ui/icons/Delete';
 import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -40,6 +38,8 @@ import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
+import Add from '../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
 
 const gd: libGDevelop = global.gd;
 
@@ -119,7 +119,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 />
               </Column>
               <IconButton size="small" onClick={onRemove}>
-                <Delete />
+                <Trash />
               </IconButton>
             </MiniToolbar>
           )}

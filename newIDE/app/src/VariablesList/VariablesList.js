@@ -7,11 +7,11 @@ import { ClickAwayListener } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { makeStyles, withStyles } from '@material-ui/styles';
 
-import Add from '@material-ui/icons/Add';
-import Edit from '@material-ui/icons/Edit';
-import Replay from '@material-ui/icons/Replay';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import Add from '../UI/CustomSvgIcons/Add';
+import Edit from '../UI/CustomSvgIcons/Edit';
+import Undo from '../UI/CustomSvgIcons/Undo';
+import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -1162,7 +1162,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               deleteNode(nodeId);
                             }}
                           >
-                            <Replay
+                            <Undo
                               htmlColor={
                                 isSelected
                                   ? gdevelopTheme.listItem.selectedTextColor
@@ -1484,7 +1484,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       <TreeView
                         multiSelect
                         defaultExpandIcon={<ChevronRight />}
-                        defaultCollapseIcon={<ExpandMore />}
+                        defaultCollapseIcon={<ChevronBottom />}
                         onNodeSelect={(event, values) =>
                           setSelectedNodes(values)
                         }

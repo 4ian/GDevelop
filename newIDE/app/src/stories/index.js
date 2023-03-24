@@ -104,7 +104,6 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import Brush from '@material-ui/icons/Brush';
-import Delete from '@material-ui/icons/Delete';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -139,6 +138,7 @@ import {
 import ListIcon from '../UI/ListIcon';
 import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import Trash from '../UI/CustomSvgIcons/Trash';
 
 configureActions({
   depth: 2,
@@ -1008,7 +1008,7 @@ storiesOf('UI Building Blocks/Accordion', module)
                   action('Header action')();
                 }}
               >
-                <Delete />
+                <Trash />
               </IconButton>,
             ]}
           >

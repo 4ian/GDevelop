@@ -8,12 +8,12 @@ import ExportHomeSeparator from './ExportHomeSeparator';
 import { type Exporter, type ExporterSection, type ExporterKey } from '.';
 import Text from '../../UI/Text';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import LaptopMac from '@material-ui/icons/LaptopMac';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
-import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import ExportLauncher from './ExportLauncher';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import PeopleOutline from '@material-ui/icons/PeopleOutline';
+import Users from '../../UI/CustomSvgIcons/Users';
+import Mobile from '../../UI/CustomSvgIcons/Mobile';
+import Desktop from '../../UI/CustomSvgIcons/Desktop';
 
 const styles = {
   titleContainer: {
@@ -73,7 +73,7 @@ const ExportHome = ({
           </Line>
         </div>
         <Line expand>
-          <PeopleOutline style={styles.icon} />
+          <Users style={styles.icon} />
         </Line>
         <div style={styles.contentContainer}>
           <ExportLauncher
@@ -101,8 +101,8 @@ const ExportHome = ({
             <Line expand>
               <div style={styles.iconsContainer}>
                 <Chrome style={styles.icon} />
-                <PhoneIphone style={styles.icon} />
-                <LaptopMac style={styles.icon} />
+                <Desktop style={styles.icon} />
+                <Mobile style={styles.icon} />
               </div>
             </Line>
             <div style={styles.contentContainer}>

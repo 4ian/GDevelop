@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react';
 import Chip from '../../UI/Chip';
-import FaceIcon from '@material-ui/icons/Face';
 import { type UserPublicProfile } from '../../Utils/GDevelopServices/User';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
+import User from '../CustomSvgIcons/User';
 
 const styles = {
   chip: {
@@ -22,7 +22,7 @@ export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
 
   return (
     <Chip
-      icon={<FaceIcon />}
+      icon={<User />}
       size="small"
       style={styles.chip}
       label={user.username}

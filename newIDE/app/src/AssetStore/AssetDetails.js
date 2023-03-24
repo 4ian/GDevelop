@@ -22,8 +22,6 @@ import Window from '../Utils/Window';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import IconButton from '../UI/IconButton';
-import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
-import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import { AssetCard } from './AssetCard';
@@ -41,6 +39,8 @@ import {
   type UserPublicProfile,
 } from '../Utils/GDevelopServices/User';
 import { getPixelatedImageRendering } from '../Utils/CssHelpers';
+import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
+import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -72,10 +72,6 @@ const styles = {
   },
   arrowContainer: {
     padding: 6,
-  },
-  // The left arrow SVG icon from Material-UI is not centered.
-  leftArrowSvg: {
-    transform: 'translateX(5px)',
   },
   scrollView: {
     // This is needed to make the scroll view take the full height of the container,
@@ -445,7 +441,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                             );
                           }}
                         >
-                          <ArrowBackIos style={styles.leftArrowSvg} />
+                          <ArrowLeft />
                         </IconButton>
                       </div>
 
@@ -491,7 +487,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                             );
                           }}
                         >
-                          <ArrowForwardIos />
+                          <ArrowRight />
                         </IconButton>
                       </div>
                     </Line>

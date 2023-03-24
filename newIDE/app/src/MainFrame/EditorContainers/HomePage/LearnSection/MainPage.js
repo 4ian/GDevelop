@@ -5,7 +5,6 @@ import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
-import PublishIcon from '@material-ui/icons/Publish';
 import TranslateIcon from '@material-ui/icons/Translate';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
@@ -27,9 +26,10 @@ import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
-import ArrowRight from '@material-ui/icons/ArrowRight';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
+import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
+import Upload from '../../../../UI/CustomSvgIcons/Upload';
 
 const useStyles = makeStyles({
   tile: {
@@ -151,7 +151,7 @@ const MainPage = ({
               formatTutorialToImageTileComponent(i18n, tutorial)
             )}
           onShowAll={() => onSelectCategory(category)}
-          showAllIcon={<ArrowRight fontSize="small" />}
+          showAllIcon={<ChevronArrowRight fontSize="small" />}
           getColumnsFromWidth={getTutorialsColumnsFromWidth}
           getLimitFromWidth={getTutorialsColumnsFromWidth}
         />
@@ -246,7 +246,7 @@ const MainPage = ({
                     );
                   }}
                   primary
-                  leftIcon={<PublishIcon />}
+                  leftIcon={<Upload />}
                   label={<Trans>Submit your project as an example</Trans>}
                 />
               )}

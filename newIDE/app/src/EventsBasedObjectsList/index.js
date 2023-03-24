@@ -23,8 +23,8 @@ import {
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 

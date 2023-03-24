@@ -28,12 +28,12 @@ import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import Edit from '@material-ui/icons/Edit';
 import FlatButton from '../../UI/FlatButton';
 import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from '../ParameterFields/ParameterFieldCommons';
+import Edit from '../../UI/CustomSvgIcons/Edit';
 
 const gd: libGDevelop = global.gd;
 

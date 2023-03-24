@@ -4,7 +4,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
-import Add from '@material-ui/icons/Add';
 import DirectionTools from './DirectionTools';
 import ImageThumbnail from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import {
@@ -32,6 +31,7 @@ import {
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
 import { Column } from '../../../UI/Grid';
+import Add from '../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail

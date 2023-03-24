@@ -6,7 +6,6 @@ import { t } from '@lingui/macro';
 import Fuse from 'fuse.js';
 
 import * as React from 'react';
-import Add from '@material-ui/icons/Add';
 import Chip from '@material-ui/core/Chip';
 import {
   createTree,
@@ -59,6 +58,7 @@ import {
   getFuseSearchQueryForMultipleKeys,
 } from '../../UI/Search/UseSearchStructuredItem';
 import { Column, Line } from '../../UI/Grid';
+import Add from '../../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 

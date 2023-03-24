@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import {
@@ -23,6 +22,7 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import uniq from 'lodash/uniq';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 type Props = {
   ...ParameterFieldProps,
@@ -190,7 +190,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         renderButton={style =>
           onOpenDialog && !isInline ? (
             <RaisedButton
-              icon={<OpenInNew />}
+              icon={<ShareExternal />}
               disabled={!variablesContainer}
               primary
               style={style}

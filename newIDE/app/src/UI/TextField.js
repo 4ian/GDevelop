@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import Visibility from '@material-ui/icons/Visibility';
 import IconButton from '@material-ui/core/IconButton';
 import MUITextField from '@material-ui/core/TextField';
 import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import Visibility from './CustomSvgIcons/Visibility';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
 import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';

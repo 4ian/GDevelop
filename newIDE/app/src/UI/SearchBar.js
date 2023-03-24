@@ -9,7 +9,6 @@ import Collapse from '@material-ui/core/Collapse';
 import MuiTextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Text from './Text';
-import FilterList from '@material-ui/icons/FilterList';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import HelpIcon from './HelpIcon';
@@ -26,6 +25,7 @@ import { type GDevelopTheme } from './Theme';
 import { useDebounce } from '../Utils/UseDebounce';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import { textEllipsisStyle } from './TextEllipsis';
+import Filter from './CustomSvgIcons/Filter';
 
 type TagsHandler = {|
   remove: string => void,
@@ -453,7 +453,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                         disabled={disabled}
                         size="small"
                       >
-                        <FilterList />
+                        <Filter />
                       </IconButton>
                     }
                     buildMenuTemplate={buildMenuTemplate}

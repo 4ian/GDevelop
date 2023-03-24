@@ -18,7 +18,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
       outlineSize: 1,
       absoluteCoordinates: false,
       clearBetweenFrames: false,
-      antialiasing: 'Low',
+      antialiasing: 'low',
     });
 
   /** @param {gdjs.RuntimeScene} runtimeScene */

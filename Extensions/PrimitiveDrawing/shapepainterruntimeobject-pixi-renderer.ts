@@ -490,7 +490,7 @@ namespace gdjs {
     }
 
     updateAntialiasing(): void {
-      if (this._object.getAntialiasing() !== 'None') {
+      if (this._object.getAntialiasing() !== 'none') {
         if (!this._antialiasingFilter) {
           this._antialiasingFilter = new PIXI.filters.FXAAFilter();
         }

@@ -13,7 +13,7 @@ namespace gdjs {
     b: integer;
   };
 
-  export type Antialiasing = 'None' | 'Low' | 'Medium' | 'High';
+  export type Antialiasing = 'none' | 'low' | 'medium' | 'high';
 
   /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
   export type ShapePainterObjectDataType = {

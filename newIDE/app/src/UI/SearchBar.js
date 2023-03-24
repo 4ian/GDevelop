@@ -373,7 +373,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
             <Line noMargin>
               <Paper classes={paperStyles} style={styles.root}>
                 <div style={styles.iconButtonSearch.container}>
-                  <Search style={styles.iconButtonSearch.iconStyle} />
+                  <Search style={styles.iconButtonSearch.iconStyle} viewBox="2 2 12 12" />
                 </div>
                 <div
                   style={styles.searchContainer}

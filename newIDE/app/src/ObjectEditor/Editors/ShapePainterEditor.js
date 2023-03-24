@@ -155,7 +155,7 @@ export default class PanelSpriteEditor extends React.Component<
             <SelectOption
               key="low"
               value="Low"
-              primaryText={t`Low quality anti-aliasing`}
+              primaryText={t`Low quality`}
             />
             <SelectOption
               key="medium"

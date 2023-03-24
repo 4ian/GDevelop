@@ -10,7 +10,6 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import Refresh from '@material-ui/icons/Refresh';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import Remove from '@material-ui/icons/Remove';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -21,6 +20,7 @@ import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Collapse } from '@material-ui/core';
 import ThreeDotsMenu from './CustomSvgIcons/ThreeDotsMenu';
+import ShareExternal from './CustomSvgIcons/ShareExternal';
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
 export const listItemWithoutIconHeight = 29;
@@ -184,7 +184,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               aria-label="open link"
               onClick={props.onOpenLink}
             >
-              <OpenInNew style={{ color: props.rightIconColor }} />
+              <ShareExternal style={{ color: props.rightIconColor }} />
             </IconButton>
           </MUIListItemSecondaryAction>
         );

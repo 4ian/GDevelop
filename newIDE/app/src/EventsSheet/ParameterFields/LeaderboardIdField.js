@@ -2,7 +2,6 @@
 import React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import {
   type ParameterFieldProps,
@@ -19,6 +18,7 @@ import GenericExpressionField from './GenericExpressionField';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
@@ -172,7 +172,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               renderButton={style => (
                 <FlatButtonWithSplitMenu
                   id="open-leaderboard-admin-button"
-                  icon={<OpenInNew />}
+                  icon={<ShareExternal />}
                   style={style}
                   primary
                   onClick={() => setIsAdminOpen(true)}

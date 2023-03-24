@@ -22,10 +22,10 @@ import Toggle from '../../UI/Toggle';
 import TextButton from '../../UI/TextButton';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Copy from '../../UI/CustomSvgIcons/Copy';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -78,7 +78,7 @@ const downloadButtons = [
   {
     displayName: t`Open build link`,
     key: 's3Key',
-    icon: <OpenInNew />,
+    icon: <ShareExternal />,
   },
 ];
 

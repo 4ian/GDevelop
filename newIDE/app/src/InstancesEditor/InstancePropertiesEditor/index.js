@@ -13,7 +13,6 @@ import { type Schema } from '../../PropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
@@ -21,6 +20,7 @@ import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
 } from '../../VariablesList/VariablesList';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 type Props = {|
   project: gdProject,
@@ -206,7 +206,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                   this.props.editInstanceVariables(instance);
                 }}
               >
-                <OpenInNew />
+                <ShareExternal />
               </IconButton>
             </Line>
           </Column>

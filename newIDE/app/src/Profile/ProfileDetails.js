@@ -3,7 +3,6 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import { Line, Spacer } from '../UI/Grid';
 import {
   ColumnStackLayout,
@@ -26,6 +25,7 @@ import { GridList } from '@material-ui/core';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
+import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 
 type DisplayedProfile = {
   id: string,
@@ -119,7 +119,7 @@ const ProfileDetails = ({
                       )
                     )
                   }
-                  leftIcon={<OpenInNew />}
+                  leftIcon={<ShareExternal />}
                 />
               </LineStackLayout>
             )}

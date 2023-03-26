@@ -88,6 +88,11 @@ class InventoryJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.count");
+	GetAllExpressions()["Inventory::Maximum"]
+		.codeExtraInformation
+		.SetIncludeFile("Extensions/Inventory/inventory.js")
+		.AddIncludeFile("Extensions/Inventory/inventorytools.js")
+		.SetFunctionName("gdjs.evtTools.inventory.maximum");
 
     StripUnimplementedInstructionsAndExpressions();
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

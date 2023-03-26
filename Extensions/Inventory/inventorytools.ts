@@ -49,7 +49,7 @@ namespace gdjs {
         );
       };
 
-	  export const maximum = function (
+      export const maximum = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         inventoryName: string,
         name: string

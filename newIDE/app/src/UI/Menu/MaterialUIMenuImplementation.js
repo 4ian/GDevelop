@@ -2,7 +2,6 @@
 import * as React from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -15,6 +14,7 @@ import {
   type MenuItemTemplate,
   type ContextMenuImplementation,
 } from './Menu.flow';
+import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 
 const useStyles = makeStyles({
   backdropRootForMouse: {
@@ -138,7 +138,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         onPointerLeave={handleLeave}
       >
         {item.label}
-        <ArrowRightIcon />
+        <ChevronArrowRight />
       </MenuItem>
       <Menu
         open={!!anchorElement}
@@ -244,7 +244,11 @@ export default class MaterialUIMenuImplementation
               style={styles.menuItem}
             >
               <ListItemIcon>
-                {item.checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+                {item.checked ? (
+                  <CheckBoxIcon fontSize="small" />
+                ) : (
+                  <CheckBoxOutlineBlankIcon fontSize="small" />
+                )}
               </ListItemIcon>
               <ListItemText primary={item.label} />
             </MenuItem>

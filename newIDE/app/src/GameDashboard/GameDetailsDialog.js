@@ -517,15 +517,9 @@ export const GameDetailsDialog = ({
                     }
                     value={publicGame.orientation}
                   >
-                    <SelectOption
-                      value="default"
-                      primaryText={t`Platform default`}
-                    />
-                    <SelectOption
-                      value="landscape"
-                      primaryText={t`Landscape`}
-                    />
-                    <SelectOption value="portrait" primaryText={t`Portrait`} />
+                    <SelectOption value="default" label={t`Platform default`} />
+                    <SelectOption value="landscape" label={t`Landscape`} />
+                    <SelectOption value="portrait" label={t`Portrait`} />
                   </SelectField>
                   <Line noMargin justifyContent="flex-end">
                     <FlatButton

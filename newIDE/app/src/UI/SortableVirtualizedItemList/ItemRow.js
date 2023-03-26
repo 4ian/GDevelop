@@ -42,7 +42,6 @@ type Props<Item> = {|
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
   scaleUpItemIconWhenSelected?: boolean,
-  connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 |};
 
 function ItemRow<Item>({
@@ -62,7 +61,6 @@ function ItemRow<Item>({
   onEdit,
   hideMenuButton,
   scaleUpItemIconWhenSelected,
-  connectIconDragSource,
 }: Props<Item>) {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
@@ -161,11 +159,7 @@ function ItemRow<Item>({
     <ListItem
       style={{ ...itemStyle }}
       primaryText={label}
-      leftIcon={
-        connectIconDragSource && leftIcon
-          ? connectIconDragSource(<div>{leftIcon}</div>)
-          : leftIcon
-      }
+      leftIcon={leftIcon}
       displayMenuButton={!hideMenuButton}
       rightIconColor={
         selected

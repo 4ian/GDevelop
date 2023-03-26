@@ -14,6 +14,7 @@ import {
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import SceneVariableField from '../../ParameterFields/SceneVariableField';
+import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { Trans } from '@lingui/macro';
@@ -54,9 +55,9 @@ export default class ForEachChildVariableEvent extends React.Component<
   EventRendererProps,
   State
 > {
-  _valueIteratorField: ?SceneVariableField = null;
-  _keyIteratorField: ?SceneVariableField = null;
-  _iterableField: ?SceneVariableField = null;
+  _valueIteratorField: ?ParameterFieldInterface = null;
+  _keyIteratorField: ?ParameterFieldInterface = null;
+  _iterableField: ?ParameterFieldInterface = null;
 
   state = {
     editingValueIteratorVariableName: false,

@@ -374,7 +374,7 @@ const AdditionalUserInfoDialog = ({
                 <SelectOption
                   key={usageOption.value}
                   value={usageOption.value}
-                  primaryText={usageOption.label}
+                  label={usageOption.label}
                 />
               ))}
             </SelectField>
@@ -392,7 +392,7 @@ const AdditionalUserInfoDialog = ({
                     <SelectOption
                       key={teamOrCompanySizeOption.value}
                       value={teamOrCompanySizeOption.value}
-                      primaryText={teamOrCompanySizeOption.label}
+                      label={teamOrCompanySizeOption.label}
                     />
                   )
                 )}
@@ -423,7 +423,7 @@ const AdditionalUserInfoDialog = ({
                 <SelectOption
                   key={experienceOption.value}
                   value={experienceOption.value}
-                  primaryText={experienceOption.label}
+                  label={experienceOption.label}
                 />
               ))}
             </SelectField>
@@ -440,7 +440,7 @@ const AdditionalUserInfoDialog = ({
                   <SelectOption
                     key={creationGoalOption.value}
                     value={creationGoalOption.value}
-                    primaryText={creationGoalOption.label}
+                    label={creationGoalOption.label}
                   />
                 ))}
               </SelectField>
@@ -457,7 +457,7 @@ const AdditionalUserInfoDialog = ({
                 <SelectOption
                   key={hearFromOption.value}
                   value={hearFromOption.value}
-                  primaryText={hearFromOption.label}
+                  label={hearFromOption.label}
                 />
               ))}
             </SelectField>

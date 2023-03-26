@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import DeleteIcon from '@material-ui/icons/Delete';
 import WarningIcon from '@material-ui/icons/Warning';
-import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -29,6 +27,8 @@ import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
 import { addVertexOnLongestEdge } from './PolygonHelper';
+import Add from '../../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../../UI/CustomSvgIcons/Trash';
 
 const gd = global.gd;
 
@@ -106,7 +106,7 @@ const VerticesTable = (props: VerticesTableProps) => {
       )}
       <Line justifyContent="center">
         <FlatButton
-          leftIcon={<AddIcon size="small" />}
+          leftIcon={<Add />}
           label={<Trans>Add a vertex</Trans>}
           onClick={() => {
             addVertexOnLongestEdge(props.vertices);
@@ -159,7 +159,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
       }}
       tooltip={t`Delete collision mask`}
     >
-      <DeleteIcon />
+      <Trash />
     </IconButton>,
   ];
 
@@ -266,7 +266,7 @@ const PolygonsList = (props: PolygonsListProps) => {
           <Line alignItems="center" justifyContent="center">
             <RaisedButtonWithSplitMenu
               primary
-              icon={<AddIcon />}
+              icon={<Add />}
               label={<Trans>Add collision mask</Trans>}
               onClick={() => {
                 addCollisionMask();

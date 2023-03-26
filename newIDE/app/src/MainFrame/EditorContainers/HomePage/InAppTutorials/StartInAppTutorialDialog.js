@@ -12,8 +12,11 @@ import Text from '../../../../UI/Text';
 import {
   FLING_GAME_IN_APP_TUTORIAL_ID,
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  TIMER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
+  JOYSTICK_IN_APP_TUTORIAL_ID,
+  isMiniTutorial,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
 const styles = {
@@ -30,22 +33,6 @@ type Props = {|
   isProjectOpened?: boolean,
   startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
 |};
-
-const fullTutorialContent = (
-  <>
-    <Text>
-      <Trans>
-        You're about to start the first chapter of this guided lesson.
-      </Trans>
-    </Text>
-    <Text>
-      <Trans>
-        GDevelop will save your progress so you can take a break when you need
-        it.
-      </Trans>
-    </Text>
-  </>
-);
 
 const getGuidedLessonContent = ({
   learningKeys,
@@ -76,7 +63,21 @@ const getGuidedLessonContent = ({
 const titleAndContentByKey = {
   [FLING_GAME_IN_APP_TUTORIAL_ID]: {
     title: <Trans>Let's make a Fling Game</Trans>,
-    content: fullTutorialContent,
+    content: (
+      <>
+        <Text>
+          <Trans>
+            You're about to start the first chapter of this guided lesson.
+          </Trans>
+        </Text>
+        <Text>
+          <Trans>
+            GDevelop will save your progress so you can take a break when you
+            need it.
+          </Trans>
+        </Text>
+      </>
+    ),
   },
   [PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID]: {
     title: <Trans>Let's improve a scoring system</Trans>,
@@ -85,6 +86,16 @@ const titleAndContentByKey = {
         <Trans>Making objects disappear or appear when colliding</Trans>,
         <Trans>Creating, modifying and accessing a scene variable</Trans>,
         <Trans>Updating a score accordingly</Trans>,
+      ],
+    }),
+  },
+  [TIMER_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's use time to measure a score</Trans>,
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Create and modify a text</Trans>,
+        <Trans>Start a timer</Trans>,
+        <Trans>Use the timer to display a score</Trans>,
       ],
     }),
   },
@@ -107,6 +118,16 @@ const titleAndContentByKey = {
       learningKeys: [
         <Trans>Add a new layer</Trans>,
         <Trans>Use a prefab to display the player's health bar</Trans>,
+      ],
+    }),
+  },
+  [JOYSTICK_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's add mobile controls to our game</Trans>,
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Add a new layer</Trans>,
+        <Trans>Add a joystick prefab</Trans>,
+        <Trans>Add a behavior</Trans>,
       ],
     }),
   },
@@ -199,7 +220,10 @@ const StartInAppTutorialDialog = ({
   };
 
   const dialogContent =
-    dialogContentByCompletionStatus[tutorialCompletionStatus];
+    dialogContentByCompletionStatus[
+      // Always show the "not started" dialog for the mini tutorials.
+      isMiniTutorial(tutorialId) ? 'notStarted' : tutorialCompletionStatus
+    ];
   const {
     title,
     content,

@@ -17,7 +17,6 @@ import HelpIcon from '../UI/HelpIcon';
 import AboutDialog from '../MainFrame/AboutDialog';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
-import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
@@ -80,7 +79,9 @@ import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtracto
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
@@ -103,7 +104,6 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import Brush from '@material-ui/icons/Brush';
-import Delete from '@material-ui/icons/Delete';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
@@ -117,11 +117,6 @@ import {
   makeFakeExpressionAutocompletions,
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
-import AutocompletePicker from '../CommandPalette/CommandPalette/AutocompletePicker';
-import {
-  type NamedCommand,
-  type CommandOption,
-} from '../CommandPalette/CommandManager';
 import HotReloadPreviewButton from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import ScrollView from '../UI/ScrollView';
@@ -143,6 +138,7 @@ import {
 import ListIcon from '../UI/ListIcon';
 import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
 import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import Trash from '../UI/CustomSvgIcons/Trash';
 
 configureActions({
   depth: 2,
@@ -170,10 +166,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -189,10 +185,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
           floatingLabelText="This is a floating label"
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -207,10 +203,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -308,7 +304,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('forceSetValue and forceSetSelection', () => {
     const [value, setValue] = React.useState('Hello World!');
-    const field = React.useRef(null);
+    const field = React.useRef<?SemiControlledTextFieldInterface>(null);
 
     return (
       <React.Fragment>
@@ -1012,7 +1008,7 @@ storiesOf('UI Building Blocks/Accordion', module)
                   action('Header action')();
                 }}
               >
-                <Delete />
+                <Trash />
               </IconButton>,
             ]}
           >
@@ -1343,11 +1339,6 @@ storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
-
-storiesOf('HelpFinder', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)
@@ -2792,68 +2783,6 @@ storiesOf('ObjectTypeSelector', module)
       floatingLabelText="Choose the object type to use"
       onChange={action('change')}
     />
-  ));
-
-storiesOf('CommandPalette', module)
-  .addDecorator(muiDecorator)
-  .add('commands', () => (
-    <I18n>
-      {({ i18n }) => (
-        <AutocompletePicker
-          i18n={i18n}
-          items={
-            ([
-              {
-                name: 'OPEN_PROJECT',
-                handler: () => {},
-              },
-              {
-                name: 'OPEN_PROJECT_PROPERTIES',
-                handler: () => {},
-              },
-              {
-                name: 'EDIT_OBJECT',
-                handler: () => {},
-              },
-            ]: Array<NamedCommand>)
-          }
-          onClose={() => {}}
-          onSelect={action('Open command')}
-          placeholder="Start typing a command..."
-        />
-      )}
-    </I18n>
-  ))
-  .add('command options', () => (
-    <I18n>
-      {({ i18n }) => (
-        <AutocompletePicker
-          i18n={i18n}
-          items={
-            ([
-              {
-                text: 'Player',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-              {
-                text: 'Platform',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-              {
-                text: 'Enemy',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-            ]: Array<CommandOption>)
-          }
-          onClose={() => {}}
-          onSelect={action('Select command option')}
-          placeholder="Edit object..."
-        />
-      )}
-    </I18n>
   ));
 
 storiesOf('HotReloadPreviewButton', module)

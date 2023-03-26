@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import TextField, { type TextFieldInterface } from './TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 
 type Props = {|
   onChange: string => void,
@@ -50,7 +51,7 @@ type Props = {|
 |};
 
 export type SemiControlledTextFieldInterface = {|
-  focus: () => void,
+  focus: FieldFocusFunction,
   forceSetValue: (text: string) => void,
   forceSetSelection: (start: number, end: number) => void,
   getInputNode: () => ?HTMLInputElement,
@@ -83,8 +84,8 @@ const SemiControlledTextField = React.forwardRef<
     }
   };
 
-  const focus = () => {
-    if (textFieldRef.current) textFieldRef.current.focus();
+  const focus: FieldFocusFunction = options => {
+    if (textFieldRef.current) textFieldRef.current.focus(options);
   };
 
   const getInputNode = (): ?HTMLInputElement => {

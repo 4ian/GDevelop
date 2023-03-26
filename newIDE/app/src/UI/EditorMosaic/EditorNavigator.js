@@ -4,8 +4,8 @@ import * as React from 'react';
 import { type Editor } from '.';
 import { Column, Line } from '../Grid';
 import FlatButton from '../FlatButton';
-import ArrowBack from '@material-ui/icons/ArrowBack';
 import Background from '../Background';
+import ChevronArrowLeft from '../CustomSvgIcons/ChevronArrowLeft';
 
 type Props = {|
   initialEditorName: string,
@@ -74,7 +74,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
                       if (transition.previousEditor)
                         setCurrentEditorName(transition.previousEditor);
                     }}
-                    leftIcon={<ArrowBack />}
+                    leftIcon={<ChevronArrowLeft />}
                   />
                 )}
                 {transition.nextLabel && transition.nextEditor && (

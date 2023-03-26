@@ -5,9 +5,6 @@ import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { differenceInCalendarDays, format } from 'date-fns';
 
-import PhoneIphone from '@material-ui/icons/PhoneIphone';
-import LaptopMac from '@material-ui/icons/LaptopMac';
-
 import { Line, LargeSpacer, Spacer, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
@@ -37,6 +34,8 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
+import Mobile from '../../UI/CustomSvgIcons/Mobile';
+import Desktop from '../../UI/CustomSvgIcons/Desktop';
 
 const styles = {
   icon: {
@@ -71,9 +70,9 @@ const getIcon = (
 ) => {
   switch (buildType) {
     case 'cordova-build':
-      return <PhoneIphone style={styles.icon} />;
+      return <Mobile style={styles.icon} />;
     case 'electron-build':
-      return <LaptopMac style={styles.icon} />;
+      return <Desktop style={styles.icon} />;
     case 'web-build':
       return <Chrome style={styles.icon} />;
     default:

@@ -1,24 +1,26 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import GenericExpressionField from './GenericExpressionField';
 import { enumerateExternalLayouts } from '../../ProjectManager/EnumerateProjectItems';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
-export default class ExternalLayoutNameField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function ExternalLayoutNameField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?GenericExpressionField>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
-    const externalLayoutNames: Array<ExpressionAutocompletion> = this.props
-      .project
-      ? enumerateExternalLayouts(this.props.project).map(externalLayout => ({
+    const externalLayoutNames: Array<ExpressionAutocompletion> = props.project
+      ? enumerateExternalLayouts(props.project).map(externalLayout => ({
           kind: 'Text',
           completion: `"${externalLayout.getName()}"`,
         }))
@@ -32,9 +34,9 @@ export default class ExternalLayoutNameField extends Component<
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
-        {...this.props}
+        ref={field}
+        {...props}
       />
     );
   }
-}
+);

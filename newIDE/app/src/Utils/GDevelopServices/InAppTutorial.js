@@ -16,13 +16,20 @@ export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
 export const CAMERA_PARALLAX_IN_APP_TUTORIAL_ID = 'cameraParallax';
 export const HEALTH_BAR_IN_APP_TUTORIAL_ID = 'healthBar';
+export const JOYSTICK_IN_APP_TUTORIAL_ID = 'joystick';
+export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
 
-export const allInAppTutorialIds = [
-  FLING_GAME_IN_APP_TUTORIAL_ID,
+export const guidedLessonsIds = [
   PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  TIMER_IN_APP_TUTORIAL_ID,
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
+  JOYSTICK_IN_APP_TUTORIAL_ID,
 ];
+
+const fullTutorialIds = [FLING_GAME_IN_APP_TUTORIAL_ID];
+
+export const allInAppTutorialIds = [...guidedLessonsIds, ...fullTutorialIds];
 
 export type InAppTutorialShortHeader = {|
   id: string,
@@ -71,6 +78,7 @@ export type InAppTutorialTooltip = {|
   placement?: 'bottom' | 'left' | 'right' | 'top',
   title?: TranslatedText,
   description?: TranslatedText,
+  touchDescription?: TranslatedText,
   image?: { dataUrl: string, width?: string },
 |};
 
@@ -194,6 +202,8 @@ export const fetchInAppTutorial = async (
 export const isMiniTutorial = (tutorialId: string) =>
   [
     PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+    TIMER_IN_APP_TUTORIAL_ID,
     CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
     HEALTH_BAR_IN_APP_TUTORIAL_ID,
+    JOYSTICK_IN_APP_TUTORIAL_ID,
   ].includes(tutorialId);

@@ -7,7 +7,7 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import { type AuthenticatedUser } from '../AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import BackgroundText from '../../UI/BackgroundText';
-import VerifiedUser from '@material-ui/icons/VerifiedUser';
+import UserVerified from '../../UI/CustomSvgIcons/UserVerified';
 import Text from '../../UI/Text';
 import { useInterval } from '../../Utils/UseInterval';
 import CircularProgress from '../../UI/CircularProgress';
@@ -102,7 +102,7 @@ export default function SubscriptionPendingDialog({
             </Text>
           </Line>
           <Line justifyContent="center" alignItems="center">
-            <VerifiedUser />
+            <UserVerified />
             <Spacer />
             <Text>
               <b>

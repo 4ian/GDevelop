@@ -3,7 +3,6 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import Add from '@material-ui/icons/Add';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
@@ -40,6 +39,7 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
 
@@ -61,6 +61,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
+  onEffectsRenamed: (oldName: string, newName: string) => void,
   target: 'object' | 'layer',
 |};
 
@@ -79,7 +80,7 @@ const getEnumeratedEffectMetadata = (
  * All available effects are fetched from the project's platform.
  */
 export default function EffectsList(props: Props) {
-  const { effectsContainer, onEffectsUpdated } = props;
+  const { effectsContainer, onEffectsUpdated, onEffectsRenamed } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const draggedEffect = React.useRef<?gdEffect>(null);
 
@@ -175,8 +176,10 @@ export default function EffectsList(props: Props) {
       });
       return;
     }
+    const oldName = effect.getName();
     effect.setName(newName);
     forceUpdate();
+    onEffectsRenamed(oldName, newName);
     onEffectsUpdated();
   };
 
@@ -320,9 +323,7 @@ export default function EffectsList(props: Props) {
                                               <SelectOption
                                                 key={effectMetadata.type}
                                                 value={effectMetadata.type}
-                                                primaryText={
-                                                  effectMetadata.fullName
-                                                }
+                                                label={effectMetadata.fullName}
                                                 disabled={
                                                   props.target === 'object' &&
                                                   effectMetadata.isMarkedAsNotWorkingForObjects

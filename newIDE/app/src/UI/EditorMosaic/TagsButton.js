@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import IconButton from '../IconButton';
-import FilterList from '@material-ui/icons/FilterList';
 import ElementWithMenu from '../Menu/ElementWithMenu';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
+import Filter from '../CustomSvgIcons/Filter';
 
 const styles = {
   container: {
@@ -27,7 +27,7 @@ export default function TagsButton(props: Props) {
     <ElementWithMenu
       element={
         <IconButton style={styles.container}>
-          <FilterList htmlColor="inherit" style={styles.icon} />
+          <Filter htmlColor="inherit" style={styles.icon} />
         </IconButton>
       }
       buildMenuTemplate={props.buildMenuTemplate}

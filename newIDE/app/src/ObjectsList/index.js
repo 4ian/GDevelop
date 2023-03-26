@@ -46,8 +46,8 @@ import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 

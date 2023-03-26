@@ -5,8 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
-import Add from '@material-ui/icons/Add';
-import Delete from '@material-ui/icons/Delete';
 import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -40,6 +38,8 @@ import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
+import Add from '../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
 
 const gd: libGDevelop = global.gd;
 
@@ -119,7 +119,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 />
               </Column>
               <IconButton size="small" onClick={onRemove}>
-                <Delete />
+                <Trash />
               </IconButton>
             </MiniToolbar>
           )}
@@ -210,6 +210,8 @@ const SortableAnimationsList = SortableContainer(
 type AnimationsListContainerProps = {|
   spriteConfiguration: gdSpriteObject,
   project: gdProject,
+  layout?: gdLayout,
+  object?: gdObject,
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   extraBottomTools: React.Node,
@@ -274,7 +276,7 @@ class AnimationsListContainer extends React.Component<
   };
 
   changeAnimationName = (i, newName) => {
-    const { spriteConfiguration } = this.props;
+    const { spriteConfiguration, project, layout, object } = this.props;
 
     const currentName = spriteConfiguration.getAnimation(i).getName();
     if (currentName === newName) return;
@@ -297,7 +299,19 @@ class AnimationsListContainer extends React.Component<
       return;
     }
 
-    spriteConfiguration.getAnimation(i).setName(newName);
+    const animation = spriteConfiguration.getAnimation(i);
+    const oldName = animation.getName();
+    animation.setName(newName);
+    // TODO EBO Refactor event-based object events when an animation is renamed.
+    if (layout && object) {
+      gd.WholeProjectRefactorer.renameObjectAnimation(
+        project,
+        layout,
+        object,
+        oldName,
+        newName
+      );
+    }
     this.forceUpdate();
     if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
@@ -431,20 +445,24 @@ class AnimationsListContainer extends React.Component<
 export function LockedSpriteEditor({
   objectConfiguration,
   project,
+  layout,
+  object,
+  objectName,
   resourceManagementProps,
   onSizeUpdated,
   onObjectUpdated,
-  objectName,
 }: EditorProps) {
   return (
     <SpriteEditor
       isAnimationListLocked
       objectConfiguration={objectConfiguration}
       project={project}
+      layout={layout}
+      object={object}
+      objectName={objectName}
       resourceManagementProps={resourceManagementProps}
       onSizeUpdated={onSizeUpdated}
       onObjectUpdated={onObjectUpdated}
-      objectName={objectName}
     />
   );
 }
@@ -457,10 +475,12 @@ type SpriteEditorProps = {|
 export default function SpriteEditor({
   objectConfiguration,
   project,
+  layout,
+  object,
+  objectName,
   resourceManagementProps,
   onSizeUpdated,
   onObjectUpdated,
-  objectName,
   isAnimationListLocked = false,
 }: SpriteEditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
@@ -482,6 +502,8 @@ export default function SpriteEditor({
         resourcesLoader={ResourcesLoader}
         resourceManagementProps={resourceManagementProps}
         project={project}
+        layout={layout}
+        object={object}
         objectName={objectName}
         onSizeUpdated={onSizeUpdated}
         onObjectUpdated={onObjectUpdated}
@@ -592,6 +614,18 @@ export default function SpriteEditor({
             resourcesLoader={ResourcesLoader}
             project={project}
             onPointsUpdated={onObjectUpdated}
+            onRenamedPoint={(oldName, newName) =>
+              // TODO EBO Refactor event-based object events when a point is renamed.
+              layout &&
+              object &&
+              gd.WholeProjectRefactorer.renameObjectPoint(
+                project,
+                layout,
+                object,
+                oldName,
+                newName
+              )
+            }
           />
         </Dialog>
       )}

@@ -117,7 +117,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               {Object.keys(themes).map(themeName => (
                 <SelectOption
                   value={themeName}
-                  primaryText={themeName}
+                  label={themeName}
                   key={themeName}
                 />
               ))}
@@ -131,7 +131,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               {getAllThemes().map(codeEditorTheme => (
                 <SelectOption
                   value={codeEditorTheme.themeName}
-                  primaryText={codeEditorTheme.name}
+                  label={codeEditorTheme.name}
                   key={codeEditorTheme.themeName}
                 />
               ))}
@@ -211,9 +211,9 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             onChange={(e, i, value: string) => setBackdropClickBehavior(value)}
             fullWidth
           >
-            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-            <SelectOption value="apply" primaryText={t`Apply changes`} />
-            <SelectOption value="nothing" primaryText={t`Do nothing`} />
+            <SelectOption value="cancel" label={t`Cancel changes`} />
+            <SelectOption value="apply" label={t`Apply changes`} />
+            <SelectOption value="nothing" label={t`Do nothing`} />
           </SelectField>
           <Text size="block-title">
             <Trans>Updates</Trans>
@@ -276,8 +276,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             }}
             fullWidth
           >
-            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-            <SelectOption value="apply" primaryText={t`Apply changes`} />
+            <SelectOption value="cancel" label={t`Cancel changes`} />
+            <SelectOption value="apply" label={t`Apply changes`} />
           </SelectField>
           <Text size="block-title">
             <Trans>Embedded help and tutorials</Trans>

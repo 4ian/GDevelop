@@ -58,6 +58,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onPointsUpdated?: () => void,
+  onRenamedPoint: (oldName: string, newName: string) => void,
 |};
 
 const PointsEditor = ({
@@ -65,6 +66,7 @@ const PointsEditor = ({
   resourcesLoader,
   project,
   onPointsUpdated,
+  onRenamedPoint,
 }: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
@@ -272,6 +274,7 @@ const PointsEditor = ({
                   selectedPointName={selectedPointName}
                   onHoverPoint={setHighlightedPointName}
                   onSelectPoint={setSelectedPointName}
+                  onRenamedPoint={onRenamedPoint}
                 />
               )}
               {!sprite && (

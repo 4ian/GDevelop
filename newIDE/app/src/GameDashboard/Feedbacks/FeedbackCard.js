@@ -6,7 +6,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import CheckCircleIcon from '@material-ui/icons//CheckCircle';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';

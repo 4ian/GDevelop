@@ -5,7 +5,7 @@ import Window from '../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../Tutorial/TutorialContext';
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
-import YouTube from '@material-ui/icons/YouTube';
+import Video from '../CustomSvgIcons/Video';
 
 type PropsType = {|
   tutorialId: ?string,
@@ -35,7 +35,7 @@ const TutorialButton = (props: PropsType) => {
       }}
       target="_blank"
       label={props.label || <Trans>Tutorial</Trans>}
-      icon={<YouTube />}
+      icon={<Video />}
     />
   );
 };

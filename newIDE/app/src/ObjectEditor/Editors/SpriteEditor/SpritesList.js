@@ -4,7 +4,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
-import Add from '@material-ui/icons/Add';
 import DirectionTools from './DirectionTools';
 import ImageThumbnail from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import {
@@ -32,6 +31,7 @@ import {
   ResponsiveLineStackLayout,
 } from '../../../UI/Layout';
 import { Column } from '../../../UI/Grid';
+import Add from '../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -154,6 +154,11 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   };
 };
 
+const removeExtensionFromFileName = fileName => {
+  const dotIndex = fileName.lastIndexOf('.');
+  return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
+};
+
 type Props = {|
   direction: gdDirection,
   project: gdProject,
@@ -266,7 +271,10 @@ const SpritesList = ({
                 direction.getTimeBetweenFrames() > 0
                   ? 1 / direction.getTimeBetweenFrames()
                   : 1,
-              name: animationName || resourceNames[0] || objectName,
+              name:
+                animationName ||
+                removeExtensionFromFileName(resourceNames[0]) ||
+                objectName,
               isLooping: direction.isLooping(),
               existingMetadata: direction.getMetadata(),
             },

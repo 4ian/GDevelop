@@ -4,6 +4,7 @@ import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { dataObjectToProps } from '../../../../Utils/HTMLDataset';
 import {
+  roundVertexToHalfPixel,
   findNearestEdgePoint,
   getMagnetizedVertexForDeletion,
   type NewVertexHintPoint,
@@ -217,6 +218,7 @@ const CollisionMasksPreview = (props: Props) => {
           onPolygonsUpdated();
           onClickVertice(null);
         } else {
+          roundVertexToHalfPixel(draggedVertex.vertex);
           onPolygonsUpdated();
           onClickVertice(draggedVertex.vertex.ptr);
         }

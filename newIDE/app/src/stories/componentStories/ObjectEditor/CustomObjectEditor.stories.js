@@ -24,6 +24,7 @@ export const ButtonObject = () => (
     <CustomObjectPropertiesEditor
       objectConfiguration={testProject.customObject.getConfiguration()}
       project={testProject.project}
+      layout={testProject.testLayout}
       resourceManagementProps={{
         getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
@@ -32,6 +33,7 @@ export const ButtonObject = () => (
         resourceExternalEditors: fakeResourceExternalEditors,
       }}
       onSizeUpdated={() => {}}
+      object={testProject.customObject}
       objectName="FakeObjectName"
     />
   </SerializedObjectDisplay>

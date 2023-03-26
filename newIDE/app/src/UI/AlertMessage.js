@@ -7,9 +7,9 @@ import { Spacer, Line, Column } from './Grid';
 import Text from './Text';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from './Layout';
-import Close from '@material-ui/icons/Close';
 import IconButton from './IconButton';
 import Paper from './Paper';
+import Cross from './CustomSvgIcons/Cross';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
@@ -86,7 +86,7 @@ const AlertMessage = ({
       {onHide && (
         <div style={styles.topRightHideButton}>
           <IconButton aria-label="hide" onClick={() => onHide()} size="small">
-            <Close style={styles.hideIcon} />
+            <Cross style={styles.hideIcon} />
           </IconButton>
         </div>
       )}

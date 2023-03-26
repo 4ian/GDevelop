@@ -19,13 +19,13 @@ import {
   isExtensionLifecycleEventsFunction,
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
-import Add from '@material-ui/icons/Add';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import ValueTypeEditor from './ValueTypeEditor';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
+import Add from '../../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 

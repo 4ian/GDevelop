@@ -382,12 +382,12 @@ function LeaderboardAppearanceDialog({
               <SelectOption
                 key={'custom'}
                 value={'custom'}
-                primaryText={t`Custom display`}
+                label={t`Custom display`}
               />
               <SelectOption
                 key={'time'}
                 value={'time'}
-                primaryText={t`Display as time`}
+                label={t`Display as time`}
               />
             </SelectField>
             <Spacer />
@@ -454,11 +454,7 @@ function LeaderboardAppearanceDialog({
                   disabled={isLoading}
                 >
                   {Object.keys(unitSelectOptions).map(option => (
-                    <SelectOption
-                      key={option}
-                      value={option}
-                      primaryText={option}
-                    />
+                    <SelectOption key={option} value={option} label={option} />
                   ))}
                 </SelectField>
                 <AlertMessage kind="info">

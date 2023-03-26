@@ -26,8 +26,8 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -295,6 +295,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     return false;
   };
 
+  _selectGroup = (groupWithContext: ?GroupWithContext) => {
+    this.setState({
+      selectedGroupWithContext: groupWithContext,
+    });
+  };
+
   _moveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
     const { selectedGroupWithContext } = this.state;
     if (!selectedGroupWithContext) return;
@@ -455,12 +461,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     onEditItem={groupWithContext =>
                       this.props.onEditGroup(groupWithContext.group)
                     }
-                    selectedItems={[]}
-                    onItemSelected={groupWithContext => {
-                      this.setState({
-                        selectedGroupWithContext: groupWithContext,
-                      });
-                    }}
+                    selectedItems={
+                      this.state.selectedGroupWithContext
+                        ? [this.state.selectedGroupWithContext]
+                        : []
+                    }
+                    onItemSelected={this._selectGroup}
                     renamedItem={renamedGroupWithContext}
                     onRename={this._onRename}
                     buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}

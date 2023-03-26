@@ -31,6 +31,8 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   const {
     objectConfiguration,
     project,
+    layout,
+    objectName,
     resourceManagementProps,
     unsavedChanges,
   } = props;
@@ -150,13 +152,16 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               <EditorComponent
                                 objectConfiguration={childObjectConfiguration}
                                 project={project}
+                                layout={layout}
                                 resourceManagementProps={
                                   resourceManagementProps
                                 }
                                 onSizeUpdated={
                                   forceUpdate /*Force update to ensure dialog is properly positionned*/
                                 }
-                                objectName={childObject.getName()}
+                                objectName={
+                                  objectName + ' ' + childObject.getName()
+                                }
                               />
                             </Column>
                           </Line>

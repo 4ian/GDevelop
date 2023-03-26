@@ -3,8 +3,6 @@ import * as React from 'react';
 import { type Resource } from '../../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
-import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
-import VideoLibrary from '@material-ui/icons/VideoLibrary';
 import FontDownload from '@material-ui/icons/FontDownload';
 import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
@@ -12,6 +10,8 @@ import { Column, Line } from '../../UI/Grid';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import CheckeredBackground from '../../ResourcesList/CheckeredBackground';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import Video from '../../UI/CustomSvgIcons/Video';
+import File from '../../UI/CustomSvgIcons/File';
 
 const paddingSize = 10;
 const styles = {
@@ -181,7 +181,7 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">
-            <InsertDriveFile style={styles.icon} />
+            <File style={styles.icon} />
           </Line>
           <Line justifyContent="center">
             <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />
@@ -192,7 +192,7 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">
-            <VideoLibrary style={styles.icon} />
+            <Video style={styles.icon} />
           </Line>
           <Line justifyContent="center">
             <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />

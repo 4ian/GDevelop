@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import Add from '@material-ui/icons/Add';
 import Fuse from 'fuse.js';
 
 import { List, type ListItemRefType } from '../../../UI/List';
@@ -29,6 +28,7 @@ import {
   sharedFuseConfiguration,
   getFuseSearchQueryForMultipleKeys,
 } from '../../../UI/Search/UseSearchStructuredItem';
+import Add from '../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 const getGroupIconSrc = (key: string) => {

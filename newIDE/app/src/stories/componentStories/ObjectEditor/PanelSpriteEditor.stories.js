@@ -25,6 +25,7 @@ export const Default = () => (
     <PanelSpriteEditor
       objectConfiguration={testProject.panelSpriteObject.getConfiguration()}
       project={testProject.project}
+      layout={testProject.testLayout}
       resourceManagementProps={{
         getStorageProvider: () => emptyStorageProvider,
         onFetchNewlyAddedResources: async () => {},
@@ -33,6 +34,7 @@ export const Default = () => (
         resourceExternalEditors: fakeResourceExternalEditors,
       }}
       onSizeUpdated={() => {}}
+      object={testProject.panelSpriteObject}
       objectName="FakeObjectName"
     />
   </SerializedObjectDisplay>

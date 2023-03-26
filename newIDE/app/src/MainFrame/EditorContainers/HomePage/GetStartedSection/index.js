@@ -30,9 +30,7 @@ import Podium from '../InAppTutorials/Icons/Podium';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
-import optionalRequire from '../../../../Utils/OptionalRequire';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
-const electron = optionalRequire('electron');
 
 const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
 
@@ -72,12 +70,6 @@ const styles = {
   },
 };
 
-export const canShowInAppTutorials = (windowWidth: WidthType) => {
-  if (!!electron) return true;
-
-  return windowWidth !== 'small';
-};
-
 type Props = {|
   onCreateProject: (?ExampleShortHeader) => void,
   onTabChange: (tab: HomeTab) => void,
@@ -104,7 +96,6 @@ const GetStartedSection = ({
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
-  const shouldShowInAppTutorialButtons = canShowInAppTutorials(windowWidth);
   const items: {
     key: string,
     title: React.Node,
@@ -135,20 +126,36 @@ const GetStartedSection = ({
     },
   ];
 
-  const flingUserProgress = getTutorialProgress({
-    tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
-    userId: authenticatedUser.profile
-      ? authenticatedUser.profile.id
-      : undefined,
-  });
-
-  const getFlingTutorialPartProgress = (part: number) => {
-    if (!flingUserProgress || !flingUserProgress.progress) return 0;
-    return flingUserProgress.progress[part];
+  const getTutorialPartProgress = ({
+    tutorialId,
+    part,
+  }: {
+    tutorialId: string,
+    part: number,
+  }) => {
+    const tutorialProgress = getTutorialProgress({
+      tutorialId,
+      userId: authenticatedUser.profile
+        ? authenticatedUser.profile.id
+        : undefined,
+    });
+    if (!tutorialProgress || !tutorialProgress.progress) return 0;
+    return tutorialProgress.progress[part];
   };
 
-  const isFlingTutorialPartComplete = (part: number) => {
-    return getFlingTutorialPartProgress(part) === 100;
+  const isTutorialPartComplete = ({
+    tutorialId,
+    part,
+  }: {
+    tutorialId: string,
+    part: number,
+  }) => {
+    return (
+      getTutorialPartProgress({
+        tutorialId,
+        part,
+      }) === 100
+    );
   };
 
   const flingInAppTutorialCards = [
@@ -166,8 +173,15 @@ const GetStartedSection = ({
       locked: false, // First phase is never locked
       // Phase is disabled if complete or if there's a running tutorial
       disabled:
-        !!currentlyRunningInAppTutorial || isFlingTutorialPartComplete(0),
-      progress: getFlingTutorialPartProgress(0),
+        !!currentlyRunningInAppTutorial ||
+        isTutorialPartComplete({
+          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+          part: 0,
+        }),
+      progress: getTutorialPartProgress({
+        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+        part: 0,
+      }),
       renderImage: props => <Unboxing {...props} />,
     },
     {
@@ -182,11 +196,21 @@ const GetStartedSection = ({
       ],
       durationInMinutes: 10,
       // Second phase is locked if first phase is not complete
-      locked: !isFlingTutorialPartComplete(0),
+      locked: !isTutorialPartComplete({
+        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+        part: 0,
+      }),
       // Phase is disabled if complete or if there's a running tutorial
       disabled:
-        !!currentlyRunningInAppTutorial || isFlingTutorialPartComplete(1),
-      progress: getFlingTutorialPartProgress(1),
+        !!currentlyRunningInAppTutorial ||
+        isTutorialPartComplete({
+          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+          part: 1,
+        }),
+      progress: getTutorialPartProgress({
+        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+        part: 1,
+      }),
       renderImage: props => <Building {...props} />,
     },
     {
@@ -201,11 +225,21 @@ const GetStartedSection = ({
       ],
       durationInMinutes: 15,
       // Third phase is locked if second phase is not complete
-      locked: !isFlingTutorialPartComplete(1),
+      locked: !isTutorialPartComplete({
+        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+        part: 1,
+      }),
       // Phase is disabled if complete or if there's a running tutorial
       disabled:
-        !!currentlyRunningInAppTutorial || isFlingTutorialPartComplete(2),
-      progress: getFlingTutorialPartProgress(2),
+        !!currentlyRunningInAppTutorial ||
+        isTutorialPartComplete({
+          tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+          part: 2,
+        }),
+      progress: getTutorialPartProgress({
+        tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+        part: 2,
+      }),
       renderImage: props => <Podium {...props} />,
     },
   ];
@@ -229,106 +263,97 @@ const GetStartedSection = ({
   );
 
   const isFlingTutorialComplete =
-    isFlingTutorialPartComplete(0) &&
-    isFlingTutorialPartComplete(1) &&
-    isFlingTutorialPartComplete(2);
+    isTutorialPartComplete({
+      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+      part: 0,
+    }) &&
+    isTutorialPartComplete({
+      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+      part: 1,
+    }) &&
+    isTutorialPartComplete({
+      tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
+      part: 2,
+    });
 
   return (
     <SectionContainer
-      title={
-        shouldShowInAppTutorialButtons ? (
-          <Trans>Guided lessons</Trans>
-        ) : (
-          <Trans>Get Started!</Trans>
-        )
-      }
+      title={<Trans>Guided lessons</Trans>}
       renderSubtitle={() => <Subtitle />}
     >
-      {shouldShowInAppTutorialButtons && (
-        <SectionRow>
-          <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
-        </SectionRow>
-      )}
-      {shouldShowInAppTutorialButtons && (
-        <SectionRow>
-          <Text size="title" noMargin>
-            <Trans>Create and Publish a Fling game</Trans>
-          </Text>
-          <Text size="body" color="secondary" noMargin>
-            <Trans>
-              3-part tutorial to creating and publishing a game from scratch.
-            </Trans>
-          </Text>
-          <Spacer />
-          <Line>
-            <div style={styles.bannerContainer}>
-              {inAppTutorialsFetchingError ? (
-                <PlaceholderError onRetry={fetchInAppTutorials}>
-                  <Trans>
-                    An error occurred when downloading the tutorials.
-                  </Trans>{' '}
-                  <Trans>
-                    Please check your internet connection or try again later.
-                  </Trans>
-                </PlaceholderError>
-              ) : inAppTutorialShortHeaders === null ? (
-                <PlaceholderLoader />
-              ) : (
-                <GridList
-                  cols={
-                    isFlingTutorialComplete
-                      ? 1
-                      : getColumnsFromWidth(windowWidth)
-                  }
-                  style={styles.grid}
-                  cellHeight="auto"
-                  spacing={ITEMS_SPACING * 2}
-                >
-                  {isFlingTutorialComplete ? (
-                    <GridListTile>
+      <SectionRow>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+      </SectionRow>
+      <SectionRow>
+        <Text size="title" noMargin>
+          <Trans>Create and Publish a Fling game</Trans>
+        </Text>
+        <Text size="body" color="secondary" noMargin>
+          <Trans>
+            3-part tutorial to creating and publishing a game from scratch.
+          </Trans>
+        </Text>
+        <Spacer />
+        <Line>
+          <div style={styles.bannerContainer}>
+            {inAppTutorialsFetchingError ? (
+              <PlaceholderError onRetry={fetchInAppTutorials}>
+                <Trans>An error occurred when downloading the tutorials.</Trans>{' '}
+                <Trans>
+                  Please check your internet connection or try again later.
+                </Trans>
+              </PlaceholderError>
+            ) : inAppTutorialShortHeaders === null ? (
+              <PlaceholderLoader />
+            ) : (
+              <GridList
+                cols={
+                  isFlingTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
+                }
+                style={styles.grid}
+                cellHeight="auto"
+                spacing={ITEMS_SPACING * 2}
+              >
+                {isFlingTutorialComplete ? (
+                  <GridListTile>
+                    <InAppTutorialPhaseCard
+                      title={t`Congratulations! You've finished this tutorial!`}
+                      description={t`Find your finished game on the “Build” section. Or restart the tutorial by clicking on the card.`}
+                      size="banner"
+                      locked={false}
+                      disabled={false}
+                      renderImage={props => (
+                        <Line justifyContent="space-around" expand>
+                          <Unboxing {...props} />
+                          <Building {...props} />
+                          <Podium {...props} />
+                        </Line>
+                      )}
+                      onClick={() =>
+                        selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
+                      }
+                    />
+                  </GridListTile>
+                ) : (
+                  flingInAppTutorialCards.map(item => (
+                    <GridListTile key={item.key}>
                       <InAppTutorialPhaseCard
-                        title={t`Congratulations! You've finished this tutorial!`}
-                        description={t`Find your finished game on the “Build” section. Or restart the tutorial by clicking on the card.`}
-                        size="banner"
-                        locked={false}
-                        disabled={false}
-                        renderImage={props => (
-                          <Line justifyContent="space-around" expand>
-                            <Unboxing {...props} />
-                            <Building {...props} />
-                            <Podium {...props} />
-                          </Line>
-                        )}
+                        {...item}
                         onClick={() =>
                           selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
                         }
                       />
                     </GridListTile>
-                  ) : (
-                    flingInAppTutorialCards.map(item => (
-                      <GridListTile key={item.key}>
-                        <InAppTutorialPhaseCard
-                          {...item}
-                          onClick={() =>
-                            selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID)
-                          }
-                        />
-                      </GridListTile>
-                    ))
-                  )}
-                </GridList>
-              )}
-            </div>
-          </Line>
-        </SectionRow>
-      )}
+                  ))
+                )}
+              </GridList>
+            )}
+          </div>
+        </Line>
+      </SectionRow>
       <SectionRow>
         <Text size="title" noMargin>
-          {shouldShowInAppTutorialButtons ? (
-            <Trans>Want to explore further?</Trans>
-          ) : (
-            <Trans>Explore GDevelop Content</Trans>
-          )}
+          <Trans>Want to explore further?</Trans>
         </Text>
         <Text size="body" color="secondary" noMargin>
           <Trans>Articles, wiki and much more.</Trans>

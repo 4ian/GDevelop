@@ -9,7 +9,6 @@ import ResourcesLoader from '../ResourcesLoader';
 import Subheader from '../UI/Subheader';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import Edit from '@material-ui/icons/Edit';
 import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
@@ -34,6 +33,7 @@ import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import Tooltip from '@material-ui/core/Tooltip';
+import Edit from '../UI/CustomSvgIcons/Edit';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -458,8 +458,8 @@ const PropertiesEditor = ({
           <SelectOption
             key={value}
             value={value}
-            primaryText={label}
-            primaryTextIsUserDefined={labelIsUserDefined}
+            label={label}
+            shouldNotTranslate={labelIsUserDefined}
           />
         ));
 
@@ -469,6 +469,7 @@ const PropertiesEditor = ({
           <SelectField
             value={getFieldValue({ instances, field })}
             key={field.name}
+            id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
@@ -491,6 +492,7 @@ const PropertiesEditor = ({
               defaultValue: '(Multiple values)',
             })}
             key={field.name}
+            id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {

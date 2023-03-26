@@ -1,9 +1,9 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
+import Download from '../../UI/CustomSvgIcons/Download';
 import { type StorageProvider, type SaveAsLocation } from '../index';
 import DownloadFileSaveAsDialog from './DownloadFileSaveAsDialog';
-import SaveAlt from '@material-ui/icons/SaveAlt';
 
 /**
  * "Storage" allowing to download a copy of the game.
@@ -12,7 +12,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 export default ({
   internalName: 'DownloadFile',
   name: t`Download a copy`,
-  renderIcon: props => <SaveAlt fontSize={props.size} />,
+  renderIcon: props => <Download fontSize={props.size} />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
     onSaveProjectAs: async (

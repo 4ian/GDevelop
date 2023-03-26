@@ -12,7 +12,9 @@ const {
   getExtensionFolderName,
   improperlyFormattedHelpPaths,
 } = require('./lib/WikiHelpLink');
-const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
+const {
+  convertCommonMarkdownToPythonMarkdown,
+} = require('./lib/PythonMarkdownHelper');
 const shell = require('shelljs');
 
 /** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
@@ -22,12 +24,10 @@ const extensionShortHeadersUrl =
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
-const extensionsFilePath = path.join(outputRootPath, 'extensions.txt');
+const extensionsMainFilePath = path.join(extensionsRootPath, 'index.md');
 
 const generateSvgImageIcon = iconUrl => {
-  // Use the `&.png?` syntax to force Dokuwiki to display the image.
-  // See https://www.dokuwiki.org/images.
-  return `{{${iconUrl}?&.png?nolink&48x48 |}}`;
+  return `<img src="${iconUrl}" class="extension-icon"></img>`;
 };
 
 /** @returns {string} */
@@ -36,11 +36,13 @@ const generateExtensionFooterText = fullName => {
     `
 ---
 
-<note tip>Learn [[gdevelop5:extensions:search|how to install new extensions]] by following a step-by-step guide.</note>
+!!! tip
 
-*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
+    Learn [how to install new extensions](/gdevelop5/extensions/search) by following a step-by-step guide.
+
+*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
     ' ' +
-    'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].'
+    'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).'
   );
 };
 
@@ -119,7 +121,7 @@ const sortKeys = table => {
  */
 const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
     extensionHeader.authors || []
@@ -135,25 +137,25 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
     (isCommunity
-      ? `<note important>
-This is an extension made by a community member — but not reviewed
-by the GDevelop extension team. As such, we can't guarantee it
-meets all the quality standards of official extensions. In case of
-doubt, contact the author to know more about what the extension
-does or inspect its content before using it.
-</note>\n\n`
+      ? `!!! warning
+    This is an extension made by a community member — but not reviewed
+    by the GDevelop extension team. As such, we can't guarantee it
+    meets all the quality standards of official extensions. In case of
+    doubt, contact the author to know more about what the extension
+    does or inspect its content before using it.
+\n\n`
       : '') +
     '---\n' +
     '\n' +
-    convertMarkdownToDokuWikiMarkdown(extensionHeader.description) +
+    convertCommonMarkdownToPythonMarkdown(extensionHeader.description) +
     '\n' +
-    (extensionHeader.helpPath ? `\n[[${helpPageUrl}|Read more...]]\n` : ``) +
+    (extensionHeader.helpPath ? `\n[Read more...](${helpPageUrl})\n` : ``) +
     generateExtensionFooterText(extensionHeader.fullName);
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
     folderName,
-    'reference.txt'
+    'index.md'
   );
   await fs.mkdir(path.dirname(extensionReferenceFilePath), {
     recursive: true,
@@ -168,72 +170,61 @@ does or inspect its content before using it.
  */
 const generateExtensionSection = extensionHeader => {
   const folderName = getExtensionFolderName(extensionHeader.name);
-  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
+  const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
 
-  return (
-    `#### ${extensionHeader.fullName}\n` +
-    // Use the `&.png?` syntax to force Dokuwiki to display the image.
-    // See https://www.dokuwiki.org/images.
-    generateSvgImageIcon(extensionHeader.previewIconUrl) +
-    '\n' +
-    extensionHeader.shortDescription +
-    '\n\n' +
-    // Link to help page or to reference if none.
-    `[[${helpPageUrl}|Read more...]]` +
+  return `|${generateSvgImageIcon(extensionHeader.previewIconUrl)}|**${
+    extensionHeader.fullName
+  }**|${extensionHeader.shortDescription}|${`[Read more...](${helpPageUrl})` +
     (helpPageUrl !== referencePageUrl
-      ? ` ([[${referencePageUrl}|reference]])`
-      : '') +
-    '\n\n'
-  );
+      ? ` ([reference](${referencePageUrl}))`
+      : '')}|\n`;
 };
 
-const generateAllExtensionsSections = extensionsAndExtensionShortHeaders => {
+const generateAllExtensionsSections = extensionShortHeaders => {
   let extensionSectionsContent = '';
   const extensionsByCategory = sortKeys(
-    groupBy(
-      extensionsAndExtensionShortHeaders,
-      pair => pair.category || 'General'
-    )
+    groupBy(extensionShortHeaders, pair => pair.category || 'General')
   );
   for (const category in extensionsByCategory) {
     const extensions = extensionsByCategory[category];
 
     extensionSectionsContent += `### ${category}\n\n`;
+    extensionSectionsContent += '||Name|Description||\n';
+    extensionSectionsContent += '|---|---|---|---|\n';
+
     for (const extensionHeader of extensions) {
       extensionSectionsContent += generateExtensionSection(extensionHeader);
     }
+    extensionSectionsContent += '\n';
   }
   return extensionSectionsContent;
 };
 
-(async () => {
-  try {
-    console.info(`ℹ️ Loading all community extensions...`);
-    const extensionHeaders = await getAllExtensionHeaders();
+const generateExtensionsList = async extensionShortHeaders => {
+  let content = `## Extensions list
 
-    let indexPageContent = `# Extensions
+Here are listed all the extensions available in GDevelop. The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
 
-GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|core features]], new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
-
-[[gdevelop5:extensions:search|Directly from GDevelop]], you have access to a collection of community created extensions, listed here. You can also [[gdevelop5:extensions:create|create]], directly in your project, new behaviors, actions, conditions or expressions for your game.
+- [Reviewed extensions](#reviewed-extensions)
+- [Community extensions](#community-extensions)
 
 `;
+  const extensionHeaders = await getAllExtensionHeaders();
+  const reviewedExtensionHeaders = extensionHeaders.filter(
+    pair => pair.tier !== 'community'
+  );
+  const communityExtensionHeaders = extensionHeaders.filter(
+    pair => pair.tier === 'community'
+  );
 
-    const reviewedExtensionHeaders = extensionHeaders.filter(
-      pair => pair.tier !== 'community'
-    );
-    const communityExtensionHeaders = extensionHeaders.filter(
-      pair => pair.tier === 'community'
-    );
+  content += '## Reviewed extensions\n\n';
+  for (const extensionHeader of reviewedExtensionHeaders) {
+    await createExtensionReferencePage(extensionHeader, false);
+  }
+  content += generateAllExtensionsSections(reviewedExtensionHeaders);
 
-    indexPageContent += '## Reviewed extensions\n\n';
-    for (const extensionHeader of reviewedExtensionHeaders) {
-      await createExtensionReferencePage(extensionHeader, false);
-    }
-    indexPageContent += generateAllExtensionsSections(reviewedExtensionHeaders);
-
-    indexPageContent += `## Community extensions
+  content += `## Community extensions
 
 The following extensions are made by community members — but not reviewed
 by the GDevelop extension team. As such, we can't guarantee it
@@ -242,28 +233,38 @@ doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 
 `;
-    for (const extensiontHeader of communityExtensionHeaders) {
-      await createExtensionReferencePage(extensiontHeader, true);
-    }
-    indexPageContent += generateAllExtensionsSections(
-      communityExtensionHeaders
-    );
+  for (const extensionHeader of communityExtensionHeaders) {
+    await createExtensionReferencePage(extensionHeader, true);
+  }
+  content += generateAllExtensionsSections(communityExtensionHeaders);
+  return content;
+};
 
-    indexPageContent += `
-## Make your own extension
+(async () => {
+  try {
+    console.info(`ℹ️ Loading all community extensions...`);
 
-It's easy to create, directly in your project, new behaviors, actions, conditions or expressions for your game.
+    let indexPageContent = `# Extensions
+
+GDevelop is built in a flexible way. In addition to [core features](/gdevelop5/all-features), new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
+
+[Directly from GDevelop](/gdevelop5/extensions/search), you have access to a collection of community created extensions, [listed here](/gdevelop5/extensions/extensions-list).
+You can also [create](/gdevelop5/extensions/create) directly in your project new behaviors, actions, conditions or expressions for your game.
 
 Read more about this:
 
-* [[gdevelop5:extensions:create|Create your own extensions]]
-* [[gdevelop5:extensions:share|Share extensions with the community]]
-* [[gdevelop5:extensions:extend-gdevelop|Extend GDevelop with JavaScript or C++]]`;
+* [Create your own extensions](/gdevelop5/extensions/create)
+* [Share extensions with the community](/gdevelop5/extensions/share)
+* [Extend GDevelop with JavaScript or C++](/gdevelop5/extensions/extend-gdevelop)
+
+`;
+
+    indexPageContent += await generateExtensionsList();
 
     try {
-      await fs.mkdir(path.dirname(extensionsFilePath), { recursive: true });
-      await fs.writeFile(extensionsFilePath, indexPageContent);
-      console.info(`✅ Done. File generated: ${extensionsFilePath}`);
+      await fs.mkdir(path.dirname(extensionsMainFilePath), { recursive: true });
+      await fs.writeFile(extensionsMainFilePath, indexPageContent);
+      console.info(`✅ Done. File generated: ${extensionsMainFilePath}`);
     } catch (err) {
       console.error('❌ Error while writing output', err);
       shell.exit(1);

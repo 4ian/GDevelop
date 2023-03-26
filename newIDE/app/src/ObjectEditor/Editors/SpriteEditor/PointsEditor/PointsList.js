@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -17,6 +16,7 @@ import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
 import PointRow from './PointRow';
 import styles from './styles';
+import Add from '../../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 type PointsListBodyProps = {|
@@ -24,6 +24,7 @@ type PointsListBodyProps = {|
   onPointsUpdated: () => void,
   onHoverPoint: (pointName: ?string) => void,
   onSelectPoint: (pointName: string) => void,
+  onRenamedPoint: (oldName: string, newName: string) => void,
   selectedPointName: ?string,
 |};
 
@@ -93,7 +94,9 @@ const PointsListBody = (props: PointsListBodyProps) => {
           if (pointsContainer.hasPoint(newName)) {
             success = false;
           } else {
+            const oldName = point.getName();
             point.setName(newName);
+            props.onRenamedPoint(oldName, newName);
             if (props.selectedPointName === pointName) {
               props.onSelectPoint(newName);
             }
@@ -175,6 +178,7 @@ type PointsListProps = {|
   onPointsUpdated: () => void,
   onHoverPoint: (pointName: ?string) => void,
   onSelectPoint: (pointName: ?string) => void,
+  onRenamedPoint: (oldName: string, newName: string) => void,
   selectedPointName: ?string,
 |};
 
@@ -202,13 +206,14 @@ const PointsList = (props: PointsListProps) => {
           onSelectPoint={props.onSelectPoint}
           selectedPointName={props.selectedPointName}
           onPointsUpdated={props.onPointsUpdated}
+          onRenamedPoint={props.onRenamedPoint}
         />
       </Table>
       <Spacer />
       <Line alignItems="center" justifyContent="center">
         <RaisedButton
           primary
-          icon={<AddIcon />}
+          icon={<Add />}
           label={<Trans>Add a point</Trans>}
           onClick={() => {
             const name = newNameGenerator('Point', name =>

@@ -5,12 +5,12 @@ import FlatButton from '../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
 import { Column, Line } from '../../UI/Grid';
-import CloudUpload from '@material-ui/icons/CloudUpload';
 import Text from '../../UI/Text';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../../Utils/Window';
+import Upload from '../../UI/CustomSvgIcons/Upload';
 
 const exportExtension = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -75,7 +75,7 @@ const ExtensionExporterDialog = (props: Props) => {
         />,
         <DialogPrimaryButton
           key="export"
-          icon={<CloudUpload />}
+          icon={<Upload />}
           primary
           label={<Trans>Export to a file</Trans>}
           onClick={() => {

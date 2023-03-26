@@ -47,9 +47,18 @@
 
 @keyframes vertical-translate {
   from {
-   transform: translateY(-15px);
+   transform: translateY(-10px);
   }
   to {
-    transform: translateY(15px);
+    transform: translateY(10px);
+  }
+}
+
+@keyframes horizontal-translate {
+  from {
+   transform: translateX(-10px);
+  }
+  to {
+    transform: translateX(10px);
   }
 }

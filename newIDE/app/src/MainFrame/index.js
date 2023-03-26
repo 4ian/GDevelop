@@ -41,7 +41,6 @@ import {
   notifyPreviewWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
-import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
 import { renderExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
@@ -116,7 +115,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette, {
+import {
+  CommandPaletteWithAlgoliaSearch,
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
@@ -174,6 +174,7 @@ import {
   isMiniTutorial,
   allInAppTutorialIds,
 } from '../Utils/GDevelopServices/InAppTutorial';
+import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -325,9 +326,6 @@ const MainFrame = (props: Props) => {
     false
   );
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
-    false
-  );
-  const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
     false
   );
   const [
@@ -799,6 +797,8 @@ const MainFrame = (props: Props) => {
           storageProviderOperations,
           authenticatedUser,
         }));
+
+        setIsProjectClosedSoAvoidReloadingExtensions(false);
       }
 
       return state;
@@ -1143,6 +1143,7 @@ const MainFrame = (props: Props) => {
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      gd.WholeProjectRefactorer.renameLayout(currentProject, oldName, newName);
       if (inAppTutorialOrchestratorRef.current) {
         inAppTutorialOrchestratorRef.current.changeData(oldName, newName);
       }
@@ -1182,6 +1183,11 @@ const MainFrame = (props: Props) => {
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
       externalLayout.setName(newName);
+      gd.WholeProjectRefactorer.renameExternalLayout(
+        currentProject,
+        oldName,
+        newName
+      );
       _onProjectItemModified();
     });
   };
@@ -1216,6 +1222,11 @@ const MainFrame = (props: Props) => {
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
       externalEvents.setName(newName);
+      gd.WholeProjectRefactorer.renameExternalEvents(
+        currentProject,
+        oldName,
+        newName
+      );
       _onProjectItemModified();
     });
   };
@@ -2195,6 +2206,7 @@ const MainFrame = (props: Props) => {
           );
           if (
             currentlyRunningInAppTutorial &&
+            !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
             inAppTutorialOrchestratorRef.current
           ) {
             preferences.saveTutorialProgress({
@@ -2337,8 +2349,10 @@ const MainFrame = (props: Props) => {
       } else {
         doEndTutorial();
       }
+      // Open the homepage, so that the user can start a new tutorial.
+      openHomePage();
     },
-    [doEndTutorial, closeProject]
+    [doEndTutorial, closeProject, openHomePage]
   );
 
   const selectInAppTutorial = React.useCallback(
@@ -2637,22 +2651,28 @@ const MainFrame = (props: Props) => {
     async (scenario: 'resume' | 'startOver' | 'start') => {
       if (!selectedInAppTutorialInfo) return;
       const { userProgress, tutorialId } = selectedInAppTutorialInfo;
-      if (userProgress && scenario === 'resume') {
+      const fileMetadataAndStorageProviderName = userProgress
+        ? userProgress.fileMetadataAndStorageProviderName
+        : null;
+      if (
+        userProgress &&
+        scenario === 'resume' &&
+        fileMetadataAndStorageProviderName // The user can only resume if the project was saved to a storage provider.
+      ) {
         if (currentProject) {
           // If there's a project opened, check if this is the one we should open
           // for the stored tutorial userProgress.
           if (
             currentFileMetadata &&
             currentFileMetadata.fileIdentifier !==
-              userProgress.fileMetadataAndStorageProviderName.fileMetadata
-                .fileIdentifier
+              fileMetadataAndStorageProviderName.fileMetadata.fileIdentifier
           ) {
             const projectIsClosed = await askToCloseProject();
             if (!projectIsClosed) {
               return;
             }
             openFromFileMetadataWithStorageProvider(
-              userProgress.fileMetadataAndStorageProviderName,
+              fileMetadataAndStorageProviderName,
               { openAllScenes: true }
             );
           } else {
@@ -2662,7 +2682,7 @@ const MainFrame = (props: Props) => {
           }
         } else {
           openFromFileMetadataWithStorageProvider(
-            userProgress.fileMetadataAndStorageProviderName,
+            fileMetadataAndStorageProviderName,
             { openAllScenes: true }
           );
         }
@@ -2768,6 +2788,12 @@ const MainFrame = (props: Props) => {
       : () => {}
   );
 
+  const openCommandPalette = React.useCallback(() => {
+    if (commandPaletteRef.current) {
+      commandPaletteRef.current.open();
+    }
+  }, []);
+
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
@@ -2798,9 +2824,7 @@ const MainFrame = (props: Props) => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
-    onOpenCommandPalette: commandPaletteRef.current
-      ? commandPaletteRef.current.open
-      : () => {},
+    onOpenCommandPalette: openCommandPalette,
     onOpenProfile: () => openProfileDialog(true),
     onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
   });
@@ -2886,6 +2910,7 @@ const MainFrame = (props: Props) => {
             state.currentProject ? state.currentProject.getName() : 'No project'
           }
           onClose={toggleProjectManager}
+          id="project-manager-drawer"
         />
         {currentProject && (
           <ProjectManager
@@ -3047,7 +3072,7 @@ const MainFrame = (props: Props) => {
                     onCreateProject: exampleShortHeader =>
                       openCreateProjectDialog(true, exampleShortHeader),
                     onOpenProfile: () => openProfileDialog(true),
-                    onOpenHelpFinder: () => openHelpFinderDialog(true),
+                    onOpenHelpFinder: openCommandPalette,
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
@@ -3096,15 +3121,11 @@ const MainFrame = (props: Props) => {
           );
         })}
       </LeaderboardProvider>
-      <CommandPalette ref={commandPaletteRef} />
+      <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
         message={fileMetadataOpeningMessage}
-      />
-      <HelpFinder
-        open={helpFinderDialogOpen}
-        onClose={() => openHelpFinderDialog(false)}
       />
       <Snackbar
         open={state.snackMessageOpen}
@@ -3328,6 +3349,7 @@ const MainFrame = (props: Props) => {
           endTutorial={() => endTutorial(true)}
         />
       )}
+      <CustomDragLayer />
     </div>
   );
 };

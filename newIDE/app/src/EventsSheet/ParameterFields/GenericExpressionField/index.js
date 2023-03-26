@@ -15,7 +15,10 @@ import ExpressionParametersEditorDialog, {
 import { hasNonCodeOnlyParameters } from './ExpressionParametersEditor';
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { type ParameterFieldProps } from '../ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type FieldFocusFunction,
+} from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
 } from './BackgroundHighlighting';
@@ -188,10 +191,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus = (selectAll: boolean = false) => {
+  focus: FieldFocusFunction = options => {
     if (this._field) {
-      this._field.focus();
-      if (selectAll) {
+      this._field.focus(options);
+      if (options && options.selectAll) {
         if (this._inputElement) {
           this._inputElement.setSelectionRange(
             0,
@@ -650,7 +653,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       this._insertAutocompletion(expressionAutocompletion);
 
                       setTimeout(
-                        this.focus,
+                        () => this.focus(),
                         50 /* Give back the focus to the field after a completion is inserted */
                       );
                     }}

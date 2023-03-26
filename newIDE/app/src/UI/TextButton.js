@@ -52,7 +52,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="text"
         size="small"
-        translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+        translate={allowBrowserAutoTranslate ? undefined : 'no'}
         color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}

@@ -1006,6 +1006,81 @@ declare namespace firebase {
     uid: string;
   }
 
+  type FirebaseSignInProvider =
+    | 'custom'
+    | 'email'
+    | 'password'
+    | 'phone'
+    | 'anonymous'
+    | 'google.com'
+    | 'facebook.com'
+    | 'github.com'
+    | 'twitter.com'
+    | 'microsoft.com'
+    | 'apple.com';
+
+  interface FirebaseIdToken {
+    /** Always set to https://securetoken.google.com/PROJECT_ID */
+    iss: string;
+
+    /** Always set to PROJECT_ID */
+    aud: string;
+
+    /** The user's unique ID */
+    sub: string;
+
+    /** The token issue time, in seconds since epoch */
+    iat: number;
+
+    /** The token expiry time, normally 'iat' + 3600 */
+    exp: number;
+
+    /** The user's unique ID. Must be equal to 'sub' */
+    user_id: string;
+
+    /** The time the user authenticated, normally 'iat' */
+    auth_time: number;
+
+    /** The sign in provider, only set when the provider is 'anonymous' */
+    provider_id?: 'anonymous';
+
+    /** The user's primary email */
+    email?: string;
+
+    /** The user's email verification status */
+    email_verified?: boolean;
+
+    /** The user's primary phone number */
+    phone_number?: string;
+
+    /** The user's display name */
+    name?: string;
+
+    /** The user's profile photo URL */
+    picture?: string;
+
+    /** Information on all identities linked to this user */
+    firebase: {
+      /** The primary sign-in provider */
+      sign_in_provider: FirebaseSignInProvider;
+
+      /** A map of providers to the user's list of unique identifiers from each provider */
+      identities?: { [provider in FirebaseSignInProvider]?: string[] };
+    };
+
+    /** Custom claims set by the developer */
+    [claim: string]: unknown;
+
+    // NO LONGER SUPPORTED. Use "sub" instead. (Not a jsdoc comment to avoid generating docs.)
+    uid?: never;
+  }
+
+  export type EmulatorMockTokenOptions = (
+    | { user_id: string }
+    | { sub: string }
+  ) &
+    Partial<FirebaseIdToken>;
+
   /**
    * Retrieves a Firebase {@link firebase.app.App app} instance.
    *
@@ -1192,8 +1267,6 @@ declare namespace firebase {
    * {@link firebase.storage.Storage `Storage`} service associated with a
    * specific app.
    *
-   * @webonly
-   *
    * @example
    * ```javascript
    * // Get the Storage service for the default app
@@ -1274,6 +1347,8 @@ declare namespace firebase {
    * If not passed, uses the default app.
    */
   function analytics(app?: firebase.app.App): firebase.analytics.Analytics;
+
+  function appCheck(app?: firebase.app.App): firebase.appCheck.AppCheck;
 }
 
 declare namespace firebase.app {
@@ -1389,8 +1464,6 @@ declare namespace firebase.app {
      * Gets the {@link firebase.storage.Storage `Storage`} service for the current
      * app, optionally initialized with a custom storage bucket.
      *
-     * @webonly
-     *
      * @example
      * ```javascript
      * var storage = app.storage();
@@ -1450,6 +1523,158 @@ declare namespace firebase.app {
      * ```
      */
     analytics(): firebase.analytics.Analytics;
+    appCheck(): firebase.appCheck.AppCheck;
+  }
+}
+
+/**
+ * @webonly
+ */
+declare namespace firebase.appCheck {
+  /**
+   * Result returned by
+   * {@link firebase.appCheck.AppCheck.getToken `firebase.appCheck().getToken()`}.
+   */
+  interface AppCheckTokenResult {
+    token: string;
+  }
+  /*
+   * ReCAPTCHA v3 token provider.
+   */
+  class ReCaptchaV3Provider {
+    /**
+     * @param siteKey - ReCAPTCHA v3 site key (public key).
+     */
+    constructor(siteKey: string);
+  }
+  /*
+   * Custom token provider.
+   */
+  class CustomProvider {
+    /**
+     * @param options - Options for creating the custom provider.
+     */
+    constructor(options: CustomProviderOptions);
+  }
+  /**
+   * Options when creating a CustomProvider.
+   */
+  interface CustomProviderOptions {
+    /**
+     * Function to get an App Check token through a custom provider
+     * service.
+     */
+    getToken: () => Promise<AppCheckToken>;
+  }
+
+  /**
+   * The Firebase AppCheck service interface.
+   *
+   * Do not call this constructor directly. Instead, use
+   * {@link firebase.appCheck `firebase.appCheck()`}.
+   */
+  export interface AppCheck {
+    /**
+     * Activate AppCheck
+     * @param provider reCAPTCHA provider, custom token provider, or reCAPTCHA site key.
+     * @param isTokenAutoRefreshEnabled If true, the SDK automatically
+     * refreshes App Check tokens as needed. If undefined, defaults to the
+     * value of `app.automaticDataCollectionEnabled`, which defaults to
+     * false and can be set in the app config.
+     */
+    activate(
+      provider:
+        | ReCaptchaV3Provider
+        | CustomProvider
+        | AppCheckProvider
+        | string,
+      isTokenAutoRefreshEnabled?: boolean
+    ): void;
+
+    /**
+     *
+     * @param isTokenAutoRefreshEnabled If true, the SDK automatically
+     * refreshes App Check tokens as needed. This overrides any value set
+     * during `activate()`.
+     */
+    setTokenAutoRefreshEnabled(isTokenAutoRefreshEnabled: boolean): void;
+    /**
+     * Get the current App Check token. Attaches to the most recent
+     * in-flight request if one is present. Returns null if no token
+     * is present and no token requests are in-flight.
+     *
+     * @param forceRefresh - If true, will always try to fetch a fresh token.
+     * If false, will use a cached token if found in storage.
+     */
+    getToken(
+      forceRefresh?: boolean
+    ): Promise<firebase.appCheck.AppCheckTokenResult>;
+
+    /**
+     * Registers a listener to changes in the token state. There can be more
+     * than one listener registered at the same time for one or more
+     * App Check instances. The listeners call back on the UI thread whenever
+     * the current token associated with this App Check instance changes.
+     *
+     * @param observer An object with `next`, `error`, and `complete`
+     * properties. `next` is called with an
+     * {@link firebase.appCheck.AppCheckTokenResult `AppCheckTokenResult`}
+     * whenever the token changes. `error` is optional and is called if an
+     * error is thrown by the listener (the `next` function). `complete`
+     * is unused, as the token stream is unending.
+     *
+     * @returns A function that unsubscribes this listener.
+     */
+    onTokenChanged(observer: {
+      next: (tokenResult: firebase.appCheck.AppCheckTokenResult) => void;
+      error?: (error: Error) => void;
+      complete?: () => void;
+    }): Unsubscribe;
+
+    /**
+     * Registers a listener to changes in the token state. There can be more
+     * than one listener registered at the same time for one or more
+     * App Check instances. The listeners call back on the UI thread whenever
+     * the current token associated with this App Check instance changes.
+     *
+     * @param onNext When the token changes, this function is called with aa
+     * {@link firebase.appCheck.AppCheckTokenResult `AppCheckTokenResult`}.
+     * @param onError Optional. Called if there is an error thrown by the
+     * listener (the `onNext` function).
+     * @param onCompletion Currently unused, as the token stream is unending.
+     * @returns A function that unsubscribes this listener.
+     */
+    onTokenChanged(
+      onNext: (tokenResult: firebase.appCheck.AppCheckTokenResult) => void,
+      onError?: (error: Error) => void,
+      onCompletion?: () => void
+    ): Unsubscribe;
+  }
+
+  /**
+   * An App Check provider. This can be either the built-in reCAPTCHA
+   * provider or a custom provider. For more on custom providers, see
+   * https://firebase.google.com/docs/app-check/web-custom-provider
+   */
+  interface AppCheckProvider {
+    /**
+     * Returns an AppCheck token.
+     */
+    getToken(): Promise<AppCheckToken>;
+  }
+
+  /**
+   * The token returned from an {@link firebase.appCheck.AppCheckProvider `AppCheckProvider`}.
+   */
+  interface AppCheckToken {
+    /**
+     * The token string in JWT format.
+     */
+    readonly token: string;
+    /**
+     * The local timestamp after which the token will expire.
+     */
+    readonly expireTimeMillis: number;
   }
 }
 
@@ -4453,8 +4678,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'add_payment_info',
@@ -4474,8 +4699,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'add_shipping_info',
@@ -4495,8 +4720,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'add_to_cart' | 'add_to_wishlist' | 'remove_from_cart',
@@ -4514,8 +4739,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'begin_checkout',
@@ -4534,8 +4759,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'checkout_progress',
@@ -4555,9 +4780,9 @@ declare namespace firebase.analytics {
      * Sends analytics event with given `eventParams`. This method
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
-     * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * See
+     * {@link https://developers.google.com/analytics/devguides/collection/ga4/exceptions
+     * | Measure exceptions}.
      */
     logEvent(
       eventName: 'exception',
@@ -4574,15 +4799,14 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'generate_lead',
       eventParams?: {
         value?: EventParams['value'];
         currency?: EventParams['currency'];
-        transaction_id?: EventParams['transaction_id'];
         [key: string]: any;
       },
       options?: firebase.analytics.AnalyticsCallOptions
@@ -4593,8 +4817,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'login',
@@ -4609,9 +4833,9 @@ declare namespace firebase.analytics {
      * Sends analytics event with given `eventParams`. This method
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
-     * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * See
+     * {@link https://developers.google.com/analytics/devguides/collection/ga4/page-view
+     * | Page views}.
      */
     logEvent(
       eventName: 'page_view',
@@ -4629,8 +4853,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'purchase' | 'refund',
@@ -4652,18 +4876,14 @@ declare namespace firebase.analytics {
      * Sends analytics event with given `eventParams`. This method
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
-     * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * See {@link https://firebase.google.com/docs/analytics/screenviews
+     * | Track Screenviews}.
      */
     logEvent(
       eventName: 'screen_view',
       eventParams?: {
-        app_name: string;
-        screen_name: EventParams['screen_name'];
-        app_id?: string;
-        app_version?: string;
-        app_installer_id?: string;
+        firebase_screen: EventParams['firebase_screen'];
+        firebase_screen_class: EventParams['firebase_screen_class'];
         [key: string]: any;
       },
       options?: firebase.analytics.AnalyticsCallOptions
@@ -4674,8 +4894,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'search' | 'view_search_results',
@@ -4691,16 +4911,14 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'select_content',
       eventParams?: {
-        items?: EventParams['items'];
-        promotions?: EventParams['promotions'];
         content_type?: EventParams['content_type'];
-        content_id?: EventParams['content_id'];
+        item_id?: EventParams['item_id'];
         [key: string]: any;
       },
       options?: firebase.analytics.AnalyticsCallOptions
@@ -4711,8 +4929,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'select_item',
@@ -4730,8 +4948,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'select_promotion' | 'view_promotion',
@@ -4749,8 +4967,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'set_checkout_option',
@@ -4767,15 +4985,15 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'share',
       eventParams?: {
         method?: EventParams['method'];
         content_type?: EventParams['content_type'];
-        content_id?: EventParams['content_id'];
+        item_id?: EventParams['item_id'];
         [key: string]: any;
       },
       options?: firebase.analytics.AnalyticsCallOptions
@@ -4786,8 +5004,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'sign_up',
@@ -4803,8 +5021,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'timing_complete',
@@ -4823,8 +5041,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'view_cart' | 'view_item',
@@ -4842,8 +5060,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent(
       eventName: 'view_item_list',
@@ -4861,8 +5079,8 @@ declare namespace firebase.analytics {
      * automatically associates this logged event with this Firebase web
      * app instance on this device.
      * List of recommended event parameters can be found in
-     * {@link https://developers.google.com/gtagjs/reference/event
-     * the gtag.js reference documentation}.
+     * {@link https://developers.google.com/gtagjs/reference/ga4-events
+     * | the GA4 reference documentation}.
      */
     logEvent<T extends string>(
       eventName: CustomEventName<T>,
@@ -4958,7 +5176,7 @@ declare namespace firebase.analytics {
   export interface EventParams {
     checkout_option?: string;
     checkout_step?: number;
-    content_id?: string;
+    item_id?: string;
     content_type?: string;
     coupon?: string;
     currency?: string;
@@ -4969,6 +5187,14 @@ declare namespace firebase.analytics {
     number?: string;
     promotions?: Promotion[];
     screen_name?: string;
+    /**
+     * Firebase-specific. Use to log a `screen_name` to Firebase Analytics.
+     */
+    firebase_screen?: string;
+    /**
+     * Firebase-specific. Use to log a `screen_class` to Firebase Analytics.
+     */
+    firebase_screen_class?: string;
     search_term?: string;
     shipping?: Currency;
     tax?: Currency;
@@ -5674,8 +5900,15 @@ declare namespace firebase.database {
      *
      * @param host the emulator host (ex: localhost)
      * @param port the emulator port (ex: 8080)
+     * @param options.mockUserToken the mock auth token to use for unit testing Security Rules
      */
-    useEmulator(host: string, port: number): void;
+    useEmulator(
+      host: string,
+      port: number,
+      options?: {
+        mockUserToken?: EmulatorMockTokenOptions | string;
+      }
+    ): void;
     /**
      * Disconnects from the server (all Database operations will be completed
      * offline).
@@ -7017,6 +7250,8 @@ declare namespace firebase.database {
     logger?: boolean | ((a: string) => any),
     persistent?: boolean
   ): any;
+
+  export type EmulatorMockTokenOptions = firebase.EmulatorMockTokenOptions;
 }
 
 declare namespace firebase.database.ServerValue {
@@ -7183,8 +7418,8 @@ declare namespace firebase.messaging {
      *
      * @param callback The function to handle the push message.
      *
-     * @deprecated onBackgroundMessage(nextOrObserver: firebase.NextFn<MessagePayload>|
-     * firebase.Observer<MessagePayload>, error?: firebase.ErrorFn,completed?: firebase.CompleteFn):
+     * @deprecated Use onBackgroundMessage(nextOrObserver: firebase.NextFn<MessagePayload> |
+     * firebase.Observer<MessagePayload>, error?: firebase.ErrorFn, completed?: firebase.CompleteFn):
      * firebase.Unsubscribe.
      */
     setBackgroundMessageHandler(
@@ -7291,9 +7526,6 @@ declare namespace firebase.messaging {
   function isSupported(): boolean;
 }
 
-/**
- * @webonly
- */
 declare namespace firebase.storage {
   /**
    * The full set of object metadata, including read-only properties.
@@ -7612,6 +7844,20 @@ declare namespace firebase.storage {
      * @see {@link firebase.storage.Storage.maxUploadRetryTime}
      */
     setMaxUploadRetryTime(time: number): any;
+    /**
+     * Modify this `Storage` instance to communicate with the Cloud Storage emulator.
+     *
+     * @param host - The emulator host (ex: localhost)
+     * @param port - The emulator port (ex: 5001)
+     * @param options.mockUserToken the mock auth token to use for unit testing Security Rules
+     */
+    useEmulator(
+      host: string,
+      port: number,
+      options?: {
+        mockUserToken?: EmulatorMockTokenOptions | string;
+      }
+    ): void;
   }
 
   /**
@@ -8135,8 +8381,16 @@ declare namespace firebase.firestore {
      *
      * @param host the emulator host (ex: localhost).
      * @param port the emulator port (ex: 9000).
+     * @param options.mockUserToken - the mock auth token to use for unit
+     * testing Security Rules.
      */
-    useEmulator(host: string, port: number): void;
+    useEmulator(
+      host: string,
+      port: number,
+      options?: {
+        mockUserToken?: EmulatorMockTokenOptions | string;
+      }
+    ): void;
 
     /**
      * Attempts to enable persistent storage, if possible.
@@ -9932,4 +10186,6 @@ declare namespace firebase.firestore {
     name: string;
     stack?: string;
   }
+
+  export type EmulatorMockTokenOptions = firebase.EmulatorMockTokenOptions;
 }

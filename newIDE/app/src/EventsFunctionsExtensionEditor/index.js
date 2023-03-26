@@ -33,8 +33,6 @@ import EditorNavigator, {
   type EditorNavigatorInterface,
 } from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from './ChooseEventsFunctionsExtensionEditor';
-import Check from '@material-ui/icons/Check';
-import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { ParametersIndexOffsets } from '../EventsFunctionsExtensionsLoader';
@@ -42,6 +40,8 @@ import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import { ToolbarGroup } from '../UI/Toolbar';
 import IconButton from '../UI/IconButton';
 import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
+import Tune from '../UI/CustomSvgIcons/Tune';
+import Mark from '../UI/CustomSvgIcons/Mark';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -1434,7 +1434,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     },
                   },
                   parameters: {
-                    nextIcon: <Check />,
+                    nextIcon: <Mark />,
                     nextLabel: <Trans>Validate these parameters</Trans>,
                     nextEditor: 'events-sheet',
                   },

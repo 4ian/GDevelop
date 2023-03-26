@@ -2,30 +2,30 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, { renderVariableWithIcon } from './VariableField';
+import VariableField, {
+  renderVariableWithIcon,
+  type VariableFieldInterface,
+} from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
-type State = {|
-  editorOpen: boolean,
-|};
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function ObjectVariableField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?VariableFieldInterface>(null);
+    const [editorOpen, setEditorOpen] = React.useState(false);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-export default class ObjectVariableField extends React.Component<
-  ParameterFieldProps,
-  State
-> {
-  _field: ?VariableField;
-  state = {
-    editorOpen: false,
-  };
-
-  focus() {
-    if (this._field) this._field.focus();
-  }
-
-  render() {
     const {
       project,
       scope,
@@ -34,7 +34,7 @@ export default class ObjectVariableField extends React.Component<
       expressionMetadata,
       expression,
       parameterIndex,
-    } = this.props;
+    } = props;
 
     const objectName = getLastObjectParameterValue({
       instructionMetadata,
@@ -72,27 +72,27 @@ export default class ObjectVariableField extends React.Component<
         <VariableField
           variablesContainer={variablesContainer}
           onComputeAllVariableNames={onComputeAllVariableNames}
-          parameterMetadata={this.props.parameterMetadata}
-          value={this.props.value}
-          onChange={this.props.onChange}
-          isInline={this.props.isInline}
-          onRequestClose={this.props.onRequestClose}
-          onApply={this.props.onApply}
-          ref={field => (this._field = field)}
-          onOpenDialog={() => this.setState({ editorOpen: true })}
-          globalObjectsContainer={this.props.globalObjectsContainer}
-          objectsContainer={this.props.objectsContainer}
+          parameterMetadata={props.parameterMetadata}
+          value={props.value}
+          onChange={props.onChange}
+          isInline={props.isInline}
+          onRequestClose={props.onRequestClose}
+          onApply={props.onApply}
+          ref={field}
+          onOpenDialog={() => setEditorOpen(true)}
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
           scope={scope}
           id={
-            this.props.parameterIndex !== undefined
-              ? `parameter-${this.props.parameterIndex}-object-variable-field`
+            props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-object-variable-field`
               : undefined
           }
         />
-        {this.state.editorOpen && variablesContainer && (
+        {editorOpen && variablesContainer && (
           <VariablesEditorDialog
             title={<Trans>Object Variables</Trans>}
-            open={this.state.editorOpen}
+            open={editorOpen}
             variablesContainer={variablesContainer}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>
@@ -104,24 +104,19 @@ export default class ObjectVariableField extends React.Component<
             }
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
-            onCancel={() => this.setState({ editorOpen: false })}
+            onCancel={() => setEditorOpen(false)}
             onApply={() => {
-              this.setState({ editorOpen: false });
-              if (this._field) this._field.updateAutocompletions();
+              setEditorOpen(false);
+              if (field.current) field.current.updateAutocompletions();
             }}
           />
         )}
       </React.Fragment>
     );
   }
-}
+);
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => {
-  return renderVariableWithIcon(
-    props,
-    'res/types/objectvar.png',
-    'object variable'
-  );
-};
+) =>
+  renderVariableWithIcon(props, 'res/types/objectvar.png', 'object variable');

@@ -42,6 +42,7 @@ import {
 } from '../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
+export const instancesEditorId = 'instances-editor-canvas';
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
   dropCursor: { cursor: 'copy' },
@@ -1078,6 +1079,7 @@ export default class InstancesEditor extends Component<Props> {
             <div
               ref={canvasArea => (this.canvasArea = canvasArea)}
               style={styles.canvasArea}
+              id={instancesEditorId}
             />
           );
         }}

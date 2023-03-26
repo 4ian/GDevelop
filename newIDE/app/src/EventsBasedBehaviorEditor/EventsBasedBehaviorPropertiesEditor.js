@@ -17,9 +17,6 @@ import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
@@ -28,6 +25,9 @@ import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView from '../UI/ScrollView';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
+import Visibility from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 
@@ -263,30 +263,21 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           }}
                           fullWidth
                         >
-                          <SelectOption
-                            value="Number"
-                            primaryText={t`Number`}
-                          />
-                          <SelectOption
-                            value="String"
-                            primaryText={t`String`}
-                          />
+                          <SelectOption value="Number" label={t`Number`} />
+                          <SelectOption value="String" label={t`String`} />
                           <SelectOption
                             value="Boolean"
-                            primaryText={t`Boolean (checkbox)`}
+                            label={t`Boolean (checkbox)`}
                           />
                           <SelectOption
                             value="Choice"
-                            primaryText={t`String from a list of options (text)`}
+                            label={t`String from a list of options (text)`}
                           />
-                          <SelectOption
-                            value="Color"
-                            primaryText={t`Color (text)`}
-                          />
+                          <SelectOption value="Color" label={t`Color (text)`} />
                           {!this.props.isSceneProperties && (
                             <SelectOption
                               value="Behavior"
-                              primaryText={t`Required behavior`}
+                              label={t`Required behavior`}
                             />
                           )}
                         </SelectField>
@@ -324,7 +315,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 return (
                                   <SelectOption
                                     value={measurementUnit.getName()}
-                                    primaryText={label}
+                                    label={label}
                                   />
                                 );
                               }
@@ -365,11 +356,11 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                           >
                             <SelectOption
                               value="true"
-                              primaryText={t`True (checked)`}
+                              label={t`True (checked)`}
                             />
                             <SelectOption
                               value="false"
-                              primaryText={t`False (not checked)`}
+                              label={t`False (not checked)`}
                             />
                           </SelectField>
                         )}
@@ -428,7 +419,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 <SelectOption
                                   key={index}
                                   value={choice}
-                                  primaryText={choice}
+                                  label={choice}
                                 />
                               )
                             )}

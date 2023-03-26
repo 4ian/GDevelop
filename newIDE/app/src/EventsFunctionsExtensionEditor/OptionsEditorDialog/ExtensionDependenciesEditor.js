@@ -12,8 +12,6 @@ import {
 } from '../../UI/Table';
 import RaisedButton from '../../UI/RaisedButton';
 import IconButton from '../../UI/IconButton';
-import Add from '@material-ui/icons/Add';
-import Delete from '@material-ui/icons/Delete';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -25,6 +23,8 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import BackgroundText from '../../UI/BackgroundText';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import Paper from '../../UI/Paper';
+import Trash from '../../UI/CustomSvgIcons/Trash';
+import Add from '../../UI/CustomSvgIcons/Add';
 
 const styles = {
   paper: { minWidth: '100%' },
@@ -157,11 +157,8 @@ export const ExtensionDependenciesEditor = ({
                         }}
                         margin="none"
                       >
-                        <SelectOption value="npm" primaryText={t`NPM`} />
-                        <SelectOption
-                          value="cordova"
-                          primaryText={t`Cordova`}
-                        />
+                        <SelectOption value="npm" label={t`NPM`} />
+                        <SelectOption value="cordova" label={t`Cordova`} />
                       </SelectField>
                     </TableRowColumn>
                     <TableRowColumn>
@@ -173,7 +170,7 @@ export const ExtensionDependenciesEditor = ({
                         }}
                         size="small"
                       >
-                        <Delete />
+                        <Trash />
                       </IconButton>
                     </TableRowColumn>
                   </TableRow>

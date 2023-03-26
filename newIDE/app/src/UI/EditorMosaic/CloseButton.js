@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import IconButton from '../IconButton';
-import Close from '@material-ui/icons/Close';
+import Cross from '../CustomSvgIcons/Cross';
 import { MosaicWindowContext, MosaicContext } from 'react-mosaic-component';
 
 const styles = {
@@ -29,7 +29,7 @@ export default function CloseButton(props: Props) {
       }}
       style={styles.container}
     >
-      <Close htmlColor="inherit" style={styles.icon} />
+      <Cross htmlColor="inherit" style={styles.icon} />
     </IconButton>
   );
 }

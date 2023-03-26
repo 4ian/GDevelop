@@ -37,12 +37,12 @@ type Props = {|
 |};
 
 const watermarkPlacementOptions = [
-  { value: 'top', primaryText: t`Top` },
-  { value: 'top-left', primaryText: t`Top left corner` },
-  { value: 'top-right', primaryText: t`Top right corner` },
-  { value: 'bottom', primaryText: t`Bottom` },
-  { value: 'bottom-left', primaryText: t`Bottom left corner` },
-  { value: 'bottom-right', primaryText: t`Bottom right corner` },
+  { value: 'top', label: t`Top` },
+  { value: 'top-left', label: t`Top left corner` },
+  { value: 'top-right', label: t`Top right corner` },
+  { value: 'bottom', label: t`Bottom` },
+  { value: 'bottom-left', label: t`Bottom left corner` },
+  { value: 'bottom-right', label: t`Bottom right corner` },
 ];
 
 export const LoadingScreenEditor = ({
@@ -114,15 +114,15 @@ export const LoadingScreenEditor = ({
                     !loadingScreen.isGDevelopLogoShownDuringLoadingScreen()
                   }
                 >
-                  <SelectOption value="light" primaryText={t`Light (plain)`} />
+                  <SelectOption value="light" label={t`Light (plain)`} />
                   <SelectOption
                     value="light-colored"
-                    primaryText={t`Light (colored)`}
+                    label={t`Light (colored)`}
                   />
-                  <SelectOption value="dark" primaryText={t`Dark (plain)`} />
+                  <SelectOption value="dark" label={t`Dark (plain)`} />
                   <SelectOption
                     value="dark-colored"
-                    primaryText={t`Dark (colored)`}
+                    label={t`Dark (colored)`}
                   />
                 </SelectField>
               </Column>
@@ -173,7 +173,7 @@ export const LoadingScreenEditor = ({
                     <SelectOption
                       key={option.value}
                       value={option.value}
-                      primaryText={option.primaryText}
+                      label={option.label}
                     />
                   ))}
                 </SelectField>

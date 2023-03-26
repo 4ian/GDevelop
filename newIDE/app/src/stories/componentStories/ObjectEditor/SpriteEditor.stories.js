@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -29,6 +30,7 @@ export const Default = () => (
       <SpriteEditor
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
+        layout={testProject.testLayout}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
@@ -37,6 +39,7 @@ export const Default = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         onSizeUpdated={() => {}}
+        object={testProject.spriteObject}
         objectName="FakeObjectName"
       />
     </DragAndDropContextProvider>
@@ -50,6 +53,7 @@ export const AnimationLocked = () => (
         isAnimationListLocked
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
+        layout={testProject.testLayout}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
           onFetchNewlyAddedResources: async () => {},
@@ -58,6 +62,7 @@ export const AnimationLocked = () => (
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
         onSizeUpdated={() => {}}
+        object={testProject.spriteObject}
         objectName="FakeObjectName"
       />
     </DragAndDropContextProvider>
@@ -72,6 +77,7 @@ export const Points = () => (
           objectConfiguration={testProject.spriteObjectConfiguration}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
+          onRenamedPoint={action('Renamed a point')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

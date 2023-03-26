@@ -23,6 +23,13 @@ namespace gdjs {
       return this._items[itemName].count;
     }
 
+    maximum(itemName) {
+      if (!this._items.hasOwnProperty(itemName)) {
+        return 0;
+      }
+      return this._items[itemName].maxCount;
+    }
+
     add(itemName) {
       if (!this._items.hasOwnProperty(itemName)) {
         this._makeItemEntry(itemName);
@@ -80,6 +87,7 @@ namespace gdjs {
       if (!this._items.hasOwnProperty(itemName)) {
         this._makeItemEntry(itemName);
       }
+      this._items[itemName].maxCount = 0;
       this._items[itemName].unlimited = enable;
     }
 

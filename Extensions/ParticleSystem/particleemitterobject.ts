@@ -53,7 +53,6 @@ namespace gdjs {
     /** Destroy the object when there is no particles? */
     destroyWhenNoParticles: boolean;
     jumpForwardInTimeOnCreation: number;
-    _jumpForwardInTimeCompleted: boolean;
   };
 
   export type ParticleEmitterObjectData = ObjectData &

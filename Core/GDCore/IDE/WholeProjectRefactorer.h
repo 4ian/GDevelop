@@ -325,7 +325,7 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Refactor the project after an object is renamed in a layout
    *
    * This will update the layout, all external layouts associated with it
-   * and all external events used by the layout.
+   * and all external events associated with it.
    */
   static void ObjectOrGroupRenamedInLayout(gd::Project& project,
                                            gd::Layout& layout,
@@ -337,7 +337,7 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Refactor the project after an object is removed in a layout
    *
    * This will update the layout, all external layouts associated with it
-   * and all external events used by the layout.
+   * and all external events associated with it.
    */
   static void ObjectOrGroupRemovedInLayout(gd::Project& project,
                                            gd::Layout& layout,

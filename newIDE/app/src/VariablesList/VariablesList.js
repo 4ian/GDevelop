@@ -12,7 +12,6 @@ import Edit from '../UI/CustomSvgIcons/Edit';
 import Undo from '../UI/CustomSvgIcons/Undo';
 import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
-import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
@@ -73,6 +72,7 @@ import { CLIPBOARD_KIND } from './ClipboardKind';
 import VariablesListToolbar from './VariablesListToolbar';
 import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
+import SwitchHorizontal from '../UI/CustomSvgIcons/SwitchHorizontal';
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -1031,7 +1031,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         </Column>
                         <Column expand>
                           {type === gd.Variable.Boolean ? (
-                            <Line noMargin>
+                            <Line noMargin alignItems="center">
                               <span
                                 style={
                                   isSelected
@@ -1067,7 +1067,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                         : t`Set to false`
                                     }
                                   >
-                                    <SwapHorizontal
+                                    <SwitchHorizontal
                                       htmlColor={
                                         isSelected
                                           ? gdevelopTheme.listItem

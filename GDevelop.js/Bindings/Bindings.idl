@@ -2398,7 +2398,8 @@ interface ExpressionParser2NodeWorker {
 interface ExpressionValidator {
     void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
 
-    [Const, Ref] VectorExpressionParserDiagnostic GetErrors();
+    [Const, Ref] VectorExpressionParserDiagnostic GetAllErrors();
+    [Const, Ref] VectorExpressionParserDiagnostic GetFatalErrors();
 
     //Inherited from ExpressionParser2NodeWorker:
 };

@@ -51,8 +51,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
                                     codeGenerator.GetObjectsAndGroups(),
                                     rootType);
   node->Visit(validator);
-  if (!validator.GetErrors().empty()) {
-    std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
+  if (!validator.GetFatalErrors().empty()) {
+    std::cout << "Error: \"" << validator.GetFatalErrors()[0]->GetMessage()
               << "\" in: \"" << expression.GetPlainString() << "\" ("
               << rootType << ")" << std::endl;
 

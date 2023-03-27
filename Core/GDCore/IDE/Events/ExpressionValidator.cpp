@@ -77,24 +77,42 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       MetadataProvider::GetBehaviorAnyExpressionMetadata(
             platform, behaviorType, function.functionName);
 
-  if (!function.objectName.empty()) {
-    // If the function needs a capability on the object that may not be covered
-    // by all objects, check it now.
-    if (!metadata.GetRequiredBaseObjectCapability().empty()) {
-      const gd::ObjectMetadata &objectMetadata =
-          MetadataProvider::GetObjectMetadata(platform, objectType);
+  Type returnType = StringToType(metadata.GetReturnType());
 
-      if (objectMetadata.IsUnsupportedBaseObjectCapability(
-              metadata.GetRequiredBaseObjectCapability())) {
-        RaiseTypeError(
-            _("This expression exists, but it can't be used on this object."),
-            function.objectNameLocation);
-        return StringToType(metadata.GetReturnType());
-      }
-    }
+  if (!function.objectName.empty() &&
+      !globalObjectsContainer.HasObjectNamed(function.objectName) &&
+      !globalObjectsContainer.GetObjectGroups().Has(function.objectName) &&
+      !objectsContainer.HasObjectNamed(function.objectName) &&
+      !objectsContainer.GetObjectGroups().Has(function.objectName)) {
+    RaiseTypeError(_("This object doesn't exist."),
+                   function.objectNameLocation, /*isFatal=*/false);
+    return returnType;
   }
 
-  Type returnType = StringToType(metadata.GetReturnType());
+  if (!function.behaviorName.empty() &&
+      !gd::HasBehaviorInObjectOrGroup(globalObjectsContainer, objectsContainer,
+                                     function.objectName,
+                                     function.behaviorName)) {
+    RaiseTypeError(_("This behavior is not attached to this object."),
+                   function.behaviorNameLocation, /*isFatal=*/false);
+    return returnType;
+  }
+
+  if (!function.objectName.empty() &&
+    // If the function needs a capability on the object that may not be covered
+    // by all objects, check it now.
+  !metadata.GetRequiredBaseObjectCapability().empty()) {
+    const gd::ObjectMetadata &objectMetadata =
+        MetadataProvider::GetObjectMetadata(platform, objectType);
+
+    if (objectMetadata.IsUnsupportedBaseObjectCapability(
+            metadata.GetRequiredBaseObjectCapability())) {
+      RaiseTypeError(
+          _("This expression exists, but it can't be used on this object."),
+          function.objectNameLocation);
+      return returnType;
+    }
+  }
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     RaiseError(
@@ -115,8 +133,8 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
             "number to a string."),
           function.location);
       return returnType;
-    }
-    else if (parentType != Type::Number && parentType != Type::NumberOrString) {
+    } else if (parentType != Type::Number &&
+               parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "number, but another type is expected:") +
                               " " + TypeToString(parentType),
@@ -131,8 +149,8 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
             "string to a number."),
           function.location);
       return returnType;
-    }
-    else if (parentType != Type::String && parentType != Type::NumberOrString) {
+    } else if (parentType != Type::String &&
+               parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "string, but another type is expected:") +
                               " " + TypeToString(parentType),
@@ -172,8 +190,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
           _("You have not entered enough parameters for the expression.") + " " +
               expectedCountMessage,
           function.location);
-    }
-    else {
+    } else {
       RaiseError(
           "extra_parameter",
           _("This parameter was not expected by this expression. Remove it "
@@ -217,8 +234,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
                     "parameter."),
                 parameter->location);
         }
-      }
-      else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
+      } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
         if (dynamic_cast<IdentifierNode *>(parameter.get()) == nullptr) {
           RaiseError(
                   "malformed_object_parameter",

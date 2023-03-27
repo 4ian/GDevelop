@@ -45,7 +45,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
   /**
    * \brief Helper function to check if a given node does not contain
-   * any error.
+   * any error including non-fatal ones.
    */
   static bool HasNoErrors(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
@@ -54,16 +54,25 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
                       gd::ExpressionNode& node) {
     gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, rootType);
     node.Visit(validator);
-    return validator.GetErrors().empty();
+    return validator.GetAllErrors().empty();
   }
+
+  /**
+   * \brief Get only the fatal errors
+   *
+   * Expressions with fatal error can't be generated.
+   */
+  const std::vector<ExpressionParserDiagnostic*>& GetFatalErrors() {
+    return fatalErrors;
+  };
 
   /**
    * \brief Get all the errors
    *
    * No errors means that the expression is valid.
    */
-  const std::vector<ExpressionParserDiagnostic*>& GetErrors() {
-    return errors;
+  const std::vector<ExpressionParserDiagnostic*>& GetAllErrors() {
+    return allErrors;
   };
 
  protected:
@@ -239,20 +248,26 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
 
-  void ReportAnyError(const ExpressionNode& node) {
+  void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {
     if (node.diagnostic && node.diagnostic->IsError()) {
       // Syntax errors are holden by the AST nodes.
       // It's fine to give pointers on them as the AST live longer than errors
       // handling.
-      errors.push_back(node.diagnostic.get());
+      allErrors.push_back(node.diagnostic.get());
+      if (isFatal) {
+        fatalErrors.push_back(node.diagnostic.get());
+      }
     }
   }
 
   void RaiseError(const gd::String &type, 
-      const gd::String &message, const ExpressionParserLocation &location) {
+      const gd::String &message, const ExpressionParserLocation &location, bool isFatal = true) {
     auto diagnostic = gd::make_unique<ExpressionParserError>(
         type, message, location);
-    errors.push_back(diagnostic.get());
+    allErrors.push_back(diagnostic.get());
+    if (isFatal) {
+      fatalErrors.push_back(diagnostic.get());
+    }
     // Errors found by the validator are not holden by the AST nodes.
     // They must be owned by the validator to keep living while errors are
     // handled by the caller.
@@ -260,8 +275,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
 
   void RaiseTypeError(
-      const gd::String &message, const ExpressionParserLocation &location) {
-    RaiseError("type_error", message, location);
+      const gd::String &message, const ExpressionParserLocation &location, bool isFatal = true) {
+    RaiseError("type_error", message, location, isFatal);
   }
 
   void RaiseOperatorError(
@@ -306,7 +321,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   static const gd::String identifierTypeString;
   static const gd::String emptyTypeString;
 
-  std::vector<ExpressionParserDiagnostic*> errors;
+  std::vector<ExpressionParserDiagnostic*> fatalErrors;
+  std::vector<ExpressionParserDiagnostic*> allErrors;
   std::vector<std::unique_ptr<ExpressionParserDiagnostic>> supplementalErrors;
   Type childType;
   Type parentType;

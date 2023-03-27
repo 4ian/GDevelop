@@ -20,11 +20,18 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
-  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
+
+  auto &myObject = layout1.InsertNewObject(project, "BuiltinObject", "MyObject", 0);
+  myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+  auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
+  myGroup.AddObject(myObject.GetName());
+  
+  layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   layout1.InsertNewObject(project,
                           "MyExtension::FakeObjectWithUnsupportedCapability",
                           "MyFakeObjectWithUnsupportedCapability",
-                          1);
+                          2);
 
   gd::ExpressionParser2 parser;
 
@@ -40,8 +47,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a text (between quotes) or a valid expression call.");
     }
     SECTION("of type number") {
@@ -55,8 +62,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number or a valid expression call.");
     }
     SECTION("of type object") {
@@ -70,8 +77,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a valid object name.");
     }
   }
@@ -147,9 +154,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(
-          validator.GetErrors()[0]->GetMessage() ==
+          validator.GetFatalErrors()[0]->GetMessage() ==
           "You must enter a text (between quotes) or a valid expression call.");
     }
     {
@@ -158,8 +165,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must wrap your text inside double quotes (example: \"Hello "
               "world\").");
     }
@@ -169,8 +176,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a number, but a text was expected (in quotes).");
     }
     {
@@ -179,12 +186,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must wrap your text inside double quotes (example: \"Hello "
               "world\").");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 9);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 9);
     }
     {
       auto node = parser.ParseExpression("abcd + efgh");
@@ -192,11 +199,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must wrap your text inside double quotes (example: \"Hello "
               "world\").");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "You must wrap your text inside double quotes (example: \"Hello "
               "world\").");
     }
@@ -207,11 +214,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "A text must end with a double quote (\"). Add a double quote to "
               "terminate the text.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 1);
     }
     {
       auto node = parser.ParseExpression("\"hello world");
@@ -219,11 +226,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "A text must end with a double quote (\"). Add a double quote to "
               "terminate the text.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 12);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 12);
     }
     {
       auto node = parser.ParseExpression("\"\"\"");
@@ -231,15 +238,15 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 3);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 3);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "More than one term was found. Verify that your expression is "
               "properly written.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
-      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 2);
-      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetStartPosition() == 2);
+      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
               "A text must end with a double quote (\"). Add a double quote to "
               "terminate the text.");
     }
@@ -252,16 +259,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 3);
+      REQUIRE(validator.GetFatalErrors().size() == 3);
 
       // TODO Find a way to remove these 2 extra errors.
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
-      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
               "You must enter a text (between quotes) or a valid expression call.");
 
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
     }
@@ -271,16 +278,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 3);
+      REQUIRE(validator.GetFatalErrors().size() == 3);
 
       // TODO Find a way to remove these 2 extra errors.
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
-      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
               "You must enter a text (between quotes) or a valid expression call.");
 
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
     }
@@ -290,11 +297,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "The list of parameters is not terminated. Add a closing "
               "parenthesis to end the parameters.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "Cannot find an expression with this name: Idontexist\n"
               "Double check that you've not made any typo in the name.");
     }
@@ -304,9 +311,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(
-          validator.GetErrors()[0]->GetMessage() ==
+          validator.GetFatalErrors()[0]->GetMessage() ==
           "You must enter a text (between quotes) or a valid expression call.");
     }
   }
@@ -318,11 +325,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "Missing a closing parenthesis. Add a closing parenthesis for "
               "each opening parenthesis.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "Missing a closing parenthesis. Add a closing parenthesis for "
               "each opening parenthesis.");
     }
@@ -332,17 +339,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 4);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 4);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must wrap your text inside double quotes "
               "(example: \"Hello world\").");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "You must add the operator + between texts or expressions. "
               "For example: \"Your name: \" + VariableString(PlayerName).");
-      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
-      REQUIRE(validator.GetErrors()[3]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[3]->GetMessage() ==
               "You must enter a text (between quotes) or a valid expression call.");
     }
   }
@@ -354,11 +361,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You've used an operator that is not supported. Only + can be "
               "used to concatenate texts.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 9);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 9);
     }
   }
 
@@ -419,7 +426,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
@@ -438,7 +445,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -460,7 +467,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
@@ -479,7 +486,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -498,7 +505,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("+123");
@@ -514,7 +521,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("-123.2");
@@ -530,7 +537,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
   SECTION("valid unary operators ('number|string' type)") {
@@ -548,7 +555,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("+123");
@@ -564,7 +571,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("-123.2");
@@ -580,7 +587,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -591,10 +598,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number or a valid expression call.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
       auto node = parser.ParseExpression("-\"hello\"");
@@ -602,12 +609,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You've used an operator that is not supported. Only + can be "
               "used to concatenate texts, and must be placed between two texts "
               "(or expressions).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
       auto node = parser.ParseExpression("+-\"hello\"");
@@ -615,17 +622,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You've used an operator that is not supported. Only + can be "
               "used to concatenate texts, and must be placed between two texts "
               "(or expressions).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 1);
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 1);
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "You've used an operator that is not supported. Only + can be "
               "used to concatenate texts, and must be placed between two texts "
               "(or expressions).");
-      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[1]->GetStartPosition() == 0);
     }
   }
 
@@ -636,10 +643,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number or a valid expression call.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
       auto node = parser.ParseExpression("abcd");
@@ -647,10 +654,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
     }
     {
       auto node = parser.ParseExpression("\"hello world\"");
@@ -658,11 +665,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a text, but a number was expected.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 13);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 13);
     }
     {
       auto node = parser.ParseExpression("123 456");
@@ -670,14 +677,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "More than one term was found. Verify that your expression is "
           "properly written.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 4);
+      REQUIRE(validator.GetFatalErrors()[1]->GetStartPosition() == 4);
     }
     {
       auto node = parser.ParseExpression("3..14");
@@ -685,14 +692,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "More than one term was found. Verify that your expression is "
           "properly written.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 2);
+      REQUIRE(validator.GetFatalErrors()[1]->GetStartPosition() == 2);
     }
     {
       auto node = parser.ParseExpression(".");
@@ -700,10 +707,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "A number was expected. You must enter a number here.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 1);
     }
   }
 
@@ -714,13 +721,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 3);
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 3);
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 4);
+      REQUIRE(validator.GetFatalErrors()[1]->GetStartPosition() == 4);
       // TODO Should error be removed?
-      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[2]->GetMessage() ==
               "You must enter a number.");
     }
     {
@@ -729,8 +736,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You've used an operator that is not supported. Operator should be "
               "either +, -, / or *.");
     }
@@ -740,25 +747,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a number or a valid expression call.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 2);
     }
   }
 
-  SECTION("Numbers and texts mismatchs") {
+  SECTION("Numbers and texts mismatches") {
     {
       auto node = parser.ParseExpression("123 + \"hello world\"");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a text, but a number was expected.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 6);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 6);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 19);
     }
     {
       auto node = parser.ParseExpression("\"hello world\" + 123");
@@ -766,14 +773,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a number, but a text was expected (in quotes).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 16);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 16);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 19);
     }
   }
-  SECTION("Numbers and texts mismatchs ('number|string' type)") {
+  SECTION("Numbers and texts mismatches ('number|string' type)") {
     {
       auto node =
           parser.ParseExpression("123 + \"hello world\"");
@@ -781,11 +788,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a text, but a number was expected.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 6);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 6);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 19);
     }
     {
       auto node =
@@ -794,14 +801,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a number, but a text was expected (in quotes).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 16);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 19);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 16);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 19);
     }
   }
-  SECTION("Numbers and texts mismatchs with parenthesis") {
+  SECTION("Numbers and texts mismatches with parenthesis") {
     {
       auto node =
           parser.ParseExpression("((123)) + (\"hello world\")");
@@ -809,11 +816,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a text, but a number was expected.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 11);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 24);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 11);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 24);
     }
     {
       auto node =
@@ -822,11 +829,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a number, but a text was expected (in quotes).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 20);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 23);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 20);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 23);
     }
   }
 
@@ -839,7 +846,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
 
     {
@@ -850,7 +857,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("Hello World 1 ");
@@ -860,7 +867,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("Hello World 1  ");
@@ -870,7 +877,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -881,8 +888,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a valid object name.");
     }
     SECTION("with operator") {
@@ -891,8 +898,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "object");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "Operators (+, -, /, *) can't be used with an object name. "
               "Remove the operator.");
     }
@@ -909,7 +916,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("number and string parameters") {
       auto node = parser.ParseExpression(
@@ -922,7 +929,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("3rd optional parameter not set") {
       auto node = parser.ParseExpression(
@@ -932,7 +939,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("3rd optional parameter set") {
       auto node = parser.ParseExpression(
@@ -942,7 +949,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("object function call") {
       auto node =
@@ -955,16 +962,46 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    SECTION("object function call on group") {
+      auto node =
+          parser.ParseExpression("MyGroup.GetFromBaseExpression()");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "GetFromBaseExpression");
+      REQUIRE(functionNode.objectName == "MyGroup");
+      REQUIRE(functionNode.behaviorName == "");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("behavior function call") {
       auto node = parser.ParseExpression(
-          "WhateverObject.WhateverBehavior::WhateverFunction()");
+          "MyObject.MyBehavior::GetBehaviorNumberWith1Param(0)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
-      REQUIRE(functionNode.functionName == "WhateverFunction");
-      REQUIRE(functionNode.objectName == "WhateverObject");
-      REQUIRE(functionNode.behaviorName == "WhateverBehavior");
+      REQUIRE(functionNode.functionName == "GetBehaviorNumberWith1Param");
+      REQUIRE(functionNode.objectName == "MyObject");
+      REQUIRE(functionNode.behaviorName == "MyBehavior");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+    SECTION("behavior function call on group") {
+      auto node = parser.ParseExpression(
+          "MyGroup.MyBehavior::GetBehaviorNumberWith1Param(0)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      REQUIRE(functionNode.functionName == "GetBehaviorNumberWith1Param");
+      REQUIRE(functionNode.objectName == "MyGroup");
+      REQUIRE(functionNode.behaviorName == "MyBehavior");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("identifier parameter") {
       auto node = parser.ParseExpression(
@@ -1003,7 +1040,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node =
@@ -1019,7 +1056,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number|string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1035,7 +1072,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression(
@@ -1048,7 +1085,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("WhateverObject  .  WhateverBehavior  "
@@ -1082,7 +1119,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1094,7 +1131,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("MyExtension::MouseX(,0)");
@@ -1103,7 +1140,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1127,8 +1164,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, project, layout1, "number");
     node->Visit(validator);
-    REQUIRE(validator.GetErrors().size() == 1);
-    REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+    REQUIRE(validator.GetFatalErrors().size() == 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "An opening parenthesis was expected here to call a function.");
   }
 
@@ -1266,12 +1303,110 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "Cannot find an expression with this name: Idontexist\nDouble "
               "check that you've not made any typo in the name.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 14);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 14);
+    }
+    SECTION("the object doesn't exist") {
+      SECTION("but the function does") {
+        auto node = parser.ParseExpression(
+            "MyInexistentObject.GetFromBaseExpression()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+        REQUIRE(validator.GetAllErrors().size() == 1);
+        REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetAllErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetAllErrors()[0]->GetEndPosition() == 18);
+      }
+      SECTION("and the neither does the function") {
+        auto node = parser.ParseExpression("MyInexistentObject.Idontexist()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+        REQUIRE(validator.GetAllErrors().size() == 1);
+        REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetAllErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetAllErrors()[0]->GetEndPosition() == 18);
+      }
+      SECTION("and the expression is invalid") {
+        auto node = parser.ParseExpression("MyInexistentObject.Idontexist(");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetAllErrors().size() == 2);
+        REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+                "The list of parameters is not terminated. Add a closing "
+                "parenthesis to end the parameters.");
+        REQUIRE(validator.GetAllErrors()[0]->GetStartPosition() == 30);
+        REQUIRE(validator.GetAllErrors()[0]->GetEndPosition() == 30);
+        REQUIRE(validator.GetAllErrors()[1]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetAllErrors()[1]->GetStartPosition() == 0);
+        REQUIRE(validator.GetAllErrors()[1]->GetEndPosition() == 18);
+      }
+    }
+    SECTION("the behavior doesn't exist") {
+      SECTION("and the object neither") {
+        auto node = parser.ParseExpression(
+            "MyInexistentObject.MyMaybeInexistentBehavior::MyMaybeExistingFunction()");
+        REQUIRE(node != nullptr);
+
+        // There should be no error on the behavior because it's not possible
+        // to know if it exist or not.
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+        REQUIRE(validator.GetAllErrors().size() == 1);
+        REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+                "This object doesn't exist.");
+        REQUIRE(validator.GetAllErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetAllErrors()[0]->GetEndPosition() == 18);
+      }
+      SECTION("and the expression is valid") {
+        auto node = parser.ParseExpression(
+            "MyObject.MyInexistentBehavior::MyMaybeExistingFunction()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+        REQUIRE(validator.GetAllErrors().size() == 1);
+        REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+                "This behavior is not attached to this object.");
+        REQUIRE(validator.GetAllErrors()[0]->GetStartPosition() == 9);
+        REQUIRE(validator.GetAllErrors()[0]->GetEndPosition() == 29);
+      }
+      SECTION("and the expression is invalid") {
+        auto node = parser.ParseExpression(
+            "MyObject.MyInexistentBehavior::Idontexist(");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetAllErrors().size() == 2);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "The list of parameters is not terminated. Add a closing "
+                "parenthesis to end the parameters.");
+        REQUIRE(validator.GetAllErrors()[0]->GetStartPosition() == 42);
+        REQUIRE(validator.GetAllErrors()[0]->GetEndPosition() == 42);
+        REQUIRE(validator.GetAllErrors()[1]->GetMessage() ==
+                "This behavior is not attached to this object.");
+        REQUIRE(validator.GetAllErrors()[1]->GetStartPosition() == 9);
+        REQUIRE(validator.GetAllErrors()[1]->GetEndPosition() == 29);
+      }
     }
     SECTION("too much parameters") {
       SECTION("on a free function") {
@@ -1281,13 +1416,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, project, layout1, "number");
         node->Visit(validator);
-        REQUIRE(validator.GetErrors().size() == 1);
-        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
                 "This parameter was not expected by this expression. Remove it "
                 "or verify that you've entered the proper expression name. "
                 "The number of parameters must be exactly 0");
-        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 23);
-        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+        REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 23);
+        REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 25);
       }
       SECTION("on an object function") {
         auto node = parser.ParseExpression("MySpriteObject.GetObjectNumber(12)");
@@ -1295,13 +1430,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, project, layout1, "number");
         node->Visit(validator);
-        REQUIRE(validator.GetErrors().size() == 1);
-        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
                 "This parameter was not expected by this expression. Remove it "
                 "or verify that you've entered the proper expression name. "
                 "The number of parameters must be exactly 0");
-        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 31);
-        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 33);
+        REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 31);
+        REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 33);
       }
     }
     SECTION("not enough parameters") {
@@ -1311,12 +1446,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You have not entered enough parameters for the expression. The "
               "number of parameters must be exactly 2");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 37);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 37);
     }
     SECTION("wrong parameter type") {
       auto node = parser.ParseExpression(
@@ -1325,11 +1460,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a number, but a text was expected (in quotes).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 37);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 38);
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 37);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 38);
     }
     SECTION("wrong return type") {
       {
@@ -1338,13 +1473,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, project, layout1, "string");
         node->Visit(validator);
-        REQUIRE(validator.GetErrors().size() == 1);
-        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
                 "You tried to use an expression that returns a number, but a "
                 "string is expected. Use `ToString` if you need to convert a "
                 "number to a string.");
-        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 24);
+        REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 24);
       }
       {
         auto node = parser.ParseExpression("MyExtension::ToString()");
@@ -1352,13 +1487,13 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, project, layout1, "number");
         node->Visit(validator);
-        REQUIRE(validator.GetErrors().size() == 1);
-        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
                 "You tried to use an expression that returns a string, but a "
                 "number is expected. Use `ToNumber` if you need to convert a "
                 "string to a number.");
-        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 23);
+        REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 23);
       }
     }
     SECTION("finishing with namespace separator") {
@@ -1368,12 +1503,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, project, layout1, "number");
         node->Visit(validator);
-        REQUIRE(validator.GetErrors().size() == 1);
-        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
                 "Cannot find an expression with this name: MyExtension::\nDouble "
                 "check that you've not made any typo in the name.");
-        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 17);
+        REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 17);
       }
       SECTION("behavior function") {
         auto node = parser.ParseExpression("MyObject.MyBehavior::(12)");
@@ -1381,14 +1516,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
         gd::ExpressionValidator validator(platform, project, layout1, "number");
         node->Visit(validator);
-        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
 
         // TODO: The error message could be improved
-        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
                 "Cannot find an expression with this name: \nDouble "
                 "check that you've not made any typo in the name.");
-        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+        REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 25);
       }
     }
   }
@@ -1400,8 +1535,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You must enter a variable name.");
     }
     SECTION("identifier in brackets") {
@@ -1410,8 +1545,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "You must enter a number or a text, wrapped inside double quotes "
             "(example: \"Hello world\").");
     }
@@ -1421,8 +1556,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "Missing a closing bracket. Add a closing bracket for each opening bracket.");
     }
     SECTION("number instead") {
@@ -1431,8 +1566,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a number, but this type was expected: variable");
     }
     SECTION("string instead") {
@@ -1441,8 +1576,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a text, but this type was expected: variable");
     }
   }
@@ -1468,7 +1603,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("child with brackets accessor") {
       auto node = parser.ParseExpression(
@@ -1485,7 +1620,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
     SECTION("child with brackets then dot") {
       auto node = parser.ParseExpression(
@@ -1503,7 +1638,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1572,7 +1707,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1603,7 +1738,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1624,7 +1759,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1646,7 +1781,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 0);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 
@@ -1662,11 +1797,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "Operators (+, -, /, *) can't be used with an object name. Remove "
               "the operator.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "An object name was expected but something else was written. "
               "Enter just the name of the object for this parameter.");
     }
@@ -1684,11 +1819,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors().size() == 2);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "Operators (+, -, /, *) can't be used in variable names. Remove "
               "the operator from the variable name.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetFatalErrors()[1]->GetMessage() ==
               "A variable name was expected but something else was written. "
               "Enter just the name of the variable for this parameter.");
     }
@@ -1702,7 +1837,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, project, layout1, "string");
     node->Visit(validator);
-    REQUIRE(validator.GetErrors().size() == 0);
+    REQUIRE(validator.GetFatalErrors().size() == 0);
   }
 
   SECTION(
@@ -1715,8 +1850,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     gd::ExpressionValidator validator(platform, project, layout1, "string");
     node->Visit(validator);
-    REQUIRE(validator.GetErrors().size() == 1);
-    REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+    REQUIRE(validator.GetFatalErrors().size() == 1);
+    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
             "This expression exists, but it can't be used on this object.");
   }
 
@@ -1729,7 +1864,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           REQUIRE(node != nullptr);
           gd::ExpressionValidator validator(platform, project, layout1, type);
           node->Visit(validator);
-          REQUIRE(validator.GetErrors().size() != 0);
+          REQUIRE(validator.GetFatalErrors().size() != 0);
         };
 
         testExpressionWithType("number");

@@ -10,11 +10,11 @@ import {
   TableHeaderColumn,
 } from '../../../UI/Table';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import AddCircle from '../../../UI/CustomSvgIcons/AddCircle';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
+import Warning from '../../../UI/CustomSvgIcons/Warning';
 import Tooltip from '@material-ui/core/Tooltip';
 
 export type Vertex = {|

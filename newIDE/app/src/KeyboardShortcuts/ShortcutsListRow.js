@@ -7,9 +7,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Chip from '../UI/Chip';
 import IconButton from '../UI/IconButton';
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
-import WarningIcon from '@material-ui/icons/Warning';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
+import Warning from '../UI/CustomSvgIcons/Warning';
+import Undo from '../UI/CustomSvgIcons/Undo';
 
 const styles = {
   shortcutChip: {
@@ -36,7 +36,7 @@ const ShortcutsListRow = (props: Props) => {
       <ListItemSecondaryAction>
         {props.isClashing && (
           <IconButton tooltip={t`This shortcut clashes with another action.`}>
-            <WarningIcon />
+            <Warning />
           </IconButton>
         )}
         <Chip
@@ -50,7 +50,7 @@ const ShortcutsListRow = (props: Props) => {
             onClick={props.onResetShortcut}
             tooltip={t`Reset to default`}
           >
-            <RotateLeftIcon />
+            <Undo />
           </IconButton>
         )}
       </ListItemSecondaryAction>

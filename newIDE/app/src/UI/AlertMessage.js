@@ -1,8 +1,5 @@
 // @flow
 import * as React from 'react';
-import Info from '@material-ui/icons/Info';
-import Warning from '@material-ui/icons/Warning';
-import Error from '@material-ui/icons/Error';
 import { Spacer, Line, Column } from './Grid';
 import Text from './Text';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
@@ -10,6 +7,9 @@ import { ResponsiveLineStackLayout } from './Layout';
 import IconButton from './IconButton';
 import Paper from './Paper';
 import Cross from './CustomSvgIcons/Cross';
+import WarningFilled from './CustomSvgIcons/WarningFilled';
+import ErrorFilled from './CustomSvgIcons/ErrorFilled';
+import Info from './CustomSvgIcons/Info';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
@@ -60,7 +60,7 @@ const AlertMessage = ({
                 <React.Fragment>
                   {kind === 'info' && <Info style={styles.icon} />}
                   {kind === 'warning' && (
-                    <Warning
+                    <WarningFilled
                       style={{
                         ...styles.icon,
                         color: gdevelopTheme.message.warning,
@@ -68,7 +68,7 @@ const AlertMessage = ({
                     />
                   )}
                   {kind === 'error' && (
-                    <Error
+                    <ErrorFilled
                       style={{
                         ...styles.icon,
                         color: gdevelopTheme.message.error,

@@ -85,7 +85,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       !objectsContainer.HasObjectNamed(function.objectName) &&
       !objectsContainer.GetObjectGroups().Has(function.objectName)) {
     RaiseTypeError(_("This object doesn't exist."),
-                   function.objectNameLocation);
+                   function.objectNameLocation, /*isFatal=*/false);
     return returnType;
   }
 
@@ -94,7 +94,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
                                      function.objectName,
                                      function.behaviorName)) {
     RaiseTypeError(_("This behavior is not attached to this object."),
-                   function.behaviorNameLocation);
+                   function.behaviorNameLocation, /*isFatal=*/false);
     return returnType;
   }
 

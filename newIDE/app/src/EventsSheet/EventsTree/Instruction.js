@@ -208,7 +208,8 @@ const Instruction = (props: Props) => {
                 parameterType
               );
               expressionNode.visit(expressionValidator);
-              expressionIsValid = expressionValidator.getErrors().size() === 0;
+              expressionIsValid =
+                expressionValidator.getAllErrors().size() === 0;
               expressionValidator.delete();
             } else if (gd.ParameterMetadata.isObject(parameterType)) {
               const objectOrGroupName = instruction

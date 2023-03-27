@@ -137,7 +137,7 @@ const extractErrors = (
     expressionType
   );
   expressionNode.visit(expressionValidator);
-  const errors = expressionValidator.getErrors();
+  const errors = expressionValidator.getAllErrors();
 
   const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
     begin: error.getStartPosition(),

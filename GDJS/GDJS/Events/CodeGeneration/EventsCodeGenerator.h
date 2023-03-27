@@ -171,6 +171,14 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::EventsCodeGenerationContext& context);
 
   /**
+   * \brief Generate the full name for accessing to a boolean variable used for
+   * conditions.
+   */
+  virtual gd::String GenerateUpperScopeBooleanFullName(
+      const gd::String& boolName,
+      const gd::EventsCodeGenerationContext& context);
+
+  /**
    * \brief Set a boolean to false.
    */
   virtual gd::String GenerateBooleanInitializationToFalse(
@@ -314,11 +322,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
     return "!(" + predicat + ")";
   };
-
-  virtual gd::String GenerateReferenceToUpperScopeBoolean(
-      const gd::String& referenceName,
-      const gd::String& referencedBoolean,
-      gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);

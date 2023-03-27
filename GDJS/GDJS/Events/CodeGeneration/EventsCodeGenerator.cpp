@@ -65,16 +65,11 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
   gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
 
-  // "Booleans" used by conditions
-  gd::String globalConditionsBooleans =
-      codeGenerator.GenerateAllConditionsBooleanDeclarations();
-
   gd::String output =
       // clang-format off
       codeGenerator.GetCodeNamespace() + " = {};\n" +
       globalDeclarations +
-      globalObjectLists + "\n" +
-      globalConditionsBooleans + "\n\n" +
+      globalObjectLists + "\n\n" +
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
       fullyQualifiedFunctionName + " = function(" +
         functionArgumentsCode +
@@ -639,21 +634,6 @@ EventsCodeGenerator::GenerateAllObjectsDeclarationsAndResets(
   return std::make_pair(globalObjectLists, globalObjectListsReset);
 }
 
-gd::String EventsCodeGenerator::GenerateAllConditionsBooleanDeclarations() {
-  gd::String globalConditionsBooleans;
-  for (unsigned int i = 0; i <= GetMaxCustomConditionsDepth(); ++i) {
-    globalConditionsBooleans += GetCodeNamespaceAccessor() + "conditionTrue_" +
-                                gd::String::From(i) + " = {val:false};\n";
-    for (std::size_t j = 0; j <= GetMaxConditionsListsSize(); ++j) {
-      globalConditionsBooleans += GetCodeNamespaceAccessor() + "condition" +
-                                  gd::String::From(j) + "IsTrue_" +
-                                  gd::String::From(i) + " = {val:false};\n";
-    }
-  }
-
-  return globalConditionsBooleans;
-}
-
 gd::String EventsCodeGenerator::GenerateObjectFunctionCall(
     gd::String objectListName,
     const gd::ObjectMetadata& objMetadata,
@@ -729,7 +709,7 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
 
   // Generate condition code
   return GenerateBooleanFullName(returnBoolean, context) +
-         ".val = " + predicat + ";\n";
+         " = " + predicat + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectCondition(
@@ -761,18 +741,18 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
 
   // Generate whole condition code
   conditionCode +=
-      "for(var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
+      "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
       ".length;i<l;++i) {\n";
   conditionCode += "    if ( " + predicat + " ) {\n";
   conditionCode += "        " +
                    GenerateBooleanFullName(returnBoolean, context) +
-                   ".val = true;\n";
+                   " = true;\n";
   conditionCode += "        " + GetObjectListName(objectName, context) +
                    "[k] = " + GetObjectListName(objectName, context) + "[i];\n";
   conditionCode += "        ++k;\n";
   conditionCode += "    }\n";
   conditionCode += "}\n";
-  conditionCode += GetObjectListName(objectName, context) + ".length = k;";
+  conditionCode += GetObjectListName(objectName, context) + ".length = k;\n";
 
   return conditionCode;
 }
@@ -816,19 +796,19 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
          << "\" (condition: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     conditionCode +=
-        "for(var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
+        "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
         ".length;i<l;++i) {\n";
     conditionCode += "    if ( " + predicat + " ) {\n";
     conditionCode += "        " +
                      GenerateBooleanFullName(returnBoolean, context) +
-                     ".val = true;\n";
+                     " = true;\n";
     conditionCode += "        " + GetObjectListName(objectName, context) +
                      "[k] = " + GetObjectListName(objectName, context) +
                      "[i];\n";
     conditionCode += "        ++k;\n";
     conditionCode += "    }\n";
     conditionCode += "}\n";
-    conditionCode += GetObjectListName(objectName, context) + ".length = k;";
+    conditionCode += GetObjectListName(objectName, context) + ".length = k;\n";
   }
 
   return conditionCode;
@@ -1096,29 +1076,26 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::EventsCodeGenerationContext& context) {
   gd::String outputCode;
 
-  for (std::size_t i = 0; i < conditions.size(); ++i)
     outputCode += GenerateBooleanInitializationToFalse(
-        "condition" + gd::String::From(i) + "IsTrue", context);
+        "isConditionTrue", context);
 
   for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
-    if (cId != 0)
-      outputCode +=
-          "if ( " +
-          GenerateBooleanFullName(
-              "condition" + gd::String::From(cId - 1) + "IsTrue", context) +
-          ".val ) {\n";
-
+    if (cId != 0) {
+      outputCode += "if (" +
+                    GenerateBooleanFullName("isConditionTrue", context) +
+                    ") {\n";
+    }
     gd::String conditionCode =
         GenerateConditionCode(conditions[cId],
-                              "condition" + gd::String::From(cId) + "IsTrue",
+                              "isConditionTrue",
                               context);
     if (!conditions[cId].GetType().empty()) {
-      outputCode += "{\n";
+      outputCode +=
+          GenerateBooleanFullName("isConditionTrue", context) + " = false;\n";
       outputCode += conditionCode;
-      outputCode += "}";
     }
   }
-
+  // Close nested "if".
   for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
     if (cId != 0) outputCode += "}\n";
   }
@@ -1331,29 +1308,27 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
   return output;
 }
 
-gd::String EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(
-    const gd::String& referenceName,
-    const gd::String& referencedBoolean,
-    gd::EventsCodeGenerationContext& context) {
+gd::String EventsCodeGenerator::GenerateUpperScopeBooleanFullName(
+    const gd::String& boolName,
+    const gd::EventsCodeGenerationContext& context) {
   if (context.GetCurrentConditionDepth() <= 0)
     return "/* Code generation error: the referenced boolean can't exist as "
            "the context has a condition depth of 0. */";
 
-  return GenerateBooleanFullName(referenceName, context) + " = " +
-         GetCodeNamespaceAccessor() + referencedBoolean + "_" +
-         gd::String::From(context.GetCurrentConditionDepth() - 1) + ";\n";
+  return boolName + "_" +
+         gd::String::From(context.GetCurrentConditionDepth() - 1);
 }
 
 gd::String EventsCodeGenerator::GenerateBooleanInitializationToFalse(
     const gd::String& boolName,
     const gd::EventsCodeGenerationContext& context) {
-  return GenerateBooleanFullName(boolName, context) + ".val = false;\n";
+  return "let " + GenerateBooleanFullName(boolName, context) + " = false;\n";
 }
 
 gd::String EventsCodeGenerator::GenerateBooleanFullName(
     const gd::String& boolName,
     const gd::EventsCodeGenerationContext& context) {
-  return GetCodeNamespaceAccessor() + boolName + "_" +
+  return boolName + "_" +
          gd::String::From(context.GetCurrentConditionDepth());
 }
 

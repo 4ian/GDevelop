@@ -390,8 +390,7 @@ describe('libGD.js - GDJS Boolean Operator Code Generation integration tests', (
       [false, true].forEach((a) => {
         [false, true].forEach((b) => {
           const result = !(a && b);
-          // TODO Fix the Not condition.
-          it.skip(`can generate a Not: !(${a} && ${b}) is ${result}`, function () {
+          it(`can generate a Not: !(${a} && ${b}) is ${result}`, function () {
             const runtimeScene =
               generateAndRunVariableAffectationWithConditions([
                 {
@@ -474,8 +473,7 @@ describe('libGD.js - GDJS Boolean Operator Code Generation integration tests', (
       [false, true].forEach((a) => {
         [false, true].forEach((b) => {
           const result = !(a && !b);
-          // TODO Fix the Not condition.
-          it.skip(`can generate a Not of Not: !(${a} && !${b}) is ${result}`, function () {
+          it(`can generate a Not of Not: !(${a} && !${b}) is ${result}`, function () {
             const runtimeScene =
               generateAndRunVariableAffectationWithConditions([
                 {
@@ -511,8 +509,7 @@ describe('libGD.js - GDJS Boolean Operator Code Generation integration tests', (
       [false, true].forEach((a) => {
         [false, true].forEach((b) => {
           const result = !(!a && b);
-          // TODO Fix the Not condition.
-          it.skip(`can generate a Not of Not: !(!${a} && ${b}) is ${result}`, function () {
+          it(`can generate a Not of Not: !(!${a} && ${b}) is ${result}`, function () {
             const runtimeScene =
               generateAndRunVariableAffectationWithConditions([
                 {

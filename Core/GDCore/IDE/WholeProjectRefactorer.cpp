@@ -1382,25 +1382,12 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
 
   // Remove object in external events
   if (removeEventsAndGroups) {
-    DependenciesAnalyzer analyzer(project, layout);
-    if (analyzer.Analyze()) {
-      for (auto& externalEventsName :
-           analyzer.GetExternalEventsDependencies()) {
-        auto& externalEvents = project.GetExternalEvents(externalEventsName);
-        gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
-                                                   project,
-                                                   layout,
-                                                   externalEvents.GetEvents(),
-                                                   objectName);
-      }
-      for (auto& layoutName : analyzer.GetScenesDependencies()) {
-        auto& layout = project.GetLayout(layoutName);
-        gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
-                                                   project,
-                                                   layout,
-                                                   layout.GetEvents(),
-                                                   objectName);
-      }
+    for (auto &externalEventsName :
+         GetAssociatedExternalEvents(project, layout.GetName())) {
+      auto &externalEvents = project.GetExternalEvents(externalEventsName);
+      gd::EventsRefactorer::RemoveObjectInEvents(
+          project.GetCurrentPlatform(), project, layout,
+          externalEvents.GetEvents(), objectName);
     }
   }
 
@@ -1439,26 +1426,12 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
   }
 
   // Rename object in external events
-  DependenciesAnalyzer analyzer(project, layout);
-  if (analyzer.Analyze()) {
-    for (auto& externalEventsName : analyzer.GetExternalEventsDependencies()) {
-      auto& externalEvents = project.GetExternalEvents(externalEventsName);
-      gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(),
-                                                 project,
-                                                 layout,
-                                                 externalEvents.GetEvents(),
-                                                 oldName,
-                                                 newName);
-    }
-    for (auto& layoutName : analyzer.GetScenesDependencies()) {
-      auto& layout = project.GetLayout(layoutName);
-      gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(),
-                                                 project,
-                                                 layout,
-                                                 layout.GetEvents(),
-                                                 oldName,
-                                                 newName);
-    }
+  for (auto &externalEventsName :
+       GetAssociatedExternalEvents(project, layout.GetName())) {
+    auto &externalEvents = project.GetExternalEvents(externalEventsName);
+    gd::EventsRefactorer::RenameObjectInEvents(
+        project.GetCurrentPlatform(), project, layout,
+        externalEvents.GetEvents(), oldName, newName);
   }
 
   // Rename object in external layouts

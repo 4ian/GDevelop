@@ -68,6 +68,16 @@ gd::String EventsCodeGenerator::GenerateRelationalOperatorCall(
     }
   }
 
+  // Check type of Relational Operator
+  if (relationalOperator == "startsWith") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").match(new RegExp('^' + " + rhs + ")) !== null";
+  } else if (relationalOperator == "endsWith") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").match(new RegExp(" + rhs + " + '$')) !== null";
+  } else if (relationalOperator == "contains") {
+    return rhs + " != '' && " + callStartString + "(" + argumentsStr + ").match(new RegExp(" + rhs + ")) !== null";
+  }
+
+  // Standard Relational Operator (==, !=)
   return callStartString + "(" + argumentsStr + ") " + relationalOperator +
          " " + rhs;
 }
@@ -673,7 +683,8 @@ const gd::String EventsCodeGenerator::GenerateRelationalOperatorCodes(const gd::
         return "==";
     }
     if (operatorString != "<" && operatorString != ">" &&
-        operatorString != "<=" && operatorString != ">=" && operatorString != "!=") {
+        operatorString != "<=" && operatorString != ">=" && operatorString != "!=" &&
+        operatorString != "startsWith" && operatorString != "endsWith" && operatorString != "contains") {
       cout << "Warning: Bad relational operator: Set to == by default." << endl;
       return "==";
     }

@@ -57,7 +57,7 @@ GetEventFirstActionFirstParameterString(const gd::BaseEvent &event) {
 }
 
 bool
-IsActionsEmpty(const gd::BaseEvent &event) {
+AreActionsEmpty(const gd::BaseEvent &event) {
   auto &actions = EnsureStandardEvent(event).GetActions();
   return actions.IsEmpty();
 }
@@ -115,7 +115,7 @@ enum TestEvent {
   ObjectActionWithOperator,
 };
 
-const std::vector<const gd::EventsList *> GetLayerScopeEventsLists(gd::Project &project) {
+const std::vector<const gd::EventsList *> GetEventsListsAssociatedToScene(gd::Project &project) {
   std::vector<const gd::EventsList *> eventLists;
   auto &scene = project.GetLayout("Scene").GetEvents();
   auto &externalEvents =
@@ -125,7 +125,7 @@ const std::vector<const gd::EventsList *> GetLayerScopeEventsLists(gd::Project &
   return eventLists;
 }
 
-const std::vector<const gd::EventsList *> GetLayerOutOfScopeEventsLists(gd::Project &project) {
+const std::vector<const gd::EventsList *> GetEventsListsNotAssociatedToScene(gd::Project &project) {
   std::vector<const gd::EventsList *> eventLists;
   auto &eventsExtension = project.GetEventsFunctionsExtension("MyEventsExtension");
   auto &objectFunctionEvents =
@@ -152,10 +152,10 @@ const std::vector<const gd::EventsList *> GetLayerOutOfScopeEventsLists(gd::Proj
 const std::vector<const gd::EventsList *> GetEventsLists(gd::Project &project) {
   std::vector<const gd::EventsList *> eventLists;
 
-  for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+  for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
     eventLists.push_back(eventsList);
   }
-  for (auto *eventsList : GetLayerOutOfScopeEventsLists(project)) {
+  for (auto *eventsList : GetEventsListsNotAssociatedToScene(project)) {
     eventLists.push_back(eventsList);
   }
   return eventLists;
@@ -1307,13 +1307,13 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
           project, layout, "ObjectWithMyBehavior", /* isObjectGroup=*/false);
 
-      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+      for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
       // Check actions with the object in parameters have been removed.
       REQUIRE(
-          IsActionsEmpty(eventsList->GetEvent(FreeFunctionWithObjects)));
+          AreActionsEmpty(eventsList->GetEvent(FreeFunctionWithObjects)));
 
       // Check actions with the object in expressions have been removed.
-      REQUIRE(IsActionsEmpty(
+      REQUIRE(AreActionsEmpty(
           eventsList->GetEvent(FreeFunctionWithObjectExpression)));
       }
     }
@@ -1450,7 +1450,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
           "RenamedObjectWithMyBehavior",
           /* isObjectGroup=*/false);
 
-      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+      for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
         // Check object name has been renamed in action parameters.
         REQUIRE(GetEventFirstActionFirstParameterString(eventsList->GetEvent(
                     FreeFunctionWithObjects)) == "RenamedObjectWithMyBehavior");
@@ -1474,14 +1474,14 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
       // Trigger the refactoring after removing a group
       gd::WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
-          project, layout, "GroupWithMyBehavior", /* isObjectGroup=*/false);
+          project, layout, "GroupWithMyBehavior", /* isObjectGroup=*/true);
 
-      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+      for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
         // Check actions with the group in parameters have been removed.
-        REQUIRE(IsActionsEmpty(eventsList->GetEvent(FreeFunctionWithGroup)));
+        REQUIRE(AreActionsEmpty(eventsList->GetEvent(FreeFunctionWithGroup)));
 
         // Check actions with the group in expressions have been removed.
-        REQUIRE(IsActionsEmpty(
+        REQUIRE(AreActionsEmpty(
             eventsList->GetEvent(FreeFunctionWithObjectExpressionOnGroup)));
       }
     }
@@ -1499,9 +1499,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
       // Trigger the refactoring after the renaming of a group
       gd::WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
           project, layout, "GroupWithMyBehavior", "RenamedGroupWithMyBehavior",
-          /* isObjectGroup=*/false);
+          /* isObjectGroup=*/true);
 
-      for (auto *eventsList : GetLayerScopeEventsLists(project)) {
+      for (auto *eventsList : GetEventsListsAssociatedToScene(project)) {
         // Check group name has been renamed in action parameters.
         REQUIRE(GetEventFirstActionFirstParameterString(eventsList->GetEvent(
                     FreeFunctionWithGroup)) == "RenamedGroupWithMyBehavior");

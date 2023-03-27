@@ -28,8 +28,8 @@ import FilterIcon from '../UI/CustomSvgIcons/Filter';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
-import Maximize from '../UI/CustomSvgIcons/Maximize';
-import Minimize from '../UI/CustomSvgIcons/Minimize';
+import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
+import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
 
 export type Log = {
   message: string,
@@ -289,8 +289,8 @@ export const DebuggerConsole = ({
                 <Trans>Show details</Trans>
               )
             }
-            checkedIcon={<Minimize />}
-            uncheckedIcon={<Maximize />}
+            checkedIcon={<MinimizeIcon />}
+            uncheckedIcon={<MaximizeIcon />}
             checked={showDetails}
             onCheck={(_, enabled) => setShowDetails(enabled)}
           />

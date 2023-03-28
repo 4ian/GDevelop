@@ -69,6 +69,7 @@ import { SubscriptionSuggestionContext } from '../../Profile/Subscription/Subscr
 import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import Paper from '../../UI/Paper';
+import SwitchHorizontal from '../../UI/CustomSvgIcons/SwitchHorizontal';
 
 type Props = {|
   onLoading: boolean => void,
@@ -789,7 +790,7 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Refresh />
+          <SwitchHorizontal />
         </IconButton>
       ),
     },

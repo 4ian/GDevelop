@@ -8,7 +8,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip';
-import Error from '@material-ui/icons/Error';
 
 import IconButton from '../../UI/IconButton';
 import { Column, Line } from '../../UI/Grid';
@@ -24,6 +23,7 @@ import Trash from '../../UI/CustomSvgIcons/Trash';
 import ChevronArrowLeft from '../../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import SkipBack from '../../UI/CustomSvgIcons/SkipBack';
+import Error from '../../UI/CustomSvgIcons/Error';
 
 type Props = {|
   entries: ?Array<LeaderboardDisplayData>,

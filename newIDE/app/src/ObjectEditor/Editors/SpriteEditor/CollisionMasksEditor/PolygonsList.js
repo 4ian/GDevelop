@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import WarningIcon from '@material-ui/icons/Warning';
 import {
   Table,
   TableBody,
@@ -29,6 +28,7 @@ import ScrollView from '../../../../UI/ScrollView';
 import { addVertexOnLongestEdge } from './PolygonHelper';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import Trash from '../../../../UI/CustomSvgIcons/Trash';
+import Warning from '../../../../UI/CustomSvgIcons/Warning';
 
 const gd = global.gd;
 
@@ -147,7 +147,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
         size="small"
         tooltip={t`Polygon is not convex!`}
       >
-        <WarningIcon style={{ color: warningColor }} />
+        <Warning style={{ color: warningColor }} />
       </IconButton>
     ),
     <IconButton

@@ -1240,6 +1240,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       multiSelect: true,
       layersVisibility: null,
     });
+    this.forceUpdatePropertiesEditor();
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
@@ -1280,6 +1281,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       multiSelect: true,
       layersVisibility: null,
     });
+    this.forceUpdatePropertiesEditor();
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {

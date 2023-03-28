@@ -369,9 +369,10 @@ export const AssetStoreStateProvider = ({
   );
 
   // Randomize asset packs when number of asset packs and private asset packs change
-  const assetPackCount = publicAssetPacks
-    ? publicAssetPacks.starterPacks.length
-    : undefined;
+  const assetPackCount =
+    publicAssetPacks && publicAssetPacks.starterPacks
+      ? publicAssetPacks.starterPacks.length
+      : undefined;
   const privateAssetPackCount = privateAssetPacks
     ? privateAssetPacks.length
     : undefined;

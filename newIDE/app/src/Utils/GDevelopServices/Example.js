@@ -36,6 +36,9 @@ export const listAllExamples = async (): Promise<AllExamples> => {
     `${GDevelopAssetApi.baseUrl}/example-short-header-and-filter`
   );
 
+  const examples = response.data;
+  if (!examples) throw new Error('Unexpected response from examples endpoint.');
+
   return response.data;
 };
 

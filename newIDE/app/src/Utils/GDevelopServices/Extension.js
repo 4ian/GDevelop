@@ -113,6 +113,9 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
     .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
     .then(response => response.data)
     .then(extensionsRegistry => {
+      if (!extensionsRegistry) {
+        throw new Error('Unexpected response from the extensions endpoint.');
+      }
       return {
         ...extensionsRegistry,
         // TODO: move this to backend endpoint

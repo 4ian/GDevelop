@@ -91,7 +91,7 @@ export const ExampleStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              exampleShortHeaders.length ? exampleShortHeaders.length : 0
+              exampleShortHeaders ? exampleShortHeaders.length : 0
             } examples from the example store.`
           );
           setExampleShortHeadersById(exampleShortHeadersById);

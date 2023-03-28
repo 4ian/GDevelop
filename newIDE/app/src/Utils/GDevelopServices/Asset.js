@@ -265,10 +265,15 @@ export const listAllResources = ({
       return Promise.all([
         client.get(resourcesUrl).then(response => response.data),
         client.get(filtersUrl).then(response => response.data),
-      ]).then(([resources, filters]) => ({
-        resources,
-        filters,
-      }));
+      ]).then(([resources, filters]) => {
+        if (!resources || !filters) {
+          throw new Error('Unexpected response from the resources endpoints.');
+        }
+        return {
+          resources,
+          filters,
+        };
+      });
     });
 };
 

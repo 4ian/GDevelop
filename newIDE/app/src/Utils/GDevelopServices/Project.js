@@ -76,6 +76,14 @@ type CloudProject = {|
   deletedAt?: string,
 |};
 
+type CloudProjectVersion = {|
+  projectId: string,
+  id: string,
+  createdAt: string,
+  /** previousVersion is null when the entity represents the initial version of a project. */
+  previousVersion: null | string,
+|};
+
 export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
   lastModifiedAt: string,
@@ -112,6 +120,24 @@ const getVersionIdFromPath = (path: string): string => {
   const filenameStartIndex = cleanedPath.lastIndexOf('/') + 1;
   const filenameEndIndex = cleanedPath.indexOf('.zip');
   return path.substring(filenameStartIndex, filenameEndIndex);
+};
+
+export const getLastVersionsOfProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<?Array<CloudProjectVersion>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`/project/${cloudProjectId}/version`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId },
+  });
+  return response.data;
 };
 
 export const getCredentialsForCloudProject = async (

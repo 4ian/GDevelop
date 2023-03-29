@@ -798,7 +798,7 @@ const defineCollisionMask = function (
     );
 
   object
-    .addCondition(
+    .addScopedCondition(
       'TilemapJsonFile',
       _('Tilemap JSON file'),
       _('Check the Tilemap JSON file being used.'),
@@ -818,7 +818,7 @@ const defineCollisionMask = function (
     .setFunctionName('isTilemapJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'SetTilemapJsonFile',
       _('Tilemap JSON file'),
       _(
@@ -840,7 +840,7 @@ const defineCollisionMask = function (
     .setFunctionName('setTilemapJsonFile');
 
   object
-    .addCondition(
+    .addScopedCondition(
       'TilesetJsonFile',
       _('Tileset JSON file'),
       _('Check the tileset JSON file being used.'),
@@ -860,7 +860,7 @@ const defineCollisionMask = function (
     .setFunctionName('isTilesetJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
@@ -882,7 +882,7 @@ const defineCollisionMask = function (
     .setFunctionName('setTilesetJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'Scale',
       _('Scale'),
       _('Modify the scale of the specified object.'),
@@ -960,7 +960,7 @@ const defineCollisionMask = function (
     .setGetter('getScaleY');
 
   object
-    .addAction(
+    .addScopedAction(
       'Width',
       _('Width'),
       _('Change the width of an object.'),
@@ -984,7 +984,7 @@ const defineCollisionMask = function (
     .setFunctionName('setWidth');
 
   object
-    .addAction(
+    .addScopedAction(
       'Height',
       _('Height'),
       _('Change the height of an object.'),

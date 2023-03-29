@@ -154,7 +154,7 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   };
 };
 
-const removeExtensionFromFileName = fileName => {
+const removeExtensionFromFileName = (fileName: string) => {
   const dotIndex = fileName.lastIndexOf('.');
   return dotIndex < 0 ? fileName : fileName.substring(0, dotIndex);
 };
@@ -273,7 +273,8 @@ const SpritesList = ({
                   : 1,
               name:
                 animationName ||
-                removeExtensionFromFileName(resourceNames[0]) ||
+                (resourceNames[0] &&
+                  removeExtensionFromFileName(resourceNames[0])) ||
                 objectName,
               isLooping: direction.isLooping(),
               existingMetadata: direction.getMetadata(),

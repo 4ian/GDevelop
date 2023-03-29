@@ -7,7 +7,7 @@ import { I18n } from '@lingui/react';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import AlertMessage from '../../UI/AlertMessage';
 import CircularProgress from '../../UI/CircularProgress';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import {
@@ -15,6 +15,7 @@ import {
   isCloudProjectVersionSane,
   type CloudProjectVersion,
 } from '../../Utils/GDevelopServices/Project';
+import FlatButton from '../../UI/FlatButton';
 
 type Props = {|
   cloudProjectId: string,
@@ -22,7 +23,11 @@ type Props = {|
   onClose: () => void,
 |};
 
-const CloudProjectRecoveryDialog = ({ cloudProjectId, onClose }: Props) => {
+const CloudProjectRecoveryDialog = ({
+  cloudProjectId,
+  onClose,
+  onOpenPreviousVersion,
+}: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     lastSaneVersion,
@@ -75,6 +80,42 @@ const CloudProjectRecoveryDialog = ({ cloudProjectId, onClose }: Props) => {
     [cloudProjectId, authenticatedUser]
   );
 
+  const actions =
+    isErrored || saneVersionHasNotBeenFound
+      ? [
+          <DialogPrimaryButton
+            key="close"
+            label={<Trans>Close</Trans>}
+            onClick={onClose}
+          />,
+        ]
+      : isLoading
+      ? []
+      : lastSaneVersion
+      ? [
+          <FlatButton
+            key="cancel"
+            label={<Trans>Cancel</Trans>}
+            onClick={onClose}
+          />,
+          <DialogPrimaryButton
+            primary
+            key="restore"
+            label={<Trans>Accept</Trans>}
+            onClick={() => onOpenPreviousVersion(lastSaneVersion.id)}
+          />,
+        ]
+      : [];
+
+  const onApply =
+    isErrored || saneVersionHasNotBeenFound
+      ? onClose
+      : isLoading
+      ? undefined
+      : lastSaneVersion
+      ? () => onOpenPreviousVersion(lastSaneVersion.id)
+      : undefined;
+
   const cloudProject = authenticatedUser.cloudProjects
     ? authenticatedUser.cloudProjects.find(
         project => project.id === cloudProjectId
@@ -90,6 +131,8 @@ const CloudProjectRecoveryDialog = ({ cloudProjectId, onClose }: Props) => {
           flexColumnBody
           maxWidth="sm"
           onRequestClose={onClose}
+          onApply={onApply}
+          actions={actions}
           title={
             lastSaneVersion ? (
               <Trans>A functioning save has been found!</Trans>

@@ -8,18 +8,19 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import PromisePool from '@supercharge/promise-pool';
 import { getFileSha512TruncatedTo256 } from '../FileHasher';
 import { isNativeMobileApp } from '../Platform';
+import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
-const projectResourcesClient = axios.create({
+export const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
   // On web/desktop, "credentials" are necessary to use the cookie previously
   // returned by the server.
   withCredentials: !isNativeMobileApp(),
 });
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
 });
 
@@ -76,7 +77,7 @@ type CloudProject = {|
   deletedAt?: string,
 |};
 
-type CloudProjectVersion = {|
+export type CloudProjectVersion = {|
   projectId: string,
   id: string,
   createdAt: string,
@@ -88,6 +89,31 @@ export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
   lastModifiedAt: string,
 |};
+
+export const isCloudProjectVersionSane = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  versionId: string
+): Promise<boolean> => {
+  const response = await refetchCredentialsForProjectAndRetryIfUnauthorized(
+    authenticatedUser,
+    cloudProjectId,
+    () =>
+      projectResourcesClient.get(
+        addGDevelopResourceJwtTokenToUrl(
+          `/${cloudProjectId}/versions/${versionId}.zip`
+        ),
+        { responseType: 'blob' }
+      )
+  );
+  const projectFile = await unzipFirstEntryOfBlob(response.data);
+  try {
+    JSON.parse(projectFile);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 const refetchCredentialsForProjectAndRetryIfUnauthorized = async <T>(
   authenticatedUser: AuthenticatedUser,

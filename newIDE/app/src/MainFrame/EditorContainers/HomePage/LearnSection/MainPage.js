@@ -13,7 +13,6 @@ import {
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { isMobile } from '../../../../Utils/Platform';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -37,10 +36,7 @@ const useStyles = makeStyles({
   },
 });
 
-const getHelpItemsColumnsFromWidth = (
-  width: WidthType,
-  showTourHelpItem: boolean
-) => {
+const getHelpItemsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
     case 'small':
       return 1;
@@ -48,7 +44,7 @@ const getHelpItemsColumnsFromWidth = (
       return 3;
     case 'large':
     default:
-      return showTourHelpItem ? 4 : 3;
+      return 4;
   }
 };
 
@@ -64,7 +60,7 @@ const getTutorialsColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large', true);
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large');
 const styles = {
   grid: {
     textAlign: 'center',
@@ -101,27 +97,24 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
   const helpItems: {
     title: React.Node,
     description: React.Node,
     action: () => void,
     disabled?: boolean,
   }[] = [
-    shouldShowInAppTutorialButtons
-      ? {
-          title: <Trans>Guided Tour</Trans>,
-          description: (
-            <Trans>
-              Learn the fundamentals of the editor with our assisted tutorial.
-            </Trans>
-          ),
-          action: () => {
-            onStartTutorial();
-          },
-          disabled: !!currentlyRunningInAppTutorial,
-        }
-      : undefined,
+    {
+      title: <Trans>Guided Tour</Trans>,
+      description: (
+        <Trans>
+          Learn the fundamentals of the editor with our assisted tutorial.
+        </Trans>
+      ),
+      action: () => {
+        onStartTutorial();
+      },
+      disabled: !!currentlyRunningInAppTutorial,
+    },
     {
       title: <Trans>Documentation</Trans>,
       description: <Trans>Find the complete documentation on everything</Trans>,
@@ -164,10 +157,7 @@ const MainPage = ({
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getHelpItemsColumnsFromWidth(
-              windowWidth,
-              shouldShowInAppTutorialButtons
-            )}
+            cols={getHelpItemsColumnsFromWidth(windowWidth)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
@@ -201,14 +191,12 @@ const MainPage = ({
           </GridList>
         </Line>
       </SectionRow>
-      {shouldShowInAppTutorialButtons && (
-        <SectionRow>
-          <Text noMargin size="section-title">
-            <Trans>Guided lessons</Trans>
-          </Text>
-          <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
-        </SectionRow>
-      )}
+      <SectionRow>
+        <Text noMargin size="section-title">
+          <Trans>Guided lessons</Trans>
+        </Text>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+      </SectionRow>
       <>
         <SectionRow>
           <Line noMargin>

@@ -9,7 +9,7 @@
     "@lingui/macro": "^2.7.3",
     "@storybook/addon-essentials": "6.3.12",
     "@storybook/react": "6.5.16",
-    "axios-mock-adapter": "^1.19.0",
+    "axios-mock-adapter": "^1.21.3",
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "8.1.0",
     "flow-bin": "0.131.0",

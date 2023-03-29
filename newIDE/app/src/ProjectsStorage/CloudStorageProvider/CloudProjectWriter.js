@@ -11,31 +11,13 @@ import {
 import type { $AxiosError } from 'axios';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { serializeToJSON } from '../../Utils/Serializer';
-import { initializeZipJs } from '../../Utils/Zip.js';
 import CloudSaveAsDialog from './CloudSaveAsDialog';
 import { t } from '@lingui/macro';
+import { createZipWithSingleTextFile } from '../../Utils/Zip.js/Utils';
 
 const zipProject = async (project: gdProject) => {
-  const zipJs: ZipJs = await initializeZipJs();
   const projectJson = serializeToJSON(project);
-  const textReader = new zipJs.TextReader(projectJson);
-
-  return new Promise((resolve, reject) => {
-    zipJs.createWriter(
-      new zipJs.BlobWriter('application/zip'),
-      zipWriter => {
-        zipWriter.add('game.json', textReader, () => {
-          zipWriter.close(blob => {
-            resolve(blob);
-          });
-        });
-      },
-      error => {
-        console.error('An error occurred when zipping project', error);
-        reject(error);
-      }
-    );
-  });
+  return createZipWithSingleTextFile(projectJson, 'game.json');
 };
 
 const zipProjectAndCommitVersion = async ({

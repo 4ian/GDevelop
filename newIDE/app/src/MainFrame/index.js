@@ -175,6 +175,7 @@ import {
   allInAppTutorialIds,
 } from '../Utils/GDevelopServices/InAppTutorial';
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
+import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -308,6 +309,10 @@ const MainFrame = (props: Props) => {
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [
+    cloudProjectIdToRecover,
+    setCloudProjectIdToRecover,
+  ] = React.useState<?string>(null);
 
   const [
     chooseResourceOptions,
@@ -842,6 +847,7 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = React.useCallback(
     async (fileMetadata: FileMetadata): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
+      const storageProviderInternalName = getStorageProvider().internalName;
 
       const {
         hasAutoSave,
@@ -938,29 +944,32 @@ const MainFrame = (props: Props) => {
             // that we're opening the file that was originally requested by the user.
             fileMetadata
           );
-          serializedProject.delete();
           return state;
-        } catch (err) {
+        } finally {
           serializedProject.delete();
-          throw err;
         }
       } catch (error) {
-        const errorMessage = getOpenErrorMessage
-          ? getOpenErrorMessage(error)
-          : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
+        if (storageProviderInternalName === 'Cloud') {
+          setCloudProjectIdToRecover(fileMetadata.fileIdentifier);
+        } else {
+          const errorMessage = getOpenErrorMessage
+            ? getOpenErrorMessage(error)
+            : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
 
-        await showAlert({
-          title: t`Unable to open the project`,
-          message: errorMessage,
-        });
-        setIsLoadingProject(false);
-        setLoaderModalProgress(null, null);
-        throw error;
+          await showAlert({
+            title: t`Unable to open the project`,
+            message: errorMessage,
+          });
+          setIsLoadingProject(false);
+          setLoaderModalProgress(null, null);
+          throw error;
+        }
       }
     },
     [
       i18n,
       getStorageProviderOperations,
+      getStorageProvider,
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
@@ -2399,6 +2408,19 @@ const MainFrame = (props: Props) => {
     return true;
   };
 
+  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+    (versionId: string) => {
+      if (!cloudProjectIdToRecover) return;
+      openFromFileMetadataWithStorageProvider({
+        storageProviderName: 'Cloud',
+        fileMetadata: {
+          fileIdentifier: `${cloudProjectIdToRecover}@${versionId}`,
+        },
+      });
+    },
+    [openFromFileMetadataWithStorageProvider, cloudProjectIdToRecover]
+  );
+
   const canInstallPrivateAsset = React.useCallback(
     () => {
       const storageProvider = getStorageProvider();
@@ -3220,6 +3242,13 @@ const MainFrame = (props: Props) => {
               ? selectedExampleShortHeader.name
               : undefined
           }
+        />
+      )}
+      {cloudProjectIdToRecover && (
+        <CloudProjectRecoveryDialog
+          cloudProjectId={cloudProjectIdToRecover}
+          onClose={() => setCloudProjectIdToRecover(null)}
+          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
         />
       )}
       {preferencesDialogOpen && (

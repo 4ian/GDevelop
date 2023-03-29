@@ -470,7 +470,8 @@ const getPresignedUrlForResourcesUpload = async (
 };
 
 export const getProjectFileAsZipBlob = async (
-  cloudProject: CloudProject
+  cloudProject: CloudProject,
+  versionId?: ?string
 ): Promise<Blob> => {
   if (!cloudProject.currentVersion) {
     throw new Error('Opening of project without current version not handled');
@@ -478,7 +479,8 @@ export const getProjectFileAsZipBlob = async (
 
   const response = await projectResourcesClient.get(
     addGDevelopResourceJwtTokenToUrl(
-      `/${cloudProject.id}/versions/${cloudProject.currentVersion}.zip`
+      `/${cloudProject.id}/versions/${versionId ||
+        cloudProject.currentVersion}.zip`
     ),
     { responseType: 'blob' }
   );

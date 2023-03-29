@@ -17,7 +17,9 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
 ): Promise<{|
   content: Object,
 |}> => {
-  const cloudProjectId = fileMetadata.fileIdentifier;
+  const [cloudProjectId, specificVersion] = fileMetadata.fileIdentifier.split(
+    '@'
+  );
 
   onProgress && onProgress((1 / 4) * 100, t`Calibrating sensors`);
   const cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
@@ -26,7 +28,10 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   onProgress && onProgress((2 / 4) * 100, t`Starting engine`);
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
   onProgress && onProgress((3 / 4) * 100, t`Checking tools`);
-  const zippedSerializedProject = await getProjectFileAsZipBlob(cloudProject);
+  const zippedSerializedProject = await getProjectFileAsZipBlob(
+    cloudProject,
+    specificVersion
+  );
   onProgress && onProgress((4 / 4) * 100, t`Opening portal`);
   // Reading only the first entry since the zip should only contain the project json file
   const serializedProject = await unzipFirstEntryOfBlob(

@@ -14,11 +14,25 @@ export default {
 };
 
 export const Default = () => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
+  React.useEffect(
+    () => {
+      if (isLoading) {
+        const timeoutId = setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [isLoading]
+  );
   return (
     <CloudProjectSaveChoiceDialog
+      isLoading={isLoading}
       onClose={() => action('onClose')()}
-      onSaveAsDuplicate={() => action('onSaveAsDuplicate')()}
-      onSaveAsMainVersion={() => action('onSaveAsMainVersion')()}
+      onSaveAsDuplicate={() => setIsLoading(true)}
+      onSaveAsMainVersion={() => setIsLoading(true)}
     />
   );
 };

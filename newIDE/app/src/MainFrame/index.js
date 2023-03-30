@@ -176,6 +176,7 @@ import {
 } from '../Utils/GDevelopServices/InAppTutorial';
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
+import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -313,7 +314,14 @@ const MainFrame = (props: Props) => {
     cloudProjectIdToRecover,
     setCloudProjectIdToRecover,
   ] = React.useState<?string>(null);
-
+  const [
+    cloudProjectRecoveryProcessEnabled,
+    setCloudProjectRecoveryProcessEnabled,
+  ] = React.useState<boolean>(false);
+  const [
+    cloudProjectSaveChoiceOpen,
+    setCloudProjectSaveChoiceOpen,
+  ] = React.useState<boolean>(false);
   const [
     chooseResourceOptions,
     setChooseResourceOptions,
@@ -2061,6 +2069,8 @@ const MainFrame = (props: Props) => {
 
         unsavedChanges.sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
+        setCloudProjectSaveChoiceOpen(false);
+        setCloudProjectRecoveryProcessEnabled(false);
 
         if (!fileMetadata) {
           // Some storage provider like "DownloadFile" don't have file metadata, because
@@ -2145,6 +2155,11 @@ const MainFrame = (props: Props) => {
     () => {
       if (!currentProject) return;
 
+      if (cloudProjectRecoveryProcessEnabled && !cloudProjectSaveChoiceOpen) {
+        setCloudProjectSaveChoiceOpen(true);
+        return;
+      }
+
       const storageProviderOperations = getStorageProviderOperations();
       if (
         props.storageProviders.filter(
@@ -2163,6 +2178,8 @@ const MainFrame = (props: Props) => {
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
+      cloudProjectRecoveryProcessEnabled,
+      cloudProjectSaveChoiceOpen,
     ]
   );
 
@@ -2171,6 +2188,11 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (!currentFileMetadata) {
         return saveProjectAs();
+      }
+
+      if (cloudProjectRecoveryProcessEnabled && !cloudProjectSaveChoiceOpen) {
+        setCloudProjectSaveChoiceOpen(true);
+        return;
       }
 
       const storageProviderOperations = getStorageProviderOperations();
@@ -2207,6 +2229,8 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          setCloudProjectSaveChoiceOpen(false);
+          setCloudProjectRecoveryProcessEnabled(false);
 
           const fileMetadataAndStorageProviderName = {
             fileMetadata: fileMetadata,
@@ -2271,6 +2295,8 @@ const MainFrame = (props: Props) => {
       setState,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      cloudProjectRecoveryProcessEnabled,
+      cloudProjectSaveChoiceOpen,
     ]
   );
 
@@ -2421,6 +2447,7 @@ const MainFrame = (props: Props) => {
         },
       });
       setCloudProjectIdToRecover(null);
+      setCloudProjectRecoveryProcessEnabled(true);
     },
     [openFromFileMetadataWithStorageProvider, cloudProjectIdToRecover]
   );
@@ -3253,6 +3280,14 @@ const MainFrame = (props: Props) => {
           cloudProjectId={cloudProjectIdToRecover}
           onClose={() => setCloudProjectIdToRecover(null)}
           onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
+        />
+      )}
+      {cloudProjectSaveChoiceOpen && (
+        <CloudProjectSaveChoiceDialog
+          isLoading={isSavingProject}
+          onClose={() => setCloudProjectSaveChoiceOpen(false)}
+          onSaveAsMainVersion={saveProject}
+          onSaveAsDuplicate={saveProjectAs}
         />
       )}
       {preferencesDialogOpen && (

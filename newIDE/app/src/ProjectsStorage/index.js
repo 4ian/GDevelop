@@ -11,6 +11,8 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 export type FileMetadata = {|
   /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
+  /** The version id if the provider supports versioning */
+  version?: string,
   lastModifiedDate?: number,
   name?: string,
   gameId?: string,

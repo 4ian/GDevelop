@@ -2416,9 +2416,11 @@ const MainFrame = (props: Props) => {
       openFromFileMetadataWithStorageProvider({
         storageProviderName: 'Cloud',
         fileMetadata: {
-          fileIdentifier: `${cloudProjectIdToRecover}@${versionId}`,
+          fileIdentifier: cloudProjectIdToRecover,
+          version: versionId,
         },
       });
+      setCloudProjectIdToRecover(null);
     },
     [openFromFileMetadataWithStorageProvider, cloudProjectIdToRecover]
   );

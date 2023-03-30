@@ -41,8 +41,8 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
     // is in the scene and the 1st of its event, but the "createObject" method
     // from function contexts is not aware of the workaround.
     
-    // TODO The created instance should be picked when the object is free.
-    it('the object list stays free', function () {
+    // TODO TODO Only the created instance should be picked when all instances was picked.
+    it('can create an instance and keep all instances picked', function () {
       const runCompiledEvents = generateFunctionWithCreateAction(gd);
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
 
@@ -61,7 +61,7 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       expect(myObjectLists.get('MyObject').length).toBe(3);
     });
 
-    it('the created instance is added to the picked instances when the object is not free', function () {
+    it('can create and pick an instance when some instances were not picked', function () {
       const runCompiledEvents = generateFunctionWithCreateAction(gd);
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
 

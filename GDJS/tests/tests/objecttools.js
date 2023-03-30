@@ -96,7 +96,7 @@ describe('gdjs.evtTools.object', function () {
   const getInstancesIds = (instances) =>
     instances.map((instance) => instance && instance.id);
 
-  it('can create and pick an object when an instance is already picked', function () {
+  it('can create and pick an instance when some instances were not picked', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
@@ -123,8 +123,8 @@ describe('gdjs.evtTools.object', function () {
     );
   });
 
-  // TODO The created instance should be picked when the object is free.
-  it('can create an object and keep the object free from picking', function () {
+  // TODO Only the created instance should be picked when all instances was picked.
+  it('can create an instance and keep all instances picked', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
@@ -132,7 +132,7 @@ describe('gdjs.evtTools.object', function () {
     const objectA1 = runtimeScene.createObject('MyObjectA');
     const objectA2 = runtimeScene.createObject('MyObjectA');
 
-    // No instance is picked (as they are all in the list).
+    // All instances are picked.
     const pickedObjectList = Hashtable.newFrom({
       MyObjectA: [objectA1, objectA2],
     });
@@ -143,9 +143,9 @@ describe('gdjs.evtTools.object', function () {
       0,
       0,
       ''
-    );
+    );.
 
-    // Still no instance is picked (as they are all in the list).
+    // All instances are still picked.
     expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
       getInstancesIds([objectA1, objectA2, newObjectA])
     );

@@ -28,6 +28,10 @@ let currentlyRunningInAppTutorial = null;
 export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
   (currentlyRunningInAppTutorial = tutorial);
 
+/**
+ * Used to send an event to the analytics.
+ * This function will retry to send the event if the analytics service is not ready.
+ */
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
   if (isDev) return;
 
@@ -52,7 +56,7 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
 };
 
 /**
- * Use this function on initialization of the app once.
+ * Used once at the beginning of the app to initialize the analytics.
  */
 export const installAnalyticsEvents = () => {
   if (isDev) {
@@ -70,7 +74,7 @@ export const installAnalyticsEvents = () => {
 };
 
 /**
- * We use this function every time the user is fetched.
+ * Must be called every time the user is fetched (and also even if the user turns out to be not connected).
  * This allows updating the user properties (like the language used, the version of the app, etc...)
  * and to identify the user if not already done.
  * We can safely call it multiple times, as it will only send the user properties if they changed.
@@ -121,18 +125,13 @@ export const identifyUserForAnalytics = (
     hearFrom: profile ? profile.hearFrom : undefined,
   };
 
-  // Important. We never alias the user while identifying, to avoid
-  // linking the Firebase ID as the future reference of possible new UUIDs.
-  // This allows keeping the Firebase ID as the reference of the first Posthog
-  // account that was linked on signup.
-
   // Identify which user is using the app, after de-duplicating the call to
   // avoid useless calls.
   // This is so we can build stats on the used version, languages and usage
   // of GDevelop features.
   const stringifiedUserProperties = JSON.stringify(userProperties);
   if (stringifiedUserProperties !== posthogLastPropertiesSent) {
-    // If the user is not logged in, identify the user by its random UUID.
+    // If the user is not logged in, identify the user by its anonymous UUID.
     // If the user is logged in, identify the user by its Firebase ID.
     const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
     posthog.identify(userId, userProperties);
@@ -142,9 +141,9 @@ export const identifyUserForAnalytics = (
 };
 
 /**
- * Use this function on signup to link the Firebase ID to the UUID.
- * This is important to do this alias only Once per ID, so only on signup.
- * It avoids linking the Firebase ID as the future reference of new UUIDs.
+ * Must be called on signup, to link the current user Firebase ID to the anonymous UUID
+ * that was used before the signup (this allows linking the events sent before the signup)
+ * This is only done on signup as an ID can only be an alias of another ID once.
  */
 export const aliasUserForAnalyticsAfterSignUp = (
   firebaseUser: FirebaseUser
@@ -164,8 +163,8 @@ export const aliasUserForAnalyticsAfterSignUp = (
     return;
   }
 
-  // This indicates posthog that the new ID (FirebaseID) is now referencing the
-  // same user as the old ID (UUID).
+  // This indicates posthog that the current user Firebase ID is now an alias
+  // of the anonymous UUID that was used before the signup.
   posthog.alias(firebaseUser.uid, getUserUUID());
 };
 

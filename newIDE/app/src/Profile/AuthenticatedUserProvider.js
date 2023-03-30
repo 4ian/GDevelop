@@ -22,6 +22,7 @@ import {
   onUserLogoutForAnalytics,
   sendSignupDone,
   identifyUserForAnalytics,
+  aliasUserForAnalyticsAfterSignUp,
 } from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
@@ -720,6 +721,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openCreateAccountDialog(false);
       sendSignupDone(form.email);
+      const firebaseUser = this.state.authenticatedUser.firebaseUser;
+      aliasUserForAnalyticsAfterSignUp(firebaseUser);
       const profile = this.state.authenticatedUser.profile;
       const username = profile ? profile.username : null;
       this.showUserSnackbar({

@@ -2,6 +2,7 @@
 import posthog from 'posthog-js';
 import { getUserUUID, resetUserUUID } from './UserUUID';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { User as FirebaseUser } from 'firebase/auth';
 import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
@@ -16,8 +17,11 @@ const electron = optionalRequire('electron');
 const isElectronApp = !!electron;
 const isDev = Window.isDev();
 
+// Flag helpful to know if posthog is ready to send events.
 let posthogLoaded = false;
-const posthogAliasMade = [];
+// Flag helpful to know if the user has been identified, to avoid sending initial events
+// to a random uuid (like program_opening), which may not be merged to the main user's account.
+let userIdentified = false;
 let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
 
@@ -27,7 +31,7 @@ export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
   if (isDev) return;
 
-  if (!posthogLoaded) {
+  if (!posthogLoaded || !userIdentified) {
     console.info(`App analytics not ready for an event - retrying in 2s.`);
     setTimeout(() => {
       console.info(
@@ -47,6 +51,9 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   });
 };
 
+/**
+ * Use this function on initialization of the app once.
+ */
 export const installAnalyticsEvents = () => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
@@ -58,10 +65,16 @@ export const installAnalyticsEvents = () => {
     loaded: () => {
       posthogLoaded = true;
     },
-    autocapture: false,
+    autocapture: false, // we disable autocapture because we want to control which events we send.
   });
 };
 
+/**
+ * We use this function every time the user is fetched.
+ * This allows updating the user properties (like the language used, the version of the app, etc...)
+ * and to identify the user if not already done.
+ * We can safely call it multiple times, as it will only send the user properties if they changed.
+ */
 export const identifyUserForAnalytics = (
   authenticatedUser: AuthenticatedUser
 ) => {
@@ -108,22 +121,10 @@ export const identifyUserForAnalytics = (
     hearFrom: profile ? profile.hearFrom : undefined,
   };
 
-  // If the user is logged in, alias the user with its firebase id.
-  if (firebaseUser) {
-    const aliasKey = firebaseUser.uid + '#' + getUserUUID();
-    if (!posthogAliasMade.includes(aliasKey)) {
-      // Try to Alias the random UUID to the Firebase ID.
-      // 2 cases:
-      // - Either it's the first time the user logs in and posthog does not know
-      //   about the Firebase ID, in which case we specify the firebaseId as 2nd parameter
-      //   of the alias method.
-      // - Or the user has already logged in and posthog knows about the Firebase ID,
-      //   in which case PostHog will reject the merging of the 2 users.
-      //   We then need to ensure we identify the user by its Firebase ID.
-      posthog.alias(getUserUUID(), firebaseUser.uid);
-      posthogAliasMade.push(aliasKey);
-    }
-  }
+  // Important. We never alias the user while identifying, to avoid
+  // linking the Firebase ID as the future reference of possible new UUIDs.
+  // This allows keeping the Firebase ID as the reference of the first Posthog
+  // account that was linked on signup.
 
   // Identify which user is using the app, after de-duplicating the call to
   // avoid useless calls.
@@ -136,7 +137,36 @@ export const identifyUserForAnalytics = (
     const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
     posthog.identify(userId, userProperties);
     posthogLastPropertiesSent = stringifiedUserProperties;
+    userIdentified = true;
   }
+};
+
+/**
+ * Use this function on signup to link the Firebase ID to the UUID.
+ * This is important to do this alias only Once per ID, so only on signup.
+ * It avoids linking the Firebase ID as the future reference of new UUIDs.
+ */
+export const aliasUserForAnalyticsAfterSignUp = (
+  firebaseUser: FirebaseUser
+) => {
+  if (isDev) {
+    console.info('Development build - Analytics disabled');
+    return;
+  }
+
+  if (!posthogLoaded) {
+    console.info(`App analytics not ready for aliasing - retrying in 2s.`);
+    setTimeout(() => {
+      console.info(`Retrying to alias the user for app analytics.`);
+      aliasUserForAnalyticsAfterSignUp(firebaseUser);
+    }, 2000);
+
+    return;
+  }
+
+  // This indicates posthog that the new ID (FirebaseID) is now referencing the
+  // same user as the old ID (UUID).
+  posthog.alias(firebaseUser.uid, getUserUUID());
 };
 
 export const onUserLogoutForAnalytics = () => {

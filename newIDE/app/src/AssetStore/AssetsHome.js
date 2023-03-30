@@ -275,7 +275,10 @@ export type AssetsHomeInterface = {|
 type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPacksListingData: Array<PrivateAssetPackListingData>,
-  assetPackRandomOrdering: Array<number>,
+  assetPackRandomOrdering: {|
+    starterPacks: Array<number>,
+    privateAssetPacks: Array<number>,
+  |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
   onCategorySelection: string => void,
@@ -323,6 +326,12 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           !openedAssetCategory ||
           assetPack.categories.includes(openedAssetCategory)
       )
+      .map((pack, index) => ({
+        pos: assetPackRandomOrdering.starterPacks[index],
+        pack,
+      }))
+      .sort((a, b) => a.pos - b.pos)
+      .map(sortObject => sortObject.pack)
       .map((assetPack, index) => (
         <PublicAssetPackTile
           assetPack={assetPack}
@@ -337,6 +346,12 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           !openedAssetCategory ||
           assetPackListingData.categories.includes(openedAssetCategory)
       )
+      .map((listingData, index) => ({
+        pos: assetPackRandomOrdering.privateAssetPacks[index],
+        listingData,
+      }))
+      .sort((a, b) => a.pos - b.pos)
+      .map(sortObject => sortObject.listingData)
       .map(assetPackListingData => (
         <PrivateAssetPackTile
           assetPackListingData={assetPackListingData}
@@ -355,10 +370,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
 
     const allTiles = mergeArraysPerGroup(
       privateAssetPacksTiles,
-      starterPacksTiles
-        .map((tile, index) => ({ pos: assetPackRandomOrdering[index], tile }))
-        .sort((a, b) => a.pos - b.pos)
-        .map(sortObject => sortObject.tile),
+      starterPacksTiles,
       2,
       1
     );

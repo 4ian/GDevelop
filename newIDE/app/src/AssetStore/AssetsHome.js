@@ -65,6 +65,11 @@ export const assetCategories = {
     imageAlt: 'Prefabs asset packs category',
     imageSource: 'res/asset-categories/Prefabs.jpeg',
   },
+  sounds: {
+    title: <Trans>Sounds and musics</Trans>,
+    imageAlt: 'Sounds and musics asset packs category',
+    imageSource: 'res/asset-categories/Sounds.jpeg',
+  },
 };
 
 const styles = {

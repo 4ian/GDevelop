@@ -224,11 +224,17 @@ export const createCloudProject = async (
   return response.data;
 };
 
-export const commitVersion = async (
+export const commitVersion = async ({
+  authenticatedUser,
+  cloudProjectId,
+  zippedProject,
+  previousVersion,
+}: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
-  zippedProject: any
-): Promise<?string> => {
+  zippedProject: Blob,
+  previousVersion?: ?string,
+}): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -257,7 +263,7 @@ export const commitVersion = async (
   // Inform backend a new version has been uploaded.
   const response = await apiClient.post(
     `/project/${cloudProjectId}/action/commit`,
-    { newVersion },
+    { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
     {
       headers: {
         Authorization: authorizationHeader,

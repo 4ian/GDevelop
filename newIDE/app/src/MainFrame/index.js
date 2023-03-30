@@ -315,9 +315,9 @@ const MainFrame = (props: Props) => {
     setCloudProjectFileMetadataToRecover,
   ] = React.useState<?FileMetadata>(null);
   const [
-    cloudProjectRecoveryProcessEnabled,
-    setCloudProjectRecoveryProcessEnabled,
-  ] = React.useState<boolean>(false);
+    cloudProjectRecoveryOpenedVersionId,
+    setCloudProjectRecoveryOpenedVersionId,
+  ] = React.useState<?string>(null);
   const [
     cloudProjectSaveChoiceOpen,
     setCloudProjectSaveChoiceOpen,
@@ -2070,7 +2070,7 @@ const MainFrame = (props: Props) => {
         unsavedChanges.sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
         setCloudProjectSaveChoiceOpen(false);
-        setCloudProjectRecoveryProcessEnabled(false);
+        setCloudProjectRecoveryOpenedVersionId(null);
 
         if (!fileMetadata) {
           // Some storage provider like "DownloadFile" don't have file metadata, because
@@ -2155,7 +2155,7 @@ const MainFrame = (props: Props) => {
     () => {
       if (!currentProject) return;
 
-      if (cloudProjectRecoveryProcessEnabled && !cloudProjectSaveChoiceOpen) {
+      if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
         return;
       }
@@ -2178,7 +2178,7 @@ const MainFrame = (props: Props) => {
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
-      cloudProjectRecoveryProcessEnabled,
+      cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
     ]
   );
@@ -2190,7 +2190,7 @@ const MainFrame = (props: Props) => {
         return saveProjectAs();
       }
 
-      if (cloudProjectRecoveryProcessEnabled && !cloudProjectSaveChoiceOpen) {
+      if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
         setCloudProjectSaveChoiceOpen(true);
         return;
       }
@@ -2222,7 +2222,10 @@ const MainFrame = (props: Props) => {
 
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
-          currentFileMetadata
+          currentFileMetadata,
+          cloudProjectRecoveryOpenedVersionId
+            ? { previousVersion: cloudProjectRecoveryOpenedVersionId }
+            : undefined
         );
 
         if (wasSaved) {
@@ -2230,7 +2233,7 @@ const MainFrame = (props: Props) => {
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
           setCloudProjectSaveChoiceOpen(false);
-          setCloudProjectRecoveryProcessEnabled(false);
+          setCloudProjectRecoveryOpenedVersionId(null);
 
           const fileMetadataAndStorageProviderName = {
             fileMetadata: fileMetadata,
@@ -2295,7 +2298,7 @@ const MainFrame = (props: Props) => {
       setState,
       authenticatedUser,
       currentlyRunningInAppTutorial,
-      cloudProjectRecoveryProcessEnabled,
+      cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
     ]
   );
@@ -2447,7 +2450,7 @@ const MainFrame = (props: Props) => {
         },
       });
       setCloudProjectFileMetadataToRecover(null);
-      setCloudProjectRecoveryProcessEnabled(true);
+      setCloudProjectRecoveryOpenedVersionId(versionId);
     },
     [openFromFileMetadataWithStorageProvider, cloudProjectFileMetadataToRecover]
   );

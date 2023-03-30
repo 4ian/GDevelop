@@ -74,7 +74,8 @@ export type StorageProviderOperations = {|
   // Project saving:
   onSaveProject?: (
     project: gdProject,
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    options?: {| previousVersion: string |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,

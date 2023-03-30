@@ -52,12 +52,12 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       const myObject2 = runtimeScene.createObject(objectName);
       myObjectLists.put(objectName, [myObject1, myObject2]);
 
-      // The object is free (all instances are in the list).
+      // All instances are picked.
       expect(myObjectLists.get('MyObject').length).toBe(2);
 
       runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
 
-      // The object is still free (all instances are in the list).
+      // All instances are still picked.
       expect(myObjectLists.get('MyObject').length).toBe(3);
     });
 
@@ -75,12 +75,12 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       runtimeScene.createObject(objectName);
       myObjectLists.put(objectName, [myObject1, myObject2]);
 
-      // The object is not free (2 of 5 instances are picked).
+      // 2 of 5 instances are picked.
       expect(myObjectLists.get('MyObject').length).toBe(2);
 
       runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
 
-      // The new instance has been added to the picked instances.
+      // The created instance has been added to the picked instances.
       expect(myObjectLists.get('MyObject').length).toBe(3);
     });
   });

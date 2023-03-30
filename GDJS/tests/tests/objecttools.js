@@ -104,7 +104,7 @@ describe('gdjs.evtTools.object', function () {
     const objectA1 = runtimeScene.createObject('MyObjectA');
     const objectA2 = runtimeScene.createObject('MyObjectA');
 
-    // An instance is already picked.
+    // 1 of 3 instances are picked.
     const pickedObjectList = Hashtable.newFrom({
       MyObjectA: [objectA1],
     });
@@ -117,7 +117,7 @@ describe('gdjs.evtTools.object', function () {
       ''
     );
 
-    // The new instance is added to the picked instances.
+    // The created instance has been added to the picked instances.
     expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
       getInstancesIds([objectA1, newObjectA])
     );

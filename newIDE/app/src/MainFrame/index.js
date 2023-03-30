@@ -311,9 +311,9 @@ const MainFrame = (props: Props) => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
-    cloudProjectIdToRecover,
-    setCloudProjectIdToRecover,
-  ] = React.useState<?string>(null);
+    cloudProjectFileMetadataToRecover,
+    setCloudProjectFileMetadataToRecover,
+  ] = React.useState<?FileMetadata>(null);
   const [
     cloudProjectRecoveryProcessEnabled,
     setCloudProjectRecoveryProcessEnabled,
@@ -960,7 +960,7 @@ const MainFrame = (props: Props) => {
         if (storageProviderInternalName === 'Cloud') {
           setIsLoadingProject(false);
           setLoaderModalProgress(null, null);
-          setCloudProjectIdToRecover(fileMetadata.fileIdentifier);
+          setCloudProjectFileMetadataToRecover(fileMetadata);
         } else {
           const errorMessage = getOpenErrorMessage
             ? getOpenErrorMessage(error)
@@ -2438,18 +2438,18 @@ const MainFrame = (props: Props) => {
 
   const onOpenCloudProjectOnSpecificVersion = React.useCallback(
     (versionId: string) => {
-      if (!cloudProjectIdToRecover) return;
+      if (!cloudProjectFileMetadataToRecover) return;
       openFromFileMetadataWithStorageProvider({
         storageProviderName: 'Cloud',
         fileMetadata: {
-          fileIdentifier: cloudProjectIdToRecover,
+          ...cloudProjectFileMetadataToRecover,
           version: versionId,
         },
       });
-      setCloudProjectIdToRecover(null);
+      setCloudProjectFileMetadataToRecover(null);
       setCloudProjectRecoveryProcessEnabled(true);
     },
-    [openFromFileMetadataWithStorageProvider, cloudProjectIdToRecover]
+    [openFromFileMetadataWithStorageProvider, cloudProjectFileMetadataToRecover]
   );
 
   const canInstallPrivateAsset = React.useCallback(
@@ -3275,10 +3275,10 @@ const MainFrame = (props: Props) => {
           }
         />
       )}
-      {cloudProjectIdToRecover && (
+      {cloudProjectFileMetadataToRecover && (
         <CloudProjectRecoveryDialog
-          cloudProjectId={cloudProjectIdToRecover}
-          onClose={() => setCloudProjectIdToRecover(null)}
+          cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
+          onClose={() => setCloudProjectFileMetadataToRecover(null)}
           onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
         />
       )}

@@ -16,6 +16,7 @@ import {
   type CloudProjectVersion,
 } from '../../Utils/GDevelopServices/Project';
 import FlatButton from '../../UI/FlatButton';
+import { sendCloudProjectCouldNotBeOpened } from '../../Utils/Analytics/EventSender';
 
 const DELAY_TO_READ_DIALOG_IN_MS = 15000;
 
@@ -31,6 +32,7 @@ const CloudProjectRecoveryDialog = ({
   onOpenPreviousVersion,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { profile } = authenticatedUser;
   const [
     lastSaneVersion,
     setLastSaneVersion,
@@ -41,6 +43,18 @@ const CloudProjectRecoveryDialog = ({
     setSaneVersionHasNotBeenFound,
   ] = React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+
+  React.useEffect(
+    () => {
+      if (cloudProjectId && profile && profile.id) {
+        sendCloudProjectCouldNotBeOpened({
+          cloudProjectId,
+          userId: profile.id,
+        });
+      }
+    },
+    [cloudProjectId, profile]
+  );
 
   React.useEffect(
     () => {

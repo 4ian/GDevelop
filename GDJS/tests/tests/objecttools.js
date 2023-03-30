@@ -143,7 +143,7 @@ describe('gdjs.evtTools.object', function () {
       0,
       0,
       ''
-    );.
+    );
 
     // All instances are still picked.
     expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(

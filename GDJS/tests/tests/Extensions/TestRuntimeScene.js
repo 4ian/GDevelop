@@ -31,4 +31,16 @@ gdjs.TestRuntimeScene = class TestRuntimeScene extends gdjs.RuntimeScene {
   registerObjectWithName(name) {
     this.registerObject({name, type: '', behaviors: [], variables: [], effects: []});
   }
+
+  /**
+   * @param {string} name 
+   * @return {gdjs.RuntimeObject} Created object.
+   */
+  createObject(name) {
+  const object = super.createObject('MyObjectA');
+  if (!object) {
+    throw new Error("Can not create an instance of the object: " + name);
+  }
+  return object;
+}
 };

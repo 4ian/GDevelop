@@ -45,7 +45,7 @@ describe('gdjs.evtTools.object', function () {
 
     runtimeScene.registerObjectWithName('MyObjectA');
     const objectA1 = runtimeScene.createObject('MyObjectA');
-    const objectA2 = runtimeScene.createObject('MyObjectA');
+    runtimeScene.createObject('MyObjectA');
     runtimeScene.registerObjectWithName('MyObjectB');
     const objectB1 = runtimeScene.createObject('MyObjectB');
 
@@ -102,7 +102,8 @@ describe('gdjs.evtTools.object', function () {
 
     runtimeScene.registerObjectWithName('MyObjectA');
     const objectA1 = runtimeScene.createObject('MyObjectA');
-    const objectA2 = runtimeScene.createObject('MyObjectA');
+    // This instance is not picked.
+    runtimeScene.createObject('MyObjectA');
 
     // 1 of 3 instances are picked.
     const pickedObjectList = Hashtable.newFrom({

@@ -17,6 +17,8 @@ import {
 } from '../../Utils/GDevelopServices/Project';
 import FlatButton from '../../UI/FlatButton';
 
+const DELAY_TO_READ_DIALOG_IN_MS = 15000;
+
 type Props = {|
   cloudProjectId: string,
   onOpenPreviousVersion: (versionId: string) => void,
@@ -43,39 +45,56 @@ const CloudProjectRecoveryDialog = ({
   React.useEffect(
     () => {
       const getVersions = async () => {
-        try {
-          const lastVersions = await getLastVersionsOfProject(
+        const lastVersions = await getLastVersionsOfProject(
+          authenticatedUser,
+          cloudProjectId
+        );
+        if (!lastVersions) {
+          throw new Error("We couldn't get the project last versions.");
+        }
+        for (
+          let versionIndex = 1; // The first version is the current one
+          versionIndex < lastVersions.length;
+          versionIndex++
+        ) {
+          const version = lastVersions[versionIndex];
+          const isSane = await isCloudProjectVersionSane(
             authenticatedUser,
-            cloudProjectId
+            cloudProjectId,
+            version.id
           );
-          if (!lastVersions) {
-            throw new Error("We couldn't get the project last versions.");
+          if (isSane) {
+            setLastSaneVersion(version);
+            return;
           }
-          for (
-            let versionIndex = 1; // The first version is the current one
-            versionIndex < lastVersions.length;
-            versionIndex++
-          ) {
-            const version = lastVersions[versionIndex];
-            const isSane = await isCloudProjectVersionSane(
-              authenticatedUser,
-              cloudProjectId,
-              version.id
-            );
-            if (isSane) {
-              setLastSaneVersion(version);
-              return;
-            }
-          }
-          setSaneVersionHasNotBeenFound(true);
+        }
+        setSaneVersionHasNotBeenFound(true);
+      };
+
+      let timeoutId;
+      const setDelay = (delayInMs: number) =>
+        new Promise(resolve => {
+          timeoutId = setTimeout(() => {
+            resolve();
+          }, delayInMs);
+          return;
+        });
+
+      const getVersionsAndWait = async () => {
+        try {
+          // Give time to user to read the content of the dialog.
+          await Promise.all([
+            getVersions(),
+            setDelay(DELAY_TO_READ_DIALOG_IN_MS),
+          ]);
         } catch (error) {
           setIsErrored(true);
         } finally {
           setIsLoading(false);
         }
       };
-
-      getVersions();
+      getVersionsAndWait();
+      return () => clearTimeout(timeoutId);
     },
     [cloudProjectId, authenticatedUser]
   );
@@ -134,7 +153,7 @@ const CloudProjectRecoveryDialog = ({
           onApply={onApply}
           actions={actions}
           title={
-            lastSaneVersion ? (
+            lastSaneVersion && !isLoading ? (
               <Trans>A functioning save has been found!</Trans>
             ) : (
               <Trans>An issue was found on this project</Trans>

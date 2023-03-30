@@ -18,6 +18,16 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   username: null,
   description: null,
   donateLink: null,
+  personalWebsiteLink: null,
+  personalWebsite2Link: null,
+  twitterUsername: null,
+  facebookUsername: null,
+  youtubeUsername: null,
+  tiktokUsername: null,
+  instagramUsername: null,
+  redditUsername: null,
+  snapchatUsername: null,
+  discordServerLink: null,
 };
 
 export default {

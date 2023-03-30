@@ -94,6 +94,7 @@ type Props = {|
 
   // Support for adornments:
   endAdornment?: ?React.Node,
+  startAdornment?: ?React.Node,
 
   // Styling:
   margin?: 'none' | 'dense',
@@ -336,6 +337,13 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               ) : (
                 undefined
               ),
+            startAdornment: props.startAdornment ? (
+              <InputAdornment position="start">
+                {props.startAdornment}
+              </InputAdornment>
+            ) : (
+              undefined
+            ),
           }}
           style={
             props.style

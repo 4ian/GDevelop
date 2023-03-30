@@ -10,9 +10,18 @@ import {
   type AuthError,
   type Profile,
 } from '../Utils/GDevelopServices/Authentication';
-import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
+import {
+  facebookLinkPrefix,
+  instagramLinkPrefix,
+  redditLinkPrefix,
+  snapchatLinkPrefix,
+  tiktokLinkPrefix,
+  twitterLinkPrefix,
+  youtubeLinkPrefix,
+  type UsernameAvailability,
+} from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import {
   isUsernameValid,
   UsernameField,
@@ -21,6 +30,16 @@ import {
 } from './UsernameField';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
+import Discord from '../UI/CustomSvgIcons/Discord';
+import Snapchat from '../UI/CustomSvgIcons/Snapchat';
+import Instagram from '../UI/CustomSvgIcons/Instagram';
+import Facebook from '../UI/CustomSvgIcons/Facebook';
+import Twitter from '../UI/CustomSvgIcons/Twitter';
+import YouTube from '../UI/CustomSvgIcons/YouTube';
+import Reddit from '../UI/CustomSvgIcons/Reddit';
+import TikTok from '../UI/CustomSvgIcons/TikTok';
+import Planet from '../UI/CustomSvgIcons/Planet';
+import Text from '../UI/Text';
 
 type Props = {|
   profile: Profile,
@@ -41,8 +60,12 @@ export const getUsernameErrorText = (error: ?AuthError) => {
 };
 
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;
-const donateLinkFormattingErrorMessage = (
+const profileLinkFormattingErrorMessage = (
   <Trans>Please enter a valid URL, starting with https://</Trans>
+);
+const simpleDiscordUrlRegex = /^https:\/\/discord[^ ]+$/;
+const discordServerLinkFormattingErrorMessage = (
+  <Trans>Please enter a valid URL, starting with https://discord</Trans>
 );
 
 const EditProfileDialog = ({
@@ -57,6 +80,36 @@ const EditProfileDialog = ({
     profile.description || ''
   );
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
+  const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
+    profile.personalWebsiteLink || ''
+  );
+  const [personalWebsite2Link, setPersonalWebsite2Link] = React.useState(
+    profile.personalWebsite2Link || ''
+  );
+  const [twitterUsername, setTwitterUsername] = React.useState(
+    profile.twitterUsername || ''
+  );
+  const [facebookUsername, setFacebookUsername] = React.useState(
+    profile.facebookUsername || ''
+  );
+  const [youtubeUsername, setYoutubeUsername] = React.useState(
+    profile.youtubeUsername || ''
+  );
+  const [tiktokUsername, setTiktokUsername] = React.useState(
+    profile.tiktokUsername || ''
+  );
+  const [instagramUsername, setInstagramUsername] = React.useState(
+    profile.instagramUsername || ''
+  );
+  const [redditUsername, setRedditUsername] = React.useState(
+    profile.redditUsername || ''
+  );
+  const [snapchatUsername, setSnapchatUsername] = React.useState(
+    profile.snapchatUsername || ''
+  );
+  const [discordServerLink, setDiscordServerLink] = React.useState(
+    profile.discordServerLink || ''
+  );
   const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
     !!profile.getGameStatsEmail
   );
@@ -80,7 +133,19 @@ const EditProfileDialog = ({
 
   const donateLinkFormattingError =
     !!donateLink && !simpleUrlRegex.test(donateLink)
-      ? donateLinkFormattingErrorMessage
+      ? profileLinkFormattingErrorMessage
+      : undefined;
+  const personalWebsiteLinkFormattingError =
+    !!personalWebsiteLink && !simpleUrlRegex.test(personalWebsiteLink)
+      ? profileLinkFormattingErrorMessage
+      : undefined;
+  const personalWebsite2LinkFormattingError =
+    !!personalWebsite2Link && !simpleUrlRegex.test(personalWebsite2Link)
+      ? profileLinkFormattingErrorMessage
+      : undefined;
+  const discordServerLinkFormattingError =
+    !!discordServerLink && !simpleDiscordUrlRegex.test(discordServerLink)
+      ? discordServerLinkFormattingErrorMessage
       : undefined;
 
   const edit = () => {
@@ -91,6 +156,16 @@ const EditProfileDialog = ({
       getGameStatsEmail,
       getNewsletterEmail,
       donateLink,
+      personalWebsiteLink,
+      personalWebsite2Link,
+      twitterUsername,
+      facebookUsername,
+      youtubeUsername,
+      tiktokUsername,
+      instagramUsername,
+      redditUsername,
+      snapchatUsername,
+      discordServerLink,
     });
   };
 
@@ -160,6 +235,146 @@ const EditProfileDialog = ({
                 disabled={updateProfileInProgress}
                 floatingLabelFixed
               />
+              <LineStackLayout noMargin alignItems="center">
+                <Planet />
+                <TextField
+                  value={personalWebsiteLink}
+                  fullWidth
+                  translatableHintText={t`Personal website, itch.io page, etc.`}
+                  onChange={(e, value) => {
+                    setPersonalWebsiteLink(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  errorText={personalWebsiteLinkFormattingError}
+                  maxLength={150}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Planet />
+                <TextField
+                  value={personalWebsite2Link}
+                  fullWidth
+                  translatableHintText={t`Personal website, itch.io page, etc.`}
+                  onChange={(e, value) => {
+                    setPersonalWebsite2Link(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  errorText={personalWebsite2LinkFormattingError}
+                  maxLength={150}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Twitter />
+                <TextField
+                  value={twitterUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setTwitterUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{twitterLinkPrefix}</Text>}
+                  maxLength={15}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Facebook />
+                <TextField
+                  value={facebookUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setFacebookUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{facebookLinkPrefix}</Text>}
+                  maxLength={50}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <YouTube />
+                <TextField
+                  value={youtubeUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setYoutubeUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{youtubeLinkPrefix}</Text>}
+                  maxLength={100}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <TikTok />
+                <TextField
+                  value={tiktokUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setTiktokUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{tiktokLinkPrefix}</Text>}
+                  maxLength={30}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Instagram />
+                <TextField
+                  value={instagramUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setInstagramUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{instagramLinkPrefix}</Text>}
+                  maxLength={30}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Reddit />
+                <TextField
+                  value={redditUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setRedditUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{redditLinkPrefix}</Text>}
+                  maxLength={20}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Snapchat />
+                <TextField
+                  value={snapchatUsername}
+                  fullWidth
+                  translatableHintText={t`username`}
+                  onChange={(e, value) => {
+                    setSnapchatUsername(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  startAdornment={<Text noMargin>{snapchatLinkPrefix}</Text>}
+                  maxLength={15}
+                />
+              </LineStackLayout>
+              <LineStackLayout noMargin alignItems="center">
+                <Discord />
+                <TextField
+                  value={discordServerLink}
+                  fullWidth
+                  translatableHintText={t`Discord server, e.g: https://discord.gg/...`}
+                  onChange={(e, value) => {
+                    setDiscordServerLink(value);
+                  }}
+                  disabled={updateProfileInProgress}
+                  errorText={discordServerLinkFormattingError}
+                  maxLength={150}
+                />
+              </LineStackLayout>
               <TextField
                 value={donateLink}
                 floatingLabelText={<Trans>Donate link</Trans>}
@@ -174,6 +389,7 @@ const EditProfileDialog = ({
                   t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
                 )}
                 errorText={donateLinkFormattingError}
+                maxLength={150}
               />
               <Checkbox
                 label={<Trans>I want to receive the GDevelop Newsletter</Trans>}

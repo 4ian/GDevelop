@@ -29,6 +29,16 @@ const defaultProps = {
     updatedAt: 12345,
     appLanguage: 'en',
     donateLink: 'https://www.gdevelop-app.com',
+    personalWebsiteLink: 'https://indie-user.com',
+    personalWebsite2Link: 'https://indie-user2.com',
+    twitterUsername: 'indie-user',
+    facebookUsername: 'indie-user',
+    youtubeUsername: 'indie-user',
+    tiktokUsername: 'indie-user',
+    instagramUsername: 'indie-user',
+    redditUsername: 'indie-user',
+    snapchatUsername: 'indie-user',
+    discordServerLink: 'https://discord.gg/indie-user',
   },
 };
 export const Default = () => <EditProfileDialog {...defaultProps} />;

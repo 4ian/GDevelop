@@ -9,6 +9,16 @@ export type UserPublicProfile = {|
   username: ?string,
   description: ?string,
   donateLink: ?string,
+  personalWebsiteLink: ?string,
+  personalWebsite2Link: ?string,
+  twitterUsername: ?string,
+  facebookUsername: ?string,
+  youtubeUsername: ?string,
+  tiktokUsername: ?string,
+  instagramUsername: ?string,
+  redditUsername: ?string,
+  snapchatUsername: ?string,
+  discordServerLink: ?string,
 |};
 
 export type UserPublicProfileByIds = {|
@@ -66,3 +76,11 @@ export const getUsernameAvailability = (
     .get(`${GDevelopUserApi.baseUrl}/username-availability/${username}`)
     .then(response => response.data);
 };
+
+export const instagramLinkPrefix = 'https://instagram.com/';
+export const twitterLinkPrefix = 'https://twitter.com/';
+export const facebookLinkPrefix = 'https://facebook.com/';
+export const youtubeLinkPrefix = 'https://youtube.com/';
+export const tiktokLinkPrefix = 'https://tiktok.com/@';
+export const redditLinkPrefix = 'https://reddit.com/user/';
+export const snapchatLinkPrefix = 'https://snapchat.com/add/';

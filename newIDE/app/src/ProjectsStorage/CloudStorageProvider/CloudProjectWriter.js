@@ -24,19 +24,19 @@ const zipProjectAndCommitVersion = async ({
   authenticatedUser,
   project,
   cloudProjectId,
-  options
+  options,
 }: {|
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
-  options?: {| previousVersion: string |}
+  options?: {| previousVersion: string |},
 |}): Promise<?string> => {
   const archive = await zipProject(project);
   const newVersion = await commitVersion({
     authenticatedUser,
     cloudProjectId,
     zippedProject: archive,
-    previousVersion: options ? options.previousVersion : null
+    previousVersion: options ? options.previousVersion : null,
   });
   return newVersion;
 };
@@ -46,7 +46,7 @@ export const generateOnSaveProject = (
 ) => async (
   project: gdProject,
   fileMetadata: FileMetadata,
-  options?: {| previousVersion: string |},
+  options?: {| previousVersion: string |}
 ) => {
   if (!fileMetadata.gameId) {
     console.info('Game id was never set, updating the cloud project.');
@@ -67,7 +67,7 @@ export const generateOnSaveProject = (
     authenticatedUser,
     project,
     cloudProjectId: newFileMetadata.fileIdentifier,
-    options
+    options,
   });
   if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
   return {

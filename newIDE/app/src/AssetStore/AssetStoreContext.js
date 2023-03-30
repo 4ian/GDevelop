@@ -60,7 +60,10 @@ type AssetStoreState = {|
   filters: ?Filters,
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
-  assetPackRandomOrdering: ?Array<number>,
+  assetPackRandomOrdering: ?{|
+    starterPacks: Array<number>,
+    privateAssetPacks: Array<number>,
+  |},
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -169,7 +172,10 @@ export const AssetStoreStateProvider = ({
   const [
     assetPackRandomOrdering,
     setAssetPackRandomOrdering,
-  ] = React.useState<?Array<number>>(null);
+  ] = React.useState<?{|
+    starterPacks: Array<number>,
+    privateAssetPacks: Array<number>,
+  |}>(null);
   const [
     privateAssetPacks,
     setPrivateAssetPacks,
@@ -381,9 +387,10 @@ export const AssetStoreStateProvider = ({
       if (assetPackCount === undefined || privateAssetPackCount === undefined) {
         return;
       }
-      setAssetPackRandomOrdering(
-        getAssetPackRandomOrdering(assetPackCount + privateAssetPackCount)
-      );
+      setAssetPackRandomOrdering({
+        starterPacks: getAssetPackRandomOrdering(assetPackCount),
+        privateAssetPacks: getAssetPackRandomOrdering(privateAssetPackCount),
+      });
     },
     [assetPackCount, privateAssetPackCount]
   );

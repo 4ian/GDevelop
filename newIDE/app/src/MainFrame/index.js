@@ -950,6 +950,8 @@ const MainFrame = (props: Props) => {
         }
       } catch (error) {
         if (storageProviderInternalName === 'Cloud') {
+          setIsLoadingProject(false);
+          setLoaderModalProgress(null, null);
           setCloudProjectIdToRecover(fileMetadata.fileIdentifier);
         } else {
           const errorMessage = getOpenErrorMessage

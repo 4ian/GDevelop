@@ -37,7 +37,7 @@ gdjs.TestRuntimeScene = class TestRuntimeScene extends gdjs.RuntimeScene {
    * @return {gdjs.RuntimeObject} Created object.
    */
   createObject(name) {
-  const object = super.createObject('MyObjectA');
+  const object = super.createObject(name);
   if (!object) {
     throw new Error("Can not create an instance of the object: " + name);
   }

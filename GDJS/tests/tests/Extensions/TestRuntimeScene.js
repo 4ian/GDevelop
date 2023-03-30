@@ -8,6 +8,10 @@ gdjs.TestRuntimeScene = class TestRuntimeScene extends gdjs.RuntimeScene {
    */
   constructor(runtimeGame) {
     super(runtimeGame);
+
+    this.addLayer({name: "", 
+    cameras: [],
+    effects: []});
   }
 
   /**
@@ -19,5 +23,12 @@ gdjs.TestRuntimeScene = class TestRuntimeScene extends gdjs.RuntimeScene {
     this._eventsFunction = (runtimeScene) => eventsFunction();
     this.renderAndStep(elapsedTime);
     this._eventsFunction = null;
+  }
+
+  /**
+   * @param {string} name 
+   */
+  registerObjectWithName(name) {
+    this.registerObject({name, type: '', behaviors: [], variables: [], effects: []});
   }
 };

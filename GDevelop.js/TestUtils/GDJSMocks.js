@@ -522,17 +522,59 @@ const copyArray = function (src, dst) {
   dst.length = len;
 };
 
-const createObjectOnScene = (objectsContext, objectsLists, x, y, layer) => {
-  const objectName = objectsLists.firstKey();
+/**
+ * @param {any} objectsContext
+ * @param {string} objectName
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ * @param {number} x
+ * @param {number} y
+ * @param {string} layer
+ */
+const doCreateObjectOnScene = function (
+  objectsContext,
+  objectName,
+  objectsLists,
+  x,
+  y,
+  layerName
+) {
+  // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
+  // eventsFunctionContext. We can't directly use runtimeScene because the object name could
+  // be different than the real object name (this is the case in a function. The eventsFunctionContext
+  // will take care of this in createObject).
   const obj = objectsContext.createObject(objectName);
   if (obj !== null) {
-    // Ignore position and layer set up of the object as we're in a minimal mock of GDJS.
-
-    // Let the new object be picked by next actions/conditions.
+    //Let the new object be picked by next actions/conditions.
     if (objectsLists.containsKey(objectName)) {
+      // TODO Encapsulate this in ObjectsLists
+      if (
+        getPickedInstancesCount(objectsLists) + 1 ===
+        getVisibleInstancesCount(objectsContext, objectsLists)
+      ) {
+        clearObjectLists(objectsLists);
+      }
       objectsLists.get(objectName).push(obj);
     }
   }
+  return obj;
+};
+
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ * @param {number} x
+ * @param {number} y
+ * @param {string} layerName
+ */
+const createObjectOnScene = (objectsContext, objectsLists, x, y, layerName) => {
+  return doCreateObjectOnScene(
+    objectsContext,
+    objectsLists.firstKey(),
+    objectsLists,
+    x,
+    y,
+    layerName
+  );
 };
 
 /**

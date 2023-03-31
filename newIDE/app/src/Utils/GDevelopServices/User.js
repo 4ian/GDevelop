@@ -9,16 +9,18 @@ export type UserPublicProfile = {|
   username: ?string,
   description: ?string,
   donateLink: ?string,
-  personalWebsiteLink: ?string,
-  personalWebsite2Link: ?string,
-  twitterUsername: ?string,
-  facebookUsername: ?string,
-  youtubeUsername: ?string,
-  tiktokUsername: ?string,
-  instagramUsername: ?string,
-  redditUsername: ?string,
-  snapchatUsername: ?string,
-  discordServerLink: ?string,
+  communityLinks: {
+    personalWebsiteLink?: string,
+    personalWebsite2Link?: string,
+    twitterUsername?: string,
+    facebookUsername?: string,
+    youtubeUsername?: string,
+    tiktokUsername?: string,
+    instagramUsername?: string,
+    redditUsername?: string,
+    snapchatUsername?: string,
+    discordServerLink?: string,
+  },
 |};
 
 export type UserPublicProfileByIds = {|

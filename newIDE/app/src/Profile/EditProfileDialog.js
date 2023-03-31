@@ -81,34 +81,34 @@ const EditProfileDialog = ({
   );
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
   const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
-    profile.personalWebsiteLink || ''
+    profile.communityLinks.personalWebsiteLink || ''
   );
   const [personalWebsite2Link, setPersonalWebsite2Link] = React.useState(
-    profile.personalWebsite2Link || ''
+    profile.communityLinks.personalWebsite2Link || ''
   );
   const [twitterUsername, setTwitterUsername] = React.useState(
-    profile.twitterUsername || ''
+    profile.communityLinks.twitterUsername || ''
   );
   const [facebookUsername, setFacebookUsername] = React.useState(
-    profile.facebookUsername || ''
+    profile.communityLinks.facebookUsername || ''
   );
   const [youtubeUsername, setYoutubeUsername] = React.useState(
-    profile.youtubeUsername || ''
+    profile.communityLinks.youtubeUsername || ''
   );
   const [tiktokUsername, setTiktokUsername] = React.useState(
-    profile.tiktokUsername || ''
+    profile.communityLinks.tiktokUsername || ''
   );
   const [instagramUsername, setInstagramUsername] = React.useState(
-    profile.instagramUsername || ''
+    profile.communityLinks.instagramUsername || ''
   );
   const [redditUsername, setRedditUsername] = React.useState(
-    profile.redditUsername || ''
+    profile.communityLinks.redditUsername || ''
   );
   const [snapchatUsername, setSnapchatUsername] = React.useState(
-    profile.snapchatUsername || ''
+    profile.communityLinks.snapchatUsername || ''
   );
   const [discordServerLink, setDiscordServerLink] = React.useState(
-    profile.discordServerLink || ''
+    profile.communityLinks.discordServerLink || ''
   );
   const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
     !!profile.getGameStatsEmail

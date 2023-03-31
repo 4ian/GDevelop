@@ -19,16 +19,7 @@ export const UserPublicProfileChip = () => (
       username: 'username',
       description: 'something',
       donateLink: 'https://myurl.com',
-      personalWebsiteLink: 'https://indie-user.com',
-      personalWebsite2Link: 'https://indie-user2.com',
-      twitterUsername: 'indie-user',
-      facebookUsername: 'indie-user',
-      youtubeUsername: 'indie-user',
-      tiktokUsername: 'indie-user',
-      instagramUsername: 'indie-user',
-      redditUsername: 'indie-user',
-      snapchatUsername: 'indie-user',
-      discordServerLink: 'https://discord.gg/indie-user',
+      communityLinks: {},
     }}
   />
 );

@@ -74,16 +74,18 @@ type DisplayedProfile = {
   username: ?string,
   description: ?string,
   donateLink: ?string,
-  personalWebsiteLink: ?string,
-  personalWebsite2Link: ?string,
-  twitterUsername: ?string,
-  facebookUsername: ?string,
-  youtubeUsername: ?string,
-  tiktokUsername: ?string,
-  instagramUsername: ?string,
-  redditUsername: ?string,
-  snapchatUsername: ?string,
-  discordServerLink: ?string,
+  communityLinks: {
+    personalWebsiteLink?: string,
+    personalWebsite2Link?: string,
+    twitterUsername?: string,
+    facebookUsername?: string,
+    youtubeUsername?: string,
+    tiktokUsername?: string,
+    instagramUsername?: string,
+    redditUsername?: string,
+    snapchatUsername?: string,
+    discordServerLink?: string,
+  },
 };
 
 type Props = {|
@@ -108,16 +110,32 @@ const ProfileDetails = ({
   onAssetPackOpen,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
-  const personalWebsiteLink = profile ? profile.personalWebsiteLink : null;
-  const personalWebsite2Link = profile ? profile.personalWebsite2Link : null;
-  const twitterUsername = profile ? profile.twitterUsername : null;
-  const facebookUsername = profile ? profile.facebookUsername : null;
-  const youtubeUsername = profile ? profile.youtubeUsername : null;
-  const tiktokUsername = profile ? profile.tiktokUsername : null;
-  const instagramUsername = profile ? profile.instagramUsername : null;
-  const redditUsername = profile ? profile.redditUsername : null;
-  const snapchatUsername = profile ? profile.snapchatUsername : null;
-  const discordServerLink = profile ? profile.discordServerLink : null;
+  const personalWebsiteLink = profile
+    ? profile.communityLinks.personalWebsiteLink
+    : null;
+  const personalWebsite2Link = profile
+    ? profile.communityLinks.personalWebsite2Link
+    : null;
+  const twitterUsername = profile
+    ? profile.communityLinks.twitterUsername
+    : null;
+  const facebookUsername = profile
+    ? profile.communityLinks.facebookUsername
+    : null;
+  const youtubeUsername = profile
+    ? profile.communityLinks.youtubeUsername
+    : null;
+  const tiktokUsername = profile ? profile.communityLinks.tiktokUsername : null;
+  const instagramUsername = profile
+    ? profile.communityLinks.instagramUsername
+    : null;
+  const redditUsername = profile ? profile.communityLinks.redditUsername : null;
+  const snapchatUsername = profile
+    ? profile.communityLinks.snapchatUsername
+    : null;
+  const discordServerLink = profile
+    ? profile.communityLinks.discordServerLink
+    : null;
   const windowWidth = useResponsiveWindowWidth();
 
   if (error)

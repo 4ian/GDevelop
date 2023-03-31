@@ -2272,7 +2272,7 @@ const MainFrame = (props: Props) => {
       } catch (rawError) {
         showErrorBox({
           message: i18n._(
-            t`Unable to save as the project! Please try again by choosing another location.`
+            t`Unable to save the project! Please try again later or save the project in another location.`
           ),
           rawError,
           errorId: 'project-save-error',

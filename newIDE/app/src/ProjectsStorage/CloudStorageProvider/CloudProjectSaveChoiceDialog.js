@@ -42,6 +42,7 @@ const CloudProjectRecoveryDialog = ({
     <Dialog
       open
       flexColumnBody
+      cannotBeDismissed={isLoading}
       maxWidth="sm"
       onRequestClose={onClose}
       onApply={onSaveAsMainVersion}

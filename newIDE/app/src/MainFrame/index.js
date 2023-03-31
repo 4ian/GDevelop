@@ -2117,7 +2117,6 @@ const MainFrame = (props: Props) => {
           }));
         }
       } catch (rawError) {
-        // If any error happens, ensure we hide the snackbars.
         _closeSnackMessage();
         const errorMessage = getWriteErrorMessage
           ? getWriteErrorMessage(rawError)
@@ -2277,6 +2276,7 @@ const MainFrame = (props: Props) => {
           rawError,
           errorId: 'project-save-error',
         });
+        _closeSnackMessage();
       } finally {
         setIsSavingProject(false);
       }
@@ -2288,6 +2288,7 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       getStorageProviderOperations,
       _showSnackMessage,
+      _closeSnackMessage,
       _replaceSnackMessage,
       i18n,
       unsavedChanges,

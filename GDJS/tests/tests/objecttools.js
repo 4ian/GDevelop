@@ -1,6 +1,6 @@
 // @ts-check
 
-describe.only('gdjs.evtTools.object', function () {
+describe('gdjs.evtTools.object', function () {
   it('can count picked instances of objects', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);

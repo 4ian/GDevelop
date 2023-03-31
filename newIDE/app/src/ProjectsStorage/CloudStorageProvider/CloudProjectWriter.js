@@ -31,10 +31,15 @@ const checkZipContent = async (
   zip: Blob,
   projectJson: string
 ): Promise<boolean> => {
-  const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
-  return (
-    unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
-  );
+  try {
+    const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
+    return (
+      unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
+    );
+  } catch (error) {
+    console.error('An error occurred when checking zipped project.', error);
+    return false;
+  }
 };
 
 const zipProjectAndCommitVersion = async ({

@@ -170,7 +170,7 @@ const CloudProjectRecoveryDialog = ({
             lastSaneVersion && !isLoading ? (
               <Trans>A functioning save has been found!</Trans>
             ) : (
-              <Trans>An issue was found on this project</Trans>
+              <Trans>This file is corrupted</Trans>
             )
           }
         >
@@ -228,18 +228,7 @@ const CloudProjectRecoveryDialog = ({
                 <Column noMargin>
                   <Text noMargin>
                     <Trans>
-                      The latest save of{' '}
-                      {cloudProjectName ? (
-                        `"${cloudProjectName}"`
-                      ) : (
-                        <Trans>this project</Trans>
-                      )}{' '}
-                      is corrupted and cannot be opened.
-                    </Trans>
-                  </Text>
-                  <Text noMargin>
-                    <Trans>
-                      However, we have found a non-corrupted save from{' '}
+                      We have found a non-corrupted save from{' '}
                       {i18n.date(lastSaneVersion.createdAt, {
                         dateStyle: 'long',
                         timeStyle: 'short',

@@ -55,7 +55,9 @@ const zipProjectAndCommitVersion = async ({
 |}): Promise<?string> => {
   const [zippedProject, projectJson] = await zipProject(project);
   const archiveIsSane = await checkZipContent(zippedProject, projectJson);
-  if (!archiveIsSane) return;
+  if (!archiveIsSane) {
+    throw new Error('Project compression failed before saving the project.');
+  }
   const newVersion = await commitVersion({
     authenticatedUser,
     cloudProjectId,

@@ -2,7 +2,9 @@
 
 import { initializeZipJs } from '.';
 
-export const unzipFirstEntryOfBlob = async (zippedBlob: Blob) => {
+export const unzipFirstEntryOfBlob = async (
+  zippedBlob: Blob
+): Promise<string> => {
   const zipJs: ZipJs = await initializeZipJs();
 
   return new Promise((resolve, reject) => {

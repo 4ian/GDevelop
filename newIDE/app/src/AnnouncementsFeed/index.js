@@ -87,6 +87,7 @@ export const AnnouncementsFeed = ({
                         }
                       : null
                   }
+                  hideButtonSize="small"
                   key={announcement.id}
                 >
                   <Text size="block-title">

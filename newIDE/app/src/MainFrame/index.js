@@ -2117,7 +2117,6 @@ const MainFrame = (props: Props) => {
           }));
         }
       } catch (rawError) {
-        // If any error happens, ensure we hide the snackbars.
         _closeSnackMessage();
         const errorMessage = getWriteErrorMessage
           ? getWriteErrorMessage(rawError)
@@ -2272,11 +2271,12 @@ const MainFrame = (props: Props) => {
       } catch (rawError) {
         showErrorBox({
           message: i18n._(
-            t`Unable to save as the project! Please try again by choosing another location.`
+            t`Unable to save the project! Please try again later or save the project in another location.`
           ),
           rawError,
           errorId: 'project-save-error',
         });
+        _closeSnackMessage();
       } finally {
         setIsSavingProject(false);
       }
@@ -2288,6 +2288,7 @@ const MainFrame = (props: Props) => {
       currentFileMetadata,
       getStorageProviderOperations,
       _showSnackMessage,
+      _closeSnackMessage,
       _replaceSnackMessage,
       i18n,
       unsavedChanges,

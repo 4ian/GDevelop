@@ -13,11 +13,33 @@ import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import { serializeToJSON } from '../../Utils/Serializer';
 import CloudSaveAsDialog from './CloudSaveAsDialog';
 import { t } from '@lingui/macro';
-import { createZipWithSingleTextFile } from '../../Utils/Zip.js/Utils';
+import {
+  createZipWithSingleTextFile,
+  unzipFirstEntryOfBlob,
+} from '../../Utils/Zip.js/Utils';
 
-const zipProject = async (project: gdProject) => {
+const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
-  return createZipWithSingleTextFile(projectJson, 'game.json');
+  const zippedProject = await createZipWithSingleTextFile(
+    projectJson,
+    'game.json'
+  );
+  return [zippedProject, projectJson];
+};
+
+const checkZipContent = async (
+  zip: Blob,
+  projectJson: string
+): Promise<boolean> => {
+  try {
+    const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
+    return (
+      unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
+    );
+  } catch (error) {
+    console.error('An error occurred when checking zipped project.', error);
+    return false;
+  }
 };
 
 const zipProjectAndCommitVersion = async ({
@@ -31,11 +53,15 @@ const zipProjectAndCommitVersion = async ({
   cloudProjectId: string,
   options?: {| previousVersion: string |},
 |}): Promise<?string> => {
-  const archive = await zipProject(project);
+  const [zippedProject, projectJson] = await zipProject(project);
+  const archiveIsSane = await checkZipContent(zippedProject, projectJson);
+  if (!archiveIsSane) {
+    throw new Error('Project compression failed before saving the project.');
+  }
   const newVersion = await commitVersion({
     authenticatedUser,
     cloudProjectId,
-    zippedProject: archive,
+    zippedProject,
     previousVersion: options ? options.previousVersion : null,
   });
   return newVersion;

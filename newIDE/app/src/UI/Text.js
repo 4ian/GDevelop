@@ -47,6 +47,9 @@ type Props = {|
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 
+    // Allow user to select text
+    userSelect?: 'text',
+
     // Allow to expand the text
     flex?: 1,
 

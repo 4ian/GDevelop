@@ -30,7 +30,7 @@ export type Profile = {|
   isCreator: boolean,
   isPlayer: boolean,
   donateLink: ?string,
-  communityLinks: CommunityLinks,
+  communityLinks?: CommunityLinks,
 
   gdevelopUsage?: string,
   teamOrCompanySize?: string,

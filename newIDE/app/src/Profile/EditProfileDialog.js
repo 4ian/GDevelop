@@ -75,40 +75,41 @@ const EditProfileDialog = ({
   updateProfileInProgress,
   error,
 }: Props) => {
+  const communityLinks = profile.communityLinks || {};
   const [username, setUsername] = React.useState(profile.username || '');
   const [description, setDescription] = React.useState(
     profile.description || ''
   );
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
   const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
-    profile.communityLinks.personalWebsiteLink || ''
+    communityLinks.personalWebsiteLink || ''
   );
   const [personalWebsite2Link, setPersonalWebsite2Link] = React.useState(
-    profile.communityLinks.personalWebsite2Link || ''
+    communityLinks.personalWebsite2Link || ''
   );
   const [twitterUsername, setTwitterUsername] = React.useState(
-    profile.communityLinks.twitterUsername || ''
+    communityLinks.twitterUsername || ''
   );
   const [facebookUsername, setFacebookUsername] = React.useState(
-    profile.communityLinks.facebookUsername || ''
+    communityLinks.facebookUsername || ''
   );
   const [youtubeUsername, setYoutubeUsername] = React.useState(
-    profile.communityLinks.youtubeUsername || ''
+    communityLinks.youtubeUsername || ''
   );
   const [tiktokUsername, setTiktokUsername] = React.useState(
-    profile.communityLinks.tiktokUsername || ''
+    communityLinks.tiktokUsername || ''
   );
   const [instagramUsername, setInstagramUsername] = React.useState(
-    profile.communityLinks.instagramUsername || ''
+    communityLinks.instagramUsername || ''
   );
   const [redditUsername, setRedditUsername] = React.useState(
-    profile.communityLinks.redditUsername || ''
+    communityLinks.redditUsername || ''
   );
   const [snapchatUsername, setSnapchatUsername] = React.useState(
-    profile.communityLinks.snapchatUsername || ''
+    communityLinks.snapchatUsername || ''
   );
   const [discordServerLink, setDiscordServerLink] = React.useState(
-    profile.communityLinks.discordServerLink || ''
+    communityLinks.discordServerLink || ''
   );
   const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
     !!profile.getGameStatsEmail
@@ -256,7 +257,7 @@ const EditProfileDialog = ({
                 <TextField
                   value={personalWebsite2Link}
                   fullWidth
-                  translatableHintText={t`Personal website, itch.io page, etc.`}
+                  translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
                   onChange={(e, value) => {
                     setPersonalWebsite2Link(value);
                   }}

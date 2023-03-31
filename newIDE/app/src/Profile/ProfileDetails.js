@@ -46,36 +46,40 @@ import {
   type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
 
-const ExternalLinkLine = ({
-  icon,
-  url,
+const CommunityLinksLines = ({
   isAuthenticatedUserProfile,
+  communityLinks,
 }: {|
-  icon: React.Node,
-  url: string,
   isAuthenticatedUserProfile: boolean,
+  communityLinks: Array<{ url: ?string, icon: React.Node }>,
 |}) => (
-  <LineStackLayout noMargin alignItems="center">
-    {icon}
-    {isAuthenticatedUserProfile ? (
-      <Text noMargin>{url}</Text>
-    ) : (
-      <Link href={url} onClick={() => Window.openExternalURL(url)}>
-        <Text noMargin color="inherit">
-          {url}
-        </Text>
-      </Link>
+  <ColumnStackLayout expand noMargin>
+    {communityLinks.map(({ url, icon }) =>
+      url ? (
+        <LineStackLayout noMargin alignItems="center">
+          {icon}
+          {isAuthenticatedUserProfile ? (
+            <Text noMargin>{url}</Text>
+          ) : (
+            <Link href={url} onClick={() => Window.openExternalURL(url)}>
+              <Text noMargin color="inherit">
+                {url}
+              </Text>
+            </Link>
+          )}
+        </LineStackLayout>
+      ) : null
     )}
-  </LineStackLayout>
+  </ColumnStackLayout>
 );
 
 type DisplayedProfile = {
   id: string,
-  +email?: string,
+  +email?: string, // the "+" allows handling both public and private profile
   username: ?string,
   description: ?string,
   donateLink: ?string,
-  communityLinks: CommunityLinks,
+  +communityLinks?: CommunityLinks, // the "+" allows handling both public and private profile
 };
 
 type Props = {|
@@ -100,32 +104,21 @@ const ProfileDetails = ({
   onAssetPackOpen,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
-  const personalWebsiteLink = profile
-    ? profile.communityLinks.personalWebsiteLink
+  const communityLinks = (profile && profile.communityLinks) || {};
+  const personalWebsiteLink = communityLinks
+    ? communityLinks.personalWebsiteLink
     : null;
   const personalWebsite2Link = profile
-    ? profile.communityLinks.personalWebsite2Link
+    ? communityLinks.personalWebsite2Link
     : null;
-  const twitterUsername = profile
-    ? profile.communityLinks.twitterUsername
-    : null;
-  const facebookUsername = profile
-    ? profile.communityLinks.facebookUsername
-    : null;
-  const youtubeUsername = profile
-    ? profile.communityLinks.youtubeUsername
-    : null;
-  const tiktokUsername = profile ? profile.communityLinks.tiktokUsername : null;
-  const instagramUsername = profile
-    ? profile.communityLinks.instagramUsername
-    : null;
-  const redditUsername = profile ? profile.communityLinks.redditUsername : null;
-  const snapchatUsername = profile
-    ? profile.communityLinks.snapchatUsername
-    : null;
-  const discordServerLink = profile
-    ? profile.communityLinks.discordServerLink
-    : null;
+  const twitterUsername = profile ? communityLinks.twitterUsername : null;
+  const facebookUsername = profile ? communityLinks.facebookUsername : null;
+  const youtubeUsername = profile ? communityLinks.youtubeUsername : null;
+  const tiktokUsername = profile ? communityLinks.tiktokUsername : null;
+  const instagramUsername = profile ? communityLinks.instagramUsername : null;
+  const redditUsername = profile ? communityLinks.redditUsername : null;
+  const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
+  const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
 
   if (error)
@@ -188,76 +181,65 @@ const ProfileDetails = ({
                 {profile.description || <Trans>No bio defined.</Trans>}
               </Text>
             </Column>
-            {personalWebsiteLink && (
-              <ExternalLinkLine
-                icon={<Planet />}
-                url={personalWebsiteLink}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {personalWebsite2Link && (
-              <ExternalLinkLine
-                icon={<Planet />}
-                url={personalWebsite2Link}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {twitterUsername && (
-              <ExternalLinkLine
-                icon={<Twitter />}
-                url={`${twitterLinkPrefix}${twitterUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {facebookUsername && (
-              <ExternalLinkLine
-                icon={<Facebook />}
-                url={`${facebookLinkPrefix}${facebookUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {youtubeUsername && (
-              <ExternalLinkLine
-                icon={<YouTube />}
-                url={`${youtubeLinkPrefix}${youtubeUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {tiktokUsername && (
-              <ExternalLinkLine
-                icon={<TikTok />}
-                url={`${tiktokLinkPrefix}${tiktokUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {instagramUsername && (
-              <ExternalLinkLine
-                icon={<Instagram />}
-                url={`${instagramLinkPrefix}${instagramUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {redditUsername && (
-              <ExternalLinkLine
-                icon={<Reddit />}
-                url={`${redditLinkPrefix}${redditUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {snapchatUsername && (
-              <ExternalLinkLine
-                icon={<Snapchat />}
-                url={`${snapchatLinkPrefix}${snapchatUsername}`}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
-            {discordServerLink && (
-              <ExternalLinkLine
-                icon={<Discord />}
-                url={discordServerLink}
-                isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
-              />
-            )}
+            <CommunityLinksLines
+              communityLinks={[
+                {
+                  url: personalWebsiteLink,
+                  icon: <Planet />,
+                },
+                {
+                  url: personalWebsite2Link,
+                  icon: <Planet />,
+                },
+                {
+                  url: twitterUsername
+                    ? twitterLinkPrefix + twitterUsername
+                    : undefined,
+                  icon: <Twitter />,
+                },
+                {
+                  url: facebookUsername
+                    ? facebookLinkPrefix + facebookUsername
+                    : undefined,
+                  icon: <Facebook />,
+                },
+                {
+                  url: youtubeUsername
+                    ? youtubeLinkPrefix + youtubeUsername
+                    : undefined,
+                  icon: <YouTube />,
+                },
+                {
+                  url: tiktokUsername
+                    ? tiktokLinkPrefix + tiktokUsername
+                    : undefined,
+                  icon: <TikTok />,
+                },
+                {
+                  url: instagramUsername
+                    ? instagramLinkPrefix + instagramUsername
+                    : undefined,
+                  icon: <Instagram />,
+                },
+                {
+                  url: redditUsername
+                    ? redditLinkPrefix + redditUsername
+                    : undefined,
+                  icon: <Reddit />,
+                },
+                {
+                  url: snapchatUsername
+                    ? snapchatLinkPrefix + snapchatUsername
+                    : undefined,
+                  icon: <Snapchat />,
+                },
+                {
+                  url: discordServerLink,
+                  icon: <Discord />,
+                },
+              ]}
+              isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
+            />
             {isAuthenticatedUserProfile && (
               <Column noMargin>
                 <Text noMargin size="body-small">

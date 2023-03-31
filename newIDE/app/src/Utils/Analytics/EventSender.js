@@ -163,7 +163,7 @@ export const aliasUserForAnalyticsAfterSignUp = (
     return;
   }
 
-  // This indicates posthog that the current user Firebase ID is now an alias
+  // This indicates to Posthog that the current user Firebase ID is now an alias
   // of the anonymous UUID that was used before the signup.
   posthog.alias(firebaseUser.uid, getUserUUID());
 };

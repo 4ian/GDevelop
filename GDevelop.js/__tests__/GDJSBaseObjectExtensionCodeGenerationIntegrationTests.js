@@ -77,5 +77,54 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       // The created instance has been added to the picked instances.
       expect(myObjectLists.get('MyObject').length).toBe(3);
     });
+
+    it('can create an instance and keep all instances picked of a group', function () {
+      const runCompiledEvents = generateFunctionWithCreateAction(gd);
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+      const myObjectLists = new gdjs.Hashtable();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      myObjectLists.put('MyObjectA', [myObjectA1, myObjectA2]);
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      myObjectLists.put('MyObjectB', [myObjectB1]);
+
+      // All instances are picked.
+      expect(myObjectLists.get('MyObjectA').length).toBe(2);
+      expect(myObjectLists.get('MyObjectB').length).toBe(1);
+
+      runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
+
+      // All instances are still picked.
+      expect(myObjectLists.get('MyObjectA').length).toBe(3);
+      expect(myObjectLists.get('MyObjectB').length).toBe(1);
+    });
+
+    it('can create and pick an instance when some instances of a group were not picked', function () {
+      const runCompiledEvents = generateFunctionWithCreateAction(gd);
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+      const myObjectLists = new gdjs.Hashtable();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      myObjectLists.put('MyObjectA', [myObjectA1, myObjectA2]);
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      myObjectLists.put('MyObjectB', [myObjectB1]);
+
+      // These objects are not added to the list.
+      runtimeScene.createObject('MyObjectB');
+      runtimeScene.createObject('MyObjectB');
+      runtimeScene.createObject('MyObjectB');
+
+      // 2 of 5 instances are picked.
+      expect(myObjectLists.get('MyObjectA').length).toBe(2);
+      expect(myObjectLists.get('MyObjectB').length).toBe(1);
+
+      runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
+
+      // The created instance has been added to the picked instances.
+      expect(myObjectLists.get('MyObjectA').length).toBe(3);
+      expect(myObjectLists.get('MyObjectB').length).toBe(1);
+    });
   });
 });

@@ -517,9 +517,7 @@ namespace gdjs {
       };
 
       export const clearObjectLists = (objectsLists: ObjectsLists) => {
-        const lists = gdjs.staticArray(
-          gdjs.evtTools.object.clearObjectLists
-        );
+        const lists = gdjs.staticArray(gdjs.evtTools.object.clearObjectLists);
         objectsLists.values(lists);
         for (let i = 0, len = lists.length; i < len; ++i) {
           lists[i].length = 0;

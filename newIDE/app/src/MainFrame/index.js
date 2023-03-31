@@ -175,6 +175,8 @@ import {
   allInAppTutorialIds,
 } from '../Utils/GDevelopServices/InAppTutorial';
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
+import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
+import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -308,7 +310,18 @@ const MainFrame = (props: Props) => {
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-
+  const [
+    cloudProjectFileMetadataToRecover,
+    setCloudProjectFileMetadataToRecover,
+  ] = React.useState<?FileMetadata>(null);
+  const [
+    cloudProjectRecoveryOpenedVersionId,
+    setCloudProjectRecoveryOpenedVersionId,
+  ] = React.useState<?string>(null);
+  const [
+    cloudProjectSaveChoiceOpen,
+    setCloudProjectSaveChoiceOpen,
+  ] = React.useState<boolean>(false);
   const [
     chooseResourceOptions,
     setChooseResourceOptions,
@@ -842,6 +855,7 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = React.useCallback(
     async (fileMetadata: FileMetadata): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
+      const storageProviderInternalName = getStorageProvider().internalName;
 
       const {
         hasAutoSave,
@@ -938,29 +952,34 @@ const MainFrame = (props: Props) => {
             // that we're opening the file that was originally requested by the user.
             fileMetadata
           );
-          serializedProject.delete();
           return state;
-        } catch (err) {
+        } finally {
           serializedProject.delete();
-          throw err;
         }
       } catch (error) {
-        const errorMessage = getOpenErrorMessage
-          ? getOpenErrorMessage(error)
-          : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
+        if (storageProviderInternalName === 'Cloud') {
+          setIsLoadingProject(false);
+          setLoaderModalProgress(null, null);
+          setCloudProjectFileMetadataToRecover(fileMetadata);
+        } else {
+          const errorMessage = getOpenErrorMessage
+            ? getOpenErrorMessage(error)
+            : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
 
-        await showAlert({
-          title: t`Unable to open the project`,
-          message: errorMessage,
-        });
-        setIsLoadingProject(false);
-        setLoaderModalProgress(null, null);
-        throw error;
+          await showAlert({
+            title: t`Unable to open the project`,
+            message: errorMessage,
+          });
+          setIsLoadingProject(false);
+          setLoaderModalProgress(null, null);
+          throw error;
+        }
       }
     },
     [
       i18n,
       getStorageProviderOperations,
+      getStorageProvider,
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
@@ -2050,6 +2069,8 @@ const MainFrame = (props: Props) => {
 
         unsavedChanges.sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
+        setCloudProjectSaveChoiceOpen(false);
+        setCloudProjectRecoveryOpenedVersionId(null);
 
         if (!fileMetadata) {
           // Some storage provider like "DownloadFile" don't have file metadata, because
@@ -2134,6 +2155,11 @@ const MainFrame = (props: Props) => {
     () => {
       if (!currentProject) return;
 
+      if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
+        setCloudProjectSaveChoiceOpen(true);
+        return;
+      }
+
       const storageProviderOperations = getStorageProviderOperations();
       if (
         props.storageProviders.filter(
@@ -2152,6 +2178,8 @@ const MainFrame = (props: Props) => {
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
+      cloudProjectRecoveryOpenedVersionId,
+      cloudProjectSaveChoiceOpen,
     ]
   );
 
@@ -2160,6 +2188,11 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
       if (!currentFileMetadata) {
         return saveProjectAs();
+      }
+
+      if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
+        setCloudProjectSaveChoiceOpen(true);
+        return;
       }
 
       const storageProviderOperations = getStorageProviderOperations();
@@ -2189,13 +2222,18 @@ const MainFrame = (props: Props) => {
 
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
-          currentFileMetadata
+          currentFileMetadata,
+          cloudProjectRecoveryOpenedVersionId
+            ? { previousVersion: cloudProjectRecoveryOpenedVersionId }
+            : undefined
         );
 
         if (wasSaved) {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          setCloudProjectSaveChoiceOpen(false);
+          setCloudProjectRecoveryOpenedVersionId(null);
 
           const fileMetadataAndStorageProviderName = {
             fileMetadata: fileMetadata,
@@ -2260,6 +2298,8 @@ const MainFrame = (props: Props) => {
       setState,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      cloudProjectRecoveryOpenedVersionId,
+      cloudProjectSaveChoiceOpen,
     ]
   );
 
@@ -2398,6 +2438,22 @@ const MainFrame = (props: Props) => {
     }
     return true;
   };
+
+  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+    (versionId: string) => {
+      if (!cloudProjectFileMetadataToRecover) return;
+      openFromFileMetadataWithStorageProvider({
+        storageProviderName: 'Cloud',
+        fileMetadata: {
+          ...cloudProjectFileMetadataToRecover,
+          version: versionId,
+        },
+      });
+      setCloudProjectFileMetadataToRecover(null);
+      setCloudProjectRecoveryOpenedVersionId(versionId);
+    },
+    [openFromFileMetadataWithStorageProvider, cloudProjectFileMetadataToRecover]
+  );
 
   const canInstallPrivateAsset = React.useCallback(
     () => {
@@ -3220,6 +3276,21 @@ const MainFrame = (props: Props) => {
               ? selectedExampleShortHeader.name
               : undefined
           }
+        />
+      )}
+      {cloudProjectFileMetadataToRecover && (
+        <CloudProjectRecoveryDialog
+          cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
+          onClose={() => setCloudProjectFileMetadataToRecover(null)}
+          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersion}
+        />
+      )}
+      {cloudProjectSaveChoiceOpen && (
+        <CloudProjectSaveChoiceDialog
+          isLoading={isSavingProject}
+          onClose={() => setCloudProjectSaveChoiceOpen(false)}
+          onSaveAsMainVersion={saveProject}
+          onSaveAsDuplicate={saveProjectAs}
         />
       )}
       {preferencesDialogOpen && (

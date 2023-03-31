@@ -6,35 +6,10 @@ import {
   getCredentialsForCloudProject,
   getProjectFileAsZipBlob,
 } from '../../Utils/GDevelopServices/Project';
-import { initializeZipJs } from '../../Utils/Zip.js';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '..';
-
-const unzipProject = async (zippedProject: Blob) => {
-  const zipJs: ZipJs = await initializeZipJs();
-
-  return new Promise((resolve, reject) => {
-    zipJs.createReader(
-      new zipJs.BlobReader(zippedProject),
-      zipReader => {
-        zipReader.getEntries(entries => {
-          // Reading only the first entry since the zip should only contain the project json file
-          entries[0].getData(new zipJs.TextWriter(), result => {
-            resolve(result);
-          });
-        });
-      },
-      error => {
-        console.error(
-          'An error occurred when unzipping archived project',
-          error
-        );
-        reject(error);
-      }
-    );
-  });
-};
+import { unzipFirstEntryOfBlob } from '../../Utils/Zip.js/Utils';
 
 export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   fileMetadata: FileMetadata,
@@ -51,9 +26,15 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   onProgress && onProgress((2 / 4) * 100, t`Starting engine`);
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
   onProgress && onProgress((3 / 4) * 100, t`Checking tools`);
-  const zippedSerializedProject = await getProjectFileAsZipBlob(cloudProject);
+  const zippedSerializedProject = await getProjectFileAsZipBlob(
+    cloudProject,
+    fileMetadata.version
+  );
   onProgress && onProgress((4 / 4) * 100, t`Opening portal`);
-  const serializedProject = await unzipProject(zippedSerializedProject);
+  // Reading only the first entry since the zip should only contain the project json file
+  const serializedProject = await unzipFirstEntryOfBlob(
+    zippedSerializedProject
+  );
 
   return {
     content: JSON.parse(serializedProject),

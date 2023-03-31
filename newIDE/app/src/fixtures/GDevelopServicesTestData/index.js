@@ -387,6 +387,10 @@ export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   subscription: subscriptionForSilverUser,
   limits: limitsForSilverUser,
 };
+export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
+  cloudProjects: tenCloudProjects,
+};
 
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
@@ -396,7 +400,6 @@ export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
 
 export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
-  cloudProjects: tenCloudProjects,
   subscription: noSubscription,
   limits: limitsForNoSubscriptionUser,
 };

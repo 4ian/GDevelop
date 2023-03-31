@@ -342,7 +342,11 @@ const Dialog = ({
       <div style={dialogContainerStyle}>
         {title && (
           <div style={styles.titleContainer}>
-            <Line noMargin justifyContent="space-between">
+            <Line
+              noMargin
+              justifyContent="space-between"
+              alignItems="flex-start"
+            >
               <Text noMargin size="section-title">
                 {title}
               </Text>

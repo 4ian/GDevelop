@@ -11,54 +11,43 @@ import {
 import type { $AxiosError } from 'axios';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { serializeToJSON } from '../../Utils/Serializer';
-import { initializeZipJs } from '../../Utils/Zip.js';
 import CloudSaveAsDialog from './CloudSaveAsDialog';
 import { t } from '@lingui/macro';
+import { createZipWithSingleTextFile } from '../../Utils/Zip.js/Utils';
 
 const zipProject = async (project: gdProject) => {
-  const zipJs: ZipJs = await initializeZipJs();
   const projectJson = serializeToJSON(project);
-  const textReader = new zipJs.TextReader(projectJson);
-
-  return new Promise((resolve, reject) => {
-    zipJs.createWriter(
-      new zipJs.BlobWriter('application/zip'),
-      zipWriter => {
-        zipWriter.add('game.json', textReader, () => {
-          zipWriter.close(blob => {
-            resolve(blob);
-          });
-        });
-      },
-      error => {
-        console.error('An error occurred when zipping project', error);
-        reject(error);
-      }
-    );
-  });
+  return createZipWithSingleTextFile(projectJson, 'game.json');
 };
 
 const zipProjectAndCommitVersion = async ({
   authenticatedUser,
   project,
   cloudProjectId,
-}: {
+  options,
+}: {|
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
-}): Promise<?string> => {
+  options?: {| previousVersion: string |},
+|}): Promise<?string> => {
   const archive = await zipProject(project);
-  const newVersion = await commitVersion(
+  const newVersion = await commitVersion({
     authenticatedUser,
     cloudProjectId,
-    archive
-  );
+    zippedProject: archive,
+    previousVersion: options ? options.previousVersion : null,
+  });
   return newVersion;
 };
 
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
-) => async (project: gdProject, fileMetadata: FileMetadata) => {
+) => async (
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  options?: {| previousVersion: string |}
+) => {
   if (!fileMetadata.gameId) {
     console.info('Game id was never set, updating the cloud project.');
     try {
@@ -78,6 +67,7 @@ export const generateOnSaveProject = (
     authenticatedUser,
     project,
     cloudProjectId: newFileMetadata.fileIdentifier,
+    options,
   });
   if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
   return {

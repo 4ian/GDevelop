@@ -11,6 +11,8 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 export type FileMetadata = {|
   /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
+  /** The version id if the provider supports versioning */
+  version?: string,
   lastModifiedDate?: number,
   name?: string,
   gameId?: string,
@@ -72,7 +74,8 @@ export type StorageProviderOperations = {|
   // Project saving:
   onSaveProject?: (
     project: gdProject,
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    options?: {| previousVersion: string |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,

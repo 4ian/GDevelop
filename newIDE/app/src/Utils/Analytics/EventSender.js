@@ -382,6 +382,13 @@ export const sendBehaviorAdded = (metadata: {|
   recordEvent('behavior-added', metadata);
 };
 
+export const sendCloudProjectCouldNotBeOpened = (metadata: {|
+  userId: string,
+  cloudProjectId: string,
+|}) => {
+  recordEvent('cloud-project-opening-failed', metadata);
+};
+
 export const sendEventsExtractedAsFunction = (metadata: {|
   step: 'begin' | 'end',
   parentEditor:

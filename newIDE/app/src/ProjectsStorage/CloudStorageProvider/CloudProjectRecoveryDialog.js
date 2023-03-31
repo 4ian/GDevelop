@@ -170,7 +170,7 @@ const CloudProjectRecoveryDialog = ({
             lastSaneVersion && !isLoading ? (
               <Trans>A functioning save has been found!</Trans>
             ) : (
-              <Trans>This file is corrupted</Trans>
+              <Trans>This file is corrupt</Trans>
             )
           }
         >
@@ -186,15 +186,17 @@ const CloudProjectRecoveryDialog = ({
               <Line>
                 <Column noMargin>
                   <Text noMargin>
-                    <Trans>
-                      The latest save of{' '}
-                      {cloudProjectName ? (
-                        `"${cloudProjectName}"`
-                      ) : (
-                        <Trans>this project</Trans>
-                      )}{' '}
-                      is corrupted and cannot be opened.
-                    </Trans>
+                    {cloudProjectName ? (
+                      <Trans>
+                        The latest save of "{cloudProjectName}" is corrupt and
+                        cannot be opened.
+                      </Trans>
+                    ) : (
+                      <Trans>
+                        The latest save of this project is corrupt and cannot be
+                        opened.
+                      </Trans>
+                    )}
                   </Text>
                   <Text noMargin>
                     <Trans>
@@ -216,7 +218,7 @@ const CloudProjectRecoveryDialog = ({
                   </Text>
                   <Text noMargin>
                     <Trans>
-                      Please get in touch with us to find a solution.{' '}
+                      Please get in touch with us to find a solution.
                     </Trans>
                   </Text>
                 </Column>
@@ -228,7 +230,7 @@ const CloudProjectRecoveryDialog = ({
                 <Column noMargin>
                   <Text noMargin>
                     <Trans>
-                      We have found a non-corrupted save from{' '}
+                      We have found a non-corrupt save from{' '}
                       {i18n.date(lastSaneVersion.createdAt, {
                         dateStyle: 'long',
                         timeStyle: 'short',
@@ -241,7 +243,7 @@ const CloudProjectRecoveryDialog = ({
               <Line>
                 <Text>
                   <Trans>
-                    Would you like to open the non-corrupted version instead?
+                    Would you like to open the non-corrupt version instead?
                   </Trans>
                 </Text>
               </Line>

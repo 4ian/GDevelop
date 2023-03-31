@@ -1393,7 +1393,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  "res/actions/create24.png",
                  "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
-      .AddParameter("objectListOrEmptyIfJustDeclared",
+      .AddParameter("objectList",
                     _("Group of potential objects"))
       .SetParameterLongDescription(
           _("Group containing objects that can be created by the action."))

@@ -36,7 +36,7 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       });
     };
 
-    it('can create an instance and keep all instances picked', function () {
+    it('can create an instance and only pick this one when all instances were picked', function () {
       const runCompiledEvents = generateFunctionWithCreateAction(gd);
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
 
@@ -51,8 +51,8 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
 
       runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
 
-      // All instances are still picked.
-      expect(myObjectLists.get('MyObject').length).toBe(3);
+      // Only the created instance is picked.
+      expect(myObjectLists.get('MyObject').length).toBe(1);
     });
 
     it('can create and pick an instance when some instances were not picked', function () {
@@ -101,7 +101,7 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       expect(myObjectLists.get('MyObject').length).toBe(1);
     });
 
-    it('can create an instance and keep all instances picked of a group', function () {
+    it('can create an instance and only pick this one when all instances were picked for a group', function () {
       const runCompiledEvents = generateFunctionWithCreateAction(gd);
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
 
@@ -118,9 +118,9 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
 
       runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
 
-      // All instances are still picked.
-      expect(myObjectLists.get('MyObjectA').length).toBe(3);
-      expect(myObjectLists.get('MyObjectB').length).toBe(1);
+      // Only the created instance is picked.
+      expect(myObjectLists.get('MyObjectA').length).toBe(1);
+      expect(myObjectLists.get('MyObjectB').length).toBe(0);
     });
 
     it('can create and pick an instance when some instances of a group were not picked', function () {

@@ -4,23 +4,25 @@ import { GDevelopUserApi } from './ApiConfigs';
 
 import { type Badge } from './Badge';
 
+export type CommunityLinks = {|
+  personalWebsiteLink?: string,
+  personalWebsite2Link?: string,
+  twitterUsername?: string,
+  facebookUsername?: string,
+  youtubeUsername?: string,
+  tiktokUsername?: string,
+  instagramUsername?: string,
+  redditUsername?: string,
+  snapchatUsername?: string,
+  discordServerLink?: string,
+|};
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,
   description: ?string,
   donateLink: ?string,
-  communityLinks: {
-    personalWebsiteLink?: string,
-    personalWebsite2Link?: string,
-    twitterUsername?: string,
-    facebookUsername?: string,
-    youtubeUsername?: string,
-    tiktokUsername?: string,
-    instagramUsername?: string,
-    redditUsername?: string,
-    snapchatUsername?: string,
-    discordServerLink?: string,
-  },
+  communityLinks: CommunityLinks,
 |};
 
 export type UserPublicProfileByIds = {|

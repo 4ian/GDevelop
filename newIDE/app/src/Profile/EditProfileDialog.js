@@ -156,16 +156,18 @@ const EditProfileDialog = ({
       getGameStatsEmail,
       getNewsletterEmail,
       donateLink,
-      personalWebsiteLink,
-      personalWebsite2Link,
-      twitterUsername,
-      facebookUsername,
-      youtubeUsername,
-      tiktokUsername,
-      instagramUsername,
-      redditUsername,
-      snapchatUsername,
-      discordServerLink,
+      communityLinks: {
+        personalWebsiteLink,
+        personalWebsite2Link,
+        twitterUsername,
+        facebookUsername,
+        youtubeUsername,
+        tiktokUsername,
+        instagramUsername,
+        redditUsername,
+        snapchatUsername,
+        discordServerLink,
+      },
     });
   };
 

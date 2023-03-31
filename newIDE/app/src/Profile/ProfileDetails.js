@@ -43,6 +43,7 @@ import {
   tiktokLinkPrefix,
   twitterLinkPrefix,
   youtubeLinkPrefix,
+  type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
 
 const ExternalLinkLine = ({
@@ -74,18 +75,7 @@ type DisplayedProfile = {
   username: ?string,
   description: ?string,
   donateLink: ?string,
-  communityLinks: {
-    personalWebsiteLink?: string,
-    personalWebsite2Link?: string,
-    twitterUsername?: string,
-    facebookUsername?: string,
-    youtubeUsername?: string,
-    tiktokUsername?: string,
-    instagramUsername?: string,
-    redditUsername?: string,
-    snapchatUsername?: string,
-    discordServerLink?: string,
-  },
+  communityLinks: CommunityLinks,
 };
 
 type Props = {|

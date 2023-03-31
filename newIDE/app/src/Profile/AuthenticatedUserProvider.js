@@ -678,16 +678,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getNewsletterEmail: form.getNewsletterEmail,
           appLanguage: preferences.language,
           donateLink: form.donateLink,
-          personalWebsiteLink: form.personalWebsiteLink,
-          personalWebsite2Link: form.personalWebsite2Link,
-          twitterUsername: form.twitterUsername,
-          facebookUsername: form.facebookUsername,
-          youtubeUsername: form.youtubeUsername,
-          tiktokUsername: form.tiktokUsername,
-          instagramUsername: form.instagramUsername,
-          redditUsername: form.redditUsername,
-          snapchatUsername: form.snapchatUsername,
-          discordServerLink: form.discordServerLink,
+          communityLinks: form.communityLinks,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();

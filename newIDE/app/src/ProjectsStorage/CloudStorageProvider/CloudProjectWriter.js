@@ -13,11 +13,25 @@ import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import { serializeToJSON } from '../../Utils/Serializer';
 import CloudSaveAsDialog from './CloudSaveAsDialog';
 import { t } from '@lingui/macro';
-import { createZipWithSingleTextFile } from '../../Utils/Zip.js/Utils';
+import {
+  createZipWithSingleTextFile,
+  unzipFirstEntryOfBlob,
+} from '../../Utils/Zip.js/Utils';
 
 const zipProject = async (project: gdProject) => {
   const projectJson = serializeToJSON(project);
   return createZipWithSingleTextFile(projectJson, 'game.json');
+};
+
+const checkZipContent = async (
+  zip: Blob,
+  project: gdProject
+): Promise<boolean> => {
+  const projectJson = serializeToJSON(project);
+  const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
+  return (
+    unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
+  );
 };
 
 const zipProjectAndCommitVersion = async ({
@@ -31,11 +45,13 @@ const zipProjectAndCommitVersion = async ({
   cloudProjectId: string,
   options?: {| previousVersion: string |},
 |}): Promise<?string> => {
-  const archive = await zipProject(project);
+  const zippedProject = await zipProject(project);
+  const archiveIsSane = await checkZipContent(zippedProject, project);
+  if (!archiveIsSane) return;
   const newVersion = await commitVersion({
     authenticatedUser,
     cloudProjectId,
-    zippedProject: archive,
+    zippedProject,
     previousVersion: options ? options.previousVersion : null,
   });
   return newVersion;

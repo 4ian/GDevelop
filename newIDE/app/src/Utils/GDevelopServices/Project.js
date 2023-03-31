@@ -224,6 +224,13 @@ export const createCloudProject = async (
   return response.data;
 };
 
+/**
+ * This method takes the zipped project, uploads it to the cloud project storage
+ * and then informs the Project service that the cloud project has a new version.
+ * By default, a new version will have the project current version as parent.
+ * In some cases (project recovery from an old version), the new version will have
+ * a specific version as parent. In that case, specify a value in `previousVersion`.
+ */
 export const commitVersion = async ({
   authenticatedUser,
   cloudProjectId,

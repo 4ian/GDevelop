@@ -72,7 +72,9 @@ function ConfirmDeleteDialog(props: Props) {
           ]}
           noMobileFullScreen
         >
-          <Text size="body">{i18n._(props.message)}</Text>
+          <Text size="body" style={{ userSelect: 'text' }}>
+            {i18n._(props.message)}
+          </Text>
           <LargeSpacer />
           <TextField
             autoFocus="desktop"

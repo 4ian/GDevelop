@@ -3,29 +3,13 @@
 describe('gdjs.evtTools.object', function () {
   it('can count picked instances of objects', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
-    const objectA1 = new gdjs.TestRuntimeObject(runtimeScene, {
-      name: 'MyObjectA',
-      type: '',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const objectA2 = new gdjs.TestRuntimeObject(runtimeScene, {
-      name: 'MyObjectA',
-      type: '',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const objectB1 = new gdjs.TestRuntimeObject(runtimeScene, {
-      name: 'MyObjectB',
-      type: '',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    const objectA1 = runtimeScene.createObject('MyObjectA');
+    const objectA2 = runtimeScene.createObject('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectB');
+    const objectB1 = runtimeScene.createObject('MyObjectB');
 
     expect(
       gdjs.evtTools.object.getPickedInstancesCount(
@@ -57,32 +41,13 @@ describe('gdjs.evtTools.object', function () {
 
   it('can count instances of objects living on the scene', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
-    const objectA1 = new gdjs.TestRuntimeObject(runtimeScene, {
-      name: 'MyObjectA',
-      type: '',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const objectA2 = new gdjs.TestRuntimeObject(runtimeScene, {
-      name: 'MyObjectA',
-      type: '',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const objectB1 = new gdjs.TestRuntimeObject(runtimeScene, {
-      name: 'MyObjectB',
-      type: '',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    runtimeScene.addObject(objectA1);
-    runtimeScene.addObject(objectA2);
-    runtimeScene.addObject(objectB1);
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    const objectA1 = runtimeScene.createObject('MyObjectA');
+    runtimeScene.createObject('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectB');
+    const objectB1 = runtimeScene.createObject('MyObjectB');
 
     expect(
       gdjs.evtTools.object.getSceneInstancesCount(
@@ -126,5 +91,130 @@ describe('gdjs.evtTools.object', function () {
         })
       )
     ).to.be(0);
+  });
+
+  const getInstancesIds = (instances) =>
+    instances.map((instance) => instance && instance.id);
+
+  it('can create and pick an instance when some instances were not picked', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    const objectA1 = runtimeScene.createObject('MyObjectA');
+    // This instance is not picked.
+    runtimeScene.createObject('MyObjectA');
+
+    // 1 of 3 instances are picked.
+    const pickedObjectList = Hashtable.newFrom({
+      MyObjectA: [objectA1],
+    });
+
+    const newObjectA = gdjs.evtTools.object.createObjectOnScene(
+      runtimeScene,
+      pickedObjectList,
+      0,
+      0,
+      ''
+    );
+
+    // The created instance has been added to the picked instances.
+    expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
+      getInstancesIds([objectA1, newObjectA])
+    );
+  });
+
+  it('can create an instance and keep all instances picked', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    const objectA1 = runtimeScene.createObject('MyObjectA');
+    const objectA2 = runtimeScene.createObject('MyObjectA');
+
+    // All instances are picked.
+    const pickedObjectList = Hashtable.newFrom({
+      MyObjectA: [objectA1, objectA2],
+    });
+
+    const newObjectA = gdjs.evtTools.object.createObjectOnScene(
+      runtimeScene,
+      pickedObjectList,
+      0,
+      0,
+      ''
+    );
+
+    // All instances are still picked.
+    expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
+      getInstancesIds([objectA1, objectA2, newObjectA])
+    );
+  });
+
+  it('can create and pick an instance when some instances of the group were not picked', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    const objectA1 = runtimeScene.createObject('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectB');
+    const objectB1 = runtimeScene.createObject('MyObjectB');
+    // This instance is not picked.
+    runtimeScene.createObject('MyObjectB');
+
+    // 2 of 3 instances are picked.
+    const pickedObjectList = Hashtable.newFrom({
+      MyObjectA: [objectA1],
+      MyObjectB: [objectB1],
+    });
+
+    const newObjectA = gdjs.evtTools.object.createObjectOnScene(
+      runtimeScene,
+      pickedObjectList,
+      0,
+      0,
+      ''
+    );
+
+    // The created instance has been added to the picked instances.
+    expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
+      getInstancesIds([objectA1, newObjectA])
+    );
+    expect(getInstancesIds(pickedObjectList.get('MyObjectB'))).to.eql(
+      getInstancesIds([objectB1])
+    );
+  });
+
+  it('can create an instance and keep all instances picked for a group', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    const objectA1 = runtimeScene.createObject('MyObjectA');
+    const objectA2 = runtimeScene.createObject('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectB');
+    const objectB1 = runtimeScene.createObject('MyObjectB');
+
+    // All instances are picked.
+    const pickedObjectList = Hashtable.newFrom({
+      MyObjectA: [objectA1, objectA2],
+      MyObjectB: [objectB1],
+    });
+
+    const newObjectA = gdjs.evtTools.object.createObjectOnScene(
+      runtimeScene,
+      pickedObjectList,
+      0,
+      0,
+      ''
+    );
+
+    // All instances are still picked.
+    expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
+      getInstancesIds([objectA1, objectA2, newObjectA])
+    );
+    expect(getInstancesIds(pickedObjectList.get('MyObjectB'))).to.eql(
+      getInstancesIds([objectB1])
+    );
   });
 });

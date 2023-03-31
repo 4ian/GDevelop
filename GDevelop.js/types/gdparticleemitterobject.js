@@ -76,6 +76,8 @@ declare class gdParticleEmitterObject extends gdObjectConfiguration {
   getParticleAngleRandomness1(): number;
   setParticleAngleRandomness2(newValue: number): void;
   getParticleAngleRandomness2(): number;
+  setJumpForwardInTimeOnCreation(newValue: number): void;
+  getJumpForwardInTimeOnCreation(): number;
   delete(): void;
   ptr: number;
 };

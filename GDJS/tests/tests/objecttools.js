@@ -5,10 +5,10 @@ describe('gdjs.evtTools.object', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
-    runtimeScene.registerObjectWithName('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
     const objectA1 = runtimeScene.createObject('MyObjectA');
     const objectA2 = runtimeScene.createObject('MyObjectA');
-    runtimeScene.registerObjectWithName('MyObjectB');
+    runtimeScene.registerEmptyObjectWithName('MyObjectB');
     const objectB1 = runtimeScene.createObject('MyObjectB');
 
     expect(
@@ -43,10 +43,10 @@ describe('gdjs.evtTools.object', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
-    runtimeScene.registerObjectWithName('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
     const objectA1 = runtimeScene.createObject('MyObjectA');
     runtimeScene.createObject('MyObjectA');
-    runtimeScene.registerObjectWithName('MyObjectB');
+    runtimeScene.registerEmptyObjectWithName('MyObjectB');
     const objectB1 = runtimeScene.createObject('MyObjectB');
 
     expect(
@@ -100,7 +100,7 @@ describe('gdjs.evtTools.object', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
-    runtimeScene.registerObjectWithName('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
     const objectA1 = runtimeScene.createObject('MyObjectA');
     // This instance is not picked.
     runtimeScene.createObject('MyObjectA');
@@ -124,12 +124,11 @@ describe('gdjs.evtTools.object', function () {
     );
   });
 
-  // TODO Only the created instance should be picked when all instances was picked.
   it('can create an instance and keep all instances picked', function () {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
 
-    runtimeScene.registerObjectWithName('MyObjectA');
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
     const objectA1 = runtimeScene.createObject('MyObjectA');
     const objectA2 = runtimeScene.createObject('MyObjectA');
 

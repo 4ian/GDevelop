@@ -36,12 +36,6 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       });
     };
 
-    // The "objectListOrEmptyIfJustDeclared" parameter type used by the
-    // "Create" action try to workaround this issue. It works when the action
-    // is in the scene and the 1st of its event, but the "createObject" method
-    // from function contexts is not aware of the workaround.
-    
-    // TODO TODO Only the created instance should be picked when all instances was picked.
     it('can create an instance and keep all instances picked', function () {
       const runCompiledEvents = generateFunctionWithCreateAction(gd);
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();

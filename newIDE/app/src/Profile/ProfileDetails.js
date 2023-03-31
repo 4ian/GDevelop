@@ -25,24 +25,9 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
-import Planet from '../UI/CustomSvgIcons/Planet';
-import Twitter from '../UI/CustomSvgIcons/Twitter';
-import Facebook from '../UI/CustomSvgIcons/Facebook';
-import YouTube from '../UI/CustomSvgIcons/YouTube';
-import TikTok from '../UI/CustomSvgIcons/TikTok';
-import Instagram from '../UI/CustomSvgIcons/Instagram';
-import Reddit from '../UI/CustomSvgIcons/Reddit';
-import Snapchat from '../UI/CustomSvgIcons/Snapchat';
-import Discord from '../UI/CustomSvgIcons/Discord';
 import Link from '../UI/Link';
 import {
-  facebookLinkPrefix,
-  instagramLinkPrefix,
-  redditLinkPrefix,
-  snapchatLinkPrefix,
-  tiktokLinkPrefix,
-  twitterLinkPrefix,
-  youtubeLinkPrefix,
+  communityLinksConfig,
   type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
 
@@ -185,57 +170,64 @@ const ProfileDetails = ({
               communityLinks={[
                 {
                   url: personalWebsiteLink,
-                  icon: <Planet />,
+                  icon: communityLinksConfig.personalWebsiteLink.icon,
                 },
                 {
                   url: personalWebsite2Link,
-                  icon: <Planet />,
+                  icon: communityLinksConfig.personalWebsite2Link.icon,
                 },
                 {
                   url: twitterUsername
-                    ? twitterLinkPrefix + twitterUsername
+                    ? communityLinksConfig.twitterUsername.prefix +
+                      twitterUsername
                     : undefined,
-                  icon: <Twitter />,
+                  icon: communityLinksConfig.twitterUsername.icon,
                 },
                 {
                   url: facebookUsername
-                    ? facebookLinkPrefix + facebookUsername
+                    ? communityLinksConfig.facebookUsername.prefix +
+                      facebookUsername
                     : undefined,
-                  icon: <Facebook />,
+                  icon: communityLinksConfig.facebookUsername.icon,
                 },
                 {
                   url: youtubeUsername
-                    ? youtubeLinkPrefix + youtubeUsername
+                    ? communityLinksConfig.youtubeUsername.prefix +
+                      youtubeUsername
                     : undefined,
-                  icon: <YouTube />,
+                  icon: communityLinksConfig.youtubeUsername.icon,
                 },
                 {
                   url: tiktokUsername
-                    ? tiktokLinkPrefix + tiktokUsername
+                    ? communityLinksConfig.tiktokUsername.prefix +
+                      tiktokUsername
                     : undefined,
-                  icon: <TikTok />,
+                  icon: communityLinksConfig.tiktokUsername.icon,
                 },
                 {
                   url: instagramUsername
-                    ? instagramLinkPrefix + instagramUsername
+                    ? communityLinksConfig.instagramUsername.prefix +
+                      instagramUsername
                     : undefined,
-                  icon: <Instagram />,
+                  icon: communityLinksConfig.instagramUsername.icon,
                 },
                 {
                   url: redditUsername
-                    ? redditLinkPrefix + redditUsername
+                    ? communityLinksConfig.redditUsername.prefix +
+                      redditUsername
                     : undefined,
-                  icon: <Reddit />,
+                  icon: communityLinksConfig.redditUsername.icon,
                 },
                 {
                   url: snapchatUsername
-                    ? snapchatLinkPrefix + snapchatUsername
+                    ? communityLinksConfig.snapchatUsername.prefix +
+                      snapchatUsername
                     : undefined,
-                  icon: <Snapchat />,
+                  icon: communityLinksConfig.snapchatUsername.icon,
                 },
                 {
                   url: discordServerLink,
-                  icon: <Discord />,
+                  icon: communityLinksConfig.discordServerLink.icon,
                 },
               ]}
               isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}

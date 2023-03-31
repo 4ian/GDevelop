@@ -11,13 +11,8 @@ import {
   type Profile,
 } from '../Utils/GDevelopServices/Authentication';
 import {
-  facebookLinkPrefix,
-  instagramLinkPrefix,
-  redditLinkPrefix,
-  snapchatLinkPrefix,
-  tiktokLinkPrefix,
-  twitterLinkPrefix,
-  youtubeLinkPrefix,
+  communityLinksConfig,
+  donateLinkConfig,
   type UsernameAvailability,
 } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
@@ -30,15 +25,6 @@ import {
 } from './UsernameField';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
-import Discord from '../UI/CustomSvgIcons/Discord';
-import Snapchat from '../UI/CustomSvgIcons/Snapchat';
-import Instagram from '../UI/CustomSvgIcons/Instagram';
-import Facebook from '../UI/CustomSvgIcons/Facebook';
-import Twitter from '../UI/CustomSvgIcons/Twitter';
-import YouTube from '../UI/CustomSvgIcons/YouTube';
-import Reddit from '../UI/CustomSvgIcons/Reddit';
-import TikTok from '../UI/CustomSvgIcons/TikTok';
-import Planet from '../UI/CustomSvgIcons/Planet';
 import Text from '../UI/Text';
 
 type Props = {|
@@ -58,15 +44,6 @@ export const getUsernameErrorText = (error: ?AuthError) => {
     return usernameFormatErrorMessage;
   return undefined;
 };
-
-const simpleUrlRegex = /^https:\/\/[^ ]+$/;
-const profileLinkFormattingErrorMessage = (
-  <Trans>Please enter a valid URL, starting with https://</Trans>
-);
-const simpleDiscordUrlRegex = /^https:\/\/discord[^ ]+$/;
-const discordServerLinkFormattingErrorMessage = (
-  <Trans>Please enter a valid URL, starting with https://discord</Trans>
-);
 
 const EditProfileDialog = ({
   profile,
@@ -126,28 +103,33 @@ const EditProfileDialog = ({
     setIsValidatingUsername,
   ] = React.useState<boolean>(false);
 
+  const personalWebsiteError = communityLinksConfig.personalWebsiteLink.getFormattingError(
+    personalWebsiteLink
+  );
+  const personalWebsite2Error = communityLinksConfig.personalWebsite2Link.getFormattingError(
+    personalWebsite2Link
+  );
+  const discordServerLinkError = communityLinksConfig.discordServerLink.getFormattingError(
+    discordServerLink
+  );
+  const donateLinkError = donateLinkConfig.getFormattingError(donateLink);
+  const tiktokUsernameError = communityLinksConfig.tiktokUsername.getFormattingError(
+    tiktokUsername
+  );
+
+  const hasFormattingError =
+    personalWebsiteError ||
+    personalWebsite2Error ||
+    discordServerLinkError ||
+    donateLinkError ||
+    tiktokUsernameError;
+
   const canEdit =
     !updateProfileInProgress &&
     isUsernameValid(username, { allowEmpty: false }) &&
     !isValidatingUsername &&
-    (!usernameAvailability || usernameAvailability.isAvailable);
-
-  const donateLinkFormattingError =
-    !!donateLink && !simpleUrlRegex.test(donateLink)
-      ? profileLinkFormattingErrorMessage
-      : undefined;
-  const personalWebsiteLinkFormattingError =
-    !!personalWebsiteLink && !simpleUrlRegex.test(personalWebsiteLink)
-      ? profileLinkFormattingErrorMessage
-      : undefined;
-  const personalWebsite2LinkFormattingError =
-    !!personalWebsite2Link && !simpleUrlRegex.test(personalWebsite2Link)
-      ? profileLinkFormattingErrorMessage
-      : undefined;
-  const discordServerLinkFormattingError =
-    !!discordServerLink && !simpleDiscordUrlRegex.test(discordServerLink)
-      ? discordServerLinkFormattingErrorMessage
-      : undefined;
+    (!usernameAvailability || usernameAvailability.isAvailable) &&
+    !hasFormattingError;
 
   const edit = () => {
     if (!canEdit) return;
@@ -239,7 +221,7 @@ const EditProfileDialog = ({
                 floatingLabelFixed
               />
               <LineStackLayout noMargin alignItems="center">
-                <Planet />
+                {communityLinksConfig.personalWebsiteLink.icon}
                 <TextField
                   value={personalWebsiteLink}
                   fullWidth
@@ -248,12 +230,12 @@ const EditProfileDialog = ({
                     setPersonalWebsiteLink(value);
                   }}
                   disabled={updateProfileInProgress}
-                  errorText={personalWebsiteLinkFormattingError}
-                  maxLength={150}
+                  errorText={personalWebsiteError}
+                  maxLength={communityLinksConfig.personalWebsiteLink.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Planet />
+                {communityLinksConfig.personalWebsite2Link.icon}
                 <TextField
                   value={personalWebsite2Link}
                   fullWidth
@@ -262,12 +244,14 @@ const EditProfileDialog = ({
                     setPersonalWebsite2Link(value);
                   }}
                   disabled={updateProfileInProgress}
-                  errorText={personalWebsite2LinkFormattingError}
-                  maxLength={150}
+                  errorText={personalWebsite2Error}
+                  maxLength={
+                    communityLinksConfig.personalWebsite2Link.maxLength
+                  }
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Twitter />
+                {communityLinksConfig.twitterUsername.icon}
                 <TextField
                   value={twitterUsername}
                   fullWidth
@@ -276,12 +260,16 @@ const EditProfileDialog = ({
                     setTwitterUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{twitterLinkPrefix}</Text>}
-                  maxLength={15}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.twitterUsername.prefix}
+                    </Text>
+                  }
+                  maxLength={communityLinksConfig.twitterUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Facebook />
+                {communityLinksConfig.facebookUsername.icon}
                 <TextField
                   value={facebookUsername}
                   fullWidth
@@ -290,12 +278,16 @@ const EditProfileDialog = ({
                     setFacebookUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{facebookLinkPrefix}</Text>}
-                  maxLength={50}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.facebookUsername.prefix}
+                    </Text>
+                  }
+                  maxLength={communityLinksConfig.facebookUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <YouTube />
+                {communityLinksConfig.instagramUsername.icon}
                 <TextField
                   value={youtubeUsername}
                   fullWidth
@@ -304,12 +296,16 @@ const EditProfileDialog = ({
                     setYoutubeUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{youtubeLinkPrefix}</Text>}
-                  maxLength={100}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.youtubeUsername.prefix}
+                    </Text>
+                  }
+                  maxLength={communityLinksConfig.youtubeUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <TikTok />
+                {communityLinksConfig.tiktokUsername.icon}
                 <TextField
                   value={tiktokUsername}
                   fullWidth
@@ -318,12 +314,17 @@ const EditProfileDialog = ({
                     setTiktokUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{tiktokLinkPrefix}</Text>}
-                  maxLength={30}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.tiktokUsername.prefix}
+                    </Text>
+                  }
+                  errorText={tiktokUsernameError}
+                  maxLength={communityLinksConfig.tiktokUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Instagram />
+                {communityLinksConfig.instagramUsername.icon}
                 <TextField
                   value={instagramUsername}
                   fullWidth
@@ -332,12 +333,16 @@ const EditProfileDialog = ({
                     setInstagramUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{instagramLinkPrefix}</Text>}
-                  maxLength={30}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.instagramUsername.prefix}
+                    </Text>
+                  }
+                  maxLength={communityLinksConfig.instagramUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Reddit />
+                {communityLinksConfig.redditUsername.icon}
                 <TextField
                   value={redditUsername}
                   fullWidth
@@ -346,12 +351,16 @@ const EditProfileDialog = ({
                     setRedditUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{redditLinkPrefix}</Text>}
-                  maxLength={20}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.redditUsername.prefix}
+                    </Text>
+                  }
+                  maxLength={communityLinksConfig.redditUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Snapchat />
+                {communityLinksConfig.snapchatUsername.icon}
                 <TextField
                   value={snapchatUsername}
                   fullWidth
@@ -360,12 +369,16 @@ const EditProfileDialog = ({
                     setSnapchatUsername(value);
                   }}
                   disabled={updateProfileInProgress}
-                  startAdornment={<Text noMargin>{snapchatLinkPrefix}</Text>}
-                  maxLength={15}
+                  startAdornment={
+                    <Text noMargin>
+                      {communityLinksConfig.snapchatUsername.prefix}
+                    </Text>
+                  }
+                  maxLength={communityLinksConfig.snapchatUsername.maxLength}
                 />
               </LineStackLayout>
               <LineStackLayout noMargin alignItems="center">
-                <Discord />
+                {communityLinksConfig.discordServerLink.icon}
                 <TextField
                   value={discordServerLink}
                   fullWidth
@@ -374,8 +387,8 @@ const EditProfileDialog = ({
                     setDiscordServerLink(value);
                   }}
                   disabled={updateProfileInProgress}
-                  errorText={discordServerLinkFormattingError}
-                  maxLength={150}
+                  errorText={discordServerLinkError}
+                  maxLength={communityLinksConfig.discordServerLink.maxLength}
                 />
               </LineStackLayout>
               <TextField
@@ -391,8 +404,8 @@ const EditProfileDialog = ({
                 helperMarkdownText={i18n._(
                   t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
                 )}
-                errorText={donateLinkFormattingError}
-                maxLength={150}
+                errorText={donateLinkError}
+                maxLength={donateLinkConfig.maxLength}
               />
               <Checkbox
                 label={<Trans>I want to receive the GDevelop Newsletter</Trans>}

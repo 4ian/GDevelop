@@ -18,16 +18,19 @@ import {
   unzipFirstEntryOfBlob,
 } from '../../Utils/Zip.js/Utils';
 
-const zipProject = async (project: gdProject) => {
+const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
-  return createZipWithSingleTextFile(projectJson, 'game.json');
+  const zippedProject = await createZipWithSingleTextFile(
+    projectJson,
+    'game.json'
+  );
+  return [zippedProject, projectJson];
 };
 
 const checkZipContent = async (
   zip: Blob,
-  project: gdProject
+  projectJson: string
 ): Promise<boolean> => {
-  const projectJson = serializeToJSON(project);
   const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
   return (
     unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
@@ -45,8 +48,8 @@ const zipProjectAndCommitVersion = async ({
   cloudProjectId: string,
   options?: {| previousVersion: string |},
 |}): Promise<?string> => {
-  const zippedProject = await zipProject(project);
-  const archiveIsSane = await checkZipContent(zippedProject, project);
+  const [zippedProject, projectJson] = await zipProject(project);
+  const archiveIsSane = await checkZipContent(zippedProject, projectJson);
   if (!archiveIsSane) return;
   const newVersion = await commitVersion({
     authenticatedUser,

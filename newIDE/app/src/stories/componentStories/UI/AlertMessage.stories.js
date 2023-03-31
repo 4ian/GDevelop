@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import muiDecorator from '../../ThemeDecorator';
-import paperDecorator from '../../PaperDecorator';
+import { getPaperDecorator } from '../../PaperDecorator';
 
 import AlertMessage from '../../../UI/AlertMessage';
 import { ColumnStackLayout } from '../../../UI/Layout';
@@ -10,7 +10,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'AlertMessage',
   component: AlertMessage,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [getPaperDecorator('medium'), muiDecorator],
 };
 
 export const Default = () => (

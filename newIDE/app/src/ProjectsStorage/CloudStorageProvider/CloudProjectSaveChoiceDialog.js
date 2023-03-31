@@ -25,7 +25,7 @@ const CloudProjectRecoveryDialog = ({
     <FlatButton
       disabled={isLoading}
       key="save-copy"
-      label={<Trans>Save as copy</Trans>}
+      label={<Trans>Save as...</Trans>}
       onClick={onSaveAsDuplicate}
     />,
     <LeftLoader isLoading={isLoading} key="save-main">

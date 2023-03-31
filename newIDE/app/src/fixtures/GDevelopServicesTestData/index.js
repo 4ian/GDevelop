@@ -1558,4 +1558,15 @@ export const fakeAnnouncements: Announcement[] = [
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',
   },
+  {
+    id: '127',
+    level: 'normal',
+    titleByLocale: {
+      en: '',
+    },
+    markdownMessageByLocale: {
+      en:
+        '[![GDevelop Android](https://resources.gdevelop.io/announcements/GDevelop_Android.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+    },
+  },
 ];

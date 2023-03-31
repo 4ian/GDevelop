@@ -503,10 +503,27 @@ namespace gdjs {
 
           //Let the new object be picked by next actions/conditions.
           if (objectsLists.containsKey(objectName)) {
+            // TODO Encapsulate this in ObjectsLists
+            if (
+              getPickedInstancesCount(objectsLists) + 1 ===
+              getVisibleInstancesCount(objectsContext, objectsLists)
+            ) {
+              clearObjectLists(objectsLists);
+            }
             objectsLists.get(objectName).push(obj);
           }
         }
         return obj;
+      };
+
+      export const clearObjectLists = (objectsLists: ObjectsLists) => {
+        const lists = gdjs.staticArray(
+          gdjs.evtTools.object.clearObjectLists
+        );
+        objectsLists.values(lists);
+        for (let i = 0, len = lists.length; i < len; ++i) {
+          lists[i].length = 0;
+        }
       };
 
       /**
@@ -561,6 +578,30 @@ namespace gdjs {
         objectsLists.values(lists);
         for (let i = 0, len = lists.length; i < len; ++i) {
           count += lists[i].length;
+        }
+        return count;
+      };
+
+      /**
+       * Return the number of instances of the specified objects visible by the given context.
+       */
+      export const getVisibleInstancesCount = (
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists
+      ) => {
+        let count = 0;
+
+        const objectNames = gdjs.staticArray(
+          gdjs.evtTools.object.getVisibleInstancesCount
+        );
+        objectsLists.keys(objectNames);
+
+        const uniqueObjectNames = new Set(objectNames);
+        for (const objectName of uniqueObjectNames) {
+          const visibleObjects = objectsContext.getObjects(objectName);
+          if (visibleObjects) {
+            count += visibleObjects.length;
+          }
         }
         return count;
       };

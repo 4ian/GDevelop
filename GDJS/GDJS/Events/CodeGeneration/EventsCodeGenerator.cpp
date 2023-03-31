@@ -568,20 +568,26 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // to create the new object as the object names used in the function
          // are not the same as the objects available in the scene.
          "  createObject: function(objectName) {\n"
-         "    const objectsList = "
+         "    const objectsLists = "
          "eventsFunctionContext._objectsMap[objectName];\n" +
          // TODO: we could speed this up by storing a map of object names, but
          // the cost of creating/storing it for each events function might not
          // be worth it.
-         "    if (objectsList) {\n" +
+         "    if (objectsLists) {\n" +
          "      const object = parentEventsFunctionContext ?\n" +
          "        "
-         "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
+         "parentEventsFunctionContext.createObject(objectsLists.firstKey()) "
          ":\n" +
-         "        runtimeScene.createObject(objectsList.firstKey());\n" +
+         "        runtimeScene.createObject(objectsLists.firstKey());\n" +
          // Add the new instance to object lists
-         "      if (object) {\n" +
-         "        objectsList.get(objectsList.firstKey()).push(object);\n" +
+         "      if (object) {\n"
+         "        if (\n"
+         "          gdjs.evtTools.object.getPickedInstancesCount(objectsLists) + 1 ===\n"
+         "          gdjs.evtTools.object.getVisibleInstancesCount(parentEventsFunctionContext || runtimeScene, objectsLists)\n"
+         "        ) {\n"
+         "          gdjs.evtTools.object.clearObjectLists(objectsLists)\n"
+         "        }\n"
+         "        objectsLists.get(objectsLists.firstKey()).push(object);\n" +
          "        "
          "eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
          "      }\n" + "      return object;" + "    }\n" +

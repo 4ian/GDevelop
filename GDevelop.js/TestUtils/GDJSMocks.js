@@ -565,6 +565,37 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const getVisibleInstancesCount = (objectsContext, objectsLists) => {
+  let count = 0;
+
+  const objectNames = [];
+  objectsLists.keys(objectNames);
+
+  const uniqueObjectNames = new Set(objectNames);
+  for (const objectName of uniqueObjectNames) {
+    const visibleObjects = objectsContext.getObjects(objectName);
+    if (visibleObjects) {
+      count += visibleObjects.length;
+    }
+  }
+  return count;
+};
+
+/**
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const clearObjectLists = (objectsLists) => {
+  const lists = [];
+  objectsLists.values(lists);
+  for (let i = 0, len = lists.length; i < len; ++i) {
+    lists[i].length = 0;
+  }
+};
+
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
   constructor(sceneData) {
@@ -729,6 +760,8 @@ function makeMinimalGDJSMock(options) {
           createObjectOnScene,
           getSceneInstancesCount,
           getPickedInstancesCount,
+          getVisibleInstancesCount,
+          clearObjectLists,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),

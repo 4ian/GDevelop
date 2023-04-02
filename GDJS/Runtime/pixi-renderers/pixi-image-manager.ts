@@ -144,6 +144,34 @@ namespace gdjs {
       return texture;
     }
 
+    getTHREETexture(resourceName: string): THREE.Texture {
+      const pixiTexture = this.getPIXITexture(resourceName);
+      const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer()._pixiRenderer;
+      if (!pixiRenderer) throw new Error("No PIXI renderer was found.");
+
+      // console.log(pixiTexture.baseTexture._glTextures)
+      // console.log(pixiRenderer.CONTEXT_UID)
+      // if (!pixiTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID]) return null
+      // const webglTexture = pixiTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID].texture;
+      // if (!webglTexture) throw new Error(`No webgl texture found for a PIXI Texture (resource name: ${resourceName}).`);
+
+      const image = pixiTexture.baseTexture.resource.source;
+      if (!(image instanceof HTMLImageElement)) {
+        throw new Error(`Can't load texture for resource "${resourceName}" as it's not an image`);
+      }
+
+      const threeTexture = new THREE.Texture(image);
+      threeTexture.magFilter = THREE.NearestFilter;
+      threeTexture.minFilter = THREE.NearestFilter;
+      threeTexture.wrapS = THREE.ClampToEdgeWrapping;
+      threeTexture.wrapT = THREE.ClampToEdgeWrapping;
+      threeTexture.needsUpdate = true;
+      // // @ts-ignore
+      // threeTexture.__webglTexture = webglTexture
+
+      return threeTexture;
+    }
+
     /**
      * Return the PIXI video texture associated to the specified resource name.
      * Returns a placeholder texture if not found.

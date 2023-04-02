@@ -93,6 +93,23 @@ namespace gdjs {
       this._threeCamera.updateProjectionMatrix();
 
       this._threeScene.add(this._threePlaneMesh);
+
+      // TEST:
+      const geometry = new THREE.BoxGeometry(100, 100, 100);
+      geometry.computeBoundingBox();
+      const box = new THREE.Mesh(
+        geometry,
+        new THREE.MeshBasicMaterial({
+          map: this._runtimeScene
+            .getGame()
+            .getImageManager()
+            .getTHREETexture('Wood.png'),
+          side: THREE.DoubleSide,
+        })
+      );
+      box.rotation.set(gdjs.toRad(20), gdjs.toRad(30), gdjs.toRad(40));
+      box.position.set(100, 100, 0);
+      this._threeScene.add(box);
     }
 
     onGameResolutionResized() {
@@ -124,8 +141,10 @@ namespace gdjs {
       // this._renderProfileText(); //Uncomment to display profiling times
 
       // render the PIXI container of the scene
+      this._pixiRenderer.reset(); // TODO: Only if THREE
       this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
+      this._pixiRenderer.reset(); // TODO: Only if THREE
 
       // TODO: use a single object
       if (
@@ -134,8 +153,11 @@ namespace gdjs {
         this._threeScene &&
         this._threeCamera
       ) {
-        this._threeScene.background = new THREE.Color(this._runtimeScene.getBackgroundColor());
+        this._threeScene.background = new THREE.Color(
+          this._runtimeScene.getBackgroundColor()
+        );
         this._threePixiCanvasTexture.needsUpdate = true;
+        this._threeRenderer.resetState();
         this._threeRenderer.render(this._threeScene, this._threeCamera);
       }
 

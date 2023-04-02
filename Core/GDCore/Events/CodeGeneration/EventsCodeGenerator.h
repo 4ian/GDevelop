@@ -585,6 +585,12 @@ class GD_CORE_API EventsCodeGenerator {
     return "fakeObjectListOf_" + objectName;
   }
 
+  // TODO Documentation
+  virtual gd::String GetObjectMapName(const gd::String &objectName,
+                                      gd::EventsCodeGenerationContext &context) {
+    return "fakeObjectListOf_" + objectName;
+  }
+
   virtual gd::String GeneratePropertyGetter(
       const gd::PropertiesContainer& propertiesContainer,
       const gd::NamedPropertyDescriptor& property,

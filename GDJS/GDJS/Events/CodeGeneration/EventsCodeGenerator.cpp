@@ -581,15 +581,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "        runtimeScene.createObject(objectsLists.firstKey());\n" +
          // Add the new instance to object lists
          "      if (object) {\n"
-         "        if (\n"
-         "          gdjs.evtTools.object.getPickedInstancesCount(objectsLists) + 1 ===\n"
-         "          gdjs.evtTools.object.getVisibleInstancesCount(parentEventsFunctionContext || runtimeScene, objectsLists)\n"
-         "        ) {\n"
-         "          gdjs.evtTools.object.clearObjectLists(objectsLists)\n"
-         "        }\n"
-         "        objectsLists.get(objectsLists.firstKey()).push(object);\n" +
-         "        "
-         "eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
+         "        gdjs.evtTools.objectsLists.addObject(objectsLists, "
+         "objectsLists.firstKey(), object);\n" +
          "      }\n" + "      return object;" + "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +
@@ -773,6 +766,9 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
   }
   if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
+  // Flag the picking list as modified.
+  conditionCode += GetObjectMapName(objectName, context) + ".isPicked = true;\n";
+
   // Generate whole condition code
   conditionCode +=
       "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
@@ -829,6 +825,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
          << "\" requested for object \'" << objectName
          << "\" (condition: " << instrInfos.GetFullName() << ")." << endl;
   } else {
+    // Flag the picking list as modified.
+    conditionCode += GetObjectMapName(objectName, context) + ".isPicked = true;\n";
+
     conditionCode +=
         "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
         ".length;i<l;++i) {\n";
@@ -1027,7 +1026,8 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
           gd::String copiedListName = "asyncObjectsList.getObjects(" +
                                       ConvertToStringExplicit(object) + ")";
           return "gdjs.copyArray(" + copiedListName + ", " + objectListName +
-                 ");\n";
+                 ");\n" +
+                 GenerateObject(object, "objectList", context) + ".isPicked = false;\n";
         }
 
         //*Optimization*: Avoid expensive copy of the object list if we're using
@@ -1038,7 +1038,8 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
         gd::String copiedListName =
             GetObjectListName(object, *context.GetParentContext());
         return "gdjs.copyArray(" + copiedListName + ", " + objectListName +
-               ");\n";
+               ");\n" +
+               GenerateObject(object, "objectList", context) + ".isPicked = false;\n";
       };
 
   gd::String declarationsCode;
@@ -1047,7 +1048,8 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration += "gdjs.copyArray(" +
                                GenerateAllInstancesGetterCode(object, context) +
-                               ", " + GetObjectListName(object, context) + ");";
+                               ", " + GetObjectListName(object, context) + ");\n" +
+                               GenerateObject(object, "objectList", context) + ".isPicked = false;\n";
     } else
       objectListDeclaration = declareObjectListFromParent(object, context);
 
@@ -1057,7 +1059,8 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
-          GetObjectListName(object, context) + ".length = 0;\n";
+          GetObjectListName(object, context) + ".length = 0;\n" +
+          GenerateObject(object, "objectList", context) + ".isPicked = false;\n";
     } else
       objectListDeclaration = declareObjectListFromParent(object, context);
 
@@ -1067,10 +1070,12 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
-          GetObjectListName(object, context) + ".length = 0;\n";
+          GetObjectListName(object, context) + ".length = 0;\n" +
+          GenerateObject(object, "objectList", context) + ".isPicked = false;\n";
     } else
       objectListDeclaration =
-          GetObjectListName(object, context) + ".length = 0;\n";
+          GetObjectListName(object, context) + ".length = 0;\n" +
+          GenerateObject(object, "objectList", context) + ".isPicked = false;\n";
 
     declarationsCode += objectListDeclaration + "\n";
   }
@@ -1188,6 +1193,28 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
   return argOutput;
 }
+
+gd::String EventsCodeGenerator::GetObjectMapName(
+    const gd::String& objectName,
+    gd::EventsCodeGenerationContext& context) {
+
+    // TODO Why can't it just use objectName directly?
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+        // The map name must be unique for each set of objects lists.
+        // We generate it from the objects lists names.
+        gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
+
+        // Map each declared object to its list.
+        for (auto& objectName : realObjects) {
+          objectsMapName +=
+              ManObjListName(GetObjectListName(objectName, context));
+        }
+        // TODO Handle objectListOrEmptyWithoutPicking?
+
+        return objectsMapName;
+    }
 
 gd::String EventsCodeGenerator::GenerateObject(
     const gd::String& objectName,

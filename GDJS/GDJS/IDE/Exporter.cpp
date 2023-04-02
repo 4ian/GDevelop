@@ -93,6 +93,7 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
     // Export engine libraries
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
+        /*pixiInThreeRenderers=*/true,
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),

@@ -12,6 +12,14 @@ namespace gdjs {
     _profilerText: PIXI.Text | null = null;
     _showCursorAtNextRender: boolean = false;
 
+    _threeRenderer: THREE.WebGLRenderer | null = null;
+    _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
+    _threePlaneGeometry: THREE.PlaneGeometry | null = null;
+    _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
+    _threePlaneMesh: THREE.Mesh | null = null;
+    _threeScene: THREE.Scene | null = null;
+    _threeCamera: THREE.PerspectiveCamera | null = null;
+
     constructor(
       runtimeScene: gdjs.RuntimeScene,
       runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null
@@ -24,6 +32,67 @@ namespace gdjs {
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
       this._pixiContainer.sortableChildren = true;
+
+      this._setupThreeScene();
+    }
+
+    _setupThreeScene() {
+      if (!this._pixiRenderer) return;
+
+      const runtimeGame = this._runtimeScene.getGame();
+      this._threeRenderer = runtimeGame.getRenderer()._threeRenderer;
+
+      if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
+      if (this._threePlaneGeometry) this._threePlaneGeometry.dispose();
+      if (this._threePlaneMaterial) this._threePlaneMaterial.dispose();
+      if (this._threePlaneMesh && this._threeScene)
+        this._threeScene.remove(this._threePlaneMesh);
+
+      // TODO: Could be optimized by using a render texture instead of a canvas.
+      // (Implies to share the same WebGL context between PixiJS and three.js).
+      const pixiCanvas = this._pixiRenderer.view;
+      this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
+
+      this._threePlaneGeometry = new THREE.PlaneGeometry(
+        runtimeGame.getGameResolutionWidth(),
+        runtimeGame.getGameResolutionHeight()
+      );
+      this._threePlaneMaterial = new THREE.MeshBasicMaterial({
+        map: this._threePixiCanvasTexture,
+        side: THREE.DoubleSide,
+        transparent: true,
+      });
+
+      this._threePlaneMesh = new THREE.Mesh(
+        this._threePlaneGeometry,
+        this._threePlaneMaterial
+      );
+      this._threePlaneMesh.position.set(
+        runtimeGame.getGameResolutionWidth() / 2,
+        runtimeGame.getGameResolutionHeight() / 2,
+        0
+      );
+      this._threePlaneMesh.renderOrder = 99999; // Ensure the plane is rendered last so it blends with 3D objects
+
+      if (!this._threeScene) this._threeScene = new THREE.Scene();
+      if (!this._threeCamera)
+        this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+
+      const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
+      const cameraDistance =
+        (0.5 * runtimeGame.getGameResolutionHeight()) /
+        Math.tan(0.5 * cameraFovInRadians);
+      this._threeCamera.position.set(
+        runtimeGame.getGameResolutionWidth() / 2,
+        runtimeGame.getGameResolutionHeight() / 2,
+        cameraDistance
+      );
+      this._threeCamera.aspect =
+        runtimeGame.getGameResolutionWidth() /
+        runtimeGame.getGameResolutionHeight();
+      this._threeCamera.updateProjectionMatrix();
+
+      this._threeScene.add(this._threePlaneMesh);
     }
 
     onGameResolutionResized() {
@@ -35,10 +104,17 @@ namespace gdjs {
         this._pixiRenderer.width / runtimeGame.getGameResolutionWidth();
       this._pixiContainer.scale.y =
         this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
+
+      this._setupThreeScene();
     }
 
-    // Nothing to do.
-    onSceneUnloaded() {}
+    onSceneUnloaded() {
+      if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
+      if (this._threePlaneGeometry) this._threePlaneGeometry.dispose();
+      if (this._threePlaneMaterial) this._threePlaneMaterial.dispose();
+      if (this._threePlaneMesh && this._threeScene)
+        this._threeScene.remove(this._threePlaneMesh);
+    }
 
     render() {
       if (!this._pixiRenderer) {
@@ -51,9 +127,22 @@ namespace gdjs {
       this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
 
+      // TODO: use a single object
+      if (
+        this._threePixiCanvasTexture &&
+        this._threeRenderer &&
+        this._threeScene &&
+        this._threeCamera
+      ) {
+        this._threeScene.background = new THREE.Color(this._runtimeScene.getBackgroundColor());
+        this._threePixiCanvasTexture.needsUpdate = true;
+        this._threeRenderer.render(this._threeScene, this._threeCamera);
+      }
+
       // synchronize showing the cursor with rendering (useful to reduce
       // blinking while switching from in-game cursor)
       if (this._showCursorAtNextRender) {
+        // TODO: replace by getCanvas()
         this._pixiRenderer.view.style.cursor = '';
         this._showCursorAtNextRender = false;
       }
@@ -85,6 +174,7 @@ namespace gdjs {
       if (!this._pixiRenderer) {
         return;
       }
+      // TODO: replace by getCanvas()
       this._pixiRenderer.view.style.cursor = 'none';
     }
 

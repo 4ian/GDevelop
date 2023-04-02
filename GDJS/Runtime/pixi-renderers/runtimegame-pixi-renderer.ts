@@ -29,6 +29,7 @@ namespace gdjs {
     _forceFullscreen: any;
 
     _pixiRenderer: PIXI.Renderer | null = null;
+    _threeRenderer: THREE.WebGLRenderer | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
@@ -71,10 +72,22 @@ namespace gdjs {
         preserveDrawingBuffer: true,
         antialias: false,
       }) as PIXI.Renderer;
-      const gameCanvas = this._pixiRenderer.view;
+
+      let gameCanvas: HTMLCanvasElement;
+      if (THREE) {
+        this._pixiRenderer.backgroundAlpha = 0;
+        this._threeRenderer = new THREE.WebGLRenderer();
+        this._threeRenderer.setPixelRatio(window.devicePixelRatio);
+        this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
+
+        gameCanvas = this._threeRenderer.domElement;
+      } else {
+        gameCanvas = this._pixiRenderer.view;
+      }
 
       // Add the renderer view element to the DOM
       parentElement.appendChild(gameCanvas);
+
       gameCanvas.style.position = 'absolute';
 
       // Ensure that the canvas has the focus.
@@ -210,6 +223,11 @@ namespace gdjs {
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
         );
+
+        if (this._threeRenderer) {
+          this._threeRenderer.setPixelRatio(window.devicePixelRatio);
+          this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
+        }
       }
 
       // Set the canvas size.
@@ -829,6 +847,7 @@ namespace gdjs {
      * Get the canvas DOM element.
      */
     getCanvas() {
+      // TODO: replace by PIXI or three canvas.
       // @ts-ignore
       return this._pixiRenderer.view;
     }

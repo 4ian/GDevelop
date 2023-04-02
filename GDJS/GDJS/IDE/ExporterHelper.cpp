@@ -121,6 +121,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
+                 /*pixiInThreeRenderers=*/true,
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
@@ -570,6 +571,7 @@ bool ExporterHelper::CompleteIndexFile(
 }
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
+                                    bool pixiInThreeRenderers,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     gd::String gdevelopLogoStyle,
@@ -641,6 +643,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "debugger-client/window-message-debugger-client.js");
   }
 
+  if (pixiInThreeRenderers) {
+    InsertUnique(includesFiles, "pixi-renderers/three.js");
+  }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");

@@ -23,6 +23,7 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 const untransformedPaths = [
   // GDJS prebuilt files:
   'GDJS/Runtime/pixi-renderers/pixi.js',
+  'GDJS/Runtime/pixi-renderers/three.js',
   'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
   'GDJS/Runtime/Cordova',
   'GDJS/Runtime/Electron',

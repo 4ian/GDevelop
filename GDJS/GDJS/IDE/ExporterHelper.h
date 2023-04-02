@@ -288,6 +288,7 @@ class ExporterHelper {
    * \brief Add libraries files to the list of includes.
    */
   void AddLibsInclude(bool pixiRenderers,
+                      bool pixiInThreeRenderers,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       gd::String gdevelopLogoStyle,

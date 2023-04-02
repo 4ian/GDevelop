@@ -149,12 +149,15 @@ namespace gdjs {
       const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer()._pixiRenderer;
       if (!pixiRenderer) throw new Error("No PIXI renderer was found.");
 
+      // TODO: Ideally we could share the same WebGL texture.
       // console.log(pixiTexture.baseTexture._glTextures)
       // console.log(pixiRenderer.CONTEXT_UID)
       // if (!pixiTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID]) return null
       // const webglTexture = pixiTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID].texture;
       // if (!webglTexture) throw new Error(`No webgl texture found for a PIXI Texture (resource name: ${resourceName}).`);
 
+      // TODO: this will result in two textures uploaded to the GPU (one for three.js, one for PixiJS).
+      // TODO: some textures could even not be used in PixiJS.
       const image = pixiTexture.baseTexture.resource.source;
       if (!(image instanceof HTMLImageElement)) {
         throw new Error(`Can't load texture for resource "${resourceName}" as it's not an image`);
@@ -166,6 +169,8 @@ namespace gdjs {
       threeTexture.wrapS = THREE.ClampToEdgeWrapping;
       threeTexture.wrapT = THREE.ClampToEdgeWrapping;
       threeTexture.needsUpdate = true;
+
+      // Ideally we could share the same WebGL texture.
       // // @ts-ignore
       // threeTexture.__webglTexture = webglTexture
 

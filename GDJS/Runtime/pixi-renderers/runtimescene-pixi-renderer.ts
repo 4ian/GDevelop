@@ -93,23 +93,6 @@ namespace gdjs {
       this._threeCamera.updateProjectionMatrix();
 
       this._threeScene.add(this._threePlaneMesh);
-
-      // TEST:
-      const geometry = new THREE.BoxGeometry(100, 100, 100);
-      geometry.computeBoundingBox();
-      const box = new THREE.Mesh(
-        geometry,
-        new THREE.MeshBasicMaterial({
-          map: this._runtimeScene
-            .getGame()
-            .getImageManager()
-            .getTHREETexture('Wood.png'),
-          side: THREE.DoubleSide,
-        })
-      );
-      box.rotation.set(gdjs.toRad(20), gdjs.toRad(30), gdjs.toRad(40));
-      box.position.set(100, 100, 0);
-      this._threeScene.add(box);
     }
 
     onGameResolutionResized() {
@@ -210,6 +193,10 @@ namespace gdjs {
 
     getRendererObject() {
       return this._pixiContainer;
+    }
+
+    get3dRendererObject() {
+      return this._threeScene!;
     }
 
     getPIXIRenderer() {

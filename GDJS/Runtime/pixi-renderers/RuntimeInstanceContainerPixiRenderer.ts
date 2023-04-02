@@ -23,6 +23,8 @@ namespace gdjs {
     setLayerIndex(layer: gdjs.RuntimeLayer, index: integer): void;
 
     getRendererObject(): PIXI.Container;
+
+    get3dRendererObject(): THREE.Object3D;
   }
 
   // Register the class to let the engine use it.

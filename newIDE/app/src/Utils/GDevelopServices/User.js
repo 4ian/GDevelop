@@ -15,6 +15,18 @@ import { GDevelopUserApi } from './ApiConfigs';
 
 import { type Badge } from './Badge';
 
+export type CommunityLinkType =
+  | 'personalWebsiteLink'
+  | 'personalWebsite2Link'
+  | 'twitterUsername'
+  | 'facebookUsername'
+  | 'youtubeUsername'
+  | 'tiktokUsername'
+  | 'instagramUsername'
+  | 'redditUsername'
+  | 'snapchatUsername'
+  | 'discordServerLink';
+
 export type CommunityLinks = {|
   personalWebsiteLink?: string,
   personalWebsite2Link?: string,

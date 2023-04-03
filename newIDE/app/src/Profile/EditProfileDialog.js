@@ -1,7 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 
-import React from 'react';
+import * as React from 'react';
 import { I18n } from '@lingui/react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -14,6 +14,7 @@ import {
   communityLinksConfig,
   donateLinkConfig,
   type UsernameAvailability,
+  type CommunityLinkType,
 } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
@@ -43,6 +44,42 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   if (error.code === 'auth/malformed-username')
     return usernameFormatErrorMessage;
   return undefined;
+};
+
+const CommunityLinkLine = ({
+  id,
+  value,
+  onChange,
+  errorText,
+  disabled,
+  translatableHintText,
+}: {|
+  id: CommunityLinkType,
+  value: string,
+  onChange: (e: any, value: string) => void,
+  errorText?: React.Node,
+  disabled: boolean,
+  translatableHintText?: string,
+|}) => {
+  const config = communityLinksConfig[id];
+
+  return (
+    <LineStackLayout noMargin alignItems="center">
+      {config.icon}
+      <TextField
+        value={value}
+        fullWidth
+        translatableHintText={translatableHintText}
+        onChange={onChange}
+        disabled={disabled}
+        errorText={errorText}
+        maxLength={config.maxLength}
+        startAdornment={
+          config.prefix ? <Text noMargin>{config.prefix}</Text> : undefined
+        }
+      />
+    </LineStackLayout>
+  );
 };
 
 const EditProfileDialog = ({
@@ -220,177 +257,100 @@ const EditProfileDialog = ({
                 disabled={updateProfileInProgress}
                 floatingLabelFixed
               />
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.personalWebsiteLink.icon}
-                <TextField
-                  value={personalWebsiteLink}
-                  fullWidth
-                  translatableHintText={t`Personal website, itch.io page, etc.`}
-                  onChange={(e, value) => {
-                    setPersonalWebsiteLink(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  errorText={personalWebsiteError}
-                  maxLength={communityLinksConfig.personalWebsiteLink.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.personalWebsite2Link.icon}
-                <TextField
-                  value={personalWebsite2Link}
-                  fullWidth
-                  translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
-                  onChange={(e, value) => {
-                    setPersonalWebsite2Link(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  errorText={personalWebsite2Error}
-                  maxLength={
-                    communityLinksConfig.personalWebsite2Link.maxLength
-                  }
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.twitterUsername.icon}
-                <TextField
-                  value={twitterUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setTwitterUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.twitterUsername.prefix}
-                    </Text>
-                  }
-                  maxLength={communityLinksConfig.twitterUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.facebookUsername.icon}
-                <TextField
-                  value={facebookUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setFacebookUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.facebookUsername.prefix}
-                    </Text>
-                  }
-                  maxLength={communityLinksConfig.facebookUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.instagramUsername.icon}
-                <TextField
-                  value={youtubeUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setYoutubeUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.youtubeUsername.prefix}
-                    </Text>
-                  }
-                  maxLength={communityLinksConfig.youtubeUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.tiktokUsername.icon}
-                <TextField
-                  value={tiktokUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setTiktokUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.tiktokUsername.prefix}
-                    </Text>
-                  }
-                  errorText={tiktokUsernameError}
-                  maxLength={communityLinksConfig.tiktokUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.instagramUsername.icon}
-                <TextField
-                  value={instagramUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setInstagramUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.instagramUsername.prefix}
-                    </Text>
-                  }
-                  maxLength={communityLinksConfig.instagramUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.redditUsername.icon}
-                <TextField
-                  value={redditUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setRedditUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.redditUsername.prefix}
-                    </Text>
-                  }
-                  maxLength={communityLinksConfig.redditUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.snapchatUsername.icon}
-                <TextField
-                  value={snapchatUsername}
-                  fullWidth
-                  translatableHintText={t`username`}
-                  onChange={(e, value) => {
-                    setSnapchatUsername(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  startAdornment={
-                    <Text noMargin>
-                      {communityLinksConfig.snapchatUsername.prefix}
-                    </Text>
-                  }
-                  maxLength={communityLinksConfig.snapchatUsername.maxLength}
-                />
-              </LineStackLayout>
-              <LineStackLayout noMargin alignItems="center">
-                {communityLinksConfig.discordServerLink.icon}
-                <TextField
-                  value={discordServerLink}
-                  fullWidth
-                  translatableHintText={t`Discord server, e.g: https://discord.gg/...`}
-                  onChange={(e, value) => {
-                    setDiscordServerLink(value);
-                  }}
-                  disabled={updateProfileInProgress}
-                  errorText={discordServerLinkError}
-                  maxLength={communityLinksConfig.discordServerLink.maxLength}
-                />
-              </LineStackLayout>
+              <CommunityLinkLine
+                id="personalWebsiteLink"
+                value={personalWebsiteLink}
+                translatableHintText={t`Personal website, itch.io page, etc.`}
+                onChange={(e, value) => {
+                  setPersonalWebsiteLink(value);
+                }}
+                disabled={updateProfileInProgress}
+                errorText={personalWebsiteError}
+              />
+              <CommunityLinkLine
+                id="personalWebsite2Link"
+                value={personalWebsite2Link}
+                translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
+                onChange={(e, value) => {
+                  setPersonalWebsite2Link(value);
+                }}
+                disabled={updateProfileInProgress}
+                errorText={personalWebsite2Error}
+              />
+              <CommunityLinkLine
+                id="twitterUsername"
+                value={twitterUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setTwitterUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="facebookUsername"
+                value={facebookUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setFacebookUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="youtubeUsername"
+                value={youtubeUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setYoutubeUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="tiktokUsername"
+                value={tiktokUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setTiktokUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+                errorText={tiktokUsernameError}
+              />
+              <CommunityLinkLine
+                id="instagramUsername"
+                value={instagramUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setInstagramUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="redditUsername"
+                value={redditUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setRedditUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="snapchatUsername"
+                value={snapchatUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setSnapchatUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="discordServerLink"
+                value={discordServerLink}
+                translatableHintText={t`Discord server, e.g: https://discord.gg/...`}
+                onChange={(e, value) => {
+                  setDiscordServerLink(value);
+                }}
+                disabled={updateProfileInProgress}
+                errorText={discordServerLinkError}
+              />
               <TextField
                 value={donateLink}
                 floatingLabelText={<Trans>Donate link</Trans>}

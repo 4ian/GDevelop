@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import AlertMessage from '../UI/AlertMessage';
@@ -10,6 +11,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
 import Window from '../Utils/Window';
 import { AnnouncementsFeedContext } from './AnnouncementsFeedContext';
+import { type Announcement } from '../Utils/GDevelopServices/Announcement';
 import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
@@ -56,6 +58,46 @@ export const AnnouncementsFeed = ({
 
   if (!displayedAnnouncements.length) return null;
 
+  const getAnnouncementContent = (
+    i18n: I18nType,
+    announcement: Announcement
+  ): {|
+    title: string,
+    message: string,
+    isMarkdownImageOnly?: boolean,
+  |} => {
+    const title = selectMessageByLocale(i18n, announcement.titleByLocale);
+    const message = selectMessageByLocale(
+      i18n,
+      announcement.markdownMessageByLocale
+    );
+
+    if (!title) {
+      const markdownClickableImageRegex = /\[!\[(?<alt>[^\][]*)\]\((?<imageSource>[^\s]*)\)\]\((?<linkHref>[^\s]*)\)/;
+      let matches = message.match(markdownClickableImageRegex);
+      if (
+        matches &&
+        matches.groups &&
+        matches.groups.alt &&
+        matches.groups.imageSource &&
+        matches.groups.linkHref
+      ) {
+        return { title, message, isMarkdownImageOnly: true };
+      }
+      const markdownImageRegex = /!\[(?<alt>[^\][]*)\]\((?<imageSource>[^\s]*)\)/;
+      matches = message.match(markdownImageRegex);
+      if (
+        matches &&
+        matches.groups &&
+        matches.groups.alt &&
+        matches.groups.imageSource
+      ) {
+        return { title, message, isMarkdownImageOnly: true };
+      }
+    }
+    return { title, message };
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -63,6 +105,10 @@ export const AnnouncementsFeed = ({
           <ColumnStackLayout noMargin={!addMargins} expand>
             {displayedAnnouncements.map(announcement => {
               const { buttonLabelByLocale, buttonUrl } = announcement;
+              const { title, message, isMarkdownImageOnly } = getAnnouncementContent(
+                i18n,
+                announcement
+              );
 
               return (
                 <AlertMessage
@@ -89,17 +135,10 @@ export const AnnouncementsFeed = ({
                   }
                   hideButtonSize="small"
                   key={announcement.id}
+                  markdownImageOnly={isMarkdownImageOnly}
                 >
-                  <Text size="block-title">
-                    {selectMessageByLocale(i18n, announcement.titleByLocale)}
-                  </Text>
-                  <MarkdownText
-                    source={selectMessageByLocale(
-                      i18n,
-                      announcement.markdownMessageByLocale
-                    )}
-                    allowParagraphs={false}
-                  />
+                  {title ? <Text size="block-title">{title}</Text> : null}
+                  <MarkdownText source={message} allowParagraphs={false} />
                 </AlertMessage>
               );
             })}

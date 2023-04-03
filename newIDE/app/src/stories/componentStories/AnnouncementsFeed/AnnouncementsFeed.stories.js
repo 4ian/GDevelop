@@ -29,6 +29,20 @@ export const Default = () => {
   );
 };
 
+export const WithClosableItems = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        error: null,
+        fetchAnnouncements: action('fetchAnnouncements'),
+      }}
+    >
+      <AnnouncementsFeed canClose/>
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
 export const ErrorLoadingAnnouncements = () => {
   return (
     <AnnouncementsFeedContext.Provider

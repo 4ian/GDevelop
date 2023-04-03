@@ -42,20 +42,53 @@ module.exports = {
       propertyName,
       newValue
     ) {
+      if (propertyName in objectContent) {
+        if (typeof objectContent[propertyName] === 'boolean')
+          objectContent[propertyName] = newValue === '1';
+        else if (typeof objectContent[propertyName] === 'number')
+          objectContent[propertyName] = parseFloat(newValue);
+        else objectContent[propertyName] = newValue;
+        return true;
+      }
+
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating an object
     threeDShapeObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
+      objectProperties
+        .getOrCreate('width')
+        .setValue(objectContent.width)
+        .setType('number')
+        .setLabel(_('Width'))
+        .setGroup(_('Default size'));
+
+      objectProperties
+        .getOrCreate('height')
+        .setValue(objectContent.height)
+        .setType('number')
+        .setLabel(_('Height'))
+        .setGroup(_('Default size'));
+
+      objectProperties
+        .getOrCreate('depth')
+        .setValue(objectContent.depth)
+        .setType('number')
+        .setLabel(_('Depth'))
+        .setGroup(_('Default size'));
+
       return objectProperties;
     };
     threeDShapeObject.setRawJSONContent(
       JSON.stringify({
+        width: 100,
+        height: 100,
+        depth: 100,
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
+    // $FlowExpectedError
     threeDShapeObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -64,9 +97,24 @@ module.exports = {
       project,
       layout
     ) {
+      if (propertyName === 'z') {
+        instance.setRawDoubleProperty('z', parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'rotationX') {
+        instance.setRawDoubleProperty('rotationX', parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'rotationY') {
+        instance.setRawDoubleProperty('rotationY', parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'depth') {
+        instance.setRawDoubleProperty('depth', parseFloat(newValue));
+        return true;
+      }
+
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
+
+    // $FlowExpectedError
     threeDShapeObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -74,6 +122,24 @@ module.exports = {
       layout
     ) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
+
+      instanceProperties
+        .getOrCreate('z')
+        .setValue(instance.getRawDoubleProperty('z').toString())
+        .setType('number')
+        .setLabel(_('Z (elevation)'));
+
+      instanceProperties
+        .getOrCreate('rotationX')
+        .setValue(instance.getRawDoubleProperty('rotationX').toString())
+        .setType('number')
+        .setLabel(_('Rotation on X axis'));
+
+      instanceProperties
+        .getOrCreate('rotationY')
+        .setValue(instance.getRawDoubleProperty('rotationY').toString())
+        .setType('number')
+        .setLabel(_('Rotation on Y axis'));
 
       return instanceProperties;
     };
@@ -95,6 +161,66 @@ module.exports = {
       );
 
     // Properties expressions/conditions/actions:
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Z',
+        _('Z (elevation)'),
+        _('the Z position (the "elevation")'),
+        _('the Z position'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setZ')
+      .setGetter('getZ');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Depth',
+        _('Depth (size on Z axis)'),
+        _('the depth (size on Z axis)'),
+        _('the depth'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setDepth')
+      .setGetter('getDepth');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'RotationX',
+        _('Rotation on X axis'),
+        _('the rotation on X axis'),
+        _('the rotation on X axis'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setRotationX')
+      .setGetter('getRotationX');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'RotationY',
+        _('Rotation on Y axis'),
+        _('the rotation on Y axis'),
+        _('the rotation on Y axis'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setRotationY')
+      .setGetter('getRotationY');
+
     return extension;
   },
   /**

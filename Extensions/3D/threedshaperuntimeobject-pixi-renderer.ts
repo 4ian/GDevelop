@@ -23,30 +23,37 @@ namespace gdjs {
       );
 
       this.updateSize();
+      this.updatePosition();
+      this.updateRotation();
       instanceContainer.getRenderer().get3dRendererObject().add(this._box);
     }
 
-    updatePreRender() {
-      // TODO: do this on demand
+    updatePosition() {
       this._box.position.set(
         this._object.x + this._object.getWidth() / 2,
         this._object.y + this._object.getHeight() / 2,
-        this._object.z
+        this._object.getZ() + this._object.getDepth() / 2
       );
-      this._box.rotation.set(0, 0, gdjs.toRad(this._object.angle));
+    }
+
+    updateRotation() {
+      this._box.rotation.set(
+        gdjs.toRad(this._object.getRotationX()),
+        gdjs.toRad(this._object.getRotationY()),
+        gdjs.toRad(this._object.angle)
+      );
     }
 
     updateSize() {
       this._box.scale.set(
         this._object.getWidth(),
         this._object.getHeight(),
-        100
+        this._object.getDepth()
       );
     }
 
     onDestroy() {
-      // TODO: dispose the geometry and mesh.
-      // TODO: Move to onDestroyFromScene??
+      // TODO: Move to onDestroyFromScene?
       this._instanceContainer
         .getRenderer()
         .get3dRendererObject()

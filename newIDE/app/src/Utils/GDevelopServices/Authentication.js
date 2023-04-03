@@ -15,6 +15,7 @@ import {
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { type CommunityLinks } from './User';
 
 export type Profile = {|
   id: string,
@@ -29,6 +30,7 @@ export type Profile = {|
   isCreator: boolean,
   isPlayer: boolean,
   donateLink: ?string,
+  communityLinks?: CommunityLinks,
 
   gdevelopUsage?: string,
   teamOrCompanySize?: string,
@@ -66,9 +68,10 @@ export type AdditionalUserInfoForm = {|
 export type EditForm = {|
   username: string,
   description: string,
-  donateLink: string,
   getGameStatsEmail: boolean,
   getNewsletterEmail: boolean,
+  donateLink: string,
+  communityLinks: CommunityLinks,
 |};
 
 export type ChangeEmailForm = {|
@@ -309,6 +312,7 @@ export default class Authentication {
       appLanguage,
       isCreator,
       donateLink,
+      communityLinks,
       gdevelopUsage,
       teamOrCompanySize,
       companyName,
@@ -323,6 +327,7 @@ export default class Authentication {
       appLanguage?: string,
       isCreator?: boolean,
       donateLink?: string,
+      communityLinks?: CommunityLinks,
       gdevelopUsage?: string,
       teamOrCompanySize?: string,
       companyName?: string,
@@ -347,6 +352,7 @@ export default class Authentication {
             appLanguage,
             isCreator,
             donateLink,
+            communityLinks,
             gdevelopUsage,
             teamOrCompanySize,
             companyName,

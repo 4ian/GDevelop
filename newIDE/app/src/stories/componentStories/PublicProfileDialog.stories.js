@@ -18,6 +18,7 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   username: null,
   description: null,
   donateLink: null,
+  communityLinks: {},
 };
 
 export default {

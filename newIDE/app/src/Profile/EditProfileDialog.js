@@ -1,7 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 
-import React from 'react';
+import * as React from 'react';
 import { I18n } from '@lingui/react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -10,9 +10,14 @@ import {
   type AuthError,
   type Profile,
 } from '../Utils/GDevelopServices/Authentication';
-import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
+import {
+  communityLinksConfig,
+  donateLinkConfig,
+  type UsernameAvailability,
+  type CommunityLinkType,
+} from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import {
   isUsernameValid,
   UsernameField,
@@ -21,6 +26,7 @@ import {
 } from './UsernameField';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
+import Text from '../UI/Text';
 
 type Props = {|
   profile: Profile,
@@ -40,10 +46,43 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   return undefined;
 };
 
-const simpleUrlRegex = /^https:\/\/[^ ]+$/;
-const donateLinkFormattingErrorMessage = (
-  <Trans>Please enter a valid URL, starting with https://</Trans>
-);
+const CommunityLinkLine = ({
+  id,
+  value,
+  onChange,
+  disabled,
+  translatableHintText,
+}: {|
+  id: CommunityLinkType,
+  value: string,
+  onChange: (e: any, value: string) => void,
+  disabled: boolean,
+  translatableHintText?: string,
+|}) => {
+  const config = communityLinksConfig[id];
+
+  return (
+    <LineStackLayout noMargin alignItems="center">
+      {config.icon}
+      <TextField
+        value={value}
+        fullWidth
+        translatableHintText={translatableHintText}
+        onChange={onChange}
+        disabled={disabled}
+        errorText={
+          config.getFormattingError
+            ? config.getFormattingError(value)
+            : undefined
+        }
+        maxLength={config.maxLength}
+        startAdornment={
+          config.prefix ? <Text noMargin>{config.prefix}</Text> : undefined
+        }
+      />
+    </LineStackLayout>
+  );
+};
 
 const EditProfileDialog = ({
   profile,
@@ -52,11 +91,42 @@ const EditProfileDialog = ({
   updateProfileInProgress,
   error,
 }: Props) => {
+  const communityLinks = profile.communityLinks || {};
   const [username, setUsername] = React.useState(profile.username || '');
   const [description, setDescription] = React.useState(
     profile.description || ''
   );
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
+  const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
+    communityLinks.personalWebsiteLink || ''
+  );
+  const [personalWebsite2Link, setPersonalWebsite2Link] = React.useState(
+    communityLinks.personalWebsite2Link || ''
+  );
+  const [twitterUsername, setTwitterUsername] = React.useState(
+    communityLinks.twitterUsername || ''
+  );
+  const [facebookUsername, setFacebookUsername] = React.useState(
+    communityLinks.facebookUsername || ''
+  );
+  const [youtubeUsername, setYoutubeUsername] = React.useState(
+    communityLinks.youtubeUsername || ''
+  );
+  const [tiktokUsername, setTiktokUsername] = React.useState(
+    communityLinks.tiktokUsername || ''
+  );
+  const [instagramUsername, setInstagramUsername] = React.useState(
+    communityLinks.instagramUsername || ''
+  );
+  const [redditUsername, setRedditUsername] = React.useState(
+    communityLinks.redditUsername || ''
+  );
+  const [snapchatUsername, setSnapchatUsername] = React.useState(
+    communityLinks.snapchatUsername || ''
+  );
+  const [discordServerLink, setDiscordServerLink] = React.useState(
+    communityLinks.discordServerLink || ''
+  );
   const [getGameStatsEmail, setGetGameStatsEmail] = React.useState(
     !!profile.getGameStatsEmail
   );
@@ -72,16 +142,33 @@ const EditProfileDialog = ({
     setIsValidatingUsername,
   ] = React.useState<boolean>(false);
 
+  const personalWebsiteError = communityLinksConfig.personalWebsiteLink.getFormattingError(
+    personalWebsiteLink
+  );
+  const personalWebsite2Error = communityLinksConfig.personalWebsite2Link.getFormattingError(
+    personalWebsite2Link
+  );
+  const discordServerLinkError = communityLinksConfig.discordServerLink.getFormattingError(
+    discordServerLink
+  );
+  const donateLinkError = donateLinkConfig.getFormattingError(donateLink);
+  const tiktokUsernameError = communityLinksConfig.tiktokUsername.getFormattingError(
+    tiktokUsername
+  );
+
+  const hasFormattingError =
+    personalWebsiteError ||
+    personalWebsite2Error ||
+    discordServerLinkError ||
+    donateLinkError ||
+    tiktokUsernameError;
+
   const canEdit =
     !updateProfileInProgress &&
     isUsernameValid(username, { allowEmpty: false }) &&
     !isValidatingUsername &&
-    (!usernameAvailability || usernameAvailability.isAvailable);
-
-  const donateLinkFormattingError =
-    !!donateLink && !simpleUrlRegex.test(donateLink)
-      ? donateLinkFormattingErrorMessage
-      : undefined;
+    (!usernameAvailability || usernameAvailability.isAvailable) &&
+    !hasFormattingError;
 
   const edit = () => {
     if (!canEdit) return;
@@ -91,6 +178,18 @@ const EditProfileDialog = ({
       getGameStatsEmail,
       getNewsletterEmail,
       donateLink,
+      communityLinks: {
+        personalWebsiteLink,
+        personalWebsite2Link,
+        twitterUsername,
+        facebookUsername,
+        youtubeUsername,
+        tiktokUsername,
+        instagramUsername,
+        redditUsername,
+        snapchatUsername,
+        discordServerLink,
+      },
     });
   };
 
@@ -160,6 +259,96 @@ const EditProfileDialog = ({
                 disabled={updateProfileInProgress}
                 floatingLabelFixed
               />
+              <CommunityLinkLine
+                id="personalWebsiteLink"
+                value={personalWebsiteLink}
+                translatableHintText={t`Personal website, itch.io page, etc.`}
+                onChange={(e, value) => {
+                  setPersonalWebsiteLink(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="personalWebsite2Link"
+                value={personalWebsite2Link}
+                translatableHintText={t`Another personal website, newgrounds.com page, etc.`}
+                onChange={(e, value) => {
+                  setPersonalWebsite2Link(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="twitterUsername"
+                value={twitterUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setTwitterUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="facebookUsername"
+                value={facebookUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setFacebookUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="youtubeUsername"
+                value={youtubeUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setYoutubeUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="tiktokUsername"
+                value={tiktokUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setTiktokUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="instagramUsername"
+                value={instagramUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setInstagramUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="redditUsername"
+                value={redditUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setRedditUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="snapchatUsername"
+                value={snapchatUsername}
+                translatableHintText={t`username`}
+                onChange={(e, value) => {
+                  setSnapchatUsername(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
+              <CommunityLinkLine
+                id="discordServerLink"
+                value={discordServerLink}
+                translatableHintText={t`Discord server, e.g: https://discord.gg/...`}
+                onChange={(e, value) => {
+                  setDiscordServerLink(value);
+                }}
+                disabled={updateProfileInProgress}
+              />
               <TextField
                 value={donateLink}
                 floatingLabelText={<Trans>Donate link</Trans>}
@@ -173,7 +362,8 @@ const EditProfileDialog = ({
                 helperMarkdownText={i18n._(
                   t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
                 )}
-                errorText={donateLinkFormattingError}
+                errorText={donateLinkError}
+                maxLength={donateLinkConfig.maxLength}
               />
               <Checkbox
                 label={<Trans>I want to receive the GDevelop Newsletter</Trans>}

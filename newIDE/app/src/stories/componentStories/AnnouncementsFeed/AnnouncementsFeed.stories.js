@@ -38,7 +38,7 @@ export const WithClosableItems = () => {
         fetchAnnouncements: action('fetchAnnouncements'),
       }}
     >
-      <AnnouncementsFeed canClose/>
+      <AnnouncementsFeed canClose />
     </AnnouncementsFeedContext.Provider>
   );
 };

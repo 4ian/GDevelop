@@ -105,10 +105,11 @@ export const AnnouncementsFeed = ({
           <ColumnStackLayout noMargin={!addMargins} expand>
             {displayedAnnouncements.map(announcement => {
               const { buttonLabelByLocale, buttonUrl } = announcement;
-              const { title, message, isMarkdownImageOnly } = getAnnouncementContent(
-                i18n,
-                announcement
-              );
+              const {
+                title,
+                message,
+                isMarkdownImageOnly,
+              } = getAnnouncementContent(i18n, announcement);
 
               return (
                 <AlertMessage

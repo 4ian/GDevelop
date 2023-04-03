@@ -50,14 +50,12 @@ const CommunityLinkLine = ({
   id,
   value,
   onChange,
-  errorText,
   disabled,
   translatableHintText,
 }: {|
   id: CommunityLinkType,
   value: string,
   onChange: (e: any, value: string) => void,
-  errorText?: React.Node,
   disabled: boolean,
   translatableHintText?: string,
 |}) => {
@@ -72,7 +70,11 @@ const CommunityLinkLine = ({
         translatableHintText={translatableHintText}
         onChange={onChange}
         disabled={disabled}
-        errorText={errorText}
+        errorText={
+          config.getFormattingError
+            ? config.getFormattingError(value)
+            : undefined
+        }
         maxLength={config.maxLength}
         startAdornment={
           config.prefix ? <Text noMargin>{config.prefix}</Text> : undefined
@@ -265,7 +267,6 @@ const EditProfileDialog = ({
                   setPersonalWebsiteLink(value);
                 }}
                 disabled={updateProfileInProgress}
-                errorText={personalWebsiteError}
               />
               <CommunityLinkLine
                 id="personalWebsite2Link"
@@ -275,7 +276,6 @@ const EditProfileDialog = ({
                   setPersonalWebsite2Link(value);
                 }}
                 disabled={updateProfileInProgress}
-                errorText={personalWebsite2Error}
               />
               <CommunityLinkLine
                 id="twitterUsername"
@@ -312,7 +312,6 @@ const EditProfileDialog = ({
                   setTiktokUsername(value);
                 }}
                 disabled={updateProfileInProgress}
-                errorText={tiktokUsernameError}
               />
               <CommunityLinkLine
                 id="instagramUsername"
@@ -349,7 +348,6 @@ const EditProfileDialog = ({
                   setDiscordServerLink(value);
                 }}
                 disabled={updateProfileInProgress}
-                errorText={discordServerLinkError}
               />
               <TextField
                 value={donateLink}

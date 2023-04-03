@@ -72,25 +72,31 @@ namespace gdjs {
         runtimeGame.getGameResolutionHeight() / 2,
         0
       );
+      this._threePlaneMesh.scale.y = -1; // Mirrored because the scene is mirrored on Y axis, see below.
       this._threePlaneMesh.renderOrder = 99999; // Ensure the plane is rendered last so it blends with 3D objects
 
       if (!this._threeScene) this._threeScene = new THREE.Scene();
       if (!this._threeCamera)
         this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
 
+      // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
       const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
       const cameraDistance =
         (0.5 * runtimeGame.getGameResolutionHeight()) /
         Math.tan(0.5 * cameraFovInRadians);
       this._threeCamera.position.set(
         runtimeGame.getGameResolutionWidth() / 2,
-        runtimeGame.getGameResolutionHeight() / 2,
+        - runtimeGame.getGameResolutionHeight() / 2, // Minus because the scene is mirrored on Y axis, see below.
         cameraDistance
       );
       this._threeCamera.aspect =
         runtimeGame.getGameResolutionWidth() /
         runtimeGame.getGameResolutionHeight();
       this._threeCamera.updateProjectionMatrix();
+
+      // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+      // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+      this._threeScene.scale.y = -1;
 
       this._threeScene.add(this._threePlaneMesh);
     }

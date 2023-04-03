@@ -13,33 +13,49 @@ namespace gdjs {
       this._runtimeGame = instanceContainer.getGame();
       this._instanceContainer = instanceContainer;
 
-      const geometry = new THREE.BoxGeometry(100, 100, 100);
-      geometry.computeBoundingBox();
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
       this._box = new THREE.Mesh(
         geometry,
         new THREE.MeshBasicMaterial({
-          map: this._runtimeGame
-            .getImageManager()
-            .getTHREETexture('Wood.png'),
+          map: this._runtimeGame.getImageManager().getTHREETexture('Wood.png'),
           side: THREE.DoubleSide,
         })
       );
 
+      this.updateSize();
       instanceContainer.getRenderer().get3dRendererObject().add(this._box);
     }
 
     updatePreRender() {
-      this._box.position.set(this._object.x, this._object.y, this._object.z);
+      // TODO: do this on demand
+      this._box.position.set(
+        this._object.x + this._object.getWidth() / 2,
+        this._object.y + this._object.getHeight() / 2,
+        this._object.z
+      );
       this._box.rotation.set(0, 0, gdjs.toRad(this._object.angle));
+    }
+
+    updateSize() {
+      this._box.scale.set(
+        this._object.getWidth(),
+        this._object.getHeight(),
+        100
+      );
     }
 
     onDestroy() {
       // TODO: dispose the geometry and mesh.
       // TODO: Move to onDestroyFromScene??
-      this._instanceContainer.getRenderer().get3dRendererObject().remove(this._box);
+      this._instanceContainer
+        .getRenderer()
+        .get3dRendererObject()
+        .remove(this._box);
     }
   }
 
-  export const ThreeDShapeRuntimeObjectRenderer = ThreeDShapeRuntimeObjectPixiRenderer;
-  export type ThreeDShapeRuntimeObjectRenderer = ThreeDShapeRuntimeObjectPixiRenderer;
+  export const ThreeDShapeRuntimeObjectRenderer =
+    ThreeDShapeRuntimeObjectPixiRenderer;
+  export type ThreeDShapeRuntimeObjectRenderer =
+    ThreeDShapeRuntimeObjectPixiRenderer;
 }

@@ -30,6 +30,7 @@ namespace gdjs {
 
     _pixiRenderer: PIXI.Renderer | null = null;
     _threeRenderer: THREE.WebGLRenderer | null = null;
+    _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
@@ -89,6 +90,7 @@ namespace gdjs {
 
       // Add the renderer view element to the DOM
       parentElement.appendChild(gameCanvas);
+      this._gameCanvas = gameCanvas;
 
       gameCanvas.style.position = 'absolute';
 
@@ -133,12 +135,12 @@ namespace gdjs {
 
       // Handle scale mode.
       if (this._game.getScaleMode() === 'nearest') {
-        this._pixiRenderer.view.style['image-rendering'] = '-moz-crisp-edges';
-        this._pixiRenderer.view.style['image-rendering'] =
+        gameCanvas.style['image-rendering'] = '-moz-crisp-edges';
+        gameCanvas.style['image-rendering'] =
           '-webkit-optimize-contrast';
-        this._pixiRenderer.view.style['image-rendering'] =
+        gameCanvas.style['image-rendering'] =
           '-webkit-crisp-edges';
-        this._pixiRenderer.view.style['image-rendering'] = 'pixelated';
+        gameCanvas.style['image-rendering'] = 'pixelated';
       }
 
       // Handle pixels rounding.
@@ -266,12 +268,14 @@ namespace gdjs {
       }
 
       // Apply the calculations to the canvas element...
-      this._pixiRenderer.view.style.top =
-        this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
-      this._pixiRenderer.view.style.left =
-        this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
-      this._pixiRenderer.view.style.width = canvasWidth + 'px';
-      this._pixiRenderer.view.style.height = canvasHeight + 'px';
+      if (this._gameCanvas) {
+        this._gameCanvas.style.top =
+          this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
+        this._gameCanvas.style.left =
+          this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
+        this._gameCanvas.style.width = canvasWidth + 'px';
+        this._gameCanvas.style.height = canvasHeight + 'px';
+      }
 
       // ...and to the div on top of it showing DOM elements (like inputs).
       this._domElementsContainer.style.top =
@@ -467,34 +471,31 @@ namespace gdjs {
       window: Window,
       document: Document
     ) {
-      const renderer = this._pixiRenderer;
-      if (!renderer) return;
-      const canvas = renderer.view;
+      const canvas = this._gameCanvas;
+      if (!canvas) return;
 
       //Translate an event (mouse or touch) made on the canvas on the page
       //to game coordinates.
-      const that = this;
-
-      function getEventPosition(e: MouseEvent | Touch) {
+      const getEventPosition = (e: MouseEvent | Touch) => {
         const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
 
         // Handle the fact that the game is stretched to fill the canvas.
         pos[0] *=
-          that._game.getGameResolutionWidth() / (that._canvasWidth || 1);
+          this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
         pos[1] *=
-          that._game.getGameResolutionHeight() / (that._canvasHeight || 1);
+          this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
         return pos;
       }
 
-      function isInsideCanvas(e: MouseEvent | Touch) {
+      const isInsideCanvas = (e: MouseEvent | Touch) => {
         const x = e.pageX - canvas.offsetLeft;
         const y = e.pageY - canvas.offsetTop;
 
         return (
           0 <= x &&
-          x < (that._canvasWidth || 1) &&
+          x < (this._canvasWidth || 1) &&
           0 <= y &&
-          y < (that._canvasHeight || 1)
+          y < (this._canvasHeight || 1)
         );
       }
 
@@ -848,10 +849,8 @@ namespace gdjs {
     /**
      * Get the canvas DOM element.
      */
-    getCanvas() {
-      // TODO: replace by PIXI or three canvas.
-      // @ts-ignore
-      return this._pixiRenderer.view;
+    getCanvas(): HTMLCanvasElement | null {
+      return this._gameCanvas;
     }
 
     /**

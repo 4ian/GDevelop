@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -46,6 +48,14 @@ export type FileMetadataAndStorageProviderName = {
   fileMetadata: FileMetadata,
   storageProviderName: string,
 };
+
+export type ResourcesActionsProps = {|
+  project: gdProject,
+  resource: gdResource,
+  i18n: I18nType,
+  updateInterface: () => void,
+  cleanUserSelectionOfResources: () => void,
+|};
 
 /**
  * Interface returned by a storage provider to manipulate files.
@@ -145,4 +155,5 @@ export type StorageProvider = {|
     closeDialog: () => void,
     authenticatedUser: AuthenticatedUser,
   }) => StorageProviderOperations,
+  getResourceActions?: ResourcesActionsProps => Array<MenuItemTemplate>,
 |};

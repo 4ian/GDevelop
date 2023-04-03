@@ -206,6 +206,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   render() {
     const { project, onRenameResource, resourceManagementProps } = this.props;
     const { selectedResource } = this.state;
+    const storageProvider = resourceManagementProps.getStorageProvider();
 
     const editors = {
       properties: {
@@ -244,6 +245,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onRemoveAllResourcesWithInvalidPath={
               this._removeAllResourcesWithInvalidPath
             }
+            getResourceActionsSpecificToStorageProvider={storageProvider.getResourceActions}
           />
         ),
       },

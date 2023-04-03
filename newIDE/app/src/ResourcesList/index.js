@@ -10,11 +10,7 @@ import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
-import { mapVector } from '../Utils/MapFor';
-import optionalRequire from '../Utils/OptionalRequire';
 import {
-  applyResourceDefaults,
-  getLocalResourceFullPath,
   getResourceFilePathStatus,
 } from './ResourceUtils';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
@@ -22,17 +18,8 @@ import {
   type ResourceKind,
   allResourceKindsAndMetadata,
 } from './ResourceSource';
-import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 import ResourcesLoader from '../ResourcesLoader';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import { Column, Line } from '../UI/Grid';
-
-const lazyRequireGlob = optionalLazyRequire('glob');
-const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const hasElectron = electron ? true : false;
-
-const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
@@ -60,6 +47,7 @@ type Props = {|
   ) => void,
   onRemoveUnusedResources: ResourceKind => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
+  getResourceActionsSpecificToStorageProvider?: any => Array<MenuItemTemplate>,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
@@ -95,84 +83,6 @@ export default class ResourcesList extends React.Component<Props, State> {
 
   _deleteResource = (resource: gdResource) => {
     this.props.onDeleteResource(resource);
-  };
-
-  _locateResourceFile = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(
-      this.props.project,
-      resource.getName()
-    );
-    electron.shell.showItemInFolder(path.resolve(resourceFilePath));
-  };
-
-  _openResourceFile = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(
-      this.props.project,
-      resource.getName()
-    );
-    electron.shell.openPath(path.resolve(resourceFilePath));
-  };
-
-  _copyResourceFilePath = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(
-      this.props.project,
-      resource.getName()
-    );
-    electron.clipboard.writeText(path.resolve(resourceFilePath));
-  };
-
-  _scanForNewResources = (
-    extensions: Array<string>,
-    createResource: () => gdResource
-  ) => {
-    const glob = lazyRequireGlob();
-    if (!glob) return;
-
-    const project = this.props.project;
-    const resourcesManager = project.getResourcesManager();
-    const projectPath = path.dirname(project.getProjectFile());
-
-    const allExtensions = [
-      ...extensions,
-      ...extensions.map(extension => extension.toUpperCase()),
-    ];
-    const getAllFiles = (src, callback) => {
-      glob(src + '/**/*.{' + allExtensions.join(',') + '}', callback);
-    };
-    getAllFiles(projectPath, (error, allFiles) => {
-      if (error) {
-        console.error(`Error finding files inside ${projectPath}:`, error);
-        return;
-      }
-
-      const filesToCheck = new gd.VectorString();
-      allFiles.forEach(filePath =>
-        filesToCheck.push_back(path.relative(projectPath, filePath))
-      );
-      const filePathsNotInResources = project
-        .getResourcesManager()
-        .findFilesNotInResources(filesToCheck);
-      filesToCheck.delete();
-
-      mapVector(filePathsNotInResources, (relativeFilePath: string) => {
-        const resourceName = newNameGenerator(relativeFilePath, name =>
-          resourcesManager.hasResource(name)
-        );
-
-        const resource = createResource();
-        resource.setFile(relativeFilePath);
-        resource.setName(resourceName);
-        applyResourceDefaults(project, resource);
-        resourcesManager.addResource(resource);
-        resource.delete();
-
-        console.info(
-          `"${relativeFilePath}" added to project as resource named "${resourceName}".`
-        );
-      });
-
-      this.forceUpdate();
-    });
   };
 
   _editName = (resource: ?gdResource) => {
@@ -256,7 +166,8 @@ export default class ResourcesList extends React.Component<Props, State> {
     resource: gdResource,
     _index: number
   ): Array<MenuItemTemplate> => {
-    return [
+    const { getResourceActionsSpecificToStorageProvider } = this.props;
+    let menu = [
       {
         label: i18n._(t`Rename`),
         click: () => this._editName(resource),
@@ -264,35 +175,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: i18n._(t`Delete`),
         click: () => this._deleteResource(resource),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Open File`),
-        click: () => this._openResourceFile(resource),
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Locate File`),
-        click: () => this._locateResourceFile(resource),
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Copy File Path`),
-        click: () => this._copyResourceFilePath(resource),
-        enabled: hasElectron,
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Scan in the project folder for...`),
-        submenu: allResourceKindsAndMetadata.map(
-          ({ displayName, fileExtensions, createNewResource }) => ({
-            label: i18n._(displayName),
-            click: () => {
-              this._scanForNewResources(fileExtensions, createNewResource);
-            },
-            enabled: hasElectron,
-          })
-        ),
       },
       { type: 'separator' },
       {
@@ -317,14 +199,21 @@ export default class ResourcesList extends React.Component<Props, State> {
             },
           ]),
       },
-      {
-        label: i18n._(t`Remove Resources with Invalid Path`),
-        click: () => {
-          this.props.onRemoveAllResourcesWithInvalidPath();
-        },
-        enabled: hasElectron,
-      },
     ];
+    if (getResourceActionsSpecificToStorageProvider) {
+      menu.push({ type: 'separator' });
+      menu = menu.concat(
+        getResourceActionsSpecificToStorageProvider({
+          project: this.props.project,
+          resource,
+          i18n,
+          updateInterface: () => this.forceUpdateList(),
+          cleanUserSelectionOfResources: () =>
+            this.props.onSelectResource(null),
+        })
+      );
+    }
+    return menu;
   };
 
   checkMissingPaths = () => {

@@ -16,7 +16,7 @@ import Info from './CustomSvgIcons/Info';
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
   topRightHideButton: { position: 'absolute', right: 0, top: 0 },
-  paper: { position: 'relative' },
+  paper: { position: 'relative', overflow: 'hidden' },
   content: { flex: 1 },
 };
 
@@ -27,6 +27,7 @@ type Props = {|
   hideButtonSize?: 'small',
   renderLeftIcon?: () => React.Node,
   renderRightButton?: ?() => React.Node,
+  markdownImageOnly?: boolean,
 |};
 
 /**
@@ -40,6 +41,7 @@ const AlertMessage = ({
   hideButtonSize,
   renderRightButton,
   renderLeftIcon,
+  markdownImageOnly,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const theme = useTheme();
@@ -47,6 +49,7 @@ const AlertMessage = ({
     position: string,
     borderColor?: string,
     backgroundColor?: string,
+    overflow: string,
   |} = {
     ...styles.paper,
   };
@@ -65,63 +68,67 @@ const AlertMessage = ({
 
   return (
     <Paper variant="outlined" style={paperStyle} background="dark">
-      <Line noMargin>
-        <Column expand>
-          <Line expand>
-            <ResponsiveLineStackLayout
-              alignItems="center"
-              justifyContent="space-between"
-              noMargin
-              expand
-            >
-              <Line noMargin alignItems="center">
-                {renderLeftIcon ? (
-                  <React.Fragment>
-                    {renderLeftIcon()}
-                    <Spacer />
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    {kind === 'info' && <Info style={styles.icon} />}
-                    {kind === 'warning' && (
-                      <WarningFilled
-                        style={{
-                          ...styles.icon,
-                          color: gdevelopTheme.message.warning,
-                        }}
-                      />
-                    )}
-                    {kind === 'error' && (
-                      <ErrorFilled
-                        style={{
-                          ...styles.icon,
-                          color: gdevelopTheme.message.error,
-                        }}
-                      />
-                    )}
-                  </React.Fragment>
-                )}
-                <Text style={styles.content}>{children}</Text>
-              </Line>
-              {renderRightButton && renderRightButton()}
-            </ResponsiveLineStackLayout>
-          </Line>
-        </Column>
-        {onHide && hideButtonSize === 'small' && (
-          <div style={styles.topRightHideButton}>
-            <IconButton aria-label="hide" onClick={() => onHide()} size="small">
-              <Cross fontSize="small" />
-            </IconButton>
-          </div>
-        )}
-        {onHide && !(hideButtonSize === 'small') && (
-          <div style={hideButtonContainerStyle}>
-            <IconButton onClick={onHide} color="default">
-              <Cross fontSize="small" />
-            </IconButton>
-          </div>
-        )}
-      </Line>
+      {markdownImageOnly ? (
+        children
+      ) : (
+        <Line noMargin>
+          <Column expand>
+            <Line expand>
+              <ResponsiveLineStackLayout
+                alignItems="center"
+                justifyContent="space-between"
+                noMargin
+                expand
+              >
+                <Line noMargin alignItems="center">
+                  {renderLeftIcon ? (
+                    <React.Fragment>
+                      {renderLeftIcon()}
+                      <Spacer />
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      {kind === 'info' && <Info style={styles.icon} />}
+                      {kind === 'warning' && (
+                        <WarningFilled
+                          style={{
+                            ...styles.icon,
+                            color: gdevelopTheme.message.warning,
+                          }}
+                        />
+                      )}
+                      {kind === 'error' && (
+                        <ErrorFilled
+                          style={{
+                            ...styles.icon,
+                            color: gdevelopTheme.message.error,
+                          }}
+                        />
+                      )}
+                    </React.Fragment>
+                  )}
+                  <Text style={styles.content}>{children}</Text>
+                </Line>
+                {renderRightButton && renderRightButton()}
+              </ResponsiveLineStackLayout>
+            </Line>
+          </Column>
+          {onHide && !(hideButtonSize === 'small') && (
+            <div style={hideButtonContainerStyle}>
+              <IconButton onClick={onHide} color="default">
+                <Cross fontSize="small" />
+              </IconButton>
+            </div>
+          )}
+        </Line>
+      )}
+      {onHide && hideButtonSize === 'small' && (
+        <div style={styles.topRightHideButton}>
+          <IconButton aria-label="hide" onClick={() => onHide()} size="small">
+            <Cross fontSize="small" />
+          </IconButton>
+        </div>
+      )}
     </Paper>
   );
 };

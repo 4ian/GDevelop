@@ -91,9 +91,7 @@ export const AnnouncementsFeed = ({
                   key={announcement.id}
                 >
                   <Text size="block-title">
-                    <Trans>
-                      {selectMessageByLocale(i18n, announcement.titleByLocale)}
-                    </Trans>
+                    {selectMessageByLocale(i18n, announcement.titleByLocale)}
                   </Text>
                   <MarkdownText
                     source={selectMessageByLocale(

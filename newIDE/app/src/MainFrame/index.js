@@ -99,6 +99,7 @@ import {
   type FileMetadata,
   type SaveAsLocation,
   type FileMetadataAndStorageProviderName,
+  type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -276,6 +277,7 @@ export type Props = {|
   getStorageProviderOperations: (
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
+  getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
   getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -453,6 +455,7 @@ const MainFrame = (props: Props) => {
     resourceMover,
     resourceFetcher,
     getStorageProviderOperations,
+    getStorageProviderResourceOperations,
     getStorageProvider,
     initialFileMetadataToOpen,
     i18n,
@@ -2893,6 +2896,7 @@ const MainFrame = (props: Props) => {
       resourceExternalEditors,
       getStorageProvider,
       onFetchNewlyAddedResources,
+      getStorageProviderResourceOperations,
     }),
     [
       resourceSources,
@@ -2900,6 +2904,7 @@ const MainFrame = (props: Props) => {
       resourceExternalEditors,
       getStorageProvider,
       onFetchNewlyAddedResources,
+      getStorageProviderResourceOperations,
     ]
   );
 

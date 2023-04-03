@@ -20,6 +20,7 @@ import {
 } from './ResourceSource';
 import ResourcesLoader from '../ResourcesLoader';
 import { Column, Line } from '../UI/Grid';
+import { type ResourcesActionsMenuBuilder } from '../ProjectsStorage';
 
 const styles = {
   listContainer: {
@@ -47,7 +48,7 @@ type Props = {|
   ) => void,
   onRemoveUnusedResources: ResourceKind => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
-  getResourceActionsSpecificToStorageProvider?: any => Array<MenuItemTemplate>,
+  getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {

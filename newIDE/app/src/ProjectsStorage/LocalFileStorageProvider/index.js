@@ -62,7 +62,7 @@ export default ({
     },
     getWriteErrorMessage,
   }),
-  getResourceActions: ({
+  createResourceOperations: () => ({
     project,
     resource,
     i18n,

@@ -57,6 +57,8 @@ export type ResourcesActionsProps = {|
   cleanUserSelectionOfResources: () => void,
 |};
 
+export type ResourcesActionsMenuBuilder = ResourcesActionsProps => Array<MenuItemTemplate>;
+
 /**
  * Interface returned by a storage provider to manipulate files.
  */
@@ -148,12 +150,14 @@ export type StorageProvider = {|
     setSaveAsLocation: (?SaveAsLocation) => void,
     newProjectsDefaultFolder?: string,
   |}) => React.Node,
-  createOperations: ({
+  createOperations: ({|
     /** Open a dialog (a render function) */
     setDialog: (() => React.Node) => void,
     /** Close the dialog */
     closeDialog: () => void,
     authenticatedUser: AuthenticatedUser,
-  }) => StorageProviderOperations,
-  getResourceActions?: ResourcesActionsProps => Array<MenuItemTemplate>,
+  |}) => StorageProviderOperations,
+  createResourceOperations?: ({|
+    authenticatedUser: AuthenticatedUser,
+  |}) => ResourcesActionsMenuBuilder,
 |};

@@ -1256,6 +1256,11 @@ size_t EventsCodeGenerator::GenerateSingleUsageUniqueIdFor(
 
 gd::String EventsCodeGenerator::GetObjectListName(
     const gd::String& name, const gd::EventsCodeGenerationContext& context) {
+  return GetObjectListNameWithoutNamespace(name, context);
+}
+
+gd::String EventsCodeGenerator::GetObjectListNameWithoutNamespace(
+    const gd::String& name, const gd::EventsCodeGenerationContext& context) {
   return ManObjListName(name);
 }
 

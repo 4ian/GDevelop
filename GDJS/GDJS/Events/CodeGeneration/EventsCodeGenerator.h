@@ -190,6 +190,12 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   virtual gd::String GetObjectListName(
       const gd::String& name, const gd::EventsCodeGenerationContext& context);
+      
+  /**
+   * \brief Get the list of objects full name without the namespace.
+   */
+  virtual gd::String GetObjectListNameWithoutNamespace(
+      const gd::String& name, const gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Get the namespace to be used to store code generated

@@ -435,6 +435,15 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GetObjectListName(
       const gd::String& name, const gd::EventsCodeGenerationContext& context);
+      
+  /**
+   * \brief Get the list of objects full name without the namespace.
+   *
+   * Default implementation simply returns the name mangled using
+   * gd::EventsCodeNameMangler.
+   */
+  virtual gd::String GetObjectListNameWithoutNamespace(
+      const gd::String& name, const gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate the code to notify the profiler of the beginning of a

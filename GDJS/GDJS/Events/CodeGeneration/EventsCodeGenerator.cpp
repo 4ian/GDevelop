@@ -945,7 +945,13 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
 
 gd::String EventsCodeGenerator::GetObjectListName(
     const gd::String& name, const gd::EventsCodeGenerationContext& context) {
-  return GetCodeNamespaceAccessor() + ManObjListName(name) +
+  return GetCodeNamespaceAccessor() +
+         GetObjectListNameWithoutNamespace(name, context);
+}
+
+gd::String EventsCodeGenerator::GetObjectListNameWithoutNamespace(
+    const gd::String& name, const gd::EventsCodeGenerationContext& context) {
+  return ManObjListName(name) +
          gd::String::From(context.GetLastDepthObjectListWasNeeded(name));
 }
 
@@ -1159,8 +1165,8 @@ gd::String EventsCodeGenerator::GenerateObject(
 
         // Map each declared object to its list.
         for (auto& objectName : declaredObjectNames) {
-          objectsMapName +=
-              ManObjListName(GetObjectListName(objectName, context));
+          objectsMapName += ManObjListName(
+              GetObjectListNameWithoutNamespace(objectName, context));
 
           if (!mapDeclaration.empty()) mapDeclaration += ", ";
           mapDeclaration += "\"" + ConvertToString(objectName) +

@@ -180,6 +180,7 @@ export function ClosableTab({
   return (
     <React.Fragment>
       <span
+        id={id}
         style={{
           flexShrink: 0, // Tabs are never resized to fit in flex container
           position: 'relative',

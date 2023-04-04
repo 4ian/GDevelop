@@ -8,8 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import ObjectEditorDialog from '../../../ObjectEditor/ObjectEditorDialog';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'ObjectEditor/ObjectEditorDialog',
@@ -27,13 +26,7 @@ export const CustomObject = () => (
     canRenameObject={name => true}
     project={testProject.project}
     layout={testProject.testLayout}
-    resourceManagementProps={{
-      getStorageProvider: () => emptyStorageProvider,
-      onFetchNewlyAddedResources: async () => {},
-      resourceSources: [],
-      onChooseResource: () => Promise.reject('Unimplemented'),
-      resourceExternalEditors: fakeResourceExternalEditors,
-    }}
+    resourceManagementProps={fakeResourceManagementProps}
     onComputeAllVariableNames={() => []}
     onUpdateBehaviorsSharedData={() => {}}
     initialTab={null}
@@ -56,13 +49,7 @@ export const StandardObject = () => (
     canRenameObject={name => true}
     project={testProject.project}
     layout={testProject.testLayout}
-    resourceManagementProps={{
-      getStorageProvider: () => emptyStorageProvider,
-      onFetchNewlyAddedResources: async () => {},
-      resourceSources: [],
-      onChooseResource: () => Promise.reject('Unimplemented'),
-      resourceExternalEditors: fakeResourceExternalEditors,
-    }}
+    resourceManagementProps={fakeResourceManagementProps}
     onComputeAllVariableNames={() => []}
     onUpdateBehaviorsSharedData={() => {}}
     initialTab={null}

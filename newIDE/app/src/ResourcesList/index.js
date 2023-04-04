@@ -10,9 +10,7 @@ import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
-import {
-  getResourceFilePathStatus,
-} from './ResourceUtils';
+import { getResourceFilePathStatus } from './ResourceUtils';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -22,6 +20,7 @@ import { type FileMetadata } from '../ProjectsStorage';
 import ResourcesLoader from '../ResourcesLoader';
 import { Column, Line } from '../UI/Grid';
 import { type ResourcesActionsMenuBuilder } from '../ProjectsStorage';
+import InfoBar from '../UI/Messages/InfoBar';
 
 const styles = {
   listContainer: {
@@ -35,6 +34,11 @@ type State = {|
   renamedResource: ?gdResource,
   searchText: string,
   resourcesWithErrors: { [string]: '' | 'error' | 'warning' },
+  infoBarContent: ?{|
+    message: React.Node,
+    actionLabel: React.Node,
+    onActionClick: () => void,
+  |},
 |};
 
 type Props = {|
@@ -59,6 +63,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     renamedResource: null,
     searchText: '',
     resourcesWithErrors: {},
+    infoBarContent: null,
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -71,7 +76,8 @@ export default class ResourcesList extends React.Component<Props, State> {
 
     if (
       this.state.renamedResource !== nextState.renamedResource ||
-      this.state.searchText !== nextState.searchText
+      this.state.searchText !== nextState.searchText ||
+      this.state.infoBarContent !== nextState.infoBarContent
     )
       return true;
 
@@ -169,7 +175,10 @@ export default class ResourcesList extends React.Component<Props, State> {
     resource: gdResource,
     _index: number
   ): Array<MenuItemTemplate> => {
-    const { getResourceActionsSpecificToStorageProvider, fileMetadata } = this.props;
+    const {
+      getResourceActionsSpecificToStorageProvider,
+      fileMetadata,
+    } = this.props;
     let menu = [
       {
         label: i18n._(t`Rename`),
@@ -211,6 +220,7 @@ export default class ResourcesList extends React.Component<Props, State> {
           fileMetadata,
           resource,
           i18n,
+          informUser: this.openInfoBar,
           updateInterface: () => this.forceUpdateList(),
           cleanUserSelectionOfResources: () =>
             this.props.onSelectResource(null),
@@ -235,13 +245,23 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.forceUpdateList();
   };
 
+  openInfoBar = (
+    infoBarContent: ?{|
+      message: React.Node,
+      actionLabel: React.Node,
+      onActionClick: () => void,
+    |}
+  ) => {
+    this.setState({ infoBarContent });
+  };
+
   componentDidMount() {
     this.checkMissingPaths();
   }
 
   render() {
     const { project, selectedResource, onSelectResource } = this.props;
-    const { searchText } = this.state;
+    const { searchText, infoBarContent } = this.state;
 
     const resourcesManager = project.getResourcesManager();
     const allResourcesList = resourcesManager
@@ -298,6 +318,14 @@ export default class ResourcesList extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
+        {!!infoBarContent && (
+          <InfoBar
+            duration={7000}
+            visible={!!infoBarContent}
+            hide={() => this.setState({ infoBarContent: null })}
+            {...infoBarContent}
+          />
+        )}
       </Background>
     );
   }

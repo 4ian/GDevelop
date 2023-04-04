@@ -54,6 +54,11 @@ export type ResourcesActionsProps = {|
   fileMetadata: FileMetadata,
   resource: gdResource,
   i18n: I18nType,
+  informUser: ?{|
+    message: React.Node,
+    actionLabel: React.Node,
+    onActionClick: () => void,
+  |} => void,
   updateInterface: () => void,
   cleanUserSelectionOfResources: () => void,
 |};

@@ -163,6 +163,8 @@ namespace gdjs {
         throw new Error(`Can't load texture for resource "${resourceName}" as it's not an image`);
       }
 
+      // TODO: reuse existing texture rather than re-creating it.
+
       const threeTexture = new THREE.Texture(image);
       threeTexture.magFilter = THREE.NearestFilter;
       threeTexture.minFilter = THREE.NearestFilter;

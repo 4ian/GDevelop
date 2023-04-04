@@ -1,4 +1,15 @@
 namespace gdjs {
+  let transparentMaterial: THREE.MeshBasicMaterial;
+  const getTransparentMaterial = () => {
+    if (!transparentMaterial)
+      transparentMaterial = new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+      });
+
+    return transparentMaterial;
+  };
+
   class ThreeDShapeRuntimeObjectPixiRenderer {
     private _object: gdjs.ThreeDShapeRuntimeObject;
     private _instanceContainer: gdjs.RuntimeInstanceContainer;
@@ -7,20 +18,68 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.ThreeDShapeRuntimeObject,
-      instanceContainer: gdjs.RuntimeInstanceContainer
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      objectData: ThreeDShapeObjectData
     ) {
       this._object = runtimeObject;
       this._runtimeGame = instanceContainer.getGame();
       this._instanceContainer = instanceContainer;
 
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      this._box = new THREE.Mesh(
-        geometry,
-        new THREE.MeshBasicMaterial({
-          map: this._runtimeGame.getImageManager().getTHREETexture('Wood.png'),
-          side: THREE.DoubleSide,
-        })
-      );
+      // TODO: support tiling of texture?
+      // TODO: investigate using MeshStandardMaterial.
+      // TODO: support color instead of texture?
+      const materials = [
+        objectData.content.rightFaceVisible
+          ? new THREE.MeshBasicMaterial({
+              map: this._runtimeGame
+                .getImageManager()
+                .getTHREETexture(objectData.content.rightFaceResourceName),
+              side: THREE.DoubleSide,
+            })
+          : getTransparentMaterial(),
+        objectData.content.leftFaceVisible
+          ? new THREE.MeshBasicMaterial({
+              map: this._runtimeGame
+                .getImageManager()
+                .getTHREETexture(objectData.content.leftFaceResourceName),
+              side: THREE.DoubleSide,
+            })
+          : getTransparentMaterial(),
+        objectData.content.bottomFaceVisible
+          ? new THREE.MeshBasicMaterial({
+              map: this._runtimeGame
+                .getImageManager()
+                .getTHREETexture(objectData.content.bottomFaceResourceName),
+              side: THREE.DoubleSide,
+            })
+          : getTransparentMaterial(),
+        objectData.content.topFaceVisible
+          ? new THREE.MeshBasicMaterial({
+              map: this._runtimeGame
+                .getImageManager()
+                .getTHREETexture(objectData.content.topFaceResourceName),
+              side: THREE.DoubleSide,
+            })
+          : getTransparentMaterial(),
+        objectData.content.frontFaceVisible
+          ? new THREE.MeshBasicMaterial({
+              map: this._runtimeGame
+                .getImageManager()
+                .getTHREETexture(objectData.content.frontFaceResourceName),
+              side: THREE.DoubleSide,
+            })
+          : getTransparentMaterial(),
+        objectData.content.backFaceVisible
+          ? new THREE.MeshBasicMaterial({
+              map: this._runtimeGame
+                .getImageManager()
+                .getTHREETexture(objectData.content.backFaceResourceName),
+              side: THREE.DoubleSide,
+            })
+          : getTransparentMaterial(),
+      ];
+      this._box = new THREE.Mesh(geometry, materials);
 
       this.updateSize();
       this.updatePosition();

@@ -73,7 +73,7 @@ namespace gdjs {
         0
       );
       this._threePlaneMesh.scale.y = -1; // Mirrored because the scene is mirrored on Y axis, see below.
-      this._threePlaneMesh.renderOrder = 99999; // Ensure the plane is rendered last so it blends with 3D objects
+      this._threePlaneMesh.renderOrder = -9999; // Ensure the plane is rendered last so it blends with 3D objects
 
       if (!this._threeScene) this._threeScene = new THREE.Scene();
       if (!this._threeCamera)

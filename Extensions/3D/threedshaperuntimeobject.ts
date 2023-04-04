@@ -6,6 +6,18 @@ namespace gdjs {
       width: float;
       height: float;
       depth: float;
+      frontFaceResourceName: string;
+      backFaceResourceName: string;
+      leftFaceResourceName: string;
+      rightFaceResourceName: string;
+      topFaceResourceName: string;
+      bottomFaceResourceName: string;
+      frontFaceVisible: boolean;
+      backFaceVisible: boolean;
+      leftFaceVisible: boolean;
+      rightFaceVisible: boolean;
+      topFaceVisible: boolean;
+      bottomFaceVisible: boolean;
     };
   }
 
@@ -30,7 +42,8 @@ namespace gdjs {
 
       this._renderer = new gdjs.ThreeDShapeRuntimeObjectRenderer(
         this,
-        instanceContainer
+        instanceContainer,
+        objectData
       );
       this._width = objectData.content.width || 100;
       this._height = objectData.content.height || 100;

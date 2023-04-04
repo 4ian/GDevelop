@@ -2382,11 +2382,10 @@ const MainFrame = (props: Props) => {
   };
 
   const endTutorial = React.useCallback(
-    (shouldCloseProject?: boolean) => {
+    async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
-        closeProject().then(() => {
-          doEndTutorial();
-        });
+        await closeProject();
+        doEndTutorial();
       } else {
         doEndTutorial();
       }
@@ -2779,7 +2778,8 @@ const MainFrame = (props: Props) => {
         }
       }
 
-      const initialStepIndex = userProgress && scenario === 'resume' ? 1 : 0;
+      const initialStepIndex =
+        userProgress && scenario === 'resume' ? userProgress.step : 0;
       const initialProjectData =
         userProgress && scenario === 'resume'
           ? userProgress.projectData
@@ -3418,7 +3418,9 @@ const MainFrame = (props: Props) => {
           canEndTutorial={
             !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
           }
-          endTutorial={() => endTutorial(true)}
+          endTutorial={() => {
+            endTutorial(true);
+          }}
         />
       )}
       <CustomDragLayer />

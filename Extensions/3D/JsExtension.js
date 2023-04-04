@@ -42,12 +42,8 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName in objectContent) {
-        if (typeof objectContent[propertyName] === 'boolean')
-          objectContent[propertyName] = newValue === '1';
-        else if (typeof objectContent[propertyName] === 'number')
-          objectContent[propertyName] = parseFloat(newValue);
-        else objectContent[propertyName] = newValue;
+      if (propertyName === 'width' || propertyName === 'height' || propertyName === 'depth') {
+        objectContent[propertyName] = parseFloat(newValue);
         return true;
       }
 
@@ -62,6 +58,7 @@ module.exports = {
         .setValue(objectContent.width)
         .setType('number')
         .setLabel(_('Width'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
 
       objectProperties
@@ -69,6 +66,7 @@ module.exports = {
         .setValue(objectContent.height)
         .setType('number')
         .setLabel(_('Height'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
 
       objectProperties
@@ -76,6 +74,7 @@ module.exports = {
         .setValue(objectContent.depth)
         .setType('number')
         .setLabel(_('Depth'))
+        .setMeasurementUnit(gd.MeasurementUnit.getPixel())
         .setGroup(_('Default size'));
 
       return objectProperties;

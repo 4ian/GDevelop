@@ -51,6 +51,7 @@ export type FileMetadataAndStorageProviderName = {
 
 export type ResourcesActionsProps = {|
   project: gdProject,
+  fileMetadata: FileMetadata,
   resource: gdResource,
   i18n: I18nType,
   updateInterface: () => void,

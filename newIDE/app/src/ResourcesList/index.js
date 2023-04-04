@@ -18,6 +18,7 @@ import {
   type ResourceKind,
   allResourceKindsAndMetadata,
 } from './ResourceSource';
+import { type FileMetadata } from '../ProjectsStorage';
 import ResourcesLoader from '../ResourcesLoader';
 import { Column, Line } from '../UI/Grid';
 import { type ResourcesActionsMenuBuilder } from '../ProjectsStorage';
@@ -46,6 +47,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  fileMetadata: ?FileMetadata,
   onRemoveUnusedResources: ResourceKind => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
@@ -167,7 +169,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     resource: gdResource,
     _index: number
   ): Array<MenuItemTemplate> => {
-    const { getResourceActionsSpecificToStorageProvider } = this.props;
+    const { getResourceActionsSpecificToStorageProvider, fileMetadata } = this.props;
     let menu = [
       {
         label: i18n._(t`Rename`),
@@ -201,11 +203,12 @@ export default class ResourcesList extends React.Component<Props, State> {
           ]),
       },
     ];
-    if (getResourceActionsSpecificToStorageProvider) {
+    if (getResourceActionsSpecificToStorageProvider && fileMetadata) {
       menu.push({ type: 'separator' });
       menu = menu.concat(
         getResourceActionsSpecificToStorageProvider({
           project: this.props.project,
+          fileMetadata,
           resource,
           i18n,
           updateInterface: () => this.forceUpdateList(),

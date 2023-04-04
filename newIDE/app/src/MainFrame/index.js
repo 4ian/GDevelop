@@ -1607,18 +1607,23 @@ const MainFrame = (props: Props) => {
     [setState, openProjectManager, i18n]
   );
 
-  const openResources = () => {
-    const { i18n } = props;
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: i18n._(t`Resources`),
-        projectItemName: null,
-        renderEditorContainer: renderResourcesEditorContainer,
-        key: 'resources',
-      }),
-    }));
-  };
+  const openResources = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: i18n._(t`Resources`),
+          projectItemName: null,
+          renderEditorContainer: renderResourcesEditorContainer,
+          key: 'resources',
+          extraEditorProps: {
+            fileMetadata: currentFileMetadata,
+          },
+        }),
+      }));
+    },
+    [currentFileMetadata, i18n, setState]
+  );
 
   const openHomePage = React.useCallback(
     () => {

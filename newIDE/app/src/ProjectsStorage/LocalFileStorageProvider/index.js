@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { type StorageProvider } from '../index';
 import {
   onOpenWithPicker,
@@ -68,6 +68,7 @@ export default ({
     i18n,
     updateInterface,
     cleanUserSelectionOfResources,
+    informUser,
   }) => [
     {
       label: i18n._(t`Locate file`),
@@ -79,7 +80,12 @@ export default ({
     },
     {
       label: i18n._(t`Copy file path`),
-      click: () => copyResourceFilePath({ project, resource }),
+      click: () => {
+        copyResourceFilePath({ project, resource });
+        informUser({
+          message: <Trans>Resource file path copied to clipboard</Trans>,
+        });
+      },
     },
     { type: 'separator' },
     {

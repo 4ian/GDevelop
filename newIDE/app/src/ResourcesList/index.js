@@ -36,8 +36,8 @@ type State = {|
   resourcesWithErrors: { [string]: '' | 'error' | 'warning' },
   infoBarContent: ?{|
     message: React.Node,
-    actionLabel: React.Node,
-    onActionClick: () => void,
+    actionLabel?: React.Node,
+    onActionClick?: () => void,
   |},
 |};
 
@@ -248,8 +248,8 @@ export default class ResourcesList extends React.Component<Props, State> {
   openInfoBar = (
     infoBarContent: ?{|
       message: React.Node,
-      actionLabel: React.Node,
-      onActionClick: () => void,
+      actionLabel?: React.Node,
+      onActionClick?: () => void,
     |}
   ) => {
     this.setState({ infoBarContent });

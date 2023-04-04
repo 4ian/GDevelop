@@ -57,8 +57,8 @@ export type ResourcesActionsProps = {|
   informUser: (
     ?{|
       message: React.Node,
-      actionLabel: React.Node,
-      onActionClick: () => void,
+      actionLabel?: React.Node,
+      onActionClick?: () => void,
     |}
   ) => void,
   updateInterface: () => void,

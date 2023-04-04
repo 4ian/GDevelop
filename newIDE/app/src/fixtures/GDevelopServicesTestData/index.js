@@ -197,6 +197,14 @@ export const subscriptionForGoldUser: Subscription = {
   userId: 'silver-user',
 };
 
+export const purchaselyGoldSubscription: Subscription = {
+  planId: 'gdevelop_gold',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  purchaselyPlan: 'gdevelop_gold_whatever',
+};
+
 export const silverSubscriptionWithRedemptionCode: Subscription = {
   planId: 'gdevelop_silver',
   createdAt: 1515084011000,
@@ -407,6 +415,12 @@ export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
+  limits: limitsForGoldUser,
+};
+
+export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: purchaselyGoldSubscription,
   limits: limitsForGoldUser,
 };
 

@@ -14,6 +14,7 @@ import optionalRequire from '../../../Utils/OptionalRequire';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
 import IconButton from '../../../UI/IconButton';
+import { isNativeMobileApp } from '../../../Utils/Platform';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -72,7 +73,7 @@ export const HomePageHeader = ({
           </Column>
           <Column>
             <LineStackLayout noMargin alignItems="center">
-              {!electron && windowWidth !== 'small' && (
+              {!electron && !isNativeMobileApp() && windowWidth !== 'small' && (
                 <FlatButton
                   label={<Trans>Download desktop app</Trans>}
                   onClick={() =>

@@ -119,7 +119,9 @@ const tiktokUsernameFormattingErrorMessage = (
 
 export const donateLinkConfig = {
   getFormattingError: (value: string) =>
-    !simpleUrlRegex.test(value) ? profileLinkFormattingErrorMessage : undefined,
+    value && !simpleUrlRegex.test(value)
+      ? profileLinkFormattingErrorMessage
+      : undefined,
   maxLength: 150,
 };
 
@@ -127,7 +129,7 @@ export const communityLinksConfig = {
   personalWebsiteLink: {
     icon: <Planet />,
     getFormattingError: (value: string) =>
-      !simpleUrlRegex.test(value)
+      value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
@@ -135,7 +137,7 @@ export const communityLinksConfig = {
   personalWebsite2Link: {
     icon: <Planet />,
     getFormattingError: (value: string) =>
-      !simpleUrlRegex.test(value)
+      value && !simpleUrlRegex.test(value)
         ? profileLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,
@@ -182,7 +184,7 @@ export const communityLinksConfig = {
   discordServerLink: {
     icon: <Discord />,
     getFormattingError: (value: string) =>
-      !simpleDiscordUrlRegex.test(value)
+      value && !simpleDiscordUrlRegex.test(value)
         ? discordServerLinkFormattingErrorMessage
         : undefined,
     maxLength: 150,

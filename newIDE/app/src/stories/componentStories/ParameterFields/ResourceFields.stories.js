@@ -18,7 +18,6 @@ import FontResourceField from '../../../EventsSheet/ParameterFields/FontResource
 import JsonResourceField from '../../../EventsSheet/ParameterFields/JsonResourceField';
 import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField';
 
-
 export const AllResourceFields = () => (
   <Column expand>
     <Line expand>

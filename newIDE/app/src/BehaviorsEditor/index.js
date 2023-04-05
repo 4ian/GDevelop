@@ -220,7 +220,6 @@ const BehaviorsEditor = (props: Props) => {
         'serializedBehavior'
       );
       if (!name || !type || !serializedBehavior) {
-        console.log(name + ' : ' + type);
         return;
       }
 

@@ -323,7 +323,9 @@ const BehaviorsEditor = (props: Props) => {
             secondaryActionLabel={
               isClipboardContainingBehaviors ? <Trans>Paste</Trans> : null
             }
-            onSecondaryAction={pasteBehaviors}
+            onSecondaryAction={() => {
+              pasteBehaviors();
+            }}
           />
         </Column>
       ) : (
@@ -511,7 +513,9 @@ const BehaviorsEditor = (props: Props) => {
                     key={'paste-behaviors'}
                     leftIcon={<PasteIcon />}
                     label={<Trans>Paste</Trans>}
-                    onClick={pasteBehaviors}
+                    onClick={() => {
+                      pasteBehaviors();
+                    }}
                   />
                 </Column>
               )}

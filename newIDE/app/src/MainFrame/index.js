@@ -981,7 +981,6 @@ const MainFrame = (props: Props) => {
     [
       i18n,
       getStorageProviderOperations,
-      getStorageProvider,
       loadFromSerializedProject,
       showConfirmation,
       showAlert,

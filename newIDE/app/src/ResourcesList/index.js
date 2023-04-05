@@ -321,7 +321,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         {!!infoBarContent && (
           <InfoBar
             duration={7000}
-            visible={!!infoBarContent}
+            visible
             hide={() => this.setState({ infoBarContent: null })}
             {...infoBarContent}
           />

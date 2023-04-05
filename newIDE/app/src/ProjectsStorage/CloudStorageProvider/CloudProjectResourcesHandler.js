@@ -27,7 +27,7 @@ export const generateGetResourceActions = ({
   fileMetadata,
   informUser,
 }: ResourcesActionsProps) => {
-  const openLabel = app && path ? t`Download` : t`Open resource in navigator`;
+  const openLabel = app && path ? t`Download` : t`Open resource in browser`;
   return [
     {
       label: i18n._(openLabel),

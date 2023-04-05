@@ -186,13 +186,11 @@ const BehaviorsEditor = (props: Props) => {
       BEHAVIORS_CLIPBOARD_KIND,
       mapVector(object.getAllBehaviorNames(), behaviorName => {
         const behavior = object.getBehavior(behaviorName);
-        return [
-          {
-            name: behaviorName,
-            type: behavior.getTypeName(),
-            serializedBehavior: serializeToJSObject(behavior),
-          },
-        ];
+        return {
+          name: behaviorName,
+          type: behavior.getTypeName(),
+          serializedBehavior: serializeToJSObject(behavior),
+        };
       })
     );
   };
@@ -221,7 +219,10 @@ const BehaviorsEditor = (props: Props) => {
         behaviorContent,
         'serializedBehavior'
       );
-      if (!name || !type || !serializedBehavior) return;
+      if (!name || !type || !serializedBehavior) {
+        console.log(name + ' : ' + type);
+        return;
+      }
 
       const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
         project.getCurrentPlatform(),
@@ -299,6 +300,10 @@ const BehaviorsEditor = (props: Props) => {
     props.openBehaviorEvents(extensionName, behaviorName);
   };
 
+  const isClipboardContainingBehaviors = Clipboard.has(
+    BEHAVIORS_CLIPBOARD_KIND
+  );
+
   return (
     <Column noMargin expand useFullHeight noOverflowParent>
       {allBehaviorNames.length === 0 ? (
@@ -310,11 +315,16 @@ const BehaviorsEditor = (props: Props) => {
                 Behaviors add features to objects in a matter of clicks.
               </Trans>
             }
-            actionLabel={<Trans>Add a behavior</Trans>}
             helpPagePath="/behaviors"
             tutorialId="intro-behaviors-and-functions"
             actionButtonId="add-behavior-button"
+            actionLabel={<Trans>Add a behavior</Trans>}
             onAction={() => setNewBehaviorDialogOpen(true)}
+            secondaryActionIcon={<PasteIcon />}
+            secondaryActionLabel={
+              isClipboardContainingBehaviors ? <Trans>Paste</Trans> : null
+            }
+            onSecondaryAction={pasteBehaviors}
           />
         </Column>
       ) : (
@@ -496,7 +506,7 @@ const BehaviorsEditor = (props: Props) => {
           </ScrollView>
           <Column>
             <Line justifyContent="flex-end" expand>
-              {Clipboard.has(BEHAVIORS_CLIPBOARD_KIND) && (
+              {isClipboardContainingBehaviors && (
                 <Column>
                   <FlatButton
                     key={'paste-behaviors'}

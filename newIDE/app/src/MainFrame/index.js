@@ -916,6 +916,7 @@ const MainFrame = (props: Props) => {
         await delay(150);
         const autoSaveFileMetadata = await checkForAutosave();
         let content;
+        let openingError: Error | null = null;
         try {
           const result = await onOpen(
             autoSaveFileMetadata,
@@ -923,6 +924,7 @@ const MainFrame = (props: Props) => {
           );
           content = result.content;
         } catch (error) {
+          openingError = error;
           // onOpen failed, try to find again an autosave.
           const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
           if (autoSaveAfterFailureFileMetadata) {
@@ -931,9 +933,10 @@ const MainFrame = (props: Props) => {
           }
         }
         if (!content) {
-          throw new Error(
-            'The project file content could not be read. It might be corrupted/malformed.'
-          );
+          throw openingError ||
+            new Error(
+              'The project file content could not be read. It might be corrupted/malformed.'
+            );
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.

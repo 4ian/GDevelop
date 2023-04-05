@@ -7,7 +7,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
-import PlanetIcon from '../../UI/CustomSvgIcons/Planet';
+import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
@@ -141,7 +141,7 @@ export default function PreviewAndPublishButtons({
       <RaisedButton
         primary
         onClick={exportProject}
-        icon={<PlanetIcon />}
+        icon={<PublishIcon />}
         label={windowWidth !== 'small' ? <Trans>Publish</Trans> : null}
         id={'toolbar-publish-button'}
       />

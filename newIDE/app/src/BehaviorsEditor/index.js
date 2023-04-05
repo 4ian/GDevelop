@@ -32,8 +32,33 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Trash from '../UI/CustomSvgIcons/Trash';
 import Add from '../UI/CustomSvgIcons/Add';
+import { mapVector } from '../Utils/MapFor';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
+import FlatButton from '../UI/FlatButton';
 
 const gd: libGDevelop = global.gd;
+
+const BEHAVIORS_CLIPBOARD_KIND = 'Behaviors';
+
+export const useBehaviorOverridingAlertDialog = () => {
+  const { showConfirmation } = useAlertDialog();
+  return async (existingBehaviorNames: Array<string>): Promise<boolean> => {
+    return await showConfirmation({
+      title: t`Existing behaviors`,
+      message: t`These behaviors are already attached to the object:${'\n\n - ' +
+        existingBehaviorNames.join('\n\n - ') +
+        '\n\n'}Do you want to replace their property values?`,
+      confirmButtonLabel: t`Replace`,
+      dismissButtonLabel: t`Omit`,
+    });
+  };
+};
 
 type Props = {|
   project: gdProject,
@@ -77,6 +102,8 @@ const BehaviorsEditor = (props: Props) => {
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );
+
+  const showBehaviorOverridingConfirmation = useBehaviorOverridingAlertDialog();
 
   const { object, project, eventsFunctionsExtension } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
@@ -141,6 +168,118 @@ const BehaviorsEditor = (props: Props) => {
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
     if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
+  };
+
+  const copyBehavior = (behaviorName: string) => {
+    const behavior = object.getBehavior(behaviorName);
+    Clipboard.set(BEHAVIORS_CLIPBOARD_KIND, [
+      {
+        name: behaviorName,
+        type: behavior.getTypeName(),
+        serializedBehavior: serializeToJSObject(behavior),
+      },
+    ]);
+  };
+
+  const copyAllBehaviors = () => {
+    Clipboard.set(
+      BEHAVIORS_CLIPBOARD_KIND,
+      mapVector(object.getAllBehaviorNames(), behaviorName => {
+        const behavior = object.getBehavior(behaviorName);
+        return [
+          {
+            name: behaviorName,
+            type: behavior.getTypeName(),
+            serializedBehavior: serializeToJSObject(behavior),
+          },
+        ];
+      })
+    );
+  };
+
+  const newNamedBehavior: Array<{
+    name: string,
+    type: string,
+    serializedBehavior: string,
+  }> = [];
+  const existingNamedBehavior: Array<{
+    name: string,
+    type: string,
+    serializedBehavior: string,
+  }> = [];
+  const existingBehaviorFullNames: Array<string> = [];
+
+  const pasteBehaviors = async () => {
+    const clipboardContent = Clipboard.get(BEHAVIORS_CLIPBOARD_KIND);
+    const behaviorContents = SafeExtractor.extractArray(clipboardContent);
+    if (!behaviorContents) return;
+
+    behaviorContents.forEach(behaviorContent => {
+      const name = SafeExtractor.extractStringProperty(behaviorContent, 'name');
+      const type = SafeExtractor.extractStringProperty(behaviorContent, 'type');
+      const serializedBehavior = SafeExtractor.extractObjectProperty(
+        behaviorContent,
+        'serializedBehavior'
+      );
+      if (!name || !type || !serializedBehavior) return;
+
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        project.getCurrentPlatform(),
+        type
+      );
+      if (
+        behaviorMetadata.getObjectType() !== '' &&
+        behaviorMetadata.getObjectType() !== object.getType()
+      ) {
+        return;
+      }
+
+      if (object.hasBehaviorNamed(name)) {
+        const existingBehavior = object.getBehavior(name);
+        if (existingBehavior.getTypeName() !== type) {
+          return;
+        }
+        existingNamedBehavior.push({ name, type, serializedBehavior });
+        existingBehaviorFullNames.push(behaviorMetadata.getFullName());
+      } else {
+        newNamedBehavior.push({ name, type, serializedBehavior });
+      }
+    });
+
+    newNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
+      object.addNewBehavior(project, type, name);
+      if (object.hasBehaviorNamed(name)) {
+        const behavior = object.getBehavior(name);
+        unserializeFromJSObject(behavior, serializedBehavior);
+      }
+    });
+    // Add missing required behaviors as a 2nd step because these behaviors
+    // could have been in the array.
+    newNamedBehavior.forEach(({ name }) => {
+      gd.WholeProjectRefactorer.addRequiredBehaviorsFor(project, object, name);
+    });
+
+    let shouldOverrideBehavior = false;
+    if (existingNamedBehavior.length > 0) {
+      shouldOverrideBehavior = await showBehaviorOverridingConfirmation(
+        existingBehaviorFullNames
+      );
+
+      if (shouldOverrideBehavior) {
+        existingNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
+          if (object.hasBehaviorNamed(name)) {
+            const behavior = object.getBehavior(name);
+            // Property values can be replaced directly because the type has been check earlier.
+            unserializeFromJSObject(behavior, serializedBehavior);
+          }
+        });
+      }
+    }
+
+    forceUpdate();
+    if (newNamedBehavior.length > 0 || shouldOverrideBehavior) {
+      if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
+    }
   };
 
   const openExtension = (behaviorType: string) => {
@@ -272,6 +411,19 @@ const BehaviorsEditor = (props: Props) => {
                             label: i18n._(t`Delete`),
                             click: () => onRemoveBehavior(behaviorName),
                           },
+                          {
+                            label: i18n._(t`Copy`),
+                            click: () => copyBehavior(behaviorName),
+                          },
+                          {
+                            label: i18n._(t`Copy all`),
+                            click: copyAllBehaviors,
+                          },
+                          {
+                            label: i18n._(t`Paste`),
+                            click: pasteBehaviors,
+                            enabled: Clipboard.has(BEHAVIORS_CLIPBOARD_KIND),
+                          },
                           ...(project.hasEventsBasedBehavior(behaviorTypeName)
                             ? [
                                 { type: 'separator' },
@@ -344,6 +496,16 @@ const BehaviorsEditor = (props: Props) => {
           </ScrollView>
           <Column>
             <Line justifyContent="flex-end" expand>
+              {Clipboard.has(BEHAVIORS_CLIPBOARD_KIND) && (
+                <Column>
+                  <FlatButton
+                    key={'paste-behaviors'}
+                    leftIcon={<PasteIcon />}
+                    label={<Trans>Paste</Trans>}
+                    onClick={pasteBehaviors}
+                  />
+                </Column>
+              )}
               <RaisedButton
                 key="add-behavior-line"
                 label={<Trans>Add a behavior</Trans>}

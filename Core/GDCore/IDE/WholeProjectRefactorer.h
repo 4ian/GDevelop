@@ -212,6 +212,13 @@ class GD_CORE_API WholeProjectRefactorer {
                                               gd::Object& object,
                                               const gd::String& behaviorType,
                                               const gd::String& behaviorName);
+  /**
+   * \brief Add required behaviors if necessary to fill every behavior
+   * properties of the added behaviors.
+   */
+  static void AddRequiredBehaviorsFor(gd::Project& project,
+                                      gd::Object& object,
+                                      const gd::String& behaviorName);
 
   /**
    * \brief Find every behavior of the object that needs the given behaviors

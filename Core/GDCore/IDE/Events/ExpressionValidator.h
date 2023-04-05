@@ -159,12 +159,29 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitNumberNode(NumberNode& node) override {
     ReportAnyError(node);
     childType = Type::Number;
-    CheckType(parentType, childType, node.location);
+    if (parentType == Type::String) {
+      RaiseTypeError(
+          _("You entered a number, but a text was expected (in quotes)."),
+          node.location);
+    } else if (parentType != Type::Number &&
+               parentType != Type::NumberOrString) {
+      RaiseTypeError(_("You entered a number, but this type was expected:") +
+                         " " + TypeToString(parentType),
+                     node.location);
+    }
   }
   void OnVisitTextNode(TextNode& node) override {
     ReportAnyError(node);
     childType = Type::String;
-    CheckType(parentType, childType, node.location);
+    if (parentType == Type::Number) {
+      RaiseTypeError(_("You entered a text, but a number was expected."),
+                     node.location);
+    } else if (parentType != Type::String &&
+               parentType != Type::NumberOrString) {
+      RaiseTypeError(_("You entered a text, but this type was expected:") +
+                         " " + TypeToString(parentType),
+                     node.location);
+    }
   }
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
@@ -172,7 +189,21 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       node.child->Visit(*this);
     }
     childType = Type::Variable;
-    CheckType(parentType, childType, node.location);
+    if (parentType == Type::String) {
+      RaiseTypeError(_("Variables must be surrounded by VariableString()."),
+                     node.location);
+    } else if (parentType == Type::Number) {
+      RaiseTypeError(_("Variables must be surrounded by Variable()."),
+                     node.location);
+    } else if (parentType == Type::NumberOrString) {
+      RaiseTypeError(
+          _("Variables must be surrounded by Variable() or VariableString()."),
+          node.location);
+    } else if (parentType != Type::Variable) {
+      RaiseTypeError(_("You entered a variable, but this type was expected:") +
+                         " " + TypeToString(parentType),
+                     node.location);
+    }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     ReportAnyError(node);
@@ -282,32 +313,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void RaiseOperatorError(
       const gd::String &message, const ExpressionParserLocation &location) {
     RaiseError("invalid_operator", message, location);
-  }
-
-  void CheckType(Type expect, Type actual, const ExpressionParserLocation &location) {
-    if (actual == Type::String) {
-      if (expect == Type::Number) {
-        RaiseTypeError(_("You entered a text, but a number was expected."),
-                           location);
-      }
-      else if (expect != Type::String && expect != Type::NumberOrString) {
-        RaiseTypeError(
-            _("You entered a text, but this type was expected:") + " " + TypeToString(expect),
-            location);
-      }
-    }
-    else if (actual == Type::Number) {
-      if (expect == Type::String) {
-        RaiseTypeError(
-            _("You entered a number, but a text was expected (in quotes)."),
-            location);
-      }
-      else if (expect != Type::Number && expect != Type::NumberOrString) {
-        RaiseTypeError(
-            _("You entered a number, but this type was expected:") + " " + TypeToString(expect),
-            location);
-      }
-    }
   }
 
   static Type StringToType(const gd::String &type);

@@ -855,7 +855,6 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = React.useCallback(
     async (fileMetadata: FileMetadata): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
-      const storageProviderInternalName = getStorageProvider().internalName;
 
       const {
         hasAutoSave,
@@ -960,7 +959,7 @@ const MainFrame = (props: Props) => {
           serializedProject.delete();
         }
       } catch (error) {
-        if (storageProviderInternalName === 'Cloud') {
+        if (error.name === 'CloudProjectReadingError') {
           setIsLoadingProject(false);
           setLoaderModalProgress(null, null);
           setCloudProjectFileMetadataToRecover(fileMetadata);

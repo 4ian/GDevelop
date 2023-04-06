@@ -105,199 +105,252 @@ const BehaviorsEditor = (props: Props) => {
 
   const showBehaviorOverridingConfirmation = useBehaviorOverridingAlertDialog();
 
-  const { object, project, eventsFunctionsExtension } = props;
+  const {
+    object,
+    project,
+    eventsFunctionsExtension,
+    onSizeUpdated,
+    onBehaviorsUpdated,
+    onUpdateBehaviorsSharedData,
+    openBehaviorEvents,
+  } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
   const forceUpdate = useForceUpdate();
 
   const { values } = React.useContext(PreferencesContext);
 
-  const addBehavior = (type: string, defaultName: string) => {
-    const wasBehaviorAdded = addBehaviorToObject(
-      project,
+  const addBehavior = React.useCallback(
+    (type: string, defaultName: string) => {
+      const wasBehaviorAdded = addBehaviorToObject(
+        project,
+        object,
+        type,
+        defaultName
+      );
+
+      if (wasBehaviorAdded) {
+        setNewBehaviorDialogOpen(false);
+        sendBehaviorAdded({
+          behaviorType: type,
+          parentEditor: 'behaviors-editor',
+        });
+        setJustAddedBehaviorName(defaultName);
+      }
+
+      forceUpdate();
+      if (onSizeUpdated) onSizeUpdated();
+      onUpdateBehaviorsSharedData();
+      if (onBehaviorsUpdated) onBehaviorsUpdated();
+    },
+    [
+      forceUpdate,
       object,
-      type,
-      defaultName
-    );
-
-    if (wasBehaviorAdded) {
-      setNewBehaviorDialogOpen(false);
-      sendBehaviorAdded({
-        behaviorType: type,
-        parentEditor: 'behaviors-editor',
-      });
-      setJustAddedBehaviorName(defaultName);
-    }
-
-    forceUpdate();
-    if (props.onSizeUpdated) props.onSizeUpdated();
-    props.onUpdateBehaviorsSharedData();
-    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
-  };
-
-  const onChangeBehaviorName = (behavior: gdBehavior, newName: string) => {
-    // TODO: This is disabled for now as there is no proper refactoring
-    // of events after a behavior renaming. Once refactoring is available,
-    // the text field can be enabled again and refactoring calls added here
-    // (or in a parent).
-    // Renaming a behavior is something that is really rare anyway! :)
-
-    if (object.hasBehaviorNamed(newName)) return;
-    object.renameBehavior(behavior.getName(), newName);
-    forceUpdate();
-    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
-  };
-
-  const onRemoveBehavior = (behaviorName: string) => {
-    let message =
-      "Are you sure you want to remove this behavior? This can't be undone.";
-    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+      onBehaviorsUpdated,
+      onSizeUpdated,
+      onUpdateBehaviorsSharedData,
       project,
-      object,
-      behaviorName
-    ).toJSArray();
-    if (dependentBehaviors.length > 0) {
-      message +=
-        '\nDependent behaviors will be removed too: ' +
-        dependentBehaviors.join(', ');
-    }
-    const answer = Window.showConfirmDialog(message);
+    ]
+  );
 
-    if (answer) {
-      object.removeBehavior(behaviorName);
-      dependentBehaviors.forEach(name => object.removeBehavior(name));
-      if (props.onSizeUpdated) props.onSizeUpdated();
-    }
-    if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
-  };
+  const onChangeBehaviorName = React.useCallback(
+    (behavior: gdBehavior, newName: string) => {
+      // TODO: This is disabled for now as there is no proper refactoring
+      // of events after a behavior renaming. Once refactoring is available,
+      // the text field can be enabled again and refactoring calls added here
+      // (or in a parent).
+      // Renaming a behavior is something that is really rare anyway! :)
 
-  const copyBehavior = (behaviorName: string) => {
-    const behavior = object.getBehavior(behaviorName);
-    Clipboard.set(BEHAVIORS_CLIPBOARD_KIND, [
-      {
-        name: behaviorName,
-        type: behavior.getTypeName(),
-        serializedBehavior: serializeToJSObject(behavior),
-      },
-    ]);
-  };
+      if (object.hasBehaviorNamed(newName)) return;
+      object.renameBehavior(behavior.getName(), newName);
+      forceUpdate();
+      if (onBehaviorsUpdated) onBehaviorsUpdated();
+    },
+    [forceUpdate, object, onBehaviorsUpdated]
+  );
 
-  const copyAllBehaviors = () => {
-    Clipboard.set(
-      BEHAVIORS_CLIPBOARD_KIND,
-      mapVector(object.getAllBehaviorNames(), behaviorName => {
-        const behavior = object.getBehavior(behaviorName);
-        return {
+  const onRemoveBehavior = React.useCallback(
+    (behaviorName: string) => {
+      let message =
+        "Are you sure you want to remove this behavior? This can't be undone.";
+      const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+        project,
+        object,
+        behaviorName
+      ).toJSArray();
+      if (dependentBehaviors.length > 0) {
+        message +=
+          '\nDependent behaviors will be removed too: ' +
+          dependentBehaviors.join(', ');
+      }
+      const answer = Window.showConfirmDialog(message);
+
+      if (answer) {
+        object.removeBehavior(behaviorName);
+        dependentBehaviors.forEach(name => object.removeBehavior(name));
+        if (onSizeUpdated) onSizeUpdated();
+      }
+      if (onBehaviorsUpdated) onBehaviorsUpdated();
+    },
+    [object, onBehaviorsUpdated, onSizeUpdated, project]
+  );
+
+  const copyBehavior = React.useCallback(
+    (behaviorName: string) => {
+      const behavior = object.getBehavior(behaviorName);
+      Clipboard.set(BEHAVIORS_CLIPBOARD_KIND, [
+        {
           name: behaviorName,
           type: behavior.getTypeName(),
           serializedBehavior: serializeToJSObject(behavior),
-        };
-      })
-    );
-  };
+        },
+      ]);
+    },
+    [object]
+  );
 
-  const newNamedBehavior: Array<{
-    name: string,
-    type: string,
-    serializedBehavior: string,
-  }> = [];
-  const existingNamedBehavior: Array<{
-    name: string,
-    type: string,
-    serializedBehavior: string,
-  }> = [];
-  const existingBehaviorFullNames: Array<string> = [];
-
-  const pasteBehaviors = async () => {
-    const clipboardContent = Clipboard.get(BEHAVIORS_CLIPBOARD_KIND);
-    const behaviorContents = SafeExtractor.extractArray(clipboardContent);
-    if (!behaviorContents) return;
-
-    behaviorContents.forEach(behaviorContent => {
-      const name = SafeExtractor.extractStringProperty(behaviorContent, 'name');
-      const type = SafeExtractor.extractStringProperty(behaviorContent, 'type');
-      const serializedBehavior = SafeExtractor.extractObjectProperty(
-        behaviorContent,
-        'serializedBehavior'
+  const copyAllBehaviors = React.useCallback(
+    () => {
+      Clipboard.set(
+        BEHAVIORS_CLIPBOARD_KIND,
+        mapVector(object.getAllBehaviorNames(), behaviorName => {
+          const behavior = object.getBehavior(behaviorName);
+          return {
+            name: behaviorName,
+            type: behavior.getTypeName(),
+            serializedBehavior: serializeToJSObject(behavior),
+          };
+        })
       );
-      if (!name || !type || !serializedBehavior) {
-        return;
+    },
+    [object]
+  );
+
+  const pasteBehaviors = React.useCallback(
+    async () => {
+      const clipboardContent = Clipboard.get(BEHAVIORS_CLIPBOARD_KIND);
+      const behaviorContents = SafeExtractor.extractArray(clipboardContent);
+      if (!behaviorContents) return;
+
+      const newNamedBehavior: Array<{
+        name: string,
+        type: string,
+        serializedBehavior: string,
+      }> = [];
+      const existingNamedBehavior: Array<{
+        name: string,
+        type: string,
+        serializedBehavior: string,
+      }> = [];
+      const existingBehaviorFullNames: Array<string> = [];
+      behaviorContents.forEach(behaviorContent => {
+        const name = SafeExtractor.extractStringProperty(
+          behaviorContent,
+          'name'
+        );
+        const type = SafeExtractor.extractStringProperty(
+          behaviorContent,
+          'type'
+        );
+        const serializedBehavior = SafeExtractor.extractObjectProperty(
+          behaviorContent,
+          'serializedBehavior'
+        );
+        if (!name || !type || !serializedBehavior) {
+          return;
+        }
+
+        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
+        if (
+          behaviorMetadata.getObjectType() !== '' &&
+          behaviorMetadata.getObjectType() !== object.getType()
+        ) {
+          return;
+        }
+
+        if (object.hasBehaviorNamed(name)) {
+          const existingBehavior = object.getBehavior(name);
+          if (existingBehavior.getTypeName() !== type) {
+            return;
+          }
+          existingNamedBehavior.push({ name, type, serializedBehavior });
+          existingBehaviorFullNames.push(behaviorMetadata.getFullName());
+        } else {
+          newNamedBehavior.push({ name, type, serializedBehavior });
+        }
+      });
+
+      newNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
+        object.addNewBehavior(project, type, name);
+        if (object.hasBehaviorNamed(name)) {
+          const behavior = object.getBehavior(name);
+          unserializeFromJSObject(behavior, serializedBehavior);
+        }
+      });
+      // Add missing required behaviors as a 2nd step because these behaviors
+      // could have been in the array.
+      newNamedBehavior.forEach(({ name }) => {
+        gd.WholeProjectRefactorer.addRequiredBehaviorsFor(
+          project,
+          object,
+          name
+        );
+      });
+
+      let shouldOverrideBehavior = false;
+      if (existingNamedBehavior.length > 0) {
+        shouldOverrideBehavior = await showBehaviorOverridingConfirmation(
+          existingBehaviorFullNames
+        );
+
+        if (shouldOverrideBehavior) {
+          existingNamedBehavior.forEach(
+            ({ name, type, serializedBehavior }) => {
+              if (object.hasBehaviorNamed(name)) {
+                const behavior = object.getBehavior(name);
+                // Property values can be replaced directly because the type has been check earlier.
+                unserializeFromJSObject(behavior, serializedBehavior);
+              }
+            }
+          );
+        }
       }
 
-      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-        project.getCurrentPlatform(),
-        type
-      );
+      forceUpdate();
+      if (newNamedBehavior.length > 0 || shouldOverrideBehavior) {
+        if (onBehaviorsUpdated) onBehaviorsUpdated();
+      }
+    },
+    [
+      forceUpdate,
+      object,
+      onBehaviorsUpdated,
+      project,
+      showBehaviorOverridingConfirmation,
+    ]
+  );
+
+  const openExtension = React.useCallback(
+    (behaviorType: string) => {
+      const elements = behaviorType.split('::');
+      if (elements.length !== 2) {
+        return;
+      }
+      const extensionName = elements[0];
+      const behaviorName = elements[1];
+
       if (
-        behaviorMetadata.getObjectType() !== '' &&
-        behaviorMetadata.getObjectType() !== object.getType()
+        !extensionName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
       ) {
         return;
       }
-
-      if (object.hasBehaviorNamed(name)) {
-        const existingBehavior = object.getBehavior(name);
-        if (existingBehavior.getTypeName() !== type) {
-          return;
-        }
-        existingNamedBehavior.push({ name, type, serializedBehavior });
-        existingBehaviorFullNames.push(behaviorMetadata.getFullName());
-      } else {
-        newNamedBehavior.push({ name, type, serializedBehavior });
-      }
-    });
-
-    newNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
-      object.addNewBehavior(project, type, name);
-      if (object.hasBehaviorNamed(name)) {
-        const behavior = object.getBehavior(name);
-        unserializeFromJSObject(behavior, serializedBehavior);
-      }
-    });
-    // Add missing required behaviors as a 2nd step because these behaviors
-    // could have been in the array.
-    newNamedBehavior.forEach(({ name }) => {
-      gd.WholeProjectRefactorer.addRequiredBehaviorsFor(project, object, name);
-    });
-
-    let shouldOverrideBehavior = false;
-    if (existingNamedBehavior.length > 0) {
-      shouldOverrideBehavior = await showBehaviorOverridingConfirmation(
-        existingBehaviorFullNames
-      );
-
-      if (shouldOverrideBehavior) {
-        existingNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
-          if (object.hasBehaviorNamed(name)) {
-            const behavior = object.getBehavior(name);
-            // Property values can be replaced directly because the type has been check earlier.
-            unserializeFromJSObject(behavior, serializedBehavior);
-          }
-        });
-      }
-    }
-
-    forceUpdate();
-    if (newNamedBehavior.length > 0 || shouldOverrideBehavior) {
-      if (props.onBehaviorsUpdated) props.onBehaviorsUpdated();
-    }
-  };
-
-  const openExtension = (behaviorType: string) => {
-    const elements = behaviorType.split('::');
-    if (elements.length !== 2) {
-      return;
-    }
-    const extensionName = elements[0];
-    const behaviorName = elements[1];
-
-    if (
-      !extensionName ||
-      !props.project.hasEventsFunctionsExtensionNamed(extensionName)
-    ) {
-      return;
-    }
-    props.openBehaviorEvents(extensionName, behaviorName);
-  };
+      openBehaviorEvents(extensionName, behaviorName);
+    },
+    [openBehaviorEvents, project]
+  );
 
   const isClipboardContainingBehaviors = Clipboard.has(
     BEHAVIORS_CLIPBOARD_KIND
@@ -433,7 +486,7 @@ const BehaviorsEditor = (props: Props) => {
                           {
                             label: i18n._(t`Paste`),
                             click: pasteBehaviors,
-                            enabled: Clipboard.has(BEHAVIORS_CLIPBOARD_KIND),
+                            enabled: isClipboardContainingBehaviors,
                           },
                           ...(project.hasEventsBasedBehavior(behaviorTypeName)
                             ? [
@@ -496,7 +549,7 @@ const BehaviorsEditor = (props: Props) => {
                           resourceManagementProps={
                             props.resourceManagementProps
                           }
-                          onBehaviorUpdated={props.onBehaviorsUpdated}
+                          onBehaviorUpdated={onBehaviorsUpdated}
                         />
                       </Line>
                     </Column>

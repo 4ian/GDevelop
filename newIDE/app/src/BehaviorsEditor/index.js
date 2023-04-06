@@ -16,6 +16,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
+import { LineStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
@@ -559,18 +560,16 @@ const BehaviorsEditor = (props: Props) => {
             })}
           </ScrollView>
           <Column>
-            <Line justifyContent="flex-end" expand>
+            <LineStackLayout justifyContent="flex-end" expand>
               {isClipboardContainingBehaviors && (
-                <Column>
-                  <FlatButton
-                    key={'paste-behaviors'}
-                    leftIcon={<PasteIcon />}
-                    label={<Trans>Paste</Trans>}
-                    onClick={() => {
-                      pasteBehaviors();
-                    }}
-                  />
-                </Column>
+                <FlatButton
+                  key={'paste-behaviors'}
+                  leftIcon={<PasteIcon />}
+                  label={<Trans>Paste</Trans>}
+                  onClick={() => {
+                    pasteBehaviors();
+                  }}
+                />
               )}
               <RaisedButton
                 key="add-behavior-line"
@@ -580,7 +579,7 @@ const BehaviorsEditor = (props: Props) => {
                 icon={<Add />}
                 id="add-behavior-button"
               />
-            </Line>
+            </LineStackLayout>
           </Column>
         </React.Fragment>
       )}

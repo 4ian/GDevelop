@@ -235,12 +235,12 @@ const BehaviorsEditor = (props: Props) => {
       const behaviorContents = SafeExtractor.extractArray(clipboardContent);
       if (!behaviorContents) return;
 
-      const newNamedBehavior: Array<{
+      const newNamedBehaviors: Array<{
         name: string,
         type: string,
         serializedBehavior: string,
       }> = [];
-      const existingNamedBehavior: Array<{
+      const existingNamedBehaviors: Array<{
         name: string,
         type: string,
         serializedBehavior: string,
@@ -279,15 +279,15 @@ const BehaviorsEditor = (props: Props) => {
           if (existingBehavior.getTypeName() !== type) {
             return;
           }
-          existingNamedBehavior.push({ name, type, serializedBehavior });
+          existingNamedBehaviors.push({ name, type, serializedBehavior });
           existingBehaviorFullNames.push(behaviorMetadata.getFullName());
         } else {
-          newNamedBehavior.push({ name, type, serializedBehavior });
+          newNamedBehaviors.push({ name, type, serializedBehavior });
         }
       });
 
       let firstAddedBehaviorName: string | null = null;
-      newNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
+      newNamedBehaviors.forEach(({ name, type, serializedBehavior }) => {
         object.addNewBehavior(project, type, name);
         if (object.hasBehaviorNamed(name)) {
           if (!firstAddedBehaviorName) {
@@ -299,7 +299,7 @@ const BehaviorsEditor = (props: Props) => {
       });
       // Add missing required behaviors as a 2nd step because these behaviors
       // could have been in the array.
-      newNamedBehavior.forEach(({ name }) => {
+      newNamedBehaviors.forEach(({ name }) => {
         gd.WholeProjectRefactorer.addRequiredBehaviorsFor(
           project,
           object,
@@ -308,13 +308,13 @@ const BehaviorsEditor = (props: Props) => {
       });
 
       let shouldOverrideBehavior = false;
-      if (existingNamedBehavior.length > 0) {
+      if (existingNamedBehaviors.length > 0) {
         shouldOverrideBehavior = await showBehaviorOverridingConfirmation(
           existingBehaviorFullNames
         );
 
         if (shouldOverrideBehavior) {
-          existingNamedBehavior.forEach(
+          existingNamedBehaviors.forEach(
             ({ name, type, serializedBehavior }) => {
               if (object.hasBehaviorNamed(name)) {
                 const behavior = object.getBehavior(name);
@@ -331,6 +331,8 @@ const BehaviorsEditor = (props: Props) => {
         setJustAddedBehaviorName(firstAddedBehaviorName);
         if (onSizeUpdated) onSizeUpdated();
         onUpdateBehaviorsSharedData();
+      } else if (existingNamedBehaviors.length === 1) {
+        setJustAddedBehaviorName(existingNamedBehaviors[0].name);
       }
       if (firstAddedBehaviorName || shouldOverrideBehavior) {
         if (onBehaviorsUpdated) onBehaviorsUpdated();

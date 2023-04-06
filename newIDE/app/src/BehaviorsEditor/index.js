@@ -307,13 +307,13 @@ const BehaviorsEditor = (props: Props) => {
         );
       });
 
-      let shouldOverrideBehavior = false;
+      let shouldOverrideBehaviors = false;
       if (existingNamedBehaviors.length > 0) {
-        shouldOverrideBehavior = await showBehaviorOverridingConfirmation(
+        shouldOverrideBehaviors = await showBehaviorOverridingConfirmation(
           existingBehaviorFullNames
         );
 
-        if (shouldOverrideBehavior) {
+        if (shouldOverrideBehaviors) {
           existingNamedBehaviors.forEach(
             ({ name, type, serializedBehavior }) => {
               if (object.hasBehaviorNamed(name)) {
@@ -334,7 +334,7 @@ const BehaviorsEditor = (props: Props) => {
       } else if (existingNamedBehaviors.length === 1) {
         setJustAddedBehaviorName(existingNamedBehaviors[0].name);
       }
-      if (firstAddedBehaviorName || shouldOverrideBehavior) {
+      if (firstAddedBehaviorName || shouldOverrideBehaviors) {
         if (onBehaviorsUpdated) onBehaviorsUpdated();
       }
     },

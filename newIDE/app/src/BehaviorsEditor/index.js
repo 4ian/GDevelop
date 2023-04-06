@@ -41,6 +41,7 @@ import {
 } from '../Utils/Serializer';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
+import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import FlatButton from '../UI/FlatButton';
 
 const gd: libGDevelop = global.gd;
@@ -287,7 +288,9 @@ const BehaviorsEditor = (props: Props) => {
       newNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
         object.addNewBehavior(project, type, name);
         if (object.hasBehaviorNamed(name)) {
-          firstAddedBehaviorName = name;
+          if (!firstAddedBehaviorName) {
+            firstAddedBehaviorName = name;
+          }
           const behavior = object.getBehavior(name);
           unserializeFromJSObject(behavior, serializedBehavior);
         }
@@ -490,10 +493,6 @@ const BehaviorsEditor = (props: Props) => {
                             click: () => copyBehavior(behaviorName),
                           },
                           {
-                            label: i18n._(t`Copy all`),
-                            click: copyAllBehaviors,
-                          },
-                          {
                             label: i18n._(t`Paste`),
                             click: pasteBehaviors,
                             enabled: isClipboardContainingBehaviors,
@@ -569,26 +568,38 @@ const BehaviorsEditor = (props: Props) => {
             })}
           </ScrollView>
           <Column>
-            <LineStackLayout justifyContent="flex-end" expand>
-              {isClipboardContainingBehaviors && (
+            <Line noMargin>
+              <LineStackLayout expand>
                 <FlatButton
-                  key={'paste-behaviors'}
-                  leftIcon={<PasteIcon />}
-                  label={<Trans>Paste</Trans>}
+                  key={'copy-all-behaviors'}
+                  leftIcon={<CopyIcon />}
+                  label={<Trans>Copy all behaviors</Trans>}
                   onClick={() => {
-                    pasteBehaviors();
+                    copyAllBehaviors();
                   }}
                 />
-              )}
-              <RaisedButton
-                key="add-behavior-line"
-                label={<Trans>Add a behavior</Trans>}
-                primary
-                onClick={() => setNewBehaviorDialogOpen(true)}
-                icon={<Add />}
-                id="add-behavior-button"
-              />
-            </LineStackLayout>
+              </LineStackLayout>
+              <LineStackLayout justifyContent="flex-end" expand>
+                {isClipboardContainingBehaviors && (
+                  <FlatButton
+                    key={'paste-behaviors'}
+                    leftIcon={<PasteIcon />}
+                    label={<Trans>Paste</Trans>}
+                    onClick={() => {
+                      pasteBehaviors();
+                    }}
+                  />
+                )}
+                <RaisedButton
+                  key="add-behavior-line"
+                  label={<Trans>Add a behavior</Trans>}
+                  primary
+                  onClick={() => setNewBehaviorDialogOpen(true)}
+                  icon={<Add />}
+                  id="add-behavior-button"
+                />
+              </LineStackLayout>
+            </Line>
           </Column>
         </React.Fragment>
       )}

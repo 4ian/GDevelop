@@ -206,8 +206,9 @@ const BehaviorsEditor = (props: Props) => {
           serializedBehavior: serializeToJSObject(behavior),
         },
       ]);
+      forceUpdate();
     },
-    [object]
+    [forceUpdate, object]
   );
 
   const copyAllBehaviors = React.useCallback(
@@ -223,8 +224,9 @@ const BehaviorsEditor = (props: Props) => {
           };
         })
       );
+      forceUpdate();
     },
-    [object]
+    [forceUpdate, object]
   );
 
   const pasteBehaviors = React.useCallback(
@@ -578,18 +580,17 @@ const BehaviorsEditor = (props: Props) => {
                     copyAllBehaviors();
                   }}
                 />
+                <FlatButton
+                  key={'paste-behaviors'}
+                  leftIcon={<PasteIcon />}
+                  label={<Trans>Paste</Trans>}
+                  onClick={() => {
+                    pasteBehaviors();
+                  }}
+                  disabled={!isClipboardContainingBehaviors}
+                />
               </LineStackLayout>
               <LineStackLayout justifyContent="flex-end" expand>
-                {isClipboardContainingBehaviors && (
-                  <FlatButton
-                    key={'paste-behaviors'}
-                    leftIcon={<PasteIcon />}
-                    label={<Trans>Paste</Trans>}
-                    onClick={() => {
-                      pasteBehaviors();
-                    }}
-                  />
-                )}
                 <RaisedButton
                   key="add-behavior-line"
                   label={<Trans>Add a behavior</Trans>}

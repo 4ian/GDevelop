@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import { Column, Line, Spacer } from '../UI/Grid';
+import { LineStackLayout } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
@@ -40,6 +41,20 @@ import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Add from '../UI/CustomSvgIcons/Add';
+import { mapVector } from '../Utils/MapFor';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
+import CopyIcon from '../UI/CustomSvgIcons/Copy';
+import FlatButton from '../UI/FlatButton';
+
+const gd: libGDevelop = global.gd;
+
+const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
 
@@ -54,6 +69,20 @@ const styles = {
     flex: 1,
     alignItems: 'center',
   },
+};
+
+export const useEffectOverridingAlertDialog = () => {
+  const { showConfirmation } = useAlertDialog();
+  return async (existingEffectNames: Array<string>): Promise<boolean> => {
+    return await showConfirmation({
+      title: t`Existing effects`,
+      message: t`These effects are already exists:${'\n\n - ' +
+        existingEffectNames.join('\n\n - ') +
+        '\n\n'}Do you want to replace them?`,
+      confirmButtonLabel: t`Replace`,
+      dismissButtonLabel: t`Omit`,
+    });
+  };
 };
 
 type Props = {|
@@ -80,8 +109,36 @@ const getEnumeratedEffectMetadata = (
  * All available effects are fetched from the project's platform.
  */
 export default function EffectsList(props: Props) {
-  const { effectsContainer, onEffectsUpdated, onEffectsRenamed } = props;
+  const {
+    effectsContainer,
+    onEffectsUpdated,
+    onEffectsRenamed,
+    project,
+    target,
+  } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
+  const [justAddedEffectName, setJustAddedEffectName] = React.useState<?string>(
+    null
+  );
+  const justAddedEffectElement = React.useRef(
+    (null: ?React$Component<any, any>)
+  );
+
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedEffectElement.current &&
+        justAddedEffectName
+      ) {
+        scrollView.current.scrollTo(justAddedEffectElement.current);
+        setJustAddedEffectName(null);
+        justAddedEffectElement.current = null;
+      }
+    },
+    [justAddedEffectName]
+  );
+
   const draggedEffect = React.useRef<?gdEffect>(null);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -99,30 +156,26 @@ export default function EffectsList(props: Props) {
     [props.project]
   );
 
+  const showEffectOverridingConfirmation = useEffectOverridingAlertDialog();
+
   const forceUpdate = useForceUpdate();
 
-  const _addEffect = () => {
-    const newName = newNameGenerator('Effect', name =>
-      effectsContainer.hasEffectNamed(name)
-    );
-    effectsContainer.insertNewEffect(
-      newName,
-      effectsContainer.getEffectsCount()
-    );
+  const _addEffect = React.useCallback(
+    () => {
+      const newName = newNameGenerator('Effect', name =>
+        effectsContainer.hasEffectNamed(name)
+      );
+      effectsContainer.insertNewEffect(
+        newName,
+        effectsContainer.getEffectsCount()
+      );
 
-    forceUpdate();
-    onEffectsUpdated();
-
-    // A gdEffect is always added at the end of the list.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      if (scrollView.current) {
-        scrollView.current.scrollToBottom();
-      }
-    }, 100); // A few ms is enough for a new render to be done.
-  };
+      forceUpdate();
+      onEffectsUpdated();
+      setJustAddedEffectName(newName);
+    },
+    [effectsContainer, forceUpdate, onEffectsUpdated]
+  );
 
   const addEffect = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
@@ -130,73 +183,220 @@ export default function EffectsList(props: Props) {
     _addEffect
   );
 
-  const removeEffect = (name: string) => {
-    effectsContainer.removeEffect(name);
-    forceUpdate();
-    onEffectsUpdated();
-  };
+  const removeEffect = React.useCallback(
+    (effect: gdEffect) => {
+      effectsContainer.removeEffect(effect.getName());
+      forceUpdate();
+      onEffectsUpdated();
+    },
+    [effectsContainer, forceUpdate, onEffectsUpdated]
+  );
 
-  const moveEffect = (targetEffect: gdEffect) => {
-    const { current } = draggedEffect;
-    if (!current) return;
+  const copyEffect = React.useCallback(
+    (effect: gdEffect) => {
+      Clipboard.set(EFFECTS_CLIPBOARD_KIND, [
+        {
+          name: effect.getName(),
+          type: effect.getEffectType(),
+          serializedEffect: serializeToJSObject(effect),
+        },
+      ]);
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
 
-    const draggedIndex = effectsContainer.getEffectPosition(current.getName());
-    const targetIndex = effectsContainer.getEffectPosition(
-      targetEffect.getName()
-    );
+  const copyAllEffects = React.useCallback(
+    () => {
+      Clipboard.set(
+        EFFECTS_CLIPBOARD_KIND,
+        mapFor(0, effectsContainer.getEffectsCount(), (index: number) => {
+          const effect: gdEffect = effectsContainer.getEffectAt(index);
+          return {
+            name: effect.getName(),
+            type: effect.getEffectType(),
+            serializedEffect: serializeToJSObject(effect),
+          };
+        })
+      );
+      forceUpdate();
+    },
+    [forceUpdate, effectsContainer]
+  );
 
-    effectsContainer.moveEffect(
-      draggedIndex,
-      targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
-    );
-    forceUpdate();
-    onEffectsUpdated();
-  };
+  const pasteEffects = React.useCallback(
+    async () => {
+      const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
+      const effectContents = SafeExtractor.extractArray(clipboardContent);
+      if (!effectContents) return;
 
-  const renameEffect = (effect: gdEffect, newName: string) => {
-    if (newName === effect.getName()) return;
-    if (nameErrors[effect.ptr]) {
-      const newNameErrors = { ...nameErrors };
-      delete newNameErrors[effect.ptr];
-      setNameErrors(newNameErrors);
-    }
+      const newNamedEffects: Array<{
+        name: string,
+        serializedEffect: string,
+      }> = [];
+      const existingNamedEffects: Array<{
+        name: string,
+        serializedEffect: string,
+      }> = [];
+      effectContents.forEach(effectContent => {
+        const name = SafeExtractor.extractStringProperty(effectContent, 'name');
+        const type = SafeExtractor.extractStringProperty(effectContent, 'type');
+        const serializedEffect = SafeExtractor.extractObjectProperty(
+          effectContent,
+          'serializedEffect'
+        );
+        if (!name || !serializedEffect) {
+          return;
+        }
 
-    if (!newName) {
-      setNameErrors({
-        ...nameErrors,
-        [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
+        const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
+        if (!effectMetadata) {
+          return;
+        }
+        if (
+          target === 'object' &&
+          effectMetadata.isMarkedAsNotWorkingForObjects()
+        ) {
+          return;
+        }
+
+        if (effectsContainer.hasEffectNamed(name)) {
+          existingNamedEffects.push({ name, serializedEffect });
+        } else {
+          newNamedEffects.push({ name, serializedEffect });
+        }
       });
-      return;
-    }
 
-    if (effectsContainer.hasEffectNamed(newName)) {
-      setNameErrors({
-        ...nameErrors,
-        [effect.ptr]: <Trans>The effect name {newName} is already taken</Trans>,
+      let firstAddedEffectName: string | null = null;
+      newNamedEffects.forEach(({ name, serializedEffect }) => {
+        const effect = effectsContainer.insertNewEffect(name);
+        unserializeFromJSObject(effect, serializedEffect);
+        if (!firstAddedEffectName) {
+          firstAddedEffectName = name;
+        }
       });
-      return;
-    }
-    const oldName = effect.getName();
-    effect.setName(newName);
-    forceUpdate();
-    onEffectsRenamed(oldName, newName);
-    onEffectsUpdated();
-  };
 
-  const chooseEffectType = (effect: gdEffect, newEffectType: string) => {
-    effect.setEffectType(newEffectType);
-    const effectMetadata = getEnumeratedEffectMetadata(
-      allEffectMetadata,
-      newEffectType
-    );
+      let shouldOverrideEffects = false;
+      if (existingNamedEffects.length > 0) {
+        shouldOverrideEffects = await showEffectOverridingConfirmation(
+          existingNamedEffects.map(namedEffect => namedEffect.name)
+        );
 
-    if (effectMetadata) {
-      setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
-    }
+        if (shouldOverrideEffects) {
+          existingNamedEffects.forEach(({ name, serializedEffect }) => {
+            if (effectsContainer.hasEffectNamed(name)) {
+              const effect = effectsContainer.getEffect(name);
+              unserializeFromJSObject(effect, serializedEffect);
+            }
+          });
+        }
+      }
 
-    forceUpdate();
-    onEffectsUpdated();
-  };
+      forceUpdate();
+      if (firstAddedEffectName) {
+        setJustAddedEffectName(firstAddedEffectName);
+      } else if (existingNamedEffects === 1) {
+        setJustAddedEffectName(existingNamedEffects[0].name);
+      }
+      if (firstAddedEffectName || shouldOverrideEffects) {
+        if (onEffectsUpdated) onEffectsUpdated();
+      }
+    },
+    [
+      forceUpdate,
+      project,
+      target,
+      effectsContainer,
+      showEffectOverridingConfirmation,
+      onEffectsUpdated,
+    ]
+  );
+
+  const moveEffect = React.useCallback(
+    (targetEffect: gdEffect) => {
+      const { current } = draggedEffect;
+      if (!current) return;
+
+      const draggedIndex = effectsContainer.getEffectPosition(
+        current.getName()
+      );
+      const targetIndex = effectsContainer.getEffectPosition(
+        targetEffect.getName()
+      );
+
+      effectsContainer.moveEffect(
+        draggedIndex,
+        targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+      );
+      forceUpdate();
+      onEffectsUpdated();
+    },
+    [effectsContainer, forceUpdate, onEffectsUpdated]
+  );
+
+  const renameEffect = React.useCallback(
+    (effect: gdEffect, newName: string) => {
+      if (newName === effect.getName()) return;
+      if (nameErrors[effect.ptr]) {
+        const newNameErrors = { ...nameErrors };
+        delete newNameErrors[effect.ptr];
+        setNameErrors(newNameErrors);
+      }
+
+      if (!newName) {
+        setNameErrors({
+          ...nameErrors,
+          [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
+        });
+        return;
+      }
+
+      if (effectsContainer.hasEffectNamed(newName)) {
+        setNameErrors({
+          ...nameErrors,
+          [effect.ptr]: (
+            <Trans>The effect name {newName} is already taken</Trans>
+          ),
+        });
+        return;
+      }
+      const oldName = effect.getName();
+      effect.setName(newName);
+      forceUpdate();
+      onEffectsRenamed(oldName, newName);
+      onEffectsUpdated();
+    },
+    [
+      effectsContainer,
+      forceUpdate,
+      nameErrors,
+      onEffectsRenamed,
+      onEffectsUpdated,
+    ]
+  );
+
+  const chooseEffectType = React.useCallback(
+    (effect: gdEffect, newEffectType: string) => {
+      effect.setEffectType(newEffectType);
+      const effectMetadata = getEnumeratedEffectMetadata(
+        allEffectMetadata,
+        newEffectType
+      );
+
+      if (effectMetadata) {
+        setEffectDefaultParameters(effect, effectMetadata.effectMetadata);
+      }
+
+      forceUpdate();
+      onEffectsUpdated();
+    },
+    [allEffectMetadata, forceUpdate, onEffectsUpdated]
+  );
+
+  const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
   return (
     <I18n>
@@ -238,8 +438,14 @@ export default function EffectsList(props: Props) {
                           effectType
                         );
 
+                        const ref =
+                          justAddedEffectName === effect.getName()
+                            ? justAddedEffectElement
+                            : null;
+
                         return (
                           <DragSourceAndDropTarget
+                            ref={ref}
                             key={effect.ptr}
                             beginDrag={() => {
                               draggedEffect.current = effect;
@@ -343,8 +549,16 @@ export default function EffectsList(props: Props) {
                                       buildMenuTemplate={(i18n: I18nType) => [
                                         {
                                           label: i18n._(t`Delete`),
-                                          click: () =>
-                                            removeEffect(effect.getName()),
+                                          click: () => removeEffect(effect),
+                                        },
+                                        {
+                                          label: i18n._(t`Copy`),
+                                          click: () => copyEffect(effect),
+                                        },
+                                        {
+                                          label: i18n._(t`Paste`),
+                                          click: pasteEffects,
+                                          enabled: isClipboardContainingEffects,
                                         },
                                         { type: 'separator' },
                                         {
@@ -411,13 +625,34 @@ export default function EffectsList(props: Props) {
                 </Line>
               </ScrollView>
               <Column>
-                <Line justifyContent="flex-end" expand>
-                  <RaisedButton
-                    primary
-                    label={<Trans>Add an effect</Trans>}
-                    onClick={addEffect}
-                    icon={<Add />}
-                  />
+                <Line noMargin>
+                  <LineStackLayout expand>
+                    <FlatButton
+                      key={'copy-all-effects'}
+                      leftIcon={<CopyIcon />}
+                      label={<Trans>Copy all effects</Trans>}
+                      onClick={() => {
+                        copyAllEffects();
+                      }}
+                    />
+                    <FlatButton
+                      key={'paste-effects'}
+                      leftIcon={<PasteIcon />}
+                      label={<Trans>Paste</Trans>}
+                      onClick={() => {
+                        pasteEffects();
+                      }}
+                      disabled={!isClipboardContainingEffects}
+                    />
+                  </LineStackLayout>
+                  <LineStackLayout justifyContent="flex-end" expand>
+                    <RaisedButton
+                      primary
+                      label={<Trans>Add an effect</Trans>}
+                      onClick={addEffect}
+                      icon={<Add />}
+                    />
+                  </LineStackLayout>
                 </Line>
               </Column>
             </React.Fragment>
@@ -435,6 +670,13 @@ export default function EffectsList(props: Props) {
                     : '/interface/scene-editor/layer-effects'
                 }
                 onAction={addEffect}
+                secondaryActionIcon={<PasteIcon />}
+                secondaryActionLabel={
+                  isClipboardContainingEffects ? <Trans>Paste</Trans> : null
+                }
+                onSecondaryAction={() => {
+                  pasteEffects();
+                }}
               />
             </Column>
           )}

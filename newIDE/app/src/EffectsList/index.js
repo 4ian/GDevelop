@@ -245,7 +245,7 @@ export default function EffectsList(props: Props) {
           effectContent,
           'serializedEffect'
         );
-        if (!name || !serializedEffect) {
+        if (!name || !type || !serializedEffect) {
           return;
         }
 
@@ -272,7 +272,10 @@ export default function EffectsList(props: Props) {
 
       let firstAddedEffectName: string | null = null;
       newNamedEffects.forEach(({ name, serializedEffect }) => {
-        const effect = effectsContainer.insertNewEffect(name);
+        const effect = effectsContainer.insertNewEffect(
+          name,
+          effectsContainer.getEffectsCount()
+        );
         unserializeFromJSObject(effect, serializedEffect);
         if (!firstAddedEffectName) {
           firstAddedEffectName = name;
@@ -298,7 +301,7 @@ export default function EffectsList(props: Props) {
       forceUpdate();
       if (firstAddedEffectName) {
         setJustAddedEffectName(firstAddedEffectName);
-      } else if (existingNamedEffects === 1) {
+      } else if (existingNamedEffects.length === 1) {
         setJustAddedEffectName(existingNamedEffects[0].name);
       }
       if (firstAddedEffectName || shouldOverrideEffects) {

@@ -283,9 +283,11 @@ const BehaviorsEditor = (props: Props) => {
         }
       });
 
+      let firstAddedBehaviorName: string | null = null;
       newNamedBehavior.forEach(({ name, type, serializedBehavior }) => {
         object.addNewBehavior(project, type, name);
         if (object.hasBehaviorNamed(name)) {
+          firstAddedBehaviorName = name;
           const behavior = object.getBehavior(name);
           unserializeFromJSObject(behavior, serializedBehavior);
         }
@@ -320,7 +322,12 @@ const BehaviorsEditor = (props: Props) => {
       }
 
       forceUpdate();
-      if (newNamedBehavior.length > 0 || shouldOverrideBehavior) {
+      if (firstAddedBehaviorName) {
+        setJustAddedBehaviorName(firstAddedBehaviorName);
+        if (onSizeUpdated) onSizeUpdated();
+        onUpdateBehaviorsSharedData();
+      }
+      if (firstAddedBehaviorName || shouldOverrideBehavior) {
         if (onBehaviorsUpdated) onBehaviorsUpdated();
       }
     },
@@ -328,6 +335,8 @@ const BehaviorsEditor = (props: Props) => {
       forceUpdate,
       object,
       onBehaviorsUpdated,
+      onSizeUpdated,
+      onUpdateBehaviorsSharedData,
       project,
       showBehaviorOverridingConfirmation,
     ]

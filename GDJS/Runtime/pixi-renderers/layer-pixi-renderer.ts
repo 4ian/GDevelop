@@ -25,10 +25,18 @@ namespace gdjs {
     _isLightingLayer: boolean;
     _clearColor: Array<integer>;
 
+    _threeContainer: THREE.Group | null = null;
+    _threeCamera: THREE.PerspectiveCamera | null = null;
+
+    _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
+    _threePlaneGeometry: THREE.PlaneGeometry | null = null;
+    _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
+    _threePlaneMesh: THREE.Mesh | null = null;
+
     /**
      * Pixi doesn't sort children with zIndex == 0.
      */
-    private static readonly zeroZOrder = Math.pow(2, -24);
+    private static readonly zeroZOrderForPixi = Math.pow(2, -24);
 
     /**
      * @param layer The layer
@@ -53,14 +61,107 @@ namespace gdjs {
       if (this._isLightingLayer) {
         this._replaceContainerWithSprite();
       }
+
+      this._setupThreeCameraAndContainer();
     }
 
     getRendererObject(): PIXI.Container {
       return this._pixiContainer;
     }
 
+    get3dRendererObject(): THREE.Group | null {
+      return this._threeContainer;
+    }
+
+    get3dRendererCamera(): THREE.Camera | null {
+      return this._threeCamera;
+    }
+
     getLightingSprite(): PIXI.Sprite | null {
       return this._lightingSprite;
+    }
+
+    _setupThreeCameraAndContainer(): void {
+      if (!this._threeCamera)
+        this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+
+      if (!this._threeContainer) {
+        this._threeContainer = new THREE.Group();
+        this._runtimeSceneRenderer
+          .get3dRendererObject()
+          .add(this._threeContainer);
+      }
+
+      if (!this._pixiRenderer) return;
+      // TODO: Could be optimized by using a render texture instead of a canvas.
+      // (Implies to share the same WebGL context between PixiJS and three.js).
+      const pixiCanvas = this._pixiRenderer.view;
+      this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
+
+      this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
+      this._threePlaneMaterial = new THREE.MeshBasicMaterial({
+        // Texture will be set in onGameResolutionResized().
+        side: THREE.DoubleSide,
+        transparent: true,
+      });
+
+      this._threePlaneMesh = new THREE.Mesh(
+        this._threePlaneGeometry,
+        this._threePlaneMaterial
+      );
+      this._threeContainer.add(this._threePlaneMesh);
+      this._threePlaneMesh.renderOrder = -9999; // Ensure the plane is rendered first so it blends with 3D objects
+
+      this.onGameResolutionResized();
+    }
+
+    onGameResolutionResized() {
+      if (
+        this._threeCamera &&
+        this._threePlaneMesh &&
+        this._threePlaneMaterial
+      ) {
+        if (this._threePixiCanvasTexture) {
+          // Game size was changed, dispose of the old texture used to read the PixiJS Canvas.
+          this._threePixiCanvasTexture.dispose();
+        }
+        if (this._pixiRenderer) {
+          // And recreate a new texture to project on the plane.
+          const pixiCanvas = this._pixiRenderer.view;
+          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
+          this._threePlaneMaterial.map = this._threePixiCanvasTexture;
+        }
+
+        const runtimeGame = this._layer._runtimeScene.getGame();
+
+        // TODO: adapt position to camera position and zoom factor
+        // TODO: should we use this._layer.getWidth()??
+        this._threePlaneMesh.position.set(
+          runtimeGame.getGameResolutionWidth() / 2,
+          runtimeGame.getGameResolutionHeight() / 2,
+          0
+        );
+        this._threePlaneMesh.scale.x = runtimeGame.getGameResolutionWidth();
+        this._threePlaneMesh.scale.y =
+          runtimeGame.getGameResolutionHeight() * -1; // Mirrored because the scene is mirrored on Y axis, see below.
+
+        // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
+        const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
+        const cameraDistance =
+          (0.5 * runtimeGame.getGameResolutionHeight()) /
+          Math.tan(0.5 * cameraFovInRadians);
+        this._threeCamera.position.set(
+          runtimeGame.getGameResolutionWidth() / 2,
+          -runtimeGame.getGameResolutionHeight() / 2, // Minus because the scene is mirrored on Y axis, see below.
+          cameraDistance
+        );
+
+        this._threeCamera.aspect =
+          runtimeGame.getGameResolutionWidth() /
+          runtimeGame.getGameResolutionHeight();
+        this._threeCamera.updateProjectionMatrix();
+      }
+      // TODO: update position?
     }
 
     /**
@@ -123,6 +224,19 @@ namespace gdjs {
           this._pixiContainer.position.y
         );
       }
+
+      // TODO: Handle zoom
+      if (this._threeCamera) {
+        this._threeCamera.position.x = this._layer.getCameraX() * zoomFactor;
+        this._threeCamera.position.y = -this._layer.getCameraY() * zoomFactor; // Inverted because the scene is mirrored on Y axis.
+        this._threeCamera.rotation.z = angle;
+
+        if (this._threePlaneMesh) {
+          this._threePlaneMesh.position.x = this._threeCamera.position.x
+          this._threePlaneMesh.position.y = -this._threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
+          this._threePlaneMesh.rotation.z = -angle;
+        }
+      }
     }
 
     updateVisibility(visible: boolean): void {
@@ -135,6 +249,12 @@ namespace gdjs {
       }
     }
 
+    // onSceneUnloaded(): void {
+    // if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
+    // if (this._threePlaneGeometry) this._threePlaneGeometry.dispose();
+    // if (this._threePlaneMaterial) this._threePlaneMaterial.dispose();
+    // }
+
     /**
      * Add a child to the pixi container associated to the layer.
      * All objects which are on this layer must be children of this container.
@@ -144,7 +264,7 @@ namespace gdjs {
      */
     addRendererObject(pixiChild, zOrder: float): void {
       const child = pixiChild as PIXI.DisplayObject;
-      child.zIndex = zOrder || LayerPixiRenderer.zeroZOrder;
+      child.zIndex = zOrder || LayerPixiRenderer.zeroZOrderForPixi;
       this._pixiContainer.addChild(child);
     }
 
@@ -167,6 +287,18 @@ namespace gdjs {
      */
     removeRendererObject(child): void {
       this._pixiContainer.removeChild(child);
+    }
+
+    add3dRendererObject(object: THREE.Object3D) {
+      if (!this._threeContainer) return;
+
+      this._threeContainer.add(object);
+    }
+
+    remove3dRendererObject(object: THREE.Object3D): void {
+      if (!this._threeContainer) return;
+
+      this._threeContainer.remove(object);
     }
 
     updateClearColor(): void {

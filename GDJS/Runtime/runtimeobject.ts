@@ -451,6 +451,10 @@ namespace gdjs {
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
       }
+      const rendererObject3d = this.get3dRendererObject();
+      if (rendererObject3d) {
+        theLayer.getRenderer().remove3dRendererObject(rendererObject3d);
+      }
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
@@ -476,12 +480,16 @@ namespace gdjs {
 
     //Rendering:
     /**
-     * Called with a callback function that should be called with the internal
-     * object used for rendering by the object (PIXI.DisplayObject...)
-     *
-     * @return The internal rendered object (PIXI.DisplayObject...)
+     * @return The internal object for a 2D rendering (PIXI.DisplayObject...)
      */
     getRendererObject(): RendererObjectInterface | null | undefined {
+      return undefined;
+    }
+
+    /**
+     * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
+     */
+    get3dRendererObject(): THREE.Object3D | null | undefined {
       return undefined;
     }
 
@@ -720,6 +728,11 @@ namespace gdjs {
       if (rendererObject) {
         oldLayer.getRenderer().removeRendererObject(rendererObject);
         newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
+      }
+      const rendererObject3d = this.get3dRendererObject();
+      if (rendererObject3d) {
+        oldLayer.getRenderer().remove3dRendererObject(rendererObject3d);
+        newLayer.getRenderer().add3dRendererObject(rendererObject3d);
       }
     }
 

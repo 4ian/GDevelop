@@ -25,6 +25,16 @@ namespace gdjs {
     }
   };
 
+  const applyThreeTextureSettings = (
+    threeTexture: THREE.Texture,
+    resourceData: ResourceData | null
+  ) => {
+    if (resourceData && !resourceData.smoothed) {
+      threeTexture.magFilter = THREE.NearestFilter;
+      threeTexture.minFilter = THREE.NearestFilter;
+    }
+  }
+
   const findResourceWithNameAndKind = (
     resources: ResourceData[],
     resourceName: string,
@@ -50,12 +60,15 @@ namespace gdjs {
      * The invalid texture is a 8x8 PNG file filled with magenta (#ff00ff), to be
      * easily spotted if rendered on screen.
      */
-    _invalidTexture: PIXI.Texture;
+    private _invalidTexture: PIXI.Texture;
 
     /**
      * Map associated resource name to the loaded PixiJS texture.
      */
-    _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
+    private _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
+
+    private _invalidThreeTexture: THREE.Texture | null;
+    private _loadedThreeTextures: Hashtable<THREE.Texture>;
 
     _resourcesLoader: RuntimeGameResourcesLoader;
 
@@ -73,6 +86,7 @@ namespace gdjs {
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA'
       );
       this._loadedTextures = new Hashtable();
+      this._loadedThreeTextures = new Hashtable();
     }
 
     /**
@@ -144,37 +158,44 @@ namespace gdjs {
       return texture;
     }
 
-    getTHREETexture(resourceName: string): THREE.Texture {
+    /**
+     * Return the three.js texture associated to the specified resource name.
+     * Returns a placeholder texture if not found.
+     * @param resourceName The name of the resource
+     * @returns The requested texture, or a placeholder if not found.
+     */
+    getThreeTexture(resourceName: string): THREE.Texture {
+      const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
+      if (loadedThreeTexture) return loadedThreeTexture;
+
+      // Texture is not loaded, load it now from the PixiJS texture.
+      // TODO: Don't load the PixiJS Texture if not used by PixiJS.
+      // TODO: Ideally we could even share the same WebGL texture.
       const pixiTexture = this.getPIXITexture(resourceName);
       const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer()._pixiRenderer;
       if (!pixiRenderer) throw new Error("No PIXI renderer was found.");
-
-      // TODO: Ideally we could share the same WebGL texture.
-      // console.log(pixiTexture.baseTexture._glTextures)
-      // console.log(pixiRenderer.CONTEXT_UID)
-      // if (!pixiTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID]) return null
-      // const webglTexture = pixiTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID].texture;
-      // if (!webglTexture) throw new Error(`No webgl texture found for a PIXI Texture (resource name: ${resourceName}).`);
-
-      // TODO: this will result in two textures uploaded to the GPU (one for three.js, one for PixiJS).
-      // TODO: some textures could even not be used in PixiJS.
+      
+      // @ts-ignore - source does exist on resource.
       const image = pixiTexture.baseTexture.resource.source;
       if (!(image instanceof HTMLImageElement)) {
-        throw new Error(`Can't load texture for resource "${resourceName}" as it's not an image`);
+        throw new Error(`Can't load texture for resource "${resourceName}" as it's not an image.`);
       }
 
-      // TODO: reuse existing texture rather than re-creating it.
-
       const threeTexture = new THREE.Texture(image);
-      threeTexture.magFilter = THREE.NearestFilter;
-      threeTexture.minFilter = THREE.NearestFilter;
-      threeTexture.wrapS = THREE.ClampToEdgeWrapping;
-      threeTexture.wrapT = THREE.ClampToEdgeWrapping;
+      threeTexture.magFilter = THREE.LinearFilter;
+      threeTexture.minFilter = THREE.LinearFilter;
+      threeTexture.wrapS = THREE.RepeatWrapping;
+      threeTexture.wrapT = THREE.RepeatWrapping;
       threeTexture.needsUpdate = true;
 
-      // Ideally we could share the same WebGL texture.
-      // // @ts-ignore
-      // threeTexture.__webglTexture = webglTexture
+      const resource = findResourceWithNameAndKind(
+        this._resources,
+        resourceName,
+        'image'
+      );
+
+      applyThreeTextureSettings(threeTexture, resource);
+      this._loadedThreeTextures.put(resourceName, threeTexture);
 
       return threeTexture;
     }

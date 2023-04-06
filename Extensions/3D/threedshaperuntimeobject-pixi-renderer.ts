@@ -34,7 +34,7 @@ namespace gdjs {
           ? new THREE.MeshBasicMaterial({
               map: this._runtimeGame
                 .getImageManager()
-                .getTHREETexture(objectData.content.rightFaceResourceName),
+                .getThreeTexture(objectData.content.rightFaceResourceName),
               side: THREE.DoubleSide,
             })
           : getTransparentMaterial(),
@@ -42,7 +42,7 @@ namespace gdjs {
           ? new THREE.MeshBasicMaterial({
               map: this._runtimeGame
                 .getImageManager()
-                .getTHREETexture(objectData.content.leftFaceResourceName),
+                .getThreeTexture(objectData.content.leftFaceResourceName),
               side: THREE.DoubleSide,
             })
           : getTransparentMaterial(),
@@ -50,7 +50,7 @@ namespace gdjs {
           ? new THREE.MeshBasicMaterial({
               map: this._runtimeGame
                 .getImageManager()
-                .getTHREETexture(objectData.content.bottomFaceResourceName),
+                .getThreeTexture(objectData.content.bottomFaceResourceName),
               side: THREE.DoubleSide,
             })
           : getTransparentMaterial(),
@@ -58,7 +58,7 @@ namespace gdjs {
           ? new THREE.MeshBasicMaterial({
               map: this._runtimeGame
                 .getImageManager()
-                .getTHREETexture(objectData.content.topFaceResourceName),
+                .getThreeTexture(objectData.content.topFaceResourceName),
               side: THREE.DoubleSide,
             })
           : getTransparentMaterial(),
@@ -66,7 +66,7 @@ namespace gdjs {
           ? new THREE.MeshBasicMaterial({
               map: this._runtimeGame
                 .getImageManager()
-                .getTHREETexture(objectData.content.frontFaceResourceName),
+                .getThreeTexture(objectData.content.frontFaceResourceName),
               side: THREE.DoubleSide,
             })
           : getTransparentMaterial(),
@@ -74,7 +74,7 @@ namespace gdjs {
           ? new THREE.MeshBasicMaterial({
               map: this._runtimeGame
                 .getImageManager()
-                .getTHREETexture(objectData.content.backFaceResourceName),
+                .getThreeTexture(objectData.content.backFaceResourceName),
               side: THREE.DoubleSide,
             })
           : getTransparentMaterial(),
@@ -84,7 +84,15 @@ namespace gdjs {
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
-      instanceContainer.getRenderer().get3dRendererObject().add(this._box);
+
+      instanceContainer
+        .getLayer('')
+        .getRenderer()
+        .add3dRendererObject(this._box);
+    }
+
+    get3dRendererObject() {
+      return this._box;
     }
 
     updatePosition() {
@@ -109,14 +117,6 @@ namespace gdjs {
         this._object.getHeight(),
         this._object.getDepth()
       );
-    }
-
-    onDestroy() {
-      // TODO: Move to onDestroyFromScene?
-      this._instanceContainer
-        .getRenderer()
-        .get3dRendererObject()
-        .remove(this._box);
     }
   }
 

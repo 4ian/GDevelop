@@ -13,12 +13,7 @@ namespace gdjs {
     _showCursorAtNextRender: boolean = false;
 
     _threeRenderer: THREE.WebGLRenderer | null = null;
-    _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
-    _threePlaneGeometry: THREE.PlaneGeometry | null = null;
-    _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
-    _threePlaneMesh: THREE.Mesh | null = null;
     _threeScene: THREE.Scene | null = null;
-    _threeCamera: THREE.PerspectiveCamera | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -37,68 +32,15 @@ namespace gdjs {
     }
 
     _setupThreeScene() {
-      if (!this._pixiRenderer) return;
-
-      const runtimeGame = this._runtimeScene.getGame();
-      this._threeRenderer = runtimeGame.getRenderer()._threeRenderer;
-
-      if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
-      if (this._threePlaneGeometry) this._threePlaneGeometry.dispose();
-      if (this._threePlaneMaterial) this._threePlaneMaterial.dispose();
-      if (this._threePlaneMesh && this._threeScene)
-        this._threeScene.remove(this._threePlaneMesh);
-
-      // TODO: Could be optimized by using a render texture instead of a canvas.
-      // (Implies to share the same WebGL context between PixiJS and three.js).
-      const pixiCanvas = this._pixiRenderer.view;
-      this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
-
-      this._threePlaneGeometry = new THREE.PlaneGeometry(
-        runtimeGame.getGameResolutionWidth(),
-        runtimeGame.getGameResolutionHeight()
-      );
-      this._threePlaneMaterial = new THREE.MeshBasicMaterial({
-        map: this._threePixiCanvasTexture,
-        side: THREE.DoubleSide,
-        transparent: true,
-      });
-
-      this._threePlaneMesh = new THREE.Mesh(
-        this._threePlaneGeometry,
-        this._threePlaneMaterial
-      );
-      this._threePlaneMesh.position.set(
-        runtimeGame.getGameResolutionWidth() / 2,
-        runtimeGame.getGameResolutionHeight() / 2,
-        0
-      );
-      this._threePlaneMesh.scale.y = -1; // Mirrored because the scene is mirrored on Y axis, see below.
-      this._threePlaneMesh.renderOrder = -9999; // Ensure the plane is rendered last so it blends with 3D objects
-
+      this._threeRenderer = this._runtimeScene.getGame().getRenderer()._threeRenderer;
+      if (this._threeRenderer) this._threeRenderer.autoClear = false;
       if (!this._threeScene) this._threeScene = new THREE.Scene();
-      if (!this._threeCamera)
-        this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
-
-      // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
-      const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
-      const cameraDistance =
-        (0.5 * runtimeGame.getGameResolutionHeight()) /
-        Math.tan(0.5 * cameraFovInRadians);
-      this._threeCamera.position.set(
-        runtimeGame.getGameResolutionWidth() / 2,
-        - runtimeGame.getGameResolutionHeight() / 2, // Minus because the scene is mirrored on Y axis, see below.
-        cameraDistance
-      );
-      this._threeCamera.aspect =
-        runtimeGame.getGameResolutionWidth() /
-        runtimeGame.getGameResolutionHeight();
-      this._threeCamera.updateProjectionMatrix();
 
       // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
       // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-      this._threeScene.scale.y = -1;
+      this._threeScene.scale.y = -1; // TODO: move this to layers
 
-      this._threeScene.add(this._threePlaneMesh);
+      if (!this._threeCamera) this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
     }
 
     onGameResolutionResized() {
@@ -111,15 +53,13 @@ namespace gdjs {
       this._pixiContainer.scale.y =
         this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
 
-      this._setupThreeScene();
+      for(const runtimeLayer of this._runtimeScene._orderedLayers) {
+        runtimeLayer.getRenderer().onGameResolutionResized();
+      }
     }
 
     onSceneUnloaded() {
-      if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
-      if (this._threePlaneGeometry) this._threePlaneGeometry.dispose();
-      if (this._threePlaneMaterial) this._threePlaneMaterial.dispose();
-      if (this._threePlaneMesh && this._threeScene)
-        this._threeScene.remove(this._threePlaneMesh);
+      // TODO: call the method with the same name on RuntimeLayers so they can dispose?
     }
 
     render() {
@@ -130,24 +70,40 @@ namespace gdjs {
       // this._renderProfileText(); //Uncomment to display profiling times
 
       // render the PIXI container of the scene
-      this._pixiRenderer.reset(); // TODO: Only if THREE
+      // TODO: disable background color if rendering made by three.js
       this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
-      this._pixiRenderer.reset(); // TODO: Only if THREE
 
-      // TODO: use a single object
-      if (
-        this._threePixiCanvasTexture &&
-        this._threeRenderer &&
-        this._threeScene &&
-        this._threeCamera
-      ) {
-        this._threeScene.background = new THREE.Color(
+      // TODO: to support multiple layers, start from the first layer and iterate on them.
+      // Start from a PIXI render texture.
+      // if it's a classic 2d pixi layer, render it (this._pixiRednerer.render(layerContainer)) to a render texture
+      // if it's a 3d layer:, render the scene with: 
+      // - The existing rendertexture as a plane, behind everything. (do a this._pixiRenderer.render())
+      // - The layer pixi objects as a plane (do a clear then this._pixiRenderer.render())
+      // - render 3D (do a this._threeRenderer.render())
+
+
+      const threeRenderer = this._threeRenderer;
+      const threeScene = this._threeScene;
+
+      if (threeRenderer && threeScene) {
+        threeScene.background = new THREE.Color(
           this._runtimeScene.getBackgroundColor()
         );
-        this._threePixiCanvasTexture.needsUpdate = true;
-        this._threeRenderer.resetState();
-        this._threeRenderer.render(this._threeScene, this._threeCamera);
+        threeRenderer.clear();
+        threeRenderer.render(threeScene, this._threeCamera)
+        
+        for(const runtimeLayer of this._runtimeScene._orderedLayers) {
+          const runtimeLayerRenderer = runtimeLayer.getRenderer();
+          const threeGroup = runtimeLayerRenderer.get3dRendererObject();
+          const threeCamera = runtimeLayerRenderer.get3dRendererCamera();
+          if (threeGroup && threeCamera) {
+            // TODO: move in a render method?
+            if (runtimeLayerRenderer._threePixiCanvasTexture)
+              runtimeLayerRenderer._threePixiCanvasTexture.needsUpdate = true;
+            threeRenderer.render(threeGroup, threeCamera);
+          }
+        }
       }
 
       // synchronize showing the cursor with rendering (useful to reduce

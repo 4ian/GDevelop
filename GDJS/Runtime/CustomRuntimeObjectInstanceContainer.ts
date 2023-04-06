@@ -44,10 +44,12 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
+      const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
       this._layers.put(
         layerData.name,
-        new gdjs.RuntimeCustomObjectLayer(layerData, this)
+        layer
       );
+      this._orderedLayers.push(layer);
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {

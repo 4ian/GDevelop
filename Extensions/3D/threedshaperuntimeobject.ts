@@ -56,6 +56,10 @@ namespace gdjs {
     getRendererObject() {
       return null;
     }
+    
+    get3dRendererObject() {
+      return this._renderer.get3dRendererObject();
+    }
 
     updateFromObjectData(
       oldObjectData: ThreeDShapeObjectData,

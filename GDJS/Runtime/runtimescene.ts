@@ -72,7 +72,9 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
+      const layer = new gdjs.Layer(layerData, this);
+      this._layers.put(layerData.name, layer);
+      this._orderedLayers.push(layer);
     }
 
     /**

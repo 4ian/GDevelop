@@ -30,6 +30,7 @@ export const Default = () => (
             onRemoveAllResourcesWithInvalidPath={action(
               'onRemoveAllResourcesWithInvalidPath'
             )}
+            fileMetadata={null}
           />
         )}
       />

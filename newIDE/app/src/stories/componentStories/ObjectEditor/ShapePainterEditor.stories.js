@@ -9,8 +9,7 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ShapePainterEditor from '../../../ObjectEditor/Editors/ShapePainterEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'ObjectEditor/ShapePainterEditor',
@@ -24,13 +23,7 @@ export const Default = () => (
       objectConfiguration={testProject.shapePainterObjectConfiguration}
       project={testProject.project}
       layout={testProject.testLayout}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       onSizeUpdated={() => {}}
       // It would be used for refactoring but this kind of object has none.
       object={testProject.spriteObject}

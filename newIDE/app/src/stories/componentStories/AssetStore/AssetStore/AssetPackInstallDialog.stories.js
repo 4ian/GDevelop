@@ -15,12 +15,11 @@ import {
 } from '../../../../fixtures/GDevelopServicesTestData';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
-import fakeResourceExternalEditors from '../../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../../ProjectsStorage/ProjectStorageProviders';
 import PrivateAssetsAuthorizationContext from '../../../../AssetStore/PrivateAssets/PrivateAssetsAuthorizationContext';
 import LocalEventsFunctionsExtensionWriter from '../../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
 import LocalEventsFunctionsExtensionOpener from '../../../../EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 import EventsFunctionsExtensionsContext from '../../../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import fakeResourceManagementProps from '../../../FakeResourceManagement';
 
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
@@ -105,13 +104,7 @@ export const LayoutPublicAssetInstallSuccess = () => {
           project={testProject.project}
           objectsContainer={testProject.testLayout}
           onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-          resourceManagementProps={{
-            getStorageProvider: () => emptyStorageProvider,
-            onFetchNewlyAddedResources: async () => {},
-            resourceSources: [],
-            onChooseResource: () => Promise.reject('Unimplemented'),
-            resourceExternalEditors: fakeResourceExternalEditors,
-          }}
+          resourceManagementProps={fakeResourceManagementProps}
           canInstallPrivateAsset={() => true}
         />
       </AssetStoreStateProvider>
@@ -138,13 +131,7 @@ export const LayoutPublicAssetInstallFailure = () => {
           project={testProject.project}
           objectsContainer={testProject.testLayout}
           onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-          resourceManagementProps={{
-            getStorageProvider: () => emptyStorageProvider,
-            onFetchNewlyAddedResources: async () => {},
-            resourceSources: [],
-            onChooseResource: () => Promise.reject('Unimplemented'),
-            resourceExternalEditors: fakeResourceExternalEditors,
-          }}
+          resourceManagementProps={fakeResourceManagementProps}
           canInstallPrivateAsset={() => true}
         />
       </AssetStoreStateProvider>
@@ -167,13 +154,7 @@ export const LayoutPublicAssetAllAlreadyInstalled = () => (
       project={testProject.project}
       objectsContainer={testProject.testLayout}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => true}
     />
   </AssetStoreStateProvider>
@@ -193,13 +174,7 @@ export const LayoutPublicAssetSomeAlreadyInstalled = () => (
         project={testProject.project}
         objectsContainer={testProject.testLayout}
         onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         canInstallPrivateAsset={() => true}
       />
     </AssetStoreStateProvider>
@@ -234,13 +209,7 @@ export const LayoutPrivateAssetInstallSuccess = () => (
         project={testProject.project}
         objectsContainer={testProject.testLayout}
         onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         canInstallPrivateAsset={() => true}
       />
     </AssetStoreStateProvider>
@@ -271,13 +240,7 @@ export const LayoutPrivateAssetInstallFailure = () => (
         project={testProject.project}
         objectsContainer={testProject.testLayout}
         onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         canInstallPrivateAsset={() => true}
       />
     </AssetStoreStateProvider>
@@ -295,13 +258,7 @@ export const LayoutPrivateAssetButCantInstall = () => (
       project={testProject.project}
       objectsContainer={testProject.testLayout}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => false}
     />
   </AssetStoreStateProvider>
@@ -321,13 +278,7 @@ export const NoObjectsContainerPublicAssetInstallSuccess = () => (
         project={testProject.project}
         objectsContainer={null}
         onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         canInstallPrivateAsset={() => true}
       />
     </AssetStoreStateProvider>
@@ -349,13 +300,7 @@ export const NoObjectsContainerPrivateAssetButCantInstall = () => (
       project={testProject.project}
       objectsContainer={null}
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => false}
     />
   </AssetStoreStateProvider>

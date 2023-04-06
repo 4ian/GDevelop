@@ -20,6 +20,7 @@ import {
   generateOnEnsureCanAccessResources,
 } from './CloudProjectOpener';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
+import { generateGetResourceActions } from './CloudProjectResourcesHandler';
 
 const isURL = (filename: string) => {
   return (
@@ -71,4 +72,5 @@ export default ({
     },
     getWriteErrorMessage,
   }),
+  createResourceOperations: generateGetResourceActions,
 }: StorageProvider);

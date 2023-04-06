@@ -4,8 +4,7 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { action } from '@storybook/addon-actions';
 import ProjectManager from '../../../ProjectManager';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../../GDevelopJsInitializerDecorator';
@@ -48,13 +47,7 @@ export const Default = () => (
     )}
     freezeUpdate={false}
     hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-    resourceManagementProps={{
-      getStorageProvider: () => emptyStorageProvider,
-      onFetchNewlyAddedResources: async () => {},
-      resourceSources: [],
-      onChooseResource: () => Promise.reject('Unimplemented'),
-      resourceExternalEditors: fakeResourceExternalEditors,
-    }}
+    resourceManagementProps={fakeResourceManagementProps}
   />
 );
 
@@ -91,12 +84,6 @@ export const ErrorsInFunctions = () => (
     )}
     freezeUpdate={false}
     hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-    resourceManagementProps={{
-      getStorageProvider: () => emptyStorageProvider,
-      onFetchNewlyAddedResources: async () => {},
-      resourceSources: [],
-      onChooseResource: () => Promise.reject('Unimplemented'),
-      resourceExternalEditors: fakeResourceExternalEditors,
-    }}
+    resourceManagementProps={fakeResourceManagementProps}
   />
 );

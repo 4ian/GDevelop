@@ -8,8 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import EffectsList from '../../../EffectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export const withSomeEffectsForALayer = () => (
   <DragAndDropContextProvider>
@@ -17,13 +16,7 @@ export const withSomeEffectsForALayer = () => (
       <EffectsList
         target="layer"
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         effectsContainer={testProject.layerWithEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -38,13 +31,7 @@ export const withSomeEffectsForAnObject = () => (
       <EffectsList
         target="object"
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -59,13 +46,7 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
       <EffectsList
         target="layer"
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -80,13 +61,7 @@ export const withoutEffectsForALayer = () => (
       <EffectsList
         target="layer"
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
@@ -101,13 +76,7 @@ export const withoutEffectsForAnObject = () => (
       <EffectsList
         target="object"
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}

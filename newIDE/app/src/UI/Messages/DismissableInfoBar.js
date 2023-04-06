@@ -40,7 +40,6 @@ const DismissableInfoBar = ({
       }
       action={
         <Button
-          key="undo"
           color={
             gdevelopTheme.palette.type === 'light' ? 'secondary' : 'primary'
           }

@@ -16,6 +16,7 @@ import {
   type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
+import { type FileMetadata } from '../ProjectsStorage';
 import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
@@ -46,6 +47,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   resourceManagementProps: ResourceManagementProps,
+  fileMetadata: ?FileMetadata,
 |};
 
 const initialMosaicEditorNodes = {
@@ -204,8 +206,14 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   render() {
-    const { project, onRenameResource, resourceManagementProps } = this.props;
+    const {
+      project,
+      onRenameResource,
+      resourceManagementProps,
+      fileMetadata,
+    } = this.props;
     const { selectedResource } = this.state;
+    const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
 
     const editors = {
       properties: {
@@ -235,6 +243,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <ResourcesList
             project={project}
+            fileMetadata={fileMetadata}
             onDeleteResource={this.deleteResource}
             onRenameResource={onRenameResource}
             onSelectResource={this._onResourceSelected}
@@ -243,6 +252,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onRemoveUnusedResources={this._removeUnusedResources}
             onRemoveAllResourcesWithInvalidPath={
               this._removeAllResourcesWithInvalidPath
+            }
+            getResourceActionsSpecificToStorageProvider={
+              resourcesActionsMenuBuilder
             }
           />
         ),

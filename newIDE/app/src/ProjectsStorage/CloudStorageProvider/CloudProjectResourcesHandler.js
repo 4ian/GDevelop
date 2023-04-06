@@ -29,7 +29,7 @@ export const generateGetResourceActions = ({
 }: ResourcesActionsProps) => {
   const openLabel =
     app && path
-      ? t`Download under "Downloads" folder`
+      ? t`Save in the "Downloads" folder`
       : t`Open resource in browser`;
 
   const openOrDownloadResource = async ({
@@ -94,7 +94,7 @@ export const generateGetResourceActions = ({
 
   if (app && path) {
     actions.push({
-      label: i18n._(t`Download under...`),
+      label: i18n._(t`Save as...`),
       click: () =>
         openOrDownloadResource({ askUserForDownloadDestination: true }),
     });

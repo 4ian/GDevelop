@@ -73,6 +73,7 @@ import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts';
 import { getInstancesInLayoutForObject } from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
 import debounce from 'lodash/debounce';
+import { mapFor } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -979,6 +980,37 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
   };
 
+  onSetAsGlobalGroup = (i18n: I18nType, groupName: string): boolean => {
+    const { layout, project } = this.props;
+    const layoutName = layout.getName();
+    const layoutsWithObjectsGroupWithSameName: Array<string> = mapFor(
+      0,
+      project.getLayoutsCount(),
+      i => {
+        const otherLayout = project.getLayoutAt(i);
+        const otherLayoutName = otherLayout.getName();
+        const groupContainer = otherLayout.getObjectGroups();
+        if (layoutName !== otherLayoutName && groupContainer.has(groupName)) {
+          return otherLayoutName;
+        }
+        return null;
+      }
+    ).filter(Boolean);
+
+    if (layoutsWithObjectsGroupWithSameName.length > 0) {
+      showWarningBox(
+        i18n._(
+          t`Making this group global would conflict with the following scenes that have a group with the same name:${'\n\n - ' +
+            layoutsWithObjectsGroupWithSameName.join('\n\n - ') +
+            '\n\n'}`
+        ),
+        { delayToNextTick: true }
+      );
+      return false;
+    }
+    return true;
+  };
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.forEach(instance => {
@@ -1602,6 +1634,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onRenameGroup={this._onRenameGroup}
                 canRenameGroup={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
+                }
+                onSetAsGlobalGroup={groupName =>
+                  this.onSetAsGlobalGroup(i18n, groupName)
                 }
                 unsavedChanges={this.props.unsavedChanges}
               />

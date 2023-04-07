@@ -59,6 +59,7 @@ type Props = {|
     newName: string,
     cb: Function
   ) => void,
+  onSetAsGlobalGroup?: (groupName: string) => boolean,
   onGroupAdded?: () => void,
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
@@ -245,7 +246,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
   _setAsGlobalGroup = (i18n: I18nType, groupWithContext: GroupWithContext) => {
     const { group } = groupWithContext;
-    const { globalObjectGroups, objectGroups } = this.props;
+    const {
+      globalObjectGroups,
+      objectGroups,
+      onSetAsGlobalGroup,
+    } = this.props;
 
     const groupName = group.getName();
 
@@ -256,6 +261,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         ),
         { delayToNextTick: true }
       );
+      return;
+    }
+
+    if (onSetAsGlobalGroup && !onSetAsGlobalGroup(groupName)) {
       return;
     }
 

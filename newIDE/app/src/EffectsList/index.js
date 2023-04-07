@@ -41,7 +41,6 @@ import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import Add from '../UI/CustomSvgIcons/Add';
-import { mapVector } from '../Utils/MapFor';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import {
   serializeToJSObject,
@@ -245,22 +244,24 @@ export default function EffectsList(props: Props) {
           effectContent,
           'serializedEffect'
         );
-        if (!name || !type || !serializedEffect) {
+        if (!name || !serializedEffect) {
           return;
         }
 
-        const effectMetadata = gd.MetadataProvider.getEffectMetadata(
-          project.getCurrentPlatform(),
-          type
-        );
-        if (!effectMetadata) {
-          return;
-        }
-        if (
-          target === 'object' &&
-          effectMetadata.isMarkedAsNotWorkingForObjects()
-        ) {
-          return;
+        if (type) {
+          const effectMetadata = gd.MetadataProvider.getEffectMetadata(
+            project.getCurrentPlatform(),
+            type
+          );
+          if (!effectMetadata) {
+            return;
+          }
+          if (
+            target === 'object' &&
+            effectMetadata.isMarkedAsNotWorkingForObjects()
+          ) {
+            return;
+          }
         }
 
         if (effectsContainer.hasEffectNamed(name)) {
@@ -448,7 +449,6 @@ export default function EffectsList(props: Props) {
 
                         return (
                           <DragSourceAndDropTarget
-                            ref={ref}
                             key={effect.ptr}
                             beginDrag={() => {
                               draggedEffect.current = effect;
@@ -475,6 +475,7 @@ export default function EffectsList(props: Props) {
                                     <DropIndicator canDrop={canDrop} />
                                   )}
                                   <div
+                                    ref={ref}
                                     style={{
                                       ...styles.rowContent,
                                       backgroundColor:

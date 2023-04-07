@@ -442,7 +442,7 @@ export default function EffectsList(props: Props) {
                           effectType
                         );
 
-                        const ref =
+                        const effectTitleRef =
                           justAddedEffectName === effect.getName()
                             ? justAddedEffectElement
                             : null;
@@ -475,7 +475,6 @@ export default function EffectsList(props: Props) {
                                     <DropIndicator canDrop={canDrop} />
                                   )}
                                   <div
-                                    ref={ref}
                                     style={{
                                       ...styles.rowContent,
                                       backgroundColor:
@@ -491,7 +490,11 @@ export default function EffectsList(props: Props) {
                                     )}
                                     <ResponsiveLineStackLayout expand>
                                       <Line noMargin expand alignItems="center">
-                                        <Text noMargin noShrink>
+                                        <Text
+                                          noMargin
+                                          noShrink
+                                          ref={effectTitleRef}
+                                        >
                                           <Trans>Effect name:</Trans>
                                         </Text>
                                         <Spacer />

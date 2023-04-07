@@ -65,8 +65,12 @@ export const create = (authentication: Authentication) => {
           }) => (
             <MainFrame
               i18n={i18n}
-              renderMainMenu={(props, callbacks) => (
-                <ElectronMainMenu props={props} callbacks={callbacks} />
+              renderMainMenu={(props, callbacks, extraCallbacks) => (
+                <ElectronMainMenu
+                  props={props}
+                  callbacks={callbacks}
+                  extraCallbacks={extraCallbacks}
+                />
               )}
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />

@@ -246,11 +246,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
   _setAsGlobalGroup = (i18n: I18nType, groupWithContext: GroupWithContext) => {
     const { group } = groupWithContext;
-    const {
-      globalObjectGroups,
-      objectGroups,
-      onSetAsGlobalGroup,
-    } = this.props;
+    const { globalObjectGroups, objectGroups, onSetAsGlobalGroup } = this.props;
 
     const groupName = group.getName();
 

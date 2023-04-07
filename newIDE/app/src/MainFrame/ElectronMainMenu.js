@@ -85,9 +85,11 @@ const ElectronMainMenu = ({
     isFocusedOnMainWindow,
     setIsFocusedOnMainWindow,
   ] = React.useState<boolean>(true);
-  const [focusedWindowId, setFocusedWindowId] = React.useState<?number>(null);
+  const [focusedWindowId, setFocusedWindowId] = React.useState<number>(
+    remote.getCurrentWindow().id
+  );
   const closePreviewWindow =
-    !isFocusedOnMainWindow && onClosePreview && focusedWindowId
+    !isFocusedOnMainWindow && onClosePreview
       ? () => onClosePreview(focusedWindowId)
       : null;
   const {

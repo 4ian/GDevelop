@@ -2799,15 +2799,20 @@ storiesOf('ProjectPropertiesDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ProjectPropertiesDialog
-      open
-      initialTab="properties"
-      project={testProject.project}
-      onClose={action('onClose')}
-      onApply={async () => true}
-      onPropertiesApplied={action('onPropertiesApplied')}
-      resourceManagementProps={fakeResourceManagementProps}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <ProjectPropertiesDialog
+          open
+          initialTab="properties"
+          project={testProject.project}
+          onClose={action('onClose')}
+          onApply={async () => true}
+          onPropertiesApplied={action('onPropertiesApplied')}
+          resourceManagementProps={fakeResourceManagementProps}
+          i18n={i18n}
+        />
+      )}
+    </I18n>
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)

@@ -980,61 +980,36 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
   };
 
-  onSetAsGlobalGroup = (i18n: I18nType, groupName: string): boolean => {
+  canObjectOrGroupBeGlobal = (
+    i18n: I18nType,
+    objectOrGroupName: string
+  ): boolean => {
     const { layout, project } = this.props;
     const layoutName = layout.getName();
-    const layoutsWithObjectsGroupWithSameName: Array<string> = mapFor(
+    const layoutsWithObjectOrGroupWithSameName: Array<string> = mapFor(
       0,
       project.getLayoutsCount(),
       i => {
         const otherLayout = project.getLayoutAt(i);
         const otherLayoutName = otherLayout.getName();
-        const groupContainer = otherLayout.getObjectGroups();
-        if (layoutName !== otherLayoutName && groupContainer.has(groupName)) {
-          return otherLayoutName;
+        if (layoutName !== otherLayoutName) {
+          if (otherLayout.hasObjectNamed(objectOrGroupName)) {
+            return otherLayoutName;
+          }
+          const groupContainer = otherLayout.getObjectGroups();
+          if (groupContainer.has(objectOrGroupName)) {
+            return otherLayoutName;
+          }
         }
         return null;
       }
     ).filter(Boolean);
 
-    if (layoutsWithObjectsGroupWithSameName.length > 0) {
+    if (layoutsWithObjectOrGroupWithSameName.length > 0) {
       showWarningBox(
         i18n._(
-          t`Making this group global would conflict with the following scenes that have a group with the same name:${'\n\n - ' +
-            layoutsWithObjectsGroupWithSameName.join('\n\n - ') +
-            '\n\n'}`
-        ),
-        { delayToNextTick: true }
-      );
-      return false;
-    }
-    return true;
-  };
-
-  onSetAsGlobalObject = (i18n: I18nType, objectName: string): boolean => {
-    const { layout, project } = this.props;
-    const layoutName = layout.getName();
-    const layoutsWithObjectWithSameName: Array<string> = mapFor(
-      0,
-      project.getLayoutsCount(),
-      i => {
-        const otherLayout = project.getLayoutAt(i);
-        const otherLayoutName = otherLayout.getName();
-        if (
-          layoutName !== otherLayoutName &&
-          otherLayout.hasObjectNamed(objectName)
-        ) {
-          return otherLayoutName;
-        }
-        return null;
-      }
-    ).filter(Boolean);
-
-    if (layoutsWithObjectWithSameName.length > 0) {
-      showWarningBox(
-        i18n._(
-          t`Making this object global would conflict with the following scenes that have an object with the same name:${'\n\n - ' +
-            layoutsWithObjectWithSameName.join('\n\n - ') +
+          t`Making "${objectOrGroupName}" global would conflict with the following scenes that have a group or an object with the same name:${'\n\n - ' +
+            layoutsWithObjectOrGroupWithSameName.join('\n\n - ') +
             '\n\n'}`
         ),
         { delayToNextTick: true }
@@ -1632,7 +1607,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
                 onSetAsGlobalObject={objectName =>
-                  this.onSetAsGlobalObject(i18n, objectName)
+                  this.canObjectOrGroupBeGlobal(i18n, objectName)
                 }
                 onChangeSelectedObjectTags={selectedObjectTags =>
                   this.setState({
@@ -1672,7 +1647,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   this._canObjectOrGroupUseNewName(newName, i18n)
                 }
                 onSetAsGlobalGroup={groupName =>
-                  this.onSetAsGlobalGroup(i18n, groupName)
+                  this.canObjectOrGroupBeGlobal(i18n, groupName)
                 }
                 unsavedChanges={this.props.unsavedChanges}
               />

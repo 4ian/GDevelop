@@ -577,7 +577,7 @@ const BehaviorsEditor = (props: Props) => {
             })}
           </ScrollView>
           <Column>
-            <Line noMargin>
+            <LineStackLayout noMargin>
               <LineStackLayout expand>
                 <FlatButton
                   key={'copy-all-behaviors'}
@@ -607,7 +607,7 @@ const BehaviorsEditor = (props: Props) => {
                   id="add-behavior-button"
                 />
               </LineStackLayout>
-            </Line>
+            </LineStackLayout>
           </Column>
         </React.Fragment>
       )}

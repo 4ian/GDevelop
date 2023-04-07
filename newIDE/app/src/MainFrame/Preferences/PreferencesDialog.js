@@ -23,6 +23,9 @@ import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { adaptAcceleratorString } from '../../UI/AcceleratorString';
+import { getElectronAccelerator } from '../../KeyboardShortcuts';
+import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -62,6 +65,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
     setNewProjectsDefaultFolder,
+    setUseShortcutToClosePreviewWindow,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -361,6 +365,25 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   label={
                     <Trans>
                       Always display the preview window on top of the editor
+                    </Trans>
+                  }
+                />
+                <Toggle
+                  onToggle={(e, check) =>
+                    setUseShortcutToClosePreviewWindow(check)
+                  }
+                  toggled={values.useShortcutToClosePreviewWindow}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Enable "Close project" shortcut (
+                      {adaptAcceleratorString(
+                        getElectronAccelerator(
+                          values.userShortcutMap['CLOSE_PROJECT'] ||
+                            defaultShortcuts['CLOSE_PROJECT']
+                        )
+                      )}
+                      ) to close preview window
                     </Trans>
                   }
                 />

@@ -376,7 +376,7 @@ export const initialPreferences = {
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
-  setUseShortcutToClosePreviewWindow: () => {}
+  setUseShortcutToClosePreviewWindow: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

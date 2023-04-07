@@ -48,6 +48,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
+import { mapFor } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -607,7 +608,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const setAsGlobalObject = React.useCallback(
-      (objectWithContext: ObjectWithContext) => {
+      (i18n: I18nType, objectWithContext: ObjectWithContext) => {
         const { object } = objectWithContext;
 
         const objectName: string = object.getName();
@@ -615,14 +616,48 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         if (project.hasObjectNamed(objectName)) {
           showWarningBox(
-            'A global object with this name already exists. Please change the object name before setting it as a global object',
+            i18n._(
+              t`A global object with this name already exists. Please change the object name before setting it as a global object`
+            ),
+            { delayToNextTick: true }
+          );
+          return;
+        }
+
+        const layoutName = layout ? layout.getName() : null;
+        const layoutsWithObjectWithSameName: Array<string> = mapFor(
+          0,
+          project.getLayoutsCount(),
+          i => {
+            const otherLayout = project.getLayoutAt(i);
+            const otherLayoutName = otherLayout.getName();
+            if (
+              layoutName &&
+              layoutName !== otherLayoutName &&
+              otherLayout.hasObjectNamed(objectName)
+            ) {
+              return otherLayoutName;
+            }
+            return null;
+          }
+        ).filter(Boolean);
+
+        if (layoutsWithObjectWithSameName.length > 0) {
+          showWarningBox(
+            i18n._(
+              t`Making this object global would conflict with the following scenes that have an object with the same name:${'\n\n - ' +
+                layoutsWithObjectWithSameName.join('\n\n - ') +
+                '\n\n'}`
+            ),
             { delayToNextTick: true }
           );
           return;
         }
 
         const answer = Window.showConfirmDialog(
-          "This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?"
+          i18n._(
+            t`This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?`
+          )
         );
         if (!answer) return;
 
@@ -636,7 +671,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         onObjectModified(true);
       },
-      [objectsContainer, onObjectModified, project]
+      [objectsContainer, onObjectModified, project, layout]
     );
 
     const openEditTagDialog = React.useCallback(
@@ -746,7 +781,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectWithContextGlobal(objectWithContext),
-            click: () => setAsGlobalObject(objectWithContext),
+            click: () => setAsGlobalObject(i18n, objectWithContext),
           },
           {
             label: i18n._(t`Tags`),

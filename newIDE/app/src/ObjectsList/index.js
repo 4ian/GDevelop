@@ -127,6 +127,7 @@ type Props = {|
   onChangeSelectedObjectTags: SelectedTags => void,
 
   onSetAsGlobalObject?: (groupName: string) => boolean,
+  canSetAsGlobalObject?: boolean,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
@@ -164,6 +165,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onChangeSelectedObjectTags,
 
       onSetAsGlobalObject,
+      canSetAsGlobalObject,
 
       onEditObject,
       onExportObject,
@@ -759,6 +761,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             label: i18n._(t`Set as global object`),
             enabled: !isObjectWithContextGlobal(objectWithContext),
             click: () => setAsGlobalObject(i18n, objectWithContext),
+            visible: canSetAsGlobalObject !== false,
           },
           {
             label: i18n._(t`Tags`),
@@ -820,6 +823,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         eventsFunctionsExtensionWriter,
         preferences.values.userShortcutMap,
+        canSetAsGlobalObject,
       ]
     );
 

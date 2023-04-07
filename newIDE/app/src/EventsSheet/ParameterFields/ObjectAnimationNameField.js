@@ -43,52 +43,45 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       parameterIndex,
     } = props;
 
-    const animationNames = React.useMemo(
-      () => {
-        const objectName = getLastObjectParameterValue({
-          instructionMetadata,
-          instruction,
-          expressionMetadata,
-          expression,
-          parameterIndex,
-        });
-
-        if (!objectName || !project) {
-          return [];
-        }
-
-        const object = getObjectByName(project, scope.layout, objectName);
-        if (!object) {
-          return [];
-        }
-
-        if (object.getType() === 'Sprite') {
-          const spriteConfiguration = gd.asSpriteConfiguration(
-            object.getConfiguration()
-          );
-
-          return mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-            const animationName = spriteConfiguration
-              .getAnimation(index)
-              .getName();
-            return animationName.length > 0 ? animationName : null;
-          })
-            .filter(Boolean)
-            .sort();
-        }
-
-        return [];
-      },
-      [
-        project,
-        scope.layout,
+    // We don't memo/callback this, as we want to recompute it every time something changes.
+    // Because of the function getLastObjectParameterValue.
+    const getAnimationNames = () => {
+      const objectName = getLastObjectParameterValue({
         instructionMetadata,
         instruction,
         expressionMetadata,
         expression,
         parameterIndex,
-      ]
-    );
+      });
+
+      if (!objectName || !project) {
+        return [];
+      }
+
+      const object = getObjectByName(project, scope.layout, objectName);
+      if (!object) {
+        return [];
+      }
+
+      if (object.getType() === 'Sprite') {
+        const spriteConfiguration = gd.asSpriteConfiguration(
+          object.getConfiguration()
+        );
+
+        return mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+          const animationName = spriteConfiguration
+            .getAnimation(index)
+            .getName();
+          return animationName.length > 0 ? animationName : null;
+        })
+          .filter(Boolean)
+          .sort();
+      }
+
+      return [];
+    };
+
+    const animationNames = getAnimationNames();
 
     const isCurrentValueInAnimationNamesList = !!animationNames.find(
       animationName => `"${animationName}"` === props.value
@@ -172,7 +165,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               leftIcon={<TypeCursorSelect />}
               style={style}
               primary
-              label={<Trans>Select an animation</Trans>}
+              label={<Trans>Select an Animation</Trans>}
               onClick={switchFieldType}
             />
           ) : (

@@ -119,9 +119,7 @@ export default function EffectsList(props: Props) {
   const [justAddedEffectName, setJustAddedEffectName] = React.useState<?string>(
     null
   );
-  const justAddedEffectElement = React.useRef(
-    (null: ?React$Component<any, any>)
-  );
+  const justAddedEffectElement = React.useRef<?any>(null);
 
   React.useEffect(
     () => {
@@ -442,7 +440,7 @@ export default function EffectsList(props: Props) {
                           effectType
                         );
 
-                        const effectTitleRef =
+                        const effectRef =
                           justAddedEffectName === effect.getName()
                             ? justAddedEffectElement
                             : null;
@@ -475,6 +473,7 @@ export default function EffectsList(props: Props) {
                                     <DropIndicator canDrop={canDrop} />
                                   )}
                                   <div
+                                    ref={effectRef}
                                     style={{
                                       ...styles.rowContent,
                                       backgroundColor:
@@ -490,11 +489,7 @@ export default function EffectsList(props: Props) {
                                     )}
                                     <ResponsiveLineStackLayout expand>
                                       <Line noMargin expand alignItems="center">
-                                        <Text
-                                          noMargin
-                                          noShrink
-                                          ref={effectTitleRef}
-                                        >
+                                        <Text noMargin noShrink>
                                           <Trans>Effect name:</Trans>
                                         </Text>
                                         <Spacer />

@@ -6,7 +6,7 @@ import { ColumnStackLayout } from './Layout';
 import { LineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
-import { Column, Line, LargeSpacer } from './Grid';
+import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import TutorialButton from './TutorialButton';

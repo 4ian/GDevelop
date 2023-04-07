@@ -1011,6 +1011,39 @@ export default class SceneEditor extends React.Component<Props, State> {
     return true;
   };
 
+  onSetAsGlobalObject = (i18n: I18nType, objectName: string): boolean => {
+    const { layout, project } = this.props;
+    const layoutName = layout.getName();
+    const layoutsWithObjectWithSameName: Array<string> = mapFor(
+      0,
+      project.getLayoutsCount(),
+      i => {
+        const otherLayout = project.getLayoutAt(i);
+        const otherLayoutName = otherLayout.getName();
+        if (
+          layoutName !== otherLayoutName &&
+          otherLayout.hasObjectNamed(objectName)
+        ) {
+          return otherLayoutName;
+        }
+        return null;
+      }
+    ).filter(Boolean);
+
+    if (layoutsWithObjectWithSameName.length > 0) {
+      showWarningBox(
+        i18n._(
+          t`Making this object global would conflict with the following scenes that have an object with the same name:${'\n\n - ' +
+            layoutsWithObjectWithSameName.join('\n\n - ') +
+            '\n\n'}`
+        ),
+        { delayToNextTick: true }
+      );
+      return false;
+    }
+    return true;
+  };
+
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     selectedInstances.forEach(instance => {
@@ -1598,6 +1631,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
+                onSetAsGlobalObject={objectName =>
+                  this.onSetAsGlobalObject(i18n, objectName)
+                }
                 onChangeSelectedObjectTags={selectedObjectTags =>
                   this.setState({
                     selectedObjectTags,

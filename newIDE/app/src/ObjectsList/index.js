@@ -48,7 +48,6 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { Column, Line } from '../UI/Grid';
 import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
 import Add from '../UI/CustomSvgIcons/Add';
-import { mapFor } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -127,6 +126,8 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
+  onSetAsGlobalObject?: (groupName: string) => boolean,
+
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
@@ -161,6 +162,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectTags,
       getAllObjectTags,
       onChangeSelectedObjectTags,
+
+      onSetAsGlobalObject,
 
       onEditObject,
       onExportObject,
@@ -624,33 +627,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
 
-        const layoutName = layout ? layout.getName() : null;
-        const layoutsWithObjectWithSameName: Array<string> = mapFor(
-          0,
-          project.getLayoutsCount(),
-          i => {
-            const otherLayout = project.getLayoutAt(i);
-            const otherLayoutName = otherLayout.getName();
-            if (
-              layoutName &&
-              layoutName !== otherLayoutName &&
-              otherLayout.hasObjectNamed(objectName)
-            ) {
-              return otherLayoutName;
-            }
-            return null;
-          }
-        ).filter(Boolean);
-
-        if (layoutsWithObjectWithSameName.length > 0) {
-          showWarningBox(
-            i18n._(
-              t`Making this object global would conflict with the following scenes that have an object with the same name:${'\n\n - ' +
-                layoutsWithObjectWithSameName.join('\n\n - ') +
-                '\n\n'}`
-            ),
-            { delayToNextTick: true }
-          );
+        if (onSetAsGlobalObject && !onSetAsGlobalObject(objectName)) {
           return;
         }
 
@@ -671,7 +648,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         onObjectModified(true);
       },
-      [objectsContainer, onObjectModified, project, layout]
+      [objectsContainer, onObjectModified, project, onSetAsGlobalObject]
     );
 
     const openEditTagDialog = React.useCallback(

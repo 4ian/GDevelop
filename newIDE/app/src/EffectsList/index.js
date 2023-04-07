@@ -628,7 +628,7 @@ export default function EffectsList(props: Props) {
               </ScrollView>
               <Column>
                 <Line noMargin>
-                  <LineStackLayout expand>
+                  <ResponsiveLineStackLayout expand>
                     <FlatButton
                       key={'copy-all-effects'}
                       leftIcon={<CopyIcon />}
@@ -646,7 +646,7 @@ export default function EffectsList(props: Props) {
                       }}
                       disabled={!isClipboardContainingEffects}
                     />
-                  </LineStackLayout>
+                  </ResponsiveLineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
                     <RaisedButton
                       primary

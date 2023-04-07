@@ -138,7 +138,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
   _toggleAsync = (eventsFunction: gdEventsFunction) => {
     eventsFunction.setAsync(!eventsFunction.isAsync());
-    this.forceUpdate();
+    this.forceUpdateList();
   };
 
   _deleteEventsFunction = (
@@ -355,7 +355,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       {
         label: eventsFunction.isAsync()
           ? i18n._(t`Make synchronous`)
-          : i18n._(t`Make asynchrounous`),
+          : i18n._(t`Make asynchronous`),
         click: () => this._toggleAsync(eventsFunction),
       },
       {

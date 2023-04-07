@@ -44,6 +44,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import FlatButton from '../UI/FlatButton';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -101,6 +102,9 @@ const BehaviorsEditor = (props: Props) => {
     },
     [justAddedBehaviorName]
   );
+
+  const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
@@ -574,11 +578,11 @@ const BehaviorsEditor = (props: Props) => {
           </ScrollView>
           <Column>
             <Line noMargin>
-              <ResponsiveLineStackLayout expand>
+              <LineStackLayout expand>
                 <FlatButton
                   key={'copy-all-behaviors'}
                   leftIcon={<CopyIcon />}
-                  label={<Trans>Copy all behaviors</Trans>}
+                  label={isSmall ? '' : <Trans>Copy all behaviors</Trans>}
                   onClick={() => {
                     copyAllBehaviors();
                   }}
@@ -586,13 +590,13 @@ const BehaviorsEditor = (props: Props) => {
                 <FlatButton
                   key={'paste-behaviors'}
                   leftIcon={<PasteIcon />}
-                  label={<Trans>Paste</Trans>}
+                  label={isSmall ? '' : <Trans>Paste</Trans>}
                   onClick={() => {
                     pasteBehaviors();
                   }}
                   disabled={!isClipboardContainingBehaviors}
                 />
-              </ResponsiveLineStackLayout>
+              </LineStackLayout>
               <LineStackLayout justifyContent="flex-end" expand>
                 <RaisedButton
                   key="add-behavior-line"

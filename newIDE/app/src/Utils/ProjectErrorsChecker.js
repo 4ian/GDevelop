@@ -1,4 +1,6 @@
 // @flow
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import values from 'lodash/values';
 const gd: libGDevelop = global.gd;
@@ -19,13 +21,11 @@ export const validatePackageName = (packageName: string) => {
   return pattern.test(packageName);
 };
 
-type TFunction = string => string; //TODO
-
 /**
  * Check if there is any blocking error in the project properties.
  */
 export const getProjectPropertiesErrors = (
-  t: TFunction,
+  i18n: I18nType,
   project: gdProject
 ): ProjectErrors => {
   const errors: ProjectErrors = {};
@@ -49,24 +49,24 @@ export const getProjectPropertiesErrors = (
     addError(
       'packageName',
       'error',
-      t('The package name is empty.'),
-      t('Choose and enter a package name in the game properties.')
+      i18n._(t`The package name is empty.`),
+      i18n._(t`Choose and enter a package name in the game properties.`)
     );
   } else if (project.getPackageName().length >= 255) {
     addError(
       'packageName',
       'error',
-      t('The package name is too long.'),
-      t('Change the package name in the game properties.')
+      i18n._(t`The package name is too long.`),
+      i18n._(t`Change the package name in the game properties.`)
     );
   } else if (!validatePackageName(project.getPackageName())) {
     addError(
       'packageName',
       'error',
-      t(
-        'The package name is containing invalid characters or not following the convention "xxx.yyy.zzz" (numbers allowed after a letter only).'
+      i18n._(
+        t`The package name is containing invalid characters or not following the convention "xxx.yyy.zzz" (numbers allowed after a letter only).`
       ),
-      t('Change the package name in the game properties.')
+      i18n._(t`Change the package name in the game properties.`)
     );
   }
 
@@ -74,8 +74,8 @@ export const getProjectPropertiesErrors = (
     addError(
       'name',
       'error',
-      t('The name of your game is too long.'),
-      t('Change the name in the game properties.')
+      i18n._(t`The name of your game is too long`),
+      i18n._(t`Change the name in the game properties.`)
     );
   }
 
@@ -83,8 +83,8 @@ export const getProjectPropertiesErrors = (
     addError(
       'packageName',
       'error',
-      t("The version that you've set for the game is invalid."),
-      t('Enter a version in the game properties.')
+      i18n._(t`The version that you've set for the game is invalid.`),
+      i18n._(t`Enter a version in the game properties.`)
     );
   }
 
@@ -92,15 +92,15 @@ export const getProjectPropertiesErrors = (
 };
 
 export const displayProjectErrorsBox = (
-  t: TFunction,
+  i18n: I18nType,
   errors: ProjectErrors
 ): boolean => {
   if (!Object.keys(errors).length) return true;
 
   showErrorBox({
     message:
-      t(
-        'Your game has some invalid elements, please fix these before continuing:'
+      i18n._(
+        t`Your game has some invalid elements, please fix these before continuing:`
       ) +
       '\n\n' +
       values(errors)

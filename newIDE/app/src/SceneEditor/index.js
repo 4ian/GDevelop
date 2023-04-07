@@ -1606,7 +1606,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
-                onSetAsGlobalObject={objectName =>
+                beforeSetAsGlobalObject={objectName =>
                   this.canObjectOrGroupBeGlobal(i18n, objectName)
                 }
                 onChangeSelectedObjectTags={selectedObjectTags =>
@@ -1646,7 +1646,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 canRenameGroup={newName =>
                   this._canObjectOrGroupUseNewName(newName, i18n)
                 }
-                onSetAsGlobalGroup={groupName =>
+                beforeSetAsGlobalGroup={groupName =>
                   this.canObjectOrGroupBeGlobal(i18n, groupName)
                 }
                 unsavedChanges={this.props.unsavedChanges}

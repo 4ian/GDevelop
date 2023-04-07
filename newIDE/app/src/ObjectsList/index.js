@@ -126,7 +126,7 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
-  onSetAsGlobalObject?: (groupName: string) => boolean,
+  beforeSetAsGlobalObject?: (groupName: string) => boolean,
   canSetAsGlobalObject?: boolean,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
@@ -164,7 +164,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       getAllObjectTags,
       onChangeSelectedObjectTags,
 
-      onSetAsGlobalObject,
+      beforeSetAsGlobalObject,
       canSetAsGlobalObject,
 
       onEditObject,
@@ -629,7 +629,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           return;
         }
 
-        if (onSetAsGlobalObject && !onSetAsGlobalObject(objectName)) {
+        if (beforeSetAsGlobalObject && !beforeSetAsGlobalObject(objectName)) {
           return;
         }
 
@@ -650,7 +650,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         onObjectModified(true);
       },
-      [objectsContainer, onObjectModified, project, onSetAsGlobalObject]
+      [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
     );
 
     const openEditTagDialog = React.useCallback(

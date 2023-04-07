@@ -178,6 +178,15 @@ class GD_CORE_API ValueTypeMetadata {
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";
+    } else if (type == "resource") {
+      return parameterType == "fontResource" ||
+             parameterType == "soundfile" ||
+             parameterType == "musicfile" ||
+             parameterType == "bitmapFontResource" ||
+             parameterType == "imageResource" ||
+             parameterType == "jsonResource" ||
+             parameterType == "tilemapResource" ||
+             parameterType == "tilesetResource";
     }
     return false;
   }

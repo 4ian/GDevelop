@@ -300,6 +300,7 @@ export default class ForEachChildVariableEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
               idPrefix={this.props.idPrefix}
@@ -331,6 +332,7 @@ export default class ForEachChildVariableEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
               idPrefix={this.props.idPrefix}

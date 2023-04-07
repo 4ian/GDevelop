@@ -252,7 +252,6 @@ export default class ExportLauncher extends Component<Props, State> {
     } catch (registerError) {
       // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game.');
-      console.log(registerError.response);
       if (registerError.response.status === 403) {
         if (
           registerError.response.data &&
@@ -270,9 +269,7 @@ export default class ExportLauncher extends Component<Props, State> {
             rawError: registerError,
             errorId: 'existing-game-register',
           });
-        }
-
-        if (
+        } else if (
           registerError.response.data &&
           registerError.response.data.code === 'game-creation/too-many-games'
         ) {

@@ -7,7 +7,7 @@ import paperDecorator from '../PaperDecorator';
 
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
-import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
+import PasteIcon from '../../UI/CustomSvgIcons/Clipboard';
 
 export default {
   title: 'UI Building Blocks/EmptyPlaceholder',

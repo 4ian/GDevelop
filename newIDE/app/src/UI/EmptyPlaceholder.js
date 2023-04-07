@@ -90,7 +90,7 @@ export const EmptyPlaceholder = (props: Props) => (
               }
               id={props.actionButtonId}
             />
-          </LineStackLayout>
+          </ResponsiveLineStackLayout>
           {props.tutorialId ? (
             <TutorialButton
               tutorialId={props.tutorialId}

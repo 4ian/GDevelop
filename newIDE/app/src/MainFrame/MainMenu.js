@@ -45,6 +45,10 @@ export type MainMenuCallbacks = {|
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 
+export type MainMenuExtraCallbacks = {|
+  onClosePreview?: ?(windowId: number) => void,
+|};
+
 export type MainMenuEvent =
   | 'main-menu-open'
   | 'main-menu-open-recent'

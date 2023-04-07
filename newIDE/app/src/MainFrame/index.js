@@ -109,6 +109,7 @@ import UnsavedChangesContext from './UnsavedChangesContext';
 import {
   type BuildMainMenuProps,
   type MainMenuCallbacks,
+  type MainMenuExtraCallbacks,
   buildMainMenuDeclarativeTemplate,
   adaptFromDeclarativeTemplate,
 } from './MainMenu';
@@ -265,7 +266,11 @@ type LaunchPreviewOptions = {
 };
 
 export type Props = {|
-  renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
+  renderMainMenu?: (
+    BuildMainMenuProps,
+    MainMenuCallbacks,
+    MainMenuExtraCallbacks
+  ) => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -2954,7 +2959,13 @@ const MainFrame = (props: Props) => {
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
-          mainMenuCallbacks
+          mainMenuCallbacks,
+          {
+            onClosePreview:
+              _previewLauncher.current && _previewLauncher.current.closePreview
+                ? _previewLauncher.current.closePreview
+                : null,
+          }
         )}
       <ProjectTitlebar
         projectName={currentProject ? currentProject.getName() : null}

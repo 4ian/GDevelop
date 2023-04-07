@@ -6,8 +6,10 @@ import {
   buildMainMenuDeclarativeTemplate,
   type BuildMainMenuProps,
   type MainMenuCallbacks,
+  type MainMenuExtraCallbacks,
   type MainMenuEvent,
 } from './MainMenu';
+import PreferencesContext from './Preferences/PreferencesContext';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -70,19 +72,34 @@ const isMainWindow = (windowTitle: string): boolean => {
 const ElectronMainMenu = ({
   props,
   callbacks,
+  extraCallbacks,
 }: {|
   props: BuildMainMenuProps,
   callbacks: MainMenuCallbacks,
+  extraCallbacks: MainMenuExtraCallbacks,
 |}) => {
   const { i18n, project, recentProjectFiles, shortcutMap } = props;
+  const { onClosePreview } = extraCallbacks;
   const language = i18n.language;
   const [
     isFocusedOnMainWindow,
     setIsFocusedOnMainWindow,
   ] = React.useState<boolean>(true);
+  const [focusedWindowId, setFocusedWindowId] = React.useState<number>(
+    remote.getCurrentWindow().id
+  );
+  const closePreviewWindow =
+    !isFocusedOnMainWindow && onClosePreview
+      ? () => onClosePreview(focusedWindowId)
+      : null;
+  const {
+    values: { useShortcutToClosePreviewWindow },
+  } = React.useContext(PreferencesContext);
+
   useAppEventListener({
     event: 'browser-window-focus',
     callback: window => {
+      setFocusedWindowId(window.id);
       setIsFocusedOnMainWindow(isMainWindow(window.title));
     },
   });
@@ -117,8 +134,14 @@ const ElectronMainMenu = ({
   });
   useIPCEventListener({
     ipcEvent: 'main-menu-close',
-    callback: callbacks.onCloseProject,
-    shouldApply: isFocusedOnMainWindow,
+    callback:
+      useShortcutToClosePreviewWindow && closePreviewWindow
+        ? closePreviewWindow
+        : callbacks.onCloseProject,
+    shouldApply:
+      useShortcutToClosePreviewWindow && closePreviewWindow
+        ? true
+        : isFocusedOnMainWindow,
   });
   useIPCEventListener({
     ipcEvent: 'main-menu-close-app',

@@ -204,6 +204,7 @@ export type PreferencesValues = {|
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
+  useShortcutToClosePreviewWindow: boolean,
 |};
 
 /**
@@ -278,6 +279,7 @@ export type Preferences = {|
     userId: ?string,
   |}) => ?InAppTutorialUserProgress,
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
+  setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -320,6 +322,7 @@ export const initialPreferences = {
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
+    useShortcutToClosePreviewWindow: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -373,6 +376,7 @@ export const initialPreferences = {
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
+  setUseShortcutToClosePreviewWindow: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

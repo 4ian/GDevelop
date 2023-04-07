@@ -37,7 +37,7 @@ export const generateGetResourceActions = ({
   }: {
     askUserForDownloadDestination: boolean,
   }) => {
-    const resourceUrl = ResourcesLoader.getResourceFullUrl(
+    let resourceUrl = ResourcesLoader.getResourceFullUrl(
       project,
       resource.getName(),
       {}
@@ -46,6 +46,12 @@ export const generateGetResourceActions = ({
       await getCredentialsForCloudProject(
         authenticatedUser,
         fileMetadata.fileIdentifier
+      );
+      // Recompute full url to include a refreshed token.
+      resourceUrl = ResourcesLoader.getResourceFullUrl(
+        project,
+        resource.getName(),
+        {}
       );
     }
     if (app && path && electron) {

@@ -12,6 +12,7 @@ import NewBehaviorDialog from './NewBehaviorDialog';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
@@ -573,7 +574,7 @@ const BehaviorsEditor = (props: Props) => {
           </ScrollView>
           <Column>
             <Line noMargin>
-              <LineStackLayout expand>
+              <ResponsiveLineStackLayout expand>
                 <FlatButton
                   key={'copy-all-behaviors'}
                   leftIcon={<CopyIcon />}
@@ -591,7 +592,7 @@ const BehaviorsEditor = (props: Props) => {
                   }}
                   disabled={!isClipboardContainingBehaviors}
                 />
-              </LineStackLayout>
+              </ResponsiveLineStackLayout>
               <LineStackLayout justifyContent="flex-end" expand>
                 <RaisedButton
                   key="add-behavior-line"

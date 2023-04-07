@@ -53,7 +53,7 @@ type Props = {|
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
-  canRenameGroup: (newName: string) => boolean,
+  canRenameGroup: (newName: string, global: boolean) => boolean,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -214,7 +214,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
-    const { group } = groupWithContext;
+    const { group, global } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
     this.setState({
@@ -230,7 +230,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
 
-    if (this.props.canRenameGroup(newName)) {
+    if (this.props.canRenameGroup(newName, global)) {
       this.props.onRenameGroup(groupWithContext, newName, doRename => {
         if (!doRename) return;
 
@@ -246,7 +246,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
   _setAsGlobalGroup = (i18n: I18nType, groupWithContext: GroupWithContext) => {
     const { group } = groupWithContext;
-    const { globalObjectGroups, objectGroups, beforeSetAsGlobalGroup } = this.props;
+    const {
+      globalObjectGroups,
+      objectGroups,
+      beforeSetAsGlobalGroup,
+    } = this.props;
 
     const groupName = group.getName();
 

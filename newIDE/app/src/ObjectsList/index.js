@@ -134,7 +134,7 @@ type Props = {|
   onObjectCreated: gdObject => void,
   onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
-  canRenameObject: (newName: string) => boolean,
+  canRenameObject: (newName: string, global: boolean) => boolean,
   onAddObjectInstance: (objectName: string) => void,
 
   getThumbnail: (
@@ -460,12 +460,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
-        const { object } = objectWithContext;
+        const { object, global } = objectWithContext;
         onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
-        if (canRenameObject(newName)) {
+        if (canRenameObject(newName, global)) {
           onRenameObjectFinish(objectWithContext, newName, doRename => {
             if (!doRename) return;
 

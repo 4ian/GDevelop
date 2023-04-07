@@ -806,7 +806,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
-  _canObjectOrGroupUseNewName = (newName: string, i18n: I18nType) => {
+  _canObjectOrGroupUseNewName = (
+    newName: string,
+    global: boolean,
+    i18n: I18nType
+  ) => {
     const { project, layout } = this.props;
 
     if (
@@ -822,7 +826,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
       );
       return false;
-    } else if (!gd.Project.validateName(newName)) {
+    }
+    if (!gd.Project.validateName(newName)) {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
@@ -830,6 +835,42 @@ export default class SceneEditor extends React.Component<Props, State> {
         { delayToNextTick: true }
       );
       return false;
+    }
+
+    if (global) {
+      // If object or group is global, also check for other layouts' objects and groups names.
+      const { layout, project } = this.props;
+      const layoutName = layout.getName();
+      const layoutsWithObjectOrGroupWithSameName: Array<string> = mapFor(
+        0,
+        project.getLayoutsCount(),
+        i => {
+          const otherLayout = project.getLayoutAt(i);
+          const otherLayoutName = otherLayout.getName();
+          if (layoutName !== otherLayoutName) {
+            if (otherLayout.hasObjectNamed(newName)) {
+              return otherLayoutName;
+            }
+            const groupContainer = otherLayout.getObjectGroups();
+            if (groupContainer.has(newName)) {
+              return otherLayoutName;
+            }
+          }
+          return null;
+        }
+      ).filter(Boolean);
+
+      if (layoutsWithObjectOrGroupWithSameName.length > 0) {
+        return Window.showConfirmDialog(
+          i18n._(
+            t`Renaming the global object/group "${newName}" would conflict with the following scenes that have a group or an object with that name:${'\n\n - ' +
+              layoutsWithObjectOrGroupWithSameName.join('\n\n - ') +
+              '\n\n'}Continue only if you know what you're doing.`
+          ),
+          'warning'
+        );
+      }
+      return true;
     }
 
     return true;
@@ -1419,6 +1460,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       resourceManagementProps,
       isActive,
     } = this.props;
+    const { editedObjectWithContext } = this.state;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
     const variablesEditedAssociatedObjectName = this.state
       .variablesEditedInstance
@@ -1594,8 +1636,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onEditObject={this.props.onEditObject || this.editObject}
                 onExportObject={this.openObjectExporterDialog}
                 onDeleteObject={this._onDeleteObject(i18n)}
-                canRenameObject={newName =>
-                  this._canObjectOrGroupUseNewName(newName, i18n)
+                canRenameObject={(newName, global) =>
+                  this._canObjectOrGroupUseNewName(newName, global, i18n)
                 }
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
@@ -1642,8 +1684,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onEditGroup={this.editGroup}
                 onDeleteGroup={this._onDeleteGroup}
                 onRenameGroup={this._onRenameGroup}
-                canRenameGroup={newName =>
-                  this._canObjectOrGroupUseNewName(newName, i18n)
+                canRenameGroup={(newName, global) =>
+                  this._canObjectOrGroupUseNewName(newName, global, i18n)
                 }
                 beforeSetAsGlobalGroup={groupName =>
                   this.canObjectOrGroupBeGlobal(i18n, groupName)
@@ -1707,10 +1749,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         <I18n>
           {({ i18n }) => (
             <React.Fragment>
-              {this.state.editedObjectWithContext && (
+              {editedObjectWithContext && (
                 <ObjectEditorDialog
                   open
-                  object={this.state.editedObjectWithContext.object}
+                  object={editedObjectWithContext.object}
                   initialTab={this.state.editedObjectInitialTab}
                   project={project}
                   layout={layout}
@@ -1727,24 +1769,24 @@ export default class SceneEditor extends React.Component<Props, State> {
                     );
                   }}
                   onCancel={() => {
-                    if (this.state.editedObjectWithContext) {
-                      this.reloadResourcesFor(
-                        this.state.editedObjectWithContext.object
-                      );
+                    if (editedObjectWithContext) {
+                      this.reloadResourcesFor(editedObjectWithContext.object);
                     }
                     this.editObject(null);
                   }}
                   canRenameObject={newName =>
-                    this._canObjectOrGroupUseNewName(newName, i18n)
+                    this._canObjectOrGroupUseNewName(
+                      newName,
+                      editedObjectWithContext.global,
+                      i18n
+                    )
                   }
                   onRename={newName => {
                     this._onRenameEditedObject(newName);
                   }}
                   onApply={() => {
-                    if (this.state.editedObjectWithContext) {
-                      this.reloadResourcesFor(
-                        this.state.editedObjectWithContext.object
-                      );
+                    if (editedObjectWithContext) {
+                      this.reloadResourcesFor(editedObjectWithContext.object);
                     }
                     this.editObject(null);
                     this.updateBehaviorsSharedData();

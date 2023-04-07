@@ -1006,15 +1006,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     ).filter(Boolean);
 
     if (layoutsWithObjectOrGroupWithSameName.length > 0) {
-      showWarningBox(
+      return Window.showConfirmDialog(
         i18n._(
           t`Making "${objectOrGroupName}" global would conflict with the following scenes that have a group or an object with the same name:${'\n\n - ' +
             layoutsWithObjectOrGroupWithSameName.join('\n\n - ') +
-            '\n\n'}`
+            '\n\n'}Continue only if you know what you're doing.`
         ),
-        { delayToNextTick: true }
+        'warning'
       );
-      return false;
     }
     return true;
   };

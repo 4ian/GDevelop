@@ -1,19 +1,18 @@
 // @flow
 import React from 'react';
-import GenericExpressionField from './GenericExpressionField';
+import { t } from '@lingui/macro';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParameters';
-
-const gd: libGDevelop = global.gd;
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function FunctionParameterNameField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?GenericExpressionField>(null);
+    const field = React.useRef<?SelectFieldInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
@@ -32,31 +31,57 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const functionsContainer = eventsBasedEntity
       ? eventsBasedEntity.getEventsFunctions()
       : props.scope.eventsFunctionsExtension;
-    const parameterNames: Array<ExpressionAutocompletion> =
+    const parameters: Array<gdParameterMetadata> =
       props.scope.eventsFunction && functionsContainer
         ? enumerateParametersUsableInExpressions(
             functionsContainer,
             props.scope.eventsFunction,
             allowedParameterTypes
-          ).map(parameterMetadata => ({
-            kind: 'Text',
-            completion: `"${parameterMetadata.getName()}"`,
-          }))
+          )
         : [];
 
-    const errorText = props.value;
+    const selectOptions = parameters.map(parameter => {
+      const parameterName = parameter.getName();
+      return (
+        <SelectOption
+          key={parameterName}
+          value={`"${parameterName}"`}
+          label={parameterName}
+          shouldNotTranslate={true}
+        />
+      );
+    });
+
+    const onChangeSelectValue = (event, value) => {
+      props.onChange(event.target.value);
+    };
+
+    const fieldLabel = props.parameterMetadata
+      ? props.parameterMetadata.getDescription()
+      : undefined;
 
     return (
-      <GenericExpressionField
-        expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
-          parameterNames.filter(
-            ({ completion }) => completion.indexOf(expression) === 0
-          )
-        }
+      <SelectField
         ref={field}
-        {...props}
-      />
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-function-parameter-field`
+            : undefined
+        }
+        value={props.value}
+        onChange={onChangeSelectValue}
+        margin={props.isInline ? 'none' : 'dense'}
+        fullWidth
+        floatingLabelText={fieldLabel}
+        translatableHintText={t`Choose a parameter`}
+        helperMarkdownText={
+          (props.parameterMetadata &&
+            props.parameterMetadata.getLongDescription()) ||
+          null
+        }
+      >
+        {selectOptions}
+      </SelectField>
     );
   }
 );

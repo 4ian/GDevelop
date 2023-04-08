@@ -35,6 +35,8 @@ void ValueTypeMetadata::UnserializeFrom(const SerializerElement& element) {
 
 const gd::String ValueTypeMetadata::numberType = "number";
 const gd::String ValueTypeMetadata::stringType = "string";
+const gd::String ValueTypeMetadata::variableType = "variable";
+const gd::String ValueTypeMetadata::booleanType = "boolean";
 
 const gd::String &ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
   if (parameterType == "number" || gd::ValueTypeMetadata::IsTypeExpression("number", parameterType)) {
@@ -42,6 +44,12 @@ const gd::String &ValueTypeMetadata::GetPrimitiveValueType(const gd::String &par
   }
   if (parameterType == "string" || gd::ValueTypeMetadata::IsTypeExpression("string", parameterType)) {
     return ValueTypeMetadata::stringType;
+  }
+  if (parameterType == "variable" || gd::ValueTypeMetadata::IsTypeExpression("variable", parameterType)) {
+    return ValueTypeMetadata::variableType;
+  }
+  if (parameterType == "boolean" || gd::ValueTypeMetadata::IsTypeExpression("boolean", parameterType)) {
+    return ValueTypeMetadata::variableType;
   }
   return parameterType;
 }

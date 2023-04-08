@@ -76,7 +76,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "res/function32.png",
                  "res/function32.png")
       .SetHelpPath("/events/functions/return")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
@@ -91,7 +91,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  "res/function32.png",
                  "res/function32.png")
       .SetHelpPath("/events/functions/return")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "variable")
       .AddParameter("scenevar", _("Scene variable"))
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
@@ -107,7 +107,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     "",
                     "res/function32.png",
                     "res/function32.png")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
@@ -118,7 +118,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Get function parameter (also called \"argument\") value."),
           "",
           "res/function16.png")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -128,7 +128,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Get function parameter (also called \"argument\") text."),
           "",
           "res/function16.png")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .SetRelevantForFunctionEventsOnly();
 
   extension
@@ -140,7 +140,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/function32.png",
           "res/function16.png")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly();
@@ -154,7 +154,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           "",
           "res/function32.png",
           "res/function16.png")
-      .AddParameter("functionParameterName", _("Parameter name"))
+      .AddParameter("functionParameterName", _("Parameter name"), "number,string,boolean")
       .UseStandardRelationalOperatorParameters(
           "string", gd::ParameterOptions::MakeNewOptions())
       .SetRelevantForFunctionEventsOnly();

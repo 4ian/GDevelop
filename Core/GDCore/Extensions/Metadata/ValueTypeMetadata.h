@@ -187,6 +187,8 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "jsonResource" ||
              parameterType == "tilemapResource" ||
              parameterType == "tilesetResource";
+    } else if (type == "boolean") {
+      return parameterType == "yesorno" || parameterType == "trueorfalse";
     }
     return false;
   }
@@ -199,6 +201,8 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String &GetPrimitiveValueType(const gd::String &parameterType);
   static const gd::String numberType;
   static const gd::String stringType;
+  static const gd::String variableType;
+  static const gd::String booleanType;
 
   /**
    * \brief Return the ValueTypeMetadata name for a property type.

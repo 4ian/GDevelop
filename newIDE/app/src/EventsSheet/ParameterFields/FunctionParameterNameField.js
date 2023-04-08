@@ -9,6 +9,8 @@ import {
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParameters';
 
+const gd: libGDevelop = global.gd;
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function FunctionParameterNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
@@ -18,6 +20,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     React.useImperativeHandle(ref, () => ({
       focus,
     }));
+
+    const { parameterMetadata } = props;
+    const allowedParameterTypes =
+      parameterMetadata && parameterMetadata.getExtraInfo()
+        ? parameterMetadata.getExtraInfo().split(',')
+        : [];
+    console.log(allowedParameterTypes);
 
     const eventsBasedEntity =
       props.scope.eventsBasedBehavior || props.scope.eventsBasedObject;
@@ -29,10 +38,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         ? enumerateParametersUsableInExpressions(
             functionsContainer,
             props.scope.eventsFunction
-          ).map(parameterMetadata => ({
-            kind: 'Text',
-            completion: `"${parameterMetadata.getName()}"`,
-          }))
+          )
+            .filter(
+              parameterMetadata =>
+                allowedParameterTypes.length === 0 ||
+                allowedParameterTypes.includes(
+                  gd.ValueTypeMetadata.getPrimitiveValueType(
+                    parameterMetadata.getType()
+                  )
+                )
+            )
+            .map(parameterMetadata => ({
+              kind: 'Text',
+              completion: `"${parameterMetadata.getName()}"`,
+            }))
         : [];
 
     return (

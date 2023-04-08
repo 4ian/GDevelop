@@ -38,20 +38,30 @@ const gd::String ValueTypeMetadata::stringType = "string";
 const gd::String ValueTypeMetadata::variableType = "variable";
 const gd::String ValueTypeMetadata::booleanType = "boolean";
 
-const gd::String &ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
-  if (parameterType == "number" || gd::ValueTypeMetadata::IsTypeExpression("number", parameterType)) {
+const gd::String &ValueTypeMetadata::GetExpressionPrimitiveValueType(
+    const gd::String &parameterType) {
+  if (parameterType == "number" ||
+      gd::ValueTypeMetadata::IsTypeExpression("number", parameterType)) {
     return ValueTypeMetadata::numberType;
   }
-  if (parameterType == "string" || gd::ValueTypeMetadata::IsTypeExpression("string", parameterType)) {
+  if (parameterType == "string" ||
+      gd::ValueTypeMetadata::IsTypeExpression("string", parameterType)) {
     return ValueTypeMetadata::stringType;
   }
-  if (parameterType == "variable" || gd::ValueTypeMetadata::IsTypeExpression("variable", parameterType)) {
-    return ValueTypeMetadata::variableType;
-  }
-  if (parameterType == "boolean" || gd::ValueTypeMetadata::IsTypeExpression("boolean", parameterType)) {
-    return ValueTypeMetadata::variableType;
-  }
   return parameterType;
+}
+
+const gd::String &
+ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
+  if (parameterType == "variable" ||
+      gd::ValueTypeMetadata::IsTypeExpression("variable", parameterType)) {
+    return ValueTypeMetadata::variableType;
+  }
+  if (parameterType == "boolean" || parameterType == "yesorno" ||
+      parameterType == "trueorfalse") {
+    return ValueTypeMetadata::variableType;
+  }
+  return GetExpressionPrimitiveValueType(parameterType);
 }
 
 const gd::String ValueTypeMetadata::numberValueType = "number";

@@ -187,8 +187,6 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "jsonResource" ||
              parameterType == "tilemapResource" ||
              parameterType == "tilesetResource";
-    } else if (type == "boolean") {
-      return parameterType == "yesorno" || parameterType == "trueorfalse";
     }
     return false;
   }
@@ -197,6 +195,17 @@ class GD_CORE_API ValueTypeMetadata {
    * \brief Return the expression type from the parameter type.
    * Declinations of "number" and "string" types (like "forceMultiplier" or
    * "sceneName") are replaced by "number" and "string".
+   * 
+   * \note It only maps string and number types.
+   */
+  static const gd::String &GetExpressionPrimitiveValueType(const gd::String &parameterType);
+
+  /**
+   * \brief Return the primitive type from the parameter type.
+   * Declinations of "number" and "string" types (like "forceMultiplier" or
+   * "sceneName") are replaced by "number" and "string".
+   * 
+   * \note It also maps variable and boolean types.
    */
   static const gd::String &GetPrimitiveValueType(const gd::String &parameterType);
   static const gd::String numberType;

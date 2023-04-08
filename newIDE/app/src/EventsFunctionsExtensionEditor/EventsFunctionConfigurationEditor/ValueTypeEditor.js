@@ -113,6 +113,7 @@ export default function ValueTypeEditor({
                   label={t`Object animation (text)`}
                 />
                 <SelectOption value="identifier" label={t`Identifier (text)`} />
+                <SelectOption value="scenevar" label={t`Scene variable`} />
               </SelectField>
             )}
             {valueTypeMetadata.isObject() && (

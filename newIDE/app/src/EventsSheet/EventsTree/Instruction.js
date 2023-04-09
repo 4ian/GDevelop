@@ -37,6 +37,9 @@ import {
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -96,6 +99,7 @@ type Props = {|
   screenType: ScreenType,
   windowWidth: WidthType,
 
+  scope: EventsScope,
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -238,6 +242,43 @@ const Instruction = (props: Props) => {
                 .getParameter(parameterIndex)
                 .getPlainString();
               expressionIsValid = resourcesManager.hasResource(resourceName);
+            }
+            if (
+              expressionIsValid &&
+              parameterType === 'functionParameterName'
+            ) {
+              const eventsFunction = props.scope.eventsFunction;
+              if (eventsFunction) {
+                const eventsBasedEntity =
+                  props.scope.eventsBasedBehavior ||
+                  props.scope.eventsBasedObject;
+                const functionsContainer = eventsBasedEntity
+                  ? eventsBasedEntity.getEventsFunctions()
+                  : props.scope.eventsFunctionsExtension;
+
+                if (functionsContainer) {
+                  const allowedParameterTypes = parameterMetadata
+                    .getExtraInfo()
+                    .split(',');
+                  const parameters = enumerateParametersUsableInExpressions(
+                    functionsContainer,
+                    eventsFunction,
+                    allowedParameterTypes
+                  );
+                  const functionParameterNameExpression = instruction
+                    .getParameter(parameterIndex)
+                    .getPlainString();
+                  const functionParameterName = functionParameterNameExpression.substring(
+                    1,
+                    functionParameterNameExpression.length - 1
+                  );
+                  expressionIsValid = parameters.some(
+                    parameter => parameter.getName() === functionParameterName
+                  );
+                }
+              } else {
+                expressionIsValid = false;
+              }
             }
           }
 
@@ -468,6 +509,7 @@ const Instruction = (props: Props) => {
                     renderObjectThumbnail={props.renderObjectThumbnail}
                     screenType={props.screenType}
                     windowWidth={props.windowWidth}
+                    scope={props.scope}
                     resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}
                     objectsContainer={props.objectsContainer}

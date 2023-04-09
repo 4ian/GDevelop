@@ -85,7 +85,7 @@ AdvancedExtension::AdvancedExtension() {
                "}\n";
       });
 
-  GetAllActions()["CopyArgumentFromVariable"]
+  GetAllActions()["CopyVariableToArgument"]
       .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,

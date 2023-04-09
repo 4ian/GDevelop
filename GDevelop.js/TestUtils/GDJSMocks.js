@@ -127,6 +127,10 @@ class Variable {
     this.setNumber(value);
   }
 
+  /**
+   * @param {string} childName 
+   * @returns {Variable}
+   */
   getChild(childName) {
     if (
       this._children[childName] === undefined ||
@@ -153,6 +157,51 @@ class Variable {
   getType() {
     return this.isPrimitive() ? 'number' : 'structure';
   }
+
+  clearChildren() {
+    this._children = {};
+    this._childrenArray = [];
+  }
+
+  clone() {
+    return Variable.copy(this, new Variable());
+  }
+
+  addChild(childName, childVariable) {
+    // Make sure this is a structure
+    this.castTo('structure');
+    this._children[childName] = childVariable;
+    return this;
+  }
+
+  /**
+   * 
+   * @param {Variable} source 
+   * @param {Variable} target 
+   * @param {?boolean} merge 
+   * @returns {Variable}
+   */
+  static copy(
+    source,
+    target,
+    merge
+  ) {
+    if (!merge) target.clearChildren();
+    target.castTo(source.getType());
+    if (source.isPrimitive()) {
+      target.setValue(source.getValue());
+    } else if (source.getType() === 'structure') {
+      const children = source.getAllChildren();
+      for (const p in children) {
+        if (children.hasOwnProperty(p))
+          target.addChild(p, children[p].clone());
+      }
+    } else if (source.getType() === 'array') {
+      for (const p of source.getAllChildrenArray())
+        target.pushVariableCopy(p);
+    }
+    return target;
+  }
 }
 
 class VariablesContainer {
@@ -160,6 +209,10 @@ class VariablesContainer {
     this._variables = new Hashtable();
   }
 
+  /**
+   * @param {string} name 
+   * @returns {Variable}
+   */
   get(name) {
     let variable = this._variables.get(name);
     if (!variable) {
@@ -610,6 +663,7 @@ function makeMinimalGDJSMock() {
       TaskGroup,
       CustomRuntimeObject,
       ManuallyResolvableTask,
+      Variable,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

@@ -96,6 +96,7 @@ type Props = {|
   screenType: ScreenType,
   windowWidth: WidthType,
 
+  resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
@@ -133,6 +134,7 @@ const Instruction = (props: Props) => {
     globalObjectsContainer,
     objectsContainer,
     id,
+    resourcesManager,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -229,6 +231,13 @@ const Instruction = (props: Props) => {
                     objectOrGroupName,
                     /*searchInGroups=*/ true
                   ) === parameterMetadata.getExtraInfo());
+            } else if (
+              gd.ParameterMetadata.isExpression('resource', parameterType)
+            ) {
+              const resourceName = instruction
+                .getParameter(parameterIndex)
+                .getPlainString();
+              expressionIsValid = resourcesManager.hasResource(resourceName);
             }
           }
 
@@ -459,6 +468,7 @@ const Instruction = (props: Props) => {
                     renderObjectThumbnail={props.renderObjectThumbnail}
                     screenType={props.screenType}
                     windowWidth={props.windowWidth}
+                    resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}
                     objectsContainer={props.objectsContainer}
                     idPrefix={props.id}

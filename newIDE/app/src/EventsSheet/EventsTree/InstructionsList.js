@@ -53,6 +53,7 @@ type Props = {|
   screenType: ScreenType,
   windowWidth: WidthType,
 
+  resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
@@ -84,6 +85,7 @@ export default function InstructionsList({
   renderObjectThumbnail,
   screenType,
   windowWidth,
+  resourcesManager,
   globalObjectsContainer,
   objectsContainer,
   idPrefix,
@@ -156,6 +158,7 @@ export default function InstructionsList({
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
         windowWidth={windowWidth}
+        resourcesManager={resourcesManager}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
         id={`${idPrefix}-${areConditions ? 'condition' : 'action'}-${i}`}

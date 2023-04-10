@@ -50,6 +50,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import FlatButton from '../UI/FlatButton';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -222,7 +223,7 @@ export default function EffectsList(props: Props) {
   );
 
   const pasteEffects = React.useCallback(
-    async () => {
+    async effectInsertionIndex => {
       const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
       const effectContents = SafeExtractor.extractArray(clipboardContent);
       if (!effectContents) return;
@@ -270,11 +271,10 @@ export default function EffectsList(props: Props) {
       });
 
       let firstAddedEffectName: string | null = null;
+      let index = effectInsertionIndex;
       newNamedEffects.forEach(({ name, serializedEffect }) => {
-        const effect = effectsContainer.insertNewEffect(
-          name,
-          effectsContainer.getEffectsCount()
-        );
+        const effect = effectsContainer.insertNewEffect(name, index);
+        index++;
         unserializeFromJSObject(effect, serializedEffect);
         if (!firstAddedEffectName) {
           firstAddedEffectName = name;
@@ -315,6 +315,20 @@ export default function EffectsList(props: Props) {
       showEffectOverridingConfirmation,
       onEffectsUpdated,
     ]
+  );
+
+  const pasteEffectsAtTheEnd = React.useCallback(
+    async () => {
+      await pasteEffects(effectsContainer.getEffectsCount());
+    },
+    [effectsContainer, pasteEffects]
+  );
+
+  const pasteEffectsBefore = React.useCallback(
+    async (effect: gdEffect) => {
+      await pasteEffects(effectsContainer.getEffectPosition(effect.getName()));
+    },
+    [effectsContainer, pasteEffects]
   );
 
   const moveEffect = React.useCallback(
@@ -399,6 +413,9 @@ export default function EffectsList(props: Props) {
   );
 
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
+
+  const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   return (
     <I18n>
@@ -559,7 +576,8 @@ export default function EffectsList(props: Props) {
                                         },
                                         {
                                           label: i18n._(t`Paste`),
-                                          click: pasteEffects,
+                                          click: () =>
+                                            pasteEffectsBefore(effect),
                                           enabled: isClipboardContainingEffects,
                                         },
                                         { type: 'separator' },
@@ -628,11 +646,11 @@ export default function EffectsList(props: Props) {
               </ScrollView>
               <Column>
                 <Line noMargin>
-                  <ResponsiveLineStackLayout expand>
+                  <LineStackLayout expand>
                     <FlatButton
                       key={'copy-all-effects'}
                       leftIcon={<CopyIcon />}
-                      label={<Trans>Copy all effects</Trans>}
+                      label={isSmall ? '' : <Trans>Copy all effects</Trans>}
                       onClick={() => {
                         copyAllEffects();
                       }}
@@ -640,13 +658,13 @@ export default function EffectsList(props: Props) {
                     <FlatButton
                       key={'paste-effects'}
                       leftIcon={<PasteIcon />}
-                      label={<Trans>Paste</Trans>}
+                      label={isSmall ? '' : <Trans>Paste</Trans>}
                       onClick={() => {
-                        pasteEffects();
+                        pasteEffectsAtTheEnd();
                       }}
                       disabled={!isClipboardContainingEffects}
                     />
-                  </ResponsiveLineStackLayout>
+                  </LineStackLayout>
                   <LineStackLayout justifyContent="flex-end" expand>
                     <RaisedButton
                       primary
@@ -677,7 +695,7 @@ export default function EffectsList(props: Props) {
                   isClipboardContainingEffects ? <Trans>Paste</Trans> : null
                 }
                 onSecondaryAction={() => {
-                  pasteEffects();
+                  pasteEffectsAtTheEnd();
                 }}
               />
             </Column>

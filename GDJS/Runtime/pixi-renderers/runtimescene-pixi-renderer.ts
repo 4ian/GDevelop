@@ -14,6 +14,7 @@ namespace gdjs {
 
     _threeRenderer: THREE.WebGLRenderer | null = null;
     _threeScene: THREE.Scene | null = null;
+    _threeCamera: THREE.Camera | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -85,13 +86,14 @@ namespace gdjs {
 
       const threeRenderer = this._threeRenderer;
       const threeScene = this._threeScene;
+      const threeDummyCamera = this._threeCamera;
 
-      if (threeRenderer && threeScene) {
+      if (threeRenderer && threeScene && threeDummyCamera) {
         threeScene.background = new THREE.Color(
           this._runtimeScene.getBackgroundColor()
         );
         threeRenderer.clear();
-        threeRenderer.render(threeScene, this._threeCamera)
+        threeRenderer.render(threeScene, threeDummyCamera)
         
         for(const runtimeLayer of this._runtimeScene._orderedLayers) {
           const runtimeLayerRenderer = runtimeLayer.getRenderer();

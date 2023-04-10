@@ -132,36 +132,12 @@ namespace gdjs {
           this._threePlaneMaterial.map = this._threePixiCanvasTexture;
         }
 
-        const runtimeGame = this._layer._runtimeScene.getGame();
-
-        // TODO: adapt position to camera position and zoom factor
-        // TODO: should we use this._layer.getWidth()??
-        this._threePlaneMesh.position.set(
-          runtimeGame.getGameResolutionWidth() / 2,
-          runtimeGame.getGameResolutionHeight() / 2,
-          0
-        );
-        this._threePlaneMesh.scale.x = runtimeGame.getGameResolutionWidth();
-        this._threePlaneMesh.scale.y =
-          runtimeGame.getGameResolutionHeight() * -1; // Mirrored because the scene is mirrored on Y axis, see below.
-
-        // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
-        const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
-        const cameraDistance =
-          (0.5 * runtimeGame.getGameResolutionHeight()) /
-          Math.tan(0.5 * cameraFovInRadians);
-        this._threeCamera.position.set(
-          runtimeGame.getGameResolutionWidth() / 2,
-          -runtimeGame.getGameResolutionHeight() / 2, // Minus because the scene is mirrored on Y axis, see below.
-          cameraDistance
-        );
-
         this._threeCamera.aspect =
-          runtimeGame.getGameResolutionWidth() /
-          runtimeGame.getGameResolutionHeight();
+          this._layer.getWidth() / this._layer.getHeight();
         this._threeCamera.updateProjectionMatrix();
+
+        this.updatePosition();
       }
-      // TODO: update position?
     }
 
     /**
@@ -225,14 +201,32 @@ namespace gdjs {
         );
       }
 
-      // TODO: Handle zoom
       if (this._threeCamera) {
-        this._threeCamera.position.x = this._layer.getCameraX() * zoomFactor;
-        this._threeCamera.position.y = -this._layer.getCameraY() * zoomFactor; // Inverted because the scene is mirrored on Y axis.
+        // TODO: Handle camera rounding like down for PixiJS?
+        this._threeCamera.position.x = this._layer.getCameraX();
+        this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
         this._threeCamera.rotation.z = angle;
 
+        // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
+        // The Z position is computed by taking the half height of the displayed rendering,
+        // and using the angle of the triangle defined by the field of view to compute the length
+        // of the triangle defining the distance between the camera and the rendering plane.
+        const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
+        const cameraZPosition =
+          (0.5 * this._layer.getHeight()) /
+          zoomFactor /
+          Math.tan(0.5 * cameraFovInRadians);
+        this._threeCamera.position.z = cameraZPosition;
+
         if (this._threePlaneMesh) {
-          this._threePlaneMesh.position.x = this._threeCamera.position.x
+          // Adapt the plane size so that it covers the whole screen.
+          this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
+          this._threePlaneMesh.scale.y =
+            (this._layer.getHeight() * -1) / // Mirrored because the scene is mirrored on Y axis, see below.
+            zoomFactor;
+
+          // Adapt the plane position so that it's always displayed on the whole screen.
+          this._threePlaneMesh.position.x = this._threeCamera.position.x;
           this._threePlaneMesh.position.y = -this._threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
           this._threePlaneMesh.rotation.z = -angle;
         }

@@ -136,6 +136,11 @@ const LayersListBody = (props: LayersListBodyProps) => {
           layer.setVisibility(visible);
           onLayerModified();
         }}
+        isLocked={layer.isLocked()}
+        onChangeLockState={isLocked => {
+          layer.setLocked(isLocked);
+          onLayerModified();
+        }}
         width={width}
       />
     );

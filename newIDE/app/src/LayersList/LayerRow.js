@@ -17,6 +17,8 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import LockIcon from '../UI/CustomSvgIcons/Lock';
+import LockOpenIcon from '../UI/CustomSvgIcons/LockOpen';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import EditIcon from '../UI/CustomSvgIcons/Edit';
@@ -43,6 +45,8 @@ type Props = {|
   onDrop: () => void,
   isVisible: boolean,
   onChangeVisibility: boolean => void,
+  isLocked: boolean,
+  onChangeLockState: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
   onEdit: () => void,
@@ -58,6 +62,8 @@ const LayerRow = ({
   onBlur,
   onRemove,
   isVisible,
+  isLocked,
+  onChangeLockState,
   effectsCount,
   onEditEffects,
   onChangeVisibility,
@@ -181,6 +187,21 @@ const LayerRow = ({
                               <Trans>Hide layer</Trans>
                             ) : (
                               <Trans>Show layer</Trans>
+                            )
+                          }
+                        />
+                        <InlineCheckbox
+                          id="layer-lock"
+                          disabled={!isVisible}
+                          checked={isLocked || !isVisible}
+                          checkedIcon={<LockIcon />}
+                          uncheckedIcon={<LockOpenIcon />}
+                          onCheck={(e, value) => onChangeLockState(value)}
+                          tooltipOrHelperText={
+                            isLocked ? (
+                              <Trans>Unlock layer</Trans>
+                            ) : (
+                              <Trans>Lock layer</Trans>
                             )
                           }
                         />

@@ -627,15 +627,15 @@ export default class InstancesEditor extends Component<Props> {
     }
   };
 
-  _getLayersVisibility = () => {
+  _getLayersLocks = () => {
     const { layout } = this.props;
-    const layersVisibility = {};
+    const layersLocks = {};
     for (let i = 0; i < layout.getLayersCount(); i++) {
-      layersVisibility[layout.getLayerAt(i).getName()] = layout
-        .getLayerAt(i)
-        .getVisibility();
+      const layer = layout.getLayerAt(i);
+      layersLocks[layout.getLayerAt(i).getName()] =
+        !layer.getVisibility() || layer.isLocked();
     }
-    return layersVisibility;
+    return layersLocks;
   };
 
   _onPanEnd = () => {
@@ -647,7 +647,7 @@ export default class InstancesEditor extends Component<Props> {
       this.props.instancesSelection.selectInstances({
         instances: instancesSelected,
         multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-        layersVisibility: this._getLayersVisibility(),
+        layersLocks: this._getLayersLocks(),
       });
       instancesSelected = this.props.instancesSelection.getSelectedInstances();
       this.props.onInstancesSelected(instancesSelected);
@@ -716,7 +716,7 @@ export default class InstancesEditor extends Component<Props> {
     this.props.instancesSelection.selectInstance({
       instance,
       multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-      layersVisibility: this._getLayersVisibility(),
+      layersLocks: this._getLayersLocks(),
     });
 
     if (this.props.onInstancesSelected) {

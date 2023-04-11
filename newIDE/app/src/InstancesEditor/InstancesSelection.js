@@ -30,12 +30,12 @@ export default class InstancesSelection {
   selectInstance({
     instance,
     multiSelect,
-    layersVisibility = null,
+    layersLocks = null,
     ignoreSeal = false,
   }: {|
     instance: gdInitialInstance,
     multiSelect: boolean,
-    layersVisibility: ?{ [string]: boolean },
+    layersLocks: ?{ [string]: boolean },
     ignoreSeal?: boolean,
   |}) {
     if (!ignoreSeal && instance.isSealed()) return;
@@ -47,7 +47,7 @@ export default class InstancesSelection {
 
     if (!multiSelect) this.clearSelection();
 
-    if (!layersVisibility || layersVisibility[instance.getLayer()]) {
+    if (!layersLocks || !layersLocks[instance.getLayer()]) {
       this.selection.push(instance);
     }
   }
@@ -55,12 +55,12 @@ export default class InstancesSelection {
   selectInstances({
     instances,
     multiSelect,
-    layersVisibility = null,
+    layersLocks = null,
     ignoreSeal = false,
   }: {|
     instances: Array<gdInitialInstance>,
     multiSelect: boolean,
-    layersVisibility: ?{ [string]: boolean },
+    layersLocks: ?{ [string]: boolean },
     ignoreSeal?: boolean,
   |}) {
     if (!multiSelect) this.clearSelection();
@@ -69,7 +69,7 @@ export default class InstancesSelection {
       this.selectInstance({
         instance,
         multiSelect: true,
-        layersVisibility,
+        layersLocks,
         ignoreSeal,
       });
     });

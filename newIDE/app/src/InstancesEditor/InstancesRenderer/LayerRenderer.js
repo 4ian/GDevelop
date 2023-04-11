@@ -127,7 +127,10 @@ export default class LayerRenderer {
       const isVisible = this._isInstanceVisible(instance);
       if (pixiObject) {
         pixiObject.visible = isVisible;
-        pixiObject.interactive = !(instance.isLocked() && instance.isSealed());
+        pixiObject.interactive = !(
+          layer.isLocked() ||
+          (instance.isLocked() && instance.isSealed())
+        );
       }
       if (isVisible) renderedInstance.update();
 

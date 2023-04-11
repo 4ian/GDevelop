@@ -15,7 +15,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
 
     expect(instancesSelection.hasSelectedInstances()).toBe(false);
@@ -24,7 +24,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
       ignoreSeal: true,
     });
 
@@ -54,17 +54,17 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance2OfObject1,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance1OfObject2,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.hasSelectedInstances()).toBe(true);
     expect(instancesSelection.getSelectedInstances()).toHaveLength(3);
@@ -92,7 +92,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.hasSelectedInstances()).toBe(true);
     expect(instancesSelection.getSelectedInstances()).toHaveLength(2);
@@ -142,17 +142,17 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance2OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance1OfObject2,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
       false
@@ -176,7 +176,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstances({
       instances: [instance1OfObject1, instance2OfObject1, instance1OfObject2],
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
       true
@@ -228,7 +228,7 @@ describe('InstancesSelection', () => {
         instance3OfObject2,
       ],
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.isInstanceSelected(instance1OfObject2)).toBe(
       true
@@ -316,7 +316,7 @@ describe('InstancesSelection', () => {
         instance2OfObject2,
       ],
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
 
     instancesSelection.unselectInstancesOnLayer('Layer1');

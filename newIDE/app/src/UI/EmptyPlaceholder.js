@@ -17,6 +17,7 @@ type Props = {|
   title: React.Node,
   description: React.Node,
   helpPagePath?: string,
+  helpPageAnchor?: string,
   tutorialId?: string,
   isLoading?: boolean,
   actionButtonId?: string,
@@ -28,8 +29,18 @@ type Props = {|
   onSecondaryAction?: () => void,
 |};
 
-const DefaultHelpButton = ({ helpPagePath }: { helpPagePath?: string }) => (
-  <HelpButton label={<Trans>Read the doc</Trans>} helpPagePath={helpPagePath} />
+const DefaultHelpButton = ({
+  helpPagePath,
+  helpPageAnchor,
+}: {
+  helpPagePath?: string,
+  helpPageAnchor?: string,
+}) => (
+  <HelpButton
+    label={<Trans>Read the doc</Trans>}
+    helpPagePath={helpPagePath}
+    anchor={helpPageAnchor}
+  />
 );
 
 /**
@@ -85,11 +96,17 @@ export const EmptyPlaceholder = (props: Props) => (
               tutorialId={props.tutorialId}
               label={<Trans>Watch tutorial</Trans>}
               renderIfNotFound={
-                <DefaultHelpButton helpPagePath={props.helpPagePath} />
+                <DefaultHelpButton
+                  helpPagePath={props.helpPagePath}
+                  helpPageAnchor={props.helpPageAnchor}
+                />
               }
             />
           ) : (
-            <DefaultHelpButton helpPagePath={props.helpPagePath} />
+            <DefaultHelpButton
+              helpPagePath={props.helpPagePath}
+              helpPageAnchor={props.helpPageAnchor}
+            />
           )}
         </ColumnStackLayout>
       </Column>

@@ -64,13 +64,13 @@ const styles = {
   },
 };
 
-export const useEffectOverridingAlertDialog = () => {
+export const usePropertyOverridingAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
-  return async (existingEffectNames: Array<string>): Promise<boolean> => {
+  return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
-      title: t`Existing effects`,
-      message: t`These effects are already exists:${'\n\n - ' +
-        existingEffectNames.join('\n\n - ') +
+      title: t`Existing properties`,
+      message: t`These properties already exist:${'\n\n - ' +
+        existingPropertyNames.join('\n\n - ') +
         '\n\n'}Do you want to replace them?`,
       confirmButtonLabel: t`Replace`,
       dismissButtonLabel: t`Omit`,
@@ -164,7 +164,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  const showPropertyOverridingConfirmation = useEffectOverridingAlertDialog();
+  const showPropertyOverridingConfirmation = usePropertyOverridingAlertDialog();
 
   const forceUpdate = useForceUpdate();
 
@@ -196,7 +196,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
       Clipboard.set(PROPERTIES_CLIPBOARD_KIND, [
         {
           name: property.getName(),
-          serializedEffect: serializeToJSObject(property),
+          serializedProperty: serializeToJSObject(property),
         },
       ]);
       forceUpdate();
@@ -205,7 +205,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
   );
 
   const pasteProperties = React.useCallback(
-    async effectInsertionIndex => {
+    async propertyInsertionIndex => {
       const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
       const propertyContents = SafeExtractor.extractArray(clipboardContent);
       if (!propertyContents) return;
@@ -218,11 +218,14 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
         name: string,
         serializedProperty: string,
       }> = [];
-      propertyContents.forEach(effectContent => {
-        const name = SafeExtractor.extractStringProperty(effectContent, 'name');
+      propertyContents.forEach(propertyContent => {
+        const name = SafeExtractor.extractStringProperty(
+          propertyContent,
+          'name'
+        );
         const serializedProperty = SafeExtractor.extractObjectProperty(
-          effectContent,
-          'serializedEffect'
+          propertyContent,
+          'serializedProperty'
         );
         if (!name || !serializedProperty) {
           return;
@@ -236,7 +239,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
       });
 
       let firstAddedPropertyName: string | null = null;
-      let index = effectInsertionIndex;
+      let index = propertyInsertionIndex;
       newNamedProperties.forEach(({ name, serializedProperty }) => {
         const property = properties.insertNew(name, index);
         index++;

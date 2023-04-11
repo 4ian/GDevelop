@@ -2627,6 +2627,7 @@ interface NamedPropertyDescriptorsList {
     void Remove([Const] DOMString name);
     void Move(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetCount();
+    unsigned long GetPosition([Const, Ref] NamedPropertyDescriptor item);
 
     unsigned long size();
     [Ref] NamedPropertyDescriptor at(unsigned long index);

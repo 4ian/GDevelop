@@ -166,6 +166,13 @@ const LayerRow = ({
                             checked: isVisible,
                             click: () => onChangeVisibility(!isVisible),
                           },
+                          {
+                            type: 'checkbox',
+                            label: i18n._(t`Locked`),
+                            enabled: isVisible,
+                            checked: isLocked || !isVisible,
+                            click: () => onChangeLockState(!isLocked),
+                          },
                           { type: 'separator' },
                           {
                             label: i18n._(t`Delete`),

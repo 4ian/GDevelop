@@ -316,6 +316,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               max: props.max,
               min: props.min,
               step: props.step,
+              autoCapitalize: 'off', // For Safari iOS, avoid auto-capitalization
               style: props.inputStyle,
               ...dataObjectToProps(props.dataset),
             },

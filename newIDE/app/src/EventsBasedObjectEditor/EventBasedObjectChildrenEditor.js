@@ -284,6 +284,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectWithLoadingScreenPreview: () => {},
                 }}
                 canInstallPrivateAsset={() => false}
+                canSetAsGlobalObject={false}
               />
             </Line>
             {this.state.editedObjectWithContext && (

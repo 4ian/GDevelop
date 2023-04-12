@@ -411,8 +411,18 @@ const ImagePreview = ({
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
 
+  const imageContainerBorderStyle = {
+    transform: `translate(${xOffset}px, ${yOffset}px)`,
+    outline: renderOverlay
+    ? `${1}px solid ${frameBorderColor}`
+    : undefined,
+    width: imageWidth * imageZoomFactor,
+    height: imageHeight *imageZoomFactor,
+    transformOrigin: '0 0',
+  }
+
   const imageContainerStyle = {
-    transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
+    transform: `scale(${imageZoomFactor})`,
     width: imageWidth,
     height: imageHeight,
     transformOrigin: '0 0',
@@ -422,9 +432,7 @@ const ImagePreview = ({
   const imageStyle = {
     ...styles.spriteThumbnailImage,
     // Apply margin only once the container is loaded, to avoid a shift in the image
-    outline: renderOverlay
-      ? `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`
-      : undefined,
+
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
   };
@@ -520,6 +528,7 @@ const ImagePreview = ({
                   </PlaceholderMessage>
                 )}
                 {!errored && (
+                  <div style={imageContainerBorderStyle}>
                   <div style={imageContainerStyle}>
                     {isImagePrivate ? (
                       <AuthorizedAssetImage
@@ -539,6 +548,7 @@ const ImagePreview = ({
                         onLoad={handleImageLoaded}
                       />
                     )}
+                    </div>
                   </div>
                 )}
                 {imageLoaded && renderOverlay && (

@@ -413,13 +413,11 @@ const ImagePreview = ({
 
   const imageContainerBorderStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px)`,
-    outline: renderOverlay
-    ? `${1}px solid ${frameBorderColor}`
-    : undefined,
-    width: imageWidth * imageZoomFactor,
-    height: imageHeight *imageZoomFactor,
+    outline: renderOverlay ? `${1}px solid ${frameBorderColor}` : undefined,
+    width: imageWidth != null ? imageWidth * imageZoomFactor : null,
+    height: imageHeight != null ? imageHeight * imageZoomFactor : null,
     transformOrigin: '0 0',
-  }
+  };
 
   const imageContainerStyle = {
     transform: `scale(${imageZoomFactor})`,
@@ -529,25 +527,25 @@ const ImagePreview = ({
                 )}
                 {!errored && (
                   <div style={imageContainerBorderStyle}>
-                  <div style={imageContainerStyle}>
-                    {isImagePrivate ? (
-                      <AuthorizedAssetImage
-                        style={imageStyle}
-                        alt={resourceName}
-                        url={imageResourceSource}
-                        onError={handleImageError}
-                        onLoad={handleImageLoaded}
-                        hideLoader={hideLoader}
-                      />
-                    ) : (
-                      <CorsAwareImage
-                        style={imageStyle}
-                        alt={resourceName}
-                        src={imageResourceSource}
-                        onError={handleImageError}
-                        onLoad={handleImageLoaded}
-                      />
-                    )}
+                    <div style={imageContainerStyle}>
+                      {isImagePrivate ? (
+                        <AuthorizedAssetImage
+                          style={imageStyle}
+                          alt={resourceName}
+                          url={imageResourceSource}
+                          onError={handleImageError}
+                          onLoad={handleImageLoaded}
+                          hideLoader={hideLoader}
+                        />
+                      ) : (
+                        <CorsAwareImage
+                          style={imageStyle}
+                          alt={resourceName}
+                          src={imageResourceSource}
+                          onError={handleImageError}
+                          onLoad={handleImageLoaded}
+                        />
+                      )}
                     </div>
                   </div>
                 )}

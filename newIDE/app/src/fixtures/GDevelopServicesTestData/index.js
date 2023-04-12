@@ -1026,6 +1026,13 @@ export const uncompatibleFireBulletExtensionShortHeader: ExtensionShortHeader = 
 export const alreadyInstalledExtensionShortHeader: ExtensionShortHeader = {
   ...fireBulletExtensionShortHeader,
   name: 'SomeAlreadyInstalledExtension',
+  version: '1.2.3',
+};
+
+export const newerVersionExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  name: 'SomeAlreadyInstalledExtension',
+  version: '1.2.4',
 };
 
 export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader = {

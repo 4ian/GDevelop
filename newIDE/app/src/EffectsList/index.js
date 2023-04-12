@@ -76,7 +76,7 @@ export const useEffectOverridingAlertDialog = () => {
   return async (existingEffectNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
       title: t`Existing effects`,
-      message: t`These effects are already exists:${'\n\n - ' +
+      message: t`These effects already exist:${'\n\n - ' +
         existingEffectNames.join('\n\n - ') +
         '\n\n'}Do you want to replace them?`,
       confirmButtonLabel: t`Replace`,

@@ -155,16 +155,23 @@ const ImagePreview = ({
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return 1;
       }
-      const zoomFactor = 
-        Math.min(containerWidth / imageWidth, containerHeight / imageHeight);
-      let zoomFactorWithMargins = 
-        zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+      const zoomFactor = Math.min(
+        containerWidth / imageWidth,
+        containerHeight / imageHeight
+      );
+      let zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
       if (zoomFactorWithMargins > 1) {
         zoomFactorWithMargins = Math.floor(zoomFactorWithMargins);
       }
       return zoomFactorWithMargins;
     },
-    [imageWidth, imageHeight, containerHeight, containerWidth, displaySpacedView]
+    [
+      imageWidth,
+      imageHeight,
+      containerHeight,
+      containerWidth,
+      displaySpacedView,
+    ]
   );
 
   const adaptZoomFactorToImage = React.useCallback(
@@ -180,13 +187,22 @@ const ImagePreview = ({
       });
       return true;
     },
-    [imageWidth, imageHeight, containerHeight, containerWidth, getZoomFactorToFitImage]
+    [
+      imageWidth,
+      imageHeight,
+      containerHeight,
+      containerWidth,
+      getZoomFactorToFitImage,
+    ]
   );
 
   const clampZoomFactor = React.useCallback(
     (zoom: number) => {
       const fitZoomFactor = getZoomFactorToFitImage();
-      return Math.max(Math.min(zoom, fitZoomFactor * imagePreviewMaxZoom), fitZoomFactor * imagePreviewMinZoom);
+      return Math.max(
+        Math.min(zoom, fitZoomFactor * imagePreviewMaxZoom),
+        fitZoomFactor * imagePreviewMinZoom
+      );
     },
     [getZoomFactorToFitImage]
   );
@@ -370,11 +386,9 @@ const ImagePreview = ({
         // or if the zoom has already been adapted.
         return;
       }
-      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage(
-        displaySpacedView
-      );
+      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
     },
-    [adaptZoomFactorToImage, displaySpacedView]
+    [adaptZoomFactorToImage]
   );
 
   const handleImageLoaded = React.useCallback(
@@ -479,8 +493,12 @@ const ImagePreview = ({
                 </IconButton>
                 <div style={styles.sliderContainer}>
                   <Slider
-                    min={Math.log2(getZoomFactorToFitImage() * imagePreviewMinZoom)}
-                    max={Math.log2(getZoomFactorToFitImage() * imagePreviewMaxZoom)}
+                    min={Math.log2(
+                      getZoomFactorToFitImage() * imagePreviewMinZoom
+                    )}
+                    max={Math.log2(
+                      getZoomFactorToFitImage() * imagePreviewMaxZoom
+                    )}
                     step={1 / 16}
                     value={Math.log2(imageZoomFactor)}
                     onChange={value => {

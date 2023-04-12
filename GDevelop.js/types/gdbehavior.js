@@ -8,6 +8,8 @@ declare class gdBehavior {
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  serializeTo(element: gdSerializerElement): void;
+  unserializeFrom(element: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

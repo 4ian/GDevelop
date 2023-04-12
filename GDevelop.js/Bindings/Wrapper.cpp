@@ -596,6 +596,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   EnsureObjectEventsFunctionsProperParameters
 #define STATIC_AddBehaviorAndRequiredBehaviors \
   AddBehaviorAndRequiredBehaviors
+#define STATIC_AddRequiredBehaviorsFor AddRequiredBehaviorsFor
 #define STATIC_FindDependentBehaviorNames \
   FindDependentBehaviorNames
 #define STATIC_FindInvalidRequiredBehaviorProperties \

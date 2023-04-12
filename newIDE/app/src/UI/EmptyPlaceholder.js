@@ -3,10 +3,10 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Container from '@material-ui/core/Container';
 import { ColumnStackLayout } from './Layout';
-import { LineStackLayout } from '../UI/Layout';
+import { ResponsiveLineStackLayout } from './Layout';
 import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
-import { Column, Line, LargeSpacer } from './Grid';
+import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import TutorialButton from './TutorialButton';
@@ -64,7 +64,7 @@ export const EmptyPlaceholder = (props: Props) => (
         </Text>
         <LargeSpacer />
         <ColumnStackLayout alignItems="center" noMargin>
-          <LineStackLayout noMargin>
+          <ResponsiveLineStackLayout noMargin>
             {props.secondaryActionLabel && props.onSecondaryAction && (
               <FlatButton
                 label={props.secondaryActionLabel}
@@ -90,7 +90,7 @@ export const EmptyPlaceholder = (props: Props) => (
               }
               id={props.actionButtonId}
             />
-          </LineStackLayout>
+          </ResponsiveLineStackLayout>
           {props.tutorialId ? (
             <TutorialButton
               tutorialId={props.tutorialId}

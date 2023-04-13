@@ -3,6 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
@@ -16,6 +17,10 @@ import {
   type UsernameAvailability,
   type CommunityLinkType,
 } from '../Utils/GDevelopServices/User';
+import {
+  hasValidSubscriptionPlan,
+  type Subscription,
+} from '../Utils/GDevelopServices/Usage';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import {
@@ -27,12 +32,16 @@ import {
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
 import Text from '../UI/Text';
+import TextButton from '../UI/TextButton';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 type Props = {|
   profile: Profile,
+  subscription: ?Subscription,
   onClose: () => void,
   onEdit: (form: EditForm) => Promise<void>,
-  updateProfileInProgress: boolean,
+  onDelete: () => Promise<void>,
+  actionInProgress: boolean,
   error: ?AuthError,
 |};
 
@@ -86,11 +95,15 @@ const CommunityLinkLine = ({
 
 const EditProfileDialog = ({
   profile,
+  subscription,
   onClose,
   onEdit,
-  updateProfileInProgress,
+  onDelete,
+  actionInProgress,
   error,
 }: Props) => {
+  const { showDeleteConfirmation, showAlert } = useAlertDialog();
+
   const communityLinks = profile.communityLinks || {};
   const [username, setUsername] = React.useState(profile.username || '');
   const [description, setDescription] = React.useState(
@@ -164,15 +177,15 @@ const EditProfileDialog = ({
     tiktokUsernameError;
 
   const canEdit =
-    !updateProfileInProgress &&
+    !actionInProgress &&
     isUsernameValid(username, { allowEmpty: false }) &&
     !isValidatingUsername &&
     (!usernameAvailability || usernameAvailability.isAvailable) &&
     !hasFormattingError;
 
-  const edit = () => {
+  const edit = async () => {
     if (!canEdit) return;
-    onEdit({
+    await onEdit({
       username,
       description,
       getGameStatsEmail,
@@ -193,15 +206,49 @@ const EditProfileDialog = ({
     });
   };
 
+  const canDelete = !actionInProgress;
+
+  const onDeleteAccount = React.useCallback(
+    async (i18n: I18nType) => {
+      if (!canDelete) return;
+
+      if (hasValidSubscriptionPlan(subscription)) {
+        await showAlert({
+          title: t`You have an active subscription`,
+          message: t`You can't delete your account while you have an active subscription. Please cancel your subscription first.`,
+        });
+        return;
+      }
+
+      const answer = await showDeleteConfirmation({
+        title: t`Delete account`,
+        message: t`Before you go, make sure that you've unpublished all your games on gd.games. Otherwise they will stay visible to the community. Are you sure you want to permanently delete your account? This action cannot be undone.`,
+        confirmButtonLabel: t`Delete account`,
+        confirmText: profile.email,
+        fieldMessage: t`Type your email to confirm`,
+      });
+      if (!answer) return;
+      await onDelete();
+    },
+    [
+      canDelete,
+      onDelete,
+      profile.email,
+      subscription,
+      showDeleteConfirmation,
+      showAlert,
+    ]
+  );
+
   const actions = [
     <FlatButton
       label={<Trans>Back</Trans>}
-      disabled={updateProfileInProgress}
+      disabled={actionInProgress}
       key="back"
       primary={false}
       onClick={onClose}
     />,
-    <LeftLoader isLoading={updateProfileInProgress} key="edit">
+    <LeftLoader isLoading={actionInProgress} key="edit">
       <DialogPrimaryButton
         label={<Trans>Save</Trans>}
         primary
@@ -211,14 +258,25 @@ const EditProfileDialog = ({
     </LeftLoader>,
   ];
 
+  const secondaryActions = [
+    <TextButton
+      label={<Trans>Delete my account</Trans>}
+      disabled={actionInProgress}
+      key="delete"
+      primary={false}
+      onClick={onDeleteAccount}
+    />,
+  ];
+
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
           title={<Trans>Edit your GDevelop profile</Trans>}
           actions={actions}
+          secondaryActions={secondaryActions}
           maxWidth="sm"
-          cannotBeDismissed={updateProfileInProgress}
+          cannotBeDismissed={actionInProgress}
           onRequestClose={onClose}
           onApply={edit}
           open
@@ -243,7 +301,7 @@ const EditProfileDialog = ({
                 onAvailabilityChecked={setUsernameAvailability}
                 onAvailabilityCheckLoading={setIsValidatingUsername}
                 isValidatingUsername={isValidatingUsername}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <TextField
                 value={description}
@@ -256,7 +314,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setDescription(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
                 floatingLabelFixed
               />
               <CommunityLinkLine
@@ -266,7 +324,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setPersonalWebsiteLink(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="personalWebsite2Link"
@@ -275,7 +333,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setPersonalWebsite2Link(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="twitterUsername"
@@ -284,7 +342,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setTwitterUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="facebookUsername"
@@ -293,7 +351,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setFacebookUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="youtubeUsername"
@@ -302,7 +360,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setYoutubeUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="tiktokUsername"
@@ -311,7 +369,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setTiktokUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="instagramUsername"
@@ -320,7 +378,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setInstagramUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="redditUsername"
@@ -329,7 +387,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setRedditUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="snapchatUsername"
@@ -338,7 +396,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setSnapchatUsername(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <CommunityLinkLine
                 id="discordServerLink"
@@ -347,7 +405,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setDiscordServerLink(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <TextField
                 value={donateLink}
@@ -357,7 +415,7 @@ const EditProfileDialog = ({
                 onChange={(e, value) => {
                   setDonateLink(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
                 floatingLabelFixed
                 helperMarkdownText={i18n._(
                   t`Add a link to your donation page. It will be displayed on your gd.games profile and game pages.`
@@ -371,7 +429,7 @@ const EditProfileDialog = ({
                 onCheck={(e, value) => {
                   setGetNewsletterEmail(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               <Checkbox
                 label={
@@ -381,7 +439,7 @@ const EditProfileDialog = ({
                 onCheck={(e, value) => {
                   setGetGameStatsEmail(value);
                 }}
-                disabled={updateProfileInProgress}
+                disabled={actionInProgress}
               />
               {/*
                 This input is needed so that the browser submits the form when

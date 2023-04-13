@@ -12,7 +12,6 @@ import NewBehaviorDialog from './NewBehaviorDialog';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';

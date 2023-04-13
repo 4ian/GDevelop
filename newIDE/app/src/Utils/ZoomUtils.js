@@ -1,6 +1,6 @@
 // @flow
 
-export const zoomStepBasePower = 1 / 16;
+const zoomStepBasePower = 1 / 16;
 
 const stepZoomFactor = Math.pow(2, 2 * zoomStepBasePower);
 export const zoomInFactor = stepZoomFactor;

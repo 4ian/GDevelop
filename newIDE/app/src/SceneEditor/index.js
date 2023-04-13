@@ -638,7 +638,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.selectInstances({
       instances,
       multiSelect,
-      layersVisibility: null,
+      layersLocks: null,
       ignoreSeal: true,
     });
 
@@ -1318,7 +1318,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.selectInstances({
       instances: newInstances,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     this.forceUpdatePropertiesEditor();
   };
@@ -1359,7 +1359,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.instancesSelection.selectInstances({
       instances: newInstances,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     this.forceUpdatePropertiesEditor();
   };
@@ -1371,7 +1371,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       instances: instancesToSelect,
       ignoreSeal: true,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     this.forceUpdateInstancesList();
     this._onInstancesSelected(instancesToSelect);

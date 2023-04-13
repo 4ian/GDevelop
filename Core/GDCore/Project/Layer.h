@@ -58,6 +58,16 @@ class GD_CORE_API Layer {
   bool GetVisibility() const { return isVisible; }
 
   /**
+   * \brief Change if layer can be modified or not.
+   */
+  void SetLocked(bool isLocked_) { isLocked = isLocked_; }
+
+  /**
+   * \brief Return true if layer can't be modified.
+   */
+  bool IsLocked() const { return isLocked; }
+
+  /**
    * \brief Set if the layer is a lightining layer or not.
    */
   void SetLightingLayer(bool isLightingLayer_) {
@@ -179,6 +189,7 @@ class GD_CORE_API Layer {
  private:
   gd::String name;       ///< The name of the layer
   bool isVisible;        ///< True if the layer is visible
+  bool isLocked;        ///< True if the layer is locked
   bool isLightingLayer;  ///< True if the layer is used to display lights and
                          ///< renders an ambient light.
   bool followBaseLayerCamera;  ///< True if the layer automatically follows the

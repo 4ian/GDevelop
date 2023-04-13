@@ -803,6 +803,8 @@ interface Layer {
     [Const, Ref] DOMString GetName();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
+    void SetLocked(boolean isLocked);
+    boolean IsLocked();
     void SetLightingLayer(boolean lightingLayer);
     boolean IsLightingLayer();
     void SetFollowBaseLayerCamera(boolean followBaseLayerCamera);

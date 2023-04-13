@@ -61,6 +61,11 @@ ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
       parameterType == "trueorfalse") {
     return ValueTypeMetadata::booleanType;
   }
+  // These 2 types are not strings from the code generator point of view,
+  // but it is for event-based extensions.
+  if (parameterType == "key" || parameterType == "mouse") {
+    return ValueTypeMetadata::stringType;
+  }
   return GetExpressionPrimitiveValueType(parameterType);
 }
 

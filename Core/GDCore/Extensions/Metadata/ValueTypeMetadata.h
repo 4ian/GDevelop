@@ -174,7 +174,9 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "functionParameterName" ||
              parameterType == "externalLayoutName" ||
              parameterType == "leaderboardId" ||
-             parameterType == "identifier";
+             parameterType == "identifier" ||
+             parameterType == "key" ||
+             parameterType == "mouse";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

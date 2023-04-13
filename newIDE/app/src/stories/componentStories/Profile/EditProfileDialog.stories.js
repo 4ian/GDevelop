@@ -14,7 +14,8 @@ export default {
 const defaultProps = {
   onClose: () => action('onClose')(),
   onEdit: action('onEdit'),
-  updateProfileInProgress: false,
+  onDelete: action('onDelete'),
+  actionInProgress: false,
   error: null,
   profile: {
     id: 'id',
@@ -42,13 +43,23 @@ const defaultProps = {
       discordServerLink: 'https://discord.gg/indie-user',
     },
   },
+  subscription: {
+    userId: 'id',
+    planId: 'planId',
+    createdAt: 12345,
+    updatedAt: 12345,
+  },
 };
-export const Default = () => <EditProfileDialog {...defaultProps} />;
+export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;
+
+export const WithoutSubscription = () => (
+  <EditProfileDialog {...defaultProps} subscription={null} />
+);
 
 export const ErrorFromBackend = () => (
   <EditProfileDialog {...defaultProps} error={{ code: 'auth/username-used' }} />
 );
 
 export const Submitting = () => (
-  <EditProfileDialog {...defaultProps} updateProfileInProgress />
+  <EditProfileDialog {...defaultProps} actionInProgress />
 );

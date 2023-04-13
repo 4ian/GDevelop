@@ -45,7 +45,7 @@ export const getEmailErrorText = (error: ?AuthError) => {
   if (error.code === 'auth/invalid-email')
     return <Trans>This email is invalid.</Trans>;
   if (error.code === 'auth/user-disabled')
-    return <Trans>The user was disabled.</Trans>;
+    return <Trans>This account has been deactivated.</Trans>;
   if (error.code === 'auth/user-not-found')
     return (
       <Trans>This user was not found: have you created your account?</Trans>

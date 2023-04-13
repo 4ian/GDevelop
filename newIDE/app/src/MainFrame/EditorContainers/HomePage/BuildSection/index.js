@@ -588,8 +588,9 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                   </LineStackLayout>
                 )}
                 <List>
-                  {authenticatedUser.loginState === 'loggingIn' ? (
-                    new Array(5).fill(0).map((_, index) => (
+                  {authenticatedUser.loginState === 'loggingIn' &&
+                  projectFiles.length === 0 ? ( // Only show skeleton on first load
+                    new Array(10).fill(0).map((_, index) => (
                       <ListItem
                         style={styles.listItem}
                         key={`skeleton-${index}`}
@@ -605,7 +606,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         </Line>
                       </ListItem>
                     ))
-                  ) : projectFiles && projectFiles.length > 0 ? (
+                  ) : projectFiles.length > 0 ? (
                     projectFiles.map(file => (
                       <ProjectFileListItem
                         key={file.fileMetadata.fileIdentifier}

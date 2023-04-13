@@ -86,6 +86,8 @@ const styles = {
   titleContainer: {
     paddingBottom: dialogTitlePadding,
     textAlign: 'left',
+    // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
+    overflowWrap: 'anywhere',
   },
   fixedContentContainer: {
     paddingBottom: 8,

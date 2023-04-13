@@ -38,6 +38,7 @@ import {
   getPrivateAssetPackListingData,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { t } from '@lingui/macro';
 
 const defaultSearchText = '';
 
@@ -351,8 +352,8 @@ export const AssetStoreStateProvider = ({
         }
 
         showAlert({
-          title: `Asset pack not found`,
-          message: `The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
+          title: t`Asset pack not found`,
+          message: t`The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
         });
       }
     },

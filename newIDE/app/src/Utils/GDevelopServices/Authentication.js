@@ -418,6 +418,30 @@ export default class Authentication {
     }
   };
 
+  deleteAccount = async (getAuthorizationHeader: () => Promise<string>) => {
+    const { currentUser } = this.auth;
+    if (!currentUser) {
+      throw new Error('Tried to delete account while not authenticated.');
+    }
+
+    try {
+      const authorizationHeader = await getAuthorizationHeader();
+      await axios.delete(`${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`, {
+        params: {
+          userId: currentUser.uid,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      });
+      // Ensure we logout the user after the account has been deleted.
+      await this.logout();
+    } catch (error) {
+      console.error('An error happened during account deletion.', error);
+      throw error;
+    }
+  };
+
   getAuthorizationHeader = async (): Promise<string> => {
     const { currentUser } = this.auth;
     if (!currentUser) throw new Error('User is not authenticated.');

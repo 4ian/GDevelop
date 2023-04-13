@@ -9,6 +9,7 @@ import {
   type Subscription,
   type PlanDetails,
   hasMobileAppStoreSubscriptionPlan,
+  hasSubscriptionBeenManuallyAdded,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -123,7 +124,8 @@ const SubscriptionDetails = ({
               }
               actions={[
                 !redemptionCodeExpirationDate &&
-                !hasMobileAppStoreSubscriptionPlan(subscription) ? (
+                !hasMobileAppStoreSubscriptionPlan(subscription) &&
+                !hasSubscriptionBeenManuallyAdded(subscription) ? (
                   <LeftLoader
                     key="manage-online"
                     isLoading={isManageSubscriptionLoading}

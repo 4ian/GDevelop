@@ -616,6 +616,7 @@ export const GameDetailsDialog = ({
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
               isLoading={isGameUpdating}
+              i18n={i18n}
             />
           )}
         </Dialog>

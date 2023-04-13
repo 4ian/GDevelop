@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import React from 'react';
 import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
@@ -39,9 +40,9 @@ type PublicProjectProperties = {|
 
 export const applyPublicPropertiesToProject = (
   project: gdProject,
+  i18n: I18nType,
   newProperties: PublicProjectProperties
 ) => {
-  const t = str => str; //TODO
   const {
     name,
     authorIds,
@@ -67,7 +68,10 @@ export const applyPublicPropertiesToProject = (
   project.setPlayableWithMobile(newProperties.playWithMobile);
   project.setOrientation(newProperties.orientation);
 
-  return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
+  return displayProjectErrorsBox(
+    i18n,
+    getProjectPropertiesErrors(i18n, project)
+  );
 };
 
 type Props = {|
@@ -76,6 +80,7 @@ type Props = {|
   onClose: () => void,
   onApply: (partialGameChange: PartialGameChange) => Promise<void>,
   isLoading: boolean,
+  i18n: I18nType,
 |};
 
 export const PublicGamePropertiesDialog = ({
@@ -84,6 +89,7 @@ export const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
   isLoading,
+  i18n,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -124,7 +130,7 @@ export const PublicGamePropertiesDialog = ({
 
   const onSave = async () => {
     if (
-      applyPublicPropertiesToProject(project, {
+      applyPublicPropertiesToProject(project, i18n, {
         name,
         categories: categories || [],
         description: description || '',

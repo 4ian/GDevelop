@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -39,6 +40,7 @@ type Props = {|
   onApply: (options: { newName?: string }) => Promise<boolean>,
   onPropertiesApplied: (options: { newName?: string }) => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  i18n: I18nType,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -65,7 +67,7 @@ type ProjectProperties = {|
   useDeprecatedZeroAsDefaultZOrder: boolean,
 |};
 
-function loadPropertiesFromProject(project: gdProject): ProjectProperties {
+const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
   return {
     gameResolutionWidth: project.getGameResolutionWidth(),
     gameResolutionHeight: project.getGameResolutionHeight(),
@@ -86,13 +88,13 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     isFolderProject: project.isFolderProject(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
-}
+};
 
 function applyPropertiesToProject(
   project: gdProject,
+  i18n: I18nType,
   newProperties: ProjectProperties
 ) {
-  const t = str => str; //TODO
   const {
     gameResolutionWidth,
     gameResolutionHeight,
@@ -137,10 +139,13 @@ function applyPropertiesToProject(
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
-  return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
+  return displayProjectErrorsBox(
+    i18n,
+    getProjectPropertiesErrors(i18n, project)
+  );
 }
 
-function ProjectPropertiesDialog(props: Props) {
+const ProjectPropertiesDialog = (props: Props) => {
   const { project, hotReloadPreviewButtonProps } = props;
 
   const initialProperties = React.useMemo(
@@ -219,26 +224,30 @@ function ProjectPropertiesDialog(props: Props) {
     const proceed = await props.onApply(specialPropertiesChanged);
     if (!proceed) return;
 
-    const wasProjectPropertiesApplied = applyPropertiesToProject(project, {
-      gameResolutionWidth,
-      gameResolutionHeight,
-      adaptGameResolutionAtRuntime,
-      name,
-      description,
-      author,
-      authorIds,
-      authorUsernames,
-      version,
-      packageName,
-      orientation,
-      scaleMode,
-      pixelsRounding,
-      sizeOnStartupMode,
-      minFPS,
-      maxFPS,
-      isFolderProject,
-      useDeprecatedZeroAsDefaultZOrder,
-    });
+    const wasProjectPropertiesApplied = applyPropertiesToProject(
+      project,
+      props.i18n,
+      {
+        gameResolutionWidth,
+        gameResolutionHeight,
+        adaptGameResolutionAtRuntime,
+        name,
+        description,
+        author,
+        authorIds,
+        authorUsernames,
+        version,
+        packageName,
+        orientation,
+        scaleMode,
+        pixelsRounding,
+        sizeOnStartupMode,
+        minFPS,
+        maxFPS,
+        isFolderProject,
+        useDeprecatedZeroAsDefaultZOrder,
+      }
+    );
 
     if (wasProjectPropertiesApplied) {
       props.onPropertiesApplied(specialPropertiesChanged);
@@ -696,6 +705,6 @@ function ProjectPropertiesDialog(props: Props) {
       )}
     </I18n>
   );
-}
+};
 
 export default ProjectPropertiesDialog;

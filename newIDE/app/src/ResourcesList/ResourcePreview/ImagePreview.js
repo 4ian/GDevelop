@@ -18,16 +18,14 @@ import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Slider from '../../UI/Slider';
 import AuthorizedAssetImage from '../../AssetStore/PrivateAssets/AuthorizedAssetImage';
 import {
-  clampImagePreviewZoom,
   getWheelStepZoomFactor,
-  imagePreviewMaxZoom,
-  imagePreviewMinZoom,
-  willZoomChange,
   zoomInFactor,
   zoomOutFactor,
-  zoomStepBasePower,
 } from '../../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
+
+const imagePreviewMaxZoom = 4;
+const imagePreviewMinZoom = 1 / 4;
 
 type Point = { x: number, y: number };
 
@@ -152,16 +150,36 @@ const ImagePreview = ({
     setErrored(true);
   };
 
+  const getZoomFactorToFitImage = React.useCallback(
+    () => {
+      if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
+        return 1;
+      }
+      const zoomFactor = Math.min(
+        containerWidth / imageWidth,
+        containerHeight / imageHeight
+      );
+      let zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+      if (zoomFactorWithMargins > 1) {
+        zoomFactorWithMargins = Math.floor(zoomFactorWithMargins);
+      }
+      return zoomFactorWithMargins;
+    },
+    [
+      imageWidth,
+      imageHeight,
+      containerHeight,
+      containerWidth,
+      displaySpacedView,
+    ]
+  );
+
   const adaptZoomFactorToImage = React.useCallback(
-    (displaySpacedView?: boolean) => {
+    () => {
       if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
         return false;
       }
-      const zoomFactor = clampImagePreviewZoom(
-        Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
-      );
-      const zoomFactorWithMargins =
-        zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+      const zoomFactorWithMargins = getZoomFactorToFitImage();
       setZoomState({
         factor: zoomFactorWithMargins,
         xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
@@ -169,28 +187,44 @@ const ImagePreview = ({
       });
       return true;
     },
-    [imageHeight, imageWidth, containerHeight, containerWidth]
+    [
+      imageWidth,
+      imageHeight,
+      containerHeight,
+      containerWidth,
+      getZoomFactorToFitImage,
+    ]
+  );
+
+  const clampZoomFactor = React.useCallback(
+    (zoom: number) => {
+      const fitZoomFactor = getZoomFactorToFitImage();
+      return Math.max(
+        Math.min(zoom, fitZoomFactor * imagePreviewMaxZoom),
+        fitZoomFactor * imagePreviewMinZoom
+      );
+    },
+    [getZoomFactorToFitImage]
   );
 
   const zoomAroundPointBy = React.useCallback(
     async (imageZoomFactorMultiplier: number, point: [number, number]) => {
-      if (!willZoomChange(imageZoomFactor, imageZoomFactorMultiplier)) {
-        return;
-      }
-      const newFactor = clampImagePreviewZoom(
+      const newFactor = clampZoomFactor(
         imageZoomFactor * imageZoomFactorMultiplier
       );
-      setZoomState(zoomState => ({
-        xOffset:
-          zoomState.xOffset +
-          (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
-        yOffset:
-          zoomState.yOffset +
-          (point[1] - zoomState.yOffset) * (1 - newFactor / zoomState.factor),
-        factor: newFactor,
-      }));
+      if (zoomState.factor !== newFactor) {
+        setZoomState(zoomState => ({
+          xOffset:
+            zoomState.xOffset +
+            (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
+          yOffset:
+            zoomState.yOffset +
+            (point[1] - zoomState.yOffset) * (1 - newFactor / zoomState.factor),
+          factor: newFactor,
+        }));
+      }
     },
-    [imageZoomFactor]
+    [clampZoomFactor, imageZoomFactor, zoomState.factor]
   );
 
   const zoomAroundPointTo = React.useCallback(
@@ -352,11 +386,9 @@ const ImagePreview = ({
         // or if the zoom has already been adapted.
         return;
       }
-      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage(
-        displaySpacedView
-      );
+      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
     },
-    [adaptZoomFactorToImage, displaySpacedView]
+    [adaptZoomFactorToImage]
   );
 
   const handleImageLoaded = React.useCallback(
@@ -466,9 +498,13 @@ const ImagePreview = ({
                 </IconButton>
                 <div style={styles.sliderContainer}>
                   <Slider
-                    min={Math.log2(imagePreviewMinZoom)}
-                    max={Math.log2(imagePreviewMaxZoom)}
-                    step={zoomStepBasePower * 4}
+                    min={Math.log2(
+                      getZoomFactorToFitImage() * imagePreviewMinZoom
+                    )}
+                    max={Math.log2(
+                      getZoomFactorToFitImage() * imagePreviewMaxZoom
+                    )}
+                    step={1 / 16}
                     value={Math.log2(imageZoomFactor)}
                     onChange={value => {
                       zoomAroundPointTo(Math.pow(2, value), containerCenter);

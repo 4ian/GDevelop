@@ -411,8 +411,17 @@ const ImagePreview = ({
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
 
+  const imageContainerBorderStyle = {
+    transform: `translate(${xOffset}px, ${yOffset}px)`,
+    // Apply margin only once the container is loaded, to avoid a shift in the image
+    outline: renderOverlay ? `1px solid ${frameBorderColor}` : undefined,
+    width: imageWidth != null ? imageWidth * imageZoomFactor : null,
+    height: imageHeight != null ? imageHeight * imageZoomFactor : null,
+    transformOrigin: '0 0',
+  };
+
   const imageContainerStyle = {
-    transform: `translate(${xOffset}px, ${yOffset}px) scale(${imageZoomFactor})`,
+    transform: `scale(${imageZoomFactor})`,
     width: imageWidth,
     height: imageHeight,
     transformOrigin: '0 0',
@@ -421,10 +430,6 @@ const ImagePreview = ({
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
-    // Apply margin only once the container is loaded, to avoid a shift in the image
-    outline: renderOverlay
-      ? `${0.5 / imageZoomFactor}px solid ${frameBorderColor}`
-      : undefined,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
   };
@@ -520,25 +525,27 @@ const ImagePreview = ({
                   </PlaceholderMessage>
                 )}
                 {!errored && (
-                  <div style={imageContainerStyle}>
-                    {isImagePrivate ? (
-                      <AuthorizedAssetImage
-                        style={imageStyle}
-                        alt={resourceName}
-                        url={imageResourceSource}
-                        onError={handleImageError}
-                        onLoad={handleImageLoaded}
-                        hideLoader={hideLoader}
-                      />
-                    ) : (
-                      <CorsAwareImage
-                        style={imageStyle}
-                        alt={resourceName}
-                        src={imageResourceSource}
-                        onError={handleImageError}
-                        onLoad={handleImageLoaded}
-                      />
-                    )}
+                  <div style={imageContainerBorderStyle}>
+                    <div style={imageContainerStyle}>
+                      {isImagePrivate ? (
+                        <AuthorizedAssetImage
+                          style={imageStyle}
+                          alt={resourceName}
+                          url={imageResourceSource}
+                          onError={handleImageError}
+                          onLoad={handleImageLoaded}
+                          hideLoader={hideLoader}
+                        />
+                      ) : (
+                        <CorsAwareImage
+                          style={imageStyle}
+                          alt={resourceName}
+                          src={imageResourceSource}
+                          onError={handleImageError}
+                          onLoad={handleImageLoaded}
+                        />
+                      )}
+                    </div>
                   </div>
                 )}
                 {imageLoaded && renderOverlay && (

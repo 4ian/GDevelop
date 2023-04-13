@@ -195,10 +195,23 @@ class GD_CORE_API ValueTypeMetadata {
    * \brief Return the expression type from the parameter type.
    * Declinations of "number" and "string" types (like "forceMultiplier" or
    * "sceneName") are replaced by "number" and "string".
+   * 
+   * \note It only maps string and number types.
+   */
+  static const gd::String &GetExpressionPrimitiveValueType(const gd::String &parameterType);
+
+  /**
+   * \brief Return the primitive type from the parameter type.
+   * Declinations of "number" and "string" types (like "forceMultiplier" or
+   * "sceneName") are replaced by "number" and "string".
+   * 
+   * \note It also maps variable and boolean types.
    */
   static const gd::String &GetPrimitiveValueType(const gd::String &parameterType);
   static const gd::String numberType;
   static const gd::String stringType;
+  static const gd::String variableType;
+  static const gd::String booleanType;
 
   /**
    * \brief Return the ValueTypeMetadata name for a property type.

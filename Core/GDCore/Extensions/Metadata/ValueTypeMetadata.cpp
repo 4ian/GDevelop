@@ -35,15 +35,38 @@ void ValueTypeMetadata::UnserializeFrom(const SerializerElement& element) {
 
 const gd::String ValueTypeMetadata::numberType = "number";
 const gd::String ValueTypeMetadata::stringType = "string";
+const gd::String ValueTypeMetadata::variableType = "variable";
+const gd::String ValueTypeMetadata::booleanType = "boolean";
 
-const gd::String &ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
-  if (parameterType == "number" || gd::ValueTypeMetadata::IsTypeExpression("number", parameterType)) {
+const gd::String &ValueTypeMetadata::GetExpressionPrimitiveValueType(
+    const gd::String &parameterType) {
+  if (parameterType == "number" ||
+      gd::ValueTypeMetadata::IsTypeExpression("number", parameterType)) {
     return ValueTypeMetadata::numberType;
   }
-  if (parameterType == "string" || gd::ValueTypeMetadata::IsTypeExpression("string", parameterType)) {
+  if (parameterType == "string" ||
+      gd::ValueTypeMetadata::IsTypeExpression("string", parameterType)) {
     return ValueTypeMetadata::stringType;
   }
   return parameterType;
+}
+
+const gd::String &
+ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
+  if (parameterType == "variable" ||
+      gd::ValueTypeMetadata::IsTypeExpression("variable", parameterType)) {
+    return ValueTypeMetadata::variableType;
+  }
+  if (parameterType == "boolean" || parameterType == "yesorno" ||
+      parameterType == "trueorfalse") {
+    return ValueTypeMetadata::booleanType;
+  }
+  // These 2 types are not strings from the code generator point of view,
+  // but it is for event-based extensions.
+  if (parameterType == "key" || parameterType == "mouse") {
+    return ValueTypeMetadata::stringType;
+  }
+  return GetExpressionPrimitiveValueType(parameterType);
 }
 
 const gd::String ValueTypeMetadata::numberValueType = "number";

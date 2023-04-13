@@ -45,6 +45,7 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_EXPRESSION: 3,
 };
 
+// TODO As parsed node tree are cached, this may no longer be needed.
 export const quicklyAnalyzeVariableName = (
   name: string
 ): VariableNameQuickAnalyzeResult => {

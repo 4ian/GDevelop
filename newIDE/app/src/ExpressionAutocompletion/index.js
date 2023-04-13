@@ -362,10 +362,16 @@ const getAutocompletionsForText = function(
     const functionsContainer = eventsBasedEntity
       ? eventsBasedEntity.getEventsFunctions()
       : scope.eventsFunctionsExtension;
-    if (scope.eventsFunction && functionsContainer) {
+    const eventsFunction = scope.eventsFunction;
+    if (eventsFunction && functionsContainer) {
+      const allowedParameterTypes = completionDescription
+        .getParameterMetadata()
+        .getExtraInfo()
+        .split(',');
       autocompletionTexts = enumerateParametersUsableInExpressions(
         functionsContainer,
-        scope.eventsFunction
+        eventsFunction,
+        allowedParameterTypes
       ).map(parameterMetadata => `"${parameterMetadata.getName()}"`);
     }
   }

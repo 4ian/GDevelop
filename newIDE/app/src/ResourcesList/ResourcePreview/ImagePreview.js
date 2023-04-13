@@ -413,7 +413,8 @@ const ImagePreview = ({
 
   const imageContainerBorderStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px)`,
-    outline: renderOverlay ? `${1}px solid ${frameBorderColor}` : undefined,
+    // Apply margin only once the container is loaded, to avoid a shift in the image
+    outline: renderOverlay ? `1px solid ${frameBorderColor}` : undefined,
     width: imageWidth != null ? imageWidth * imageZoomFactor : null,
     height: imageHeight != null ? imageHeight * imageZoomFactor : null,
     transformOrigin: '0 0',
@@ -429,8 +430,6 @@ const ImagePreview = ({
 
   const imageStyle = {
     ...styles.spriteThumbnailImage,
-    // Apply margin only once the container is loaded, to avoid a shift in the image
-
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
   };

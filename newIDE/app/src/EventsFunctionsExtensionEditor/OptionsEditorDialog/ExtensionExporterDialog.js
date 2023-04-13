@@ -55,10 +55,7 @@ const ExtensionExporterDialog = (props: Props) => {
     <Dialog
       title={<Trans>Export extension</Trans>}
       secondaryActions={[
-        <HelpButton
-          key="help"
-          helpPagePath="/community/contribute-to-the-assets-store"
-        />,
+        <HelpButton key="help" helpPagePath="/extensions/share/" />,
         <FlatButton
           label={<Trans>Submit to the community</Trans>}
           onClick={openGitHubIssue}

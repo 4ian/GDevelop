@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -24,6 +24,20 @@ import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
 import HelpButton from '../../UI/HelpButton';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+
+export const useOutOfDateAlertDialog = () => {
+  const { showConfirmation } = useAlertDialog();
+  return async (): Promise<boolean> => {
+    return await showConfirmation({
+      title: t`Outdated extension`,
+      message: t`The extension installed in this project is not up to date.
+      Consider upgrading it before reporting any issue.`,
+      confirmButtonLabel: t`Close`,
+      dismissButtonLabel: t`Report anyway`,
+    });
+  };
+};
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
@@ -57,7 +71,7 @@ const ExtensionInstallDialog = ({
   onEdit,
   project,
 }: Props) => {
-  const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
+  const alreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
 
@@ -119,6 +133,25 @@ const ExtensionInstallDialog = ({
     [onInstall, canInstallExtension, alreadyInstalled, fromStore]
   );
 
+  const showOutOfDateAlert = useOutOfDateAlertDialog();
+  const onUserReportIssue = React.useCallback(
+    async () => {
+      if (extensionUpdate) {
+        const shouldNotReportIssue = await showOutOfDateAlert();
+        if (shouldNotReportIssue) {
+          return;
+        }
+      }
+      Window.openExternalURL(
+        `https://github.com/GDevelopApp/GDevelop-extensions/issues/new` +
+          `?assignees=&labels=&template=bug-report.md&title=[${
+            extensionShortHeader.name
+          }] Issue short description`
+      );
+    },
+    [extensionShortHeader.name, extensionUpdate, showOutOfDateAlert]
+  );
+
   return (
     <Dialog
       title={extensionShortHeader.fullName}
@@ -167,6 +200,15 @@ const ExtensionInstallDialog = ({
             key="edit-extension"
             label={<Trans>Open in editor</Trans>}
             onClick={onEdit}
+          />
+        ) : (
+          undefined
+        ),
+        alreadyInstalled ? (
+          <FlatButton
+            key="report-extension"
+            label={<Trans>Report an issue</Trans>}
+            onClick={() => onUserReportIssue()}
           />
         ) : (
           undefined

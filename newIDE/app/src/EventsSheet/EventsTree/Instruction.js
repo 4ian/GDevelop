@@ -277,6 +277,8 @@ const Instruction = (props: Props) => {
                   );
                 }
               } else {
+                // This can happen if function-dedicated instructions are
+                // copied to scene events.
                 expressionIsValid = false;
               }
             }

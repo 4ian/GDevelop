@@ -59,7 +59,7 @@ ValueTypeMetadata::GetPrimitiveValueType(const gd::String &parameterType) {
   }
   if (parameterType == "boolean" || parameterType == "yesorno" ||
       parameterType == "trueorfalse") {
-    return ValueTypeMetadata::variableType;
+    return ValueTypeMetadata::booleanType;
   }
   return GetExpressionPrimitiveValueType(parameterType);
 }

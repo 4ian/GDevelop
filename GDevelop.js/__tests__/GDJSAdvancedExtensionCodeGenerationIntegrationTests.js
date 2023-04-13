@@ -46,12 +46,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a number parameter condition that is true', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       [123],
       [
         {
           type: { value: 'CompareArgumentAsNumber' },
-          parameters: ['"ParameterName"', '=', '123'],
+          parameters: ['"MyParameter"', '=', '123'],
         },
       ]
     );
@@ -64,12 +64,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a number parameter condition that is false', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       [123],
       [
         {
           type: { value: 'BuiltinAdvanced::CompareArgumentAsNumber' },
-          parameters: ['ParameterName', '=', '456'],
+          parameters: ['MyParameter', '=', '456'],
         },
       ]
     );
@@ -79,12 +79,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a string parameter condition that is true', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       ['123'],
       [
         {
           type: { value: 'CompareArgumentAsString' },
-          parameters: ['"ParameterName"', '=', '"123"'],
+          parameters: ['"MyParameter"', '=', '"123"'],
         },
       ]
     );
@@ -97,12 +97,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a string parameter condition that is false', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       ['123'],
       [
         {
           type: { value: 'BuiltinAdvanced::CompareArgumentAsString' },
-          parameters: ['ParameterName', '=', '"456"'],
+          parameters: ['MyParameter', '=', '"456"'],
         },
       ]
     );
@@ -118,7 +118,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         actions: [
           {
             type: { value: 'CopyArgumentToVariable' },
-            parameters: ['"ParameterName"', '__MyExtensionVariable'],
+            parameters: ['"MyParameter"', '__MyExtensionVariable'],
           },
         ],
         events: [],
@@ -128,7 +128,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement,
-      { parameterTypes: { ParameterName: 'scenevar' }, logCode: false }
+      { parameterTypes: { MyParameter: 'scenevar' }, logCode: false }
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
@@ -159,7 +159,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           },
           {
             type: { value: 'CopyVariableToArgument' },
-            parameters: ['"ParameterName"', '__MyExtensionVariable'],
+            parameters: ['"MyParameter"', '__MyExtensionVariable'],
           },
         ],
         events: [],
@@ -169,7 +169,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement,
-      { parameterTypes: { ParameterName: 'scenevar' }, logCode: true }
+      { parameterTypes: { MyParameter: 'scenevar' }, logCode: true }
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();

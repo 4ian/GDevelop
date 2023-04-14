@@ -96,11 +96,6 @@ namespace gdjs {
       });
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
-      this._renderer.onDestroy();
-    }
-
     setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();

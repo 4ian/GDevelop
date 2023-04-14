@@ -143,16 +143,31 @@ export default class KeyboardShortcuts {
   };
 
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
+    const hasModifierChanged =
+      this._metaPressed !== evt.metaKey ||
+      this._altPressed !== evt.altKey ||
+      this._ctrlPressed !== evt.ctrlKey ||
+      this._shiftPressed !== evt.shiftKey;
+
     this._metaPressed = evt.metaKey;
     this._altPressed = evt.altKey;
     this._ctrlPressed = evt.ctrlKey;
     this._shiftPressed = evt.shiftKey;
+
+    return hasModifierChanged;
   };
 
   _updateSpecialKeysStatus = (evt: KeyboardEvent, isDown: boolean) => {
     if (evt.which === SPACE_KEY) {
+      // Prevent scrolling in Physics2 property editor.
+      evt.preventDefault();
+      evt.stopPropagation();
+
+      const hasStateChanged = this._spacePressed !== isDown;
       this._spacePressed = isDown;
+      return hasStateChanged;
     }
+    return false;
   };
 
   _isControlOrCmdPressed = () => {
@@ -179,22 +194,24 @@ export default class KeyboardShortcuts {
   };
 
   onKeyUp = (evt: KeyboardEvent) => {
-    this._updateModifiersFromEvent(evt);
-    this._updateSpecialKeysStatus(evt, false);
+    const hasModifierChanged = this._updateModifiersFromEvent(evt);
+    const hasSpecialKeyChanged = this._updateSpecialKeysStatus(evt, false);
+    return hasModifierChanged || hasSpecialKeyChanged;
   };
 
   onKeyDown = (evt: KeyboardEvent) => {
-    this._updateModifiersFromEvent(evt);
+    let hasStateChanged = this._updateModifiersFromEvent(evt);
 
-    if (this._isActive && !this._isActive()) return;
+    if (this._isActive && !this._isActive()) return hasStateChanged;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
     // $FlowFixMe
     if (evt.target && evt.target.closest(textEditorSelectors)) {
-      return; // Something else is currently being edited.
+      return hasStateChanged; // Something else is currently being edited.
     }
 
-    this._updateSpecialKeysStatus(evt, true);
+    const hasSpecialKeyChanged = this._updateSpecialKeysStatus(evt, true);
+    hasStateChanged = hasStateChanged || hasSpecialKeyChanged;
 
     const {
       onDelete,
@@ -316,5 +333,7 @@ export default class KeyboardShortcuts {
       evt.preventDefault();
       onShift3();
     }
+
+    return hasStateChanged;
   };
 }

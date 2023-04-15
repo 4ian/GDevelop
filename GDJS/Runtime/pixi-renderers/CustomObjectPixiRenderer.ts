@@ -9,6 +9,7 @@ namespace gdjs {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
+    _threeContainer: THREE.Group | null;
     _isContainerDirty: boolean = true;
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
@@ -28,6 +29,7 @@ namespace gdjs {
       this._object = object;
       this._instanceContainer = instanceContainer;
       this._pixiContainer = new PIXI.Container();
+      this._threeContainer = THREE ? new THREE.Group() : null;
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
@@ -39,6 +41,11 @@ namespace gdjs {
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
+        if (this._threeContainer) {
+          layer
+          .getRenderer()
+          .add3dRendererObject(this._threeContainer);
+        }
       }
     }
 
@@ -53,11 +60,20 @@ namespace gdjs {
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
+        if (this._threeContainer) {
+          layer
+          .getRenderer()
+          .add3dRendererObject(this._threeContainer);
+        }
       }
     }
 
     getRendererObject() {
       return this._pixiContainer;
+    }
+
+    get3dRendererObject(): THREE.Object3D | null {
+      return this._threeContainer;
     }
 
     /**
@@ -88,6 +104,7 @@ namespace gdjs {
     ensureUpToDate() {
       if (this._isContainerDirty) {
         this._updatePIXIContainer();
+        // TODO (3D): Add support for 3D objects in custom objects.
       }
     }
 

@@ -174,7 +174,7 @@ namespace gdjs {
       const pixiTexture = this.getPIXITexture(resourceName);
       const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer()._pixiRenderer;
       if (!pixiRenderer) throw new Error("No PIXI renderer was found.");
-      
+
       // @ts-ignore - source does exist on resource.
       const image = pixiTexture.baseTexture.resource.source;
       if (!(image instanceof HTMLImageElement)) {

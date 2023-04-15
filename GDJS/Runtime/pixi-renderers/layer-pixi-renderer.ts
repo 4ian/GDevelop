@@ -25,9 +25,9 @@ namespace gdjs {
     _isLightingLayer: boolean;
     _clearColor: Array<integer>;
 
-    _threeContainer: THREE.Group | null = null;
-    _threeCamera: THREE.PerspectiveCamera | null = null;
+    _threeGroup: THREE.Group | null = null;
 
+    _threeCamera: THREE.PerspectiveCamera | null = null;
     _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
     _threePlaneGeometry: THREE.PlaneGeometry | null = null;
     _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
@@ -45,7 +45,7 @@ namespace gdjs {
     constructor(
       layer: gdjs.RuntimeLayer,
       runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer,
-      pixiRenderer: PIXI.Renderer | null
+      pixiRenderer: PIXI.Renderer | null // TODO: check if this can even be null?
     ) {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.sortableChildren = true;
@@ -69,11 +69,11 @@ namespace gdjs {
       return this._pixiContainer;
     }
 
-    get3dRendererObject(): THREE.Group | null {
-      return this._threeContainer;
+    getThreeGroup(): THREE.Group | null {
+      return this._threeGroup;
     }
 
-    get3dRendererCamera(): THREE.Camera | null {
+    getThreeCamera(): THREE.Camera | null {
       return this._threeCamera;
     }
 
@@ -82,37 +82,49 @@ namespace gdjs {
     }
 
     _setupThreeCameraAndContainer(): void {
-      if (!this._threeCamera)
-        this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
-
-      if (!this._threeContainer) {
-        this._threeContainer = new THREE.Group();
-        this._runtimeSceneRenderer
-          .get3dRendererObject()
-          .add(this._threeContainer);
+      const parentThreeContainer = this._runtimeSceneRenderer.get3dRendererObject();
+      if (!parentThreeContainer) {
+        // No parent 3D renderer object, 3D is disabled.
+        return;
       }
 
-      if (!this._pixiRenderer) return;
-      // TODO: Could be optimized by using a render texture instead of a canvas.
-      // (Implies to share the same WebGL context between PixiJS and three.js).
-      const pixiCanvas = this._pixiRenderer.view;
-      this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
+      if (!this._threeGroup) {
+        // TODO (3D) - optimization: do not create a THREE.Group if no 3D object are contained inside.
+        this._threeGroup = new THREE.Group();
+        parentThreeContainer.add(this._threeGroup);
+      }
 
-      this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
-      this._threePlaneMaterial = new THREE.MeshBasicMaterial({
-        // Texture will be set in onGameResolutionResized().
-        side: THREE.DoubleSide,
-        transparent: true,
-      });
+      if (!this._pixiRenderer) {
+        // No PixiJS renderer, which is unexpected.
+        return;
+      }
 
-      this._threePlaneMesh = new THREE.Mesh(
-        this._threePlaneGeometry,
-        this._threePlaneMaterial
-      );
-      this._threeContainer.add(this._threePlaneMesh);
-      this._threePlaneMesh.renderOrder = -9999; // Ensure the plane is rendered first so it blends with 3D objects
+      // TODO (3D): ideally we would avoid the need for this flag at all,
+      // maybe by having separate rendering classes for custom object layers and scene layers.
+      if (this._layer instanceof gdjs.Layer) {
+        if (!this._threeCamera)
+          this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
 
-      this.onGameResolutionResized();
+        // TODO: Could be optimized by using a render texture instead of a canvas.
+        // (Implies to share the same WebGL context between PixiJS and three.js).
+        const pixiCanvas = this._pixiRenderer.view;
+        this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
+
+        this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
+        this._threePlaneMaterial = new THREE.MeshBasicMaterial({
+          // Texture will be set in onGameResolutionResized().
+          side: THREE.DoubleSide,
+          transparent: true,
+        });
+
+        this._threePlaneMesh = new THREE.Mesh(
+          this._threePlaneGeometry,
+          this._threePlaneMaterial
+        );
+        this._threeGroup.add(this._threePlaneMesh);
+
+        this.onGameResolutionResized();
+      }
     }
 
     onGameResolutionResized() {
@@ -284,15 +296,15 @@ namespace gdjs {
     }
 
     add3dRendererObject(object: THREE.Object3D) {
-      if (!this._threeContainer) return;
+      if (!this._threeGroup) return;
 
-      this._threeContainer.add(object);
+      this._threeGroup.add(object);
     }
 
     remove3dRendererObject(object: THREE.Object3D): void {
-      if (!this._threeContainer) return;
+      if (!this._threeGroup) return;
 
-      this._threeContainer.remove(object);
+      this._threeGroup.remove(object);
     }
 
     updateClearColor(): void {

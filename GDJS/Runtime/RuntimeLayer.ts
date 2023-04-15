@@ -5,9 +5,9 @@
  */
 namespace gdjs {
   /**
-   * Represents a layer of a container, used to display objects.
-   *
-   * Viewports and multiple cameras are not supported.
+   * Represents a layer of a "container", used to display objects.
+   * The container can be a scene (see gdjs.Layer)
+   * or a custom object (see gdjs.RuntimeCustomObjectLayer).
    */
   export abstract class RuntimeLayer implements EffectsTarget {
     _name: string;

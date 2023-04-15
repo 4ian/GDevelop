@@ -14,7 +14,7 @@ namespace gdjs {
 
     _threeRenderer: THREE.WebGLRenderer | null = null;
     _threeScene: THREE.Scene | null = null;
-    _threeCamera: THREE.Camera | null = null;
+    _threeDummyCamera: THREE.Camera | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -41,7 +41,7 @@ namespace gdjs {
       // We use a mirroring rather than a camera rotation so that the Z order is not changed.
       this._threeScene.scale.y = -1; // TODO: move this to layers
 
-      if (!this._threeCamera) this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+      if (!this._threeDummyCamera) this._threeDummyCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
     }
 
     onGameResolutionResized() {
@@ -49,6 +49,9 @@ namespace gdjs {
         return;
       }
       const runtimeGame = this._runtimeScene.getGame();
+
+      // TODO (3D): should this be done for each individual layer?
+      // Especially if we remove _pixiContainer entirely.
       this._pixiContainer.scale.x =
         this._pixiRenderer.width / runtimeGame.getGameResolutionWidth();
       this._pixiContainer.scale.y =
@@ -60,7 +63,7 @@ namespace gdjs {
     }
 
     onSceneUnloaded() {
-      // TODO: call the method with the same name on RuntimeLayers so they can dispose?
+      // TODO (3D): call the method with the same name on RuntimeLayers so they can dispose?
     }
 
     render() {
@@ -70,48 +73,59 @@ namespace gdjs {
 
       // this._renderProfileText(); //Uncomment to display profiling times
 
-      // render the PIXI container of the scene
-      // TODO: disable background color if rendering made by three.js
-      this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
-      this._pixiRenderer.render(this._pixiContainer);
-
-      // TODO: to support multiple layers, start from the first layer and iterate on them.
-      // Start from a PIXI render texture.
-      // if it's a classic 2d pixi layer, render it (this._pixiRednerer.render(layerContainer)) to a render texture
-      // if it's a 3d layer:, render the scene with: 
-      // - The existing rendertexture as a plane, behind everything. (do a this._pixiRenderer.render())
-      // - The layer pixi objects as a plane (do a clear then this._pixiRenderer.render())
-      // - render 3D (do a this._threeRenderer.render())
-
-
       const threeRenderer = this._threeRenderer;
       const threeScene = this._threeScene;
-      const threeDummyCamera = this._threeCamera;
+      const threeDummyCamera = this._threeDummyCamera;
 
       if (threeRenderer && threeScene && threeDummyCamera) {
+        // Layered 2D+3D rendering.
+        // TODO (3D) - optimization: avoid separate rendering for each layer.
+        // Each layer needs a separate PixiJS render. If no 3D objects are present,
+        // this could probably be simplified: "collapse" the renders without `clear`-ing in between.
+        // So that if no 3D objects at all, this would be as efficient as the 2D only rendering.
+
+        // Render the background color.
         threeScene.background = new THREE.Color(
           this._runtimeScene.getBackgroundColor()
         );
         threeRenderer.clear();
         threeRenderer.render(threeScene, threeDummyCamera)
-        
+
         for(const runtimeLayer of this._runtimeScene._orderedLayers) {
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
-          const threeGroup = runtimeLayerRenderer.get3dRendererObject();
-          const threeCamera = runtimeLayerRenderer.get3dRendererCamera();
+          const pixiContainer = runtimeLayerRenderer.getRendererObject();
+          const threeGroup = runtimeLayerRenderer.getThreeGroup();
+          const threeCamera = runtimeLayerRenderer.getThreeCamera();
+
+          // Render the 2D objects of this layer, which will be displayed on a plane.
+          // Note: no need to `clear`, it's made by `render`.
+          this._pixiRenderer.render(pixiContainer);
+
+          // Render the 3D objects of this layer.
           if (threeGroup && threeCamera) {
             // TODO: move in a render method?
+            // The plane showing the PIXI rendering must be updated.
             if (runtimeLayerRenderer._threePixiCanvasTexture)
               runtimeLayerRenderer._threePixiCanvasTexture.needsUpdate = true;
+
+            // Clear the depth as each layer is independent and display on top of the previous one,
+            // even 3D objects.
+            threeRenderer.clearDepth();
             threeRenderer.render(threeGroup, threeCamera);
           }
         }
+      } else {
+        // 2D only rendering.
+        // render the PIXI container of the scene
+        // TODO: replace by a loop like in 3D.
+        this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
+        this._pixiRenderer.render(this._pixiContainer);
       }
 
       // synchronize showing the cursor with rendering (useful to reduce
       // blinking while switching from in-game cursor)
       if (this._showCursorAtNextRender) {
-        // TODO: replace by getCanvas()
+        // TODO (3D): replace by getCanvas().
         this._pixiRenderer.view.style.cursor = '';
         this._showCursorAtNextRender = false;
       }
@@ -143,7 +157,7 @@ namespace gdjs {
       if (!this._pixiRenderer) {
         return;
       }
-      // TODO: replace by getCanvas()
+      // TODO (3D): replace by getCanvas().
       this._pixiRenderer.view.style.cursor = 'none';
     }
 

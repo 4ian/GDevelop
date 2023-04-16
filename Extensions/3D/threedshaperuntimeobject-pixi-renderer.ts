@@ -117,6 +117,7 @@ namespace gdjs {
         this._object.getHeight(),
         this._object.getDepth()
       );
+      this.updatePosition();
     }
   }
 

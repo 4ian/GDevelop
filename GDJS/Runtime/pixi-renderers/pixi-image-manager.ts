@@ -169,8 +169,8 @@ namespace gdjs {
       if (loadedThreeTexture) return loadedThreeTexture;
 
       // Texture is not loaded, load it now from the PixiJS texture.
-      // TODO: Don't load the PixiJS Texture if not used by PixiJS.
-      // TODO: Ideally we could even share the same WebGL texture.
+      // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
+      // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
       const pixiTexture = this.getPIXITexture(resourceName);
       const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer()._pixiRenderer;
       if (!pixiRenderer) throw new Error("No PIXI renderer was found.");

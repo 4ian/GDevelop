@@ -39,7 +39,7 @@ namespace gdjs {
 
       // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
       // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-      this._threeScene.scale.y = -1; // TODO: move this to layers
+      this._threeScene.scale.y = -1;
 
       if (!this._threeDummyCamera) this._threeDummyCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
     }

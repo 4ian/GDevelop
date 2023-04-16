@@ -351,7 +351,78 @@ module.exports = {
     // TODO: action to change face textures.
     // TODO: action to change face visibilities.
 
-    
+    extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'CameraZ',
+        _('Camera Z position'),
+        _('the camera position on Z axis'),
+        _('the camera position on Z axis'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .markAsAdvanced()
+      .setFunctionName('gdjs.threeD.camera.setCameraZ')
+      .setGetter('gdjs.threeD.camera.getCameraZ')
+      .setIncludeFile('Extensions/3D/threedtools.js');
+
+    extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'CameraRotationX',
+        _('Camera X rotation'),
+        _('the camera rotation on X axis'),
+        _('the camera rotation on X axis'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Angle (in degrees)')
+        )
+      )
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .markAsAdvanced()
+      .setFunctionName('gdjs.threeD.camera.setCameraRotationX')
+      .setGetter('gdjs.threeD.camera.getCameraRotationX')
+      .setIncludeFile('Extensions/3D/threedtools.js');
+
+    extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'CameraRotationY',
+        _('Camera Y rotation'),
+        _('the camera rotation on Y axis'),
+        _('the camera rotation on Y axis'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Angle (in degrees)')
+        )
+      )
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .markAsAdvanced()
+      .setFunctionName('gdjs.threeD.camera.setCameraRotationY')
+      .setGetter('gdjs.threeD.camera.getCameraRotationY')
+      .setIncludeFile('Extensions/3D/threedtools.js');
 
     return extension;
   },

@@ -105,7 +105,7 @@ namespace gdjs {
         if (!this._threeCamera)
           this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
 
-        // TODO: Could be optimized by using a render texture instead of a canvas.
+        // TODO (3D) - optimization: could be optimized by using a render texture instead of a canvas.
         // (Implies to share the same WebGL context between PixiJS and three.js).
         const pixiCanvas = this._pixiRenderer.view;
         this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
@@ -214,7 +214,7 @@ namespace gdjs {
       }
 
       if (this._threeCamera) {
-        // TODO: Handle camera rounding like down for PixiJS?
+        // TODO (3D): handle camera rounding like down for PixiJS?
         this._threeCamera.position.x = this._layer.getCameraX();
         this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
         this._threeCamera.rotation.z = angle;
@@ -254,12 +254,6 @@ namespace gdjs {
         this._updateRenderTexture();
       }
     }
-
-    // onSceneUnloaded(): void {
-    // if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
-    // if (this._threePlaneGeometry) this._threePlaneGeometry.dispose();
-    // if (this._threePlaneMaterial) this._threePlaneMaterial.dispose();
-    // }
 
     /**
      * Add a child to the pixi container associated to the layer.
@@ -351,11 +345,10 @@ namespace gdjs {
       const oldSourceFrame = this._pixiRenderer.renderTexture.sourceFrame;
       this._pixiRenderer.renderTexture.bind(this._renderTexture);
       this._pixiRenderer.renderTexture.clear(this._clearColor);
-      this._pixiRenderer.render(
-        this._pixiContainer,
-        this._renderTexture,
-        false
-      );
+      this._pixiRenderer.render(this._pixiContainer, {
+        renderTexture: this._renderTexture,
+        clear: false,
+      });
       this._pixiRenderer.renderTexture.bind(
         oldRenderTexture,
         oldSourceFrame,

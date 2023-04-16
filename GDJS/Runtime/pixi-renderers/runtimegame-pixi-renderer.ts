@@ -77,9 +77,7 @@ namespace gdjs {
       let gameCanvas: HTMLCanvasElement;
       if (THREE) {
         this._pixiRenderer.backgroundAlpha = 0;
-        this._threeRenderer = new THREE.WebGLRenderer({
-          // context: this._pixiRenderer.gl,
-        });
+        this._threeRenderer = new THREE.WebGLRenderer({});
         this._threeRenderer.setPixelRatio(window.devicePixelRatio);
         this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
 

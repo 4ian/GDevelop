@@ -90,16 +90,30 @@ namespace gdjs {
         );
         threeRenderer.clear();
         threeRenderer.render(threeScene, threeDummyCamera)
+        this._pixiRenderer.clearBeforeRender = false;
 
-        for(const runtimeLayer of this._runtimeScene._orderedLayers) {
+        // Render each layer
+        for(let i = 0; i< this._runtimeScene._orderedLayers.length;++i) {
+          const runtimeLayer = this._runtimeScene._orderedLayers[i];
+          if (runtimeLayer.isLightingLayer()) continue;
+
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const pixiContainer = runtimeLayerRenderer.getRendererObject();
           const threeGroup = runtimeLayerRenderer.getThreeGroup();
           const threeCamera = runtimeLayerRenderer.getThreeCamera();
 
           // Render the 2D objects of this layer, which will be displayed on a plane.
-          // Note: no need to `clear`, it's made by `render`.
+          this._pixiRenderer.clear();
           this._pixiRenderer.render(pixiContainer);
+
+          // Also render the next layer if it's the lighting layer.
+          const nextRuntimeLayer: gdjs.RuntimeLayer | undefined = this._runtimeScene._orderedLayers[i + 1];
+          if (nextRuntimeLayer && nextRuntimeLayer.isLightingLayer()) {
+            const pixiSprite = nextRuntimeLayer.getRenderer().getLightingSprite();
+            if (pixiSprite) {
+              this._pixiRenderer.render(pixiSprite);
+            }
+          }
 
           // Render the 3D objects of this layer.
           if (threeGroup && threeCamera) {

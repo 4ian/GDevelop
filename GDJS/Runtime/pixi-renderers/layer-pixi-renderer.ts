@@ -247,6 +247,7 @@ namespace gdjs {
 
     updateVisibility(visible: boolean): void {
       this._pixiContainer.visible = !!visible;
+      if (this._threeGroup) this._threeGroup.visible = !!visible;
     }
 
     updatePreRender(): void {

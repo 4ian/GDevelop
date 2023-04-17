@@ -454,6 +454,8 @@ namespace gdjs {
         // (so we have a "safety margin") but these objects should be fixed
         // instead.
         // - objects having effects rendering outside of their visibility AABB.
+
+        // TODO (3D) culling - add support for 3D object culling?
         this._updateLayersCameraCoordinates(2);
         const allInstancesList = this.getAdhocListOfAllInstances();
         for (let i = 0, len = allInstancesList.length; i < len; ++i) {

@@ -40,14 +40,14 @@ namespace gdjs {
     ) {
       super(instanceContainer, objectData);
 
+      this._width = objectData.content.width || 100;
+      this._height = objectData.content.height || 100;
+      this._depth = objectData.content.depth || 100;
       this._renderer = new gdjs.ThreeDShapeRuntimeObjectRenderer(
         this,
         instanceContainer,
         objectData
       );
-      this._width = objectData.content.width || 100;
-      this._height = objectData.content.height || 100;
-      this._depth = objectData.content.depth || 100;
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -56,7 +56,7 @@ namespace gdjs {
     getRendererObject() {
       return null;
     }
-    
+
     get3dRendererObject() {
       return this._renderer.get3dRendererObject();
     }

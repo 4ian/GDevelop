@@ -83,6 +83,7 @@ namespace gdjs {
         // Each layer needs a separate PixiJS render. If no 3D objects are present,
         // this could probably be simplified: "collapse" the renders without `clear`-ing in between.
         // So that if no 3D objects at all, this would be as efficient as the 2D only rendering.
+        // If done, visibility of layers and lighting layers must be properly handled.
 
         // Render the background color.
         threeScene.background = new THREE.Color(

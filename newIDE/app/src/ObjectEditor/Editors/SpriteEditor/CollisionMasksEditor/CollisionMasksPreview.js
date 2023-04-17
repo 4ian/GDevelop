@@ -278,20 +278,6 @@ const CollisionMasksPreview = (props: Props) => {
     ]
   );
 
-  const renderBoundingBox = () => {
-    return (
-      <polygon
-        fill="rgba(255,133,105,0.2)"
-        stroke="rgba(255,133,105,0.5)"
-        strokeWidth={1}
-        fillRule="evenodd"
-        points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
-          imageZoomFactor},${imageHeight * imageZoomFactor} 0,${imageHeight *
-          imageZoomFactor}`}
-      />
-    );
-  };
-
   const forcedCursorStyle = forcedCursor
     ? {
         cursor: forcedCursor,
@@ -304,6 +290,21 @@ const CollisionMasksPreview = (props: Props) => {
   };
   const polygonStyle = {
     ...forcedCursorStyle,
+  };
+
+  const renderBoundingBox = () => {
+    return (
+      <polygon
+        style={forcedCursorStyle}
+        fill="rgba(255,133,105,0.2)"
+        stroke="rgba(255,133,105,0.5)"
+        strokeWidth={1}
+        fillRule="evenodd"
+        points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
+          imageZoomFactor},${imageHeight * imageZoomFactor} 0,${imageHeight *
+          imageZoomFactor}`}
+      />
+    );
   };
 
   const renderPolygons = () => {

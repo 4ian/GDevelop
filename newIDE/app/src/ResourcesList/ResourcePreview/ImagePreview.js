@@ -454,17 +454,18 @@ const ImagePreview = ({
     }
   }, []);
   const onPointerMove = React.useCallback((event: PointerEvent) => {
-    if (keyboardShortcuts.current.shouldMoveView()) {
-      if (previousPointerCoordinates.current) {
-        const [previousX, previousY] = previousPointerCoordinates.current;
-        const newPosition = [event.clientX, event.clientY];
-        previousPointerCoordinates.current = newPosition;
-        setZoomState(zoomState => ({
-          ...zoomState,
-          xOffset: zoomState.xOffset + (newPosition[0] - previousX),
-          yOffset: zoomState.yOffset + (newPosition[1] - previousY),
-        }));
-      }
+    if (
+      keyboardShortcuts.current.shouldMoveView() &&
+      previousPointerCoordinates.current
+    ) {
+      const [previousX, previousY] = previousPointerCoordinates.current;
+      const newPosition = [event.clientX, event.clientY];
+      previousPointerCoordinates.current = newPosition;
+      setZoomState(zoomState => ({
+        ...zoomState,
+        xOffset: zoomState.xOffset + (newPosition[0] - previousX),
+        yOffset: zoomState.yOffset + (newPosition[1] - previousY),
+      }));
     }
   }, []);
   const onPointerUp = React.useCallback((event: PointerEvent) => {

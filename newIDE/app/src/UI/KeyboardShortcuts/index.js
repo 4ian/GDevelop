@@ -159,7 +159,7 @@ export default class KeyboardShortcuts {
 
   _updateSpecialKeysStatus = (evt: KeyboardEvent, isDown: boolean) => {
     if (evt.which === SPACE_KEY) {
-      // Prevent scrolling in Physics2 property editor.
+      // Prevent scrolling in the rest of the UI when the grab tool is used.
       evt.preventDefault();
       evt.stopPropagation();
 

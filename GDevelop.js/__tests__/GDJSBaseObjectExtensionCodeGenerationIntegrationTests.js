@@ -31,7 +31,7 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
       ]);
 
       return generateCompiledEventsFromSerializedEvents(gd, serializerElement, {
-        parameterTypes: { MyObject: 'object' },
+        parameterTypes: { MyObject: 'objectList' },
         logCode: false,
       });
     };
@@ -76,6 +76,29 @@ describe('libGD.js - GDJS Code Generation integration tests', () => {
 
       // The created instance has been added to the picked instances.
       expect(myObjectLists.get('MyObject').length).toBe(3);
+    });
+
+    it('can create and pick an instance when no instance was picked', function () {
+      const runCompiledEvents = generateFunctionWithCreateAction(gd);
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+      const objectName = 'MyObject';
+      const myObjectLists = new gdjs.Hashtable();
+      // These objects are not added to the list.
+      runtimeScene.createObject(objectName);
+      runtimeScene.createObject(objectName);
+      runtimeScene.createObject(objectName);
+      // The list can be empty when the object parameter is a
+      // objectListOrEmptyIfJustDeclared.
+      myObjectLists.put(objectName, []);
+
+      // 2 of 5 instances are picked.
+      expect(myObjectLists.get('MyObject').length).toBe(0);
+
+      runCompiledEvents(gdjs, runtimeScene, [myObjectLists]);
+
+      // The created instance has been added to the picked instances.
+      expect(myObjectLists.get('MyObject').length).toBe(1);
     });
 
     it('can create an instance and keep all instances picked of a group', function () {

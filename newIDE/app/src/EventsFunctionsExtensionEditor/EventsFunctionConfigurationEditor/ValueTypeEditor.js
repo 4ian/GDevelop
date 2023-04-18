@@ -114,6 +114,12 @@ export default function ValueTypeEditor({
                 />
                 <SelectOption value="identifier" label={t`Identifier (text)`} />
                 <SelectOption value="scenevar" label={t`Scene variable`} />
+                {!isExpressionType && (
+                  <SelectOption
+                    value="objectListOrEmptyIfJustDeclared"
+                    label={t`Created objects`}
+                  />
+                )}
               </SelectField>
             )}
             {valueTypeMetadata.isObject() && (

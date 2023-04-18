@@ -13,10 +13,13 @@ import {
 } from '../CommandManager';
 import AutocompletePicker from './AutocompletePicker';
 import commandsList, { type CommandName } from '../CommandsList';
-import algoliasearch from 'algoliasearch/lite';
 import Window from '../../Utils/Window';
 import Command from '../../UI/CustomSvgIcons/Command';
-import { type AlgoliaSearchHit } from '../../Utils/AlgoliaSearch';
+import {
+  searchClient,
+  type AlgoliaSearchHit,
+  indexName,
+} from '../../Utils/AlgoliaSearch';
 
 import {
   InstantSearch,
@@ -25,7 +28,6 @@ import {
 } from 'react-instantsearch-hooks';
 import { useDebounce } from '../../Utils/UseDebounce';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-const indexName = 'gdevelop';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -210,11 +212,6 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       </I18n>
     );
   }
-);
-
-const searchClient = algoliasearch(
-  'RC2XAJAUNE',
-  '7853cc8136c930e6c7b8f68238eea179'
 );
 
 export const CommandPaletteWithAlgoliaSearch = React.forwardRef<

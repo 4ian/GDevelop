@@ -105,6 +105,16 @@ const ShapePreview = (props: Props) => {
     return { frameX, frameY };
   };
 
+  const forcedCursorStyle = forcedCursor
+    ? {
+        cursor: forcedCursor,
+      }
+    : {};
+
+  const boxStyle = {
+    ...forcedCursorStyle,
+  };
+
   const renderBox = () => {
     const {
       dimensionA,
@@ -123,6 +133,7 @@ const ShapePreview = (props: Props) => {
     return (
       <rect
         key={'boxShape'}
+        style={boxStyle}
         fill="rgba(255,0,0,0.75)"
         strokeWidth={1}
         x={(offsetX + imageWidth / 2 - fixedWidth / 2) * imageZoomFactor}
@@ -131,6 +142,10 @@ const ShapePreview = (props: Props) => {
         height={fixedHeight * imageZoomFactor}
       />
     );
+  };
+
+  const circleStyle = {
+    ...forcedCursorStyle,
   };
 
   const renderCircle = () => {
@@ -146,6 +161,7 @@ const ShapePreview = (props: Props) => {
     return (
       <circle
         key={'circleShape'}
+        style={circleStyle}
         fill="rgba(255,0,0,0.75)"
         strokeWidth={1}
         cx={(offsetX + imageWidth / 2) * imageZoomFactor}
@@ -159,6 +175,10 @@ const ShapePreview = (props: Props) => {
         }
       />
     );
+  };
+
+  const edgeStyle = {
+    ...forcedCursorStyle,
   };
 
   const renderEdge = () => {
@@ -180,6 +200,7 @@ const ShapePreview = (props: Props) => {
     return (
       <line
         key={'edgeShape'}
+        style={edgeStyle}
         stroke="rgba(255,0,0,0.75)"
         strokeWidth={2}
         x1={(offsetX + imageWidth / 2 - halfLength * cos) * imageZoomFactor}
@@ -189,12 +210,6 @@ const ShapePreview = (props: Props) => {
       />
     );
   };
-
-  const forcedCursorStyle = forcedCursor
-    ? {
-        cursor: forcedCursor,
-      }
-    : {};
 
   const renderPolygon = () => {
     const {

@@ -23,7 +23,6 @@ import {
   zoomOutFactor,
 } from '../../Utils/ZoomUtils';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
-import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
@@ -156,14 +155,15 @@ const ImagePreview = ({
   const handleImageError = () => {
     setErrored(true);
   };
+  const [shouldMoveView, setShouldMoveView] = React.useState<boolean>(false);
   const keyboardShortcuts = React.useRef<KeyboardShortcuts>(
     new KeyboardShortcuts({
       isActive: () => !deactivateControls,
-      shortcutCallbacks: {},
+      shortcutCallbacks: {
+        onToggleGrabbingTool: setShouldMoveView,
+      },
     })
   );
-
-  const forceUpdate = useForceUpdate();
 
   const getZoomFactorToFitImage = React.useCallback(
     () => {
@@ -445,31 +445,38 @@ const ImagePreview = ({
     }
   }, []);
 
-  const onPointerDown = React.useCallback((event: PointerEvent) => {
-    if (containerRef.current) {
-      containerRef.current.focus();
-    }
-    if (keyboardShortcuts.current.shouldMoveView()) {
-      previousPointerCoordinates.current = [event.clientX, event.clientY];
-    }
-  }, []);
-  const onPointerMove = React.useCallback((event: PointerEvent) => {
-    if (
-      keyboardShortcuts.current.shouldMoveView() &&
-      previousPointerCoordinates.current
-    ) {
-      const [previousX, previousY] = previousPointerCoordinates.current;
-      const newPosition = [event.clientX, event.clientY];
-      previousPointerCoordinates.current = newPosition;
-      setZoomState(zoomState => ({
-        ...zoomState,
-        xOffset: zoomState.xOffset + (newPosition[0] - previousX),
-        yOffset: zoomState.yOffset + (newPosition[1] - previousY),
-      }));
-    }
-  }, []);
+  const onPointerDown = React.useCallback(
+    (event: PointerEvent) => {
+      if (containerRef.current) {
+        containerRef.current.focus();
+      }
+      if (shouldMoveView) {
+        previousPointerCoordinates.current = [event.clientX, event.clientY];
+      }
+    },
+    [shouldMoveView]
+  );
+  const onPointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      if (shouldMoveView && previousPointerCoordinates.current) {
+        const [previousX, previousY] = previousPointerCoordinates.current;
+        const newPosition = [event.clientX, event.clientY];
+        previousPointerCoordinates.current = newPosition;
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset + (newPosition[0] - previousX),
+          yOffset: zoomState.yOffset + (newPosition[1] - previousY),
+        }));
+      }
+    },
+    [shouldMoveView]
+  );
   const onPointerUp = React.useCallback((event: PointerEvent) => {
     previousPointerCoordinates.current = null;
+  }, []);
+  const onPointerLeave = React.useCallback((event: PointerEvent) => {
+    previousPointerCoordinates.current = null;
+    setShouldMoveView(false);
   }, []);
 
   const theme = React.useContext(GDevelopThemeContext);
@@ -485,9 +492,7 @@ const ImagePreview = ({
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
 
-  const forcedCursor = keyboardShortcuts.current.shouldMoveView()
-    ? 'grab'
-    : null;
+  const forcedCursor = shouldMoveView ? 'grab' : null;
   const forcedCursorStyle = forcedCursor
     ? {
         cursor: forcedCursor,
@@ -609,23 +614,15 @@ const ImagePreview = ({
                 onPointerDown={deactivateControls ? null : onPointerDown}
                 onPointerMove={deactivateControls ? null : onPointerMove}
                 onPointerUp={deactivateControls ? null : onPointerUp}
-                onPointerLeave={deactivateControls ? null : onPointerUp}
-                onKeyDown={event => {
-                  const stateHasChanged = keyboardShortcuts.current.onKeyDown(
-                    event
-                  );
-                  if (stateHasChanged) {
-                    forceUpdate();
-                  }
-                }}
-                onKeyUp={event => {
-                  const stateHasChanged = keyboardShortcuts.current.onKeyUp(
-                    event
-                  );
-                  if (stateHasChanged) {
-                    forceUpdate();
-                  }
-                }}
+                onPointerLeave={deactivateControls ? null : onPointerLeave}
+                onKeyDown={
+                  deactivateControls
+                    ? null
+                    : keyboardShortcuts.current.onKeyDown
+                }
+                onKeyUp={
+                  deactivateControls ? null : keyboardShortcuts.current.onKeyUp
+                }
               >
                 {!!errored && (
                   <PlaceholderMessage>
@@ -666,10 +663,8 @@ const ImagePreview = ({
                       imageOffsetTop: yOffset,
                       imageOffsetLeft: xOffset,
                       imageZoomFactor: imageZoomFactor,
-                      forcedCursor: keyboardShortcuts.current.shouldMoveView()
-                        ? 'grab'
-                        : null,
-                      deactivateControls: keyboardShortcuts.current.shouldMoveView(),
+                      forcedCursor,
+                      deactivateControls: shouldMoveView,
                     })}
                   </div>
                 )}

@@ -47,6 +47,7 @@ type ShortcutCallbacks = {|
   onShift1?: () => void,
   onShift2?: () => void,
   onShift3?: () => void,
+  onToggleGrabbingTool?: (isEnabled: boolean) => void,
 |};
 
 type ConstructorArgs = {|
@@ -108,6 +109,32 @@ export default class KeyboardShortcuts {
     return this._spacePressed || this._mouseMidButtonPressed;
   }
 
+  _setSpacePressed(spacePressed: boolean) {
+    const previousShouldMoveView = this.shouldMoveView();
+
+    this._spacePressed = spacePressed;
+
+    this._callOnToggleGrabbingToolIfNeeded(previousShouldMoveView);
+  }
+
+  _setMouseMidButtonPressed(mouseMidButtonPressed: boolean) {
+    const previousShouldMoveView = this.shouldMoveView();
+
+    this._mouseMidButtonPressed = mouseMidButtonPressed;
+
+    this._callOnToggleGrabbingToolIfNeeded(previousShouldMoveView);
+  }
+
+  _callOnToggleGrabbingToolIfNeeded(previousShouldMoveView: boolean) {
+    const shouldMoveView = this.shouldMoveView();
+    if (shouldMoveView !== previousShouldMoveView) {
+      const onToggleGrabbingTool = this._shortcutCallbacks.onToggleGrabbingTool;
+      if (onToggleGrabbingTool) {
+        onToggleGrabbingTool(shouldMoveView);
+      }
+    }
+  }
+
   shouldZoom(evt: WheelEvent) {
     // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
     // does a pinch gesture on a trackpad. If this is the case, we zoom.
@@ -138,8 +165,8 @@ export default class KeyboardShortcuts {
     this._altPressed = false;
     this._ctrlPressed = false;
     this._shiftPressed = false;
-    this._mouseMidButtonPressed = false;
-    this._spacePressed = false;
+    this._setMouseMidButtonPressed(false);
+    this._setSpacePressed(false);
   };
 
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
@@ -159,15 +186,14 @@ export default class KeyboardShortcuts {
 
   _updateSpecialKeysStatus = (evt: KeyboardEvent, isDown: boolean) => {
     if (evt.which === SPACE_KEY) {
-      // Prevent scrolling in the rest of the UI when the grab tool is used.
-      evt.preventDefault();
-      evt.stopPropagation();
+      if (this._shortcutCallbacks.onToggleGrabbingTool) {
+        // Prevent scrolling in the rest of the UI when the grab tool is used.
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
 
-      const hasStateChanged = this._spacePressed !== isDown;
-      this._spacePressed = isDown;
-      return hasStateChanged;
+      this._setSpacePressed(isDown);
     }
-    return false;
   };
 
   _isControlOrCmdPressed = () => {
@@ -177,15 +203,15 @@ export default class KeyboardShortcuts {
 
   onMouseDown = (evt: MouseEvent) => {
     if (evt.button === MID_MOUSE_BUTTON) {
-      this._mouseMidButtonPressed = true;
+      this._setMouseMidButtonPressed(true);
     } else {
-      this._mouseMidButtonPressed = false;
+      this._setMouseMidButtonPressed(false);
     }
   };
 
   onMouseUp = (evt: MouseEvent) => {
     if (evt.button === MID_MOUSE_BUTTON) {
-      this._mouseMidButtonPressed = false;
+      this._setMouseMidButtonPressed(false);
     }
   };
 
@@ -194,24 +220,22 @@ export default class KeyboardShortcuts {
   };
 
   onKeyUp = (evt: KeyboardEvent) => {
-    const hasModifierChanged = this._updateModifiersFromEvent(evt);
-    const hasSpecialKeyChanged = this._updateSpecialKeysStatus(evt, false);
-    return hasModifierChanged || hasSpecialKeyChanged;
+    this._updateModifiersFromEvent(evt);
+    this._updateSpecialKeysStatus(evt, false);
   };
 
   onKeyDown = (evt: KeyboardEvent) => {
-    let hasStateChanged = this._updateModifiersFromEvent(evt);
+    this._updateModifiersFromEvent(evt);
 
-    if (this._isActive && !this._isActive()) return hasStateChanged;
+    if (this._isActive && !this._isActive()) return;
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
     // $FlowFixMe
     if (evt.target && evt.target.closest(textEditorSelectors)) {
-      return hasStateChanged; // Something else is currently being edited.
+      return; // Something else is currently being edited.
     }
 
-    const hasSpecialKeyChanged = this._updateSpecialKeysStatus(evt, true);
-    hasStateChanged = hasStateChanged || hasSpecialKeyChanged;
+    this._updateSpecialKeysStatus(evt, true);
 
     const {
       onDelete,
@@ -333,7 +357,5 @@ export default class KeyboardShortcuts {
       evt.preventDefault();
       onShift3();
     }
-
-    return hasStateChanged;
   };
 }

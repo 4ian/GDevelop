@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import MuiTextField from '@material-ui/core/TextField';
 import { indexName, searchClient } from '../Utils/AlgoliaSearch';
 import {
@@ -51,9 +51,6 @@ const WikiSearchBar = ({ id }: Props) => {
     [status, algoliaSearchStableStatus]
   );
 
-  const shouldHideAlgoliaSearchResults =
-    !value || algoliaSearchStableStatus === 'error';
-
   const launchSearch = useDebounce(() => {
     if (value) {
       refine(value);
@@ -70,7 +67,37 @@ const WikiSearchBar = ({ id }: Props) => {
 
   const commands: Array<GoToWikiCommand> = React.useMemo(
     () => {
-      if (shouldHideAlgoliaSearchResults) return [];
+      if (!value) return [];
+      if (results.hits.length === 0)
+        return [
+          {
+            hit: {
+              content: (
+                <Trans>
+                  No results found. The search is only available in English at
+                  the moment.
+                </Trans>
+              ),
+              hierarchy: {},
+            },
+            handler: () => {},
+          },
+        ];
+      if (algoliaSearchStableStatus === 'error')
+        return [
+          {
+            hit: {
+              content: (
+                <Trans>
+                  An error occurred while searching for a result. Please try
+                  again later.
+                </Trans>
+              ),
+              hierarchy: {},
+            },
+            handler: () => {},
+          },
+        ];
 
       const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
         (hit: AlgoliaSearchHitType) => {
@@ -82,7 +109,7 @@ const WikiSearchBar = ({ id }: Props) => {
       );
       return algoliaCommands;
     },
-    [results.hits, shouldHideAlgoliaSearchResults]
+    [results.hits, value, algoliaSearchStableStatus]
   );
 
   const handleAutocompleteInput = (

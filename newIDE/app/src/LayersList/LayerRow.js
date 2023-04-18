@@ -185,6 +185,7 @@ const LayerRow = ({
                       <React.Fragment>
                         <InlineCheckbox
                           id="layer-visibility"
+                          paddingSize="small"
                           checked={isVisible}
                           checkedIcon={<VisibilityIcon />}
                           uncheckedIcon={<VisibilityOffIcon />}
@@ -199,6 +200,7 @@ const LayerRow = ({
                         />
                         <InlineCheckbox
                           id="layer-lock"
+                          paddingSize="small"
                           disabled={!isVisible}
                           checked={isLocked || !isVisible}
                           checkedIcon={<LockIcon />}

@@ -4,7 +4,7 @@ import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import TranslateIcon from '@material-ui/icons/Translate';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';

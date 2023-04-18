@@ -68,11 +68,26 @@ const WikiSearchBar = ({ id }: Props) => {
 
   const nonEmpty = !!value && value.length > 0;
 
-  // --- Autocomplete-specific handlers ---
+  const commands: Array<GoToWikiCommand> = React.useMemo(
+    () => {
+      if (shouldHideAlgoliaSearchResults) return [];
+
+      const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
+        (hit: AlgoliaSearchHitType) => {
+          return {
+            hit,
+            handler: () => Window.openExternalURL(hit.url),
+          };
+        }
+      );
+      return algoliaCommands;
+    },
+    [results.hits, shouldHideAlgoliaSearchResults]
+  );
 
   const handleAutocompleteInput = (
     event: any,
-    newValue: ?string,
+    newValue: ?AlgoliaSearchHitType,
     reason:
       | 'create-option'
       | 'select-option'
@@ -81,8 +96,8 @@ const WikiSearchBar = ({ id }: Props) => {
       | 'clear'
   ) => {
     // Called when the value of the autocomplete changes.
-    if (reason === 'select-option') {
-      newValue.handler()
+    if (reason === 'select-option' && newValue) {
+      newValue.handler();
       // Clear the value that was entered as an option was selected.
       setAutocompleteValue('');
     } else {
@@ -105,23 +120,6 @@ const WikiSearchBar = ({ id }: Props) => {
     }
   };
 
-  const commands: Array<GoToWikiCommand> = React.useMemo(
-    () => {
-      if (shouldHideAlgoliaSearchResults) return [];
-
-      const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
-        (hit: AlgoliaSearchHitType) => {
-          return {
-            hit,
-            handler: () => Window.openExternalURL(hit.url),
-          };
-        }
-      );
-      return algoliaCommands;
-    },
-    [results.hits, shouldHideAlgoliaSearchResults]
-  );
-
   return (
     <I18n>
       {({ i18n }) => (
@@ -138,11 +136,11 @@ const WikiSearchBar = ({ id }: Props) => {
               defaultValue=""
               inputValue={value}
               value={autocompleteValue}
-              getOptionLabel={() => 'bonjour'}
               onChange={handleAutocompleteInput}
               onInputChange={handleAutocompleteInputChange}
               onBlur={handleBlur}
               onFocus={handleFocus}
+              filterOptions={options => options}
               PopperComponent={props => (
                 <div style={popperContainerStyle}>{props.children}</div>
               )}

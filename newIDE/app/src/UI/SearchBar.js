@@ -26,6 +26,7 @@ import { useDebounce } from '../Utils/UseDebounce';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import { textEllipsisStyle } from './TextEllipsis';
 import Filter from './CustomSvgIcons/Filter';
+import SearchBarContainer from './SearchBarContainer';
 
 type TagsHandler = {|
   remove: string => void,
@@ -369,132 +370,95 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin>
-            <Line noMargin>
-              <Paper classes={paperStyles} style={styles.root}>
-                <div style={styles.iconButtonSearch.container}>
-                  <Search
-                    style={styles.iconButtonSearch.iconStyle}
-                    viewBox="2 2 12 12"
-                  />
-                </div>
-                <div
-                  style={styles.searchContainer}
-                  {...dataObjectToProps({ searchBarContainer: 'true' })}
-                >
-                  <div style={styles.inputContainer}>
-                    {tags ? (
-                      <Autocomplete
-                        id={id}
-                        options={tags}
-                        freeSolo
-                        fullWidth
-                        defaultValue=""
-                        inputValue={value}
-                        value={autocompleteValue}
-                        onChange={handleAutocompleteInput}
-                        onInputChange={handleAutocompleteInputChange}
-                        onKeyPress={handleKeyPressed}
-                        onBlur={handleBlur}
-                        onFocus={handleFocus}
-                        getOptionDisabled={option =>
-                          option.disabled ||
-                          (!!tagsHandler &&
-                            !!tagsHandler.chosenTags.has(option))
-                        }
-                        getOptionSelected={(option, _) =>
-                          !!tagsHandler && tagsHandler.chosenTags.has(option)
-                        }
-                        PopperComponent={props => (
-                          <div style={styles.popperContainer}>
-                            {props.children}
-                          </div>
-                        )}
-                        renderOption={option => <Text noMargin>{option}</Text>}
-                        renderInput={params => (
-                          <MuiTextField
-                            margin="none"
-                            {...params}
-                            autoFocus={shouldAutoFocusTextField}
-                            inputRef={textField}
-                            InputProps={{
-                              ...params.InputProps,
-                              disableUnderline: true,
-                              endAdornment: null,
-                              placeholder: i18n._(placeholder || t`Search`),
-                              style: styles.inputStyle,
-                            }}
-                          />
-                        )}
+          <SearchBarContainer
+            onCancel={handleCancel}
+            isFocused={isInputFocused}
+            disabled={disabled}
+            isSearchBarEmpty={!nonEmpty}
+            helpPagePath={helpPagePath}
+            aspect={aspect}
+            buildMenuTemplate={buildMenuTemplate}
+            renderSubLine={
+              tagsHandler
+                ? () => (
+                    <Collapse in={tagsHandler.chosenTags.size > 0}>
+                      <TagChips
+                        tags={Array.from(tagsHandler.chosenTags)}
+                        onRemove={tag => {
+                          if (tagsHandler.chosenTags.size === 1) {
+                            // If the last tag is removed, focus the search bar.
+                            focus();
+                          }
+                          tagsHandler.remove(tag);
+                        }}
                       />
-                    ) : (
-                      <TextField
-                        id={id}
-                        margin="none"
-                        dataset={{ searchBar: 'true' }}
-                        translatableHintText={placeholder || t`Search`}
-                        onBlur={handleBlur}
-                        value={value}
-                        onChange={handleInput}
-                        onKeyUp={handleKeyPressed}
-                        fullWidth
-                        underlineShow={false}
-                        disabled={disabled}
-                        ref={textField}
-                        inputStyle={styles.inputStyle}
-                        onFocus={handleFocus}
-                        autoFocus={autoFocus}
-                      />
-                    )}
-                  </div>
-                </div>
-                {buildMenuTemplate && (
-                  <ElementWithMenu
-                    element={
-                      <IconButton
-                        style={styles.iconButtonFilter.style}
-                        disabled={disabled}
-                        size="small"
-                      >
-                        <Filter />
-                      </IconButton>
-                    }
-                    buildMenuTemplate={buildMenuTemplate}
-                  />
-                )}
-                {helpPagePath && (
-                  <HelpIcon
-                    disabled={disabled}
-                    helpPagePath={helpPagePath}
-                    style={styles.iconButtonHelp.style}
-                    size="small"
-                  />
-                )}
-                <IconButton
-                  onClick={handleCancel}
-                  style={styles.iconButtonClose.style}
-                  disabled={disabled}
-                  size="small"
-                >
-                  <Cross />
-                </IconButton>
-              </Paper>
-            </Line>
-            {tagsHandler && (
-              <Collapse in={tagsHandler.chosenTags.size > 0}>
-                <TagChips
-                  tags={Array.from(tagsHandler.chosenTags)}
-                  onRemove={tag => {
-                    if (tagsHandler.chosenTags.size === 1) {
-                      // If the last tag is removed, focus the search bar.
-                      focus();
-                    }
-                    tagsHandler.remove(tag);
-                  }}
+                    </Collapse>
+                  )
+                : null
+            }
+            renderContent={({ inputStyle, popperContainerStyle }) =>
+              tags ? (
+                <Autocomplete
+                  id={id}
+                  options={tags}
+                  freeSolo
+                  fullWidth
+                  defaultValue=""
+                  inputValue={value}
+                  value={autocompleteValue}
+                  onChange={handleAutocompleteInput}
+                  onInputChange={handleAutocompleteInputChange}
+                  onKeyPress={handleKeyPressed}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
+                  getOptionDisabled={option =>
+                    option.disabled ||
+                    (!!tagsHandler && !!tagsHandler.chosenTags.has(option))
+                  }
+                  getOptionSelected={(option, _) =>
+                    !!tagsHandler && tagsHandler.chosenTags.has(option)
+                  }
+                  PopperComponent={props => (
+                    <div style={popperContainerStyle}>{props.children}</div>
+                  )}
+                  renderOption={option => <Text noMargin>{option}</Text>}
+                  renderInput={params => (
+                    <MuiTextField
+                      margin="none"
+                      {...params}
+                      autoFocus={shouldAutoFocusTextField}
+                      inputRef={textField}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                        endAdornment: null,
+                        placeholder: i18n._(placeholder || t`Search`),
+                        style: inputStyle,
+                      }}
+                    />
+                  )}
                 />
-              </Collapse>
-            )}
-          </Column>
+              ) : (
+                <TextField
+                  id={id}
+                  margin="none"
+                  dataset={{ searchBar: 'true' }}
+                  translatableHintText={placeholder || t`Search`}
+                  onBlur={handleBlur}
+                  value={value}
+                  onChange={handleInput}
+                  onKeyUp={handleKeyPressed}
+                  fullWidth
+                  underlineShow={false}
+                  disabled={disabled}
+                  ref={textField}
+                  inputStyle={inputStyle}
+                  onFocus={handleFocus}
+                  autoFocus={autoFocus}
+                />
+              )
+            }
+          />
         )}
       </I18n>
     );

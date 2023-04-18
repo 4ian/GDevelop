@@ -84,7 +84,7 @@ type Props<T> = {|
 
 type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
-const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
+export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;

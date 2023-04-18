@@ -4,7 +4,7 @@ import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import TranslateIcon from '@material-ui/icons/Translate';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
@@ -29,6 +29,7 @@ import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
+import WikiSearchBar from '../../../../UI/WikiSearchBar';
 
 const useStyles = makeStyles({
   tile: {
@@ -154,6 +155,12 @@ const MainPage = ({
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
+      <SectionRow>
+        <Text>
+          <Trans>Quick search</Trans>
+        </Text>
+        <WikiSearchBar  />
+      </SectionRow>
       <SectionRow>
         <Line noMargin>
           <GridList

@@ -22,6 +22,8 @@ import {
   zoomInFactor,
   zoomOutFactor,
 } from '../../Utils/ZoomUtils';
+import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
+
 const gd: libGDevelop = global.gd;
 
 const imagePreviewMaxZoom = 4;
@@ -58,6 +60,7 @@ const styles = {
     width: '100%',
     height: '100%',
     boxSizing: 'border-box',
+    outline: 'none',
 
     // The container contains the image and the "overlay" that can display
     // points or polygons that can be drag'n'dropped. `touch-action` must
@@ -84,9 +87,11 @@ type Props = {|
   renderOverlay?: ({|
     imageWidth: number,
     imageHeight: number,
-    offsetTop: number,
-    offsetLeft: number,
+    imageOffsetTop: number,
+    imageOffsetLeft: number,
     imageZoomFactor: number,
+    forcedCursor: string | null,
+    deactivateControls?: boolean,
   |}) => React.Node,
   onSize?: (number, number) => void,
   hideCheckeredBackground?: boolean,
@@ -144,11 +149,21 @@ const ImagePreview = ({
   const { xOffset, yOffset, factor: imageZoomFactor } = zoomState;
   const previousDoubleTouchInfo = React.useRef<any>(null);
   const previousSingleTouchCoordinates = React.useRef<?[number, number]>(null);
+  const previousPointerCoordinates = React.useRef<?[number, number]>(null);
   const hasZoomBeenAdaptedToImageRef = React.useRef<boolean>(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const handleImageError = () => {
     setErrored(true);
   };
+  const [shouldMoveView, setShouldMoveView] = React.useState<boolean>(false);
+  const keyboardShortcuts = React.useRef<KeyboardShortcuts>(
+    new KeyboardShortcuts({
+      isActive: () => !deactivateControls,
+      shortcutCallbacks: {
+        onToggleGrabbingTool: setShouldMoveView,
+      },
+    })
+  );
 
   const getZoomFactorToFitImage = React.useCallback(
     () => {
@@ -430,6 +445,40 @@ const ImagePreview = ({
     }
   }, []);
 
+  const onPointerDown = React.useCallback(
+    (event: PointerEvent) => {
+      if (containerRef.current) {
+        containerRef.current.focus();
+      }
+      if (shouldMoveView) {
+        previousPointerCoordinates.current = [event.clientX, event.clientY];
+      }
+    },
+    [shouldMoveView]
+  );
+  const onPointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      if (shouldMoveView && previousPointerCoordinates.current) {
+        const [previousX, previousY] = previousPointerCoordinates.current;
+        const newPosition = [event.clientX, event.clientY];
+        previousPointerCoordinates.current = newPosition;
+        setZoomState(zoomState => ({
+          ...zoomState,
+          xOffset: zoomState.xOffset + (newPosition[0] - previousX),
+          yOffset: zoomState.yOffset + (newPosition[1] - previousY),
+        }));
+      }
+    },
+    [shouldMoveView]
+  );
+  const onPointerUp = React.useCallback((event: PointerEvent) => {
+    previousPointerCoordinates.current = null;
+  }, []);
+  const onPointerLeave = React.useCallback((event: PointerEvent) => {
+    previousPointerCoordinates.current = null;
+    setShouldMoveView(false);
+  }, []);
+
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
 
@@ -442,6 +491,13 @@ const ImagePreview = ({
   // so that the image takes the space of the container whilst being hidden.
   // TODO: handle a proper loader.
   const visibility = containerLoaded ? undefined : 'hidden';
+
+  const forcedCursor = shouldMoveView ? 'grab' : null;
+  const forcedCursorStyle = forcedCursor
+    ? {
+        cursor: forcedCursor,
+      }
+    : {};
 
   const imageContainerBorderStyle = {
     transform: `translate(${xOffset}px, ${yOffset}px)`,
@@ -464,6 +520,7 @@ const ImagePreview = ({
     ...styles.spriteThumbnailImage,
     visibility,
     ...(!isImageResourceSmooth ? styles.previewImagePixelated : undefined),
+    cursor: forcedCursor,
   };
 
   const overlayStyle = {
@@ -544,6 +601,7 @@ const ImagePreview = ({
                 style={{
                   ...styles.imagePreviewContainer,
                   overflow: containerLoaded ? 'unset' : 'hidden',
+                  ...forcedCursorStyle,
                 }}
                 ref={ref => {
                   measureRef(ref);
@@ -552,6 +610,19 @@ const ImagePreview = ({
                 onTouchStart={deactivateControls ? null : onTouchStart}
                 onTouchMove={deactivateControls ? null : handleTouchMove}
                 onTouchEnd={deactivateControls ? null : onTouchEnd}
+                tabIndex={0}
+                onPointerDown={deactivateControls ? null : onPointerDown}
+                onPointerMove={deactivateControls ? null : onPointerMove}
+                onPointerUp={deactivateControls ? null : onPointerUp}
+                onPointerLeave={deactivateControls ? null : onPointerLeave}
+                onKeyDown={
+                  deactivateControls
+                    ? null
+                    : keyboardShortcuts.current.onKeyDown
+                }
+                onKeyUp={
+                  deactivateControls ? null : keyboardShortcuts.current.onKeyUp
+                }
               >
                 {!!errored && (
                   <PlaceholderMessage>
@@ -589,9 +660,11 @@ const ImagePreview = ({
                     {renderOverlay({
                       imageWidth: imageWidth || 0,
                       imageHeight: imageHeight || 0,
-                      offsetTop: yOffset,
-                      offsetLeft: xOffset,
+                      imageOffsetTop: yOffset,
+                      imageOffsetLeft: xOffset,
                       imageZoomFactor: imageZoomFactor,
+                      forcedCursor,
+                      deactivateControls: shouldMoveView,
                     })}
                   </div>
                 )}

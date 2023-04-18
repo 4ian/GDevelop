@@ -77,7 +77,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
    * \brief Check if the behavior is private - it can't be used outside of its
    * extension.
    */
-  bool IsPrivate() { return isPrivate; }
+  bool IsPrivate() const { return isPrivate; }
 
   /**
    * \brief Set that the behavior is private - it can't be used outside of its

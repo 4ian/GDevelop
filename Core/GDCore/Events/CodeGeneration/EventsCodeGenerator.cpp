@@ -267,11 +267,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     return "/* Unknown instruction - skipped. */";
   }
 
-  AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
+  AddIncludeFiles(instrInfos.GetIncludeFiles());
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
-  if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(
         condition, *this, context);
@@ -459,9 +459,9 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     return "/* Unknown instruction - skipped. */";
   }
 
-  AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
+  AddIncludeFiles(instrInfos.GetIncludeFiles());
 
-  if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (instrInfos.HasCustomCodeGenerator()) {
     return instrInfos.codeExtraInformation.customCodeGenerator(
         action, *this, context);
   }

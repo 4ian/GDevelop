@@ -153,7 +153,7 @@
       "id": "OpenPropertiesManager",
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings"
       },
       "tooltip": {
         "description": {
@@ -169,7 +169,7 @@
       }
     },
     {
-      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings",
+      "elementToHighlightId": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings",
       "nextStepTrigger": {
         "presenceOfElement": "#project-manager-tab-game-properties"
       },
@@ -1290,7 +1290,7 @@
       "id": "OpenPropertiesManagerForExtension",
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-extensions"
       },
       "tooltip": {
         "title": {
@@ -1315,7 +1315,7 @@
       }
     },
     {
-      "elementToHighlightId": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-extensions",
+      "elementToHighlightId": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-extensions",
       "nextStepTrigger": {
         "presenceOfElement": "#project-manager-extension-search-or-create"
       },
@@ -3330,7 +3330,7 @@
     {
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings"
       },
       "tooltip": {
         "title": {
@@ -5367,7 +5367,7 @@
     {
       "elementToHighlightId": "#main-toolbar-project-manager-button",
       "nextStepTrigger": {
-        "presenceOfElement": "div[role=\"presentation\"]:not([aria-hidden=true]) #project-manager-tab-game-settings"
+        "presenceOfElement": "div[role=\"presentation\"]:is([data-open=true], :not([aria-hidden=true])) #project-manager-tab-game-settings"
       },
       "tooltip": {
         "description": {

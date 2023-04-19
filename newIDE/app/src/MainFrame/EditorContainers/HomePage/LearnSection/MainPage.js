@@ -159,7 +159,7 @@ const MainPage = ({
         <Text>
           <Trans>Quick search</Trans>
         </Text>
-        <WikiSearchBar  />
+        <WikiSearchBar />
       </SectionRow>
       <SectionRow>
         <Line noMargin>

@@ -75,6 +75,7 @@ import VariablesListToolbar from './VariablesListToolbar';
 import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
 import SwitchHorizontal from '../UI/CustomSvgIcons/SwitchHorizontal';
+import useRefocusField from './useRefocusField';
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -179,20 +180,16 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
-  const topLevelVariableNameInputRefs = React.useRef<{
+  const topLevelVariableNameInputRefs = React.useRef<{|
     [number]: SemiControlledAutoCompleteInterface,
-  }>({});
-  const topLevelVariableValueInputRefs = React.useRef<{
+  |}>({});
+  const topLevelVariableValueInputRefs = React.useRef<{|
     [number]: SemiControlledTextFieldInterface,
-  }>({});
-  const [
-    variablePtrToFocusName,
-    setVariablePtrToFocusName,
-  ] = React.useState<?number>(null);
-  const [
-    variablePtrToFocusValue,
-    setVariablePtrToFocusValue,
-  ] = React.useState<?{ ptr: number, caretPosition: ?number }>(null);
+  |}>({});
+  // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+  const refocusNameField = useRefocusField(topLevelVariableNameInputRefs);
+  // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+  const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -225,36 +222,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       }
     },
     [searchText, triggerSearch]
-  );
-
-  React.useEffect(
-    () => {
-      if (variablePtrToFocusName) {
-        const inputRef =
-          topLevelVariableNameInputRefs.current[variablePtrToFocusName];
-        if (inputRef) {
-          inputRef.focus();
-          setVariablePtrToFocusName(null);
-        }
-      }
-    },
-    [variablePtrToFocusName]
-  );
-
-  React.useEffect(
-    () => {
-      if (variablePtrToFocusValue) {
-        const inputRef =
-          topLevelVariableValueInputRefs.current[variablePtrToFocusValue.ptr];
-        if (inputRef) {
-          inputRef.focus({
-            caretPosition: variablePtrToFocusValue.caretPosition,
-          });
-          setVariablePtrToFocusValue(null);
-        }
-      }
-    },
-    [variablePtrToFocusValue]
   );
 
   const shouldHideExpandIcons =
@@ -820,7 +787,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       );
       _onChange();
       setSelectedNodes([newName]);
-      setVariablePtrToFocusName(variable.ptr);
+      refocusNameField({ identifier: variable.ptr });
       return;
     }
 
@@ -845,7 +812,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     _onChange();
     setSelectedNodes([newName]);
-    setVariablePtrToFocusName(variable.ptr);
+    refocusNameField({ identifier: variable.ptr });
   };
 
   const renderVariableAndChildrenRows = (
@@ -1391,8 +1358,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       }
       const currentlyFocusedValueField =
         topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
-      setVariablePtrToFocusValue({
-        ptr: variable.ptr,
+      refocusValueField({
+        identifier: variable.ptr,
         caretPosition: currentlyFocusedValueField
           ? currentlyFocusedValueField.getCaretPosition()
           : null,

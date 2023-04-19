@@ -14,7 +14,9 @@ import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 
 import { Column, Line, Spacer } from '../UI/Grid';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../UI/SemiControlledTextField';
 import IconButton from '../UI/IconButton';
 import { DragHandleIcon } from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
@@ -181,7 +183,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     [number]: SemiControlledAutoCompleteInterface,
   }>({});
   const topLevelVariableValueInputRefs = React.useRef<{
-    [number]: SemiControlledTextField,
+    [number]: SemiControlledTextFieldInterface,
   }>({});
   const [
     variablePtrToFocusName,
@@ -190,7 +192,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [
     variablePtrToFocusValue,
     setVariablePtrToFocusValue,
-  ] = React.useState<?number>(null);
+  ] = React.useState<?{ ptr: number, caretPosition: ?number }>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -243,9 +245,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     () => {
       if (variablePtrToFocusValue) {
         const inputRef =
-          topLevelVariableValueInputRefs.current[variablePtrToFocusValue];
+          topLevelVariableValueInputRefs.current[variablePtrToFocusValue.ptr];
         if (inputRef) {
-          inputRef.focus();
+          inputRef.focus({
+            caretPosition: variablePtrToFocusValue.caretPosition,
+          });
           setVariablePtrToFocusValue(null);
         }
       }
@@ -1385,7 +1389,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       } else {
         setSelectedNodes([...newSelectedNodes, name]);
       }
-      setVariablePtrToFocusValue(variable.ptr)
+      const currentlyFocusedValueField =
+        topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
+      setVariablePtrToFocusValue({
+        ptr: variable.ptr,
+        caretPosition: currentlyFocusedValueField
+          ? currentlyFocusedValueField.getCaretPosition()
+          : null,
+      });
       newVariable.delete();
     } else {
       const { variable: changedVariable } = getVariableContextFromNodeId(

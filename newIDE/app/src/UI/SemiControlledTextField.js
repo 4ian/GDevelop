@@ -97,9 +97,9 @@ const SemiControlledTextField = React.forwardRef<
     if (textFieldRef.current) return textFieldRef.current.getFieldWidth();
   };
 
-  const getCaretPosition = ()=> {
+  const getCaretPosition = () => {
     if (textFieldRef.current) return textFieldRef.current.getCaretPosition();
-  }
+  };
 
   React.useImperativeHandle(ref, () => ({
     focus,

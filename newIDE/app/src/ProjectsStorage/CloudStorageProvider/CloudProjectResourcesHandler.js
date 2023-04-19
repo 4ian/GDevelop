@@ -5,9 +5,7 @@ import { Trans, t } from '@lingui/macro';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type ResourcesActionsProps } from '../../ProjectsStorage';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { getCredentialsForCloudProject } from '../../Utils/GDevelopServices/Project';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
-import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
 import Window from '../../Utils/Window';
 import ResourcesLoader from '../../ResourcesLoader';
 
@@ -42,18 +40,6 @@ export const generateGetResourceActions = ({
       resource.getName(),
       {}
     );
-    if (checkIfIsGDevelopCloudBucketUrl(resourceUrl)) {
-      await getCredentialsForCloudProject(
-        authenticatedUser,
-        fileMetadata.fileIdentifier
-      );
-      // Recompute full url to include a refreshed token.
-      resourceUrl = ResourcesLoader.getResourceFullUrl(
-        project,
-        resource.getName(),
-        {}
-      );
-    }
     if (app && path && electron) {
       const defaultPath = path.join(
         app.getPath('downloads'),

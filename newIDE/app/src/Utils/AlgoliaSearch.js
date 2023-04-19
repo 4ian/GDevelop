@@ -1,3 +1,12 @@
+import algoliasearch from 'algoliasearch/lite';
+
+export const searchClient = algoliasearch(
+  'RC2XAJAUNE',
+  '7853cc8136c930e6c7b8f68238eea179'
+);
+
+export const indexName = 'gdevelop';
+
 type AlgoliaSearchHitHierarchy = {|
   lvl0: string,
   lvl1?: string,

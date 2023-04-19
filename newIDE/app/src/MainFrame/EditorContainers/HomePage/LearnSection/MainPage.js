@@ -29,6 +29,7 @@ import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext
 import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
+import WikiSearchBar from '../../../../UI/WikiSearchBar';
 
 const useStyles = makeStyles({
   tile: {
@@ -154,6 +155,12 @@ const MainPage = ({
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
+      <SectionRow>
+        <Text>
+          <Trans>Quick search</Trans>
+        </Text>
+        <WikiSearchBar />
+      </SectionRow>
       <SectionRow>
         <Line noMargin>
           <GridList

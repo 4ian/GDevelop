@@ -4,6 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
+import { isNativeMobileApp } from '../Utils/Platform';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 
@@ -56,7 +57,7 @@ export default React.memo<Props>(function CloseConfirmDialog({
             // Returning undefined will let the window close
           }
         };
-      } else if (window) {
+      } else if (window && !isNativeMobileApp()) {
         if (shouldPrompt) {
           window.onbeforeunload = () => message;
         } else {

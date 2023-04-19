@@ -179,6 +179,7 @@ import {
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
+import { dataObjectToProps } from '../Utils/HTMLDataset';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2983,6 +2984,9 @@ const MainFrame = (props: Props) => {
           keepMounted: true,
         }}
         onClose={toggleProjectManager}
+        {...dataObjectToProps({
+          open: projectManagerOpen ? 'true' : undefined,
+        })}
       >
         <DrawerTopBar
           title={

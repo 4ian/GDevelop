@@ -27,10 +27,14 @@ import {
   getHitLastHierarchyLevel,
   type AlgoliaSearchHit as AlgoliaSearchHitType,
 } from '../../Utils/AlgoliaSearch';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
     width: '100%',
+  },
+  rootSmallPadding: {
+    paddingLeft: 0,
   },
   wikiPrimaryTextHierarchy: {
     color: theme.palette.text.secondary,
@@ -85,6 +89,7 @@ type Props<T> = {|
 type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
 export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
+  const windowWidth = useResponsiveWindowWidth();
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -100,7 +105,10 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
       dense
       component="div"
       ContainerComponent="div"
-      classes={{ container: classes.listItemContainer }}
+      classes={{
+        container: classes.listItemContainer,
+        root: windowWidth === 'small' ? classes.rootSmallPadding : null,
+      }}
     >
       <ListItemIcon>
         <Book />
@@ -118,6 +126,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
 const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
+  const windowWidth = useResponsiveWindowWidth();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
@@ -177,7 +186,10 @@ const AutocompletePicker = (
           dense
           component="div"
           ContainerComponent="div"
-          classes={{ container: classes.listItemContainer }}
+          classes={{
+            container: classes.listItemContainer,
+            root: windowWidth === 'small' ? classes.rootSmallPadding : null,
+          }}
         >
           <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
           <ListItemText primary={getItemText(item)} />
@@ -185,7 +197,14 @@ const AutocompletePicker = (
         </ListItem>
       );
     },
-    [classes.listItemContainer, getItemText, getItemHint, getItemIcon]
+    [
+      classes.listItemContainer,
+      classes.rootSmallPadding,
+      windowWidth,
+      getItemText,
+      getItemHint,
+      getItemIcon,
+    ]
   );
 
   return (

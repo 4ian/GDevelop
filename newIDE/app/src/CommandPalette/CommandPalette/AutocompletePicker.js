@@ -28,6 +28,7 @@ import {
   type AlgoliaSearchHit as AlgoliaSearchHitType,
 } from '../../Utils/AlgoliaSearch';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
@@ -127,6 +128,7 @@ const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
   const windowWidth = useResponsiveWindowWidth();
+  const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
@@ -227,7 +229,7 @@ const AutocompletePicker = (
           {...params}
           placeholder={props.i18n._(props.placeholder)}
           variant="outlined"
-          autoFocus
+          autoFocus={shouldAutofocusInput}
         />
       )}
       renderOption={renderOption}

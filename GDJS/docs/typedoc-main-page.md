@@ -1,4 +1,4 @@
-[![GDevelop logo](media/GDevelop%20banner.png "GDevelop logo")](https://gdevelop.io)
+![GDevelop logo](media/GDevelop%20banner.png "GDevelop logo")
 
 # GDevelop JavaScript game engine reference
 

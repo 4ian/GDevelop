@@ -8,8 +8,8 @@ GDevelop source code is hosted on GitHub, which is based on the Git version cont
 
 If it's the first time and you have just "forked" GDevelop on GitHub, clone your repository: `git clone git@github.com:your-username/GDevelop.git`. This will download your copy of the repository on your local computer.
 
-* Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push`, `git pull`, your usually, unless specified otherwise, getting or sending code to your repository.
-* The [GDevelop "official repository"](https://github.com/4ian/GDevelop) is also a remote, usually called `upstream`.
+- Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push`, `git pull`, your usually, unless specified otherwise, getting or sending code to your repository.
+- The [GDevelop "official repository"](https://github.com/4ian/GDevelop) is also a remote, usually called `upstream`.
 
 By default, when you have just "cloned" your repository, there is only the single remote `origin`. It will be useful later to have the `upstream` remote (to get the latest code from GDevelop). You can do it by entering: `git remote add upstream https://github.com/4ian/GDevelop.git`.
 

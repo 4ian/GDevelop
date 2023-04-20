@@ -79,7 +79,7 @@ npm run format # or yarn format
 
 It's pretty easy to create new themes. Check the [README about themes](./README-themes.md)
 
-### Development of the game engine or extensions.
+### Development of the game engine or extensions
 
 Make sure to have the standalone app running with Electron.
 

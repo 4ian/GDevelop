@@ -5,8 +5,9 @@ Themes are a consistent set of colors and other styles that unify the look and f
 ## How themes are handled
 
 Theme styles are held in a `theme.json`, which is used to generate:
- - A `.css` file, containing the styles as CSS Custom Properties. These properties are set by applying the theme class 
- to specific sections of the app. To see where the properties are used, see the stylesheets in the `Global` folder.
+
+- A `.css` file, containing the styles as CSS Custom Properties. These properties are set by applying the theme class
+to specific sections of the app. To see where the properties are used, see the stylesheets in the `Global` folder.
 - A `.json` file, containing the styles as a flat object, where each style is a field. This is imported and used by the Material UI library
 as well as custom components
 

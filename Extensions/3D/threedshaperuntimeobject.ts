@@ -21,6 +21,16 @@ namespace gdjs {
     };
   }
 
+  type FaceName = 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom';
+  const faceNameToBitmaskIndex = {
+    front: 0,
+    back: 1,
+    left: 2,
+    right: 3,
+    top: 4,
+    bottom: 5,
+  };
+
   /**
    * Shows a 3D box object.
    */
@@ -33,6 +43,15 @@ namespace gdjs {
     private _rotationX: float = 0;
     private _rotationY: float = 0;
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
+    private _visibleFacesBitmask: integer;
+    private _faceResourceNames: [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string
+    ];
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -43,6 +62,28 @@ namespace gdjs {
       this._width = objectData.content.width || 100;
       this._height = objectData.content.height || 100;
       this._depth = objectData.content.depth || 100;
+      this._visibleFacesBitmask = 0;
+      if (objectData.content.frontFaceVisible)
+        this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['front'];
+      if (objectData.content.backFaceVisible)
+        this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['back'];
+      if (objectData.content.leftFaceVisible)
+        this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['left'];
+      if (objectData.content.rightFaceVisible)
+        this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['right'];
+      if (objectData.content.topFaceVisible)
+        this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['top'];
+      if (objectData.content.bottomFaceVisible)
+        this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['bottom'];
+      this._faceResourceNames = [
+        objectData.content.frontFaceResourceName,
+        objectData.content.backFaceResourceName,
+        objectData.content.leftFaceResourceName,
+        objectData.content.rightFaceResourceName,
+        objectData.content.topFaceResourceName,
+        objectData.content.bottomFaceResourceName,
+      ];
+
       this._renderer = new gdjs.ThreeDShapeRuntimeObjectRenderer(
         this,
         instanceContainer,
@@ -51,6 +92,55 @@ namespace gdjs {
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
+    }
+
+    setFaceVisibility(faceName: FaceName, value: boolean) {
+      const faceIndex = faceNameToBitmaskIndex[faceName];
+      if (faceIndex === undefined) {
+        return;
+      }
+      if (value === this.isFaceAtIndexVisible(faceIndex)) {
+        return;
+      }
+
+      if (value) {
+        this._visibleFacesBitmask |= 1 << faceIndex;
+      } else {
+        this._visibleFacesBitmask &= ~(1 << faceIndex);
+      }
+      this._renderer.updateFace(faceIndex);
+    }
+
+    isFaceVisible(faceName: FaceName): boolean {
+      const faceIndex = faceNameToBitmaskIndex[faceName];
+      if (faceIndex === undefined) {
+        return false;
+      }
+
+      return this.isFaceAtIndexVisible(faceIndex);
+    }
+
+    /** @internal */
+    isFaceAtIndexVisible(faceIndex): boolean {
+      return (this._visibleFacesBitmask & (1 << faceIndex)) !== 0;
+    }
+
+    setFaceResourceName(faceName: FaceName, resourceName: string): void {
+      const faceIndex = faceNameToBitmaskIndex[faceName];
+      if (faceIndex === undefined) {
+        return;
+      }
+      if (this._faceResourceNames[faceIndex] === resourceName) {
+        return;
+      }
+
+      this._faceResourceNames[faceIndex] = resourceName;
+      this._renderer.updateFace(faceIndex);
+    }
+
+    /** @internal */
+    getFaceAtIndexResourceName(faceIndex: integer): string {
+      return this._faceResourceNames[faceIndex];
     }
 
     getRendererObject() {

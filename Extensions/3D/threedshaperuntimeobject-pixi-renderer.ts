@@ -1,10 +1,32 @@
 namespace gdjs {
+  // Three.js materials for a cube and the order of faces in the object is different,
+  // so we keep the mapping from one to the other.
+  const faceIndexToMaterialIndex = {
+    3: 0,
+    2: 1,
+    5: 2,
+    4: 3,
+    0: 4,
+    1: 5,
+  };
+  const materialIndexToFaceIndex = {
+    0: 3,
+    1: 2,
+    2: 5,
+    3: 4,
+    4: 0,
+    5: 1,
+  };
+
   let transparentMaterial: THREE.MeshBasicMaterial;
   const getTransparentMaterial = () => {
     if (!transparentMaterial)
       transparentMaterial = new THREE.MeshBasicMaterial({
         transparent: true,
         opacity: 0,
+        // Set the alpha test to to ensure the faces behind are rendered
+        // (no "back face culling" that would still be done if alphaTest is not set).
+        alphaTest: 1,
       });
 
     return transparentMaterial;
@@ -26,58 +48,15 @@ namespace gdjs {
       this._instanceContainer = instanceContainer;
 
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO: support tiling of texture?
       // TODO: investigate using MeshStandardMaterial.
       // TODO: support color instead of texture?
       const materials = [
-        objectData.content.rightFaceVisible
-          ? new THREE.MeshBasicMaterial({
-              map: this._runtimeGame
-                .getImageManager()
-                .getThreeTexture(objectData.content.rightFaceResourceName),
-              side: THREE.DoubleSide,
-            })
-          : getTransparentMaterial(),
-        objectData.content.leftFaceVisible
-          ? new THREE.MeshBasicMaterial({
-              map: this._runtimeGame
-                .getImageManager()
-                .getThreeTexture(objectData.content.leftFaceResourceName),
-              side: THREE.DoubleSide,
-            })
-          : getTransparentMaterial(),
-        objectData.content.bottomFaceVisible
-          ? new THREE.MeshBasicMaterial({
-              map: this._runtimeGame
-                .getImageManager()
-                .getThreeTexture(objectData.content.bottomFaceResourceName),
-              side: THREE.DoubleSide,
-            })
-          : getTransparentMaterial(),
-        objectData.content.topFaceVisible
-          ? new THREE.MeshBasicMaterial({
-              map: this._runtimeGame
-                .getImageManager()
-                .getThreeTexture(objectData.content.topFaceResourceName),
-              side: THREE.DoubleSide,
-            })
-          : getTransparentMaterial(),
-        objectData.content.frontFaceVisible
-          ? new THREE.MeshBasicMaterial({
-              map: this._runtimeGame
-                .getImageManager()
-                .getThreeTexture(objectData.content.frontFaceResourceName),
-              side: THREE.DoubleSide,
-            })
-          : getTransparentMaterial(),
-        objectData.content.backFaceVisible
-          ? new THREE.MeshBasicMaterial({
-              map: this._runtimeGame
-                .getImageManager()
-                .getThreeTexture(objectData.content.backFaceResourceName),
-              side: THREE.DoubleSide,
-            })
-          : getTransparentMaterial(),
+        this._getFaceMaterial(materialIndexToFaceIndex[0]),
+        this._getFaceMaterial(materialIndexToFaceIndex[1]),
+        this._getFaceMaterial(materialIndexToFaceIndex[2]),
+        this._getFaceMaterial(materialIndexToFaceIndex[3]),
+        this._getFaceMaterial(materialIndexToFaceIndex[4]),
+        this._getFaceMaterial(materialIndexToFaceIndex[5]),
       ];
       this._box = new THREE.Mesh(geometry, materials);
 
@@ -89,6 +68,27 @@ namespace gdjs {
         .getLayer('')
         .getRenderer()
         .add3dRendererObject(this._box);
+    }
+
+    _getFaceMaterial(faceIndex: integer) {
+      // TODO: support tiling of texture?
+      if (!this._object.isFaceAtIndexVisible(faceIndex))
+        return getTransparentMaterial();
+
+      return new THREE.MeshBasicMaterial({
+          map: this._runtimeGame
+            .getImageManager()
+            .getThreeTexture(this._object.getFaceAtIndexResourceName(faceIndex)),
+          side: THREE.DoubleSide,
+          transparent: true,
+        })
+    }
+
+    updateFace(faceIndex: integer) {
+      const materialIndex = faceIndexToMaterialIndex[faceIndex];
+      if (materialIndex === undefined) return;
+
+      this._box.material[materialIndex] = this._getFaceMaterial(faceIndex);
     }
 
     get3dRendererObject() {

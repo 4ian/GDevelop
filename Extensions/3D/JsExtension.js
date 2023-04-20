@@ -348,8 +348,49 @@ module.exports = {
       .setFunctionName('setRotationY')
       .setGetter('getRotationY');
 
-    // TODO: action to change face textures.
-    // TODO: action to change face visibilities.
+    object
+      .addExpressionAndConditionAndAction(
+        'boolean',
+        'FaceVisibility',
+        _('Face visibility'),
+        _('the face visibility'), // TODO (3D) - face visibility: fix the sentence.
+        _('the _PARAM1_ face visibility'),
+        '',
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Face'),
+        JSON.stringify(['front', 'back', 'left', 'right', 'top', 'bottom']),
+        false
+      )
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Visible?'))
+      )
+      .setFunctionName('setFaceVisibility')
+      .setGetter('isFaceVisible');
+
+    object
+      .addAction(
+        'SetFaceResource',
+        _('Face image'),
+        _('Change the image of the face'),
+        _('Change the image of _PARAM1_ face of _PARAM0_ to _PARAM2_'),
+        '',
+        'res/conditions/text24_black.png', //TODO
+        'res/conditions/text24_black.png' //TODO
+      )
+      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Face'),
+        JSON.stringify(['front', 'back', 'left', 'right', 'top', 'bottom']),
+        false
+      )
+      .addParameter('imageResource', _('Image'), '', false)
+      .setFunctionName('setFaceResourceName');
 
     extension
       .addExpressionAndConditionAndAction(

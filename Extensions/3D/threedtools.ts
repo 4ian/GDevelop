@@ -101,7 +101,7 @@ namespace gdjs {
         const threeCamera = layerRenderer._threeCamera;
         if (!threeCamera) return;
 
-        threeCamera.rotation.y = angle;
+        threeCamera.rotation.y = gdjs.toRad(angle);
       };
     }
   }

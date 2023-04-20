@@ -34,7 +34,7 @@ Learn how to launch [manually the type checking in GJDS Readme](../../GDJS/READM
 
 ## For the editor (`newIDE/app`)
 
-The editor sources are processed by Babel, which _transpiles_ the JavaScript latest features so that they run on older browsers. Thus, it's fine to use **all the latest and greatest** syntax and features 🎉
+The editor sources are processed by Babel, which _transpiler_ the JavaScript latest features so that they run on older browsers. Thus, it's fine to use **all the latest and greatest** syntax and features 🎉
 
 All source files should use the arrow function (`=>`), `class`, `let`/`const` and anything that makes the codebase more readable, concise and less error prone.
 

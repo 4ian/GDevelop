@@ -28,10 +28,10 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
 
 - Launch the build from GDevelop.js folder:
 
-```shell
-    cd GDevelop.js
-    npm install
-    npm run build
+```bash
+cd GDevelop.js
+npm install
+npm run build
 ```
 
 > ⚠️ If the npm install fails, relaunch it in a different terminal using a recent Node.js and npm version (to avoid using the old npm version from Emscripten).
@@ -42,18 +42,18 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 
-```shell
-    cd ..
-    cd newIDE/app
-    npm install
-    npm start
+```bash
+cd ..
+cd newIDE/app
+npm install
+npm start
 ```
 
 More information in [GDevelop 5 readme](https://github.com/4ian/GD/blob/master/newIDE/README.md).
 
 ### Tests
 
-```
+```bash
 npm test
 ```
 

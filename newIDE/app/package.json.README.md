@@ -16,7 +16,7 @@ GDevelop relies on some dependencies that can have special requirements.
 
 ## Create React App
 
-We need `"react-error-overlay": "6.0.9"` because of https://github.com/facebook/create-react-app/issues/11773.
+We need `"react-error-overlay": "6.0.9"` because of <https://github.com/facebook/create-react-app/issues/11773>.
 Can be removed if upgrading create-react-app to v5.
 
 ## LinguiJS

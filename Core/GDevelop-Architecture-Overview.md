@@ -99,7 +99,7 @@ Everything in GDevelop.js is meant to create a "bridge" allowing us to run and u
 
 ### I want all the gory details about GDevelop.js 🧐
 
-All the required C++ files are imported into this huge list: https://github.com/4ian/GDevelop/blob/master/GDevelop.js/Bindings/Wrapper.cpp#L1-L79. C++ compilation is done with a "build system" called CMake, which is using [this file](https://github.com/4ian/GDevelop/blob/master/GDevelop.js/CMakeLists.txt#L82-L101) to see what to compile.
+All the required C++ files are imported into this huge list: <https://github.com/4ian/GDevelop/blob/master/GDevelop.js/Bindings/Wrapper.cpp#L1-L79>. C++ compilation is done with a "build system" called CMake, which is using [this file](https://github.com/4ian/GDevelop/blob/master/GDevelop.js/CMakeLists.txt#L82-L101) to see what to compile.
 
 > In an ideal world, there would be something to do this automatically, so the GDevelop.js folder would not even exist 😉
 > If you're interested and want to know more about GDevelop.js bridging between C++ and JavaScript, look at [this talk from GDevelop original author](https://www.youtube.com/watch?v=6La7jSCnYyk).

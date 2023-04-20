@@ -1,6 +1,6 @@
 # Nightly Builds and continuous deployment
 
-GDevelop is using CircleCI (a continous deployment/integration service) and AppVeyor to automatically build new versions for **every commit on `master`** branch.
+GDevelop is using CircleCI (a continuous deployment/integration service) and AppVeyor to automatically build new versions for **every commit on `master`** branch.
 
 You can download these here - **replace XX by the current version number**:
 

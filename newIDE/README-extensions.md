@@ -60,7 +60,7 @@ Read about [`gdjs.RuntimeScene`](https://docs.gdevelop.io/GDJS%20Runtime%20Docum
 
 ##### How to create an asynchronous function
 
-You can make an asynchronous action by making your function return an instance of an AsyncTask (don't forget to also declare your function as async!). You can make an `AsyncTask` yourself by extending the `gdjs.AsyncTask` abstract base class, or, if you are using JavaScript async functions/promises, by instanciating a new `gdjs.PromiseTask` with your promise as argument.
+You can make an asynchronous action by making your function return an instance of an AsyncTask (don't forget to also declare your function as async!). You can make an `AsyncTask` yourself by extending the `gdjs.AsyncTask` abstract base class, or, if you are using JavaScript async functions/promises, by instantiating a new `gdjs.PromiseTask` with your promise as argument.
 
 #### How to create a behavior by extending `gdjs.RuntimeBehavior`
 

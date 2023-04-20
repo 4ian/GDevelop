@@ -218,8 +218,10 @@ const AutocompletePicker = (
       options={props.items}
       getOptionLabel={getItemText}
       onChange={handleSelect}
-      onInputChange={(e, value) => {
-        if (props.onInputChange) props.onInputChange(value);
+      onInputChange={(e, value, reason) => {
+        if (reason === 'input' && props.onInputChange) {
+          props.onInputChange(value);
+        }
       }}
       openOnFocus
       autoHighlight

@@ -257,6 +257,7 @@ If you want to start a new extension:
 -   Remove all the actions/conditions/expressions declarations and tests, run `node import-GDJS-Runtime.js` and reload GDevelop to verify that your extension is loaded.
 -   Create a file called for example _yourextensionnametools.js_ in the same directory.
 -   Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the ts file that you've created **but with a js extension**, prefixed by the path from the root folder. For example:
+
     ```js
     .setIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.ts")
     ```

@@ -20,6 +20,7 @@ By default, when you have just "cloned" your repository, there is only the singl
 In git, all the code is stored in the repository, and changes are stored in *commits*. The latest version of the source code is in a "branch", which is called `master` (it's an arbitrary convention).
 
 When you'll make new additions to GDevelop, you'll make a new "branch". Imagine a branch like the branch of a tree:
+
 - The source code is in master, which is the trunk of the tree, with tons of commits.
 - Your branch will grow from master, adding a few commits.
 - You can open a [Pull Request](https://help.github.com/en/articles/creating-a-pull-request) to propose the changes made on your branch.

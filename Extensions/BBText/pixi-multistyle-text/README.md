@@ -46,6 +46,7 @@ $ yarn build
 Creates a new `MultiStyleText` with the given text and styles.
 
 #### `textStyles`
+
 Type: `{ [key: string]: ExtendedTextStyle }`
 
 Each key of this dictionary should match with a tag in the text. Use the key `default` for the default style.

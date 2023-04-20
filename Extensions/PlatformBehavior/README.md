@@ -306,10 +306,3 @@ This is the code used to plot the first graphic of the [Polynomial piece-wise fu
   ]), 0, 0.8, ymin=0, color='cyan')
 )
 ```
-
-
-
-
-
-
-

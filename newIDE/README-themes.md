@@ -10,8 +10,8 @@ Theme styles are held in a `theme.json`, which is used to generate:
 - A `.json` file, containing the styles as a flat object, where each style is a field. This is imported and used by the Material UI library
 as well as custom components
 
-They are created by leveraging (Style Dictionary)[https://amzn.github.io/style-dictionary] to compile them from `theme.json` using 
-the `build-theme-resources` script, in the scripts folder. There is also an npm script to run it (`build-theme-resources`)
+They are created by leveraging [Style Dictionary](https://amzn.github.io/style-dictionary) to compile them from `theme.json` using
+the `build-theme-resources` script in the scripts folder. There is also an npm script to run it (`build-theme-resources`).
 
 ## Creating new themes
 

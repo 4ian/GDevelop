@@ -28,6 +28,7 @@ import {
   type AlgoliaSearchHit as AlgoliaSearchHitType,
 } from '../../Utils/AlgoliaSearch';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {
@@ -127,6 +128,7 @@ const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
   const windowWidth = useResponsiveWindowWidth();
+  const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();
@@ -142,6 +144,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
+      if (windowWidth === 'small' || windowWidth === 'medium') return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -154,7 +157,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap]
+    [shortcutMap, windowWidth]
   );
 
   const getItemText = React.useCallback(
@@ -215,8 +218,10 @@ const AutocompletePicker = (
       options={props.items}
       getOptionLabel={getItemText}
       onChange={handleSelect}
-      onInputChange={(e, value) => {
-        if (props.onInputChange) props.onInputChange(value);
+      onInputChange={(e, value, reason) => {
+        if (reason === 'input' && props.onInputChange) {
+          props.onInputChange(value);
+        }
       }}
       openOnFocus
       autoHighlight
@@ -226,7 +231,7 @@ const AutocompletePicker = (
           {...params}
           placeholder={props.i18n._(props.placeholder)}
           variant="outlined"
-          autoFocus
+          autoFocus={shouldAutofocusInput}
         />
       )}
       renderOption={renderOption}

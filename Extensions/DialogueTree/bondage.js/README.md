@@ -6,7 +6,7 @@
 
 #### As a Web Tool
 
-To run through your yarn files in your browser, go to http://hayley.zone/bondage.js, paste your yarn data in the field, then hit "compile".
+To run through your yarn files in your browser, go to <http://hayley.zone/bondage.js>, paste your yarn data in the field, then hit "compile".
 
 #### As a Command Line Tool
 Installation: `npm install -g bondage`

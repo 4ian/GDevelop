@@ -142,6 +142,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
+      if (windowWidth === 'small' || windowWidth === 'medium') return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -154,7 +155,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap]
+    [shortcutMap, windowWidth]
   );
 
   const getItemText = React.useCallback(

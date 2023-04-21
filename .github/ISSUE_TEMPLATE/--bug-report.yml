@@ -24,22 +24,29 @@ body:
       required: true
   - type: dropdown
     attributes:
-      label: GDevelop version
-      description: Which version of GDevelop are you used?
+      label: GDevelop platform
+      description: Which platform of GDevelop are you using?
       multiple: true
       options:
-        - Desktop app
-        - Web app
+        - Desktop
+        - Web
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: GDevelop version
+      description: Which version of GDevelop are you using?
+      placeholder: 5.1.159? 5.1.160?
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Info
+      label: Platform info
       value: |
         OS: 
         OS Version: 
-        Browser(For Web app): 
-        Device(For Smartphone): 
+        Browser(For Web): 
+        Device(For Mobile): 
   - type: textarea
     attributes:
       label: Additional context

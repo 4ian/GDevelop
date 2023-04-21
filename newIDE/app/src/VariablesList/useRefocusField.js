@@ -23,10 +23,7 @@ const useRefocusField = (fieldRefs: {|
         }
       }
     },
-    // The effect should only be triggered if fieldToFocus is defined.
-    // The list of refs should be up to date when the effect executes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fieldToFocus]
+    [fieldToFocus, fieldRefs]
   );
   return setFieldToFocus;
 };

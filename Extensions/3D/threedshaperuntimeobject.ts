@@ -99,16 +99,16 @@ namespace gdjs {
      * @param faceName - The name of the face to set visibility for.
      * @param value - The visibility value to set.
      */
-    setFaceVisibility(faceName: FaceName, value: boolean) {
+    setFaceVisibility(faceName: FaceName, enable: boolean) {
       const faceIndex = faceNameToBitmaskIndex[faceName];
       if (faceIndex === undefined) {
         return;
       }
-      if (value === this.isFaceAtIndexVisible(faceIndex)) {
+      if (enable === this.isFaceAtIndexVisible(faceIndex)) {
         return;
       }
 
-      if (value) {
+      if (enable) {
         this._visibleFacesBitmask |= 1 << faceIndex;
       } else {
         this._visibleFacesBitmask &= ~(1 << faceIndex);
@@ -168,6 +168,99 @@ namespace gdjs {
       }
       if (oldObjectData.content.depth !== newObjectData.content.depth) {
         this.setDepth(newObjectData.content.depth);
+      }
+      if (
+        oldObjectData.content.frontFaceVisible !==
+        newObjectData.content.frontFaceVisible
+      ) {
+        this.setFaceVisibility('front', newObjectData.content.frontFaceVisible);
+      }
+      if (
+        oldObjectData.content.backFaceVisible !==
+        newObjectData.content.backFaceVisible
+      ) {
+        this.setFaceVisibility('back', newObjectData.content.backFaceVisible);
+      }
+      if (
+        oldObjectData.content.leftFaceVisible !==
+        newObjectData.content.leftFaceVisible
+      ) {
+        this.setFaceVisibility('left', newObjectData.content.leftFaceVisible);
+      }
+      if (
+        oldObjectData.content.rightFaceVisible !==
+        newObjectData.content.rightFaceVisible
+      ) {
+        this.setFaceVisibility('right', newObjectData.content.rightFaceVisible);
+      }
+      if (
+        oldObjectData.content.topFaceVisible !==
+        newObjectData.content.topFaceVisible
+      ) {
+        this.setFaceVisibility('top', newObjectData.content.topFaceVisible);
+      }
+      if (
+        oldObjectData.content.bottomFaceVisible !==
+        newObjectData.content.bottomFaceVisible
+      ) {
+        this.setFaceVisibility(
+          'bottom',
+          newObjectData.content.bottomFaceVisible
+        );
+      }
+      if (
+        oldObjectData.content.frontFaceResourceName !==
+        newObjectData.content.frontFaceResourceName
+      ) {
+        this.setFaceResourceName(
+          'front',
+          newObjectData.content.frontFaceResourceName
+        );
+      }
+      if (
+        oldObjectData.content.backFaceResourceName !==
+        newObjectData.content.backFaceResourceName
+      ) {
+        this.setFaceResourceName(
+          'back',
+          newObjectData.content.backFaceResourceName
+        );
+      }
+      if (
+        oldObjectData.content.leftFaceResourceName !==
+        newObjectData.content.leftFaceResourceName
+      ) {
+        this.setFaceResourceName(
+          'left',
+          newObjectData.content.leftFaceResourceName
+        );
+      }
+      if (
+        oldObjectData.content.rightFaceResourceName !==
+        newObjectData.content.rightFaceResourceName
+      ) {
+        this.setFaceResourceName(
+          'right',
+          newObjectData.content.rightFaceResourceName
+        );
+      }
+      if (
+        oldObjectData.content.topFaceResourceName !==
+        newObjectData.content.topFaceResourceName
+      ) {
+        this.setFaceResourceName(
+          'top',
+          newObjectData.content.topFaceResourceName
+        );
+      }
+      if (
+        oldObjectData.content.bottomFaceResourceName !==
+        newObjectData.content.bottomFaceResourceName
+      ) {
+        this.setFaceResourceName(
+          'bottom',
+          newObjectData.content.bottomFaceResourceName
+        );
       }
 
       return true;

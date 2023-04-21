@@ -56,7 +56,7 @@ export type ParameterFieldProps = {|
 export type FieldFocusFunction = (
   ?{|
     selectAll?: boolean,
-    caretPosition?: 'end',
+    caretPosition?: 'end' | number | null,
   |}
 ) => void;
 

@@ -1,13 +1,12 @@
-name: 🐛Bug report
-description: Create a bug report about GDevelop or the game engine
-title: "[Bug]: "
+name: "🐛Bug report"
+description: "Create a bug report about GDevelop or the game engine"
+body:
   - type: textarea
     attributes:
       label: Describe the bug
       description: |
         A clear and concise description of what the bug is.
         Please double check that the bug is not already reported in the issues list.
-      placeholder: Tell us what you see!
     validations:
       required: true
   - type: textarea
@@ -23,16 +22,25 @@ title: "[Bug]: "
         4. See error
     validations:
       required: true
+  - type: dropdown
+    attributes:
+      label: GDevelop version
+      description: Which version of GDevelop are you used?
+      multiple: true
+      options:
+        - Desktop app
+        - Web app
+    validations:
+      required: true
   - type: textarea
     attributes:
-      label: Other details
-      description: |
-        * Include any OS/browser version/smartphone that you're using
-        * Which version of GDevelop are you using? The desktop app or the web-app?
-        * Add any other context about the problem here.
+      label: Info
       value: |
-        OS:
-        Browser version:
-        GDevelop app type(desktop app or the web-app):
-        GDevelop version:
-
+        OS: 
+        OS Version: 
+        Browser(For Web app): 
+        Device(For Smartphone): 
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.

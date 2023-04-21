@@ -30,6 +30,7 @@ body:
       options:
         - Desktop
         - Web
+        - Mobile
     validations:
       required: true
   - type: input

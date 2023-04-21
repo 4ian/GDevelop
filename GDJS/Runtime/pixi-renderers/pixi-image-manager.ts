@@ -63,14 +63,16 @@ namespace gdjs {
     private _invalidTexture: PIXI.Texture;
 
     /**
-     * Map associated resource name to the loaded PixiJS texture.
+     * Map associating a resource name to the loaded PixiJS texture.
      */
     private _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
 
-    private _invalidThreeTexture: THREE.Texture | null;
+    /**
+     * Map associating a resource name to the loaded Three.js texture.
+     */
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
 
-    _resourcesLoader: RuntimeGameResourcesLoader;
+    private _resourcesLoader: RuntimeGameResourcesLoader;
 
     /**
      * @param resources The resources data of the game.
@@ -172,7 +174,7 @@ namespace gdjs {
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
       // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
       const pixiTexture = this.getPIXITexture(resourceName);
-      const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer()._pixiRenderer;
+      const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer().getPIXIRenderer();
       if (!pixiRenderer) throw new Error("No PIXI renderer was found.");
 
       // @ts-ignore - source does exist on resource.

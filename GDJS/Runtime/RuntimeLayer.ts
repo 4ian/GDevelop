@@ -51,7 +51,7 @@ namespace gdjs {
       this._renderer = new gdjs.LayerRenderer(
         this,
         instanceContainer.getRenderer(),
-        instanceContainer.getGame().getRenderer().getPIXIRenderer()
+        instanceContainer.getGame().getRenderer()
       );
       this.show(!this._hidden);
       for (let i = 0; i < layerData.effects.length; ++i) {

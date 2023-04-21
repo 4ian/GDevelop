@@ -6,7 +6,7 @@ namespace gdjs {
    */
   export class RuntimeScenePixiRenderer
     implements gdjs.RuntimeInstanceContainerPixiRenderer {
-    _pixiRenderer: PIXI.Renderer | null;
+    private _runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null;
     _runtimeScene: gdjs.RuntimeScene;
     _pixiContainer: PIXI.Container;
     _profilerText: PIXI.Text | null = null;
@@ -20,9 +20,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null
     ) {
-      this._pixiRenderer = runtimeGameRenderer
-        ? runtimeGameRenderer.getPIXIRenderer()
-        : null;
+      this._runtimeGameRenderer = runtimeGameRenderer;
       this._runtimeScene = runtimeScene;
       this._pixiContainer = new PIXI.Container();
 
@@ -33,19 +31,22 @@ namespace gdjs {
     }
 
     _setupThreeScene() {
-      this._threeRenderer = this._runtimeScene.getGame().getRenderer()._threeRenderer;
-      if (this._threeRenderer) this._threeRenderer.autoClear = false;
-      if (!this._threeScene) this._threeScene = new THREE.Scene();
+      this._threeRenderer = this._runtimeScene.getGame().getRenderer().getThreeRenderer();
+      if (this._threeRenderer) {
+        this._threeRenderer.autoClear = false;
+        if (!this._threeScene) this._threeScene = new THREE.Scene();
 
-      // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
-      // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-      this._threeScene.scale.y = -1;
+        // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+        // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+        this._threeScene.scale.y = -1;
 
-      if (!this._threeDummyCamera) this._threeDummyCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+        if (!this._threeDummyCamera) this._threeDummyCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+      }
     }
 
     onGameResolutionResized() {
-      if (!this._pixiRenderer) {
+      const pixiRenderer = this._runtimeGameRenderer ? this._runtimeGameRenderer.getPIXIRenderer() : null;
+      if (!pixiRenderer) {
         return;
       }
       const runtimeGame = this._runtimeScene.getGame();
@@ -53,9 +54,9 @@ namespace gdjs {
       // TODO (3D): should this be done for each individual layer?
       // Especially if we remove _pixiContainer entirely.
       this._pixiContainer.scale.x =
-        this._pixiRenderer.width / runtimeGame.getGameResolutionWidth();
+        pixiRenderer.width / runtimeGame.getGameResolutionWidth();
       this._pixiContainer.scale.y =
-        this._pixiRenderer.height / runtimeGame.getGameResolutionHeight();
+        pixiRenderer.height / runtimeGame.getGameResolutionHeight();
 
       for(const runtimeLayer of this._runtimeScene._orderedLayers) {
         runtimeLayer.getRenderer().onGameResolutionResized();
@@ -67,12 +68,13 @@ namespace gdjs {
     }
 
     render() {
-      if (!this._pixiRenderer) {
-        return;
-      }
+      const runtimeGameRenderer = this._runtimeGameRenderer;
+      if (!runtimeGameRenderer) return;
 
-      // this._renderProfileText(); //Uncomment to display profiling times
+      const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
+      if (!pixiRenderer) return;
 
+      const threePixiCanvasTexture = runtimeGameRenderer.getThreePixiCanvasTexture();
       const threeRenderer = this._threeRenderer;
       const threeScene = this._threeScene;
       const threeDummyCamera = this._threeDummyCamera;
@@ -85,13 +87,16 @@ namespace gdjs {
         // So that if no 3D objects at all, this would be as efficient as the 2D only rendering.
         // If done, visibility of layers and lighting layers must be properly handled.
 
+        threeRenderer.info.autoReset = false;
+        threeRenderer.info.reset();
+
         // Render the background color.
         threeScene.background = new THREE.Color(
           this._runtimeScene.getBackgroundColor()
         );
         threeRenderer.clear();
         threeRenderer.render(threeScene, threeDummyCamera)
-        this._pixiRenderer.clearBeforeRender = false;
+        pixiRenderer.clearBeforeRender = false;
 
         // Render each layer
         for(let i = 0; i< this._runtimeScene._orderedLayers.length;++i) {
@@ -103,25 +108,26 @@ namespace gdjs {
           const threeGroup = runtimeLayerRenderer.getThreeGroup();
           const threeCamera = runtimeLayerRenderer.getThreeCamera();
 
-          // Render the 2D objects of this layer, which will be displayed on a plane.
-          this._pixiRenderer.clear();
-          this._pixiRenderer.render(pixiContainer);
+          // Render the 2D objects of this layer, which will be displayed on a plane
+          // (see `threePixiCanvasTexture`).
+          pixiRenderer.clear();
+          pixiRenderer.render(pixiContainer);
 
           // Also render the next layer if it's the lighting layer.
           const nextRuntimeLayer: gdjs.RuntimeLayer | undefined = this._runtimeScene._orderedLayers[i + 1];
           if (nextRuntimeLayer && nextRuntimeLayer.isLightingLayer()) {
             const pixiSprite = nextRuntimeLayer.getRenderer().getLightingSprite();
             if (pixiSprite) {
-              this._pixiRenderer.render(pixiSprite);
+              pixiRenderer.render(pixiSprite);
             }
           }
 
           // Render the 3D objects of this layer.
           if (threeGroup && threeCamera) {
-            // TODO: move in a render method?
-            // The plane showing the PIXI rendering must be updated.
-            if (runtimeLayerRenderer._threePixiCanvasTexture)
-              runtimeLayerRenderer._threePixiCanvasTexture.needsUpdate = true;
+            // The plane showing the PixiJS rendering must be updated, so that the 2D rendering
+            // made by PixiJS can be shown in the 3D world.
+            if (threePixiCanvasTexture)
+              threePixiCanvasTexture.needsUpdate = true;
 
             // Clear the depth as each layer is independent and display on top of the previous one,
             // even 3D objects.
@@ -129,19 +135,25 @@ namespace gdjs {
             threeRenderer.render(threeGroup, threeCamera);
           }
         }
+
+        // Uncomment to display some debug metrics from Three.js.
+        // console.log(threeRenderer.info);
       } else {
         // 2D only rendering.
         // render the PIXI container of the scene
         // TODO: replace by a loop like in 3D.
-        this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
-        this._pixiRenderer.render(this._pixiContainer);
+
+        // this._renderProfileText(); //Uncomment to display profiling times
+
+        pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
+        pixiRenderer.render(this._pixiContainer);
       }
 
       // synchronize showing the cursor with rendering (useful to reduce
       // blinking while switching from in-game cursor)
       if (this._showCursorAtNextRender) {
-        // TODO (3D): replace by getCanvas().
-        this._pixiRenderer.view.style.cursor = '';
+        const canvas = runtimeGameRenderer.getCanvas();
+        if (canvas) canvas.style.cursor = '';
         this._showCursorAtNextRender = false;
       }
     }
@@ -169,11 +181,9 @@ namespace gdjs {
 
     hideCursor(): void {
       this._showCursorAtNextRender = false;
-      if (!this._pixiRenderer) {
-        return;
-      }
-      // TODO (3D): replace by getCanvas().
-      this._pixiRenderer.view.style.cursor = 'none';
+
+      const canvas = this._runtimeGameRenderer ? this._runtimeGameRenderer.getCanvas() : null;
+      if (canvas) canvas.style.cursor = 'none';
     }
 
     showCursor(): void {
@@ -192,8 +202,9 @@ namespace gdjs {
       return this._threeScene!;
     }
 
+    /** @deprecated use `runtimeGame.getRenderer().getPIXIRenderer()` instead */
     getPIXIRenderer() {
-      return this._pixiRenderer;
+      return this._runtimeGameRenderer ? this._runtimeGameRenderer.getPIXIRenderer() : null;
     }
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {

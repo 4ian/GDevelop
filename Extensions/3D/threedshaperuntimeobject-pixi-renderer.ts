@@ -34,22 +34,19 @@ namespace gdjs {
 
   class ThreeDShapeRuntimeObjectPixiRenderer {
     private _object: gdjs.ThreeDShapeRuntimeObject;
-    private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
     private _box: THREE.Mesh;
 
     constructor(
       runtimeObject: gdjs.ThreeDShapeRuntimeObject,
-      instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ThreeDShapeObjectData
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._runtimeGame = instanceContainer.getGame();
-      this._instanceContainer = instanceContainer;
 
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO: investigate using MeshStandardMaterial.
-      // TODO: support color instead of texture?
+      // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
+      // TODO (3D) - feature: support color instead of texture?
       const materials = [
         this._getFaceMaterial(materialIndexToFaceIndex[0]),
         this._getFaceMaterial(materialIndexToFaceIndex[1]),
@@ -71,17 +68,18 @@ namespace gdjs {
     }
 
     _getFaceMaterial(faceIndex: integer) {
-      // TODO: support tiling of texture?
+      // TODO (3D) - feature: support tiling of texture.
       if (!this._object.isFaceAtIndexVisible(faceIndex))
         return getTransparentMaterial();
 
       return new THREE.MeshBasicMaterial({
-          map: this._runtimeGame
-            .getImageManager()
-            .getThreeTexture(this._object.getFaceAtIndexResourceName(faceIndex)),
-          side: THREE.DoubleSide,
-          transparent: true,
-        })
+        map: this._runtimeGame
+          .getImageManager()
+          .getThreeTexture(this._object.getFaceAtIndexResourceName(faceIndex)),
+        // TODO (3D) - optimization: use FrontSide instead of DoubleSide if no transparent textures and all face are shown.
+        side: THREE.DoubleSide,
+        transparent: true,
+      })
     }
 
     updateFace(faceIndex: integer) {

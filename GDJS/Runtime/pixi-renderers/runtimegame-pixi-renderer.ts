@@ -29,8 +29,9 @@ namespace gdjs {
     _forceFullscreen: any;
 
     _pixiRenderer: PIXI.Renderer | null = null;
-    _threeRenderer: THREE.WebGLRenderer | null = null;
-    _gameCanvas: HTMLCanvasElement | null = null;
+    private _threeRenderer: THREE.WebGLRenderer | null = null;
+    private _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
+    private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
@@ -78,7 +79,7 @@ namespace gdjs {
       if (THREE) {
         this._pixiRenderer.backgroundAlpha = 0;
         this._threeRenderer = new THREE.WebGLRenderer({});
-        this._threeRenderer.setPixelRatio(window.devicePixelRatio);
+        // this._threeRenderer.setPixelRatio(0.05);
         this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
 
         gameCanvas = this._threeRenderer.domElement;
@@ -214,7 +215,7 @@ namespace gdjs {
     private _resizeCanvas() {
       if (!this._pixiRenderer || !this._domElementsContainer) return;
 
-      // Set the Pixi renderer size to the game size.
+      // Set the Pixi (and/or Three) renderer size to the game size.
       // There is no "smart" resizing to be done here: the rendering of the game
       // should be done with the size set on the game.
       if (
@@ -227,8 +228,14 @@ namespace gdjs {
         );
 
         if (this._threeRenderer) {
-          this._threeRenderer.setPixelRatio(window.devicePixelRatio);
           this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
+
+          // Update the texture that is used by Three.js to render the 2D PixiJS rendering.
+          // TODO (3D) - optimization: this could be optimized by using a render texture instead of a canvas.
+          // This implies to share the same WebGL context between PixiJS and Three.js.
+          const pixiCanvas = this._pixiRenderer.view;
+          if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
+          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas)
         }
       }
 
@@ -794,6 +801,25 @@ namespace gdjs {
       return this._pixiRenderer;
     }
 
+    /**
+     * Get the Three.js renderer for the game - if any.
+     */
+    getThreeRenderer(): THREE.WebGLRenderer | null {
+      return this._threeRenderer;
+    }
+
+    /**
+     * Get the Three.js texture that contains the 2D rendering made by PixiJS on its own canvas.
+     * @internal
+     */
+    getThreePixiCanvasTexture(): THREE.Texture | null {
+      return this._threePixiCanvasTexture;
+    }
+
+    /**
+     * Get the DOM element used as a container for HTML elements to display
+     * on top of the game.
+     */
     getDomElementContainer() {
       return this._domElementsContainer;
     }

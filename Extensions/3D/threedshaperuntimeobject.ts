@@ -86,14 +86,19 @@ namespace gdjs {
 
       this._renderer = new gdjs.ThreeDShapeRuntimeObjectRenderer(
         this,
-        instanceContainer,
-        objectData
+        instanceContainer
       );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
+    /**
+     * Sets the visibility of a face of the 3D box.
+     *
+     * @param faceName - The name of the face to set visibility for.
+     * @param value - The visibility value to set.
+     */
     setFaceVisibility(faceName: FaceName, value: boolean) {
       const faceIndex = faceNameToBitmaskIndex[faceName];
       if (faceIndex === undefined) {

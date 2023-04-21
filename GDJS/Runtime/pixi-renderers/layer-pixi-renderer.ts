@@ -17,7 +17,7 @@ namespace gdjs {
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
     _runtimeSceneRenderer: gdjs.RuntimeInstanceContainerRenderer;
-    _pixiRenderer: PIXI.Renderer | null;
+    _runtimeGameRenderer: gdjs.RuntimeGameRenderer;
 
     // Width and height are tracked when a render texture is used.
     _oldWidth: float | null = null;
@@ -27,11 +27,10 @@ namespace gdjs {
 
     _threeGroup: THREE.Group | null = null;
 
-    _threeCamera: THREE.PerspectiveCamera | null = null;
-    _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
-    _threePlaneGeometry: THREE.PlaneGeometry | null = null;
-    _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
-    _threePlaneMesh: THREE.Mesh | null = null;
+    private _threeCamera: THREE.PerspectiveCamera | null = null;
+    private _threePlaneGeometry: THREE.PlaneGeometry | null = null;
+    private _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
+    private _threePlaneMesh: THREE.Mesh | null = null;
 
     /**
      * Pixi doesn't sort children with zIndex == 0.
@@ -45,13 +44,13 @@ namespace gdjs {
     constructor(
       layer: gdjs.RuntimeLayer,
       runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer,
-      pixiRenderer: PIXI.Renderer | null // TODO: check if this can even be null?
+      runtimeGameRenderer: gdjs.RuntimeGameRenderer,
     ) {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
       this._runtimeSceneRenderer = runtimeInstanceContainerRenderer;
-      this._pixiRenderer = pixiRenderer;
+      this._runtimeGameRenderer = runtimeGameRenderer;
       this._isLightingLayer = layer.isLightingLayer();
       this._clearColor = layer.getClearColor();
       runtimeInstanceContainerRenderer
@@ -73,7 +72,7 @@ namespace gdjs {
       return this._threeGroup;
     }
 
-    getThreeCamera(): THREE.Camera | null {
+    getThreeCamera(): THREE.PerspectiveCamera | null {
       return this._threeCamera;
     }
 
@@ -94,26 +93,16 @@ namespace gdjs {
         parentThreeContainer.add(this._threeGroup);
       }
 
-      if (!this._pixiRenderer) {
-        // No PixiJS renderer, which is unexpected.
-        return;
-      }
-
       // TODO (3D): ideally we would avoid the need for this flag at all,
       // maybe by having separate rendering classes for custom object layers and scene layers.
       if (this._layer instanceof gdjs.Layer) {
         if (!this._threeCamera)
           this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
 
-        // TODO (3D) - optimization: could be optimized by using a render texture instead of a canvas.
-        // (Implies to share the same WebGL context between PixiJS and three.js).
-        const pixiCanvas = this._pixiRenderer.view;
-        this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
-
         this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
         this._threePlaneMaterial = new THREE.MeshBasicMaterial({
           // Texture will be set in onGameResolutionResized().
-          side: THREE.DoubleSide,
+          side: THREE.FrontSide,
           transparent: true,
         });
 
@@ -130,19 +119,9 @@ namespace gdjs {
     onGameResolutionResized() {
       if (
         this._threeCamera &&
-        this._threePlaneMesh &&
         this._threePlaneMaterial
       ) {
-        if (this._threePixiCanvasTexture) {
-          // Game size was changed, dispose of the old texture used to read the PixiJS Canvas.
-          this._threePixiCanvasTexture.dispose();
-        }
-        if (this._pixiRenderer) {
-          // And recreate a new texture to project on the plane.
-          const pixiCanvas = this._pixiRenderer.view;
-          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
-          this._threePlaneMaterial.map = this._threePixiCanvasTexture;
-        }
+        this._threePlaneMaterial.map = this._runtimeGameRenderer.getThreePixiCanvasTexture();
 
         this._threeCamera.aspect =
           this._layer.getWidth() / this._layer.getHeight();
@@ -214,7 +193,7 @@ namespace gdjs {
       }
 
       if (this._threeCamera) {
-        // TODO (3D): handle camera rounding like down for PixiJS?
+        // TODO (3D) - improvement: handle camera rounding like down for PixiJS?
         this._threeCamera.position.x = this._layer.getCameraX();
         this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
         this._threeCamera.rotation.z = angle;
@@ -312,18 +291,19 @@ namespace gdjs {
      * Also, render texture is cleared with a specified clear color.
      */
     _updateRenderTexture(): void {
+      const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
       if (
-        !this._pixiRenderer ||
-        this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
+        !pixiRenderer ||
+        pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
       ) {
         return;
       }
       if (!this._renderTexture) {
-        this._oldWidth = this._pixiRenderer.screen.width;
-        this._oldHeight = this._pixiRenderer.screen.height;
+        this._oldWidth = pixiRenderer.screen.width;
+        this._oldHeight = pixiRenderer.screen.height;
         const width = this._oldWidth;
         const height = this._oldHeight;
-        const resolution = this._pixiRenderer.resolution;
+        const resolution = pixiRenderer.resolution;
         this._renderTexture = PIXI.RenderTexture.create({
           width,
           height,
@@ -332,25 +312,25 @@ namespace gdjs {
         this._renderTexture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
       }
       if (
-        this._oldWidth !== this._pixiRenderer.screen.width ||
-        this._oldHeight !== this._pixiRenderer.screen.height
+        this._oldWidth !== pixiRenderer.screen.width ||
+        this._oldHeight !== pixiRenderer.screen.height
       ) {
         this._renderTexture.resize(
-          this._pixiRenderer.screen.width,
-          this._pixiRenderer.screen.height
+          pixiRenderer.screen.width,
+          pixiRenderer.screen.height
         );
-        this._oldWidth = this._pixiRenderer.screen.width;
-        this._oldHeight = this._pixiRenderer.screen.height;
+        this._oldWidth = pixiRenderer.screen.width;
+        this._oldHeight = pixiRenderer.screen.height;
       }
-      const oldRenderTexture = this._pixiRenderer.renderTexture.current;
-      const oldSourceFrame = this._pixiRenderer.renderTexture.sourceFrame;
-      this._pixiRenderer.renderTexture.bind(this._renderTexture);
-      this._pixiRenderer.renderTexture.clear(this._clearColor);
-      this._pixiRenderer.render(this._pixiContainer, {
+      const oldRenderTexture = pixiRenderer.renderTexture.current;
+      const oldSourceFrame = pixiRenderer.renderTexture.sourceFrame;
+      pixiRenderer.renderTexture.bind(this._renderTexture);
+      pixiRenderer.renderTexture.clear(this._clearColor);
+      pixiRenderer.render(this._pixiContainer, {
         renderTexture: this._renderTexture,
         clear: false,
       });
-      this._pixiRenderer.renderTexture.bind(
+      pixiRenderer.renderTexture.bind(
         oldRenderTexture,
         oldSourceFrame,
         undefined
@@ -364,9 +344,10 @@ namespace gdjs {
      * used only in lighting for now as the sprite could have MULTIPLY blend mode.
      */
     private _replaceContainerWithSprite(): void {
+      const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
       if (
-        !this._pixiRenderer ||
-        this._pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
+        !pixiRenderer ||
+        pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
       ) {
         return;
       }

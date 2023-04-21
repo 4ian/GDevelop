@@ -11,7 +11,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer._threeCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
         if (threeCamera) {
           return threeCamera.position.z;
         }
@@ -36,7 +36,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer._threeCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
 
         const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
         const cameraFovInRadians = gdjs.toRad(fov);
@@ -56,7 +56,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer._threeCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
         if (!threeCamera) return 0;
         return gdjs.toDegrees(threeCamera.rotation.x);
       };
@@ -70,7 +70,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer._threeCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
         if (!threeCamera) return;
 
         threeCamera.rotation.x = gdjs.toRad(angle);
@@ -84,7 +84,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer._threeCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
         if (!threeCamera) return 0;
         return gdjs.toDegrees(threeCamera.rotation.y);
       };
@@ -98,7 +98,7 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
 
-        const threeCamera = layerRenderer._threeCamera;
+        const threeCamera = layerRenderer.getThreeCamera();
         if (!threeCamera) return;
 
         threeCamera.rotation.y = gdjs.toRad(angle);

@@ -166,7 +166,8 @@ const EventContainer = (props: EventsContainerProps) => {
         onEventContextMenu(domEvent.clientX, domEvent.clientY);
       },
       [onEventContextMenu]
-    )
+    ),
+    'events-tree-event-component'
   );
 
   const EventComponent = EventsRenderingService.getEventComponent(event);

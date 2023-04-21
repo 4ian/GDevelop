@@ -44,7 +44,7 @@ namespace gdjs {
     constructor(
       layer: gdjs.RuntimeLayer,
       runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer,
-      runtimeGameRenderer: gdjs.RuntimeGameRenderer,
+      runtimeGameRenderer: gdjs.RuntimeGameRenderer
     ) {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.sortableChildren = true;
@@ -117,10 +117,7 @@ namespace gdjs {
     }
 
     onGameResolutionResized() {
-      if (
-        this._threeCamera &&
-        this._threePlaneMaterial
-      ) {
+      if (this._threeCamera && this._threePlaneMaterial) {
         this._threePlaneMaterial.map = this._runtimeGameRenderer.getThreePixiCanvasTexture();
 
         this._threeCamera.aspect =
@@ -292,10 +289,7 @@ namespace gdjs {
      */
     _updateRenderTexture(): void {
       const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
-      if (
-        !pixiRenderer ||
-        pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
-      ) {
+      if (!pixiRenderer || pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) {
         return;
       }
       if (!this._renderTexture) {
@@ -345,10 +339,7 @@ namespace gdjs {
      */
     private _replaceContainerWithSprite(): void {
       const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
-      if (
-        !pixiRenderer ||
-        pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL
-      ) {
+      if (!pixiRenderer || pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) {
         return;
       }
       this._updateRenderTexture();

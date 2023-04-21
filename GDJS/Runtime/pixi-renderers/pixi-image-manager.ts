@@ -33,7 +33,7 @@ namespace gdjs {
       threeTexture.magFilter = THREE.NearestFilter;
       threeTexture.minFilter = THREE.NearestFilter;
     }
-  }
+  };
 
   const findResourceWithNameAndKind = (
     resources: ResourceData[],
@@ -174,13 +174,17 @@ namespace gdjs {
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
       // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
       const pixiTexture = this.getPIXITexture(resourceName);
-      const pixiRenderer = this._resourcesLoader._runtimeGame.getRenderer().getPIXIRenderer();
-      if (!pixiRenderer) throw new Error("No PIXI renderer was found.");
+      const pixiRenderer = this._resourcesLoader._runtimeGame
+        .getRenderer()
+        .getPIXIRenderer();
+      if (!pixiRenderer) throw new Error('No PIXI renderer was found.');
 
       // @ts-ignore - source does exist on resource.
       const image = pixiTexture.baseTexture.resource.source;
       if (!(image instanceof HTMLImageElement)) {
-        throw new Error(`Can't load texture for resource "${resourceName}" as it's not an image.`);
+        throw new Error(
+          `Can't load texture for resource "${resourceName}" as it's not an image.`
+        );
       }
 
       const threeTexture = new THREE.Texture(image);

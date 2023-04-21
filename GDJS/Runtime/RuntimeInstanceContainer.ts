@@ -628,7 +628,7 @@ namespace gdjs {
      * @param layerName The name of the layer to remove
      */
     removeLayer(layerName: string) {
-      const existingLayer = this._layers.get(layerName)
+      const existingLayer = this._layers.get(layerName);
       if (!existingLayer) return;
 
       const allInstances = this.getAdhocListOfAllInstances();

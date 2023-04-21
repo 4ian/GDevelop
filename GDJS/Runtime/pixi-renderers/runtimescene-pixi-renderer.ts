@@ -31,7 +31,10 @@ namespace gdjs {
     }
 
     _setupThreeScene() {
-      this._threeRenderer = this._runtimeScene.getGame().getRenderer().getThreeRenderer();
+      this._threeRenderer = this._runtimeScene
+        .getGame()
+        .getRenderer()
+        .getThreeRenderer();
       if (this._threeRenderer) {
         this._threeRenderer.autoClear = false;
         if (!this._threeScene) this._threeScene = new THREE.Scene();
@@ -40,12 +43,20 @@ namespace gdjs {
         // We use a mirroring rather than a camera rotation so that the Z order is not changed.
         this._threeScene.scale.y = -1;
 
-        if (!this._threeDummyCamera) this._threeDummyCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+        if (!this._threeDummyCamera)
+          this._threeDummyCamera = new THREE.PerspectiveCamera(
+            45,
+            1,
+            0.1,
+            5000
+          );
       }
     }
 
     onGameResolutionResized() {
-      const pixiRenderer = this._runtimeGameRenderer ? this._runtimeGameRenderer.getPIXIRenderer() : null;
+      const pixiRenderer = this._runtimeGameRenderer
+        ? this._runtimeGameRenderer.getPIXIRenderer()
+        : null;
       if (!pixiRenderer) {
         return;
       }
@@ -58,7 +69,7 @@ namespace gdjs {
       this._pixiContainer.scale.y =
         pixiRenderer.height / runtimeGame.getGameResolutionHeight();
 
-      for(const runtimeLayer of this._runtimeScene._orderedLayers) {
+      for (const runtimeLayer of this._runtimeScene._orderedLayers) {
         runtimeLayer.getRenderer().onGameResolutionResized();
       }
     }
@@ -95,11 +106,11 @@ namespace gdjs {
           this._runtimeScene.getBackgroundColor()
         );
         threeRenderer.clear();
-        threeRenderer.render(threeScene, threeDummyCamera)
+        threeRenderer.render(threeScene, threeDummyCamera);
         pixiRenderer.clearBeforeRender = false;
 
         // Render each layer
-        for(let i = 0; i< this._runtimeScene._orderedLayers.length;++i) {
+        for (let i = 0; i < this._runtimeScene._orderedLayers.length; ++i) {
           const runtimeLayer = this._runtimeScene._orderedLayers[i];
           if (runtimeLayer.isLightingLayer()) continue;
 
@@ -114,9 +125,12 @@ namespace gdjs {
           pixiRenderer.render(pixiContainer);
 
           // Also render the next layer if it's the lighting layer.
-          const nextRuntimeLayer: gdjs.RuntimeLayer | undefined = this._runtimeScene._orderedLayers[i + 1];
+          const nextRuntimeLayer: gdjs.RuntimeLayer | undefined = this
+            ._runtimeScene._orderedLayers[i + 1];
           if (nextRuntimeLayer && nextRuntimeLayer.isLightingLayer()) {
-            const pixiSprite = nextRuntimeLayer.getRenderer().getLightingSprite();
+            const pixiSprite = nextRuntimeLayer
+              .getRenderer()
+              .getLightingSprite();
             if (pixiSprite) {
               pixiRenderer.render(pixiSprite);
             }
@@ -182,7 +196,9 @@ namespace gdjs {
     hideCursor(): void {
       this._showCursorAtNextRender = false;
 
-      const canvas = this._runtimeGameRenderer ? this._runtimeGameRenderer.getCanvas() : null;
+      const canvas = this._runtimeGameRenderer
+        ? this._runtimeGameRenderer.getCanvas()
+        : null;
       if (canvas) canvas.style.cursor = 'none';
     }
 
@@ -204,7 +220,9 @@ namespace gdjs {
 
     /** @deprecated use `runtimeGame.getRenderer().getPIXIRenderer()` instead */
     getPIXIRenderer() {
-      return this._runtimeGameRenderer ? this._runtimeGameRenderer.getPIXIRenderer() : null;
+      return this._runtimeGameRenderer
+        ? this._runtimeGameRenderer.getPIXIRenderer()
+        : null;
     }
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {

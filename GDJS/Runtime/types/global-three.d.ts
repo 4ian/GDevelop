@@ -1,4 +1,3 @@
 import * as THREE from 'three';
 
-export as namespace THREE
-
+export as namespace THREE;

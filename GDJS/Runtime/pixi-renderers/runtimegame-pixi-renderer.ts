@@ -80,7 +80,10 @@ namespace gdjs {
         this._pixiRenderer.backgroundAlpha = 0;
         this._threeRenderer = new THREE.WebGLRenderer({});
         // this._threeRenderer.setPixelRatio(0.05);
-        this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
+        this._threeRenderer.setSize(
+          this._game.getGameResolutionWidth(),
+          this._game.getGameResolutionHeight()
+        );
 
         gameCanvas = this._threeRenderer.domElement;
       } else {
@@ -135,10 +138,8 @@ namespace gdjs {
       // Handle scale mode.
       if (this._game.getScaleMode() === 'nearest') {
         gameCanvas.style['image-rendering'] = '-moz-crisp-edges';
-        gameCanvas.style['image-rendering'] =
-          '-webkit-optimize-contrast';
-        gameCanvas.style['image-rendering'] =
-          '-webkit-crisp-edges';
+        gameCanvas.style['image-rendering'] = '-webkit-optimize-contrast';
+        gameCanvas.style['image-rendering'] = '-webkit-crisp-edges';
         gameCanvas.style['image-rendering'] = 'pixelated';
       }
 
@@ -228,14 +229,18 @@ namespace gdjs {
         );
 
         if (this._threeRenderer) {
-          this._threeRenderer.setSize(this._game.getGameResolutionWidth(), this._game.getGameResolutionHeight());
+          this._threeRenderer.setSize(
+            this._game.getGameResolutionWidth(),
+            this._game.getGameResolutionHeight()
+          );
 
           // Update the texture that is used by Three.js to render the 2D PixiJS rendering.
           // TODO (3D) - optimization: this could be optimized by using a render texture instead of a canvas.
           // This implies to share the same WebGL context between PixiJS and Three.js.
           const pixiCanvas = this._pixiRenderer.view;
-          if (this._threePixiCanvasTexture) this._threePixiCanvasTexture.dispose();
-          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas)
+          if (this._threePixiCanvasTexture)
+            this._threePixiCanvasTexture.dispose();
+          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
         }
       }
 
@@ -490,7 +495,7 @@ namespace gdjs {
         pos[1] *=
           this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
         return pos;
-      }
+      };
 
       const isInsideCanvas = (e: MouseEvent | Touch) => {
         const x = e.pageX - canvas.offsetLeft;
@@ -502,7 +507,7 @@ namespace gdjs {
           0 <= y &&
           y < (this._canvasHeight || 1)
         );
-      }
+      };
 
       //Some browsers lacks definition of some variables used to do calculations
       //in getEventPosition. They are defined to 0 as they are useless.

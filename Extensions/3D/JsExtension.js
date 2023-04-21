@@ -276,12 +276,12 @@ module.exports = {
         'ThreeDShapeObject',
         _('3D Shape'),
         _('A 3D shape.'),
-        'JsPlatform/Extensions/text_input.svg', // TODO
+        'JsPlatform/Extensions/text_input.svg', // TODO (3D) - make or choose a proper icon for this.
         threeDShapeObject
       )
       .setCategoryFullName(_('3D'))
       .addUnsupportedBaseObjectCapability('effect')
-      // .addUnsupportedBaseObjectCapability('effect') // TODO: more unsupported features?
+      // .addUnsupportedBaseObjectCapability('effect') // TODO: are there more unsupported features?
       .setIncludeFile('Extensions/3D/threedshaperuntimeobject.js')
       .addIncludeFile(
         'Extensions/3D/threedshaperuntimeobject-pixi-renderer.js'
@@ -296,7 +296,7 @@ module.exports = {
         _('the Z position (the "elevation")'),
         _('the Z position'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
@@ -311,7 +311,7 @@ module.exports = {
         _('the depth (size on Z axis)'),
         _('the depth'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
@@ -326,7 +326,7 @@ module.exports = {
         _('the rotation on X axis'),
         _('the rotation on X axis'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
@@ -341,7 +341,7 @@ module.exports = {
         _('the rotation on Y axis'),
         _('the rotation on Y axis'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
@@ -356,7 +356,7 @@ module.exports = {
         _('the face visibility'), // TODO (3D) - face visibility: fix the sentence.
         _('the _PARAM1_ face visibility'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
       .addParameter(
@@ -379,8 +379,8 @@ module.exports = {
         _('Change the image of the face'),
         _('Change the image of _PARAM1_ face of _PARAM0_ to _PARAM2_'),
         '',
-        'res/conditions/text24_black.png', //TODO
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png', // TODO (3D) - make or choose a proper icon for this.
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
       .addParameter(
@@ -400,7 +400,7 @@ module.exports = {
         _('the camera position on Z axis'),
         _('the camera position on Z axis'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
@@ -421,7 +421,7 @@ module.exports = {
         _('the camera rotation on X axis'),
         _('the camera rotation on X axis'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters(
@@ -447,7 +447,7 @@ module.exports = {
         _('the camera rotation on Y axis'),
         _('the camera rotation on Y axis'),
         '',
-        'res/conditions/text24_black.png' //TODO
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
       )
       .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters(

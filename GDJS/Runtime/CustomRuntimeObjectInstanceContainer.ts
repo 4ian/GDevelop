@@ -45,10 +45,7 @@ namespace gdjs {
 
     addLayer(layerData: LayerData) {
       const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
-      this._layers.put(
-        layerData.name,
-        layer
-      );
+      this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
     }
 

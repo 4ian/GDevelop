@@ -79,7 +79,7 @@ namespace gdjs {
         // TODO (3D) - optimization: use FrontSide instead of DoubleSide if no transparent textures and all face are shown.
         side: THREE.DoubleSide,
         transparent: true,
-      })
+      });
     }
 
     updateFace(faceIndex: integer) {
@@ -119,8 +119,6 @@ namespace gdjs {
     }
   }
 
-  export const ThreeDShapeRuntimeObjectRenderer =
-    ThreeDShapeRuntimeObjectPixiRenderer;
-  export type ThreeDShapeRuntimeObjectRenderer =
-    ThreeDShapeRuntimeObjectPixiRenderer;
+  export const ThreeDShapeRuntimeObjectRenderer = ThreeDShapeRuntimeObjectPixiRenderer;
+  export type ThreeDShapeRuntimeObjectRenderer = ThreeDShapeRuntimeObjectPixiRenderer;
 }

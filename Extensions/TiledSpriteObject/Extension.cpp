@@ -211,8 +211,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetXOffset");
 
   obj.AddExpression("XOffset",
-                    _("Get X offset"),
-                    _("Get the X offset of the texture of the tiled sprite."),
+                    _("Image X Offset"),
+                    _("Return the offset used on the X axis when displaying the image."),
                     _("Image offset"),
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite");
@@ -247,8 +247,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetYOffset");
 
   obj.AddExpression("YOffset",
-                    _("Get Y offset"),
-                    _("Get the Y offset of the texture of the tiled sprite."),
+                    _("Image Y Offset"),
+                    _("Return the offset used on the Y axis when displaying the image."),
                     _("Image offset"),
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "TiledSprite");

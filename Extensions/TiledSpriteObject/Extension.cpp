@@ -210,6 +210,13 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetXOffset");
 
+  obj.AddExpression("XOffset",
+                    _("Get X offset"),
+                    _("Get the X offset of the texture of the tiled sprite."),
+                    _("Image offset"),
+                    "res/actions/scaleWidth_black.png")
+      .AddParameter("object", _("Object"), "TiledSprite");
+
   obj.AddAction(
          "YOffset",
          _("Image Y Offset"),
@@ -238,4 +245,11 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetYOffset");
+
+  obj.AddExpression("YOffset",
+                    _("Get Y offset"),
+                    _("Get the Y offset of the texture of the tiled sprite."),
+                    _("Image offset"),
+                    "res/actions/scaleWidth_black.png")
+      .AddParameter("object", _("Object"), "TiledSprite");
 }

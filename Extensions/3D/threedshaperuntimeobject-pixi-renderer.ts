@@ -35,7 +35,7 @@ namespace gdjs {
   class ThreeDShapeRuntimeObjectPixiRenderer {
     private _object: gdjs.ThreeDShapeRuntimeObject;
     private _runtimeGame: gdjs.RuntimeGame;
-    private _box: THREE.Mesh;
+    private _boxMesh: THREE.Mesh;
 
     constructor(
       runtimeObject: gdjs.ThreeDShapeRuntimeObject,
@@ -55,7 +55,7 @@ namespace gdjs {
         this._getFaceMaterial(materialIndexToFaceIndex[4]),
         this._getFaceMaterial(materialIndexToFaceIndex[5]),
       ];
-      this._box = new THREE.Mesh(geometry, materials);
+      this._boxMesh = new THREE.Mesh(geometry, materials);
 
       this.updateSize();
       this.updatePosition();
@@ -64,7 +64,7 @@ namespace gdjs {
       instanceContainer
         .getLayer('')
         .getRenderer()
-        .add3dRendererObject(this._box);
+        .add3dRendererObject(this._boxMesh);
     }
 
     _getFaceMaterial(faceIndex: integer) {
@@ -86,15 +86,15 @@ namespace gdjs {
       const materialIndex = faceIndexToMaterialIndex[faceIndex];
       if (materialIndex === undefined) return;
 
-      this._box.material[materialIndex] = this._getFaceMaterial(faceIndex);
+      this._boxMesh.material[materialIndex] = this._getFaceMaterial(faceIndex);
     }
 
     get3dRendererObject() {
-      return this._box;
+      return this._boxMesh;
     }
 
     updatePosition() {
-      this._box.position.set(
+      this._boxMesh.position.set(
         this._object.x + this._object.getWidth() / 2,
         this._object.y + this._object.getHeight() / 2,
         this._object.getZ() + this._object.getDepth() / 2
@@ -102,7 +102,7 @@ namespace gdjs {
     }
 
     updateRotation() {
-      this._box.rotation.set(
+      this._boxMesh.rotation.set(
         gdjs.toRad(this._object.getRotationX()),
         gdjs.toRad(this._object.getRotationY()),
         gdjs.toRad(this._object.angle)
@@ -110,7 +110,7 @@ namespace gdjs {
     }
 
     updateSize() {
-      this._box.scale.set(
+      this._boxMesh.scale.set(
         this._object.getWidth(),
         this._object.getHeight(),
         this._object.getDepth()

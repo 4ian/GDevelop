@@ -39,7 +39,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
-  fallbackResourceKind?: ResourceKind,
+  fallbackResourceKind?: ?ResourceKind,
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,

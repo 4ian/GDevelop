@@ -49,14 +49,14 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     this._pixiObject.clear();
     this._pixiObject.beginFill(0x0033ff);
     this._pixiObject.lineStyle(1, 0xffd900, 1);
-    this._pixiObject.moveTo(- width /2 , - height /2);
-    this._pixiObject.lineTo(width /2 , - height /2);
-    this._pixiObject.lineTo(width /2 , height /2);
-    this._pixiObject.lineTo(- width /2 , height /2);
+    this._pixiObject.moveTo(-width / 2, -height / 2);
+    this._pixiObject.lineTo(width / 2, -height / 2);
+    this._pixiObject.lineTo(width / 2, height / 2);
+    this._pixiObject.lineTo(-width / 2, height / 2);
     this._pixiObject.endFill();
 
-    this._pixiObject.position.x = this._instance.getX() + width/2;
-    this._pixiObject.position.y = this._instance.getY() + height/2;
+    this._pixiObject.position.x = this._instance.getX() + width / 2;
+    this._pixiObject.position.y = this._instance.getY() + height / 2;
     this._pixiObject.rotation = (this._instance.getAngle() * Math.PI) / 180.0;
   }
 }

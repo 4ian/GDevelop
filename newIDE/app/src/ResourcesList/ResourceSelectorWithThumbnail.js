@@ -20,6 +20,7 @@ type Props = {|
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
   helperMarkdownText?: ?string,
+  fallbackResourceKind?: ResourceKind,
 |};
 
 const ResourceSelectorWithThumbnail = ({
@@ -31,6 +32,7 @@ const ResourceSelectorWithThumbnail = ({
   floatingLabelText,
   hintText,
   helperMarkdownText,
+  fallbackResourceKind,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const itemsAlignment = windowWidth === 'small' ? 'center' : 'flex-end';
@@ -54,6 +56,7 @@ const ResourceSelectorWithThumbnail = ({
         floatingLabelText={floatingLabelText}
         hintText={hintText}
         helperMarkdownText={helperMarkdownText}
+        fallbackResourceKind={fallbackResourceKind}
       />
     </LineStackLayout>
   );

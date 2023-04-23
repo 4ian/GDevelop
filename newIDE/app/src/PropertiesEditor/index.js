@@ -4,7 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import ResourceSelector from '../ResourcesList/ResourceSelector';
+import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import ResourcesLoader from '../ResourcesLoader';
 import Subheader from '../UI/Subheader';
 import SelectField from '../UI/SelectField';
@@ -549,15 +549,13 @@ const PropertiesEditor = ({
 
     const { setValue } = field;
     return (
-      <ResourceSelector
+      <ResourceSelectorWithThumbnail
         key={field.name}
         project={project}
         resourceManagementProps={resourceManagementProps}
-        resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fallbackResourceKind={field.fallbackResourceKind}
-        fullWidth
-        initialResourceName={getFieldValue({
+        resourceName={getFieldValue({
           instances,
           field,
           defaultValue: '(Multiple values)', //TODO

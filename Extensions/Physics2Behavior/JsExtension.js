@@ -758,7 +758,7 @@ module.exports = {
 
     aut
       .addAction(
-        'SetSleepingAllowed',
+        'SetSleepingaAllowed',
         _('Sleeping allowed'),
         _(
           'Allow or not an object to sleep. If enabled the object will be able to sleep, improving performance for non-currently-moving objects.'
@@ -774,6 +774,9 @@ module.exports = {
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
+    
+    // Deprecated action (fixed typo):
+    aut.addDuplicatedAction("SetSleepingaAllowed", "SetSleepingAllowed").SetHidden();
 
     aut
       .addCondition(

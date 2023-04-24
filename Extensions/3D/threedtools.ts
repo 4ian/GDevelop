@@ -168,6 +168,64 @@ namespace gdjs {
         threeCamera.far = Math.max(distance, threeCamera.near);
         layerRenderer.setThreeCameraDirty(true);
       };
+
+      export const getFov = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return 45;
+        return threeCamera.fov;
+      };
+
+      export const setFov = (
+        runtimeScene: RuntimeScene,
+        angle: float,
+        layerName: string,
+        cameraIndex: integer
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return;
+
+        threeCamera.fov = Math.min(Math.max(angle, 0), 180);
+        layerRenderer.setThreeCameraDirty(true);
+      };
+
+      export const getAspectRatio = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return 1;
+        return threeCamera.aspect;
+      };
+
+      export const setAspectRatio = (
+        runtimeScene: RuntimeScene,
+        aspect: float,
+        layerName: string,
+        cameraIndex: integer
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return;
+
+        threeCamera.aspect = Math.max(aspect, 0);
+        layerRenderer.setThreeCameraDirty(true);
+      };
     }
   }
 }

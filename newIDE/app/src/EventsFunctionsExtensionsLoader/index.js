@@ -439,8 +439,6 @@ const generateFreeFunctionMetadata = (
   );
   instructionOrExpression.setIncludeFile(functionFile);
 
-  // console.log("codeGenerationContext.extensionIncludeFiles:");
-  // console.log(codeGenerationContext.extensionIncludeFiles);
   // Always include the extension include files when using a free function.
   codeGenerationContext.extensionIncludeFiles.forEach(includeFile => {
     instructionOrExpression.addIncludeFile(includeFile);

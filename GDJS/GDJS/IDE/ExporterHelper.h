@@ -152,8 +152,8 @@ struct PreviewExportOptions {
   }
 
   /**
-   * Set the token to use by the game engine when requiring any resource stored on
-   * GDevelop Cloud buckets. Note that this is only useful during previews.
+   * Set the token to use by the game engine when requiring any resource stored
+   * on GDevelop Cloud buckets. Note that this is only useful during previews.
    */
   PreviewExportOptions &SetGDevelopResourceToken(
       const gd::String &gdevelopResourceToken_) {

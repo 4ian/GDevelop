@@ -116,7 +116,7 @@ namespace gdjs {
       let ready = false;
 
       /**
-       * True if an error occured.
+       * True if an error occurred.
        */
       let error = false;
 

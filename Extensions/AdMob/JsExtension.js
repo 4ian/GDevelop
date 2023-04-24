@@ -181,7 +181,7 @@ module.exports = {
       )
       .addParameter(
         'yesorno',
-        _('Display in landscape? (portait otherwise)'),
+        _('Display in landscape? (portrait otherwise)'),
         '',
         false
       )

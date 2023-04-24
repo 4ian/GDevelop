@@ -17,7 +17,6 @@
 #include "GDJS/Events/CodeGeneration/ObjectCodeGenerator.h"
 #include <regex>
 
-
 namespace gdjs {
 
 /**
@@ -96,20 +95,19 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
 gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
     gd::PlatformExtension &extension,
     const gd::EventsBasedObject &eventsBasedObject) {
-  auto
-      &objectMetadata =
-          extension
-              .AddEventsBasedObject(eventsBasedObject.GetName(),
-                                    eventsBasedObject.GetFullName() ||
-                                        eventsBasedObject.GetName(),
-                                    eventsBasedObject.GetDescription(),
-                                    GetExtensionIconUrl(extension))
-              // TODO Change the metadata model to only set a category on the
-              // extension. If an extension has behavior or object across
-              // several categories, we can assume it"s not scoped correctly.
-              // Note: We shouldn"t rely on gdPlatformExtension but this line
-              // will be removed soon.
-              .SetCategoryFullName(extension.GetCategory());
+  auto &objectMetadata =
+      extension
+          .AddEventsBasedObject(eventsBasedObject.GetName(),
+                                eventsBasedObject.GetFullName() ||
+                                    eventsBasedObject.GetName(),
+                                eventsBasedObject.GetDescription(),
+                                GetExtensionIconUrl(extension))
+          // TODO Change the metadata model to only set a category on the
+          // extension. If an extension has behavior or object across
+          // several categories, we can assume it"s not scoped correctly.
+          // Note: We shouldn"t rely on gdPlatformExtension but this line
+          // will be removed soon.
+          .SetCategoryFullName(extension.GetCategory());
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.
@@ -403,8 +401,7 @@ MetadataDeclarationHelper::DeclareExpressionMetadata(
         RemoveTrailingDot(eventsFunction.GetDescription()) ||
             eventsFunction.GetFullName(),
         // An operator and an operand are inserted before user parameters.
-        ShiftSentenceParamIndexes(
-            CapitalizeFirstLetter(eventsFunction.GetSentence()), 2),
+        ShiftSentenceParamIndexes(eventsFunction.GetSentence(), 2),
         eventsFunction.GetGroup(), GetExtensionIconUrl(extension));
     // By convention, first parameter is always the Runtime Scene.
     expressionAndCondition.AddCodeOnlyParameter("currentScene", "");
@@ -593,8 +590,7 @@ MetadataDeclarationHelper::DeclareBehaviorExpressionMetadata(
         RemoveTrailingDot(eventsFunction.GetDescription()) ||
             eventsFunction.GetFullName(),
         // An operator and an operand are inserted before user parameters.
-        ShiftSentenceParamIndexes(
-            CapitalizeFirstLetter(eventsFunction.GetSentence()), 2),
+        ShiftSentenceParamIndexes(eventsFunction.GetSentence(), 2),
         eventsFunction.GetGroup() || eventsBasedBehavior.GetFullName() ||
             eventsBasedBehavior.GetName(),
         GetExtensionIconUrl(extension));
@@ -765,8 +761,7 @@ MetadataDeclarationHelper::DeclareObjectExpressionMetadata(
         RemoveTrailingDot(eventsFunction.GetDescription()) ||
             eventsFunction.GetFullName(),
         // An operator and an operand are inserted before user parameters.
-        ShiftSentenceParamIndexes(
-            CapitalizeFirstLetter(eventsFunction.GetSentence()), 2),
+        ShiftSentenceParamIndexes(eventsFunction.GetSentence(), 2),
         eventsFunction.GetGroup() || eventsBasedObject.GetFullName() ||
             eventsBasedObject.GetName(),
         GetExtensionIconUrl(extension));

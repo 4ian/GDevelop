@@ -180,7 +180,8 @@ describe('MetadataDeclarationHelper', () => {
     const condition = extension.getAllConditions().get('Value');
     expect(condition.getFullName()).toBe('Some value');
     expect(condition.getDescription()).toBe('Compare some value.');
-    expect(condition.getSentence()).toBe('Some value _PARAM1_ _PARAM2_');
+    // The IDE fixes the first letter case.
+    expect(condition.getSentence()).toBe('some value _PARAM1_ _PARAM2_');
 
     extension.delete();
     project.delete();
@@ -446,8 +447,9 @@ describe('MetadataDeclarationHelper', () => {
       .get('MyBehavior::Value');
     expect(condition.getFullName()).toBe('Some value');
     expect(condition.getDescription()).toBe('Compare some value.');
+    // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'Some value of _PARAM0_ _PARAM2_ _PARAM3_'
+      'some value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
 
     expect(condition.getParametersCount()).toBe(5);
@@ -580,9 +582,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getParametersCount()).toBe(4);
     expect(action.getParameter(0).getType()).toBe('object');
     expect(action.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(action.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(action.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
     expect(action.getParameter(2).getType()).toBe('operator');
     expect(action.getParameter(3).getType()).toBe('string');
 
@@ -596,7 +596,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe(
       'Compare the property value for the some value.'
     );
-    // TODO Check why does it starts with a lower case.
+    // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
       'the property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
@@ -606,9 +606,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getParametersCount()).toBe(4);
     expect(condition.getParameter(0).getType()).toBe('object');
     expect(condition.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(condition.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
     expect(condition.getParameter(2).getType()).toBe('relationalOperator');
     expect(condition.getParameter(3).getType()).toBe('string');
 
@@ -627,9 +625,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(expression.getParametersCount()).toBe(2);
     expect(expression.getParameter(0).getType()).toBe('object');
     expect(expression.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(expression.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
 
     extension.delete();
     project.delete();
@@ -693,9 +689,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getParametersCount()).toBe(3);
     expect(action.getParameter(0).getType()).toBe('object');
     expect(action.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(action.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(action.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
     expect(action.getParameter(2).getType()).toBe('yesorno');
 
     expect(
@@ -708,7 +702,6 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe(
       'Check the property value for some value.'
     );
-    // TODO Check why does it starts with a lower case.
     expect(condition.getSentence()).toBe(
       'Property some value of _PARAM0_ is true'
     );
@@ -718,9 +711,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getParametersCount()).toBe(2);
     expect(condition.getParameter(0).getType()).toBe('object');
     expect(condition.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(condition.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
 
     extension.delete();
     project.delete();
@@ -775,9 +766,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getParametersCount()).toBe(4);
     expect(action.getParameter(0).getType()).toBe('object');
     expect(action.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(action.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(action.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
     expect(action.getParameter(2).getType()).toBe('operator');
     expect(action.getParameter(3).getType()).toBe('string');
 
@@ -791,7 +780,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe(
       'Compare the property value for the some value.'
     );
-    // TODO Check why does it starts with a lower case.
+    // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
       'the property value for the some value of _PARAM0_ _PARAM2_ _PARAM3_'
     );
@@ -801,9 +790,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getParametersCount()).toBe(4);
     expect(condition.getParameter(0).getType()).toBe('object');
     expect(condition.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(condition.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
     expect(condition.getParameter(2).getType()).toBe('relationalOperator');
     expect(condition.getParameter(3).getType()).toBe('string');
 
@@ -822,9 +809,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(expression.getParametersCount()).toBe(2);
     expect(expression.getParameter(0).getType()).toBe('object');
     expect(expression.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(expression.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
 
     extension.delete();
     project.delete();
@@ -880,9 +865,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(action.getParametersCount()).toBe(3);
     expect(action.getParameter(0).getType()).toBe('object');
     expect(action.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(action.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(action.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
     expect(action.getParameter(2).getType()).toBe('yesorno');
 
     expect(
@@ -895,7 +878,6 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe(
       'Check the property value for some value.'
     );
-    // TODO Check why does it starts with a lower case.
     expect(condition.getSentence()).toBe(
       'Property some value of _PARAM0_ is true'
     );
@@ -905,9 +887,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getParametersCount()).toBe(2);
     expect(condition.getParameter(0).getType()).toBe('object');
     expect(condition.getParameter(1).getType()).toBe('behavior');
-    // TODO Check if there is actually no extension prefix.
     expect(condition.getParameter(1).getExtraInfo()).toBe('MyBehavior');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyBehavior");
 
     extension.delete();
     project.delete();
@@ -1214,8 +1194,9 @@ describe('MetadataDeclarationHelper', () => {
     const condition = objectMetadata.getAllConditions().get('MyObject::Value');
     expect(condition.getFullName()).toBe('Some value');
     expect(condition.getDescription()).toBe('Compare some value.');
+    // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
-      'Some value of _PARAM0_ _PARAM1_ _PARAM2_'
+      'some value of _PARAM0_ _PARAM1_ _PARAM2_'
     );
 
     expect(condition.getParametersCount()).toBe(4);
@@ -1335,9 +1316,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(action.getParametersCount()).toBe(3);
     expect(action.getParameter(0).getType()).toBe('object');
-    // TODO Check if there is actually no extension prefix.
     expect(action.getParameter(0).getExtraInfo()).toBe('MyObject');
-    //expect(action.getParameter(0).getExtraInfo()).toBe("MyExtension::MyObject");
     expect(action.getParameter(1).getType()).toBe('operator');
     expect(action.getParameter(2).getType()).toBe('string');
 
@@ -1351,7 +1330,7 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe(
       'Compare the property value for the some value.'
     );
-    // TODO Check why does it starts with a lower case.
+    // The IDE fixes the first letter case.
     expect(condition.getSentence()).toBe(
       'the property value for the some value of _PARAM0_ _PARAM1_ _PARAM2_'
     );
@@ -1360,9 +1339,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(condition.getParametersCount()).toBe(3);
     expect(condition.getParameter(0).getType()).toBe('object');
-    // TODO Check if there is actually no extension prefix.
     expect(condition.getParameter(0).getExtraInfo()).toBe('MyObject');
-    //expect(condition.getParameter(1).getExtraInfo()).toBe("MyExtension::MyObject");
     expect(condition.getParameter(1).getType()).toBe('relationalOperator');
     expect(condition.getParameter(2).getType()).toBe('string');
 
@@ -1380,9 +1357,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(expression.getParametersCount()).toBe(1);
     expect(expression.getParameter(0).getType()).toBe('object');
-    // TODO Check if there is actually no extension prefix.
     expect(expression.getParameter(0).getExtraInfo()).toBe('MyObject');
-    //expect(condition.getParameter(0).getExtraInfo()).toBe("MyExtension::MyObject");
 
     extension.delete();
     project.delete();
@@ -1435,9 +1410,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(action.getParametersCount()).toBe(2);
     expect(action.getParameter(0).getType()).toBe('object');
-    // TODO Check if there is actually no extension prefix.
     expect(action.getParameter(0).getExtraInfo()).toBe('MyObject');
-    //expect(action.getParameter(0).getExtraInfo()).toBe("MyExtension::MyObject");
     expect(action.getParameter(1).getType()).toBe('yesorno');
 
     expect(
@@ -1450,7 +1423,6 @@ describe('MetadataDeclarationHelper', () => {
     expect(condition.getDescription()).toBe(
       'Check the property value for some value.'
     );
-    // TODO Check why does it starts with a lower case.
     expect(condition.getSentence()).toBe(
       'Property some value of _PARAM0_ is true'
     );
@@ -1459,9 +1431,7 @@ describe('MetadataDeclarationHelper', () => {
 
     expect(condition.getParametersCount()).toBe(1);
     expect(condition.getParameter(0).getType()).toBe('object');
-    // TODO Check if there is actually no extension prefix.
     expect(condition.getParameter(0).getExtraInfo()).toBe('MyObject');
-    //expect(condition.getParameter(0).getExtraInfo()).toBe("MyExtension::MyObject");
 
     extension.delete();
     project.delete();

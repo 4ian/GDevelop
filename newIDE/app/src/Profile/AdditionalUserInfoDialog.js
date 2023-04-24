@@ -130,7 +130,7 @@ const personalOrStudentCreationGoalOptions = [
   { value: 'learn-gamedev', label: t`Learn Game Development principles` },
   { value: 'create-fun', label: t`Create games for fun` },
   { value: 'create-community', label: t`Create games for my community` },
-  { value: 'create-money', label: t`Create games for monetisation` },
+  { value: 'create-money', label: t`Create games for monetization` },
   { value: 'other', label: t`Other` },
 ];
 
@@ -414,8 +414,8 @@ const AdditionalUserInfoDialog = ({
             <SelectField
               floatingLabelText={formFields.creationExperience.title}
               value={creationExperience}
-              onChange={(e, i, newCreationExpersience: string) => {
-                setCreationExperience(newCreationExpersience);
+              onChange={(e, i, newCreationExperience: string) => {
+                setCreationExperience(newCreationExperience);
               }}
               {...selectFieldCommonProps}
             >

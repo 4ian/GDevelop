@@ -130,7 +130,7 @@ const personalOrStudentCreationGoalOptions = [
   { value: 'learn-gamedev', label: t`Learn Game Development principles` },
   { value: 'create-fun', label: t`Create games for fun` },
   { value: 'create-community', label: t`Create games for my community` },
-  { value: 'create-money', label: t`Create games for monetisation` },
+  { value: 'create-money', label: t`Create games for monetization` },
   { value: 'other', label: t`Other` },
 ];
 

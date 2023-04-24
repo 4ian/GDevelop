@@ -90,7 +90,7 @@ const CollisionMasksEditor = ({
     spriteIndex
   );
 
-  // Note: sprite should always be defined so this value will be correctly initialised.
+  // Note: sprite should always be defined so this value will be correctly initialized.
   const [
     sameCollisionMasksForAnimations,
     setSameCollisionMasksForAnimations,
@@ -105,7 +105,7 @@ const CollisionMasksEditor = ({
       : false
   );
 
-  // Note: sprite & animation should always be defined so this value will be correctly initialised.
+  // Note: sprite & animation should always be defined so this value will be correctly initialized.
   const [
     sameCollisionMasksForSprites,
     setSameCollisionMasksForSprites,

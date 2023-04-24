@@ -444,7 +444,7 @@ namespace gdjs {
         super._updateObjectsPreRender();
         return;
       } else {
-        // After first frame, optimise rendering by setting only objects
+        // After first frame, optimize rendering by setting only objects
         // near camera as visible.
         // TODO: For compatibility, pass a scale of `2`,
         // meaning that size of cameras will be multiplied by 2 and so objects

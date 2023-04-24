@@ -465,6 +465,54 @@ module.exports = {
       .setGetter('gdjs.threeD.camera.getCameraRotationY')
       .setIncludeFile('Extensions/3D/threedtools.js');
 
+    extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'CameraNearPlane',
+        _('Camera near plane'),
+        _('the camera near plane distance'),
+        _('the camera near plane distance'),
+        '',
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Distance (> 0)'))
+      )
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .markAsAdvanced()
+      .setFunctionName('gdjs.threeD.camera.setNearPlane')
+      .setGetter('gdjs.threeD.camera.getNearPlane')
+      .setIncludeFile('Extensions/3D/threedtools.js');
+
+    extension
+      .addExpressionAndConditionAndAction(
+        'number',
+        'CameraFarPlane',
+        _('Camera far plane'),
+        _('the camera far plane distance'),
+        _('the camera far plane distance'),
+        '',
+        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Distance (> 0)'))
+      )
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .markAsAdvanced()
+      .setFunctionName('gdjs.threeD.camera.setFarPlane')
+      .setGetter('gdjs.threeD.camera.getFarPlane')
+      .setIncludeFile('Extensions/3D/threedtools.js');
+
     return extension;
   },
   /**

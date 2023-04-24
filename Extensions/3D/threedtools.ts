@@ -103,6 +103,71 @@ namespace gdjs {
 
         threeCamera.rotation.y = gdjs.toRad(angle);
       };
+
+      export const getNearPlane = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return 0;
+        return threeCamera.near;
+      };
+
+      export const setNearPlane = (
+        runtimeScene: RuntimeScene,
+        distance: float,
+        layerName: string,
+        cameraIndex: integer
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return;
+
+        threeCamera.near = Math.min(
+          // 0 is not a valid value for three js perspective camera:
+          // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.
+          Math.max(distance, 0.0001),
+          // Near value cannot exceed far value.
+          threeCamera.far
+        );
+        layerRenderer.setThreeCameraDirty(true);
+      };
+
+      export const getFarPlane = (
+        runtimeScene: RuntimeScene,
+        layerName: string,
+        cameraIndex: integer
+      ): float => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return 0;
+        return threeCamera.far;
+      };
+
+      export const setFarPlane = (
+        runtimeScene: RuntimeScene,
+        distance: float,
+        layerName: string,
+        cameraIndex: integer
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return;
+
+        // Far value cannot be lower than near value
+        threeCamera.far = Math.max(distance, threeCamera.near);
+        layerRenderer.setThreeCameraDirty(true);
+      };
     }
   }
 }

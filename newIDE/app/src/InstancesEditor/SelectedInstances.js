@@ -222,7 +222,7 @@ export default class SelectedInstances {
     let y1 = 0;
     let x2 = 0;
     let y2 = 0;
-    let initialised = false;
+    let initialized = false;
 
     // Update the selection rectangle of each instance.
     for (var i = 0; i < selection.length; i++) {
@@ -260,12 +260,12 @@ export default class SelectedInstances {
       if (instance.isLocked()) {
         continue;
       }
-      if (!initialised) {
+      if (!initialized) {
         x1 = instanceRect.left;
         y1 = instanceRect.top;
         x2 = instanceRect.left + instanceRect.width();
         y2 = instanceRect.top + instanceRect.height();
-        initialised = true;
+        initialized = true;
       } else {
         if (instanceRect.left < x1) x1 = instanceRect.left;
         if (instanceRect.top < y1) y1 = instanceRect.top;

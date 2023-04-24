@@ -31,6 +31,7 @@ namespace gdjs {
     private _threePlaneGeometry: THREE.PlaneGeometry | null = null;
     private _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
     private _threePlaneMesh: THREE.Mesh | null = null;
+    private _threeCameraDirty: boolean = false;
 
     /**
      * Pixi doesn't sort children with zIndex == 0.
@@ -114,6 +115,10 @@ namespace gdjs {
 
         this.onGameResolutionResized();
       }
+    }
+
+    setThreeCameraDirty(enable: boolean) {
+      this._threeCameraDirty = enable;
     }
 
     onGameResolutionResized() {
@@ -227,6 +232,13 @@ namespace gdjs {
     }
 
     updatePreRender(): void {
+      if (this._threeCameraDirty) {
+        const camera = this.getThreeCamera();
+        if (camera) {
+          camera.updateProjectionMatrix();
+        }
+        this._threeCameraDirty = false;
+      }
       if (this._renderTexture) {
         this._updateRenderTexture();
       }

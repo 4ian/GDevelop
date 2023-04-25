@@ -27,6 +27,7 @@ namespace gdjs {
 
     _threeGroup: THREE.Group | null = null;
 
+    private _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
     private _threeCamera: THREE.PerspectiveCamera | null = null;
     private _threePlaneGeometry: THREE.PlaneGeometry | null = null;
     private _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
@@ -77,6 +78,10 @@ namespace gdjs {
       return this._threeCamera;
     }
 
+    getThreePixiCanvasTexture(): THREE.Texture | null {
+      return this._threePixiCanvasTexture;
+    }
+
     getLightingSprite(): PIXI.Sprite | null {
       return this._lightingSprite;
     }
@@ -123,7 +128,20 @@ namespace gdjs {
 
     onGameResolutionResized() {
       if (this._threeCamera && this._threePlaneMaterial) {
-        this._threePlaneMaterial.map = this._runtimeGameRenderer.getThreePixiCanvasTexture();
+        if (this._threePixiCanvasTexture) {
+          // Game size was changed, dispose of the old texture used to read the PixiJS Canvas.
+          this._threePixiCanvasTexture.dispose();
+        }
+
+        const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
+        if (pixiRenderer) {
+          // And recreate a new texture to project on the plane.
+          // TODO (3D) - optimization: could be optimized by using a render texture instead of a canvas.
+          // (Implies to share the same WebGL context between PixiJS and three.js).
+          const pixiCanvas = pixiRenderer.view;
+          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
+          this._threePlaneMaterial.map = this._threePixiCanvasTexture;
+        }
 
         this._threeCamera.aspect =
           this._layer.getWidth() / this._layer.getHeight();

@@ -30,7 +30,6 @@ namespace gdjs {
 
     _pixiRenderer: PIXI.Renderer | null = null;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
-    private _threePixiCanvasTexture: THREE.CanvasTexture | null = null;
     private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
 
@@ -233,14 +232,6 @@ namespace gdjs {
             this._game.getGameResolutionWidth(),
             this._game.getGameResolutionHeight()
           );
-
-          // Update the texture that is used by Three.js to render the 2D PixiJS rendering.
-          // TODO (3D) - optimization: this could be optimized by using a render texture instead of a canvas.
-          // This implies to share the same WebGL context between PixiJS and Three.js.
-          const pixiCanvas = this._pixiRenderer.view;
-          if (this._threePixiCanvasTexture)
-            this._threePixiCanvasTexture.dispose();
-          this._threePixiCanvasTexture = new THREE.CanvasTexture(pixiCanvas);
         }
       }
 
@@ -811,14 +802,6 @@ namespace gdjs {
      */
     getThreeRenderer(): THREE.WebGLRenderer | null {
       return this._threeRenderer;
-    }
-
-    /**
-     * Get the Three.js texture that contains the 2D rendering made by PixiJS on its own canvas.
-     * @internal
-     */
-    getThreePixiCanvasTexture(): THREE.Texture | null {
-      return this._threePixiCanvasTexture;
     }
 
     /**

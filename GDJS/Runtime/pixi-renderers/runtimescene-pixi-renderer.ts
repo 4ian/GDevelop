@@ -85,7 +85,6 @@ namespace gdjs {
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
       if (!pixiRenderer) return;
 
-      const threePixiCanvasTexture = runtimeGameRenderer.getThreePixiCanvasTexture();
       const threeRenderer = this._threeRenderer;
       const threeScene = this._threeScene;
       const threeDummyCamera = this._threeDummyCamera;
@@ -140,6 +139,7 @@ namespace gdjs {
           if (threeGroup && threeCamera) {
             // The plane showing the PixiJS rendering must be updated, so that the 2D rendering
             // made by PixiJS can be shown in the 3D world.
+            const threePixiCanvasTexture = runtimeLayerRenderer.getThreePixiCanvasTexture();
             if (threePixiCanvasTexture)
               threePixiCanvasTexture.needsUpdate = true;
 

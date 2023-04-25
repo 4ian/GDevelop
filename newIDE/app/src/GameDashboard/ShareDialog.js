@@ -51,7 +51,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
       {showAlertMessage && (
         <AlertMessage kind="error" onHide={() => setShowAlertMessage(false)}>
           <Trans>
-            An error occured while generating the game url with the currently
+            An error occurred while generating the game url with the currently
             set game slug.
           </Trans>
         </AlertMessage>

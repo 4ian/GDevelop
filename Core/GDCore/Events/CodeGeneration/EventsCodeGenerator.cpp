@@ -289,7 +289,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     condition.SetParameters(parameters);
   }
 
-  // Verify that there are no mismatchs between object type in parameters.
+  // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter =
@@ -481,7 +481,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     action.SetParameters(parameters);
   }
 
-  // Verify that there are no mismatchs between object type in parameters.
+  // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
@@ -1018,15 +1018,15 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
     bool conditionInverted,
     gd::EventsCodeGenerationContext& context) {
   // Generate call
-  gd::String predicat;
+  gd::String predicate;
   if (instrInfos.codeExtraInformation.type == "number" ||
       instrInfos.codeExtraInformation.type == "string") {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos,
         arguments,
         instrInfos.codeExtraInformation.functionCallName);
   } else {
-    predicat = instrInfos.codeExtraInformation.functionCallName + "(" +
+    predicate = instrInfos.codeExtraInformation.functionCallName + "(" +
                GenerateArgumentsList(arguments, 0) + ")";
   }
 
@@ -1039,10 +1039,10 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
-    predicat = GenerateNegatedPredicat(predicat);
+    predicate = GenerateNegatedPredicate(predicate);
 
   // Generate condition code
-  return returnBoolean + " = " + predicat + ";\n";
+  return returnBoolean + " = " + predicate + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectCondition(
@@ -1064,18 +1064,18 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
                 instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
-  gd::String predicat;
+  gd::String predicate;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos, arguments, objectFunctionCallNamePart, 1);
   } else {
-    predicat = objectFunctionCallNamePart + "(" +
+    predicate = objectFunctionCallNamePart + "(" +
                GenerateArgumentsList(arguments, 1) + ")";
   }
-  if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+  if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
-  return "For each picked object \"" + objectName + "\", check " + predicat +
+  return "For each picked object \"" + objectName + "\", check " + predicate +
          ".\n";
 }
 
@@ -1089,16 +1089,16 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
     bool conditionInverted,
     gd::EventsCodeGenerationContext& context) {
   // Create call
-  gd::String predicat;
+  gd::String predicate;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
-    predicat = GenerateRelationalOperatorCall(instrInfos, arguments, "", 2);
+    predicate = GenerateRelationalOperatorCall(instrInfos, arguments, "", 2);
   } else {
-    predicat = "(" + GenerateArgumentsList(arguments, 2) + ")";
+    predicate = "(" + GenerateArgumentsList(arguments, 2) + ")";
   }
-  if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+  if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
-  return "For each picked object \"" + objectName + "\", check " + predicat +
+  return "For each picked object \"" + objectName + "\", check " + predicate +
          " for behavior \"" + behaviorName + "\".\n";
 }
 
@@ -1238,7 +1238,7 @@ size_t EventsCodeGenerator::GenerateSingleUsageUniqueIdFor(
               << std::endl;
   }
 
-  // Base the unique id on the adress in memory so that the same instruction
+  // Base the unique id on the address in memory so that the same instruction
   // in memory will get the same id across different code generations.
   size_t uniqueId = (size_t)instruction;
 

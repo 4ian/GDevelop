@@ -41,10 +41,10 @@ const getIdFromPrivateAssetPackUserFriendlySlug = (slug: string) =>
   slug.slice(-36);
 
 const findPublicAssetPackWithUserFriendlySlug = (
-  publisAssetPacks: PublicAssetPacks,
+  publicAssetPacks: PublicAssetPacks,
   userFriendlySlug: string
 ): PublicAssetPack | null => {
-  for (const publicAssetPack of publisAssetPacks.starterPacks) {
+  for (const publicAssetPack of publicAssetPacks.starterPacks) {
     const publicAssetPackUserFriendlySlug = getPublicAssetPackUserFriendlySlug(
       publicAssetPack
     );

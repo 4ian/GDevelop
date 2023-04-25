@@ -42,7 +42,7 @@ export const WithErrors = () => (
 export const ReplacerPromptAuthenticatedUser = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <ReplacePromptDialog
-      leaderboardsToReplace={['leadeboard-to-replace']}
+      leaderboardsToReplace={['leaderboard-to-replace']}
       onClose={action('onClose')}
       onTriggerReplace={action('onTriggerReplace')}
     />
@@ -54,7 +54,7 @@ export const ReplacerPromptNotAuthenticatedUser = () => (
     value={{ ...fakeSilverAuthenticatedUser, authenticated: false }}
   >
     <ReplacePromptDialog
-      leaderboardsToReplace={['leadeboard-to-replace']}
+      leaderboardsToReplace={['leaderboard-to-replace']}
       onClose={action('onClose')}
       onTriggerReplace={action('onTriggerReplace')}
     />

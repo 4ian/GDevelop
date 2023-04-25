@@ -68,7 +68,7 @@ class GD_CORE_API Layer {
   bool IsLocked() const { return isLocked; }
 
   /**
-   * \brief Set if the layer is a lightining layer or not.
+   * \brief Set if the layer is a lighting layer or not.
    */
   void SetLightingLayer(bool isLightingLayer_) {
     isLightingLayer = isLightingLayer_;

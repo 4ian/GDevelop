@@ -82,7 +82,7 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
 
 // Expressions scanner
 
-// Ignore litterals nodes
+// Ignore literals nodes
 void UsedExtensionsFinder::OnVisitNumberNode(NumberNode& node){};
 void UsedExtensionsFinder::OnVisitTextNode(TextNode& node){};
 

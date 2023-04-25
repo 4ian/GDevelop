@@ -61,6 +61,7 @@ type ProjectProperties = {|
   sizeOnStartupMode: string,
   minFPS: number,
   maxFPS: number,
+  enable3d: boolean,
   isFolderProject: boolean,
   useDeprecatedZeroAsDefaultZOrder: boolean,
 |};
@@ -83,6 +84,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     sizeOnStartupMode: project.getSizeOnStartupMode(),
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
+    enable3d: project.is3dEnabled(),
     isFolderProject: project.isFolderProject(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
@@ -110,6 +112,7 @@ function applyPropertiesToProject(
     sizeOnStartupMode,
     minFPS,
     maxFPS,
+    enable3d,
     isFolderProject,
     useDeprecatedZeroAsDefaultZOrder,
   } = newProperties;
@@ -134,6 +137,7 @@ function applyPropertiesToProject(
   project.setSizeOnStartupMode(sizeOnStartupMode);
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
+  project.setEnable3d(enable3d);
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
@@ -182,6 +186,9 @@ function ProjectPropertiesDialog(props: Props) {
   );
   let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
+  const [enable3d, setEnable3d] = React.useState<boolean>(
+    initialProperties.enable3d
+  );
   let [isFolderProject, setIsFolderProject] = React.useState(
     initialProperties.isFolderProject
   );
@@ -236,6 +243,7 @@ function ProjectPropertiesDialog(props: Props) {
       sizeOnStartupMode,
       minFPS,
       maxFPS,
+      enable3d,
       isFolderProject,
       useDeprecatedZeroAsDefaultZOrder,
     });
@@ -622,6 +630,14 @@ function ProjectPropertiesDialog(props: Props) {
                   checked={pixelsRounding}
                   onCheck={(e, checked) => {
                     setPixelsRounding(checked);
+                    notifyOfChange();
+                  }}
+                />
+                <Checkbox
+                  label={<Trans>Enable 3D rendering (experimental)</Trans>}
+                  checked={enable3d}
+                  onCheck={(e, checked) => {
+                    setEnable3d(checked);
                     notifyOfChange();
                   }}
                 />

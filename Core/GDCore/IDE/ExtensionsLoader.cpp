@@ -144,7 +144,7 @@ void ExtensionsLoader::LoadExtension(const gd::String &fullpath,
                                      bool forgiving) {
   if (platform.GetExtensionCreateFunctionName().empty()) {
     cout << "Unable to load extension " << fullpath << ":" << endl;
-    cout << "The plaftorm does not support extensions creation." << endl;
+    cout << "The platform does not support extensions creation." << endl;
     return;
   }
 

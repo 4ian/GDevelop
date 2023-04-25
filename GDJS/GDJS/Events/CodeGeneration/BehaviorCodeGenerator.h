@@ -19,7 +19,7 @@ namespace gdjs {
 
 /**
  * \brief The class being responsible for generating JavaScript code for
- * EventsBasedBhavior.
+ * EventsBasedBehavior.
  *
  * See also gd::EventsCodeGenerator.
  */

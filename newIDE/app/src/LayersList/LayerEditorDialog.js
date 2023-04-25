@@ -246,39 +246,42 @@ const LayerEditorDialog = (props: Props) => {
               </Trans>
             }
           />
-          {/* TODO (3D): Show only if 3D is activated */}
-          <Text size="block-title">
-            <Trans>3D settings</Trans>
-          </Text>
-          <ResponsiveLineStackLayout>
-            <SemiControlledTextField
-              commitOnBlur
-              fullWidth
-              errorText={threeDFieldOfViewError}
-              onChange={onChangeThreeDFieldOfView}
-              value={layer.getThreeDFieldOfView().toString(10)}
-              floatingLabelText={<Trans>Field of view (in degrees)</Trans>}
-              floatingLabelFixed
-            />
-            <SemiControlledTextField
-              commitOnBlur
-              fullWidth
-              errorText={threeDNearPlaneDistanceError}
-              onChange={onChangeThreeDNearPlaneDistance}
-              value={layer.getThreeDNearPlaneDistance().toString(10)}
-              floatingLabelText={<Trans>Near plane distance</Trans>}
-              floatingLabelFixed
-            />
-            <SemiControlledTextField
-              commitOnBlur
-              fullWidth
-              errorText={threeDFarPlaneDistanceError}
-              onChange={onChangeThreeDFarPlaneDistance}
-              value={layer.getThreeDFarPlaneDistance().toString(10)}
-              floatingLabelText={<Trans>Far plane distance</Trans>}
-              floatingLabelFixed
-            />
-          </ResponsiveLineStackLayout>
+          {props.project.is3dEnabled() && (
+            <>
+              <Text size="block-title">
+                <Trans>3D settings</Trans>
+              </Text>
+              <ResponsiveLineStackLayout>
+                <SemiControlledTextField
+                  commitOnBlur
+                  fullWidth
+                  errorText={threeDFieldOfViewError}
+                  onChange={onChangeThreeDFieldOfView}
+                  value={layer.getThreeDFieldOfView().toString(10)}
+                  floatingLabelText={<Trans>Field of view (in degrees)</Trans>}
+                  floatingLabelFixed
+                />
+                <SemiControlledTextField
+                  commitOnBlur
+                  fullWidth
+                  errorText={threeDNearPlaneDistanceError}
+                  onChange={onChangeThreeDNearPlaneDistance}
+                  value={layer.getThreeDNearPlaneDistance().toString(10)}
+                  floatingLabelText={<Trans>Near plane distance</Trans>}
+                  floatingLabelFixed
+                />
+                <SemiControlledTextField
+                  commitOnBlur
+                  fullWidth
+                  errorText={threeDFarPlaneDistanceError}
+                  onChange={onChangeThreeDFarPlaneDistance}
+                  value={layer.getThreeDFarPlaneDistance().toString(10)}
+                  floatingLabelText={<Trans>Far plane distance</Trans>}
+                  floatingLabelFixed
+                />
+              </ResponsiveLineStackLayout>
+            </>
+          )}
           {layer.isLightingLayer() ? (
             <React.Fragment>
               <Text size="block-title">

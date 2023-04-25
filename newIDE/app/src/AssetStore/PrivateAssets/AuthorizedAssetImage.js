@@ -30,7 +30,7 @@ const AuthorizedAssetImage = ({
 
   React.useEffect(
     () => {
-      // Avoid trigerring a new request if the image is already loaded.
+      // Avoid triggering a new request if the image is already loaded.
       // This can happen if it was loaded with a previous token, and
       // A new token is fetched for another image.
       if (isImageLoaded) return;

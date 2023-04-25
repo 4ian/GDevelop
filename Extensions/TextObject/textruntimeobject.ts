@@ -464,7 +464,7 @@ namespace gdjs {
      * Set the shadow for the text object.
      * @param str color as a "R;G;B" string, for example: "255;0;0"
      * @param distance distance between the shadow and the text, in pixels.
-     * @param blur amout of shadow blur, in pixels.
+     * @param blur amount of shadow blur, in pixels.
      * @param angle shadow offset direction, in degrees.
      */
     setShadow(

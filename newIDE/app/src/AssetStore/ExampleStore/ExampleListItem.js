@@ -141,7 +141,7 @@ export const ExampleListItem = ({
               <Text
                 noMargin
                 size="body2"
-                displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+                displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
               >
                 {renderExampleField('shortDescription')}
               </Text>

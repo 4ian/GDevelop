@@ -117,7 +117,7 @@ namespace gdjs {
 
         await admob.start();
 
-        logger.info('AdMob succesfully started.');
+        logger.info('AdMob successfully started.');
         admobStarted = true;
       },
       false

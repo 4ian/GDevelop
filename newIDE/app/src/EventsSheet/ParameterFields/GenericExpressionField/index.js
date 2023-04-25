@@ -58,7 +58,7 @@ const styles = {
     flex: 1,
     minWidth: 200,
   },
-  textFieldAndHightlightContainer: {
+  textFieldAndHighlightContainer: {
     position: 'relative',
   },
   expressionSelectorPopoverContentSmall: {
@@ -547,7 +547,7 @@ export default class ExpressionField extends React.Component<Props, State> {
           margin={this.props.isInline ? 'none' : 'dense'}
           renderTextField={() => (
             <div style={styles.textFieldContainer}>
-              <div style={styles.textFieldAndHightlightContainer}>
+              <div style={styles.textFieldAndHighlightContainer}>
                 <BackgroundHighlighting
                   value={this.state.validatedValue}
                   style={{ ...styles.input, ...backgroundHighlightingStyle }}

@@ -36,7 +36,7 @@ export class LicenseAssetStoreSearchFilter
   static noAttributionLicenses = [
     'CC0 (public domain)',
     'Apache 2.0',
-    'Trademark of GDevelop Ltd (fair use authorized in GDevelop games)',
+    'Trademark of GDevelop Ltd (fair use authorised in GDevelop games)',
     'SIL Open Font License 1.1 (OFL)',
   ];
 

@@ -507,7 +507,7 @@ class GD_CORE_API EventsCodeGenerator {
    * - string : %Text expression -> string
    * - layer, color, file, stringWithSelector : Same as string
    * - relationalOperator : Used to make a comparison between the function
-  resturn value and value of the parameter preceding the relationOperator
+  return value and value of the parameter preceding the relationOperator
   parameter -> string
    * - operator : Used to update a value using a setter and a getter -> string
    * - key, mouse, objectvar, scenevar, globalvar, password, musicfile,
@@ -668,13 +668,13 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
-   * \brief Must negate a predicat.
+   * \brief Must negate a predicate.
    *
-   * The default implementation generates C-style code : It wraps the predicat
+   * The default implementation generates C-style code : It wraps the predicate
    * inside parenthesis and add a !.
    */
-  virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
-    return "!(" + predicat + ")";
+  virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const {
+    return "!(" + predicate + ")";
   };
 
   virtual gd::String GenerateFreeCondition(
@@ -785,7 +785,7 @@ class GD_CORE_API EventsCodeGenerator {
   const gd::Project* project;  ///< The project being used.
   const gd::Layout* scene;     ///< The scene being generated.
 
-  bool errorOccurred;          ///< Must be set to true if an error occured.
+  bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
 

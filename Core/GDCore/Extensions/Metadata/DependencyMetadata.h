@@ -62,7 +62,7 @@ class GD_CORE_API DependencyMetadata {
   };
 
   /**
-   * \brief Sets the type of dependecy (what will be used to install it)
+   * \brief Sets the type of dependency (what will be used to install it)
    *
    * This can either be "npm" or "cordova" for now.
    */

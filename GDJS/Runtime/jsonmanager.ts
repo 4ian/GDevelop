@@ -11,7 +11,7 @@ namespace gdjs {
   ) => void;
   type JsonManagerOnCompleteCallback = (totalCount: integer) => void;
 
-  /** The callback called when a json that was requested is loaded (or an error occured). */
+  /** The callback called when a json that was requested is loaded (or an error occurred). */
   export type JsonManagerRequestCallback = (
     error: Error | null,
     content: Object | null
@@ -102,7 +102,7 @@ namespace gdjs {
      * (null if none) and the loaded json (a JS Object).
      *
      * @param resourceName The resource pointing to the json file to load.
-     * @param callback The callback function called when json is loaded (or an error occured).
+     * @param callback The callback function called when json is loaded (or an error occurred).
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.find(function (resource) {

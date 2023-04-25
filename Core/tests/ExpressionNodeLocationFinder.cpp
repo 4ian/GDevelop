@@ -197,14 +197,14 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
     }
   }
 
-  SECTION("Numbers and texts mismatchs") {
+  SECTION("Numbers and texts mismatches") {
     REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(parser, "12+\"hello\"", 0) == true);
     REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(parser, "12+\"hello\"", 1) == true);
     REQUIRE(CheckNodeAtLocationIs<gd::OperatorNode>(parser, "12+\"hello\"", 2) == true);
     REQUIRE(CheckNodeAtLocationIs<gd::TextNode>(parser, "12+\"hello\"", 3) == true);
   }
 
-  SECTION("Numbers and texts mismatchs (parent node)") {
+  SECTION("Numbers and texts mismatches (parent node)") {
     REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(parser, "12+\"hello\"", 0) == true);
     REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(parser, "12+\"hello\"", 1) == true);
     REQUIRE(CheckNoParentNodeAtLocation(parser, "12+\"hello\"", 2) == true);

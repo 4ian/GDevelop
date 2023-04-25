@@ -81,6 +81,21 @@ class GD_CORE_API Layer {
    */
   bool IsFollowingBaseLayerCamera() const { return followBaseLayerCamera; }
 
+  /** \name 3D
+   */
+  ///@{
+  double GetThreeDNearPlaneDistance() const { return threeDNearPlaneDistance; }
+  void SetThreeDNearPlaneDistance(double distance) {
+    threeDNearPlaneDistance = distance;
+  }
+  double GetThreeDFarPlaneDistance() const { return threeDFarPlaneDistance; }
+  void SetThreeDFarPlaneDistance(double distance) {
+    threeDFarPlaneDistance = distance;
+  }
+  double GetThreeDFieldOfView() const { return threeDFieldOfView; }
+  void SetThreeDFieldOfView(double angle) { threeDFieldOfView = angle; }
+  ///@}
+
   /** \name Cameras
    */
   ///@{
@@ -164,12 +179,10 @@ class GD_CORE_API Layer {
   const EffectsContainer& GetEffects() const;
   ///@}
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize layer.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layer.
@@ -183,6 +196,9 @@ class GD_CORE_API Layer {
                          ///< renders an ambient light.
   bool followBaseLayerCamera;  ///< True if the layer automatically follows the
                                ///< base layer
+  double threeDNearPlaneDistance;  ///< 3D camera frustrum near plan distance
+  double threeDFarPlaneDistance;   ///< 3D camera frustrum far plan distance
+  double threeDFieldOfView;        ///< 3D camera field of view (fov) in degrees
   unsigned int ambientLightColorR;  ///< Ambient light color Red component
   unsigned int ambientLightColorG;  ///< Ambient light color Green component
   unsigned int ambientLightColorB;  ///< Ambient light color Blue component

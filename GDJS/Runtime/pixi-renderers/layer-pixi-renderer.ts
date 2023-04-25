@@ -103,7 +103,12 @@ namespace gdjs {
       // maybe by having separate rendering classes for custom object layers and scene layers.
       if (this._layer instanceof gdjs.Layer) {
         if (!this._threeCamera)
-          this._threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+          this._threeCamera = new THREE.PerspectiveCamera(
+            this._layer.getInitialThreeDFieldOfView(),
+            1,
+            this._layer.getInitialThreeDNearPlaneDistance(),
+            this._layer.getInitialThreeDFarPlaneDistance()
+          );
 
         this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
         this._threePlaneMaterial = new THREE.MeshBasicMaterial({

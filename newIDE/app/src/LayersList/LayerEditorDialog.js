@@ -1,10 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import React from 'react';
+import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import {
   rgbColorToRGBString,
@@ -22,6 +22,7 @@ import HelpButton from '../UI/HelpButton';
 import { Tabs } from '../UI/Tabs';
 import EffectsList from '../EffectsList';
 import { Spacer } from '../UI/Grid';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -55,6 +56,18 @@ const LayerEditorDialog = (props: Props) => {
     serializableObject: layer,
     onCancel: onClose,
   });
+  const [
+    threeDFieldOfViewError,
+    setThreeDFieldOfViewError,
+  ] = React.useState<?React.Node>(null);
+  const [
+    threeDFarPlaneDistanceError,
+    setThreeDFarPlaneDistanceError,
+  ] = React.useState<?React.Node>(null);
+  const [
+    threeDNearPlaneDistanceError,
+    setThreeDNearPlaneDistanceError,
+  ] = React.useState<?React.Node>(null);
   const [currentTab, setCurrentTab] = React.useState(initialTab);
   const { instancesCount, highestZOrder } = React.useMemo(
     () => {
@@ -68,6 +81,68 @@ const LayerEditorDialog = (props: Props) => {
       return { instancesCount, highestZOrder };
     },
     [layer, initialInstances]
+  );
+
+  const onChangeThreeDFieldOfView = React.useCallback(
+    value => {
+      setThreeDFieldOfViewError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= 0 || newValue > 180) {
+        setThreeDFieldOfViewError(
+          <Trans>
+            The field of view cannot be lower than 0° or greater than 180°.
+          </Trans>
+        );
+        return;
+      }
+      if (newValue === layer.getThreeDFieldOfView()) return;
+      layer.setThreeDFieldOfView(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
+  );
+
+  const onChangeThreeDNearPlaneDistance = React.useCallback(
+    value => {
+      setThreeDNearPlaneDistanceError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= 0 || newValue >= layer.getThreeDFarPlaneDistance()) {
+        setThreeDNearPlaneDistanceError(
+          <Trans>
+            The near plane distance must be strictly greater than 0 and lower
+            than the far plan distance.
+          </Trans>
+        );
+        return;
+      }
+      if (newValue === layer.getThreeDNearPlaneDistance()) return;
+      layer.setThreeDNearPlaneDistance(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
+  );
+
+  const onChangeThreeDFarPlaneDistance = React.useCallback(
+    value => {
+      setThreeDFarPlaneDistanceError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= layer.getThreeDNearPlaneDistance()) {
+        setThreeDFarPlaneDistanceError(
+          <Trans>
+            The far plane distance must be greater than the near plan distance.
+          </Trans>
+        );
+
+        return;
+      }
+      if (newValue === layer.getThreeDFarPlaneDistance()) return;
+      layer.setThreeDFarPlaneDistance(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
   );
 
   return (
@@ -171,6 +246,39 @@ const LayerEditorDialog = (props: Props) => {
               </Trans>
             }
           />
+          {/* TODO (3D): Show only if 3D is activated */}
+          <Text size="block-title">
+            <Trans>3D settings</Trans>
+          </Text>
+          <ResponsiveLineStackLayout>
+            <SemiControlledTextField
+              commitOnBlur
+              fullWidth
+              errorText={threeDFieldOfViewError}
+              onChange={onChangeThreeDFieldOfView}
+              value={layer.getThreeDFieldOfView().toString(10)}
+              floatingLabelText={<Trans>Field of view (in degrees)</Trans>}
+              floatingLabelFixed
+            />
+            <SemiControlledTextField
+              commitOnBlur
+              fullWidth
+              errorText={threeDNearPlaneDistanceError}
+              onChange={onChangeThreeDNearPlaneDistance}
+              value={layer.getThreeDNearPlaneDistance().toString(10)}
+              floatingLabelText={<Trans>Near plane distance</Trans>}
+              floatingLabelFixed
+            />
+            <SemiControlledTextField
+              commitOnBlur
+              fullWidth
+              errorText={threeDFarPlaneDistanceError}
+              onChange={onChangeThreeDFarPlaneDistance}
+              value={layer.getThreeDFarPlaneDistance().toString(10)}
+              floatingLabelText={<Trans>Far plane distance</Trans>}
+              floatingLabelFixed
+            />
+          </ResponsiveLineStackLayout>
           {layer.isLightingLayer() ? (
             <React.Fragment>
               <Text size="block-title">

@@ -9,6 +9,12 @@ declare class gdLayer {
   isLightingLayer(): boolean;
   setFollowBaseLayerCamera(followBaseLayerCamera: boolean): void;
   isFollowingBaseLayerCamera(): boolean;
+  getThreeDNearPlaneDistance(): number;
+  setThreeDNearPlaneDistance(distance: number): void;
+  getThreeDFarPlaneDistance(): number;
+  setThreeDFarPlaneDistance(distance: number): void;
+  getThreeDFieldOfView(): number;
+  setThreeDFieldOfView(angle: number): void;
   setAmbientLightColor(r: number, g: number, b: number): void;
   getAmbientLightColorRed(): number;
   getAmbientLightColorGreen(): number;

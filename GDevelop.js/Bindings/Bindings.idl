@@ -426,6 +426,8 @@ interface Project {
     boolean GetPixelsRounding();
     void SetSizeOnStartupMode([Const] DOMString orientation);
     [Const, Ref] DOMString GetSizeOnStartupMode();
+    boolean Is3dEnabled();
+    void SetEnable3d(boolean enable);
     long GetMaximumFPS();
     void SetMaximumFPS(long fps);
     long GetMinimumFPS();

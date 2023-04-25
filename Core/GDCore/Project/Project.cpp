@@ -60,6 +60,7 @@ Project::Project()
       windowHeight(600),
       maxFPS(60),
       minFPS(20),
+      enable3d(false),
       verticalSync(false),
       scaleMode("linear"),
       pixelsRounding(false),
@@ -614,6 +615,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetChild("maxFPS", 0, "FPSmax").GetValue().GetInt());
   SetMinimumFPS(
       propElement.GetChild("minFPS", 0, "FPSmin").GetValue().GetInt());
+  SetEnable3d(propElement.GetBoolAttribute("enable3d"));
   SetVerticalSyncActivatedByDefault(
       propElement.GetChild("verticalSync").GetValue().GetBool());
   SetScaleMode(propElement.GetStringAttribute("scaleMode", "linear"));
@@ -866,6 +868,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("windowHeight").SetValue(GetGameResolutionHeight());
   propElement.AddChild("latestCompilationDirectory")
       .SetValue(GetLastCompilationDirectory());
+  propElement.AddChild("enable3d").SetBoolValue(Is3dEnabled());
   propElement.AddChild("maxFPS").SetValue(GetMaximumFPS());
   propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
   propElement.AddChild("verticalSync")
@@ -1101,6 +1104,7 @@ void Project::Init(const gd::Project& game) {
   windowHeight = game.windowHeight;
   maxFPS = game.maxFPS;
   minFPS = game.minFPS;
+  enable3d = game.enable3d;
   verticalSync = game.verticalSync;
   scaleMode = game.scaleMode;
   pixelsRounding = game.pixelsRounding;

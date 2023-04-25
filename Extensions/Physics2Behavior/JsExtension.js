@@ -776,7 +776,9 @@ module.exports = {
       .setFunctionName('setSleepingAllowed');
     
     // Deprecated action (fixed typo):
-    aut.addDuplicatedAction("SetSleepingaAllowed", "SetSleepingAllowed").SetHidden();
+    aut
+      .addDuplicatedAction("SetSleepingaAllowed", "SetSleepingAllowed")
+      .setHidden();
 
     aut
       .addCondition(

@@ -87,7 +87,7 @@ describe('Project service', () => {
       );
     });
   });
-  describe('getProjectUuidFromProjetResourceUrl', () => {
+  describe('getProjectUuidFromProjectResourceUrl', () => {
     it('gives the project UUID from an URL', () => {
       expect(
         extractProjectUuidFromProjectResourceUrl(

@@ -526,7 +526,9 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .useStandardParameters(
         'number',
-        gd.ParameterOptions.makeNewOptions().setDescription(_('Field of view in degrees (between 0° and 180°)'))
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Field of view in degrees (between 0° and 180°)')
+        )
       )
       .addParameter('layer', _('Layer'), '', true)
       .setDefaultValue('""')
@@ -535,30 +537,6 @@ module.exports = {
       .markAsAdvanced()
       .setFunctionName('gdjs.threeD.camera.setFov')
       .setGetter('gdjs.threeD.camera.getFov')
-      .setIncludeFile('Extensions/3D/threedtools.js');
-
-    extension
-      .addExpressionAndConditionAndAction(
-        'number',
-        'CameraAspectRatio',
-        _('Camera aspect ratio'),
-        _('the camera aspect ratio'),
-        _('the camera aspect ratio'),
-        '',
-        'res/conditions/text24_black.png' // TODO (3D) - make or choose a proper icon for this.
-      )
-      .addCodeOnlyParameter('currentScene', '')
-      .useStandardParameters(
-        'number',
-        gd.ParameterOptions.makeNewOptions().setDescription(_('Ratio (> 0)'))
-      )
-      .addParameter('layer', _('Layer'), '', true)
-      .setDefaultValue('""')
-      .addParameter('expression', _('Camera number (default : 0)'), '', true)
-      .setDefaultValue('0')
-      .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setAspectRatio')
-      .setGetter('gdjs.threeD.camera.getAspectRatio')
       .setIncludeFile('Extensions/3D/threedtools.js');
 
     return extension;

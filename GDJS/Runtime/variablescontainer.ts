@@ -131,7 +131,7 @@ namespace gdjs {
     get(name: string): gdjs.Variable {
       let variable = this._variables.get(name);
       if (!variable) {
-        //Add automatically in existing variables.
+        //Add automatically non-existing variables.
         variable = new gdjs.Variable();
         this._variables.put(name, variable);
       } else {

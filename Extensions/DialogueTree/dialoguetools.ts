@@ -103,7 +103,7 @@ namespace gdjs {
       return;
     }
 
-    // AutoScroll commands so the user doesn't have to press again
+    // Autoscroll commands so the user doesn't have to press again.
     if (
       gdjs.dialogueTree._isLineTypeCommand() &&
       this.dialogueDataType === 'text' &&

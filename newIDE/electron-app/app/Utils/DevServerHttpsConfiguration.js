@@ -22,7 +22,7 @@ dvc+WEVll0GLtqGMzR/grVOzMdCQp30sMcTCI75arderUMTDc5Q4wiJRJDbvDTft
 019N5rvz1/c978m3pu6eyM5Mm3K/BHHZycjSY6T7wGpsGw==
 -----END CERTIFICATE-----`;
 
-// Private key used to generate the certifcate.
+// Private key used to generate the certificate.
 // Only to be used for development purpose.
 const key = `-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAs74Q3MYrvYugXf3axe1SXk63n29Ihu9Dw9dlH2WfU9C1+n90

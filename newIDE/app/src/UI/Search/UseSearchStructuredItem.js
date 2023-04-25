@@ -170,7 +170,7 @@ export const filterSearchResults = <
 /**
  * Allow to efficiently search and filters items.
  *
- * This instanciates a search API, indexes the specified items,
+ * This instantiates a search API, indexes the specified items,
  * then returns the results of the search (according to the
  * search text and the chosen category/filters).
  */

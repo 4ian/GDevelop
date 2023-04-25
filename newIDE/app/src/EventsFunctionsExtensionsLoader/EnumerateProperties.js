@@ -15,7 +15,7 @@ type EnumeratedProperty = {|
 
 /**
  * Transform a gdNamedPropertyDescriptorsList into a JS object.
- * **Don't use this** unless you explictely need to deal with JS objects.
+ * **Don't use this** unless you explicitly need to deal with JS objects.
  * Otherwise, prefer just iterating and using gdNamedPropertyDescriptorsList functions.
  */
 export const enumerateNamedPropertyDescriptorsList = (

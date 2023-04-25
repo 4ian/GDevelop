@@ -72,7 +72,7 @@ const analyzeFile = filePath =>
       if (content.includes('No i18n in this file')) {
         results.requiresTrans = false;
         results.requiresI18n = false;
-        results.reason = "Explict comment telling no i18n required";
+        results.reason = "Explicit comment telling no i18n required";
       }
 
       // Other things: (Base layer)

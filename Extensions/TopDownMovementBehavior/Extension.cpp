@@ -441,7 +441,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
 
   aut.AddAction("AllowDiagonals",
                 _("Diagonal movement"),
-                _("Allow or restrict diagonal movemment"),
+                _("Allow or restrict diagonal movement"),
                 _("Allow diagonal moves for _PARAM0_: _PARAM2_"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",

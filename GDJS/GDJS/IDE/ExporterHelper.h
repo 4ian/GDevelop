@@ -83,7 +83,7 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the (optional) external layout to be instanciated in the scene
+   * \brief Set the (optional) external layout to be instantiated in the scene
    * at the beginning of the previewed game.
    */
   PreviewExportOptions &SetExternalLayoutName(
@@ -261,7 +261,7 @@ class ExporterHelper {
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
-   * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
+   * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
   static gd::String ExportProjectData(

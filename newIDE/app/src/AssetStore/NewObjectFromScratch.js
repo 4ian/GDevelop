@@ -135,6 +135,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
   project: gdProject,
 |}): { [key: string]: Array<EnumeratedObjectMetadata> } => {
   const installedEnumeratedObjectMetadatas = enumerateObjectTypes(project);
+  const is3dEnabled = project.is3dEnabled();
 
   // - Objects with only a name defined are built in, so will be replaced
   //   by the real object metadata when we loop through the installed objects.
@@ -283,9 +284,14 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       },
     ],
   };
-
   installedEnumeratedObjectMetadatas.forEach(
     installedEnumeratedObjectMetadata => {
+      if (
+        !is3dEnabled &&
+        installedEnumeratedObjectMetadata.name.startsWith('3D::')
+      ) {
+        return;
+      }
       const category = translateExtensionCategory(
         installedEnumeratedObjectMetadata.categoryFullName,
         i18n

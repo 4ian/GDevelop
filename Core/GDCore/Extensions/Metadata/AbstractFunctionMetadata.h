@@ -27,9 +27,9 @@ class SerializerElement;
 namespace gd {
 
 /**
- * \brief Describe user-friendly information about an instruction (action or
- * condition), its parameters and the function name as well as other information
- * for code generation.
+ * \brief Describe user-friendly information about an expression or an
+ * instruction (action or condition), its parameters and the function name as
+ * well as other information for code generation.
  *
  * \ingroup Events
  */

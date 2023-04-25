@@ -22,7 +22,7 @@ class ExpressionMetadata;
 namespace gd {
 
 /**
- * \brief Contains user-friendly information about a behavior or object type.
+ * \brief Contains user-friendly information about a behavior or an object type.
  *
  * \ingroup Events
  */

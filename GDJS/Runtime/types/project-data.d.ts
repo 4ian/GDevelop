@@ -139,6 +139,9 @@ declare interface LayerData {
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
+  threeDFieldOfView: float;
+  threeDFarPlaneDistance: float;
+  threeDNearPlaneDistance: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
 }

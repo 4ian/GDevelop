@@ -15,6 +15,9 @@ namespace gdjs {
     _defaultZOrder: integer = 0;
     _hidden: boolean;
     _initialEffectsData: Array<EffectData>;
+    _initialThreeDFieldOfView: float;
+    _initialThreeDFarPlaneDistance: float;
+    _initialThreeDNearPlaneDistance: float;
 
     _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -37,6 +40,9 @@ namespace gdjs {
     ) {
       this._name = layerData.name;
       this._hidden = !layerData.visibility;
+      this._initialThreeDFieldOfView = layerData.threeDFieldOfView;
+      this._initialThreeDFarPlaneDistance = layerData.threeDFarPlaneDistance;
+      this._initialThreeDNearPlaneDistance = layerData.threeDNearPlaneDistance;
       this._initialEffectsData = layerData.effects || [];
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
@@ -291,6 +297,16 @@ namespace gdjs {
 
     getHeight(): float {
       return this._runtimeScene.getViewportHeight();
+    }
+
+    getInitialThreeDFieldOfView(): float {
+      return this._initialThreeDFieldOfView;
+    }
+    getInitialThreeDNearPlaneDistance(): float {
+      return this._initialThreeDNearPlaneDistance;
+    }
+    getInitialThreeDFarPlaneDistance(): float {
+      return this._initialThreeDFarPlaneDistance;
     }
 
     /**

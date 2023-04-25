@@ -89,7 +89,7 @@ const PointsEditor = ({
     spriteIndex
   );
 
-  // Note: sprite should always be defined so this value will be correctly initialized.
+  // Note: sprite should always be defined so this value will be correctly initialised.
   const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
     sprite
       ? every(
@@ -100,7 +100,7 @@ const PointsEditor = ({
         )
       : false
   );
-  // Note: sprite & animation should always be defined so this value will be correctly initialized.
+  // Note: sprite & animation should always be defined so this value will be correctly initialised.
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(
     sprite && animation ? allSpritesHaveSamePointsAs(sprite, animation) : false
   );

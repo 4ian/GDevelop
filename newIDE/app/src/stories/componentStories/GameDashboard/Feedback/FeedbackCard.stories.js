@@ -53,7 +53,7 @@ export const WithNamedBuild = () => (
     comment={commentUnprocessed}
     buildProperties={{
       id: 'build-id',
-      name: 'My magnificient build',
+      name: 'My magnificent build',
       isDeleted: false,
     }}
     authenticatedUser={fakeSilverAuthenticatedUser}

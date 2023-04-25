@@ -582,7 +582,7 @@ export type LDtkTilesetDef = {
   tagsSourceEnumUid: integer | null;
   /**  */
   tileGridSize: integer;
-  /** Unique Intidentifier */
+  /** Unique Identifier */
   uid: integer;
 };
 

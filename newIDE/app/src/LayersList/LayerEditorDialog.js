@@ -4,7 +4,7 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import {
   rgbColorToRGBString,
@@ -22,6 +22,7 @@ import HelpButton from '../UI/HelpButton';
 import { Tabs } from '../UI/Tabs';
 import EffectsList from '../EffectsList';
 import { Spacer } from '../UI/Grid';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -171,6 +172,51 @@ const LayerEditorDialog = (props: Props) => {
               </Trans>
             }
           />
+          {/* TODO (3D): Show only if 3D is activated */}
+          <Text size="block-title">
+            <Trans>3D settings</Trans>
+          </Text>
+          <ResponsiveLineStackLayout>
+            <SemiControlledTextField
+              fullWidth
+              onChange={value => {
+                const newValue = parseFloat(value) || 0;
+                if (newValue === layer.getThreeDFieldOfView()) return;
+                layer.setThreeDFieldOfView(newValue);
+                forceUpdate();
+                notifyOfChange();
+              }}
+              value={layer.getThreeDFieldOfView().toString(10)}
+              floatingLabelText={<Trans>Field of view (in degrees)</Trans>}
+              floatingLabelFixed
+            />
+            <SemiControlledTextField
+              fullWidth
+              onChange={value => {
+                const newValue = parseFloat(value) || 0;
+                if (newValue === layer.getThreeDNearPlaneDistance()) return;
+                layer.setThreeDNearPlaneDistance(newValue);
+                forceUpdate();
+                notifyOfChange();
+              }}
+              value={layer.getThreeDNearPlaneDistance().toString(10)}
+              floatingLabelText={<Trans>Near plane distance</Trans>}
+              floatingLabelFixed
+            />
+            <SemiControlledTextField
+              fullWidth
+              onChange={value => {
+                const newValue = parseFloat(value) || 0;
+                if (newValue === layer.getThreeDFarPlaneDistance()) return;
+                layer.setThreeDFarPlaneDistance(newValue);
+                forceUpdate();
+                notifyOfChange();
+              }}
+              value={layer.getThreeDFarPlaneDistance().toString(10)}
+              floatingLabelText={<Trans>Far plane distance</Trans>}
+              floatingLabelFixed
+            />
+          </ResponsiveLineStackLayout>
           {layer.isLightingLayer() ? (
             <React.Fragment>
               <Text size="block-title">

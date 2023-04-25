@@ -14,7 +14,9 @@ import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 
 import { Column, Line, Spacer } from '../UI/Grid';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../UI/SemiControlledTextField';
 import IconButton from '../UI/IconButton';
 import { DragHandleIcon } from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
@@ -73,6 +75,7 @@ import VariablesListToolbar from './VariablesListToolbar';
 import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
 import SwitchHorizontal from '../UI/CustomSvgIcons/SwitchHorizontal';
+import useRefocusField from './useRefocusField';
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -177,12 +180,16 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
-  const topLevelVariableNameInputRefs = React.useRef<{
+  const topLevelVariableNameInputRefs = React.useRef<{|
     [number]: SemiControlledAutoCompleteInterface,
-  }>({});
-  const [variablePtrToFocus, setVariablePtrToFocus] = React.useState<?number>(
-    null
-  );
+  |}>({});
+  const topLevelVariableValueInputRefs = React.useRef<{|
+    [number]: SemiControlledTextFieldInterface,
+  |}>({});
+  // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+  const refocusNameField = useRefocusField(topLevelVariableNameInputRefs);
+  // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+  const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -215,20 +222,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       }
     },
     [searchText, triggerSearch]
-  );
-
-  React.useEffect(
-    () => {
-      if (variablePtrToFocus) {
-        const inputRef =
-          topLevelVariableNameInputRefs.current[variablePtrToFocus];
-        if (inputRef) {
-          inputRef.focus();
-          setVariablePtrToFocus(null);
-        }
-      }
-    },
-    [variablePtrToFocus]
   );
 
   const shouldHideExpandIcons =
@@ -794,7 +787,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       );
       _onChange();
       setSelectedNodes([newName]);
-      setVariablePtrToFocus(variable.ptr);
+      refocusNameField({ identifier: variable.ptr });
       return;
     }
 
@@ -819,7 +812,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     _onChange();
     setSelectedNodes([newName]);
-    setVariablePtrToFocus(variable.ptr);
+    refocusNameField({ identifier: variable.ptr });
   };
 
   const renderVariableAndChildrenRows = (
@@ -1082,6 +1075,13 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           ) : (
                             <SemiControlledTextField
                               margin="none"
+                              ref={element => {
+                                if (depth === 0 && element) {
+                                  topLevelVariableValueInputRefs.current[
+                                    variable.ptr
+                                  ] = element;
+                                }
+                              }}
                               type={
                                 type === gd.Variable.Number ? 'number' : 'text'
                               }
@@ -1356,6 +1356,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       } else {
         setSelectedNodes([...newSelectedNodes, name]);
       }
+      const currentlyFocusedValueField =
+        topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
+      refocusValueField({
+        identifier: variable.ptr,
+        caretPosition: currentlyFocusedValueField
+          ? currentlyFocusedValueField.getCaretPosition()
+          : null,
+      });
       newVariable.delete();
     } else {
       const { variable: changedVariable } = getVariableContextFromNodeId(

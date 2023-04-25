@@ -176,6 +176,7 @@ export type TextFieldInterface = {|
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
+  getCaretPosition: () => ?number,
 |};
 
 /**
@@ -203,6 +204,10 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           props.value.toString().length
         );
       }
+      if (options && Number.isInteger(options.caretPosition) && props.value) {
+        const position = Number(options.caretPosition);
+        input.setSelectionRange(position, position);
+      }
     }
   };
 
@@ -227,11 +232,19 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     return null;
   };
 
+  const getCaretPosition = () => {
+    if (inputRef.current) {
+      return inputRef.current.selectionStart;
+    }
+    return null;
+  };
+
   React.useImperativeHandle(ref, () => ({
     focus,
     blur,
     getInputNode,
     getFieldWidth,
+    getCaretPosition,
   }));
 
   const onChange = props.onChange || undefined;

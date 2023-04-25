@@ -38,7 +38,7 @@ class GD_CORE_API ExtensionsLoader {
    * an error. (All other errors are still reported as usual).
    *
    * \note Extensions files must have extensions *.xgd(w|l|m)(e),
-   * w for Windows, l for Linux, m for Mac, e for EditTime extensions.
+   * w for Windows, l for Linux, m for Mac, e for Edittime extensions.
    */
   static void LoadAllExtensions(const gd::String& directory,
                                 gd::Platform& platform,

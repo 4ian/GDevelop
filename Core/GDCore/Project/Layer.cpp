@@ -14,7 +14,12 @@ namespace gd {
 Camera Layer::badCamera;
 
 Layer::Layer()
-    : isVisible(true), isLightingLayer(false), followBaseLayerCamera(false) {}
+    : isVisible(true),
+      isLightingLayer(false),
+      followBaseLayerCamera(false),
+      threeDNearPlaneDistance(0.1),
+      threeDFarPlaneDistance(2000),
+      threeDFieldOfView(45) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -26,7 +31,6 @@ void Layer::SetCameraCount(std::size_t n) {
     cameras.erase(cameras.begin() + cameras.size() - 1);
 }
 
-#if defined(GD_IDE_ONLY)
 void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("visibility", GetVisibility());
@@ -35,6 +39,9 @@ void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("ambientLightColorR", (int)GetAmbientLightColorRed());
   element.SetAttribute("ambientLightColorG", (int)GetAmbientLightColorGreen());
   element.SetAttribute("ambientLightColorB", (int)GetAmbientLightColorBlue());
+  element.SetAttribute("threeDNearPlaneDistance", GetThreeDNearPlaneDistance());
+  element.SetAttribute("threeDFarPlaneDistance", GetThreeDFarPlaneDistance());
+  element.SetAttribute("threeDFieldOfView", GetThreeDFieldOfView());
 
   SerializerElement& camerasElement = element.AddChild("cameras");
   camerasElement.ConsiderAsArrayOf("camera");
@@ -55,7 +62,6 @@ void Layer::SerializeTo(SerializerElement& element) const {
   SerializerElement& effectsElement = element.AddChild("effects");
   effectsContainer.SerializeTo(effectsElement);
 }
-#endif
 
 /**
  * \brief Unserialize the layer.
@@ -69,6 +75,11 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200),
                        element.GetIntAttribute("ambientLightColorG", 200),
                        element.GetIntAttribute("ambientLightColorB", 200));
+  SetThreeDNearPlaneDistance(
+      element.GetDoubleAttribute("threeDNearPlaneDistance", 0.1));
+  SetThreeDFarPlaneDistance(
+      element.GetDoubleAttribute("threeDFarPlaneDistance", 2000));
+  SetThreeDFieldOfView(element.GetDoubleAttribute("threeDFieldOfView", 45));
 
   cameras.clear();
   SerializerElement& camerasElement = element.GetChild("cameras");
@@ -80,24 +91,22 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
     camera.SetUseDefaultSize(
         cameraElement.GetBoolAttribute("defaultSize", true));
     camera.SetSize(cameraElement.GetDoubleAttribute("width"),
-                    cameraElement.GetDoubleAttribute("height"));
+                   cameraElement.GetDoubleAttribute("height"));
     camera.SetUseDefaultViewport(
         cameraElement.GetBoolAttribute("defaultViewport", true));
-    camera.SetViewport(
-        cameraElement.GetDoubleAttribute("viewportLeft"),
-        cameraElement.GetDoubleAttribute("viewportTop"),
-        cameraElement.GetDoubleAttribute("viewportRight"),
-        cameraElement.GetDoubleAttribute(
-            "viewportBottom"));
+    camera.SetViewport(cameraElement.GetDoubleAttribute("viewportLeft"),
+                       cameraElement.GetDoubleAttribute("viewportTop"),
+                       cameraElement.GetDoubleAttribute("viewportRight"),
+                       cameraElement.GetDoubleAttribute("viewportBottom"));
 
     cameras.push_back(camera);
   }
 
   if (camerasElement.GetChildrenCount() > 50) {
-    // Highly unlikely that we want as many cameras, as they were not even exposed in
-    // the editor nor used in the game engine. Must be because of a bug in the editor that
-    // duplicated cameras when cancelling changes on a layer.
-    // Reset to one camera.
+    // Highly unlikely that we want as many cameras, as they were not even
+    // exposed in the editor nor used in the game engine. Must be because of a
+    // bug in the editor that duplicated cameras when cancelling changes on a
+    // layer. Reset to one camera.
     SetCameraCount(1);
   }
 
@@ -105,9 +114,7 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   effectsContainer.UnserializeFrom(effectsElement);
 }
 
-gd::EffectsContainer& Layer::GetEffects() {
-  return effectsContainer;
-}
+gd::EffectsContainer& Layer::GetEffects() { return effectsContainer; }
 
 const gd::EffectsContainer& Layer::GetEffects() const {
   return effectsContainer;

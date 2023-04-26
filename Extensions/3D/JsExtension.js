@@ -601,9 +601,10 @@ module.exports = {
           pixiResourcesLoader
         );
         /**
-         *
+         * Name of the resource that is rendered.
+         * If no face is visible, this will be null.
          */
-        this._renderedResource = undefined;
+        this._renderedResourceName = undefined;
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
         this._defaultHeight = parseFloat(properties.get('height').getValue());
@@ -669,7 +670,7 @@ module.exports = {
           RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
-        if (textureName === this._renderedResource) return;
+        if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
@@ -682,7 +683,7 @@ module.exports = {
 
         if (!textureName) {
           this._renderFallbackObject = true;
-          this._renderedResource = null;
+          this._renderedResourceName = null;
         } else {
           const texture = this._pixiResourcesLoader.getPIXITexture(
             this._project,
@@ -691,7 +692,7 @@ module.exports = {
           this._pixiTexturedObject.texture = texture;
           this._centerX = texture.frame.width / 2;
           this._centerY = texture.frame.height / 2;
-          this._renderedResource = textureName;
+          this._renderedResourceName = textureName;
 
           if (!texture.baseTexture.valid) {
             // Post pone texture update if texture is not loaded.

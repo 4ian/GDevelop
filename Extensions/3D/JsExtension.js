@@ -580,6 +580,229 @@ module.exports = {
   registerInstanceRenderers: function (
     objectsRenderingService /*: ObjectsRenderingService */
   ) {
-    // TODO
+    const RenderedInstance = objectsRenderingService.RenderedInstance;
+    const PIXI = objectsRenderingService.PIXI;
+
+    class RenderedThreeDShapeObjectInstance extends RenderedInstance {
+      constructor(
+        project,
+        layout,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
+        /**
+         *
+         */
+        this._renderedResource = undefined;
+        const properties = associatedObjectConfiguration.getProperties();
+        this._defaultWidth = parseFloat(properties.get('width').getValue());
+        this._defaultHeight = parseFloat(properties.get('height').getValue());
+
+        this._pixiObject = new PIXI.Container();
+        this._pixiFallbackObject = new PIXI.Graphics();
+        this._pixiTexturedObject = new PIXI.Sprite(
+          this._pixiResourcesLoader.getInvalidPIXITexture()
+        );
+        this._pixiObject.addChild(this._pixiTexturedObject);
+        this._pixiObject.addChild(this._pixiFallbackObject);
+        this._pixiContainer.addChild(this._pixiObject);
+        this._renderFallbackObject = false;
+        this.updateTexture();
+      }
+
+      static _getResourceNameToDisplay(objectConfiguration) {
+        const properties = objectConfiguration.getProperties();
+
+        const orderedFaces = [
+          ['frontFaceVisible', 'frontFaceResourceName'],
+          ['backFaceVisible', 'backFaceResourceName'],
+          ['leftFaceVisible', 'leftFaceResourceName'],
+          ['rightFaceVisible', 'rightFaceResourceName'],
+          ['topFaceVisible', 'topFaceResourceName'],
+          ['bottomFaceVisible', 'bottomFaceResourceName'],
+        ];
+
+        for (const [
+          faceVisibleProperty,
+          faceResourceNameProperty,
+        ] of orderedFaces) {
+          if (properties.get(faceVisibleProperty).getValue() === 'true') {
+            const textureResource = properties
+              .get(faceResourceNameProperty)
+              .getValue();
+            if (textureResource) return textureResource;
+          }
+        }
+
+        return null;
+      }
+
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        const instance = this._instance;
+
+        const textureResourceName =
+          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+            objectConfiguration
+          );
+        if (textureResourceName) {
+          return resourcesLoader.getResourceFullUrl(
+            project,
+            textureResourceName,
+            {}
+          );
+        }
+        return 'JsPlatform/Extensions/3d_box.svg';
+      }
+
+      updateTextureIfNeeded() {
+        const textureName =
+          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
+        if (textureName === this._renderedResource) return;
+
+        this.updateTexture();
+      }
+
+      updateTexture() {
+        const textureName =
+          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
+
+        if (!textureName) {
+          this._renderFallbackObject = true;
+          this._renderedResource = null;
+        } else {
+          const texture = this._pixiResourcesLoader.getPIXITexture(
+            this._project,
+            textureName
+          );
+          this._pixiTexturedObject.texture = texture;
+          this._centerX = texture.frame.width / 2;
+          this._centerY = texture.frame.height / 2;
+          this._renderedResource = textureName;
+
+          if (!texture.baseTexture.valid) {
+            // Post pone texture update if texture is not loaded.
+            texture.once('update', () => {
+              this.updateTexture();
+              this.updatePIXISprite();
+            });
+            return;
+          }
+        }
+      }
+
+      updatePIXISprite() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+
+        this._pixiTexturedObject.anchor.x =
+          this._centerX / this._pixiTexturedObject.texture.frame.width;
+        this._pixiTexturedObject.anchor.y =
+          this._centerY / this._pixiTexturedObject.texture.frame.height;
+
+        this._pixiTexturedObject.angle = this._instance.getAngle();
+        this._pixiTexturedObject.scale.x =
+          width / this._pixiTexturedObject.texture.frame.width;
+        this._pixiTexturedObject.scale.y =
+          height / this._pixiTexturedObject.texture.frame.height;
+
+        this._pixiTexturedObject.position.x =
+          this._instance.getX() +
+          +this._centerX * Math.abs(this._pixiTexturedObject.scale.x);
+        this._pixiTexturedObject.position.y =
+          this._instance.getY() +
+          +this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
+      }
+
+      updateFallbackObject() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+
+        this._pixiFallbackObject.clear();
+        this._pixiFallbackObject.beginFill(0x0033ff);
+        this._pixiFallbackObject.lineStyle(1, 0xffd900, 1);
+        this._pixiFallbackObject.moveTo(-width / 2, -height / 2);
+        this._pixiFallbackObject.lineTo(width / 2, -height / 2);
+        this._pixiFallbackObject.lineTo(width / 2, height / 2);
+        this._pixiFallbackObject.lineTo(-width / 2, height / 2);
+        this._pixiFallbackObject.endFill();
+
+        this._pixiFallbackObject.position.x = this._instance.getX() + width / 2;
+        this._pixiFallbackObject.position.y =
+          this._instance.getY() + height / 2;
+        this._pixiFallbackObject.angle = this._instance.getAngle();
+      }
+
+      update() {
+        this.updateTextureIfNeeded();
+
+        this._pixiFallbackObject.visible = this._renderFallbackObject;
+        this._pixiTexturedObject.visible = !this._renderFallbackObject;
+
+        if (this._renderFallbackObject) {
+          this.updateFallbackObject();
+        } else {
+          this.updatePIXISprite();
+        }
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+
+      getCenterX() {
+        if (this._renderFallbackObject) {
+          if (this._instance.hasCustomSize()) {
+            return this._instance.getCustomWidth() / 2;
+          } else {
+            return this.getDefaultWidth() / 2;
+          }
+        } else {
+          return this._centerX * this._pixiTexturedObject.scale.x;
+        }
+      }
+
+      getCenterY() {
+        if (this._renderFallbackObject) {
+          if (this._instance.hasCustomSize()) {
+            return this._instance.getCustomHeight() / 2;
+          } else {
+            return this.getDefaultHeight() / 2;
+          }
+        } else {
+          return this._centerY * this._pixiTexturedObject.scale.y;
+        }
+      }
+    }
+
+    objectsRenderingService.registerInstanceRenderer(
+      '3D::ThreeDShapeObject',
+      RenderedThreeDShapeObjectInstance
+    );
   },
 };

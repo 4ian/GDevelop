@@ -276,7 +276,7 @@ module.exports = {
         'ThreeDShapeObject',
         _('3D Shape'),
         _('A 3D shape.'),
-        'JsPlatform/Extensions/text_input.svg', // TODO (3D) - make or choose a proper icon for this.
+        'JsPlatform/Extensions/3d_box.svg',
         threeDShapeObject
       )
       .setCategoryFullName(_('3D'))

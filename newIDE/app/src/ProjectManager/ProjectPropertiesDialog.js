@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -30,6 +31,8 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -637,6 +640,25 @@ function ProjectPropertiesDialog(props: Props) {
                   label={<Trans>Enable 3D rendering (experimental)</Trans>}
                   checked={enable3d}
                   onCheck={(e, checked) => {
+                    if (!checked) {
+                      const usedExtensionsNames = gd.UsedExtensionsFinder.scanProject(
+                        project
+                      )
+                        .getUsedExtensions()
+                        .toNewVectorString()
+                        .toJSArray();
+                      if (usedExtensionsNames.includes('3D')) {
+                        showErrorBox({
+                          message: i18n._(
+                            t`3D cannot be disabled for the project. Remove all 3D related objects and events first.`
+                          ),
+                          errorId: '',
+                          rawError: undefined,
+                          doNotReport: true,
+                        });
+                        return;
+                      }
+                    }
                     setEnable3d(checked);
                     notifyOfChange();
                   }}

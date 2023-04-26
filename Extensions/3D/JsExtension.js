@@ -465,6 +465,52 @@ module.exports = {
       .setGetter('gdjs.threeD.camera.getCameraRotationY')
       .setIncludeFile('Extensions/3D/threedtools.js');
 
+      extension
+        .addAction(
+          'TurnCameraTowardObject',
+          _('Look at an object'),
+          _('Change the camera rotation to look at an object. The camera top always face the screen.'),
+          _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
+          '',
+           // TODO (3D) - make or choose a proper icon for this.
+          'res/conditions/text24_black.png',
+          'res/conditions/text24_black.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('objectPtr', _('Object'), '3D::ThreeDShapeObject')
+        .addParameter('layer', _('Layer'), '', true)
+        .setDefaultValue('""')
+        .addParameter('expression', _('Camera number (default : 0)'), '', true)
+        .setDefaultValue('0')
+        .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
+        .setDefaultValue('false')
+        .setFunctionName('gdjs.threeD.camera.turnCameraTowardObject')
+        .setIncludeFile('Extensions/3D/threedtools.js');
+
+        extension
+          .addAction(
+            'TurnCameraTowardPosition',
+            _('Look at a position'),
+            _('Change the camera rotation to look at a position. The camera top always face the screen.'),
+            _('Change the camera rotation of _PARAM4_ to look at _PARAM1_; _PARAM2_; _PARAM3_'),
+            '',
+             // TODO (3D) - make or choose a proper icon for this.
+            'res/conditions/text24_black.png',
+            'res/conditions/text24_black.png'
+          )
+          .addCodeOnlyParameter('currentScene', '')
+          .addParameter('number', _('X position'))
+          .addParameter('number', _('Y position'))
+          .addParameter('number', _('Z position'))
+          .addParameter('layer', _('Layer'), '', true)
+          .setDefaultValue('""')
+          .addParameter('expression', _('Camera number (default : 0)'), '', true)
+          .setDefaultValue('0')
+          .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
+          .setDefaultValue('false')
+          .setFunctionName('gdjs.threeD.camera.turnCameraTowardPosition')
+          .setIncludeFile('Extensions/3D/threedtools.js');
+
     extension
       .addExpressionAndConditionAndAction(
         'number',

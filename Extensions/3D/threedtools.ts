@@ -104,6 +104,58 @@ namespace gdjs {
         threeCamera.rotation.y = gdjs.toRad(angle);
       };
 
+      export const turnCameraTowardObject = (
+        runtimeScene: RuntimeScene,
+        object: gdjs.ThreeDShapeRuntimeObject,
+        layerName: string,
+        cameraIndex: integer,
+        isStandingOnY: boolean
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return;
+
+        if (isStandingOnY) {
+          threeCamera.up.set(0, 1, 0);
+        } else {
+          threeCamera.up.set(0, 0, 1);
+        }
+        threeCamera.lookAt(
+          object.getCenterXInScene(),
+          -object.getCenterYInScene(),
+          object.getZ()
+        );
+        // The layer angle takes over the 3D camera Z rotation.
+        layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));
+      };
+
+      export const turnCameraTowardPosition = (
+        runtimeScene: RuntimeScene,
+        x: float,
+        y: float,
+        z: float,
+        layerName: string,
+        cameraIndex: integer,
+        isStandingOnY: boolean
+      ) => {
+        const layer = runtimeScene.getLayer(layerName);
+        const layerRenderer = layer.getRenderer();
+
+        const threeCamera = layerRenderer.getThreeCamera();
+        if (!threeCamera) return;
+
+        if (isStandingOnY) {
+          threeCamera.up.set(0, 1, 0);
+        } else {
+          threeCamera.up.set(0, 0, 1);
+        }
+        threeCamera.lookAt(x, -y, z);
+        // The layer angle takes over the 3D camera Z rotation.
+        layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));
+      };
+
       export const getNearPlane = (
         runtimeScene: RuntimeScene,
         layerName: string,

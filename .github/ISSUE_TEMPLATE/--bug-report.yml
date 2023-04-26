@@ -43,7 +43,7 @@ body:
       label: GDevelop version
       description: |
         Which version of GDevelop are you using?
-        Take a look here: [Home - About GDevelop - "This version of GDevelop is: ~~~"]
+        Take a look here: [Editor Home - About GDevelop - "This version of GDevelop is: ~~~"]
       placeholder: 5.1.159? 5.1.160?
     validations:
       required: true

@@ -168,7 +168,9 @@ namespace gdjs {
      * @param resourceName The name of the resource
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture {
+    getThreeTexture(
+      resourceName: string,
+    ): THREE.Texture {
       const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
       if (loadedThreeTexture) return loadedThreeTexture;
 

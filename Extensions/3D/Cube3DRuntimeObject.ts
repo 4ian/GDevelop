@@ -61,7 +61,6 @@ namespace gdjs {
       objectData: Cube3DObjectData
     ) {
       super(instanceContainer, objectData);
-
       this._width = objectData.content.width || 100;
       this._height = objectData.content.height || 100;
       this._depth = objectData.content.depth || 100;
@@ -151,6 +150,17 @@ namespace gdjs {
     /** @internal */
     getFaceAtIndexResourceName(faceIndex: integer): string {
       return this._faceResourceNames[faceIndex];
+    }
+
+    getFaceDimension(faceIndex: integer): { height: float; width: float } {
+      if (faceIndex === 0 || faceIndex === 1) {
+        return { height: this._height, width: this._width };
+      }
+      if (faceIndex === 2 || faceIndex === 3) {
+        return { height: this._depth, width: this._height };
+      }
+
+      return { height: this._depth, width: this._width };
     }
 
     getRendererObject() {

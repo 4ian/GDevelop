@@ -114,6 +114,21 @@ namespace gdjs {
         this._object.getDepth()
       );
       this.updatePosition();
+      this.updateTextures();
+    }
+
+    updateTextures() {
+      this._boxMesh.material.forEach((material, materialIndex) => {
+        if (!material.map) return;
+        const faceIndex = materialIndexToFaceIndex[materialIndex];
+        const faceDimension = this._object.getFaceDimension(faceIndex);
+        const { height: resourceHeight, width: resourceWidth } =
+          material.map.source.data;
+        material.map.repeat.set(
+          faceDimension.width / resourceWidth,
+          faceDimension.height / resourceHeight
+        );
+      });
     }
   }
 

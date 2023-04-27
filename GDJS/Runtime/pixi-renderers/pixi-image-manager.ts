@@ -71,6 +71,7 @@ namespace gdjs {
      * Map associating a resource name to the loaded Three.js texture.
      */
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
+    private _loadedThreeMaterials: Hashtable<THREE.Material>;
 
     private _resourcesLoader: RuntimeGameResourcesLoader;
 
@@ -89,6 +90,7 @@ namespace gdjs {
       );
       this._loadedTextures = new Hashtable();
       this._loadedThreeTextures = new Hashtable();
+      this._loadedThreeMaterials = new Hashtable();
     }
 
     /**
@@ -204,6 +206,24 @@ namespace gdjs {
       this._loadedThreeTextures.put(resourceName, threeTexture);
 
       return threeTexture;
+    }
+
+    /**
+     * Return the three.js material associated to the specified resource name.
+     * @param resourceName The name of the resource
+     * @returns The requested material.
+     */
+    getThreeMaterial(resourceName: string) {
+      const loadedThreeMaterial = this._loadedThreeMaterials.get(resourceName);
+      if (loadedThreeMaterial) return loadedThreeMaterial;
+
+      const material = new THREE.MeshBasicMaterial({
+        map: this.getThreeTexture(resourceName),
+        side: THREE.FrontSide,
+      });
+
+      this._loadedThreeMaterials.put(resourceName, material);
+      return material;
     }
 
     /**

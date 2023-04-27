@@ -434,7 +434,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
                           i18n._(
-                            t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommened)?`
+                            t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommended)?`
                           )
                         );
                         if (!answer) return;

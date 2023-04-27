@@ -1375,7 +1375,7 @@ namespace gdjs {
 
       // Avoid a `_slopeClimbingFactor` set to exactly 0.
       // Otherwise, this can lead the floor finding functions to consider
-      // a floor to be "too high" to reach, even if the object is very slighlty
+      // a floor to be "too high" to reach, even if the object is very slightly
       // inside it, which can happen because of rounding errors.
       // See "Floating-point error mitigations" tests.
       if (this._slopeClimbingFactor < 1 / 1024) {

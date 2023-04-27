@@ -162,7 +162,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
     });
 
     it('keeps the same animation when using an invalid/empty name', () => {
-      object.setAnimationName('unexisting animation');
+      object.setAnimationName('non-existing animation');
       expect(object.getAnimation()).to.be(1);
       object.setAnimationName('');
       expect(object.getAnimation()).to.be(1);

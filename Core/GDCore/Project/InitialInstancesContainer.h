@@ -178,7 +178,7 @@ class GD_CORE_API InitialInstancesContainer {
 
  private:
   void RemoveInstanceIf(
-      std::function<bool(const gd::InitialInstance &)> predicat);
+      std::function<bool(const gd::InitialInstance &)> predicate);
 
   std::list<gd::InitialInstance> initialInstances;
 

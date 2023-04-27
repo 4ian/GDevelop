@@ -140,7 +140,7 @@ namespace gdjs {
       } else if (behaviorData.platformType === 'Jumpthru') {
         this._platformType = PlatformRuntimeBehavior.JUMPTHRU;
       } else {
-        this._platformType = PlatformRuntimeBehavior.NORMALPLAFTORM;
+        this._platformType = PlatformRuntimeBehavior.NORMALPLATFORM;
       }
       this._canBeGrabbed = behaviorData.canBeGrabbed || false;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
@@ -232,7 +232,7 @@ namespace gdjs {
       } else if (platformType === 'Jumpthru') {
         this._platformType = PlatformRuntimeBehavior.JUMPTHRU;
       } else {
-        this._platformType = PlatformRuntimeBehavior.NORMALPLAFTORM;
+        this._platformType = PlatformRuntimeBehavior.NORMALPLATFORM;
       }
     }
 
@@ -248,7 +248,7 @@ namespace gdjs {
       return this._yGrabOffset;
     }
 
-    static NORMALPLAFTORM = 0;
+    static NORMALPLATFORM = 0;
     static JUMPTHRU = 1;
     static LADDER = 2;
 

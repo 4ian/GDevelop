@@ -87,7 +87,7 @@ export const ExtensionListItem = ({
               <Text
                 noMargin
                 allowBrowserAutoTranslate={false}
-                displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+                displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
               >
                 {renderExtensionField('fullName')}
               </Text>
@@ -126,7 +126,7 @@ export const ExtensionListItem = ({
               noMargin
               size="body2"
               allowBrowserAutoTranslate={false}
-              displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the hightlighted text.
+              displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
             >
               {renderExtensionField('shortDescription')}
             </Text>

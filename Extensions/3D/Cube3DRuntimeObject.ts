@@ -66,7 +66,7 @@ namespace gdjs {
       this._height = objectData.content.height || 100;
       this._depth = objectData.content.depth || 100;
       this._enableTextureTransparency =
-        objectData.content.enableTextureTransparency;
+        objectData.content.enableTextureTransparency || false;
       this._visibleFacesBitmask = 0;
       if (objectData.content.frontFaceVisible)
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['front'];

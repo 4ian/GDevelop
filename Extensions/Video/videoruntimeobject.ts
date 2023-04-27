@@ -240,7 +240,7 @@ namespace gdjs {
 
     /**
      * Get the volume of the video object.
-     * @returns The current video's volume, betwenn 0 and 100.
+     * @returns The current video's volume, between 0 and 100.
      */
     getVolume(): number {
       return (

@@ -68,7 +68,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -95,7 +95,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -121,7 +121,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -148,7 +148,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -174,7 +174,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -201,7 +201,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -240,7 +240,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -278,7 +278,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -316,7 +316,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -354,7 +354,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -379,7 +379,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true

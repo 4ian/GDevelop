@@ -154,7 +154,7 @@ type DialogProps = {|
    * Callback called when the dialog is asking to be closed
    * (either by Escape key or a click outside, according to preferences).
    * This is the default way of closing a dialog and should almost always be
-   * specified - unless your dialog is representing an uninteruptible process.
+   * specified - unless your dialog is representing an uninterruptible process.
    *
    * If `onApply` is also specified, this must be interpreted as a "cancelling"
    * of changes.

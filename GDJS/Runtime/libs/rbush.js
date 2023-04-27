@@ -91,7 +91,7 @@ rbush.prototype = {
             return this;
         }
 
-        // recursively build the tree with the given data from stratch using OMT algorithm
+        // recursively build the tree with the given data from scratch using OMT algorithm
         var node = this._build(data.slice(), 0, data.length - 1, 0);
 
         if (!this.data.children.length) {

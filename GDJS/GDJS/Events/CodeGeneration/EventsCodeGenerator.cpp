@@ -684,15 +684,15 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
     bool conditionInverted,
     gd::EventsCodeGenerationContext& context) {
   // Generate call
-  gd::String predicat;
+  gd::String predicate;
   if (instrInfos.codeExtraInformation.type == "number" ||
       instrInfos.codeExtraInformation.type == "string") {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos,
         arguments,
         instrInfos.codeExtraInformation.functionCallName);
   } else {
-    predicat = instrInfos.codeExtraInformation.functionCallName + "(" +
+    predicate = instrInfos.codeExtraInformation.functionCallName + "(" +
                GenerateArgumentsList(arguments) + ")";
   }
 
@@ -705,11 +705,11 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
-    predicat = GenerateNegatedPredicat(predicat);
+    predicate = GenerateNegatedPredicate(predicate);
 
   // Generate condition code
   return GenerateBooleanFullName(returnBoolean, context) +
-         " = " + predicat + ";\n";
+         " = " + predicate + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectCondition(
@@ -728,22 +728,22 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
       instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
-  gd::String predicat;
+  gd::String predicate;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos, arguments, objectFunctionCallNamePart, 1);
   } else {
-    predicat = objectFunctionCallNamePart + "(" +
+    predicate = objectFunctionCallNamePart + "(" +
                GenerateArgumentsList(arguments, 1) + ")";
   }
-  if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+  if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
   // Generate whole condition code
   conditionCode +=
       "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
       ".length;i<l;++i) {\n";
-  conditionCode += "    if ( " + predicat + " ) {\n";
+  conditionCode += "    if ( " + predicate + " ) {\n";
   conditionCode += "        " +
                    GenerateBooleanFullName(returnBoolean, context) +
                    " = true;\n";
@@ -775,16 +775,16 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
       instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
-  gd::String predicat;
+  gd::String predicate;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos, arguments, objectFunctionCallNamePart, 2);
   } else {
-    predicat = objectFunctionCallNamePart + "(" +
+    predicate = objectFunctionCallNamePart + "(" +
                GenerateArgumentsList(arguments, 2) + ")";
   }
-  if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+  if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
   // Verify that object has behavior.
   vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
@@ -798,7 +798,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
     conditionCode +=
         "for (var i = 0, k = 0, l = " + GetObjectListName(objectName, context) +
         ".length;i<l;++i) {\n";
-    conditionCode += "    if ( " + predicat + " ) {\n";
+    conditionCode += "    if ( " + predicate + " ) {\n";
     conditionCode += "        " +
                      GenerateBooleanFullName(returnBoolean, context) +
                      " = true;\n";

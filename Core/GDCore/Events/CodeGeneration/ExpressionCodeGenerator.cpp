@@ -170,7 +170,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   }
   else {
     // This is for function names that are put in IdentifierNode
-    // because the type is needed to tell them appart from variables.
+    // because the type is needed to tell them apart from variables.
     output += GenerateDefaultValue(type);
   }
 }

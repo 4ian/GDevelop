@@ -52,6 +52,7 @@ namespace gdjs {
       string,
       string
     ];
+    private static _temporaryVector = new THREE.Vector3();
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -336,6 +337,51 @@ namespace gdjs {
      */
     getRotationX(): float {
       return this._rotationX;
+    }
+
+    /**
+     * Turn the object around the scene x axis at its center.
+     * @param deltaAngle the rotation angle
+     */
+    turnAroundX(deltaAngle: float): void {
+      const axisX = gdjs.Cube3DRuntimeObject._temporaryVector;
+      axisX.set(1, 0, 0);
+
+      const mesh = this._renderer.get3dRendererObject();
+      mesh.rotateOnWorldAxis(axisX, gdjs.toRad(deltaAngle));
+      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+    }
+
+    /**
+     * Turn the object around the scene y axis at its center.
+     * @param deltaAngle the rotation angle
+     */
+    turnAroundY(deltaAngle: float): void {
+      const axisY = gdjs.Cube3DRuntimeObject._temporaryVector;
+      axisY.set(0, 1, 0);
+
+      const mesh = this._renderer.get3dRendererObject();
+      mesh.rotateOnWorldAxis(axisY, gdjs.toRad(deltaAngle));
+      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
+    }
+
+    /**
+     * Turn the object around the scene z axis at its center.
+     * @param deltaAngle the rotation angle
+     */
+    turnAroundZ(deltaAngle: float): void {
+      const axisZ = gdjs.Cube3DRuntimeObject._temporaryVector;
+      axisZ.set(0, 0, 1);
+
+      const mesh = this._renderer.get3dRendererObject();
+      mesh.rotateOnWorldAxis(axisZ, gdjs.toRad(deltaAngle));
+      this._rotationX = gdjs.toDegrees(mesh.rotation.x);
+      this._rotationY = gdjs.toDegrees(mesh.rotation.y);
+      this.setAngle(gdjs.toDegrees(mesh.rotation.z));
     }
 
     /**

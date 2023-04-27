@@ -34,6 +34,9 @@ module.exports = {
         'MIT'
       )
       .setCategory('General');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('3D'))
+      .setIcon('res/conditions/3d_box.svg');
 
     const Cube3DObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
@@ -372,11 +375,53 @@ module.exports = {
       .setFunctionName('setFaceVisibility')
       .setGetter('isFaceVisible');
 
+      object
+        .addAction(
+          'TurnAroundX',
+          _('Turn around X axis'),
+          _('Turn the object around X axis. This axis doesn\'t move with the object rotation.'),
+          _('Turn _PARAM0_ from _PARAM1_° around X axis'),
+          '',
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+        .addParameter('number', _('Rotation angle'), '', false)
+        .setFunctionName('turnAroundX');
+
+        object
+          .addAction(
+            'TurnAroundY',
+            _('Turn around Y axis'),
+            _('Turn the object around Y axis. This axis doesn\'t move with the object rotation.'),
+            _('Turn _PARAM0_ from _PARAM1_° around Y axis'),
+            '',
+            'res/conditions/3d_box.svg',
+            'res/conditions/3d_box.svg'
+          )
+          .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+          .addParameter('number', _('Rotation angle'), '', false)
+          .setFunctionName('turnAroundY');
+
+          object
+            .addAction(
+              'TurnAroundZ',
+              _('Turn around Z axis'),
+              _('Turn the object around Z axis. This axis doesn\'t move with the object rotation.'),
+              _('Turn _PARAM0_ from _PARAM1_° around Z axis'),
+              '',
+              'res/conditions/3d_box.svg',
+              'res/conditions/3d_box.svg'
+            )
+            .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+            .addParameter('number', _('Rotation angle'), '', false)
+            .setFunctionName('turnAroundZ');
+
     object
       .addAction(
         'SetFaceResource',
         _('Face image'),
-        _('Change the image of the face'),
+        _('Change the image of the face.'),
         _('Change the image of _PARAM1_ face of _PARAM0_ to _PARAM2_'),
         '',
         'res/conditions/3d_box.svg',
@@ -465,51 +510,106 @@ module.exports = {
       .setGetter('gdjs.scene3d.camera.getCameraRotationY')
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
-      extension
-        .addAction(
-          'TurnCameraTowardObject',
-          _('Look at an object'),
-          _('Change the camera rotation to look at an object. The camera top always face the screen.'),
-          _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
-          '',
-           // TODO (3D) - make or choose a proper icon for this.
-          'res/conditions/text24_black.png',
-          'res/conditions/text24_black.png'
-        )
-        .addCodeOnlyParameter('currentScene', '')
-        .addParameter('objectPtr', _('Object'), 'Scene3D::Cube3DObject')
-        .addParameter('layer', _('Layer'), '', true)
-        .setDefaultValue('""')
-        .addParameter('expression', _('Camera number (default : 0)'), '', true)
-        .setDefaultValue('0')
-        .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
-        .setDefaultValue('false')
-        .setFunctionName('gdjs.scene3d.camera.turnCameraTowardObject')
-        .setIncludeFile('Extensions/3D/Scene3DTools.js');
+    extension
+      .addAction(
+        'TurnCameraTowardObject',
+        _('Look at an object'),
+        _('Change the camera rotation to look at an object. The camera top always face the screen.'),
+        _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('objectPtr', _('Object'), 'Scene3D::Cube3DObject')
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
+      .setDefaultValue('false')
+      .setFunctionName('gdjs.scene3d.camera.turnCameraTowardObject')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
-        extension
-          .addAction(
-            'TurnCameraTowardPosition',
-            _('Look at a position'),
-            _('Change the camera rotation to look at a position. The camera top always face the screen.'),
-            _('Change the camera rotation of _PARAM4_ to look at _PARAM1_; _PARAM2_; _PARAM3_'),
-            '',
-             // TODO (3D) - make or choose a proper icon for this.
-            'res/conditions/text24_black.png',
-            'res/conditions/text24_black.png'
-          )
-          .addCodeOnlyParameter('currentScene', '')
-          .addParameter('number', _('X position'))
-          .addParameter('number', _('Y position'))
-          .addParameter('number', _('Z position'))
-          .addParameter('layer', _('Layer'), '', true)
-          .setDefaultValue('""')
-          .addParameter('expression', _('Camera number (default : 0)'), '', true)
-          .setDefaultValue('0')
-          .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
-          .setDefaultValue('false')
-          .setFunctionName('gdjs.scene3d.camera.turnCameraTowardPosition')
-          .setIncludeFile('Extensions/3D/Scene3DTools.js');
+    extension
+      .addAction(
+        'TurnCameraTowardPosition',
+        _('Look at a position'),
+        _('Change the camera rotation to look at a position. The camera top always face the screen.'),
+        _('Change the camera rotation of _PARAM4_ to look at _PARAM1_; _PARAM2_; _PARAM3_'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('number', _('X position'))
+      .addParameter('number', _('Y position'))
+      .addParameter('number', _('Z position'))
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
+      .setDefaultValue('false')
+      .setFunctionName('gdjs.scene3d.camera.turnCameraTowardPosition')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addAction(
+        'TurnCameraAroundX',
+        _('Turn the camera around X axis'),
+        _('Turn the object around X axis. This axis doesn\'t move with the camera rotation.'),
+        _('Turn the camera of _PARAM2_ from _PARAM1_° around X axis'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('number', _('Rotation angle'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.turnCameraAroundX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addAction(
+        'TurnCameraAroundY',
+        _('Turn the camera around Y axis'),
+        _('Turn the camera around Y axis. This axis doesn\'t move with the camera rotation.'),
+        _('Turn the camera of _PARAM2_ from _PARAM1_° around Y axis'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('number', _('Rotation angle'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.turnCameraAroundY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
+
+    extension
+      .addAction(
+        'TurnCameraAroundZ',
+        _('Turn the camera around Z axis'),
+        _('Turn the camera around Z axis. This axis doesn\'t move with the camera rotation.'),
+        _('Turn the camera of _PARAM2_ from _PARAM1_° around Z axis'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('number', _('Rotation angle'), '', false)
+      .addParameter('layer', _('Layer'), '', true)
+      .setDefaultValue('""')
+      .addParameter('expression', _('Camera number (default : 0)'), '', true)
+      .setDefaultValue('0')
+      .setFunctionName('gdjs.scene3d.camera.turnCameraAroundZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
       .addExpressionAndConditionAndAction(

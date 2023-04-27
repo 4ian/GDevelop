@@ -29,7 +29,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   originalProject.ExposeResources(absolutePathChecker);
 
   auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
-  std::cout << "Copying all ressources from " << projectDirectory << " to "
+  std::cout << "Copying all resources from " << projectDirectory << " to "
             << destinationDirectory << "..." << std::endl;
 
   // Get the resources to be copied

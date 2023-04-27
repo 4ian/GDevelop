@@ -35,7 +35,7 @@ class GD_CORE_API ExtensionsLoader {
    * \param platform The platform the extensions belongs to.
    * \param forgiving If set to true, files will try to be opened, but a failure
    * when searching for the platform creation function symbol won't be logged as
-   * an error. (All other errors are still reparted as usual).
+   * an error. (All other errors are still reported as usual).
    *
    * \note Extensions files must have extensions *.xgd(w|l|m)(e),
    * w for Windows, l for Linux, m for Mac, e for Edittime extensions.
@@ -51,7 +51,7 @@ class GD_CORE_API ExtensionsLoader {
    * \param platform The platform the extension belongs to.
    * \param forgiving If set to true, files will try to be opened, but a failure
    * when searching for the platform creation function symbol won't be logged as
-   * an error. (All other errors are still reparted as usual).
+   * an error. (All other errors are still reported as usual).
    */
   static void LoadExtension(const gd::String& fullpath,
                             gd::Platform& platform,

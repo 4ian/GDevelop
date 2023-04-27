@@ -1496,7 +1496,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
-      // All the remaining objects, refered by "MyGroup" in the function, should have their variable increased.
+      // All the remaining objects, referred by "MyGroup" in the function, should have their variable increased.
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1 + 5 + 5
       );
@@ -1664,7 +1664,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
-      // All the remaining objects, refered by "MyGroup" in the function, should have their variable increased.
+      // All the remaining objects, referred by "MyGroup" in the function, should have their variable increased.
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         10
       );

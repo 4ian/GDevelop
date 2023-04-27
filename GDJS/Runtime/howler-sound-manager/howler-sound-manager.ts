@@ -221,7 +221,7 @@ namespace gdjs {
       return this;
     }
 
-    //TODO: Replace float type in those 2 methods with RangeOf<0..1> once it is standarized (https://github.com/Microsoft/TypeScript/issues/15480)
+    //TODO: Replace float type in those 2 methods with RangeOf<0..1> once it is standardized (https://github.com/Microsoft/TypeScript/issues/15480)
     /**
      * Get the sound volume.
      * @returns A float from 0 to 1.

@@ -103,7 +103,7 @@ namespace gdjs {
       return;
     }
 
-    // Autoscroll commands so the user doesnt have to press again
+    // Autoscroll commands so the user doesn't have to press again.
     if (
       gdjs.dialogueTree._isLineTypeCommand() &&
       this.dialogueDataType === 'text' &&
@@ -458,7 +458,7 @@ namespace gdjs {
    *
    * There are three types:
    * - text - regular dialogue text is being parsed at the moment
-   * - options - the player has reached a branching choise moment where they must select one of multiple options
+   * - options - the player has reached a branching choice moment where they must select one of multiple options
    * - command - a <<command>> was called in the background, that can be used to trigger game events, but will not be displayed in the dialogue box.
    *
    * @param type The type you want to check for ( one of the three above )
@@ -485,7 +485,7 @@ namespace gdjs {
   };
 
   /**
-   * Check if a branch exists. It is also used internaly whenever you use the start from action.
+   * Check if a branch exists. It is also used internally whenever you use the start from action.
    * @param branchName The Dialogue Branch name you want to check.
    */
   gdjs.dialogueTree.hasDialogueBranch = function (branchName: string) {

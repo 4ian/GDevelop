@@ -72,14 +72,9 @@ namespace gdjs {
       if (!this._object.isFaceAtIndexVisible(faceIndex))
         return getTransparentMaterial();
 
-      return new THREE.MeshBasicMaterial({
-        map: this._runtimeGame
-          .getImageManager()
-          .getThreeTexture(this._object.getFaceAtIndexResourceName(faceIndex)),
-        // TODO (3D) - optimization: use FrontSide instead of DoubleSide if no transparent textures and all face are shown.
-        side: THREE.DoubleSide,
-        transparent: true,
-      });
+      return this._runtimeGame
+        .getImageManager()
+        .getThreeMaterial(this._object.getFaceAtIndexResourceName(faceIndex));
     }
 
     updateFace(faceIndex: integer) {

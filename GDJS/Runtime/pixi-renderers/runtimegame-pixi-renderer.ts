@@ -223,6 +223,8 @@ namespace gdjs {
         this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
         this._pixiRenderer.height !== this._game.getGameResolutionHeight()
       ) {
+        // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
+        // to enable a mode where pixi always fills the whole screen.
         this._pixiRenderer.resize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()

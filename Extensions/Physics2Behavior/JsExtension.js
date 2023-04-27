@@ -758,7 +758,7 @@ module.exports = {
 
     aut
       .addAction(
-        'SetSleepingaAllowed',
+        'SetSleepingAllowed',
         _('Sleeping allowed'),
         _(
           'Allow or not an object to sleep. If enabled the object will be able to sleep, improving performance for non-currently-moving objects.'

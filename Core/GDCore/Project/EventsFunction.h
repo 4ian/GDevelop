@@ -217,7 +217,7 @@ class GD_CORE_API EventsFunction {
   bool IsAsync() const { return isAsync; }
 
   /**
-   * \brief Sets the asycronity of the function.
+   * \brief Sets the asynchronicity of the function.
    */
   EventsFunction& SetAsync(bool _isAsync) {
     isAsync = _isAsync;

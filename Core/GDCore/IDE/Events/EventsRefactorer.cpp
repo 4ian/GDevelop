@@ -642,7 +642,7 @@ std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
   return modifiedEvents;
 }
 
-gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context,
+gd::String ReplaceAllOccurrencesCaseInsensitive(gd::String context,
                                                gd::String from,
                                                const gd::String& to) {
   size_t lookHere = 0;
@@ -673,7 +673,7 @@ bool EventsRefactorer::ReplaceStringInActions(gd::ObjectsContainer& project,
           matchCase
               ? actions[aId].GetParameter(pNb).GetPlainString().FindAndReplace(
                     toReplace, newString, true)
-              : ReplaceAllOccurencesCaseUnsensitive(
+              : ReplaceAllOccurrencesCaseInsensitive(
                     actions[aId].GetParameter(pNb).GetPlainString(),
                     toReplace,
                     newString);
@@ -713,7 +713,7 @@ bool EventsRefactorer::ReplaceStringInConditions(
                           .GetParameter(pNb)
                           .GetPlainString()
                           .FindAndReplace(toReplace, newString, true)
-                    : ReplaceAllOccurencesCaseUnsensitive(
+                    : ReplaceAllOccurrencesCaseInsensitive(
                           conditions[cId].GetParameter(pNb).GetPlainString(),
                           toReplace,
                           newString);
@@ -749,7 +749,7 @@ bool EventsRefactorer::ReplaceStringInEventSearchableStrings(
   for (std::size_t sNb = 0; sNb < stringEvent.size(); ++sNb) {
     gd::String newStringEvent =
         matchCase ? stringEvent[sNb].FindAndReplace(toReplace, newString, true)
-                  : ReplaceAllOccurencesCaseUnsensitive(
+                  : ReplaceAllOccurrencesCaseInsensitive(
                         stringEvent[sNb], toReplace, newString);
     newEventStrings.push_back(newStringEvent);
   }

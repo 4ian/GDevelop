@@ -584,32 +584,32 @@ public:
     String substr( size_type start = 0, size_type length = npos ) const;
 
     /**
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      */
     size_type find( const String &search, size_type pos = 0 ) const;
 
     /**
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      */
     size_type find( const char *search, size_type pos = 0 ) const;
 
     /**
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      */
     size_type find( const value_type search, size_type pos = 0 ) const;
 
     /**
-     * \return the position of the last occurence of **search** starting before **pos**.
+     * \return the position of the last occurrence of **search** starting before **pos**.
      */
     size_type rfind( const String &search, size_type pos = npos ) const;
 
     /**
-     * \return the position of the last occurence of **search** starting before **pos**.
+     * \return the position of the last occurrence of **search** starting before **pos**.
      */
     size_type rfind( const char *search, size_type pos = npos ) const;
 
     /**
-     * \return the position of the last occurence of **search** starting before **pos**.
+     * \return the position of the last occurrence of **search** starting before **pos**.
      */
     size_type rfind( const value_type &search, size_type pos = npos ) const;
 
@@ -658,7 +658,7 @@ public:
 
     /**
      * \brief Do a case-insensitive search
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      *
      * \note This method isn't very efficient as it is linear on the string size times the
      * search string size

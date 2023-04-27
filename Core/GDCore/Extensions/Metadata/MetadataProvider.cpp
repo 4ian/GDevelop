@@ -135,11 +135,11 @@ MetadataProvider::GetExtensionAndConditionMetadata(const gd::Platform& platform,
 
     const auto& objects = extension->GetExtensionObjectsTypes();
     for (const gd::String& extObjectType : objects) {
-      const auto& allObjetsConditions =
+      const auto& allObjectsConditions =
           extension->GetAllConditionsForObject(extObjectType);
-      if (allObjetsConditions.find(conditionType) != allObjetsConditions.end())
+      if (allObjectsConditions.find(conditionType) != allObjectsConditions.end())
         return ExtensionAndMetadata<InstructionMetadata>(
-            *extension, allObjetsConditions.find(conditionType)->second);
+            *extension, allObjectsConditions.find(conditionType)->second);
     }
 
     const auto& autos = extension->GetBehaviorsTypes();

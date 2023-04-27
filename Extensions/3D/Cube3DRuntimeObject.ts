@@ -6,6 +6,7 @@ namespace gdjs {
       width: float;
       height: float;
       depth: float;
+      enableTextureTransparency: boolean;
       frontFaceResourceName: string;
       backFaceResourceName: string;
       leftFaceResourceName: string;

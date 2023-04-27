@@ -70,7 +70,8 @@ module.exports = {
         propertyName === 'leftFaceVisible' ||
         propertyName === 'rightFaceVisible' ||
         propertyName === 'topFaceVisible' ||
-        propertyName === 'bottomFaceVisible'
+        propertyName === 'bottomFaceVisible' ||
+        propertyName === 'enableTextureTransparency'
       ) {
         objectContent[propertyName] = newValue === '1';
         return true;
@@ -81,6 +82,18 @@ module.exports = {
     // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
+
+      objectProperties
+        .getOrCreate('enableTextureTransparency')
+        .setValue(objectContent.enableTextureTransparency ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Enable texture transparency'))
+        .setDescription(
+          _(
+            'Enabling texture transparency has an impact on rendering performance.'
+          )
+        )
+        .setGroup(_('Texture settings'));
 
       objectProperties
         .getOrCreate('width')
@@ -203,6 +216,7 @@ module.exports = {
         width: 100,
         height: 100,
         depth: 100,
+        enableTextureTransparency: false,
         frontFaceResourceName: '',
         backFaceResourceName: '',
         leftFaceResourceName: '',

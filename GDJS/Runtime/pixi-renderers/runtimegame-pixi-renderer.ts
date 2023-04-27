@@ -75,8 +75,7 @@ namespace gdjs {
       }) as PIXI.Renderer;
 
       let gameCanvas: HTMLCanvasElement;
-      if (this._game.is3dEnabled()) {
-        if (!THREE) throw new Error('3D engine could not be found on 3D game.');
+      if (typeof THREE !== 'undefined' && this._game.is3dEnabled()) {
         this._pixiRenderer.backgroundAlpha = 0;
         this._threeRenderer = new THREE.WebGLRenderer({});
         // this._threeRenderer.setPixelRatio(0.05);

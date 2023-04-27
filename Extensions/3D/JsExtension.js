@@ -300,9 +300,7 @@ module.exports = {
       .addUnsupportedBaseObjectCapability('effect')
       // .addUnsupportedBaseObjectCapability('effect') // TODO: are there more unsupported features?
       .setIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
-      .addIncludeFile(
-        'Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js'
-      );
+      .addIncludeFile('Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js');
 
     // Properties expressions/conditions/actions:
     object
@@ -389,47 +387,53 @@ module.exports = {
       .setFunctionName('setFaceVisibility')
       .setGetter('isFaceVisible');
 
-      object
-        .addAction(
-          'TurnAroundX',
-          _('Turn around X axis'),
-          _('Turn the object around X axis. This axis doesn\'t move with the object rotation.'),
-          _('Turn _PARAM0_ from _PARAM1_° around X axis'),
-          '',
-          'res/conditions/3d_box.svg',
-          'res/conditions/3d_box.svg'
-        )
-        .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
-        .addParameter('number', _('Rotation angle'), '', false)
-        .setFunctionName('turnAroundX');
+    object
+      .addAction(
+        'TurnAroundX',
+        _('Turn around X axis'),
+        _(
+          "Turn the object around X axis. This axis doesn't move with the object rotation."
+        ),
+        _('Turn _PARAM0_ from _PARAM1_° around X axis'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('number', _('Rotation angle'), '', false)
+      .setFunctionName('turnAroundX');
 
-        object
-          .addAction(
-            'TurnAroundY',
-            _('Turn around Y axis'),
-            _('Turn the object around Y axis. This axis doesn\'t move with the object rotation.'),
-            _('Turn _PARAM0_ from _PARAM1_° around Y axis'),
-            '',
-            'res/conditions/3d_box.svg',
-            'res/conditions/3d_box.svg'
-          )
-          .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
-          .addParameter('number', _('Rotation angle'), '', false)
-          .setFunctionName('turnAroundY');
+    object
+      .addAction(
+        'TurnAroundY',
+        _('Turn around Y axis'),
+        _(
+          "Turn the object around Y axis. This axis doesn't move with the object rotation."
+        ),
+        _('Turn _PARAM0_ from _PARAM1_° around Y axis'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('number', _('Rotation angle'), '', false)
+      .setFunctionName('turnAroundY');
 
-          object
-            .addAction(
-              'TurnAroundZ',
-              _('Turn around Z axis'),
-              _('Turn the object around Z axis. This axis doesn\'t move with the object rotation.'),
-              _('Turn _PARAM0_ from _PARAM1_° around Z axis'),
-              '',
-              'res/conditions/3d_box.svg',
-              'res/conditions/3d_box.svg'
-            )
-            .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
-            .addParameter('number', _('Rotation angle'), '', false)
-            .setFunctionName('turnAroundZ');
+    object
+      .addAction(
+        'TurnAroundZ',
+        _('Turn around Z axis'),
+        _(
+          "Turn the object around Z axis. This axis doesn't move with the object rotation."
+        ),
+        _('Turn _PARAM0_ from _PARAM1_° around Z axis'),
+        '',
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('number', _('Rotation angle'), '', false)
+      .setFunctionName('turnAroundZ');
 
     object
       .addAction(
@@ -528,7 +532,9 @@ module.exports = {
       .addAction(
         'TurnCameraTowardObject',
         _('Look at an object'),
-        _('Change the camera rotation to look at an object. The camera top always face the screen.'),
+        _(
+          'Change the camera rotation to look at an object. The camera top always face the screen.'
+        ),
         _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
         '',
         'res/conditions/3d_box.svg',
@@ -549,8 +555,12 @@ module.exports = {
       .addAction(
         'TurnCameraTowardPosition',
         _('Look at a position'),
-        _('Change the camera rotation to look at a position. The camera top always face the screen.'),
-        _('Change the camera rotation of _PARAM4_ to look at _PARAM1_; _PARAM2_; _PARAM3_'),
+        _(
+          'Change the camera rotation to look at a position. The camera top always face the screen.'
+        ),
+        _(
+          'Change the camera rotation of _PARAM4_ to look at _PARAM1_; _PARAM2_; _PARAM3_'
+        ),
         '',
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
@@ -572,7 +582,9 @@ module.exports = {
       .addAction(
         'TurnCameraAroundX',
         _('Turn the camera around X axis'),
-        _('Turn the object around X axis. This axis doesn\'t move with the camera rotation.'),
+        _(
+          "Turn the object around X axis. This axis doesn't move with the camera rotation."
+        ),
         _('Turn the camera of _PARAM2_ from _PARAM1_° around X axis'),
         '',
         'res/conditions/3d_box.svg',
@@ -591,7 +603,9 @@ module.exports = {
       .addAction(
         'TurnCameraAroundY',
         _('Turn the camera around Y axis'),
-        _('Turn the camera around Y axis. This axis doesn\'t move with the camera rotation.'),
+        _(
+          "Turn the camera around Y axis. This axis doesn't move with the camera rotation."
+        ),
         _('Turn the camera of _PARAM2_ from _PARAM1_° around Y axis'),
         '',
         'res/conditions/3d_box.svg',
@@ -610,7 +624,9 @@ module.exports = {
       .addAction(
         'TurnCameraAroundZ',
         _('Turn the camera around Z axis'),
-        _('Turn the camera around Z axis. This axis doesn\'t move with the camera rotation.'),
+        _(
+          "Turn the camera around Z axis. This axis doesn't move with the camera rotation."
+        ),
         _('Turn the camera of _PARAM2_ from _PARAM1_° around Z axis'),
         '',
         'res/conditions/3d_box.svg',

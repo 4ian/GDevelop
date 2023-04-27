@@ -1,6 +1,6 @@
 namespace gdjs {
-  /** Base parameters for {@link gdjs.ThreeDShapeRuntimeObject} */
-  export interface ThreeDShapeObjectData extends ObjectData {
+  /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
+  export interface Cube3DObjectData extends ObjectData {
     /** The base parameters of the ThreeDShape */
     content: {
       width: float;
@@ -34,8 +34,8 @@ namespace gdjs {
   /**
    * Shows a 3D box object.
    */
-  export class ThreeDShapeRuntimeObject extends gdjs.RuntimeObject {
-    _renderer: ThreeDShapeRuntimeObjectRenderer;
+  export class Cube3DRuntimeObject extends gdjs.RuntimeObject {
+    _renderer: Cube3DRuntimeObjectRenderer;
     private _z: float = 0;
     private _width: float;
     private _height: float;
@@ -55,7 +55,7 @@ namespace gdjs {
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
-      objectData: ThreeDShapeObjectData
+      objectData: Cube3DObjectData
     ) {
       super(instanceContainer, objectData);
 
@@ -84,7 +84,7 @@ namespace gdjs {
         objectData.content.bottomFaceResourceName,
       ];
 
-      this._renderer = new gdjs.ThreeDShapeRuntimeObjectRenderer(
+      this._renderer = new gdjs.Cube3DRuntimeObjectRenderer(
         this,
         instanceContainer
       );
@@ -157,8 +157,8 @@ namespace gdjs {
     }
 
     updateFromObjectData(
-      oldObjectData: ThreeDShapeObjectData,
-      newObjectData: ThreeDShapeObjectData
+      oldObjectData: Cube3DObjectData,
+      newObjectData: Cube3DObjectData
     ): boolean {
       if (oldObjectData.content.width !== newObjectData.content.width) {
         this.setWidth(newObjectData.content.width);
@@ -386,5 +386,5 @@ namespace gdjs {
       this._renderer.updateSize();
     }
   }
-  gdjs.registerObject('3D::ThreeDShapeObject', gdjs.ThreeDShapeRuntimeObject);
+  gdjs.registerObject('Scene3D::Cube3DObject', gdjs.Cube3DRuntimeObject);
 }

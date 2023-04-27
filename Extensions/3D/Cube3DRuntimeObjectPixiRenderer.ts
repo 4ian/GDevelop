@@ -32,13 +32,13 @@ namespace gdjs {
     return transparentMaterial;
   };
 
-  class ThreeDShapeRuntimeObjectPixiRenderer {
-    private _object: gdjs.ThreeDShapeRuntimeObject;
+  class Cube3DRuntimeObjectPixiRenderer {
+    private _object: gdjs.Cube3DRuntimeObject;
     private _runtimeGame: gdjs.RuntimeGame;
     private _boxMesh: THREE.Mesh;
 
     constructor(
-      runtimeObject: gdjs.ThreeDShapeRuntimeObject,
+      runtimeObject: gdjs.Cube3DRuntimeObject,
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
@@ -119,6 +119,6 @@ namespace gdjs {
     }
   }
 
-  export const ThreeDShapeRuntimeObjectRenderer = ThreeDShapeRuntimeObjectPixiRenderer;
-  export type ThreeDShapeRuntimeObjectRenderer = ThreeDShapeRuntimeObjectPixiRenderer;
+  export const Cube3DRuntimeObjectRenderer = Cube3DRuntimeObjectPixiRenderer;
+  export type Cube3DRuntimeObjectRenderer = Cube3DRuntimeObjectPixiRenderer;
 }

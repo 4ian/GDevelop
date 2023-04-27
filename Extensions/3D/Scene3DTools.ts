@@ -1,5 +1,5 @@
 namespace gdjs {
-  export namespace threeD {
+  export namespace scene3d {
     const assumedFovIn2D = 45;
 
     export namespace camera {
@@ -106,7 +106,7 @@ namespace gdjs {
 
       export const turnCameraTowardObject = (
         runtimeScene: RuntimeScene,
-        object: gdjs.ThreeDShapeRuntimeObject,
+        object: gdjs.Cube3DRuntimeObject,
         layerName: string,
         cameraIndex: integer,
         isStandingOnY: boolean

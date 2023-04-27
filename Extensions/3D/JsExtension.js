@@ -27,7 +27,7 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
-        '3D',
+        'Scene3D',
         _('3D'),
         _('Support for 3D in GDevelop.'),
         'Florian Rival',
@@ -35,9 +35,9 @@ module.exports = {
       )
       .setCategory('General');
 
-    const threeDShapeObject = new gd.ObjectJsImplementation();
+    const Cube3DObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
-    threeDShapeObject.updateProperty = function (
+    Cube3DObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -76,7 +76,7 @@ module.exports = {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating an object
-    threeDShapeObject.getProperties = function (objectContent) {
+    Cube3DObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties
@@ -195,7 +195,7 @@ module.exports = {
 
       return objectProperties;
     };
-    threeDShapeObject.setRawJSONContent(
+    Cube3DObject.setRawJSONContent(
       JSON.stringify({
         width: 100,
         height: 100,
@@ -216,7 +216,7 @@ module.exports = {
     );
 
     // $FlowExpectedError
-    threeDShapeObject.updateInitialInstanceProperty = function (
+    Cube3DObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -242,7 +242,7 @@ module.exports = {
     };
 
     // $FlowExpectedError
-    threeDShapeObject.getInitialInstanceProperties = function (
+    Cube3DObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -273,18 +273,18 @@ module.exports = {
 
     const object = extension
       .addObject(
-        'ThreeDShapeObject',
+        'Cube3DObject',
         _('3D Shape'),
         _('A 3D shape.'),
         'JsPlatform/Extensions/3d_box.svg',
-        threeDShapeObject
+        Cube3DObject
       )
       .setCategoryFullName(_('3D'))
       .addUnsupportedBaseObjectCapability('effect')
       // .addUnsupportedBaseObjectCapability('effect') // TODO: are there more unsupported features?
-      .setIncludeFile('Extensions/3D/threedshaperuntimeobject.js')
+      .setIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
       .addIncludeFile(
-        'Extensions/3D/threedshaperuntimeobject-pixi-renderer.js'
+        'Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js'
       );
 
     // Properties expressions/conditions/actions:
@@ -298,7 +298,7 @@ module.exports = {
         '',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setZ')
       .setGetter('getZ');
@@ -313,7 +313,7 @@ module.exports = {
         '',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDepth')
       .setGetter('getDepth');
@@ -328,7 +328,7 @@ module.exports = {
         '',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setRotationX')
       .setGetter('getRotationX');
@@ -343,7 +343,7 @@ module.exports = {
         '',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setRotationY')
       .setGetter('getRotationY');
@@ -358,7 +358,7 @@ module.exports = {
         '',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
       .addParameter(
         'stringWithSelector',
         _('Face'),
@@ -382,7 +382,7 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'ThreeDShapeObject', false)
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
       .addParameter(
         'stringWithSelector',
         _('Face'),
@@ -409,9 +409,9 @@ module.exports = {
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
       .setDefaultValue('0')
       .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setCameraZ')
-      .setGetter('gdjs.threeD.camera.getCameraZ')
-      .setIncludeFile('Extensions/3D/threedtools.js');
+      .setFunctionName('gdjs.scene3d.camera.setCameraZ')
+      .setGetter('gdjs.scene3d.camera.getCameraZ')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -435,9 +435,9 @@ module.exports = {
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
       .setDefaultValue('0')
       .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setCameraRotationX')
-      .setGetter('gdjs.threeD.camera.getCameraRotationX')
-      .setIncludeFile('Extensions/3D/threedtools.js');
+      .setFunctionName('gdjs.scene3d.camera.setCameraRotationX')
+      .setGetter('gdjs.scene3d.camera.getCameraRotationX')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -461,9 +461,9 @@ module.exports = {
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
       .setDefaultValue('0')
       .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setCameraRotationY')
-      .setGetter('gdjs.threeD.camera.getCameraRotationY')
-      .setIncludeFile('Extensions/3D/threedtools.js');
+      .setFunctionName('gdjs.scene3d.camera.setCameraRotationY')
+      .setGetter('gdjs.scene3d.camera.getCameraRotationY')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
       extension
         .addAction(
@@ -477,15 +477,15 @@ module.exports = {
           'res/conditions/text24_black.png'
         )
         .addCodeOnlyParameter('currentScene', '')
-        .addParameter('objectPtr', _('Object'), '3D::ThreeDShapeObject')
+        .addParameter('objectPtr', _('Object'), 'Scene3D::Cube3DObject')
         .addParameter('layer', _('Layer'), '', true)
         .setDefaultValue('""')
         .addParameter('expression', _('Camera number (default : 0)'), '', true)
         .setDefaultValue('0')
         .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
         .setDefaultValue('false')
-        .setFunctionName('gdjs.threeD.camera.turnCameraTowardObject')
-        .setIncludeFile('Extensions/3D/threedtools.js');
+        .setFunctionName('gdjs.scene3d.camera.turnCameraTowardObject')
+        .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
         extension
           .addAction(
@@ -508,8 +508,8 @@ module.exports = {
           .setDefaultValue('0')
           .addParameter('yesorno', _('Stand on Y instead of Z'), '', true)
           .setDefaultValue('false')
-          .setFunctionName('gdjs.threeD.camera.turnCameraTowardPosition')
-          .setIncludeFile('Extensions/3D/threedtools.js');
+          .setFunctionName('gdjs.scene3d.camera.turnCameraTowardPosition')
+          .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -531,9 +531,9 @@ module.exports = {
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
       .setDefaultValue('0')
       .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setNearPlane')
-      .setGetter('gdjs.threeD.camera.getNearPlane')
-      .setIncludeFile('Extensions/3D/threedtools.js');
+      .setFunctionName('gdjs.scene3d.camera.setNearPlane')
+      .setGetter('gdjs.scene3d.camera.getNearPlane')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -555,9 +555,9 @@ module.exports = {
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
       .setDefaultValue('0')
       .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setFarPlane')
-      .setGetter('gdjs.threeD.camera.getFarPlane')
-      .setIncludeFile('Extensions/3D/threedtools.js');
+      .setFunctionName('gdjs.scene3d.camera.setFarPlane')
+      .setGetter('gdjs.scene3d.camera.getFarPlane')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     extension
       .addExpressionAndConditionAndAction(
@@ -581,9 +581,9 @@ module.exports = {
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
       .setDefaultValue('0')
       .markAsAdvanced()
-      .setFunctionName('gdjs.threeD.camera.setFov')
-      .setGetter('gdjs.threeD.camera.getFov')
-      .setIncludeFile('Extensions/3D/threedtools.js');
+      .setFunctionName('gdjs.scene3d.camera.setFov')
+      .setGetter('gdjs.scene3d.camera.getFov')
+      .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
     return extension;
   },
@@ -612,7 +612,7 @@ module.exports = {
     objectsEditorService /*: ObjectsEditorService */
   ) {
     objectsEditorService.registerEditorConfiguration(
-      '3D::ThreeDShapeObject',
+      'Scene3D::Cube3DObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
         helpPagePath: '/objects/3d_shape',
       })
@@ -848,7 +848,7 @@ module.exports = {
     }
 
     objectsRenderingService.registerInstanceRenderer(
-      '3D::ThreeDShapeObject',
+      'Scene3D::Cube3DObject',
       RenderedThreeDShapeObjectInstance
     );
   },

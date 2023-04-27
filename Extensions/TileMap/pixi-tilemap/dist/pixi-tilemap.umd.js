@@ -77,7 +77,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
          * The width/height of each texture tile in a {@link TEXTILE_DIMEN}. This is 1024px by default.
          *
          * This should fit all tile base-textures; otherwise, {@link TextileResource} may fail to correctly
-         * upload the textures together in a tiled fashion.
+         * upload the textures togther in a tiled fashion.
          */
         TEXTILE_DIMEN: 1024,
 

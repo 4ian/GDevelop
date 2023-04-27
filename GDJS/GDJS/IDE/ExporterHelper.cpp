@@ -121,7 +121,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 /*pixiInThreeRenderers=*/true,
+                 /*pixiInThreeRenderers=*/exportedProject.Is3dEnabled(),
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/

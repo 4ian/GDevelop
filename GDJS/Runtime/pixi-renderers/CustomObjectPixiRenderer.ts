@@ -32,7 +32,11 @@ namespace gdjs {
       // TODO (3D) - optimization: don't create a PixiJS container if only 3D objects.
       // And same, in reverse, for 2D only objects.
       this._pixiContainer = new PIXI.Container();
-      this._threeGroup = THREE ? new THREE.Group() : null;
+      this._threeGroup =
+        typeof THREE !== 'undefined' &&
+        this._object.getRuntimeScene().getGame().is3dEnabled()
+          ? new THREE.Group()
+          : null;
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).

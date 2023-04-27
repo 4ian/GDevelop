@@ -144,6 +144,7 @@ namespace gdjs {
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
     _minFPS: integer;
+    _enable3d: boolean;
     _gameResolutionWidth: integer;
     _gameResolutionHeight: integer;
     _originalWidth: float;
@@ -230,8 +231,9 @@ namespace gdjs {
         this._imageManager
       );
       this._effectsManager = new gdjs.EffectsManager();
-      this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
-      this._minFPS = this._data ? this._data.properties.minFPS : 15;
+      this._enable3d = this._data.properties.enable3d;
+      this._maxFPS = this._data.properties.maxFPS;
+      this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
@@ -606,6 +608,13 @@ namespace gdjs {
      */
     getMinimalFramerate(): integer {
       return this._minFPS;
+    }
+
+    /**
+     * Return true if the game should be rendered in a 3D environment.
+     */
+    is3dEnabled(): boolean {
+      return this._enable3d
     }
 
     /**

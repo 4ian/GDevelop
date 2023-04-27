@@ -177,7 +177,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
 /**
  * Allow to efficiently search and filters items.
  *
- * This instanciates a search API (in a web-worker, if available), index
+ * This instantiates a search API (in a web-worker, if available), index
  * the specified items, then returns the results of the search (according to the
  * search text and the chosen category/filters).
  *

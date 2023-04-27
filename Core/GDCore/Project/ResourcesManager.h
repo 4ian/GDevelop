@@ -142,7 +142,7 @@ class GD_CORE_API Resource {
   virtual void SerializeTo(SerializerElement& element) const {};
 
   /**
-   * \brief Unserialize the objectt.
+   * \brief Unserialize the object.
    */
   virtual void UnserializeFrom(const SerializerElement& element){};
 
@@ -195,7 +195,7 @@ class GD_CORE_API ImageResource : public Resource {
   void SerializeTo(SerializerElement& element) const override;
 
   /**
-   * \brief Unserialize the objectt.
+   * \brief Unserialize the object.
    */
   void UnserializeFrom(const SerializerElement& element) override;
 
@@ -637,7 +637,7 @@ class GD_CORE_API ResourcesManager {
   void SerializeTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the objectt.
+   * \brief Unserialize the object.
    */
   void UnserializeFrom(const SerializerElement& element);
 
@@ -714,7 +714,7 @@ class GD_CORE_API ResourceFolder {
   void SerializeTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the objectt.
+   * \brief Unserialize the object.
    */
   void UnserializeFrom(const SerializerElement& element,
                        gd::ResourcesManager& parentManager);

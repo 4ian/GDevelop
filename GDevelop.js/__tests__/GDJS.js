@@ -306,10 +306,10 @@ describe('libGD.js - GDJS related tests', function () {
         'gdjs.SceneCode.GDMyObjectObjects1[i].setAnimation(2);'
       );
 
-      // Check that the action with a wrong obejct was not generated.
+      // Check that the action with a wrong object was not generated.
       expect(code).toMatch('/* Mismatched object type - skipped. */');
 
-      // Check that the action with a wrong obejct was not generated.
+      // Check that the action with a wrong object was not generated.
       expect(code).toMatch('/* Unknown object - skipped. */');
 
       // Check that the unknown action was not generated.

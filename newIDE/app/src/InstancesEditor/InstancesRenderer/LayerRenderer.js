@@ -114,7 +114,7 @@ export default class LayerRenderer {
         gd.InitialInstance
       );
 
-      //Get the "RendereredInstance" object associated to the instance and tell it to update.
+      //Get the "RenderedInstance" object associated to the instance and tell it to update.
       var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
         instance
       );

@@ -305,7 +305,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         // It's important to call onDeleteObject, because the parent might
         // have to do some refactoring/clean up work before the object is deleted
-        // (typically, the SceneEditor will remove instances refering to the object,
+        // (typically, the SceneEditor will remove instances referring to the object,
         // leading to the removal of their renderer - which can keep a reference to
         // the object).
         onDeleteObject(objectWithContext, doRemove => {

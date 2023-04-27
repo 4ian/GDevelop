@@ -119,7 +119,7 @@ export default function InlinePopover(props: Props) {
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab
           // (or shift+tab), we "loop" the focus so that it stays inside the popover.
-          // Otherwise, the focus would espace and could go in some unrelated element
+          // Otherwise, the focus would escape and could go in some unrelated element
           // in the events sheet, triggering a scroll, which would be very disturbing
           // and would break the keyboard navigation.
           if (shouldFocusNextField(event)) {

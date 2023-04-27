@@ -92,7 +92,7 @@ namespace gdjs {
       }
 
       // Replaces all non-alphanumeric characters with dashes to ensure no issues when
-      // refering to this font family (see https://github.com/4ian/GDevelop/issues/1521).
+      // referring to this font family (see https://github.com/4ian/GDevelop/issues/1521).
       let baseSlugifiedName =
         'gdjs_font_' + filename.toLowerCase().replace(/[^\w]/gi, '-');
 

@@ -97,7 +97,7 @@ const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
   };
 };
 
-/** Check if the IDE version, passed as argument, satisfiy the version required by the extension. */
+/** Check if the IDE version, passed as argument, satisfy the version required by the extension. */
 export const isCompatibleWithExtension = (
   ideVersion: string,
   extensionShortHeader: ExtensionShortHeader

@@ -56,7 +56,7 @@ type ConstructorArgs = {|
 |};
 
 /**
- * Listen to keyboard shorcuts and call callbacks according to them.
+ * Listen to keyboard shortcuts and call callbacks according to them.
  * Also store the state of the modifier keys (shift, ctrl, alt, meta) to know
  * if some special operations (multi selection, selection duplication) must
  * be done.

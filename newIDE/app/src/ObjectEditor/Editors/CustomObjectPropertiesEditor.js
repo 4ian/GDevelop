@@ -157,7 +157,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                                   resourceManagementProps
                                 }
                                 onSizeUpdated={
-                                  forceUpdate /*Force update to ensure dialog is properly positionned*/
+                                  forceUpdate /*Force update to ensure dialog is properly positioned*/
                                 }
                                 objectName={
                                   objectName + ' ' + childObject.getName()

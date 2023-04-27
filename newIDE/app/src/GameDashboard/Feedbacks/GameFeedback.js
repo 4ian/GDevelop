@@ -318,7 +318,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
           {authenticatedUser.authenticated && isErrored && (
             <PlaceholderError onRetry={loadFeedbacksAndBuilds}>
               <Trans>
-                An error occured while retrieving feedbacks for this game.
+                An error occurred while retrieving feedbacks for this game.
               </Trans>
             </PlaceholderError>
           )}

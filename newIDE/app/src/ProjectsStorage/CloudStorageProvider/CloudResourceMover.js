@@ -8,7 +8,7 @@ import {
   type UploadedProjectResourceFiles,
   uploadProjectResourceFiles,
   extractFilenameFromProjectResourceUrl,
-  extractProjectUuidFromProjetResourceUrl,
+  extractProjectUuidFromProjectResourceUrl,
 } from '../../Utils/GDevelopServices/Project';
 import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
 import {
@@ -59,7 +59,7 @@ export const moveAllCloudProjectResourcesToCloudProject = async ({
           if (isURL(resourceFile)) {
             if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
               if (
-                extractProjectUuidFromProjetResourceUrl(resourceFile) ===
+                extractProjectUuidFromProjectResourceUrl(resourceFile) ===
                 newCloudProjectId
               ) {
                 // Somehow the resource is *already* stored in the new project - surely because

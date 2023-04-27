@@ -205,7 +205,7 @@ describe('InstancesSelection', () => {
     instance3OfObject2.delete();
   });
 
-  it('handles deselecting instances explicitely', () => {
+  it('handles deselecting instances explicitly', () => {
     const instancesSelection = new InstancesSelection();
     const instance1OfObject1 = new gd.InitialInstance();
     instance1OfObject1.setObjectName('Object1');

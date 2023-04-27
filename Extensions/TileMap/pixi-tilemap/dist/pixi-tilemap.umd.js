@@ -77,7 +77,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
          * The width/height of each texture tile in a {@link TEXTILE_DIMEN}. This is 1024px by default.
          *
          * This should fit all tile base-textures; otherwise, {@link TextileResource} may fail to correctly
-         * upload the textures togther in a tiled fashion.
+         * upload the textures together in a tiled fashion.
          */
         TEXTILE_DIMEN: 1024,
 
@@ -865,7 +865,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
     /**
      * A tilemap composite that lazily builds tilesets layered into multiple tilemaps.
      *
-     * The composite tileset is the concatenatation of the individual tilesets used in the tilemaps. You can
+     * The composite tileset is the concatenation of the individual tilesets used in the tilemaps. You can
      * preinitialized it by passing a list of tile textures to the constructor. Otherwise, the composite tilemap
      * is lazily built as you add more tiles with newer tile textures. A new tilemap is created once the last
      * tilemap has reached its limit (as set by {@link CompositeTilemap.texturesPerTilemap texturesPerTilemap}).
@@ -1381,7 +1381,7 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
         get texPerChild() { return this.texturesPerTilemap; }
     }
 
-    // For some reason ESLint goes mad with indendation in this file ^&^
+    // For some reason ESLint goes mad with indentation in this file ^&^
     /* eslint-disable indent */
 
     /**
@@ -1680,7 +1680,7 @@ void main(void)
 }
 `;
 
-    // For some reason ESLint goes mad with indendation in this file ^&^
+    // For some reason ESLint goes mad with indentation in this file ^&^
     /* eslint-disable no-mixed-spaces-and-tabs, indent */
 
     class TilemapShader extends core.Shader
@@ -1732,7 +1732,7 @@ void main(void)
     	
     }
 
-    // For some reason ESLint goes mad with indendation in this file ^&^
+    // For some reason ESLint goes mad with indentation in this file ^&^
     /* eslint-disable no-mixed-spaces-and-tabs, indent */
 
     /**

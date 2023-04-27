@@ -774,6 +774,11 @@ module.exports = {
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
+    
+    // Deprecated action (fixed typo):
+    aut
+      .addDuplicatedAction("SetSleepingaAllowed", "SetSleepingAllowed")
+      .setHidden();
 
     aut
       .addCondition(

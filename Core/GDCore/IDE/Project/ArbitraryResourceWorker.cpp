@@ -66,7 +66,7 @@ void ArbitraryResourceWorker::ExposeAudio(gd::String& audioName) {
     }
   }
 
-  // For compatibility with older projects (where events were refering to files
+  // For compatibility with older projects (where events were referring to files
   // directly), we consider that this resource name is a filename, and so expose
   // it as a file.
   ExposeFile(audioName);
@@ -83,7 +83,7 @@ void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
     }
   }
 
-  // For compatibility with older projects (where events were refering to files
+  // For compatibility with older projects (where events were referring to files
   // directly), we consider that this resource name is a filename, and so expose
   // it as a file.
   ExposeFile(fontName);

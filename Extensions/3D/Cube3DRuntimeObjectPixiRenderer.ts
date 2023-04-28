@@ -74,7 +74,9 @@ namespace gdjs {
 
       return this._runtimeGame
         .getImageManager()
-        .getThreeMaterial(this._object.getFaceAtIndexResourceName(faceIndex));
+        .getThreeMaterial(this._object.getFaceAtIndexResourceName(faceIndex), {
+          useTransparentTexture: this._object.shouldUseTransparentTexture(),
+        });
     }
 
     updateFace(faceIndex: integer) {

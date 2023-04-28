@@ -211,18 +211,24 @@ namespace gdjs {
     /**
      * Return the three.js material associated to the specified resource name.
      * @param resourceName The name of the resource
+     * @param options
      * @returns The requested material.
      */
-    getThreeMaterial(resourceName: string) {
-      const loadedThreeMaterial = this._loadedThreeMaterials.get(resourceName);
+    getThreeMaterial(
+      resourceName: string,
+      { useTransparentTexture }: { useTransparentTexture: boolean }
+    ) {
+      const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
+      const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
       if (loadedThreeMaterial) return loadedThreeMaterial;
 
       const material = new THREE.MeshBasicMaterial({
         map: this.getThreeTexture(resourceName),
-        side: THREE.FrontSide,
+        side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+        transparent: useTransparentTexture,
       });
 
-      this._loadedThreeMaterials.put(resourceName, material);
+      this._loadedThreeMaterials.put(cacheKey, material);
       return material;
     }
 

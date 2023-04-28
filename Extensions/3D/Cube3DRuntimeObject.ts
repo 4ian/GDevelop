@@ -13,6 +13,12 @@ namespace gdjs {
       rightFaceResourceName: string;
       topFaceResourceName: string;
       bottomFaceResourceName: string;
+      frontFaceResourceRepeat: boolean;
+      backFaceResourceRepeat: boolean;
+      leftFaceResourceRepeat: boolean;
+      rightFaceResourceRepeat: boolean;
+      topFaceResourceRepeat: boolean;
+      bottomFaceResourceRepeat: boolean;
       frontFaceVisible: boolean;
       backFaceVisible: boolean;
       leftFaceVisible: boolean;
@@ -46,6 +52,7 @@ namespace gdjs {
     private _shouldUseTransparentTexture: boolean;
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
     private _visibleFacesBitmask: integer;
+    private _textureRepeatFacesBitmask: integer;
     private _faceResourceNames: [
       string,
       string,
@@ -79,6 +86,20 @@ namespace gdjs {
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['top'];
       if (objectData.content.bottomFaceVisible)
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['bottom'];
+      this._textureRepeatFacesBitmask = 0;
+      if (objectData.content.frontFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['front'];
+      if (objectData.content.backFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['back'];
+      if (objectData.content.leftFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['left'];
+      if (objectData.content.rightFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['right'];
+      if (objectData.content.topFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['top'];
+      if (objectData.content.bottomFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |=
+          1 << faceNameToBitmaskIndex['bottom'];
       this._faceResourceNames = [
         objectData.content.frontFaceResourceName,
         objectData.content.backFaceResourceName,
@@ -132,6 +153,11 @@ namespace gdjs {
     /** @internal */
     isFaceAtIndexVisible(faceIndex): boolean {
       return (this._visibleFacesBitmask & (1 << faceIndex)) !== 0;
+    }
+
+    /** @internal */
+    shouldRepeatTextureOnFaceAtIndex(faceIndex): boolean {
+      return (this._textureRepeatFacesBitmask & (1 << faceIndex)) !== 0;
     }
 
     setFaceResourceName(faceName: FaceName, resourceName: string): void {

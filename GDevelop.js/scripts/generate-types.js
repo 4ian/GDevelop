@@ -60,7 +60,7 @@ const webidlToolsFlowResult = shell.exec(
     fs.rmdirSync(idlTempFolder);
     if (code !== 0 || stdout.length > 1000) {
       shell.echo(
-        '❌ The output of "webidl-tools flow" is suspicously long or errored. Considering as an error.'
+        '❌ The output of "webidl-tools flow" is suspiciously long or errored. Considering as an error.'
       );
       shell.echo(
         'ℹ️ Is Bindings.idl improperly formatted, or using a syntax not understood by "webidl-tools flow"?'

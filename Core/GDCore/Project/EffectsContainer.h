@@ -64,7 +64,7 @@ class GD_CORE_API EffectsContainer {
   std::size_t GetEffectPosition(const gd::String& name) const;
 
   /**
-   * Return the number of effecst.
+   * Return the number of effects.
    */
   std::size_t GetEffectsCount() const;
 

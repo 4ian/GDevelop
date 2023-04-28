@@ -440,7 +440,7 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   componentWillUnmount() {
-    // This is an antipattern and is theorically not needed, but help
+    // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 

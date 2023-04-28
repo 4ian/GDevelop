@@ -339,6 +339,12 @@ module.exports = {
         .setType('number')
         .setLabel(_('Rotation on Y axis'));
 
+      instanceProperties
+        .getOrCreate('depth')
+        .setValue(instance.getRawDoubleProperty('depth').toString())
+        .setType('number')
+        .setLabel(_('Depth'));
+
       return instanceProperties;
     };
 

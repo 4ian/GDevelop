@@ -59,7 +59,8 @@ module.exports = {
         propertyName === 'leftFaceResourceName' ||
         propertyName === 'rightFaceResourceName' ||
         propertyName === 'topFaceResourceName' ||
-        propertyName === 'bottomFaceResourceName'
+        propertyName === 'bottomFaceResourceName' ||
+        propertyName === 'backFaceUpThroughWhichAxisRotation'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -139,6 +140,19 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Back face image'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('backFaceUpThroughWhichAxisRotation')
+        .setValue(objectContent.backFaceUpThroughWhichAxisRotation)
+        .setType('choice')
+        .addExtraInfo('X')
+        .addExtraInfo('Y')
+        .setLabel(
+          _(
+            'Rotation axis around which to get to the back face with the right way up.'
+          )
+        )
         .setGroup(_('Textures'));
 
       objectProperties
@@ -267,6 +281,7 @@ module.exports = {
         enableTextureTransparency: false,
         frontFaceResourceName: '',
         backFaceResourceName: '',
+        backFaceUpThroughWhichAxisRotation: 'X',
         leftFaceResourceName: '',
         rightFaceResourceName: '',
         topFaceResourceName: '',

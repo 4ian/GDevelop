@@ -9,6 +9,7 @@ namespace gdjs {
       enableTextureTransparency: boolean;
       frontFaceResourceName: string;
       backFaceResourceName: string;
+      backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
       leftFaceResourceName: string;
       rightFaceResourceName: string;
       topFaceResourceName: string;
@@ -49,6 +50,7 @@ namespace gdjs {
     private _depth: float;
     private _rotationX: float = 0;
     private _rotationY: float = 0;
+    private _backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
     private _shouldUseTransparentTexture: boolean;
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
     private _visibleFacesBitmask: integer;
@@ -100,6 +102,8 @@ namespace gdjs {
       if (objectData.content.bottomFaceResourceRepeat)
         this._textureRepeatFacesBitmask |=
           1 << faceNameToBitmaskIndex['bottom'];
+      this._backFaceUpThroughWhichAxisRotation =
+        objectData.content.backFaceUpThroughWhichAxisRotation;
       this._faceResourceNames = [
         objectData.content.frontFaceResourceName,
         objectData.content.backFaceResourceName,
@@ -195,6 +199,10 @@ namespace gdjs {
 
     get3dRendererObject() {
       return this._renderer.get3dRendererObject();
+    }
+
+    getBackFaceUpThroughWhichAxisRotation(): 'X' | 'Y' {
+      return this._backFaceUpThroughWhichAxisRotation;
     }
 
     updateFromObjectData(

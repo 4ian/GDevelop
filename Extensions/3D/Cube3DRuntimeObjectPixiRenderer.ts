@@ -205,18 +205,37 @@ namespace gdjs {
         } else {
           // Front or back
           const isFront = materialIndex === 4;
+          const shouldBackFaceBeUpThroughXAxisRotation =
+            this._object.getBackFaceUpThroughWhichAxisRotation() === 'X';
 
           let x: float, y: float;
           if (shouldRepeatTexture) {
             x =
-              (isFront ? 1 : -1) *
+              (isFront ? 1 : shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
               (this._boxMesh.scale.x / material.map.source.data.width) *
-              (pos.getX(vertexIndex) + (isFront ? 1 : -1) * 0.5);
+              (pos.getX(vertexIndex) +
+                (isFront
+                  ? 1
+                  : shouldBackFaceBeUpThroughXAxisRotation
+                  ? 1
+                  : -1) *
+                  0.5);
             y =
-              -(this._boxMesh.scale.y / material.map.source.data.height) *
-              (pos.getY(vertexIndex) + 0.5);
+              (isFront ? -1 : shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+              (this._boxMesh.scale.y / material.map.source.data.height) *
+              (pos.getY(vertexIndex) +
+                (isFront
+                  ? 1
+                  : shouldBackFaceBeUpThroughXAxisRotation
+                  ? -1
+                  : 1) *
+                  0.5);
           } else {
             [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+            if (!isFront && shouldBackFaceBeUpThroughXAxisRotation) {
+              x = -x;
+              y = -y;
+            }
           }
           uvMapping.setXY(vertexIndex, x, y);
         }

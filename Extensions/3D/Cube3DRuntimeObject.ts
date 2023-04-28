@@ -43,7 +43,7 @@ namespace gdjs {
     private _depth: float;
     private _rotationX: float = 0;
     private _rotationY: float = 0;
-    private _enableTextureTransparency: boolean;
+    private _shouldUseTransparentTexture: boolean;
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
     private _visibleFacesBitmask: integer;
     private _faceResourceNames: [
@@ -65,7 +65,7 @@ namespace gdjs {
       this._width = objectData.content.width || 100;
       this._height = objectData.content.height || 100;
       this._depth = objectData.content.depth || 100;
-      this._enableTextureTransparency =
+      this._shouldUseTransparentTexture =
         objectData.content.enableTextureTransparency || false;
       this._visibleFacesBitmask = 0;
       if (objectData.content.frontFaceVisible)
@@ -347,7 +347,7 @@ namespace gdjs {
      * Return true if the texture transparency should be enabled.
      */
     shouldUseTransparentTexture(): boolean {
-      return this._enableTextureTransparency;
+      return this._shouldUseTransparentTexture;
     }
 
     /**

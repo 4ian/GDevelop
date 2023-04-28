@@ -2,12 +2,12 @@ namespace gdjs {
   // Three.js materials for a cube and the order of faces in the object is different,
   // so we keep the mapping from one to the other.
   const faceIndexToMaterialIndex = {
-    3: 0,
-    2: 1,
-    5: 2,
-    4: 3,
-    0: 4,
-    1: 5,
+    3: 0, // right
+    2: 1, // left
+    5: 2, // top
+    4: 3, // bottom
+    0: 4, // front
+    1: 5, // back
   };
   const materialIndexToFaceIndex = {
     0: 3,
@@ -114,21 +114,68 @@ namespace gdjs {
         this._object.getDepth()
       );
       this.updatePosition();
-      this.updateTextures();
+      this.updateTextureUvMapping();
     }
 
-    updateTextures() {
-      this._boxMesh.material.forEach((material, materialIndex) => {
-        if (!material.map) return;
-        const faceIndex = materialIndexToFaceIndex[materialIndex];
-        const faceDimension = this._object.getFaceDimension(faceIndex);
-        const { height: resourceHeight, width: resourceWidth } =
-          material.map.source.data;
-        material.map.repeat.set(
-          faceDimension.width / resourceWidth,
-          faceDimension.height / resourceHeight
+    /**
+     * Updates the UV mapping of the geometry in order to repeat a material
+     * over the different faces of the cube.
+     * The mesh must be configured with a list of materials in order
+     * for the method to work.
+     */
+    updateTextureUvMapping() {
+      // @ts-ignore - position is stored as a Float32BufferAttribute
+      const pos: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('position');
+      // @ts-ignore - uv is stored as a Float32BufferAttribute
+      const uvMapping: THREE.BufferAttribute =
+        this._boxMesh.geometry.getAttribute('uv');
+      for (var vertexIndex = 0; vertexIndex < pos.count; vertexIndex++) {
+        const materialIndex = Math.floor(
+          vertexIndex /
+            // Each face of the cube has 4 points
+            4
         );
-      });
+        const material = this._boxMesh.material[materialIndex];
+        if (!material || !material.map) {
+          continue;
+        }
+        if (materialIndex === 0 || materialIndex === 1) {
+          // Right or left
+          const isRight = materialIndex === 0;
+          const y =
+            (isRight ? -1 : 1) *
+            (this._boxMesh.scale.y / material.map.source.data.width) *
+            (pos.getY(vertexIndex) + 0.5);
+          const z =
+            (this._boxMesh.scale.z / material.map.source.data.height) *
+            (pos.getZ(vertexIndex) - 0.5);
+          uvMapping.setXY(vertexIndex, y, z);
+        } else if (materialIndex === 2 || materialIndex === 3) {
+          // Top or bottom
+          const isTop = materialIndex === 2;
+          const x =
+            (isTop ? 1 : -1) *
+            (this._boxMesh.scale.x / material.map.source.data.width) *
+            (pos.getX(vertexIndex) + 0.5);
+          const z =
+            (this._boxMesh.scale.z / material.map.source.data.height) *
+            (pos.getZ(vertexIndex) - 0.5);
+          uvMapping.setXY(vertexIndex, x, z);
+        } else {
+          // Front or back
+          const isFront = materialIndex === 4;
+          const x =
+            (isFront ? 1 : -1) *
+            (this._boxMesh.scale.x / material.map.source.data.width) *
+            (pos.getX(vertexIndex) + (isFront ? 1 : -1) * 0.5);
+          const y =
+            -(this._boxMesh.scale.y / material.map.source.data.height) *
+            (pos.getY(vertexIndex) + 0.5);
+          uvMapping.setXY(vertexIndex, x, y);
+        }
+      }
+      uvMapping.needsUpdate = true;
     }
   }
 

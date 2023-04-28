@@ -182,17 +182,6 @@ namespace gdjs {
       return this._faceResourceNames[faceIndex];
     }
 
-    getFaceDimension(faceIndex: integer): { height: float; width: float } {
-      if (faceIndex === 0 || faceIndex === 1) {
-        return { height: this._height, width: this._width };
-      }
-      if (faceIndex === 2 || faceIndex === 3) {
-        return { height: this._depth, width: this._height };
-      }
-
-      return { height: this._depth, width: this._width };
-    }
-
     getRendererObject() {
       return null;
     }

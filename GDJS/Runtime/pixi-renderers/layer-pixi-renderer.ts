@@ -109,6 +109,7 @@ namespace gdjs {
             this._layer.getInitialThreeDNearPlaneDistance(),
             this._layer.getInitialThreeDFarPlaneDistance()
           );
+          this._threeCamera.rotation.order = 'ZYX';
 
         this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
         this._threePlaneMaterial = new THREE.MeshBasicMaterial({

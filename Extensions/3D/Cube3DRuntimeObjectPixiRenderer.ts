@@ -56,6 +56,7 @@ namespace gdjs {
         this._getFaceMaterial(materialIndexToFaceIndex[5]),
       ];
       this._boxMesh = new THREE.Mesh(geometry, materials);
+      this._boxMesh.rotation.order = 'ZYX';
 
       this.updateSize();
       this.updatePosition();

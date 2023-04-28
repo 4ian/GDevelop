@@ -336,6 +336,36 @@ module.exports = {
     object
       .addExpressionAndConditionAndAction(
         'number',
+        'Width',
+        _('Width'),
+        _('the width'),
+        _('the width'),
+        '',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setWidth')
+      .setGetter('getWidth');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Height',
+        _('Height'),
+        _('the height'),
+        _('the height'),
+        '',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setHeight')
+      .setGetter('getHeight');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
         'RotationX',
         _('Rotation on X axis'),
         _('the rotation on X axis'),

@@ -92,6 +92,9 @@ namespace gdjs {
       if (materialIndex === undefined) return;
 
       this._boxMesh.material[materialIndex] = this._getFaceMaterial(faceIndex);
+      if (this._object.isFaceAtIndexVisible(faceIndex)) {
+        this.updateTextureUvMapping(faceIndex);
+      }
     }
 
     get3dRendererObject() {
@@ -129,15 +132,26 @@ namespace gdjs {
      * over the different faces of the cube.
      * The mesh must be configured with a list of materials in order
      * for the method to work.
+     * @param faceIndex The face index to update. If undefined, updates all the faces.
      */
-    updateTextureUvMapping() {
+    updateTextureUvMapping(faceIndex?: number) {
       // @ts-ignore - position is stored as a Float32BufferAttribute
       const pos: THREE.BufferAttribute =
         this._boxMesh.geometry.getAttribute('position');
       // @ts-ignore - uv is stored as a Float32BufferAttribute
       const uvMapping: THREE.BufferAttribute =
         this._boxMesh.geometry.getAttribute('uv');
-      for (var vertexIndex = 0; vertexIndex < pos.count; vertexIndex++) {
+      const startIndex =
+        faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
+      const endIndex =
+        faceIndex === undefined
+          ? 23
+          : faceIndexToMaterialIndex[faceIndex] * 4 + 3;
+      for (
+        var vertexIndex = startIndex;
+        vertexIndex <= endIndex;
+        vertexIndex++
+      ) {
         const materialIndex = Math.floor(
           vertexIndex /
             // Each face of the cube has 4 points

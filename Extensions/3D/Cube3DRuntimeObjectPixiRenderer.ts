@@ -18,6 +18,13 @@ namespace gdjs {
     5: 1,
   };
 
+  const noRepeatTextureVertexIndexToUvMapping = {
+    0: [0, 1],
+    1: [1, 1],
+    2: [0, 0],
+    3: [1, 0],
+  };
+
   let transparentMaterial: THREE.MeshBasicMaterial;
   const getTransparentMaterial = () => {
     if (!transparentMaterial)
@@ -140,38 +147,60 @@ namespace gdjs {
         if (!material || !material.map) {
           continue;
         }
+        const shouldRepeatTexture =
+          this._object.shouldRepeatTextureOnFaceAtIndex(
+            materialIndexToFaceIndex[materialIndex]
+          );
         if (materialIndex === 0 || materialIndex === 1) {
           // Right or left
           const isRight = materialIndex === 0;
-          const y =
-            (isRight ? -1 : 1) *
-            (this._boxMesh.scale.y / material.map.source.data.width) *
-            (pos.getY(vertexIndex) + 0.5);
-          const z =
-            (this._boxMesh.scale.z / material.map.source.data.height) *
-            (pos.getZ(vertexIndex) - 0.5);
+
+          let y: float, z: float;
+          if (shouldRepeatTexture) {
+            y =
+              (isRight ? -1 : 1) *
+              (this._boxMesh.scale.y / material.map.source.data.width) *
+              (pos.getY(vertexIndex) + 0.5);
+            z =
+              (this._boxMesh.scale.z / material.map.source.data.height) *
+              (pos.getZ(vertexIndex) - 0.5);
+          } else {
+            [y, z] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+          }
           uvMapping.setXY(vertexIndex, y, z);
         } else if (materialIndex === 2 || materialIndex === 3) {
           // Top or bottom
           const isTop = materialIndex === 2;
-          const x =
-            (isTop ? 1 : -1) *
-            (this._boxMesh.scale.x / material.map.source.data.width) *
-            (pos.getX(vertexIndex) + 0.5);
-          const z =
-            (this._boxMesh.scale.z / material.map.source.data.height) *
-            (pos.getZ(vertexIndex) - 0.5);
+
+          let x: float, z: float;
+          if (shouldRepeatTexture) {
+            x =
+              (isTop ? 1 : -1) *
+              (this._boxMesh.scale.x / material.map.source.data.width) *
+              (pos.getX(vertexIndex) + 0.5);
+            z =
+              (this._boxMesh.scale.z / material.map.source.data.height) *
+              (pos.getZ(vertexIndex) - 0.5);
+          } else {
+            [x, z] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+          }
           uvMapping.setXY(vertexIndex, x, z);
         } else {
           // Front or back
           const isFront = materialIndex === 4;
-          const x =
-            (isFront ? 1 : -1) *
-            (this._boxMesh.scale.x / material.map.source.data.width) *
-            (pos.getX(vertexIndex) + (isFront ? 1 : -1) * 0.5);
-          const y =
-            -(this._boxMesh.scale.y / material.map.source.data.height) *
-            (pos.getY(vertexIndex) + 0.5);
+
+          let x: float, y: float;
+          if (shouldRepeatTexture) {
+            x =
+              (isFront ? 1 : -1) *
+              (this._boxMesh.scale.x / material.map.source.data.width) *
+              (pos.getX(vertexIndex) + (isFront ? 1 : -1) * 0.5);
+            y =
+              -(this._boxMesh.scale.y / material.map.source.data.height) *
+              (pos.getY(vertexIndex) + 0.5);
+          } else {
+            [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+          }
           uvMapping.setXY(vertexIndex, x, y);
         }
       }

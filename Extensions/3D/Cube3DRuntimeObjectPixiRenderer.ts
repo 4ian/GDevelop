@@ -4,8 +4,8 @@ namespace gdjs {
   const faceIndexToMaterialIndex = {
     3: 0, // right
     2: 1, // left
-    5: 2, // top
-    4: 3, // bottom
+    5: 2, // bottom
+    4: 3, // top
     0: 4, // front
     1: 5, // back
   };
@@ -19,10 +19,10 @@ namespace gdjs {
   };
 
   const noRepeatTextureVertexIndexToUvMapping = {
-    0: [0, 1],
-    1: [1, 1],
-    2: [0, 0],
-    3: [1, 0],
+    0: [0, 0],
+    1: [1, 0],
+    2: [0, 1],
+    3: [1, 1],
   };
 
   let transparentMaterial: THREE.MeshBasicMaterial;
@@ -147,10 +147,12 @@ namespace gdjs {
         if (!material || !material.map) {
           continue;
         }
+
         const shouldRepeatTexture =
           this._object.shouldRepeatTextureOnFaceAtIndex(
             materialIndexToFaceIndex[materialIndex]
           );
+
         if (materialIndex === 0 || materialIndex === 1) {
           // Right or left
           const isRight = materialIndex === 0;
@@ -160,27 +162,28 @@ namespace gdjs {
             y =
               (isRight ? -1 : 1) *
               (this._boxMesh.scale.y / material.map.source.data.width) *
-              (pos.getY(vertexIndex) + 0.5);
+              (pos.getZ(vertexIndex) + (isRight ? -1 : 1) * 0.5);
             z =
+              (isRight ? -1 : -1) *
               (this._boxMesh.scale.z / material.map.source.data.height) *
-              (pos.getZ(vertexIndex) - 0.5);
+              (pos.getY(vertexIndex) + 0.5);
           } else {
             [y, z] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
           }
           uvMapping.setXY(vertexIndex, y, z);
         } else if (materialIndex === 2 || materialIndex === 3) {
           // Top or bottom
-          const isTop = materialIndex === 2;
+          const isBottom = materialIndex === 2;
 
           let x: float, z: float;
           if (shouldRepeatTexture) {
             x =
-              (isTop ? 1 : -1) *
               (this._boxMesh.scale.x / material.map.source.data.width) *
               (pos.getX(vertexIndex) + 0.5);
             z =
+              (isBottom ? 1 : -1) *
               (this._boxMesh.scale.z / material.map.source.data.height) *
-              (pos.getZ(vertexIndex) - 0.5);
+              (pos.getZ(vertexIndex) + (isBottom ? -1 : 1) * 0.5);
           } else {
             [x, z] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
           }

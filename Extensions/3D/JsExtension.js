@@ -71,6 +71,12 @@ module.exports = {
         propertyName === 'rightFaceVisible' ||
         propertyName === 'topFaceVisible' ||
         propertyName === 'bottomFaceVisible' ||
+        propertyName === 'frontFaceResourceRepeat' ||
+        propertyName === 'backFaceResourceRepeat' ||
+        propertyName === 'leftFaceResourceRepeat' ||
+        propertyName === 'rightFaceResourceRepeat' ||
+        propertyName === 'topFaceResourceRepeat' ||
+        propertyName === 'bottomFaceResourceRepeat' ||
         propertyName === 'enableTextureTransparency'
       ) {
         objectContent[propertyName] = newValue === '1';
@@ -168,6 +174,48 @@ module.exports = {
         .setGroup(_('Textures'));
 
       objectProperties
+        .getOrCreate('frontFaceResourceRepeat')
+        .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Front face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('backFaceResourceRepeat')
+        .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Back face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('leftFaceResourceRepeat')
+        .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Left face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('rightFaceResourceRepeat')
+        .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Right face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('topFaceResourceRepeat')
+        .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Top face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('bottomFaceResourceRepeat')
+        .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Bottom face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
         .getOrCreate('frontFaceVisible')
         .setValue(objectContent.frontFaceVisible ? 'true' : 'false')
         .setType('boolean')
@@ -229,6 +277,12 @@ module.exports = {
         rightFaceVisible: true,
         topFaceVisible: true,
         bottomFaceVisible: true,
+        frontFaceResourceRepeat: false,
+        backFaceResourceRepeat: false,
+        leftFaceResourceRepeat: false,
+        rightFaceResourceRepeat: false,
+        topFaceResourceRepeat: false,
+        bottomFaceResourceRepeat: false,
       })
     );
 

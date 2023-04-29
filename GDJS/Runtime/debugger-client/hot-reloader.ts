@@ -1060,7 +1060,7 @@ namespace gdjs {
         }
       }
 
-      // TODO: cameras
+      // TODO (3D): handle change in rendering type of layers (2D, 3D, 2D+3D...)
 
       // Effects
       this._hotReloadRuntimeLayerEffects(

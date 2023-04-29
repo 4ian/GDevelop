@@ -133,15 +133,16 @@ declare interface InstanceStringProperty {
 
 declare interface LayerData {
   name: string;
+  renderingType?: '2d' | '3d' | '2d+3d';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
-  threeDFieldOfView: float;
-  threeDFarPlaneDistance: float;
-  threeDNearPlaneDistance: float;
+  threeDFieldOfView?: float;
+  threeDFarPlaneDistance?: float;
+  threeDNearPlaneDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
 }
@@ -191,7 +192,7 @@ declare interface ProjectPropertiesData {
   latestCompilationDirectory: string;
   maxFPS: number;
   minFPS: number;
-  enable3d: boolean;
+  enable3d?: boolean;
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
   watermark: WatermarkData;

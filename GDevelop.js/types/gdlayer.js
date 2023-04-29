@@ -3,6 +3,8 @@ declare class gdLayer {
   constructor(): void;
   setName(name: string): void;
   getName(): string;
+  setRenderingType(renderingType: string): void;
+  getRenderingType(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
   setLightingLayer(lightingLayer: boolean): void;

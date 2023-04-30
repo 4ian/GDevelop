@@ -305,7 +305,7 @@ namespace gdjs {
         if (this._threePlaneMesh) {
           // Adapt the plane size so that it covers the whole screen.
           this._threePlaneMesh.scale.x = this._layer.getWidth() / zoomFactor;
-          this._threePlaneMesh.scale.y = this._layer.getHeight() * zoomFactor;
+          this._threePlaneMesh.scale.y = this._layer.getHeight() / zoomFactor;
 
           // Adapt the plane position so that it's always displayed on the whole screen.
           this._threePlaneMesh.position.x = this._threeCamera.position.x;

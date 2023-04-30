@@ -67,7 +67,7 @@ namespace gdjs {
       let gameCanvas: HTMLCanvasElement;
       if (typeof THREE !== 'undefined' && this._game.is3dEnabled()) {
         gameCanvas = document.createElement('canvas');
-        this._threeRenderer = new THREE.WebGL1Renderer({
+        this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
         });
         this._threeRenderer.autoClear = false;
@@ -77,6 +77,9 @@ namespace gdjs {
           this._game.getGameResolutionHeight()
         );
 
+        // Create a PixiJS renderer that use the same GL context as Three.js
+        // so that both can render to the canvas and even have PixiJS rendering
+        // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
         this._pixiRenderer = new PIXI.Renderer({
           width: this._game.getGameResolutionWidth(),
           height: this._game.getGameResolutionHeight(),
@@ -88,7 +91,7 @@ namespace gdjs {
           antialias: false,
           backgroundAlpha: 0,
           // TODO (3D): `resolution: window.devicePixelRatio`?
-        }) as PIXI.Renderer;
+        });
 
         gameCanvas = this._threeRenderer.domElement;
       } else {

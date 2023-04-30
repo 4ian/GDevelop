@@ -7,14 +7,11 @@ namespace gdjs {
   export class RuntimeScenePixiRenderer
     implements gdjs.RuntimeInstanceContainerPixiRenderer {
     private _runtimeGameRenderer: gdjs.RuntimeGamePixiRenderer | null;
-    _runtimeScene: gdjs.RuntimeScene;
-    _pixiContainer: PIXI.Container;
-    _profilerText: PIXI.Text | null = null;
-    _showCursorAtNextRender: boolean = false;
-
-    _threeRenderer: THREE.WebGLRenderer | null = null;
-    _threeScene: THREE.Scene | null = null;
-    _threeDummyCamera: THREE.Camera | null = null;
+    private _runtimeScene: gdjs.RuntimeScene;
+    private _pixiContainer: PIXI.Container;
+    private _profilerText: PIXI.Text | null = null;
+    private _showCursorAtNextRender: boolean = false;
+    private _threeRenderer: THREE.WebGLRenderer | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -110,10 +107,10 @@ namespace gdjs {
 
             if (runtimeLayer.isLightingLayer()) {
               // Render the lights on the render texture used then by the lighting Sprite.
-              runtimeLayerRenderer._renderOnPixiRenderTexture();
+              runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
             }
 
-            // TODO (3D): support lighting layer.
+            // TODO (2d lights): refactor to remove the need for `getLightingSprite`.
             const pixiContainer =
               (runtimeLayer.isLightingLayer() &&
                 runtimeLayerRenderer.getLightingSprite()) ||
@@ -141,29 +138,14 @@ namespace gdjs {
                 }
 
                 // Do the rendering of the PixiJS objects of the layer on the render texture.
-                runtimeLayerRenderer._renderOnPixiRenderTexture();
-
-                // The plane showing the PixiJS rendering must be updated, so that the 2D rendering
-                // made by PixiJS can be shown in the 3D world.
-                const threePixiPlaneTexture = runtimeLayerRenderer.getThreePixiPlaneTexture();
-                if (
-                  threePixiPlaneTexture &&
-                  runtimeLayerRenderer._renderTexture
-                ) {
-                  const glTexture =
-                    runtimeLayerRenderer._renderTexture.baseTexture._glTextures[
-                      pixiRenderer.CONTEXT_UID
-                    ];
-                  if (glTexture) {
-                    // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
-                    // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.
-                    // This works because PixiJS and Three.js are using the same WebGL context.
-                    const texture = threeRenderer.properties.get(
-                      threePixiPlaneTexture
-                    );
-                    texture.__webglTexture = glTexture.texture;
-                  }
-                }
+                // Then, update the texture of the plane showing the PixiJS rendering,
+                // so that the 2D rendering made by PixiJS can be shown in the 3D world.
+                runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
+                runtimeLayerRenderer.updateThreePlaneTextureFromPixiRenderTexture(
+                  // The renderers are needed to find the internal WebGL texture.
+                  threeRenderer,
+                  pixiRenderer
+                );
 
                 lastRenderWas3d = false;
               }
@@ -215,7 +197,7 @@ namespace gdjs {
           if (runtimeLayer.isLightingLayer()) {
             // Render the lights on the render texture used then by the lighting Sprite.
             const runtimeLayerRenderer = runtimeLayer.getRenderer();
-            runtimeLayerRenderer._renderOnPixiRenderTexture();
+            runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
           }
         }
 
@@ -298,6 +280,7 @@ namespace gdjs {
         | PIXI.Sprite
         | null = layerPixiRenderer.getRendererObject();
       if (layer.isLightingLayer()) {
+        // TODO (2d lights): refactor to remove the need for `getLightingSprite`.
         layerPixiObject = layerPixiRenderer.getLightingSprite();
       }
       if (!layerPixiObject) {

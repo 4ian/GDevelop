@@ -13,29 +13,37 @@ namespace gdjs {
    * The renderer for a gdjs.Layer using Pixi.js.
    */
   export class LayerPixiRenderer {
-    _pixiContainer: PIXI.Container;
+    private _pixiContainer: PIXI.Container;
 
-    _layer: gdjs.RuntimeLayer;
-    _renderTexture: PIXI.RenderTexture | null = null;
-    _lightingSprite: PIXI.Sprite | null = null;
-    _runtimeSceneRenderer: gdjs.RuntimeInstanceContainerRenderer;
-    _runtimeGameRenderer: gdjs.RuntimeGameRenderer;
+    private _layer: gdjs.RuntimeLayer;
+
+    /** For a lighting layer, the sprite used to display the render texture. */
+    private _lightingSprite: PIXI.Sprite | null = null;
+    private _isLightingLayer: boolean;
+    private _clearColor: Array<integer>;
+
+    /**
+     * The render texture where the whole 2D layer is rendered. Useful then for
+     * lighting or render it in a 3D scene, for a 2D+3D layer.
+     */
+    private _renderTexture: PIXI.RenderTexture | null = null;
 
     // Width and height are tracked when a render texture is used.
-    _oldWidth: float | null = null;
-    _oldHeight: float | null = null;
-    _isLightingLayer: boolean;
-    _clearColor: Array<integer>;
+    private _oldWidth: float | null = null;
+    private _oldHeight: float | null = null;
 
-    _threeGroup: THREE.Group | null = null;
-    _threeScene: THREE.Scene | null = null;
-
-    private _threePlaneTexture: THREE.Texture | null = null;
+    // For a 3D (or 2D+3D) layer:
+    private _threeGroup: THREE.Group | null = null;
+    private _threeScene: THREE.Scene | null = null;
     private _threeCamera: THREE.PerspectiveCamera | null = null;
+    private _threeCameraDirty: boolean = false;
+
+    // For a 2D+3D layer, the 2D rendering is done on the render texture
+    // and then must be displayed on a plane in the 3D world:
+    private _threePlaneTexture: THREE.Texture | null = null;
     private _threePlaneGeometry: THREE.PlaneGeometry | null = null;
     private _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
     private _threePlaneMesh: THREE.Mesh | null = null;
-    private _threeCameraDirty: boolean = false;
 
     /**
      * Pixi doesn't sort children with zIndex == 0.
@@ -54,19 +62,23 @@ namespace gdjs {
       this._pixiContainer = new PIXI.Container();
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
-      this._runtimeSceneRenderer = runtimeInstanceContainerRenderer;
-      this._runtimeGameRenderer = runtimeGameRenderer;
       this._isLightingLayer = layer.isLightingLayer();
       this._clearColor = layer.getClearColor();
       runtimeInstanceContainerRenderer
         .getRendererObject()
         .addChild(this._pixiContainer);
       this._pixiContainer.filters = [];
-      if (this._isLightingLayer) {
-        this._replaceContainerWithSprite();
-      }
 
-      this._setupThreeCameraAndContainer();
+      // Setup rendering for lighting or 3D rendering:
+      const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
+      if (this._isLightingLayer) {
+        this._setupLightingRendering(
+          pixiRenderer,
+          runtimeInstanceContainerRenderer
+        );
+      } else {
+        this._setup3dRendering(pixiRenderer, runtimeInstanceContainerRenderer);
+      }
     }
 
     getRendererObject(): PIXI.Container {
@@ -81,52 +93,80 @@ namespace gdjs {
       return this._threeCamera;
     }
 
-    getThreePixiPlaneTexture(): THREE.Texture | null {
-      return this._threePlaneTexture;
-    }
-
+    /**
+     * The sprite, displaying the "render texture" of the layer, to display
+     * for a lighting layer.
+     */
     getLightingSprite(): PIXI.Sprite | null {
       return this._lightingSprite;
     }
 
-    _setupThreeCameraAndContainer(): void {
+    /**
+     * Create, or re-create, Three.js objects for 3D rendering of this layer.
+     */
+    private _setup3dRendering(
+      pixiRenderer: PIXI.Renderer | null,
+      runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer
+    ): void {
       // TODO (3D): ideally we would avoid the need for this check at all,
       // maybe by having separate rendering classes for custom object layers and scene layers.
       if (this._layer instanceof gdjs.Layer) {
-        this._threeScene = new THREE.Scene();
-
-        // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
-        // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-        this._threeScene.scale.y = -1;
-
-        this._threeGroup = new THREE.Group();
-        this._threeScene.add(this._threeGroup);
-
-        this._threeCamera = new THREE.PerspectiveCamera(
-          this._layer.getInitialThreeDFieldOfView(),
-          1,
-          this._layer.getInitialThreeDNearPlaneDistance(),
-          this._layer.getInitialThreeDFarPlaneDistance()
-        );
-        this._threeCamera.rotation.order = 'ZYX';
-
         if (
           this._layer.getRenderingType() ===
-          gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
+            gdjs.RuntimeLayerRenderingType.THREE_D ||
+          this._layer.getRenderingType() ===
+            gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
         ) {
-          // If we have both 2D and 3D objects to be rendered, create a render texture that PixiJS will use
-          // to render, and that will be projected on a plane by Three.js
-          this._createPixiRenderTexture();
+          if (this._threeScene || this._threeGroup || this._threeCamera) {
+            throw new Error(
+              'Tried to setup 3D rendering for a layer that is already set up.'
+            );
+          }
 
-          // Create the plane that will show this texture.
-          this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
-          this._threePlaneMaterial = new THREE.MeshBasicMaterial({
-            side: THREE.FrontSide,
-            transparent: true,
-          });
+          this._threeScene = new THREE.Scene();
 
-          // Create the texture to project on the plane.
-          if (!this._threePlaneTexture) {
+          // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+          // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+          this._threeScene.scale.y = -1;
+
+          this._threeGroup = new THREE.Group();
+          this._threeScene.add(this._threeGroup);
+
+          this._threeCamera = new THREE.PerspectiveCamera(
+            this._layer.getInitialThreeDFieldOfView(),
+            1,
+            this._layer.getInitialThreeDNearPlaneDistance(),
+            this._layer.getInitialThreeDFarPlaneDistance()
+          );
+          this._threeCamera.rotation.order = 'ZYX';
+
+          if (
+            this._layer.getRenderingType() ===
+            gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
+          ) {
+            if (
+              this._renderTexture ||
+              this._threePlaneGeometry ||
+              this._threePlaneMaterial ||
+              this._threePlaneTexture ||
+              this._threePlaneMesh
+            )
+              throw new Error(
+                'Tried to setup PixiJS plane for 2D rendering in 3D for a layer that is already set up.'
+              );
+
+            // If we have both 2D and 3D objects to be rendered, create a render texture that PixiJS will use
+            // to render, and that will be projected on a plane by Three.js
+            this._createPixiRenderTexture(pixiRenderer);
+
+            // Create the plane that will show this texture.
+            this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
+            this._threePlaneMaterial = new THREE.MeshBasicMaterial({
+              side: THREE.FrontSide,
+              transparent: true,
+            });
+
+            // Create the texture to project on the plane.
             // Use a buffer to create a "fake" DataTexture, just so the texture
             // is considered initialized by Three.js.
             const width = 1;
@@ -142,21 +182,21 @@ namespace gdjs {
             this._threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
             this._threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
             this._threePlaneMaterial.map = this._threePlaneTexture;
-          }
 
-          // Finally, create the mesh shown in the scene.
-          this._threePlaneMesh = new THREE.Mesh(
-            this._threePlaneGeometry,
-            this._threePlaneMaterial
-          );
-          this._threeScene.add(this._threePlaneMesh);
+            // Finally, create the mesh shown in the scene.
+            this._threePlaneMesh = new THREE.Mesh(
+              this._threePlaneGeometry,
+              this._threePlaneMaterial
+            );
+            this._threeScene.add(this._threePlaneMesh);
+          }
         }
 
         this.onGameResolutionResized();
       } else {
         // This is a layer of a custom object.
 
-        const parentThreeObject = this._runtimeSceneRenderer.get3dRendererObject();
+        const parentThreeObject = runtimeInstanceContainerRenderer.get3dRendererObject();
         if (!parentThreeObject) {
           // No parent 3D renderer object, 3D is disabled.
           return;
@@ -346,8 +386,7 @@ namespace gdjs {
      * Can be used either for lighting or for rendering the layer in a texture
      * so it can then be consumed by Three.js to render it in 3D.
      */
-    _createPixiRenderTexture(): void {
-      const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
+    private _createPixiRenderTexture(pixiRenderer: PIXI.Renderer | null): void {
       if (!pixiRenderer || pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) {
         return;
       }
@@ -376,11 +415,7 @@ namespace gdjs {
      * Render the layer of the PixiJS RenderTexture, so that it can be then displayed
      * with a blend mode (for a lighting layer) or consumed by Three.js (for 2D+3D layers).
      */
-    _renderOnPixiRenderTexture() {
-      const pixiRenderer = this._runtimeGameRenderer.getPIXIRenderer();
-      if (!pixiRenderer || pixiRenderer.type !== PIXI.RENDERER_TYPE.WEBGL) {
-        return;
-      }
+    renderOnPixiRenderTexture(pixiRenderer: PIXI.Renderer) {
       if (!this._renderTexture) {
         return;
       }
@@ -416,23 +451,50 @@ namespace gdjs {
     }
 
     /**
+     * Set the texture of the 2D plane in the 3D world to be the same WebGL texture
+     * as the PixiJS RenderTexture - so that the 2D rendering can be shown in the 3D world.
+     */
+    updateThreePlaneTextureFromPixiRenderTexture(
+      threeRenderer: THREE.WebGLRenderer,
+      pixiRenderer: PIXI.Renderer
+    ): void {
+      if (!this._threePlaneTexture || !this._renderTexture) {
+        return;
+      }
+
+      const glTexture = this._renderTexture.baseTexture._glTextures[
+        pixiRenderer.CONTEXT_UID
+      ];
+      if (glTexture) {
+        // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
+        // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.
+        // This works because PixiJS and Three.js are using the same WebGL context.
+        const texture = threeRenderer.properties.get(this._threePlaneTexture);
+        texture.__webglTexture = glTexture.texture;
+      }
+    }
+
+    /**
      * Enable the use of a PIXI.RenderTexture to render the PIXI.Container
      * of the layer and, in the scene PIXI container, replace the container
      * of the layer by a sprite showing this texture.
      * used only in lighting for now as the sprite could have MULTIPLY blend mode.
      */
-    private _replaceContainerWithSprite(): void {
-      this._createPixiRenderTexture();
+    private _setupLightingRendering(
+      pixiRenderer: PIXI.Renderer | null,
+      runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer
+    ): void {
+      this._createPixiRenderTexture(pixiRenderer);
       if (!this._renderTexture) {
         return;
       }
 
       this._lightingSprite = new PIXI.Sprite(this._renderTexture);
       this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-      const sceneContainer = this._runtimeSceneRenderer.getRendererObject();
-      const index = sceneContainer.getChildIndex(this._pixiContainer);
-      sceneContainer.addChildAt(this._lightingSprite, index);
-      sceneContainer.removeChild(this._pixiContainer);
+      const parentPixiContainer = runtimeInstanceContainerRenderer.getRendererObject();
+      const index = parentPixiContainer.getChildIndex(this._pixiContainer);
+      parentPixiContainer.addChildAt(this._lightingSprite, index);
+      parentPixiContainer.removeChild(this._pixiContainer);
     }
   }
 

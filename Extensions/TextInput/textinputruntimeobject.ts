@@ -429,6 +429,10 @@ namespace gdjs {
     isFocused(): boolean {
       return this._renderer.isFocused();
     }
+
+    focus(): boolean {
+      return this._renderer.isFocused();
+    }
   }
   gdjs.registerObject(
     'TextInput::TextInputObject',

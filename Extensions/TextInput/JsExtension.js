@@ -561,19 +561,19 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
-      object
-        .addScopedAction(
-          'Focus',
-          _('Focus'),
-          _('Focus the object to enable the inputs from keyboard automatically.'),
-          _('Focus on _PARAM0_'),
-          _(''),
-          'res/conditions/surObjet24.png',
-          'res/conditions/surObjet.png'
-        )
-        .addParameter('object', _('Text input'), 'TextInputObject', false)
-        .getCodeExtraInformation()
-        .setFunctionName('focus');
+    object
+      .addScopedAction(
+        'Focus',
+        _('Focus'),
+        _('Focus the input so that text can be entered (like if it was touched/clicked).'),
+        _('Focus _PARAM0_'),
+        _(''),
+        'res/conditions/surObjet24.png',
+        'res/conditions/surObjet.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('focus');
 
     return extension;
   },

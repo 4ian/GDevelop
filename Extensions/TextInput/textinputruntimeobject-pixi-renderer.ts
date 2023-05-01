@@ -277,7 +277,7 @@ namespace gdjs {
     }
     updateDisabled() {
       if (!this._input) return;
-      
+
       this._input.disabled = this._object.isDisabled();
     }
     updateReadOnly() {
@@ -285,14 +285,14 @@ namespace gdjs {
 
       this._input.readOnly = this._object.isReadOnly();
     }
-    
+
     isFocused() {
       return this._input === document.activeElement;
     }
-    
+
     focus() {
       if (!this._input) return;
-      
+
       this._input.focus();
     }
   }

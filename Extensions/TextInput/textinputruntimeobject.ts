@@ -430,8 +430,8 @@ namespace gdjs {
       return this._renderer.isFocused();
     }
 
-    focus(): boolean {
-      return this._renderer.isFocused();
+    focus(): void {
+      this._renderer.focus();
     }
   }
   gdjs.registerObject(

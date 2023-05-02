@@ -64,28 +64,47 @@ namespace gdjs {
      *
      */
     createStandardCanvas(parentElement: HTMLElement) {
-      // Create the renderer and setup the rendering area.
-      // "preserveDrawingBuffer: true" is needed to avoid flickering
-      // and background issues on some mobile phones (see #585 #572 #566 #463).
-      this._pixiRenderer = PIXI.autoDetectRenderer({
-        width: this._game.getGameResolutionWidth(),
-        height: this._game.getGameResolutionHeight(),
-        preserveDrawingBuffer: true,
-        antialias: false,
-      }) as PIXI.Renderer;
-
       let gameCanvas: HTMLCanvasElement;
       if (typeof THREE !== 'undefined' && this._game.is3dEnabled()) {
-        this._pixiRenderer.backgroundAlpha = 0;
-        this._threeRenderer = new THREE.WebGLRenderer({});
+        gameCanvas = document.createElement('canvas');
+        this._threeRenderer = new THREE.WebGLRenderer({
+          canvas: gameCanvas,
+        });
+        this._threeRenderer.autoClear = false;
         // this._threeRenderer.setPixelRatio(0.05);
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
         );
 
+        // Create a PixiJS renderer that use the same GL context as Three.js
+        // so that both can render to the canvas and even have PixiJS rendering
+        // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+        this._pixiRenderer = new PIXI.Renderer({
+          width: this._game.getGameResolutionWidth(),
+          height: this._game.getGameResolutionHeight(),
+          view: gameCanvas,
+          // @ts-ignore - reuse the context from Three.js.
+          context: this._threeRenderer.getContext(),
+          clearBeforeRender: false,
+          preserveDrawingBuffer: true,
+          antialias: false,
+          backgroundAlpha: 0,
+          // TODO (3D): `resolution: window.devicePixelRatio`?
+        });
+
         gameCanvas = this._threeRenderer.domElement;
       } else {
+        // Create the renderer and setup the rendering area.
+        // "preserveDrawingBuffer: true" is needed to avoid flickering
+        // and background issues on some mobile phones (see #585 #572 #566 #463).
+        this._pixiRenderer = PIXI.autoDetectRenderer({
+          width: this._game.getGameResolutionWidth(),
+          height: this._game.getGameResolutionHeight(),
+          preserveDrawingBuffer: true,
+          antialias: false,
+        }) as PIXI.Renderer;
+
         gameCanvas = this._pixiRenderer.view;
       }
 

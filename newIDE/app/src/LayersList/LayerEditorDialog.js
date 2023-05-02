@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -23,6 +23,8 @@ import { Tabs } from '../UI/Tabs';
 import EffectsList from '../EffectsList';
 import { Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -251,35 +253,63 @@ const LayerEditorDialog = (props: Props) => {
               <Text size="block-title">
                 <Trans>3D settings</Trans>
               </Text>
-              <ResponsiveLineStackLayout>
-                <SemiControlledTextField
-                  commitOnBlur
-                  fullWidth
-                  errorText={threeDFieldOfViewError}
-                  onChange={onChangeThreeDFieldOfView}
-                  value={layer.getThreeDFieldOfView().toString(10)}
-                  floatingLabelText={<Trans>Field of view (in degrees)</Trans>}
-                  floatingLabelFixed
+              <SelectField
+                fullWidth
+                floatingLabelText={<Trans>Rendering type</Trans>}
+                value={layer.getRenderingType()}
+                onChange={(e, i, newValue: string) => {
+                  layer.setRenderingType(newValue);
+                  forceUpdate();
+                }}
+              >
+                <SelectOption
+                  value={'2d'}
+                  label={t`Display only 2D objects (default)`}
                 />
-                <SemiControlledTextField
-                  commitOnBlur
-                  fullWidth
-                  errorText={threeDNearPlaneDistanceError}
-                  onChange={onChangeThreeDNearPlaneDistance}
-                  value={layer.getThreeDNearPlaneDistance().toString(10)}
-                  floatingLabelText={<Trans>Near plane distance</Trans>}
-                  floatingLabelFixed
+                <SelectOption
+                  value={'3d'}
+                  label={t`Display only 3D objects`}
+                  disabled={layer.isLightingLayer()}
                 />
-                <SemiControlledTextField
-                  commitOnBlur
-                  fullWidth
-                  errorText={threeDFarPlaneDistanceError}
-                  onChange={onChangeThreeDFarPlaneDistance}
-                  value={layer.getThreeDFarPlaneDistance().toString(10)}
-                  floatingLabelText={<Trans>Far plane distance</Trans>}
-                  floatingLabelFixed
+                <SelectOption
+                  value={'2d+3d'}
+                  label={t`Display both 2D and 3D objects (slower)`}
+                  disabled={layer.isLightingLayer()}
                 />
-              </ResponsiveLineStackLayout>
+              </SelectField>
+              {layer.getRenderingType() !== '2d' && (
+                <ResponsiveLineStackLayout>
+                  <SemiControlledTextField
+                    commitOnBlur
+                    fullWidth
+                    errorText={threeDFieldOfViewError}
+                    onChange={onChangeThreeDFieldOfView}
+                    value={layer.getThreeDFieldOfView().toString(10)}
+                    floatingLabelText={
+                      <Trans>Field of view (in degrees)</Trans>
+                    }
+                    floatingLabelFixed
+                  />
+                  <SemiControlledTextField
+                    commitOnBlur
+                    fullWidth
+                    errorText={threeDNearPlaneDistanceError}
+                    onChange={onChangeThreeDNearPlaneDistance}
+                    value={layer.getThreeDNearPlaneDistance().toString(10)}
+                    floatingLabelText={<Trans>Near plane distance</Trans>}
+                    floatingLabelFixed
+                  />
+                  <SemiControlledTextField
+                    commitOnBlur
+                    fullWidth
+                    errorText={threeDFarPlaneDistanceError}
+                    onChange={onChangeThreeDFarPlaneDistance}
+                    value={layer.getThreeDFarPlaneDistance().toString(10)}
+                    floatingLabelText={<Trans>Far plane distance</Trans>}
+                    floatingLabelFixed
+                  />
+                </ResponsiveLineStackLayout>
+              )}
             </>
           )}
           {layer.isLightingLayer() ? (

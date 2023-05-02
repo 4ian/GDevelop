@@ -646,7 +646,7 @@ function ProjectPropertiesDialog(props: Props) {
                         .getUsedExtensions()
                         .toNewVectorString()
                         .toJSArray();
-                      if (usedExtensionsNames.includes('3D')) {
+                      if (usedExtensionsNames.includes('Scene3D')) {
                         showErrorBox({
                           message: i18n._(
                             t`3D cannot be disabled for the project. Remove all 3D related objects and events first.`

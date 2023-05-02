@@ -4,6 +4,21 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  export enum RuntimeLayerRenderingType {
+    TWO_D,
+    THREE_D,
+    TWO_D_PLUS_THREE_D,
+  }
+
+  const getRenderingTypeFromString = (
+    renderingTypeAsString: string | undefined
+  ) =>
+    renderingTypeAsString === '3d'
+      ? RuntimeLayerRenderingType.THREE_D
+      : renderingTypeAsString === '2d+3d'
+      ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
+      : RuntimeLayerRenderingType.TWO_D;
+
   /**
    * Represents a layer of a "container", used to display objects.
    * The container can be a scene (see gdjs.Layer)
@@ -11,10 +26,14 @@ namespace gdjs {
    */
   export abstract class RuntimeLayer implements EffectsTarget {
     _name: string;
+    _renderingType: RuntimeLayerRenderingType;
     _timeScale: float = 1;
     _defaultZOrder: integer = 0;
     _hidden: boolean;
     _initialEffectsData: Array<EffectData>;
+
+    // TODO EBO Don't store scene layer related data in layers used by custom objects.
+    // (both these 3D settings and the lighting layer properties below).
     _initialThreeDFieldOfView: float;
     _initialThreeDFarPlaneDistance: float;
     _initialThreeDNearPlaneDistance: float;
@@ -39,10 +58,13 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._name = layerData.name;
+      this._renderingType = getRenderingTypeFromString(layerData.renderingType);
       this._hidden = !layerData.visibility;
-      this._initialThreeDFieldOfView = layerData.threeDFieldOfView;
-      this._initialThreeDFarPlaneDistance = layerData.threeDFarPlaneDistance;
-      this._initialThreeDNearPlaneDistance = layerData.threeDNearPlaneDistance;
+      this._initialThreeDFieldOfView = layerData.threeDFieldOfView || 45;
+      this._initialThreeDFarPlaneDistance =
+        layerData.threeDFarPlaneDistance || 0.1;
+      this._initialThreeDNearPlaneDistance =
+        layerData.threeDNearPlaneDistance || 2000;
       this._initialEffectsData = layerData.effects || [];
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
@@ -67,6 +89,10 @@ namespace gdjs {
 
     getRenderer(): gdjs.LayerRenderer {
       return this._renderer;
+    }
+
+    getRenderingType(): RuntimeLayerRenderingType {
+      return this._renderingType;
     }
 
     /**

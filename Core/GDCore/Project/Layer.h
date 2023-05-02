@@ -47,6 +47,9 @@ class GD_CORE_API Layer {
    */
   const gd::String& GetName() const { return name; }
 
+  const gd::String& GetRenderingType() const { return renderingType; }
+  void SetRenderingType(const gd::String& renderingType_) { renderingType = renderingType_; }
+
   /**
    * \brief Change if layer is displayed or not
    */
@@ -191,6 +194,7 @@ class GD_CORE_API Layer {
 
  private:
   gd::String name;       ///< The name of the layer
+  gd::String renderingType;  ///< The rendering type: "2d", "3d" or "2d+3d".
   bool isVisible;        ///< True if the layer is visible
   bool isLightingLayer;  ///< True if the layer is used to display lights and
                          ///< renders an ambient light.

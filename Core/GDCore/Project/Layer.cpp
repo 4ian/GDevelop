@@ -14,7 +14,8 @@ namespace gd {
 Camera Layer::badCamera;
 
 Layer::Layer()
-    : isVisible(true),
+    : renderingType("2d"),
+      isVisible(true),
       isLightingLayer(false),
       followBaseLayerCamera(false),
       threeDNearPlaneDistance(0.1),
@@ -33,6 +34,7 @@ void Layer::SetCameraCount(std::size_t n) {
 
 void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
+  element.SetAttribute("renderingType", GetRenderingType());
   element.SetAttribute("visibility", GetVisibility());
   element.SetAttribute("isLightingLayer", IsLightingLayer());
   element.SetAttribute("followBaseLayerCamera", IsFollowingBaseLayerCamera());
@@ -68,6 +70,7 @@ void Layer::SerializeTo(SerializerElement& element) const {
  */
 void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
+  SetRenderingType(element.GetStringAttribute("renderingType", "2d"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
   SetFollowBaseLayerCamera(

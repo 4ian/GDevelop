@@ -800,6 +800,8 @@ interface Layer {
     void Layer();
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetRenderingType([Const] DOMString renderingType);
+    [Const, Ref] DOMString GetRenderingType();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
     void SetLightingLayer(boolean lightingLayer);

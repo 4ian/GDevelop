@@ -116,13 +116,13 @@ function patchGlueCppFile(cb) {
           var name = line.substring(freeCallPos + 11, nameEndPos);
           var startOfLine = line.substring(0, freeCallPos);
           var endOfLine = line.substring(nameEndPos + 1, line.length);
-          var hasOtherParamers = endOfLine[0] !== ')';
+          var hasOtherParameters = endOfLine[0] !== ')';
 
           line =
             startOfLine +
             name +
             '(*self' +
-            (hasOtherParamers ? ', ' : '') +
+            (hasOtherParameters ? ', ' : '') +
             endOfLine;
         }
 

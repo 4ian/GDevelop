@@ -66,9 +66,9 @@ jobs:
           name: Build GDevelop IDE
           command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac --publish=never
 
-      - run:
-          name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf "newIDE/electron-app/dist/mac-universal/GDevelop 5.app"
+      #- run:
+      #    name: Clean dist folder to keep only installers/binaries.
+      #    command: rm -rf "newIDE/electron-app/dist/mac-universal/GDevelop 5.app"
 
       # Upload artifacts (CircleCI)
       - store_artifacts:

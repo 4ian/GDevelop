@@ -192,7 +192,7 @@ declare interface ProjectPropertiesData {
   latestCompilationDirectory: string;
   maxFPS: number;
   minFPS: number;
-  enable3d?: boolean;
+  enable3d: boolean;
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
   watermark: WatermarkData;

@@ -109,7 +109,7 @@ const contributors = [
     name: 'Arthur Pacaud (arthuro555)',
     description:
       'Numerous code contributions to GDevelop and community moderation',
-    link: 'https://forum.gdevelop-app.com/u/arthuro555/summary',
+    link: 'https://forum.gdevelop.io/u/arthuro555/summary',
   },
   {
     name: 'The Gem Dev',

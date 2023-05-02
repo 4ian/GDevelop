@@ -14,7 +14,7 @@ orbs:
 jobs:
   # Build the **entire** app for macOS.
   build-macos:
-    resource_class: macos.m1.large.gen1
+    # resource_class: macos.m1.large.gen1
     macos:
       xcode: 14.2.0
     steps:

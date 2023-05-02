@@ -25,6 +25,13 @@ namespace gdjs {
     3: [1, 1],
   };
 
+  const noRepeatTextureVertexIndexToUvMappingBis = {
+    0: [0, 1],
+    1: [0, 0],
+    2: [1, 1],
+    3: [1, 0],
+  };
+
   let transparentMaterial: THREE.MeshBasicMaterial;
   const getTransparentMaterial = () => {
     if (!transparentMaterial)
@@ -167,6 +174,9 @@ namespace gdjs {
             materialIndexToFaceIndex[materialIndex]
           );
 
+        const shouldOrientateFacesTowardsY =
+          this._object.getFacesOrientation() === 'Y';
+
         let x: float, y: float;
         switch (materialIndex) {
           case 0:
@@ -179,7 +189,12 @@ namespace gdjs {
                 -(this._boxMesh.scale.z / material.map.source.data.height) *
                 (pos.getY(vertexIndex) + 0.5);
             } else {
-              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              if (shouldOrientateFacesTowardsY) {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              } else {
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingBis[vertexIndex % 4];
+              }
             }
             break;
           case 1:
@@ -192,7 +207,14 @@ namespace gdjs {
                 -(this._boxMesh.scale.z / material.map.source.data.height) *
                 (pos.getY(vertexIndex) + 0.5);
             } else {
-              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              if (shouldOrientateFacesTowardsY) {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              } else {
+                [x, y] =
+                  noRepeatTextureVertexIndexToUvMappingBis[vertexIndex % 4];
+                x = -x;
+                y = -y;
+              }
             }
             break;
           case 2:
@@ -219,6 +241,10 @@ namespace gdjs {
                 (pos.getZ(vertexIndex) + 0.5);
             } else {
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              if (!shouldOrientateFacesTowardsY) {
+                x = -x;
+                y = -y;
+              }
             }
             break;
           case 4:
@@ -251,7 +277,8 @@ namespace gdjs {
                 (pos.getY(vertexIndex) +
                   (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
             } else {
-              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              [x, y] =
+                noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               if (shouldBackFaceBeUpThroughXAxisRotation) {
                 x = -x;
                 y = -y;

@@ -60,7 +60,7 @@ namespace gdjs {
 
         /**
          * Updates a database variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param variable - The variable to update.
          * @param [callbackStateVariable] - The variable where to store the result.
          */
@@ -85,7 +85,7 @@ namespace gdjs {
 
         /**
          * Updates a field of a database variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param field - The field where to update.
          * @param value - The value to write.
          * @param [callbackStateVariable] - The variable where to store the result.
@@ -114,7 +114,7 @@ namespace gdjs {
 
         /**
          * Deletes a database variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param [callbackStateVariable] - The variable where to store the result.
          */
         export const deleteVariable = (
@@ -137,7 +137,7 @@ namespace gdjs {
 
         /**
          * Deletes a field of a database variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param field - The field to delete.
          * @param [callbackStateVariable] - The variable where to store the result.
          */
@@ -164,7 +164,7 @@ namespace gdjs {
 
         /**
          * Gets a database variable and store it in a variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param callbackValueVariable - The variable where to store the result.
          * @param [callbackStateVariable] - The variable where to store if the operation was successful.
          */
@@ -192,7 +192,7 @@ namespace gdjs {
 
         /**
          * Gets a field of a database variable and store it in a variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param field - The field to get.
          * @param callbackValueVariable - The variable where to store the result.
          * @param [callbackStateVariable] - The variable where to store if the operation was successful.
@@ -222,7 +222,7 @@ namespace gdjs {
 
         /**
          * Checks for existence of a database variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param callbackValueVariable - The variable where to store the result.
          * @param [callbackStateVariable] - The variable where to store if the operation was successful.
          */
@@ -254,7 +254,7 @@ namespace gdjs {
 
         /**
          * Checks for existence of a database variable.
-         * @param path - The name under wich the variable will be saved (document name).
+         * @param path - The name under which the variable will be saved (document name).
          * @param field - The field to check.
          * @param callbackValueVariable - The variable where to store the result.
          * @param [callbackStateVariable] - The variable where to store if the operation was successful.

@@ -60,7 +60,8 @@ module.exports = {
         propertyName === 'rightFaceResourceName' ||
         propertyName === 'topFaceResourceName' ||
         propertyName === 'bottomFaceResourceName' ||
-        propertyName === 'backFaceUpThroughWhichAxisRotation'
+        propertyName === 'backFaceUpThroughWhichAxisRotation' ||
+        propertyName === 'facesOrientation'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -101,6 +102,20 @@ module.exports = {
           )
         )
         .setGroup(_('Texture settings'));
+
+      objectProperties
+        .getOrCreate('facesOrientation')
+        .setValue(objectContent.facesOrientation)
+        .setType('choice')
+        .addExtraInfo('Y')
+        .addExtraInfo('Z')
+        .setLabel(_('How to set up the face orientation'))
+        .setDescription(
+          _(
+            'When set to Z, the faces are oriented so that their up side is towards the player. When set to Y, the faces are oriented towards the top of the screen.'
+          )
+        )
+        .setGroup(_('Face orientation'));
 
       objectProperties
         .getOrCreate('width')
@@ -279,6 +294,7 @@ module.exports = {
         height: 100,
         depth: 100,
         enableTextureTransparency: false,
+        facesOrientation: 'Y',
         frontFaceResourceName: '',
         backFaceResourceName: '',
         backFaceUpThroughWhichAxisRotation: 'X',

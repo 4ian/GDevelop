@@ -167,78 +167,101 @@ namespace gdjs {
             materialIndexToFaceIndex[materialIndex]
           );
 
-        if (materialIndex === 0 || materialIndex === 1) {
-          // Right or left
-          const isRight = materialIndex === 0;
-
-          let y: float, z: float;
-          if (shouldRepeatTexture) {
-            y =
-              (isRight ? -1 : 1) *
-              (this._boxMesh.scale.y / material.map.source.data.width) *
-              (pos.getZ(vertexIndex) + (isRight ? -1 : 1) * 0.5);
-            z =
-              (isRight ? -1 : -1) *
-              (this._boxMesh.scale.z / material.map.source.data.height) *
-              (pos.getY(vertexIndex) + 0.5);
-          } else {
-            [y, z] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
-          }
-          uvMapping.setXY(vertexIndex, y, z);
-        } else if (materialIndex === 2 || materialIndex === 3) {
-          // Top or bottom
-          const isBottom = materialIndex === 2;
-
-          let x: float, z: float;
-          if (shouldRepeatTexture) {
-            x =
-              (this._boxMesh.scale.x / material.map.source.data.width) *
-              (pos.getX(vertexIndex) + 0.5);
-            z =
-              (isBottom ? 1 : -1) *
-              (this._boxMesh.scale.z / material.map.source.data.height) *
-              (pos.getZ(vertexIndex) + (isBottom ? -1 : 1) * 0.5);
-          } else {
-            [x, z] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
-          }
-          uvMapping.setXY(vertexIndex, x, z);
-        } else {
-          // Front or back
-          const isFront = materialIndex === 4;
-          const shouldBackFaceBeUpThroughXAxisRotation =
-            this._object.getBackFaceUpThroughWhichAxisRotation() === 'X';
-
-          let x: float, y: float;
-          if (shouldRepeatTexture) {
-            x =
-              (isFront ? 1 : shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-              (this._boxMesh.scale.x / material.map.source.data.width) *
-              (pos.getX(vertexIndex) +
-                (isFront
-                  ? 1
-                  : shouldBackFaceBeUpThroughXAxisRotation
-                  ? 1
-                  : -1) *
-                  0.5);
-            y =
-              (isFront ? -1 : shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-              (this._boxMesh.scale.y / material.map.source.data.height) *
-              (pos.getY(vertexIndex) +
-                (isFront
-                  ? 1
-                  : shouldBackFaceBeUpThroughXAxisRotation
-                  ? -1
-                  : 1) *
-                  0.5);
-          } else {
-            [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
-            if (!isFront && shouldBackFaceBeUpThroughXAxisRotation) {
-              x = -x;
-              y = -y;
+        let x: float, y: float;
+        switch (materialIndex) {
+          case 0:
+            // Right face
+            if (shouldRepeatTexture) {
+              x =
+                -(this._boxMesh.scale.y / material.map.source.data.width) *
+                (pos.getZ(vertexIndex) - 0.5);
+              y =
+                -(this._boxMesh.scale.z / material.map.source.data.height) *
+                (pos.getY(vertexIndex) + 0.5);
+            } else {
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
             }
-          }
-          uvMapping.setXY(vertexIndex, x, y);
+            break;
+          case 1:
+            // Left face
+            if (shouldRepeatTexture) {
+              x =
+                (this._boxMesh.scale.y / material.map.source.data.width) *
+                (pos.getZ(vertexIndex) + 0.5);
+              y =
+                -(this._boxMesh.scale.z / material.map.source.data.height) *
+                (pos.getY(vertexIndex) + 0.5);
+            } else {
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+            }
+            break;
+          case 2:
+            // Bottom face
+            if (shouldRepeatTexture) {
+              x =
+                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (pos.getX(vertexIndex) + 0.5);
+              y =
+                (this._boxMesh.scale.z / material.map.source.data.height) *
+                (pos.getZ(vertexIndex) - 0.5);
+            } else {
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+            }
+            break;
+          case 3:
+            // Top face
+            if (shouldRepeatTexture) {
+              x =
+                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (pos.getX(vertexIndex) + 0.5);
+              y =
+                -(this._boxMesh.scale.z / material.map.source.data.height) *
+                (pos.getZ(vertexIndex) + 0.5);
+            } else {
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+            }
+            break;
+          case 4:
+            // Front face
+            if (shouldRepeatTexture) {
+              x =
+                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (pos.getX(vertexIndex) + 0.5);
+              y =
+                -(this._boxMesh.scale.y / material.map.source.data.height) *
+                (pos.getY(vertexIndex) + 0.5);
+            } else {
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+            }
+            break;
+          case 5:
+            // Back face
+            const shouldBackFaceBeUpThroughXAxisRotation =
+              this._object.getBackFaceUpThroughWhichAxisRotation() === 'X';
+
+            if (shouldRepeatTexture) {
+              x =
+                (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+                (this._boxMesh.scale.x / material.map.source.data.width) *
+                (pos.getX(vertexIndex) +
+                  (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) * 0.5);
+              y =
+                (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+                (this._boxMesh.scale.y / material.map.source.data.height) *
+                (pos.getY(vertexIndex) +
+                  (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
+            } else {
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              if (shouldBackFaceBeUpThroughXAxisRotation) {
+                x = -x;
+                y = -y;
+              }
+            }
+            break;
+          default:
+            [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
         }
+        uvMapping.setXY(vertexIndex, x, y);
       }
       uvMapping.needsUpdate = true;
     }

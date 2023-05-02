@@ -7,6 +7,7 @@ namespace gdjs {
       height: float;
       depth: float;
       enableTextureTransparency: boolean;
+      facesOrientation: 'Y' | 'Z';
       frontFaceResourceName: string;
       backFaceResourceName: string;
       backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
@@ -50,6 +51,7 @@ namespace gdjs {
     private _depth: float;
     private _rotationX: float = 0;
     private _rotationY: float = 0;
+    private _facesOrientation: 'Y' | 'Z';
     private _backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
     private _shouldUseTransparentTexture: boolean;
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
@@ -75,6 +77,7 @@ namespace gdjs {
       this._depth = objectData.content.depth || 100;
       this._shouldUseTransparentTexture =
         objectData.content.enableTextureTransparency || false;
+      this._facesOrientation = objectData.content.facesOrientation;
       this._visibleFacesBitmask = 0;
       if (objectData.content.frontFaceVisible)
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['front'];
@@ -192,6 +195,10 @@ namespace gdjs {
 
     getBackFaceUpThroughWhichAxisRotation(): 'X' | 'Y' {
       return this._backFaceUpThroughWhichAxisRotation;
+    }
+
+    getFacesOrientation(): 'Y' | 'Z' {
+      return this._facesOrientation;
     }
 
     updateFromObjectData(

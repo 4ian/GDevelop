@@ -1,5 +1,5 @@
-name: "🐛Bug report"
-description: "Create a bug report about GDevelop or the game engine"
+name: 🐛Bug report
+description: Create a bug report about GDevelop or the game engine
 body:
   - type: checkboxes
     attributes:
@@ -10,8 +10,7 @@ body:
   - type: textarea
     attributes:
       label: Describe the bug
-      description: |
-        A clear and concise description of what the bug is.
+      description: A clear and concise description of what the bug is.
     validations:
       required: true
   - type: textarea
@@ -51,10 +50,21 @@ body:
     attributes:
       label: Platform info
       value: |
-        OS: (e.g. Windows, Linux, macOS, Android, iOS)
-        OS Version: (e.g. Windows 10, macOS 10.15)
-        Browser(For Web): (e.g. Chrome, Firefox, Safari)
-        Device(For Mobile): (e.g. iPhone 12, Samsung Galaxy S21)
+        <details>
+
+        *OS (e.g. Windows, Linux, macOS, Android, iOS)*
+        >
+
+        *OS Version (e.g. Windows 10, macOS 10.15)*
+        >
+
+        *Browser(For Web) (e.g. Chrome, Firefox, Safari)*
+        >
+
+        *Device(For Mobile) (e.g. iPhone 12, Samsung Galaxy S21)*
+        >
+
+        </details>
   - type: textarea
     attributes:
       label: Additional context

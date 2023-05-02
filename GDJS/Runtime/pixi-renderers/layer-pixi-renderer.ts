@@ -23,8 +23,9 @@ namespace gdjs {
     private _clearColor: Array<integer>;
 
     /**
-     * The render texture where the whole 2D layer is rendered. Useful then for
-     * lighting or render it in a 3D scene, for a 2D+3D layer.
+     * The render texture where the whole 2D layer is rendered.
+     * The render texture is then used for lighting (if it's a light layer)
+     * or to be rendered in a 3D scene (for a 2D+3D layer).
      */
     private _renderTexture: PIXI.RenderTexture | null = null;
 

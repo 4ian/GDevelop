@@ -1,5 +1,5 @@
 #This is the CMake file used to build GDevelop.
-#For more information, see the Readme.md file.
+#For more information, see the README.md file.
 
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)

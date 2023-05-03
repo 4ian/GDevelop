@@ -76,12 +76,14 @@ static gd::String CleanProjectName(gd::String projectName) {
       "\\/:*?\"<>|";  // See
                       // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 
-  for (size_t i = 0; i < partiallyCleanedProjectName.size();
-       ++i)  // Delete all characters that are not allowed
-  {
+  for (size_t i = 0; i < partiallyCleanedProjectName.size();) {
+    // Delete all characters that are not allowed in a filename
     if (forbiddenFileNameCharacters.find(partiallyCleanedProjectName[i]) !=
-        gd::String::npos)
+        gd::String::npos) {
       partiallyCleanedProjectName.erase(i, 1);
+    } else {
+      i++;
+    }
   }
 
   if (partiallyCleanedProjectName.empty())

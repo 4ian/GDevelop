@@ -25,7 +25,7 @@ namespace gdjs {
     3: [1, 1],
   };
 
-  const noRepeatTextureVertexIndexToUvMappingBis = {
+  const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
     0: [0, 1],
     1: [0, 0],
     2: [1, 1],
@@ -202,7 +202,9 @@ namespace gdjs {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
                 [x, y] =
-                  noRepeatTextureVertexIndexToUvMappingBis[vertexIndex % 4];
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
               }
             }
             break;
@@ -229,7 +231,9 @@ namespace gdjs {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
                 [x, y] =
-                  noRepeatTextureVertexIndexToUvMappingBis[vertexIndex % 4];
+                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 x = -x;
                 y = -y;
               }

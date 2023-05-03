@@ -6,7 +6,7 @@ GDevelop Core is a portable C++ library, compiled to be used in JavaScript in th
 
 ## 1) Getting started 🤓
 
-First, take a look at the _README.md_ at the root of the repository and the [developer documentation](https://docs.gdevelop.io/).
+First, take a look at the _[README.md](../README.md)_ at the root of the repository and the [developer documentation](https://docs.gdevelop.io/).
 
 ## 2) How to contribute 😎
 

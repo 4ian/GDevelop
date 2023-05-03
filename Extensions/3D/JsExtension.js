@@ -59,7 +59,9 @@ module.exports = {
         propertyName === 'leftFaceResourceName' ||
         propertyName === 'rightFaceResourceName' ||
         propertyName === 'topFaceResourceName' ||
-        propertyName === 'bottomFaceResourceName'
+        propertyName === 'bottomFaceResourceName' ||
+        propertyName === 'backFaceUpThroughWhichAxisRotation' ||
+        propertyName === 'facesOrientation'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -71,6 +73,12 @@ module.exports = {
         propertyName === 'rightFaceVisible' ||
         propertyName === 'topFaceVisible' ||
         propertyName === 'bottomFaceVisible' ||
+        propertyName === 'frontFaceResourceRepeat' ||
+        propertyName === 'backFaceResourceRepeat' ||
+        propertyName === 'leftFaceResourceRepeat' ||
+        propertyName === 'rightFaceResourceRepeat' ||
+        propertyName === 'topFaceResourceRepeat' ||
+        propertyName === 'bottomFaceResourceRepeat' ||
         propertyName === 'enableTextureTransparency'
       ) {
         objectContent[propertyName] = newValue === '1';
@@ -94,6 +102,20 @@ module.exports = {
           )
         )
         .setGroup(_('Texture settings'));
+
+      objectProperties
+        .getOrCreate('facesOrientation')
+        .setValue(objectContent.facesOrientation)
+        .setType('choice')
+        .addExtraInfo('Y')
+        .addExtraInfo('Z')
+        .setLabel(_('How to set up the face orientation'))
+        .setDescription(
+          _(
+            'When set to Z, the faces are oriented so that their up side is towards the player. When set to Y, the faces are oriented towards the top of the screen.'
+          )
+        )
+        .setGroup(_('Face orientation'));
 
       objectProperties
         .getOrCreate('width')
@@ -136,6 +158,19 @@ module.exports = {
         .setGroup(_('Textures'));
 
       objectProperties
+        .getOrCreate('backFaceUpThroughWhichAxisRotation')
+        .setValue(objectContent.backFaceUpThroughWhichAxisRotation)
+        .setType('choice')
+        .addExtraInfo('X')
+        .addExtraInfo('Y')
+        .setLabel(
+          _(
+            'Rotation axis around which to get to the back face with the right way up.'
+          )
+        )
+        .setGroup(_('Textures'));
+
+      objectProperties
         .getOrCreate('leftFaceResourceName')
         .setValue(objectContent.leftFaceResourceName || '')
         .setType('resource')
@@ -165,6 +200,48 @@ module.exports = {
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Bottom face image'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('frontFaceResourceRepeat')
+        .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Front face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('backFaceResourceRepeat')
+        .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Back face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('leftFaceResourceRepeat')
+        .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Left face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('rightFaceResourceRepeat')
+        .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Right face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('topFaceResourceRepeat')
+        .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Top face resource repeat'))
+        .setGroup(_('Textures'));
+
+      objectProperties
+        .getOrCreate('bottomFaceResourceRepeat')
+        .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Bottom face resource repeat'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -217,8 +294,10 @@ module.exports = {
         height: 100,
         depth: 100,
         enableTextureTransparency: false,
+        facesOrientation: 'Y',
         frontFaceResourceName: '',
         backFaceResourceName: '',
+        backFaceUpThroughWhichAxisRotation: 'X',
         leftFaceResourceName: '',
         rightFaceResourceName: '',
         topFaceResourceName: '',
@@ -229,6 +308,12 @@ module.exports = {
         rightFaceVisible: true,
         topFaceVisible: true,
         bottomFaceVisible: true,
+        frontFaceResourceRepeat: false,
+        backFaceResourceRepeat: false,
+        leftFaceResourceRepeat: false,
+        rightFaceResourceRepeat: false,
+        topFaceResourceRepeat: false,
+        bottomFaceResourceRepeat: false,
       })
     );
 
@@ -285,6 +370,12 @@ module.exports = {
         .setType('number')
         .setLabel(_('Rotation on Y axis'));
 
+      instanceProperties
+        .getOrCreate('depth')
+        .setValue(instance.getRawDoubleProperty('depth').toString())
+        .setType('number')
+        .setLabel(_('Depth'));
+
       return instanceProperties;
     };
 
@@ -332,6 +423,36 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDepth')
       .setGetter('getDepth');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Width',
+        _('Width'),
+        _('the width'),
+        _('the width'),
+        '',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setWidth')
+      .setGetter('getWidth');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Height',
+        _('Height'),
+        _('the height'),
+        _('the height'),
+        '',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setFunctionName('setHeight')
+      .setGetter('getHeight');
 
     object
       .addExpressionAndConditionAndAction(

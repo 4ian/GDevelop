@@ -7,12 +7,20 @@ namespace gdjs {
       height: float;
       depth: float;
       enableTextureTransparency: boolean;
+      facesOrientation: 'Y' | 'Z';
       frontFaceResourceName: string;
       backFaceResourceName: string;
+      backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
       leftFaceResourceName: string;
       rightFaceResourceName: string;
       topFaceResourceName: string;
       bottomFaceResourceName: string;
+      frontFaceResourceRepeat: boolean;
+      backFaceResourceRepeat: boolean;
+      leftFaceResourceRepeat: boolean;
+      rightFaceResourceRepeat: boolean;
+      topFaceResourceRepeat: boolean;
+      bottomFaceResourceRepeat: boolean;
       frontFaceVisible: boolean;
       backFaceVisible: boolean;
       leftFaceVisible: boolean;
@@ -43,9 +51,12 @@ namespace gdjs {
     private _depth: float;
     private _rotationX: float = 0;
     private _rotationY: float = 0;
+    private _facesOrientation: 'Y' | 'Z';
+    private _backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
     private _shouldUseTransparentTexture: boolean;
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
     private _visibleFacesBitmask: integer;
+    private _textureRepeatFacesBitmask: integer;
     private _faceResourceNames: [
       string,
       string,
@@ -61,12 +72,12 @@ namespace gdjs {
       objectData: Cube3DObjectData
     ) {
       super(instanceContainer, objectData);
-
       this._width = objectData.content.width || 100;
       this._height = objectData.content.height || 100;
       this._depth = objectData.content.depth || 100;
       this._shouldUseTransparentTexture =
         objectData.content.enableTextureTransparency || false;
+      this._facesOrientation = objectData.content.facesOrientation;
       this._visibleFacesBitmask = 0;
       if (objectData.content.frontFaceVisible)
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['front'];
@@ -80,6 +91,22 @@ namespace gdjs {
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['top'];
       if (objectData.content.bottomFaceVisible)
         this._visibleFacesBitmask |= 1 << faceNameToBitmaskIndex['bottom'];
+      this._textureRepeatFacesBitmask = 0;
+      if (objectData.content.frontFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['front'];
+      if (objectData.content.backFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['back'];
+      if (objectData.content.leftFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['left'];
+      if (objectData.content.rightFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['right'];
+      if (objectData.content.topFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |= 1 << faceNameToBitmaskIndex['top'];
+      if (objectData.content.bottomFaceResourceRepeat)
+        this._textureRepeatFacesBitmask |=
+          1 << faceNameToBitmaskIndex['bottom'];
+      this._backFaceUpThroughWhichAxisRotation =
+        objectData.content.backFaceUpThroughWhichAxisRotation;
       this._faceResourceNames = [
         objectData.content.frontFaceResourceName,
         objectData.content.backFaceResourceName,
@@ -135,6 +162,11 @@ namespace gdjs {
       return (this._visibleFacesBitmask & (1 << faceIndex)) !== 0;
     }
 
+    /** @internal */
+    shouldRepeatTextureOnFaceAtIndex(faceIndex): boolean {
+      return (this._textureRepeatFacesBitmask & (1 << faceIndex)) !== 0;
+    }
+
     setFaceResourceName(faceName: FaceName, resourceName: string): void {
       const faceIndex = faceNameToBitmaskIndex[faceName];
       if (faceIndex === undefined) {
@@ -159,6 +191,14 @@ namespace gdjs {
 
     get3dRendererObject() {
       return this._renderer.get3dRendererObject();
+    }
+
+    getBackFaceUpThroughWhichAxisRotation(): 'X' | 'Y' {
+      return this._backFaceUpThroughWhichAxisRotation;
+    }
+
+    getFacesOrientation(): 'Y' | 'Z' {
+      return this._facesOrientation;
     }
 
     updateFromObjectData(

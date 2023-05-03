@@ -19,7 +19,7 @@ Layer::Layer()
       isLightingLayer(false),
       followBaseLayerCamera(false),
       threeDNearPlaneDistance(0.1),
-      threeDFarPlaneDistance(2000),
+      threeDFarPlaneDistance(10000),
       threeDFieldOfView(45) {}
 
 /**
@@ -81,7 +81,7 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetThreeDNearPlaneDistance(
       element.GetDoubleAttribute("threeDNearPlaneDistance", 0.1));
   SetThreeDFarPlaneDistance(
-      element.GetDoubleAttribute("threeDFarPlaneDistance", 2000));
+      element.GetDoubleAttribute("threeDFarPlaneDistance", 10000));
   SetThreeDFieldOfView(element.GetDoubleAttribute("threeDFieldOfView", 45));
 
   cameras.clear();

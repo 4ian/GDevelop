@@ -347,6 +347,40 @@ namespace gdjs {
     }
 
     /**
+     * Tween an object Z position.
+     * @param identifier Unique id to identify the tween
+     * @param toZ The target Z position
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectPositionZTween(
+      identifier: string,
+      toZ: number,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const { owner } = this;
+      if (!(owner instanceof gdjs.Cube3DRuntimeObject)) return;
+
+      this._addTween(
+        identifier,
+        easingValue,
+        {
+          from: { z: owner.getZ() },
+          to: { z: toZ },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => owner.setZ(state.z),
+        },
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
      * Tween an object Y position.
      * @param identifier Unique id to identify the tween
      * @param toY The target Y position
@@ -871,6 +905,42 @@ namespace gdjs {
           easing: easingValue,
           render: (state) => {
             this.owner.setHeight(state.height);
+          },
+        },
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue,
+        destroyObjectWhenFinished
+      );
+    }
+
+    /**
+     * Tween an object depth.
+     * @param identifier Unique id to identify the tween
+     * @param toDepth The target depth
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectDepthTween(
+      identifier: string,
+      toDepth: float,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const { owner } = this;
+      if (!(owner instanceof gdjs.Cube3DRuntimeObject)) return;
+
+      this._addTween(
+        identifier,
+        easingValue,
+        {
+          from: { depth: owner.getDepth() },
+          to: { depth: toDepth },
+          duration: durationValue,
+          easing: easingValue,
+          render: (state) => {
+            owner.setDepth(state.depth);
           },
         },
         this._runtimeScene.getTimeManager().getTimeFromStart(),

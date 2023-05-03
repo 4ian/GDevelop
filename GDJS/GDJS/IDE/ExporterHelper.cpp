@@ -72,16 +72,20 @@ static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
 static gd::String CleanProjectName(gd::String projectName) {
   gd::String partiallyCleanedProjectName = projectName;
 
-  static const gd::String allowedCharacters =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+  static const gd::String forbiddenFileNameCharacters =
+      "\\/:*?\"<>|";  // See
+                      // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 
   for (size_t i = 0; i < partiallyCleanedProjectName.size();
        ++i)  // Delete all characters that are not allowed
   {
-    if (allowedCharacters.find(partiallyCleanedProjectName[i]) ==
+    if (forbiddenFileNameCharacters.find(partiallyCleanedProjectName[i]) !=
         gd::String::npos)
       partiallyCleanedProjectName.erase(i, 1);
   }
+
+  if (partiallyCleanedProjectName.empty())
+    partiallyCleanedProjectName = "Project";
 
   return partiallyCleanedProjectName;
 }

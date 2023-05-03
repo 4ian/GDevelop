@@ -182,12 +182,21 @@ namespace gdjs {
           case 0:
             // Right face
             if (shouldRepeatTexture) {
-              x =
-                -(this._boxMesh.scale.y / material.map.source.data.width) *
-                (pos.getZ(vertexIndex) - 0.5);
-              y =
-                -(this._boxMesh.scale.z / material.map.source.data.height) *
-                (pos.getY(vertexIndex) + 0.5);
+              if (shouldOrientateFacesTowardsY) {
+                x =
+                  -(this._boxMesh.scale.z / material.map.source.data.width) *
+                  (pos.getZ(vertexIndex) - 0.5);
+                y =
+                  -(this._boxMesh.scale.y / material.map.source.data.height) *
+                  (pos.getY(vertexIndex) + 0.5);
+              } else {
+                x =
+                  -(this._boxMesh.scale.y / material.map.source.data.width) *
+                  (pos.getY(vertexIndex) - 0.5);
+                y =
+                  (this._boxMesh.scale.z / material.map.source.data.height) *
+                  (pos.getZ(vertexIndex) - 0.5);
+              }
             } else {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -200,12 +209,21 @@ namespace gdjs {
           case 1:
             // Left face
             if (shouldRepeatTexture) {
-              x =
-                (this._boxMesh.scale.y / material.map.source.data.width) *
-                (pos.getZ(vertexIndex) + 0.5);
-              y =
-                -(this._boxMesh.scale.z / material.map.source.data.height) *
-                (pos.getY(vertexIndex) + 0.5);
+              if (shouldOrientateFacesTowardsY) {
+                x =
+                  (this._boxMesh.scale.z / material.map.source.data.width) *
+                  (pos.getZ(vertexIndex) + 0.5);
+                y =
+                  -(this._boxMesh.scale.y / material.map.source.data.height) *
+                  (pos.getY(vertexIndex) + 0.5);
+              } else {
+                x =
+                  (this._boxMesh.scale.y / material.map.source.data.width) *
+                  (pos.getY(vertexIndex) + 0.5);
+                y =
+                  (this._boxMesh.scale.z / material.map.source.data.height) *
+                  (pos.getZ(vertexIndex) - 0.5);
+              }
             } else {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -233,12 +251,21 @@ namespace gdjs {
           case 3:
             // Top face
             if (shouldRepeatTexture) {
-              x =
-                (this._boxMesh.scale.x / material.map.source.data.width) *
-                (pos.getX(vertexIndex) + 0.5);
-              y =
-                -(this._boxMesh.scale.z / material.map.source.data.height) *
-                (pos.getZ(vertexIndex) + 0.5);
+              if (shouldOrientateFacesTowardsY) {
+                x =
+                  (this._boxMesh.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) + 0.5);
+                y =
+                  -(this._boxMesh.scale.z / material.map.source.data.height) *
+                  (pos.getZ(vertexIndex) + 0.5);
+              } else {
+                x =
+                  -(this._boxMesh.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) - 0.5);
+                y =
+                  (this._boxMesh.scale.z / material.map.source.data.height) *
+                  (pos.getZ(vertexIndex) - 0.5);
+              }
             } else {
               [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               if (!shouldOrientateFacesTowardsY) {
@@ -277,8 +304,7 @@ namespace gdjs {
                 (pos.getY(vertexIndex) +
                   (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
             } else {
-              [x, y] =
-                noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               if (shouldBackFaceBeUpThroughXAxisRotation) {
                 x = -x;
                 y = -y;

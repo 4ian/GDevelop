@@ -263,7 +263,7 @@ export default class ExportLauncher extends Component<Props, State> {
                 t`A game with this ID already exists and you are not the owner.`
               ),
               i18n._(
-                t`A test link will be created but the game will not be registered.`
+                t`A link or file will be created but the game will not be registered.`
               ),
             ].join('\n\n'),
             rawError: registerError,
@@ -279,7 +279,7 @@ export default class ExportLauncher extends Component<Props, State> {
                 t`You have reached the maximum number of games you can register! You can unregister games in your Games Dashboard.`
               ),
               i18n._(
-                t`A test link will be created but the game will not be registered.`
+                t`A link or file will be created but the game will not be registered.`
               ),
             ].join('\n\n'),
             rawError: registerError,

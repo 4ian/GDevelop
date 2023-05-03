@@ -69,6 +69,29 @@ static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
     container.push_back(str);
 }
 
+static gd::String CleanProjectName(gd::String projectName) {
+  gd::String partiallyCleanedProjectName = projectName;
+
+  static const gd::String forbiddenFileNameCharacters =
+      "\\/:*?\"<>|";  // See
+                      // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+
+  for (size_t i = 0; i < partiallyCleanedProjectName.size();) {
+    // Delete all characters that are not allowed in a filename
+    if (forbiddenFileNameCharacters.find(partiallyCleanedProjectName[i]) !=
+        gd::String::npos) {
+      partiallyCleanedProjectName.erase(i, 1);
+    } else {
+      i++;
+    }
+  }
+
+  if (partiallyCleanedProjectName.empty())
+    partiallyCleanedProjectName = "Project";
+
+  return partiallyCleanedProjectName;
+}
+
 ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
                                gd::String gdjsRoot_,
                                gd::String codeOutputDir_)
@@ -101,8 +124,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   } else {
     // Most of the time, we skip the logo and minimum duration so that
     // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen().ShowGDevelopLogoDuringLoadingScreen(false).SetMinDuration(
-        0);
+    exportedProject.GetLoadingScreen()
+        .ShowGDevelopLogoDuringLoadingScreen(false)
+        .SetMinDuration(0);
     exportedProject.GetWatermark().ShowGDevelopWatermark(false);
   }
 
@@ -308,16 +332,22 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     }
 
     // Splashscreen icon for Android 12+.
-    gd::String splashScreenIconFilename = getIconFilename("android", "windowSplashScreenAnimatedIcon");
+    gd::String splashScreenIconFilename =
+        getIconFilename("android", "windowSplashScreenAnimatedIcon");
     if (!splashScreenIconFilename.empty())
-      output += "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" value=\""
-        + splashScreenIconFilename + "\" />\n";
+      output +=
+          "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" "
+          "value=\"" +
+          splashScreenIconFilename + "\" />\n";
 
     // Splashscreen "branding" image for Android 12+.
-    gd::String splashScreenBrandingImageFilename = getIconFilename("android", "windowSplashScreenBrandingImage");
+    gd::String splashScreenBrandingImageFilename =
+        getIconFilename("android", "windowSplashScreenBrandingImage");
     if (!splashScreenBrandingImageFilename.empty())
-      output += "<preference name=\"AndroidWindowSplashScreenBrandingImage\" value=\""
-        + splashScreenBrandingImageFilename + "\" />\n";
+      output +=
+          "<preference name=\"AndroidWindowSplashScreenBrandingImage\" "
+          "value=\"" +
+          splashScreenBrandingImageFilename + "\" />\n";
 
     return output;
   };
@@ -458,11 +488,15 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                 ->GetMangledSceneName(project.GetName())
                                 .LowerCase()
                                 .FindAndReplace(" ", "-")));
+  // It's important to clean the project name from special characters,
+  // otherwise Windows executable may be corrupted when electron builds it.
+  gd::String jsonCleanedName = gd::Serializer::ToJSON(
+      gd::SerializerElement(CleanProjectName(project.GetName())));
 
   {
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
-            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonCleanedName)
             .FindAndReplace("\"GDJS_GAME_PACKAGE_NAME\"", jsonPackageName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
@@ -651,10 +685,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/CustomObjectPixiRenderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/DebuggerPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/CustomObjectPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");

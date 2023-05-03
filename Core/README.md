@@ -21,5 +21,5 @@ or any pull request so as to add a nice feature, do not hesitate to get in touch
 
 ## License
 
-GDevelop Core is distributed under the MIT license: see license.txt for
+GDevelop Core is distributed under the MIT license: see [LICENSE.md](LICENSE.md) for
 more information.

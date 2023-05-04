@@ -10,6 +10,7 @@ import {
 } from '../GDJSInspectorDescriptions';
 import VariablesContainerInspector from './VariablesContainerInspector';
 import Text from '../../UI/Text';
+import TimersInspector from './TimersInspector';
 
 type Props = {|
   runtimeObject: GameData,
@@ -96,6 +97,12 @@ const RuntimeObjectInspector = (props: Props) => (
         props.onEdit(['_variables'].concat(path), newValue)
       }
       onCall={(path, args) => props.onCall(['_variables'].concat(path), args)}
+    />
+    <Text>
+      <Trans>Timers:</Trans>
+    </Text>
+    <TimersInspector
+      timers={props.runtimeObject ? props.runtimeObject._timers : null}
     />
   </React.Fragment>
 );

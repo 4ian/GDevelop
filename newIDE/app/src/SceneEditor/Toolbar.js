@@ -82,7 +82,7 @@ const Toolbar = (props: Props) => {
           onClick={props.toggleObjectsList}
           selected={props.isObjectsListShown}
           tooltip={
-            props.isObjectGroupsListShown
+            props.isObjectsListShown
               ? t`Close Objects Panel`
               : t`Open Objects Panel`
           }

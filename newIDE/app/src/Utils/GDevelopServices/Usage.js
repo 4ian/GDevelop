@@ -22,6 +22,8 @@ export type Subscription = {|
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
 
+  purchaselyPlan?: string,
+
   redemptionCode?: string | null,
   redemptionCodeValidUntil?: number | null,
 |};
@@ -276,11 +278,36 @@ export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
   return !!subscription.stripeSubscriptionId;
 };
 
-export const hasValidSubscriptionPlan = (subscription: ?Subscription) =>
-  !!subscription &&
-  !!subscription.planId &&
-  (!subscription.redemptionCodeValidUntil || // No redemption code
-    subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
+export const hasMobileAppStoreSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
+  return !!subscription && !!subscription.purchaselyPlan;
+};
+
+export const hasSubscriptionBeenManuallyAdded = (
+  subscription: ?Subscription
+): boolean => {
+  return (
+    !!subscription &&
+    (subscription.stripeSubscriptionId === 'MANUALLY_ADDED' ||
+      subscription.stripeCustomerId === 'MANUALLY_ADDED')
+  );
+};
+
+export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+  const hasValidSubscription =
+    !!subscription &&
+    !!subscription.planId &&
+    (!subscription.redemptionCodeValidUntil || // No redemption code
+      subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
+
+  if (hasValidSubscription) {
+    // The user has a subscription registered in the backend (classic "Registered" user).
+    return true;
+  }
+
+  return false;
+};
 
 type UploadType = 'build' | 'preview';
 

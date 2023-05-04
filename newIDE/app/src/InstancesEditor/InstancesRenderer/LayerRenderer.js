@@ -114,7 +114,7 @@ export default class LayerRenderer {
         gd.InitialInstance
       );
 
-      //Get the "RendereredInstance" object associated to the instance and tell it to update.
+      //Get the "RenderedInstance" object associated to the instance and tell it to update.
       var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
         instance
       );
@@ -127,7 +127,10 @@ export default class LayerRenderer {
       const isVisible = this._isInstanceVisible(instance);
       if (pixiObject) {
         pixiObject.visible = isVisible;
-        pixiObject.interactive = !(instance.isLocked() && instance.isSealed());
+        pixiObject.interactive = !(
+          layer.isLocked() ||
+          (instance.isLocked() && instance.isSealed())
+        );
       }
       if (isVisible) renderedInstance.update();
 

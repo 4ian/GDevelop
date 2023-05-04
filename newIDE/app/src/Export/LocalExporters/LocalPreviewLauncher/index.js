@@ -80,6 +80,11 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
+  closePreview = (windowId: number) => {
+    if (!ipcRenderer) return;
+    ipcRenderer.invoke('preview-close', { windowId });
+  };
+
   _openPreviewWindow = (
     project: gdProject,
     gamePath: string,

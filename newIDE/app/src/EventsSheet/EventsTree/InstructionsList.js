@@ -15,6 +15,7 @@ import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   addButton: {
@@ -53,6 +54,8 @@ type Props = {|
   screenType: ScreenType,
   windowWidth: WidthType,
 
+  scope: EventsScope,
+  resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
@@ -84,6 +87,8 @@ export default function InstructionsList({
   renderObjectThumbnail,
   screenType,
   windowWidth,
+  scope,
+  resourcesManager,
   globalObjectsContainer,
   objectsContainer,
   idPrefix,
@@ -156,6 +161,8 @@ export default function InstructionsList({
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
         windowWidth={windowWidth}
+        scope={scope}
+        resourcesManager={resourcesManager}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
         id={`${idPrefix}-${areConditions ? 'condition' : 'action'}-${i}`}

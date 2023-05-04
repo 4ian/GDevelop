@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line } from '../../UI/Grid';
@@ -7,6 +8,8 @@ import {
   getSubscriptionPlans,
   type Subscription,
   type PlanDetails,
+  hasMobileAppStoreSubscriptionPlan,
+  hasSubscriptionBeenManuallyAdded,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
@@ -18,6 +21,8 @@ import FlatButton from '../../UI/FlatButton';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Paper from '../../UI/Paper';
 import PlanCard from './PlanCard';
+import { isNativeMobileApp } from '../../Utils/Platform';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 const styles = {
   diamondIcon: {
@@ -35,6 +40,7 @@ type Props = {
   subscription: ?Subscription,
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
+  simulateNativeMobileApp?: boolean,
 };
 
 /**
@@ -55,10 +61,12 @@ const SubscriptionDetails = ({
   subscription,
   isManageSubscriptionLoading,
   onManageSubscription,
+  simulateNativeMobileApp,
 }: Props) => {
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+  const { showAlert } = useAlertDialog();
 
   const userPlan = React.useMemo(
     () => {
@@ -78,6 +86,9 @@ const SubscriptionDetails = ({
 
   if (!subscription) return <PlaceholderLoader />;
 
+  const isOnOrSimulateMobileApp =
+    isNativeMobileApp() || simulateNativeMobileApp;
+
   return (
     <Column noMargin>
       <Line alignItems="center">
@@ -86,64 +97,88 @@ const SubscriptionDetails = ({
         </Text>
       </Line>
       {userPlan && userPlan.planId && !isSubscriptionExpired ? (
-        <ColumnStackLayout noMargin>
-          <PlanCard
-            plan={userPlan}
-            hidePrice={!!redemptionCodeExpirationDate}
-            actions={[
-              !redemptionCodeExpirationDate ? (
-                <LeftLoader
-                  key="manage-online"
-                  isLoading={isManageSubscriptionLoading}
-                >
-                  <FlatButton
-                    label={<Trans>Manage online</Trans>}
-                    primary
-                    onClick={onManageSubscription}
-                    disabled={isManageSubscriptionLoading}
-                  />
-                </LeftLoader>
-              ) : (
-                undefined
-              ),
-              <RaisedButton
-                key="manage"
-                label={<Trans>Manage subscription</Trans>}
-                primary
-                onClick={() =>
-                  openSubscriptionDialog({ reason: 'Consult profile' })
-                }
-                disabled={isManageSubscriptionLoading}
-              />,
-            ].filter(Boolean)}
-            isHighlighted={false}
-            background="medium"
+        isOnOrSimulateMobileApp ? (
+          <RaisedButton
+            label={<Trans>Manage subscription</Trans>}
+            primary
+            onClick={() => {
+              if (hasMobileAppStoreSubscriptionPlan(subscription)) {
+                // Would open App Store subscriptions settings.
+              } else {
+                showAlert({
+                  title: t`Subscription outside the app store`,
+                  message: t`The subscription of this account comes from outside the app store. Connect with your account on gdevelop.io from your web-browser to manage it.`,
+                });
+              }
+            }}
           />
-          {!!redemptionCodeExpirationDate && (
-            <I18n>
-              {({ i18n }) => (
-                <Paper background="dark" variant="outlined">
-                  <LineStackLayout alignItems="center">
-                    <img
-                      src="res/diamond.svg"
-                      style={styles.diamondIcon}
-                      alt=""
+        ) : (
+          // On web/desktop, displays the subscription as usual:
+          <ColumnStackLayout noMargin>
+            <PlanCard
+              plan={userPlan}
+              hidePrice={
+                // A redemption code means the price does not really reflect what was paid, so we hide it.
+                !!redemptionCodeExpirationDate ||
+                hasMobileAppStoreSubscriptionPlan(subscription)
+              }
+              actions={[
+                !redemptionCodeExpirationDate &&
+                !hasMobileAppStoreSubscriptionPlan(subscription) &&
+                !hasSubscriptionBeenManuallyAdded(subscription) ? (
+                  <LeftLoader
+                    key="manage-online"
+                    isLoading={isManageSubscriptionLoading}
+                  >
+                    <FlatButton
+                      label={<Trans>Manage online</Trans>}
+                      primary
+                      onClick={onManageSubscription}
+                      disabled={isManageSubscriptionLoading}
                     />
-                    <Column>
-                      <Text>
-                        <Trans>
-                          Thanks to the redemption code you've used, you have
-                          this subscription enabled until{' '}
-                          {i18n.date(subscription.redemptionCodeValidUntil)}.
-                        </Trans>
-                      </Text>
-                    </Column>
-                  </LineStackLayout>
-                </Paper>
-              )}
-            </I18n>
-          )}
-        </ColumnStackLayout>
+                  </LeftLoader>
+                ) : (
+                  undefined
+                ),
+                <RaisedButton
+                  key="manage"
+                  label={<Trans>Manage subscription</Trans>}
+                  primary
+                  onClick={() =>
+                    openSubscriptionDialog({ reason: 'Consult profile' })
+                  }
+                  disabled={isManageSubscriptionLoading}
+                />,
+              ].filter(Boolean)}
+              isHighlighted={false}
+              background="medium"
+            />
+            {!!redemptionCodeExpirationDate && (
+              <I18n>
+                {({ i18n }) => (
+                  <Paper background="dark" variant="outlined">
+                    <LineStackLayout alignItems="center">
+                      <img
+                        src="res/diamond.svg"
+                        style={styles.diamondIcon}
+                        alt=""
+                      />
+                      <Column>
+                        <Text>
+                          <Trans>
+                            Thanks to the redemption code you've used, you have
+                            this subscription enabled until{' '}
+                            {i18n.date(subscription.redemptionCodeValidUntil)}.
+                          </Trans>
+                        </Text>
+                      </Column>
+                    </LineStackLayout>
+                  </Paper>
+                )}
+              </I18n>
+            )}
+          </ColumnStackLayout>
+        )
       ) : (
         <Paper background="medium" variant="outlined" style={styles.paper}>
           <LineStackLayout alignItems="center">
@@ -151,20 +186,31 @@ const SubscriptionDetails = ({
             <Column expand>
               <Line>
                 {!isSubscriptionExpired ? (
-                  <Column noMargin>
-                    <Text noMargin>
-                      <Trans>
-                        Unlock more one-click exports, cloud projects,
-                        leaderboards and remove the GDevelop splashscreen.
-                      </Trans>
-                    </Text>
-                    <Text noMargin>
-                      <Trans>
-                        With a subscription, you’re also supporting the
-                        improvement of GDevelop.
-                      </Trans>
-                    </Text>
-                  </Column>
+                  isOnOrSimulateMobileApp ? (
+                    <Column noMargin>
+                      <Text noMargin>
+                        <Trans>
+                          Unlock full access to GDevelop to create without
+                          limits!
+                        </Trans>
+                      </Text>
+                    </Column>
+                  ) : (
+                    <Column noMargin>
+                      <Text noMargin>
+                        <Trans>
+                          Unlock more one-click exports, cloud projects,
+                          leaderboards and remove the GDevelop splashscreen.
+                        </Trans>
+                      </Text>
+                      <Text noMargin>
+                        <Trans>
+                          With a subscription, you’re also supporting the
+                          improvement of GDevelop.
+                        </Trans>
+                      </Text>
+                    </Column>
+                  )
                 ) : (
                   <Text noMargin>
                     <Trans>

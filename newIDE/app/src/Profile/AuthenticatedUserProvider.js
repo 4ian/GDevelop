@@ -64,6 +64,7 @@ type State = {|
   createAccountInProgress: boolean,
   editProfileDialogOpen: boolean,
   editInProgress: boolean,
+  deleteInProgress: boolean,
   additionalUserInfoDialogOpen: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
@@ -90,6 +91,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     createAccountInProgress: false,
     editProfileDialogOpen: false,
     editInProgress: false,
+    deleteInProgress: false,
     additionalUserInfoDialogOpen: false,
     authError: null,
     resetPasswordDialogOpen: false,
@@ -678,6 +680,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           getNewsletterEmail: form.getNewsletterEmail,
           appLanguage: preferences.language,
           donateLink: form.donateLink,
+          communityLinks: form.communityLinks,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
@@ -737,6 +740,32 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
     this.setState({
       createAccountInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doDeleteAccount = async () => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      deleteInProgress: true,
+      authError: null,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.deleteAccount(authentication.getAuthorizationHeader);
+      this._resetAuthenticatedUser();
+      clearCloudProjectCookies();
+      this.openEditProfileDialog(false);
+      this.showUserSnackbar({
+        message: <Trans>Your account has been deleted!</Trans>,
+      });
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      deleteInProgress: false,
     });
     this._automaticallyUpdateUserProfile = true;
   };
@@ -947,9 +976,13 @@ export default class AuthenticatedUserProvider extends React.Component<
               this.state.editProfileDialogOpen && (
                 <EditProfileDialog
                   profile={this.state.authenticatedUser.profile}
+                  subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}
                   onEdit={form => this._doEdit(form, preferences)}
-                  updateProfileInProgress={this.state.editInProgress}
+                  onDelete={this._doDeleteAccount}
+                  actionInProgress={
+                    this.state.editInProgress || this.state.deleteInProgress
+                  }
                   error={this.state.authError}
                 />
               )}

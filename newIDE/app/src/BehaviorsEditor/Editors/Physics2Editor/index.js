@@ -354,6 +354,7 @@ const Physics2Editor = (props: Props) => {
 
                 return (
                   <ShapePreview
+                    {...overlayProps}
                     shape={properties.get('shape').getValue()}
                     dimensionA={parseFloat(
                       properties.get('shapeDimensionA').getValue()
@@ -369,11 +370,6 @@ const Physics2Editor = (props: Props) => {
                     )}
                     polygonOrigin={properties.get('polygonOrigin').getValue()}
                     vertices={JSON.parse(properties.get('vertices').getValue())}
-                    width={overlayProps.imageWidth}
-                    height={overlayProps.imageHeight}
-                    frameOffsetTop={overlayProps.offsetTop}
-                    frameOffsetLeft={overlayProps.offsetLeft}
-                    zoomFactor={overlayProps.imageZoomFactor}
                     onMoveVertex={(index, newX, newY) => {
                       let vertices = JSON.parse(
                         properties.get('vertices').getValue()

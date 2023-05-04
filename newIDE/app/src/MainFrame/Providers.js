@@ -71,25 +71,25 @@ const Providers = ({
                       scope="app"
                     >
                       <InAppTutorialProvider>
-                        <AuthenticatedUserProvider
-                          authentication={authentication}
-                        >
-                          <PublicProfileProvider>
-                            <I18n update>
-                              {({ i18n }) => (
-                                <EventsFunctionsExtensionsProvider
-                                  i18n={i18n}
-                                  makeEventsFunctionCodeWriter={
-                                    makeEventsFunctionCodeWriter
-                                  }
-                                  eventsFunctionsExtensionWriter={
-                                    eventsFunctionsExtensionWriter
-                                  }
-                                  eventsFunctionsExtensionOpener={
-                                    eventsFunctionsExtensionOpener
-                                  }
-                                >
-                                  <AlertProvider>
+                        <AlertProvider>
+                          <AuthenticatedUserProvider
+                            authentication={authentication}
+                          >
+                            <PublicProfileProvider>
+                              <I18n update>
+                                {({ i18n }) => (
+                                  <EventsFunctionsExtensionsProvider
+                                    i18n={i18n}
+                                    makeEventsFunctionCodeWriter={
+                                      makeEventsFunctionCodeWriter
+                                    }
+                                    eventsFunctionsExtensionWriter={
+                                      eventsFunctionsExtensionWriter
+                                    }
+                                    eventsFunctionsExtensionOpener={
+                                      eventsFunctionsExtensionOpener
+                                    }
+                                  >
                                     <SubscriptionSuggestionProvider>
                                       <CommandsContextProvider>
                                         <AssetStoreStateProvider>
@@ -109,12 +109,12 @@ const Providers = ({
                                         </AssetStoreStateProvider>
                                       </CommandsContextProvider>
                                     </SubscriptionSuggestionProvider>
-                                  </AlertProvider>
-                                </EventsFunctionsExtensionsProvider>
-                              )}
-                            </I18n>
-                          </PublicProfileProvider>
-                        </AuthenticatedUserProvider>
+                                  </EventsFunctionsExtensionsProvider>
+                                )}
+                              </I18n>
+                            </PublicProfileProvider>
+                          </AuthenticatedUserProvider>
+                        </AlertProvider>
                       </InAppTutorialProvider>
                     </ErrorBoundary>
                   </FullThemeProvider>

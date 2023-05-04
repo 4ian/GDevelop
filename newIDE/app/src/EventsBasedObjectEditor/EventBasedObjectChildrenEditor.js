@@ -246,6 +246,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   onChooseResource: async () => [],
                   getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
+                  getStorageProviderResourceOperations: () => null,
                 }}
                 selectedObjectNames={selectedObjectNames}
                 onEditObject={this.editObject}
@@ -283,6 +284,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   launchProjectWithLoadingScreenPreview: () => {},
                 }}
                 canInstallPrivateAsset={() => false}
+                canSetAsGlobalObject={false}
               />
             </Line>
             {this.state.editedObjectWithContext && (
@@ -298,6 +300,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                   onChooseResource: async () => [],
                   getStorageProvider: () => emptyStorageProvider,
                   onFetchNewlyAddedResources: async () => {},
+                  getStorageProviderResourceOperations: () => null,
                 }}
                 onComputeAllVariableNames={() => {
                   return [];

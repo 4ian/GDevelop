@@ -7,6 +7,8 @@ declare class gdLayer {
   getRenderingType(): string;
   setVisibility(visible: boolean): void;
   getVisibility(): boolean;
+  setLocked(isLocked: boolean): void;
+  isLocked(): boolean;
   setLightingLayer(lightingLayer: boolean): void;
   isLightingLayer(): boolean;
   setFollowBaseLayerCamera(followBaseLayerCamera: boolean): void;

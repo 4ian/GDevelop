@@ -14,7 +14,8 @@ export default {
 const defaultProps = {
   onClose: () => action('onClose')(),
   onEdit: action('onEdit'),
-  updateProfileInProgress: false,
+  onDelete: action('onDelete'),
+  actionInProgress: false,
   error: null,
   profile: {
     id: 'id',
@@ -29,14 +30,36 @@ const defaultProps = {
     updatedAt: 12345,
     appLanguage: 'en',
     donateLink: 'https://www.gdevelop-app.com',
+    communityLinks: {
+      personalWebsiteLink: 'https://indie-user.com',
+      personalWebsite2Link: 'https://indie-user2.com',
+      twitterUsername: 'indie-user',
+      facebookUsername: 'indie-user',
+      youtubeUsername: 'indie-user',
+      tiktokUsername: 'indie-user',
+      instagramUsername: 'indie-user',
+      redditUsername: 'indie-user',
+      snapchatUsername: 'indie-user',
+      discordServerLink: 'https://discord.gg/indie-user',
+    },
+  },
+  subscription: {
+    userId: 'id',
+    planId: 'planId',
+    createdAt: 12345,
+    updatedAt: 12345,
   },
 };
-export const Default = () => <EditProfileDialog {...defaultProps} />;
+export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;
+
+export const WithoutSubscription = () => (
+  <EditProfileDialog {...defaultProps} subscription={null} />
+);
 
 export const ErrorFromBackend = () => (
   <EditProfileDialog {...defaultProps} error={{ code: 'auth/username-used' }} />
 );
 
 export const Submitting = () => (
-  <EditProfileDialog {...defaultProps} updateProfileInProgress />
+  <EditProfileDialog {...defaultProps} actionInProgress />
 );

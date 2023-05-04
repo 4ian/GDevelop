@@ -104,7 +104,6 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import Brush from '@material-ui/icons/Brush';
-import fakeResourceExternalEditors from './FakeResourceExternalEditors';
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
@@ -137,8 +136,8 @@ import {
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
 import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
-import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
 import Trash from '../UI/CustomSvgIcons/Trash';
+import fakeResourceManagementProps from './FakeResourceManagement';
 
 configureActions({
   depth: 2,
@@ -2370,16 +2369,7 @@ storiesOf('InstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceExternalEditors: fakeResourceExternalEditors,
-        onChooseResource: () => {
-          action('onChooseResource');
-          return Promise.reject();
-        },
-        resourceSources: [],
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2397,16 +2387,7 @@ storiesOf('InstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceExternalEditors: fakeResourceExternalEditors,
-        onChooseResource: () => {
-          action('onChooseResource');
-          return Promise.reject();
-        },
-        resourceSources: [],
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2431,16 +2412,7 @@ storiesOf('InstructionEditorDialog', module)
         isCondition
         isNewInstruction={true}
         instruction={testProject.testInstruction}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceExternalEditors: fakeResourceExternalEditors,
-          onChooseResource: () => {
-            action('onChooseResource');
-            return Promise.reject();
-          },
-          resourceSources: [],
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         openInstructionOrExpression={action('open instruction or expression')}
         onCancel={action('cancel')}
         onSubmit={action('submit')}
@@ -2472,13 +2444,7 @@ storiesOf('InstructionEditorMenu', module)
             isCondition
             isNewInstruction={false}
             instruction={testProject.testInstruction}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
             openInstructionOrExpression={action(
               'open instruction or expression'
             )}
@@ -2833,21 +2799,20 @@ storiesOf('ProjectPropertiesDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ProjectPropertiesDialog
-      open
-      initialTab="properties"
-      project={testProject.project}
-      onClose={action('onClose')}
-      onApply={async () => true}
-      onPropertiesApplied={action('onPropertiesApplied')}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <ProjectPropertiesDialog
+          open
+          initialTab="properties"
+          project={testProject.project}
+          onClose={action('onClose')}
+          onApply={async () => true}
+          onPropertiesApplied={action('onPropertiesApplied')}
+          resourceManagementProps={fakeResourceManagementProps}
+          i18n={i18n}
+        />
+      )}
+    </I18n>
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
@@ -2860,13 +2825,7 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       onLoadingScreenUpdated={action('onLoadingscreenUpdated')}
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
     />
   ));
 

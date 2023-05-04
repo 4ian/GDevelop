@@ -134,6 +134,18 @@ export const indieUserProfile: Profile = {
   isCreator: true,
   isPlayer: false,
   donateLink: 'https://www.paypal.me/indie-user',
+  communityLinks: {
+    personalWebsiteLink: 'https://indie-user.com',
+    personalWebsite2Link: 'https://indie-user2.com',
+    twitterUsername: 'indie-user',
+    facebookUsername: 'indie-user',
+    youtubeUsername: 'indie-user',
+    tiktokUsername: 'indie-user',
+    instagramUsername: 'indie-user',
+    redditUsername: 'indie-user',
+    snapchatUsername: 'indie-user',
+    discordServerLink: 'https://discord.gg/indie-user',
+  },
 };
 
 export const usagesForIndieUser: Usages = [
@@ -183,6 +195,14 @@ export const subscriptionForGoldUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'silver-user',
+};
+
+export const purchaselyGoldSubscription: Subscription = {
+  planId: 'gdevelop_gold',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  purchaselyPlan: 'gdevelop_gold_whatever',
 };
 
 export const silverSubscriptionWithRedemptionCode: Subscription = {
@@ -395,6 +415,12 @@ export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
+  limits: limitsForGoldUser,
+};
+
+export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: purchaselyGoldSubscription,
   limits: limitsForGoldUser,
 };
 
@@ -1000,6 +1026,13 @@ export const uncompatibleFireBulletExtensionShortHeader: ExtensionShortHeader = 
 export const alreadyInstalledExtensionShortHeader: ExtensionShortHeader = {
   ...fireBulletExtensionShortHeader,
   name: 'SomeAlreadyInstalledExtension',
+  version: '1.2.3',
+};
+
+export const newerVersionExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  name: 'SomeAlreadyInstalledExtension',
+  version: '1.2.4',
 };
 
 export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader = {
@@ -1557,5 +1590,16 @@ export const fakeAnnouncements: Announcement[] = [
     },
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',
+  },
+  {
+    id: '127',
+    level: 'normal',
+    titleByLocale: {
+      en: '',
+    },
+    markdownMessageByLocale: {
+      en:
+        '[![GDevelop Android](https://resources.gdevelop.io/announcements/GDevelop_Android.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+    },
   },
 ];

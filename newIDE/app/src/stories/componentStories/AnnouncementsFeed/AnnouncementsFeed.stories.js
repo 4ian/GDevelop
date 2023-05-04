@@ -15,6 +15,34 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
+export const Default = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        error: null,
+        fetchAnnouncements: action('fetchAnnouncements'),
+      }}
+    >
+      <AnnouncementsFeed />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
+export const WithClosableItems = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        error: null,
+        fetchAnnouncements: action('fetchAnnouncements'),
+      }}
+    >
+      <AnnouncementsFeed canClose />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
 export const ErrorLoadingAnnouncements = () => {
   return (
     <AnnouncementsFeedContext.Provider
@@ -34,20 +62,6 @@ export const LoadingAnnouncements = () => {
     <AnnouncementsFeedContext.Provider
       value={{
         announcements: null,
-        error: null,
-        fetchAnnouncements: action('fetchAnnouncements'),
-      }}
-    >
-      <AnnouncementsFeed />
-    </AnnouncementsFeedContext.Provider>
-  );
-};
-
-export const Default = () => {
-  return (
-    <AnnouncementsFeedContext.Provider
-      value={{
-        announcements: fakeAnnouncements,
         error: null,
         fetchAnnouncements: action('fetchAnnouncements'),
       }}

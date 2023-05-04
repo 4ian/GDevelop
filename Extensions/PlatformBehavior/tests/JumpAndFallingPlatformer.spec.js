@@ -1358,7 +1358,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       jumpthru.setPosition(12, -90);
       jumpthru.setCustomWidthAndHeight(60, 20);
 
-      // Add another jumpthu under with a 10 pixels interleave (less than object height).
+      // Add another jumpthru under with a 10 pixels interleave (less than object height).
       bottomJumpthru = addJumpThroughPlatformObject(runtimeScene);
       bottomJumpthru.setPosition(0, -70);
       bottomJumpthru.setCustomWidthAndHeight(60, 20);
@@ -1396,12 +1396,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       jumpthru.setPosition(10, -90);
       jumpthru.setCustomWidthAndHeight(60, 20);
 
-      // Add another jumpthu under with a 10 pixels interleave (less than object height).
+      // Add another jumpthru under with a 10 pixels interleave (less than object height).
       bottomJumpthru = addJumpThroughPlatformObject(runtimeScene);
       bottomJumpthru.setPosition(0, -70);
       bottomJumpthru.setCustomWidthAndHeight(60, 20);
 
-      // The character falls next to the jumthru.
+      // The character falls next to the jumpthru.
       for (let i = 0; i < 8; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);

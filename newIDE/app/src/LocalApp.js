@@ -59,14 +59,19 @@ export const create = (authentication: Authentication) => {
         >
           {({
             getStorageProviderOperations,
+            getStorageProviderResourceOperations,
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
           }) => (
             <MainFrame
               i18n={i18n}
-              renderMainMenu={(props, callbacks) => (
-                <ElectronMainMenu props={props} callbacks={callbacks} />
+              renderMainMenu={(props, callbacks, extraCallbacks) => (
+                <ElectronMainMenu
+                  props={props}
+                  callbacks={callbacks}
+                  extraCallbacks={extraCallbacks}
+                />
               )}
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />
@@ -89,6 +94,9 @@ export const create = (authentication: Authentication) => {
               resourceMover={LocalResourceMover}
               resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProviderResourceOperations={
+                getStorageProviderResourceOperations
+              }
               getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}
               resourceExternalEditors={localResourceExternalEditors}

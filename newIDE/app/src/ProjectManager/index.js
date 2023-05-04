@@ -1183,6 +1183,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
                 }
+                i18n={i18n}
               />
             )}
             {!!this.state.editedPropertiesLayout && (

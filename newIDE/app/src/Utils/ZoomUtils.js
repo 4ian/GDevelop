@@ -1,6 +1,6 @@
 // @flow
 
-export const zoomStepBasePower = 1 / 16;
+const zoomStepBasePower = 1 / 16;
 
 const stepZoomFactor = Math.pow(2, 2 * zoomStepBasePower);
 export const zoomInFactor = stepZoomFactor;
@@ -19,19 +19,3 @@ const instancesEditorMinZoom = 1 / 128;
 
 export const clampInstancesEditorZoom = (zoom: number): number =>
   Math.max(Math.min(zoom, instancesEditorMaxZoom), instancesEditorMinZoom);
-
-export const imagePreviewMaxZoom = 16;
-export const imagePreviewMinZoom = 1 / 16;
-
-export const clampImagePreviewZoom = (zoom: number): number =>
-  Math.max(Math.min(zoom, imagePreviewMaxZoom), imagePreviewMinZoom);
-
-export const willZoomChange = (
-  currentZoom: number,
-  multiplier: number
-): boolean => {
-  return !(
-    (currentZoom >= imagePreviewMaxZoom && multiplier > 1) ||
-    (currentZoom <= imagePreviewMinZoom && multiplier < 1)
-  );
-};

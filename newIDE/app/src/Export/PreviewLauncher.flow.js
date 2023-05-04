@@ -72,6 +72,7 @@ export type PreviewLauncherInterface = {
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
   canDoHotReload: () => boolean,
+  +closePreview?: (windowId: number) => void,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 

@@ -16,6 +16,7 @@ Camera Layer::badCamera;
 Layer::Layer()
     : renderingType("2d"),
       isVisible(true),
+      isLocked(false),
       isLightingLayer(false),
       followBaseLayerCamera(false),
       threeDNearPlaneDistance(0.1),
@@ -36,6 +37,7 @@ void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("renderingType", GetRenderingType());
   element.SetAttribute("visibility", GetVisibility());
+  element.SetAttribute("isLocked", IsLocked());
   element.SetAttribute("isLightingLayer", IsLightingLayer());
   element.SetAttribute("followBaseLayerCamera", IsFollowingBaseLayerCamera());
   element.SetAttribute("ambientLightColorR", (int)GetAmbientLightColorRed());
@@ -72,6 +74,7 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
   SetRenderingType(element.GetStringAttribute("renderingType", "2d"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
+  SetLocked(element.GetBoolAttribute("isLocked", false));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
   SetFollowBaseLayerCamera(
       element.GetBoolAttribute("followBaseLayerCamera", false));

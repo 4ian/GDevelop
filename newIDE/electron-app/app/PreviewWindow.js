@@ -50,6 +50,8 @@ const openPreviewWindow = ({
 
   previewWindow.loadURL(previewGameIndexHtmlPath);
 
+  previewWindows.push(previewWindow);
+
   previewWindow.on('closed', event => {
     previewWindows = previewWindows.filter(
       otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
@@ -58,6 +60,12 @@ const openPreviewWindow = ({
   });
 };
 
+const closePreviewWindow = windowId => {
+  const previewWindow = previewWindows.find(window => window.id === windowId);
+  if (previewWindow) previewWindow.close();
+};
+
 module.exports = {
   openPreviewWindow,
+  closePreviewWindow,
 };

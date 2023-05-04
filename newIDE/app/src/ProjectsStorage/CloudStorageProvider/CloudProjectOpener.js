@@ -11,6 +11,18 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '..';
 import { unzipFirstEntryOfBlob } from '../../Utils/Zip.js/Utils';
 
+class CloudProjectReadingError extends Error {
+  constructor() {
+    super();
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, CloudProjectReadingError);
+    }
+
+    this.name = 'CloudProjectReadingError';
+  }
+}
+
 export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
@@ -32,13 +44,16 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   );
   onProgress && onProgress((4 / 4) * 100, t`Opening portal`);
   // Reading only the first entry since the zip should only contain the project json file
-  const serializedProject = await unzipFirstEntryOfBlob(
-    zippedSerializedProject
-  );
-
-  return {
-    content: JSON.parse(serializedProject),
-  };
+  try {
+    const serializedProject = await unzipFirstEntryOfBlob(
+      zippedSerializedProject
+    );
+    return {
+      content: JSON.parse(serializedProject),
+    };
+  } catch (error) {
+    throw new CloudProjectReadingError();
+  }
 };
 
 export const generateOnEnsureCanAccessResources = (

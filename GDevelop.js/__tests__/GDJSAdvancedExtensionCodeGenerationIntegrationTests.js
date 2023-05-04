@@ -46,12 +46,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a number parameter condition that is true', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       [123],
       [
         {
           type: { value: 'CompareArgumentAsNumber' },
-          parameters: ['"ParameterName"', '=', '123'],
+          parameters: ['"MyParameter"', '=', '123'],
         },
       ]
     );
@@ -64,12 +64,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a number parameter condition that is false', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       [123],
       [
         {
           type: { value: 'BuiltinAdvanced::CompareArgumentAsNumber' },
-          parameters: ['ParameterName', '=', '456'],
+          parameters: ['MyParameter', '=', '456'],
         },
       ]
     );
@@ -79,12 +79,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a string parameter condition that is true', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       ['123'],
       [
         {
           type: { value: 'CompareArgumentAsString' },
-          parameters: ['"ParameterName"', '=', '"123"'],
+          parameters: ['"MyParameter"', '=', '"123"'],
         },
       ]
     );
@@ -97,16 +97,93 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   it('can generate a string parameter condition that is false', function () {
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
-      { ParameterName: 'number' },
+      { MyParameter: 'number' },
       ['123'],
       [
         {
           type: { value: 'BuiltinAdvanced::CompareArgumentAsString' },
-          parameters: ['ParameterName', '=', '"456"'],
+          parameters: ['MyParameter', '=', '"456"'],
         },
       ]
     );
 
     expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+  });
+
+  it('can copy a variable parameter variable', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'CopyArgumentToVariable' },
+            parameters: ['"MyParameter"', '__MyExtensionVariable'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { parameterTypes: { MyParameter: 'scenevar' }, logCode: false }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const myVariable = runtimeScene.getVariables().get('MyVariable');
+    myVariable.getChild('MyChildVariable').setNumber(123);
+    runCompiledEvents(gdjs, runtimeScene, [myVariable]);
+
+    // The user variable is copied into a variable with the extension namespace.
+    expect(runtimeScene.getVariables().has('__MyExtensionVariable')).toBe(true);
+    expect(
+      runtimeScene
+        .getVariables()
+        .get('__MyExtensionVariable')
+        .getChild('MyChildVariable')
+        .getAsNumber()
+    ).toBe(123);
+  });
+
+  it('can write a variable parameter variable', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['__MyExtensionVariable.MyChildVariable', '=', '123'],
+          },
+          {
+            type: { value: 'CopyVariableToArgument' },
+            parameters: ['"MyParameter"', '__MyExtensionVariable'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { parameterTypes: { MyParameter: 'scenevar' }, logCode: true }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const myVariable = runtimeScene.getVariables().get('MyVariable');
+    runCompiledEvents(gdjs, runtimeScene, [myVariable]);
+
+    // The extension variable is copied into the user variable.
+    expect(runtimeScene.getVariables().has('MyVariable')).toBe(true);
+    expect(
+      runtimeScene
+        .getVariables()
+        .get('MyVariable')
+        .getChild('MyChildVariable')
+        .getAsNumber()
+    ).toBe(123);
   });
 });

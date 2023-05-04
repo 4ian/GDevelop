@@ -16,6 +16,7 @@ export const withSomeEffectsForALayer = () => (
     <FixedHeightFlexContainer height={600}>
       <EffectsList
         target="layer"
+        layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
@@ -37,6 +38,7 @@ export const withSomeEffectsForAnObject = () => (
     <FixedHeightFlexContainer height={600}>
       <EffectsList
         target="object"
+        layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
@@ -58,6 +60,7 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
     <FixedHeightFlexContainer height={600}>
       <EffectsList
         target="layer"
+        layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
@@ -74,11 +77,58 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForALayer = () => (
+export const withoutEffectsForALayer2D = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
         target="layer"
+        layerRenderingType="2d"
+        project={testProject.project}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
+        effectsContainer={testProject.layerWithoutEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
+        onEffectsUpdated={action('effects updated')}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const withoutEffectsForALayer3D = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <EffectsList
+        target="layer"
+        layerRenderingType="3d"
+        project={testProject.project}
+        resourceManagementProps={{
+          getStorageProvider: () => emptyStorageProvider,
+          onFetchNewlyAddedResources: async () => {},
+          resourceSources: [],
+          onChooseResource: () => Promise.reject('Unimplemented'),
+          resourceExternalEditors: fakeResourceExternalEditors,
+        }}
+        effectsContainer={testProject.layerWithoutEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
+        onEffectsUpdated={action('effects updated')}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+// TODO Add a story with 2 effects of the same type that should be unique.
+
+export const withoutEffectsForAMixedLayer = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <EffectsList
+        target="layer"
+        layerRenderingType="2d+3d"
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
@@ -100,6 +150,7 @@ export const withoutEffectsForAnObject = () => (
     <FixedHeightFlexContainer height={600}>
       <EffectsList
         target="object"
+        layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,

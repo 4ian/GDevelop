@@ -46,7 +46,7 @@ namespace gdjs {
     _followBaseLayerCamera: boolean;
     _clearColor: Array<integer>;
 
-    _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
+    _rendererEffects: Record<string, gdjs.PixiFiltersTools.Filter> = {};
     _renderer: gdjs.LayerRenderer;
 
     /**
@@ -89,6 +89,14 @@ namespace gdjs {
 
     getRenderer(): gdjs.LayerRenderer {
       return this._renderer;
+    }
+
+    getRendererObject() {
+      return this._renderer.getRendererObject();
+    }
+
+    get3dRendererObject() {
+      return this._renderer.getThreeScene();
     }
 
     getRenderingType(): RuntimeLayerRenderingType {
@@ -349,12 +357,7 @@ namespace gdjs {
      * @param effectData The data of the effect to add.
      */
     addEffect(effectData: EffectData): void {
-      this._effectsManager.addEffect(
-        effectData,
-        this._rendererEffects,
-        this._renderer.getRendererObject(),
-        this
-      );
+      this._effectsManager.addEffect(effectData, this._rendererEffects, this);
     }
 
     /**
@@ -364,7 +367,7 @@ namespace gdjs {
     removeEffect(effectName: string): void {
       this._effectsManager.removeEffect(
         this._rendererEffects,
-        this._renderer.getRendererObject(),
+        this,
         effectName
       );
     }
@@ -432,7 +435,12 @@ namespace gdjs {
      * @param enable true to enable, false to disable
      */
     enableEffect(name: string, enable: boolean): void {
-      this._effectsManager.enableEffect(this._rendererEffects, name, enable);
+      this._effectsManager.enableEffect(
+        this._rendererEffects,
+        this,
+        name,
+        enable
+      );
     }
 
     /**
@@ -441,7 +449,11 @@ namespace gdjs {
      * @return true if the effect is enabled, false otherwise.
      */
     isEffectEnabled(name: string): boolean {
-      return this._effectsManager.isEffectEnabled(this._rendererEffects, name);
+      return this._effectsManager.isEffectEnabled(
+        this._rendererEffects,
+        this,
+        name
+      );
     }
 
     /**

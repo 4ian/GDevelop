@@ -1703,12 +1703,18 @@ interface EffectMetadata {
     [Ref] EffectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] EffectMetadata AddIncludeFile([Const] DOMString includeFile);
     [Ref] EffectMetadata MarkAsNotWorkingForObjects();
+    [Ref] EffectMetadata MarkAsOnlyWorkingFor2D();
+    [Ref] EffectMetadata MarkAsOnlyWorkingFor3D();
+    [Ref] EffectMetadata MarkAsUnique();
 
     [Const, Ref] DOMString GetType();
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetHelpPath();
     boolean IsMarkedAsNotWorkingForObjects();
+    boolean IsMarkedAsOnlyWorkingFor2D();
+    boolean IsMarkedAsOnlyWorkingFor3D();
+    boolean IsMarkedAsUnique();
 
     [Ref] MapStringPropertyDescriptor GetProperties();
 };

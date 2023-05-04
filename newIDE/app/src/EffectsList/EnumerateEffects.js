@@ -12,6 +12,8 @@ export type EnumeratedEffectMetadata = {|
   description: string,
   parametersSchema: Schema,
   isMarkedAsNotWorkingForObjects: boolean,
+  isMarkedAsOnlyWorkingFor2D: boolean,
+  isMarkedAsOnlyWorkingFor3D: boolean,
 |};
 
 /**
@@ -117,6 +119,8 @@ export const enumerateEffectsMetadata = (
             fullName: effectMetadata.getFullName(),
             description: effectMetadata.getDescription(),
             isMarkedAsNotWorkingForObjects: effectMetadata.isMarkedAsNotWorkingForObjects(),
+            isMarkedAsOnlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
+            isMarkedAsOnlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
             parametersSchema,
           };
         });

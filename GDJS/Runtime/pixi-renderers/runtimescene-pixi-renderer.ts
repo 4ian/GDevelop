@@ -24,10 +24,9 @@ namespace gdjs {
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
       this._pixiContainer.sortableChildren = true;
 
-      this._threeRenderer = this._runtimeScene
-        .getGame()
-        .getRenderer()
-        .getThreeRenderer();
+      this._threeRenderer = this._runtimeGameRenderer
+        ? this._runtimeGameRenderer.getThreeRenderer()
+        : null;
     }
 
     onGameResolutionResized() {

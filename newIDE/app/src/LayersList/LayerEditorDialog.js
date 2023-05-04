@@ -371,6 +371,7 @@ const LayerEditorDialog = (props: Props) => {
       {currentTab === 'effects' && (
         <EffectsList
           target="layer"
+          layerRenderingType={layer.getRenderingType()}
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={layer.getEffects()}

@@ -15,6 +15,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import PropertiesEditor from '../PropertiesEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import AlertMessage from '../UI/AlertMessage';
 import BackgroundText from '../UI/BackgroundText';
 import { MarkdownText } from '../UI/MarkdownText';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -63,6 +64,7 @@ type Props = {|
   onEffectsUpdated: () => void,
   onEffectsRenamed: (oldName: string, newName: string) => void,
   target: 'object' | 'layer',
+  layerRenderingType: string,
 |};
 
 const getEnumeratedEffectMetadata = (
@@ -198,6 +200,36 @@ export default function EffectsList(props: Props) {
     onEffectsUpdated();
   };
 
+  const getDuplicatedUniqueEffectMetadata = React.useCallback(
+    () => {
+      if (effectsContainer.getEffectsCount() < 2) {
+        return null;
+      }
+      const uniqueEffectTypes = [];
+      for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
+        const effect: gdEffect = effectsContainer.getEffectAt(i);
+        const effectType = effect.getEffectType();
+        const effectMetadata = getEnumeratedEffectMetadata(
+          allEffectMetadata,
+          effectType
+        );
+        if (!effectMetadata) {
+          continue;
+        }
+        if (effectMetadata.isMarkedAsOnlyWorkingFor3D) {
+          if (uniqueEffectTypes.includes(effectType)) {
+            return effectMetadata;
+          }
+          uniqueEffectTypes.push(effectType);
+        }
+      }
+      return null;
+    },
+    [allEffectMetadata, effectsContainer]
+  );
+
+  const duplicatedUniqueEffectMetadata = getDuplicatedUniqueEffectMetadata();
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -205,9 +237,21 @@ export default function EffectsList(props: Props) {
           {effectsContainer.getEffectsCount() !== 0 ? (
             <React.Fragment>
               <ScrollView ref={scrollView}>
+                {duplicatedUniqueEffectMetadata && (
+                  <Line>
+                    <Column expand>
+                      <AlertMessage kind="error">
+                        <Trans>
+                          The "{duplicatedUniqueEffectMetadata.fullName}" effect
+                          can only be applied once.
+                        </Trans>
+                      </AlertMessage>
+                    </Column>
+                  </Line>
+                )}
                 {effectsContainer.getEffectsCount() > 3 && (
                   <Line>
-                    <Column>
+                    <Column expand>
                       <DismissableAlertMessage
                         identifier="too-much-effects"
                         kind="warning"
@@ -325,8 +369,14 @@ export default function EffectsList(props: Props) {
                                                 value={effectMetadata.type}
                                                 label={effectMetadata.fullName}
                                                 disabled={
-                                                  props.target === 'object' &&
-                                                  effectMetadata.isMarkedAsNotWorkingForObjects
+                                                  (props.target === 'object' &&
+                                                    effectMetadata.isMarkedAsNotWorkingForObjects) ||
+                                                  (props.layerRenderingType ===
+                                                    '3d' &&
+                                                    effectMetadata.isMarkedAsOnlyWorkingFor2D) ||
+                                                  (props.layerRenderingType ===
+                                                    '2d' &&
+                                                    effectMetadata.isMarkedAsOnlyWorkingFor3D)
                                                 }
                                               />
                                             )

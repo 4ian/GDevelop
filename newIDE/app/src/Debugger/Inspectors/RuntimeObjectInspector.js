@@ -19,7 +19,7 @@ type Props = {|
 
 const transform = runtimeObject => {
   if (!runtimeObject) return null;
-  return {
+  const runtimeObjectData = {
     'X position': runtimeObject.x,
     'Y position': runtimeObject.y,
     Angle: runtimeObject.angle,
@@ -27,6 +27,17 @@ const transform = runtimeObject => {
     'Z order': runtimeObject.zOrder,
     'Is hidden?': runtimeObject.hidden,
   };
+  // TODO: Improve check to have more robust type checking
+  if (runtimeObject._z) {
+    // 3D Cube
+    runtimeObjectData['Z position'] = runtimeObject._z;
+    runtimeObjectData['Rotation around X axis'] = runtimeObject._rotationX;
+    runtimeObjectData['Rotation around Y axis'] = runtimeObject._rotationY;
+    runtimeObjectData['Rotation around Z axis (Angle)'] =
+      runtimeObjectData['Angle'];
+    delete runtimeObjectData['Angle'];
+  }
+  return runtimeObjectData;
 };
 
 const handleEdit = (edit, { onCall, onEdit }: Props) => {
@@ -34,7 +45,16 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
     onCall(['setX'], [parseFloat(edit.new_value)]);
   } else if (edit.name === 'Y position') {
     onCall(['setY'], [parseFloat(edit.new_value)]);
-  } else if (edit.name === 'Angle') {
+  } else if (edit.name === 'Z position') {
+    onCall(['setZ'], [parseFloat(edit.new_value)]);
+  } else if (edit.name === 'Rotation around X axis') {
+    onCall(['setRotationX'], [parseFloat(edit.new_value)]);
+  } else if (edit.name === 'Rotation around Y axis') {
+    onCall(['setRotationY'], [parseFloat(edit.new_value)]);
+  } else if (
+    edit.name === 'Angle' ||
+    edit.name === 'Rotation around Z axis (Angle)'
+  ) {
     onCall(['setAngle'], [parseFloat(edit.new_value)]);
   } else if (edit.name === 'Layer') {
     onCall(['setLayer'], [edit.new_value]);

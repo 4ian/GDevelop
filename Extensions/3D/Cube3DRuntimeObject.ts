@@ -148,6 +148,29 @@ namespace gdjs {
       this._renderer.updateFace(faceIndex);
     }
 
+    /**
+     * Sets the texture repeat of a face of the 3D box.
+     *
+     * @param faceName - The name of the face to set visibility for.
+     * @param value - The visibility value to set.
+     */
+    setRepeatTextureOnFace(faceName: FaceName, enable: boolean) {
+      const faceIndex = faceNameToBitmaskIndex[faceName];
+      if (faceIndex === undefined) {
+        return;
+      }
+      if (enable === this.shouldRepeatTextureOnFaceAtIndex(faceIndex)) {
+        return;
+      }
+
+      if (enable) {
+        this._textureRepeatFacesBitmask |= 1 << faceIndex;
+      } else {
+        this._textureRepeatFacesBitmask &= ~(1 << faceIndex);
+      }
+      this._renderer.updateFace(faceIndex);
+    }
+
     isFaceVisible(faceName: FaceName): boolean {
       const faceIndex = faceNameToBitmaskIndex[faceName];
       if (faceIndex === undefined) {
@@ -197,8 +220,21 @@ namespace gdjs {
       return this._backFaceUpThroughWhichAxisRotation;
     }
 
+    setBackFaceUpThroughWhichAxisRotation(axis: 'X' | 'Y'): void {
+      this._backFaceUpThroughWhichAxisRotation = axis;
+      this._renderer.updateFace(faceNameToBitmaskIndex['back']);
+    }
+
     getFacesOrientation(): 'Y' | 'Z' {
       return this._facesOrientation;
+    }
+
+    setFacesOrientation(orientation: 'Y' | 'Z'): void {
+      this._facesOrientation = orientation;
+      this._renderer.updateFace(faceNameToBitmaskIndex['left']);
+      this._renderer.updateFace(faceNameToBitmaskIndex['right']);
+      this._renderer.updateFace(faceNameToBitmaskIndex['top']);
+      // Bottom texture should not change based on that setting.
     }
 
     updateFromObjectData(
@@ -306,6 +342,74 @@ namespace gdjs {
           'bottom',
           newObjectData.content.bottomFaceResourceName
         );
+      }
+      if (
+        oldObjectData.content.frontFaceResourceRepeat !==
+        newObjectData.content.frontFaceResourceRepeat
+      ) {
+        this.setRepeatTextureOnFace(
+          'front',
+          newObjectData.content.frontFaceResourceRepeat
+        );
+      }
+      if (
+        oldObjectData.content.backFaceResourceRepeat !==
+        newObjectData.content.backFaceResourceRepeat
+      ) {
+        this.setRepeatTextureOnFace(
+          'back',
+          newObjectData.content.backFaceResourceRepeat
+        );
+      }
+      if (
+        oldObjectData.content.leftFaceResourceRepeat !==
+        newObjectData.content.leftFaceResourceRepeat
+      ) {
+        this.setRepeatTextureOnFace(
+          'left',
+          newObjectData.content.leftFaceResourceRepeat
+        );
+      }
+      if (
+        oldObjectData.content.rightFaceResourceRepeat !==
+        newObjectData.content.rightFaceResourceRepeat
+      ) {
+        this.setRepeatTextureOnFace(
+          'right',
+          newObjectData.content.rightFaceResourceRepeat
+        );
+      }
+      if (
+        oldObjectData.content.topFaceResourceRepeat !==
+        newObjectData.content.topFaceResourceRepeat
+      ) {
+        this.setRepeatTextureOnFace(
+          'top',
+          newObjectData.content.topFaceResourceRepeat
+        );
+      }
+      if (
+        oldObjectData.content.bottomFaceResourceRepeat !==
+        newObjectData.content.bottomFaceResourceRepeat
+      ) {
+        this.setRepeatTextureOnFace(
+          'bottom',
+          newObjectData.content.bottomFaceResourceRepeat
+        );
+      }
+      if (
+        oldObjectData.content.backFaceUpThroughWhichAxisRotation !==
+        newObjectData.content.backFaceUpThroughWhichAxisRotation
+      ) {
+        this.setBackFaceUpThroughWhichAxisRotation(
+          newObjectData.content.backFaceUpThroughWhichAxisRotation
+        );
+      }
+      if (
+        oldObjectData.content.facesOrientation !==
+        newObjectData.content.facesOrientation
+      ) {
+        this.setFacesOrientation(newObjectData.content.facesOrientation);
       }
 
       return true;

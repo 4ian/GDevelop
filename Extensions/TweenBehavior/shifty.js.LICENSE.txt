@@ -1,4 +1,3 @@
-
 /*!
  *  TERMS OF USE - EASING EQUATIONS
  *  Open source under the BSD License.
@@ -14,4 +13,4 @@
  * [subject to terms](http://www.robertpenner.com/easing_terms_of_use.html).
  */
 
-/*! Shifty 2.16.0 - https://github.com/jeremyckahn/shifty */
+/*! Shifty 2.20.4 - https://github.com/jeremyckahn/shifty */

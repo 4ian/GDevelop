@@ -298,16 +298,9 @@ namespace gdjs {
         this._threeCamera.position.y = -this._layer.getCameraY(); // Inverted because the scene is mirrored on Y axis.
         this._threeCamera.rotation.z = angle;
 
-        // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
-        // The Z position is computed by taking the half height of the displayed rendering,
-        // and using the angle of the triangle defined by the field of view to compute the length
-        // of the triangle defining the distance between the camera and the rendering plane.
-        const cameraFovInRadians = gdjs.toRad(this._threeCamera.fov);
-        const cameraZPosition =
-          (0.5 * this._layer.getHeight()) /
-          zoomFactor /
-          Math.tan(0.5 * cameraFovInRadians);
-        this._threeCamera.position.z = cameraZPosition;
+        this._threeCamera.position.z = this._layer.getCameraZ(
+          this._threeCamera.fov
+        );
 
         if (this._threePlaneMesh) {
           // Adapt the plane size so that it covers the whole screen.

@@ -33,9 +33,7 @@ namespace gdjs {
       // And same, in reverse, for 2D only objects.
       this._pixiContainer = new PIXI.Container();
       this._threeGroup =
-        typeof THREE !== 'undefined'
-          ? new THREE.Group()
-          : null;
+        typeof THREE !== 'undefined' ? new THREE.Group() : null;
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).

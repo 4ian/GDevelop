@@ -48,6 +48,12 @@ namespace gdjs {
     setCameraZoom(newZoom: float, cameraId?: integer): void {}
 
     getCameraZoom(cameraId?: integer): float {
+      return 1;
+    }
+
+    setCameraZ(z: float, fov: float, cameraId?: integer): void {}
+
+    getCameraZ(fov: float = 45, cameraId?: integer): float {
       return 0;
     }
 

@@ -240,6 +240,24 @@ namespace gdjs {
     abstract getCameraZoom(cameraId?: integer): float;
 
     /**
+     * Set the camera center Z position.
+     *
+     * @param z The new y position.
+     * @param fov The field of view.
+     * @param cameraId The camera number. Currently ignored.
+     */
+    abstract setCameraZ(z: float, fov: float, cameraId?: integer): void;
+
+    /**
+     * Get the camera center Z position.
+     *
+     * @param fov The field of view.
+     * @param cameraId The camera number. Currently ignored.
+     * @return The z position of the camera
+     */
+    abstract getCameraZ(fov: float, cameraId?: integer): float;
+
+    /**
      * Get the rotation of the camera, expressed in degrees.
      *
      * @param cameraId The camera number. Currently ignored.

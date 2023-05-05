@@ -10,21 +10,9 @@ namespace gdjs {
       ): float => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-
         const threeCamera = layerRenderer.getThreeCamera();
-        if (threeCamera) {
-          return threeCamera.position.z;
-        }
-
-        // No 3D camera found, compute the imaginary Z position as if we had a 3D camera.
-        const zoomFactor = layer.getCameraZoom();
-        const cameraFovInRadians = gdjs.toRad(assumedFovIn2D);
-        const cameraZPosition =
-          (0.5 * layer.getHeight()) /
-          zoomFactor /
-          Math.tan(0.5 * cameraFovInRadians);
-
-        return cameraZPosition;
+        const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
+        return layer.getCameraZ(fov, cameraIndex);
       };
 
       export const setCameraZ = (
@@ -35,17 +23,9 @@ namespace gdjs {
       ) => {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
-
         const threeCamera = layerRenderer.getThreeCamera();
-
         const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
-        const cameraFovInRadians = gdjs.toRad(fov);
-
-        const zoomFactor =
-          (0.5 * layer.getHeight()) / (z * Math.tan(0.5 * cameraFovInRadians));
-
-        if (Number.isFinite(zoomFactor) && zoomFactor > 0)
-          layer.setCameraZoom(zoomFactor);
+        layer.setCameraZ(z, fov, cameraIndex);
       };
 
       export const getCameraRotationX = (

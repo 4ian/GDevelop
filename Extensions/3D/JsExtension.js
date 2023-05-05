@@ -776,51 +776,51 @@ module.exports = {
       .setGetter('gdjs.scene3d.camera.getFov')
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
-      {
-        const effect = extension
-          .addEffect('LinearFog')
-          .setFullName(_('Fog (linear)'))
-          .setDescription(_('Linear fog for 3D objects.'))
-          .markAsNotWorkingForObjects()
-          .markAsOnlyWorkingFor3D()
-          .addIncludeFile('Extensions/3D/LinearFog.js');
-        const properties = effect.getProperties();
-        properties
-          .getOrCreate('color')
-          .setValue('255;255;255')
-          .setLabel(_('Fog color'))
-          .setType('color');
-        properties
-          .getOrCreate('near')
-          .setValue('200')
-          .setLabel(_('Distance where the fog starts'))
-          .setType('number');
-        properties
-          .getOrCreate('far')
-          .setValue('2000')
-          .setLabel(_('Distance where the fog is fully opaque'))
-          .setType('number');
-      }
-      {
-        const effect = extension
-          .addEffect('ExponentialFog')
-          .setFullName(_('Fog (exponential)'))
-          .setDescription(_('Exponential fog for 3D objects.'))
-          .markAsNotWorkingForObjects()
-          .markAsOnlyWorkingFor3D()
-          .addIncludeFile('Extensions/3D/ExponentialFog.js');
-        const properties = effect.getProperties();
-        properties
-          .getOrCreate('color')
-          .setValue('255;255;255')
-          .setLabel(_('Fog color'))
-          .setType('color');
-        properties
-          .getOrCreate('density')
-          .setValue('0.0012')
-          .setLabel(_('Density'))
-          .setType('number');
-      }
+    {
+      const effect = extension
+        .addEffect('LinearFog')
+        .setFullName(_('Fog (linear)'))
+        .setDescription(_('Linear fog for 3D objects.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/LinearFog.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Fog color'))
+        .setType('color');
+      properties
+        .getOrCreate('near')
+        .setValue('200')
+        .setLabel(_('Distance where the fog starts'))
+        .setType('number');
+      properties
+        .getOrCreate('far')
+        .setValue('2000')
+        .setLabel(_('Distance where the fog is fully opaque'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('ExponentialFog')
+        .setFullName(_('Fog (exponential)'))
+        .setDescription(_('Exponential fog for 3D objects.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ExponentialFog.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Fog color'))
+        .setType('color');
+      properties
+        .getOrCreate('density')
+        .setValue('0.0012')
+        .setLabel(_('Density'))
+        .setType('number');
+    }
 
     return extension;
   },

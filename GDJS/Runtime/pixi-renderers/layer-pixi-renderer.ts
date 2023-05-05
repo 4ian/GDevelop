@@ -179,7 +179,13 @@ namespace gdjs {
 
             this._threePlaneTexture = texture;
             this._threePlaneTexture.generateMipmaps = false;
-            this._threePlaneTexture.minFilter = THREE.LinearFilter;
+            const filter =
+              this._layer.getRuntimeScene().getGame().getScaleMode() ===
+              'nearest'
+                ? THREE.NearestFilter
+                : THREE.LinearFilter;
+            this._threePlaneTexture.minFilter = filter;
+            this._threePlaneTexture.magFilter = filter;
             this._threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
             this._threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
             this._threePlaneMaterial.map = this._threePlaneTexture;

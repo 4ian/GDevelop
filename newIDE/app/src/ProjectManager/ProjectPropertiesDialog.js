@@ -31,8 +31,6 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
-import { showErrorBox } from '../UI/Messages/MessageBox';
-const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,

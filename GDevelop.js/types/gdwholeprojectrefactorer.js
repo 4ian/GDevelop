@@ -33,6 +33,7 @@ declare class gdWholeProjectRefactorer {
   static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior): void;
   static ensureObjectEventsFunctionsProperParameters(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject): void;
   static addBehaviorAndRequiredBehaviors(project: gdProject, obj: gdObject, behaviorType: string, behaviorName: string): void;
+  static addRequiredBehaviorsFor(project: gdProject, obj: gdObject, behaviorName: string): void;
   static findDependentBehaviorNames(project: gdProject, obj: gdObject, behaviorName: string): gdVectorString;
   static findInvalidRequiredBehaviorProperties(project: gdProject): gdVectorUnfilledRequiredBehaviorPropertyProblem;
   static getBehaviorsWithType(obj: gdObject, type: string): gdVectorString;

@@ -94,6 +94,7 @@ type Props = {|
 
   // Support for adornments:
   endAdornment?: ?React.Node,
+  startAdornment?: ?React.Node,
 
   // Styling:
   margin?: 'none' | 'dense',
@@ -175,6 +176,7 @@ export type TextFieldInterface = {|
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
+  getCaretPosition: () => ?number,
 |};
 
 /**
@@ -202,6 +204,10 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           props.value.toString().length
         );
       }
+      if (options && Number.isInteger(options.caretPosition) && props.value) {
+        const position = Number(options.caretPosition);
+        input.setSelectionRange(position, position);
+      }
     }
   };
 
@@ -226,11 +232,19 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     return null;
   };
 
+  const getCaretPosition = () => {
+    if (inputRef.current) {
+      return inputRef.current.selectionStart;
+    }
+    return null;
+  };
+
   React.useImperativeHandle(ref, () => ({
     focus,
     blur,
     getInputNode,
     getFieldWidth,
+    getCaretPosition,
   }));
 
   const onChange = props.onChange || undefined;
@@ -315,6 +329,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               max: props.max,
               min: props.min,
               step: props.step,
+              autoCapitalize: 'off', // For Safari iOS, avoid auto-capitalization
               style: props.inputStyle,
               ...dataObjectToProps(props.dataset),
             },
@@ -336,6 +351,13 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               ) : (
                 undefined
               ),
+            startAdornment: props.startAdornment ? (
+              <InputAdornment position="start">
+                {props.startAdornment}
+              </InputAdornment>
+            ) : (
+              undefined
+            ),
           }}
           style={
             props.style

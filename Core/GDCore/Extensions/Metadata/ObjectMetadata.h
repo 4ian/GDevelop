@@ -57,7 +57,7 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Construct an object metadata, with a function that will be called
-   * to instanciate a new object.
+   * to instantiate a new object.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
@@ -224,7 +224,7 @@ class GD_CORE_API ObjectMetadata {
   /**
    * \brief The "capabilities" that are offered by the base object that are
    * *not* supported by this object, and should be hidden in the editor
-   * inferface.
+   * interface.
    */
   const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
     return unsupportedBaseObjectCapabilities;
@@ -232,7 +232,7 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Add a "capability" that is offered by the base object that is *not*
-   * supported by this object, and should be hidden in the editor inferface.
+   * supported by this object, and should be hidden in the editor interface.
    */
   ObjectMetadata& AddUnsupportedBaseObjectCapability(
       const gd::String& capability) {
@@ -242,7 +242,7 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Check if a "capability" that is offered by the base object is *not*
-   * supported by this object, and should be hidden in the editor inferface.
+   * supported by this object, and should be hidden in the editor interface.
    */
   bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
     return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();

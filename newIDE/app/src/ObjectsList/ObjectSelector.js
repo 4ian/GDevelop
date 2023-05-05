@@ -28,7 +28,7 @@ type Props = {|
 
   noGroups?: boolean,
 
-  /** A list of object names to exclude from the autocomplete list (for exasmple if they have already been selected). */
+  /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
 
   onChoose?: string => void,

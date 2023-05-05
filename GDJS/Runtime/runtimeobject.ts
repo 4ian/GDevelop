@@ -1816,7 +1816,7 @@ namespace gdjs {
     }
 
     /**
-     * Create the behavior decribed by the given BehaviorData
+     * Create the behavior described by the given BehaviorData
      *
      * @param behaviorData The data to be used to construct the behavior.
      * @returns true if the behavior was properly created, false otherwise.

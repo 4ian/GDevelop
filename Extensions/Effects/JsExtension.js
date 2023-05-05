@@ -319,7 +319,7 @@ module.exports = {
       .setLabel(_('Color map texture for the effect'))
       .setDescription(
         _(
-          'You can change colors of pixels by modifing a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layer-effects).'
+          'You can change colors of pixels by modifying a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layer-effects).'
         )
       );
     colorMapProperties

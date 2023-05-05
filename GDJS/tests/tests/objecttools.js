@@ -105,7 +105,7 @@ describe('gdjs.evtTools.object', function () {
     // This instance is not picked.
     runtimeScene.createObject('MyObjectA');
 
-    // 1 of 3 instances are picked.
+    // 1 of 2 instances are picked.
     const pickedObjectList = Hashtable.newFrom({
       MyObjectA: [objectA1],
     });
@@ -121,6 +121,34 @@ describe('gdjs.evtTools.object', function () {
     // The created instance has been added to the picked instances.
     expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
       getInstancesIds([objectA1, newObjectA])
+    );
+  });
+
+  it('can create and pick an instance when no instance was picked', function () {
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
+
+    runtimeScene.registerEmptyObjectWithName('MyObjectA');
+    // These instances are not picked.
+    runtimeScene.createObject('MyObjectA');
+    runtimeScene.createObject('MyObjectA');
+
+    // 0 of 2 instances are picked.
+    const pickedObjectList = Hashtable.newFrom({
+      MyObjectA: [],
+    });
+
+    const newObjectA = gdjs.evtTools.object.createObjectOnScene(
+      runtimeScene,
+      pickedObjectList,
+      0,
+      0,
+      ''
+    );
+
+    // The created instance has been added to the picked instances.
+    expect(getInstancesIds(pickedObjectList.get('MyObjectA'))).to.eql(
+      getInstancesIds([newObjectA])
     );
   });
 

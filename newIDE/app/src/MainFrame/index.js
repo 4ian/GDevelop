@@ -99,6 +99,7 @@ import {
   type FileMetadata,
   type SaveAsLocation,
   type FileMetadataAndStorageProviderName,
+  type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -108,6 +109,7 @@ import UnsavedChangesContext from './UnsavedChangesContext';
 import {
   type BuildMainMenuProps,
   type MainMenuCallbacks,
+  type MainMenuExtraCallbacks,
   buildMainMenuDeclarativeTemplate,
   adaptFromDeclarativeTemplate,
 } from './MainMenu';
@@ -177,6 +179,7 @@ import {
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
+import { dataObjectToProps } from '../Utils/HTMLDataset';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -264,7 +267,11 @@ type LaunchPreviewOptions = {
 };
 
 export type Props = {|
-  renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
+  renderMainMenu?: (
+    BuildMainMenuProps,
+    MainMenuCallbacks,
+    MainMenuExtraCallbacks
+  ) => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -276,6 +283,7 @@ export type Props = {|
   getStorageProviderOperations: (
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
+  getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
   getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -453,6 +461,7 @@ const MainFrame = (props: Props) => {
     resourceMover,
     resourceFetcher,
     getStorageProviderOperations,
+    getStorageProviderResourceOperations,
     getStorageProvider,
     initialFileMetadataToOpen,
     i18n,
@@ -855,7 +864,6 @@ const MainFrame = (props: Props) => {
   const openFromFileMetadata = React.useCallback(
     async (fileMetadata: FileMetadata): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
-      const storageProviderInternalName = getStorageProvider().internalName;
 
       const {
         hasAutoSave,
@@ -916,6 +924,7 @@ const MainFrame = (props: Props) => {
         await delay(150);
         const autoSaveFileMetadata = await checkForAutosave();
         let content;
+        let openingError: Error | null = null;
         try {
           const result = await onOpen(
             autoSaveFileMetadata,
@@ -923,6 +932,7 @@ const MainFrame = (props: Props) => {
           );
           content = result.content;
         } catch (error) {
+          openingError = error;
           // onOpen failed, try to find again an autosave.
           const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
           if (autoSaveAfterFailureFileMetadata) {
@@ -931,9 +941,10 @@ const MainFrame = (props: Props) => {
           }
         }
         if (!content) {
-          throw new Error(
-            'The project file content could not be read. It might be corrupted/malformed.'
-          );
+          throw openingError ||
+            new Error(
+              'The project file content could not be read. It might be corrupted/malformed.'
+            );
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
@@ -957,7 +968,7 @@ const MainFrame = (props: Props) => {
           serializedProject.delete();
         }
       } catch (error) {
-        if (storageProviderInternalName === 'Cloud') {
+        if (error.name === 'CloudProjectReadingError') {
           setIsLoadingProject(false);
           setLoaderModalProgress(null, null);
           setCloudProjectFileMetadataToRecover(fileMetadata);
@@ -979,7 +990,6 @@ const MainFrame = (props: Props) => {
     [
       i18n,
       getStorageProviderOperations,
-      getStorageProvider,
       loadFromSerializedProject,
       showConfirmation,
       showAlert,
@@ -1604,18 +1614,23 @@ const MainFrame = (props: Props) => {
     [setState, openProjectManager, i18n]
   );
 
-  const openResources = () => {
-    const { i18n } = props;
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: i18n._(t`Resources`),
-        projectItemName: null,
-        renderEditorContainer: renderResourcesEditorContainer,
-        key: 'resources',
-      }),
-    }));
-  };
+  const openResources = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(state.editorTabs, {
+          label: i18n._(t`Resources`),
+          projectItemName: null,
+          renderEditorContainer: renderResourcesEditorContainer,
+          key: 'resources',
+          extraEditorProps: {
+            fileMetadata: currentFileMetadata,
+          },
+        }),
+      }));
+    },
+    [currentFileMetadata, i18n, setState]
+  );
 
   const openHomePage = React.useCallback(
     () => {
@@ -2382,11 +2397,10 @@ const MainFrame = (props: Props) => {
   };
 
   const endTutorial = React.useCallback(
-    (shouldCloseProject?: boolean) => {
+    async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
-        closeProject().then(() => {
-          doEndTutorial();
-        });
+        await closeProject();
+        doEndTutorial();
       } else {
         doEndTutorial();
       }
@@ -2779,7 +2793,8 @@ const MainFrame = (props: Props) => {
         }
       }
 
-      const initialStepIndex = userProgress && scenario === 'resume' ? 1 : 0;
+      const initialStepIndex =
+        userProgress && scenario === 'resume' ? userProgress.step : 0;
       const initialProjectData =
         userProgress && scenario === 'resume'
           ? userProgress.projectData
@@ -2893,6 +2908,7 @@ const MainFrame = (props: Props) => {
       resourceExternalEditors,
       getStorageProvider,
       onFetchNewlyAddedResources,
+      getStorageProviderResourceOperations,
     }),
     [
       resourceSources,
@@ -2900,6 +2916,7 @@ const MainFrame = (props: Props) => {
       resourceExternalEditors,
       getStorageProvider,
       onFetchNewlyAddedResources,
+      getStorageProviderResourceOperations,
     ]
   );
 
@@ -2943,7 +2960,13 @@ const MainFrame = (props: Props) => {
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
-          mainMenuCallbacks
+          mainMenuCallbacks,
+          {
+            onClosePreview:
+              _previewLauncher.current && _previewLauncher.current.closePreview
+                ? _previewLauncher.current.closePreview
+                : null,
+          }
         )}
       <ProjectTitlebar
         projectName={currentProject ? currentProject.getName() : null}
@@ -2961,6 +2984,9 @@ const MainFrame = (props: Props) => {
           keepMounted: true,
         }}
         onClose={toggleProjectManager}
+        {...dataObjectToProps({
+          open: projectManagerOpen ? 'true' : undefined,
+        })}
       >
         <DrawerTopBar
           title={
@@ -3418,7 +3444,9 @@ const MainFrame = (props: Props) => {
           canEndTutorial={
             !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
           }
-          endTutorial={() => endTutorial(true)}
+          endTutorial={() => {
+            endTutorial(true);
+          }}
         />
       )}
       <CustomDragLayer />

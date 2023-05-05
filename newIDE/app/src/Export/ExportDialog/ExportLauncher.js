@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { t, Trans } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
@@ -74,7 +75,7 @@ export default class ExportLauncher extends Component<Props, State> {
     ),
   };
   buildsWatcher = new BuildsWatcher();
-  launchWholeExport: () => Promise<void>;
+  launchWholeExport: (i18n: I18nType) => Promise<void>;
 
   componentWillUnmount() {
     this.buildsWatcher.stop();
@@ -187,39 +188,40 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  _launchWholeExport = async () => {
-    const t = str => str; //TODO;
+  _launchWholeExport = async (i18n: I18nType) => {
     const { project, exportPipeline, authenticatedUser } = this.props;
     sendExportLaunched(exportPipeline.name);
 
-    if (!displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project)))
+    if (
+      !displayProjectErrorsBox(i18n, getProjectPropertiesErrors(i18n, project))
+    )
       return;
 
     const getErrorMessage = () => {
       switch (this.state.exportStep) {
         case 'export':
-          return t('Error while exporting the game.');
+          return i18n._(t`Error while exporting the game.`);
         case 'resources-download':
-          return t(
-            'Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.'
+          return i18n._(
+            t`Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.`
           );
         case 'compress':
-          return t('Error while compressing the game.');
+          return i18n._(t`Error while compressing the game.`);
         case 'upload':
-          return t(
-            'Error while uploading the game. Check your internet connection or try again later.'
+          return i18n._(
+            t`Error while uploading the game. Check your internet connection or try again later.`
           );
         case 'waiting-for-build':
-          return t(
-            'Error while building the game. Check the logs of the build for more details.'
+          return i18n._(
+            t`Error while building the game. Check the logs of the build for more details.`
           );
         case 'build':
-          return t(
-            'Error while building of the game. Check the logs of the build for more details.'
+          return i18n._(
+            t`Error while building of the game. Check the logs of the build for more details.`
           );
         default:
-          return t(
-            'Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.'
+          return i18n._(
+            t`Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.`
           );
       }
     };
@@ -247,9 +249,44 @@ export default class ExportLauncher extends Component<Props, State> {
       setStep('register');
       // We await for this call, allowing to link the build to the game just registered.
       await this.registerGameIfNot();
-    } catch {
+    } catch (registerError) {
       // But if it fails, we don't prevent building the game.
-      console.warn('Error while registering the game - ignoring it.');
+      console.warn('Error while registering the game.');
+      if (registerError.response.status === 403) {
+        if (
+          registerError.response.data &&
+          registerError.response.data.code === 'game-creation/existing-game'
+        ) {
+          showErrorBox({
+            message: [
+              i18n._(
+                t`A game with this ID already exists and you are not the owner.`
+              ),
+              i18n._(
+                t`A test link will be created but the game will not be registered.`
+              ),
+            ].join('\n\n'),
+            rawError: registerError,
+            errorId: 'existing-game-register',
+          });
+        } else if (
+          registerError.response.data &&
+          registerError.response.data.code === 'game-creation/too-many-games'
+        ) {
+          showErrorBox({
+            message: [
+              i18n._(
+                t`You have reached the maximum number of games you can register! You can unregister games in your Games Dashboard.`
+              ),
+              i18n._(
+                t`A test link will be created but the game will not be registered.`
+              ),
+            ].join('\n\n'),
+            rawError: registerError,
+            errorId: 'too-many-games-register',
+          });
+        }
+      }
     }
 
     try {
@@ -375,104 +412,109 @@ export default class ExportLauncher extends Component<Props, State> {
     };
 
     return (
-      <Column noMargin>
-        {!!exportPipeline.packageNameWarningType &&
-          project.getPackageName().indexOf('com.example') !== -1 && (
-            <Line>
-              <DismissableAlertMessage
-                identifier="project-should-have-unique-package-name"
-                kind="warning"
-              >
-                <I18n>
-                  {({ i18n }) =>
-                    i18n._(
+      <I18n>
+        {({ i18n }) => (
+          <Column noMargin>
+            {!!exportPipeline.packageNameWarningType &&
+              project.getPackageName().indexOf('com.example') !== -1 && (
+                <Line>
+                  <DismissableAlertMessage
+                    identifier="project-should-have-unique-package-name"
+                    kind="warning"
+                  >
+                    {i18n._(
                       exportPipeline.packageNameWarningType === 'mobile'
-                        ? t`The package name begins with com.example, make sure you replace it with an unique one to be able to publish your game on app stores.`
-                        : t`The package name begins with com.example, make sure you replace it with an unique one, else installing your game might overwrite other games.`
-                    )
+                        ? t`The package name begins with com.example, make sure you
+                    replace it with an unique one to be able to publish your
+                    game on app stores.`
+                        : t`The package name begins with
+                    com.example, make sure you replace it with an unique one,
+                    else installing your game might overwrite other games.`
+                    )}
+                  </DismissableAlertMessage>
+                </Line>
+              )}
+            <Line>
+              {exportPipeline.renderHeader({
+                project,
+                exportState,
+                updateExportState: this._updateExportState,
+              })}
+            </Line>
+            {(!exportPipeline.onlineBuildType ||
+              authenticatedUser.authenticated) && (
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={exportPipeline.renderLaunchButtonLabel()}
+                  primary
+                  id={`launch-export-${exportPipeline.name}-button`}
+                  onClick={() => this.launchWholeExport(i18n)}
+                  disabled={!canLaunchBuild(authenticatedUser)}
+                />
+              </Line>
+            )}
+            <Spacer />
+            {!!exportPipeline.onlineBuildType &&
+              !authenticatedUser.authenticated && (
+                <CreateProfile
+                  onLogin={authenticatedUser.onLogin}
+                  onCreateAccount={authenticatedUser.onCreateAccount}
+                  message={
+                    <Trans>
+                      Create an account or login first to publish your game.
+                    </Trans>
                   }
-                </I18n>
-              </DismissableAlertMessage>
-            </Line>
-          )}
-        <Line>
-          {exportPipeline.renderHeader({
-            project,
-            exportState,
-            updateExportState: this._updateExportState,
-          })}
-        </Line>
-        {(!exportPipeline.onlineBuildType ||
-          authenticatedUser.authenticated) && (
-          <Line justifyContent="center">
-            <RaisedButton
-              label={exportPipeline.renderLaunchButtonLabel()}
-              primary
-              id={`launch-export-${exportPipeline.name}-button`}
-              onClick={this.launchWholeExport}
-              disabled={!canLaunchBuild(authenticatedUser)}
-            />
-          </Line>
+                  justifyContent="center"
+                />
+              )}
+            {authenticatedUser.authenticated &&
+              (exportPipeline.renderCustomStepsProgress ? (
+                exportPipeline.renderCustomStepsProgress({
+                  build,
+                  project,
+                  onSaveProject,
+                  errored,
+                  exportStep,
+                })
+              ) : (
+                <Line expand>
+                  <BuildStepsProgress
+                    exportStep={exportStep}
+                    hasBuildStep={!!exportPipeline.onlineBuildType}
+                    build={build}
+                    stepMaxProgress={stepMaxProgress}
+                    stepCurrentProgress={stepCurrentProgress}
+                    errored={errored}
+                  />
+                </Line>
+              ))}
+            {!!exportPipeline.limitedBuilds &&
+              authenticatedUser.authenticated && (
+                <CurrentUsageDisplayer
+                  subscription={authenticatedUser.subscription}
+                  currentUsage={getBuildCurrentUsage(authenticatedUser)}
+                  onChangeSubscription={this.props.onChangeSubscription}
+                />
+              )}
+            {doneFooterOpen &&
+              exportPipeline.renderDoneFooter &&
+              exportPipeline.renderDoneFooter({
+                compressionOutput,
+                exportState,
+                onClose: this._closeDoneFooter,
+              })}
+            {doneFooterOpen && (
+              <Line justifyContent="center">
+                <GameRegistration
+                  project={project}
+                  hideLoader
+                  suggestGameStatsEmail
+                />
+              </Line>
+            )}
+          </Column>
         )}
-        <Spacer />
-        {!!exportPipeline.onlineBuildType &&
-          !authenticatedUser.authenticated && (
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-              message={
-                <Trans>
-                  Create an account or login first to publish your game.
-                </Trans>
-              }
-              justifyContent="center"
-            />
-          )}
-        {authenticatedUser.authenticated &&
-          (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress({
-              build,
-              project,
-              onSaveProject,
-              errored,
-              exportStep,
-            })
-          ) : (
-            <Line expand>
-              <BuildStepsProgress
-                exportStep={exportStep}
-                hasBuildStep={!!exportPipeline.onlineBuildType}
-                build={build}
-                stepMaxProgress={stepMaxProgress}
-                stepCurrentProgress={stepCurrentProgress}
-                errored={errored}
-              />
-            </Line>
-          ))}
-        {!!exportPipeline.limitedBuilds && authenticatedUser.authenticated && (
-          <CurrentUsageDisplayer
-            subscription={authenticatedUser.subscription}
-            currentUsage={getBuildCurrentUsage(authenticatedUser)}
-            onChangeSubscription={this.props.onChangeSubscription}
-          />
-        )}
-        {doneFooterOpen &&
-          exportPipeline.renderDoneFooter &&
-          exportPipeline.renderDoneFooter({
-            compressionOutput,
-            exportState,
-            onClose: this._closeDoneFooter,
-          })}
-        {doneFooterOpen && (
-          <Line justifyContent="center">
-            <GameRegistration
-              project={project}
-              hideLoader
-              suggestGameStatsEmail
-            />
-          </Line>
-        )}
-      </Column>
+      </I18n>
     );
   }
 }

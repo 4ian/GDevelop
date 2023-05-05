@@ -429,7 +429,7 @@ namespace gdjs {
             );
           else {
             // Arrays cannot be hot reloaded.
-            // As indices can change at runtime, and in the IDE, they can be desychronized.
+            // As indices can change at runtime, and in the IDE, they can be desynchronized.
             // It will in that case mess up the whole array,
             // and there is no way to know if that was the case.
             //
@@ -494,7 +494,7 @@ namespace gdjs {
               );
             else {
               // Arrays cannot be hot reloaded.
-              // As indices can change at runtime, and in the IDE, they can be desychronized.
+              // As indices can change at runtime, and in the IDE, they can be desynchronized.
               // It will in that case mess up the whole array,
               // and there is no way to know if that was the case.
               //

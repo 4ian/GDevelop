@@ -1085,7 +1085,7 @@ module.exports = {
         'ServerTimestamp',
         _('Get server timestamp'),
         _(
-          'Set a field to the timstamp on the server when the request arrives there'
+          'Set a field to the timestamp on the server when the request arrives there'
         ),
         _('Cloud Firestore Database'),
         'JsPlatform/Extensions/firebase.png'
@@ -1376,11 +1376,11 @@ module.exports = {
         'FirestoreWatchQuery',
         _('Continuously run (watch) a query'),
         _(
-          'Runs a query continously, so that every time a new documents starts ' +
+          'Runs a query continuously, so that every time a new documents starts ' +
             'or stops matching the query, or a document that matches the query has been changed, the variables will be filled with the new results.'
         ),
         _(
-          'Run query _PARAM0_ continously and store results into _PARAM1_ each time documents matching the query are changed (store result state in _PARAM2_)'
+          'Run query _PARAM0_ continuously and store results into _PARAM1_ each time documents matching the query are changed (store result state in _PARAM2_)'
         ),
         _('Cloud Firestore Database/Queries/Run'),
         'JsPlatform/Extensions/firebase.png',

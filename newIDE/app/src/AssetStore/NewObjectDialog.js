@@ -236,8 +236,8 @@ export default function NewObjectDialog({
       } catch (error) {
         console.error('Error while installing the asset:', error);
         showAlert({
-          title: `Could not install the asset`,
-          message: `There was an error while installing the asset "${
+          title: t`Could not install the asset`,
+          message: t`There was an error while installing the asset "${
             assetShortHeader.name
           }". Verify your internet connection or try again later.`,
         });
@@ -292,8 +292,8 @@ export default function NewObjectDialog({
       } catch (error) {
         console.error('Error while creating the object:', error);
         showAlert({
-          title: `Could not create the object`,
-          message: `There was an error while creating the object "${
+          title: t`Could not create the object`,
+          message: t`There was an error while creating the object "${
             selectedCustomObjectEnumeratedMetadata.fullName
           }". Verify your internet connection or try again later.`,
         });

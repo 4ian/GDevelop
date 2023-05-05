@@ -12,9 +12,11 @@ import {
   subscriptionForIndieUser,
   subscriptionForProUser,
   subscriptionForSilverUser,
+  purchaselyGoldSubscription,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
+import AlertProvider from '../../../../UI/Alert/AlertProvider';
 
 export default {
   title: 'Subscription/SubscriptionDetails',
@@ -23,73 +25,156 @@ export default {
 };
 
 export const LoadingSubscription = () => (
-  <SubscriptionDetails
-    subscription={null}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={null}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const ManagingSubscription = () => (
-  <SubscriptionDetails
-    subscription={subscriptionForSilverUser}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={true}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForSilverUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={true}
+    />
+  </AlertProvider>
 );
 
 export const WithNoSubscription = () => (
-  <SubscriptionDetails
-    subscription={noSubscription}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={noSubscription}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const WithSilverSubscription = () => (
-  <SubscriptionDetails
-    subscription={subscriptionForSilverUser}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForSilverUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const WithGoldSubscription = () => (
-  <SubscriptionDetails
-    subscription={subscriptionForGoldUser}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForGoldUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const WithValidSilverRedemptionCodeSubscription = () => (
-  <SubscriptionDetails
-    subscription={silverSubscriptionWithRedemptionCode}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={silverSubscriptionWithRedemptionCode}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const WithExpiredSilverRedemptionCodeSubscription = () => (
-  <SubscriptionDetails
-    subscription={silverSubscriptionWithExpiredRedemptionCode}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={silverSubscriptionWithExpiredRedemptionCode}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithPurchaselyGoldSubscription = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={purchaselyGoldSubscription}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const WithLegacyIndieSubscription = () => (
-  <SubscriptionDetails
-    subscription={subscriptionForIndieUser}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForIndieUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
 );
 
 export const WithLegacyProSubscription = () => (
-  <SubscriptionDetails
-    subscription={subscriptionForProUser}
-    onManageSubscription={action('manage subscription')}
-    isManageSubscriptionLoading={false}
-  />
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForProUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithNoSubscriptionOnMobile = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={noSubscription}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+      simulateNativeMobileApp
+    />
+  </AlertProvider>
+);
+
+export const WithGoldSubscriptionOnMobile = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForGoldUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+      simulateNativeMobileApp
+    />
+  </AlertProvider>
+);
+
+export const WithExpiredSilverRedemptionCodeSubscriptionOnMobile = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={silverSubscriptionWithExpiredRedemptionCode}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+      simulateNativeMobileApp
+    />
+  </AlertProvider>
+);
+
+export const WithPurchaselyGoldSubscriptionOnMobile = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={purchaselyGoldSubscription}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+      simulateNativeMobileApp
+    />
+  </AlertProvider>
+);
+
+export const WithLegacyProSubscriptionOnMobile = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForProUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+      simulateNativeMobileApp
+    />
+  </AlertProvider>
 );

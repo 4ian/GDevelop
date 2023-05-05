@@ -6,15 +6,6 @@ import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
 const circleRadius = 7;
 
-const styles = {
-  point: { cursor: 'move' },
-  containerStyle: {
-    position: 'relative',
-    width: '100%',
-    height: '100%',
-  },
-};
-
 const pointKindIdentifiers = {
   NORMAL: 1,
   ORIGIN: 2,
@@ -38,13 +29,15 @@ type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
   imageWidth: number,
   imageHeight: number,
-  offsetTop: number,
-  offsetLeft: number,
+  imageOffsetTop: number,
+  imageOffsetLeft: number,
   imageZoomFactor: number,
   onPointsUpdated: () => void,
   highlightedPointName: ?string,
   selectedPointName: ?string,
   onClickPoint: string => void,
+  forcedCursor: string | null,
+  deactivateControls?: boolean,
 |};
 
 type State = {|
@@ -63,14 +56,25 @@ const PointsPreview = (props: Props) => {
     pointsContainer,
     imageWidth,
     imageHeight,
-    offsetTop,
-    offsetLeft,
+    imageOffsetTop,
+    imageOffsetLeft,
     imageZoomFactor,
     highlightedPointName,
     selectedPointName,
     onClickPoint,
     onPointsUpdated,
+    forcedCursor,
+    deactivateControls,
   } = props;
+
+  if (deactivateControls) {
+    if (state.draggedPoint || state.draggedPointKind) {
+      setState({
+        draggedPoint: null,
+        draggedPointKind: null,
+      });
+    }
+  }
 
   const forceUpdate = useForceUpdate();
 
@@ -174,6 +178,8 @@ const PointsPreview = (props: Props) => {
     }) => {
       const pointName = getPointName(kind, point);
 
+      const pointStyle = { cursor: forcedCursor || 'move' };
+
       return (
         <React.Fragment key={`point-${pointName}`}>
           <line
@@ -213,12 +219,12 @@ const PointsPreview = (props: Props) => {
             cx={x}
             cy={y}
             r={circleRadius}
-            style={styles.point}
+            style={pointStyle}
           />
         </React.Fragment>
       );
     },
-    [highlightedPointName, onStartDragPoint, selectedPointName]
+    [forcedCursor, highlightedPointName, onStartDragPoint, selectedPointName]
   );
 
   const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
@@ -265,13 +271,27 @@ const PointsPreview = (props: Props) => {
     ]
   );
 
+  const forcedCursorStyle = forcedCursor
+    ? {
+        cursor: forcedCursor,
+      }
+    : {};
+
+  const containerStyle = {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    ...forcedCursorStyle,
+  };
+
   const svgStyle = {
     position: 'absolute',
-    top: offsetTop || 0,
-    left: offsetLeft || 0,
+    top: imageOffsetTop || 0,
+    left: imageOffsetLeft || 0,
     width: imageWidth * imageZoomFactor,
     height: imageHeight * imageZoomFactor,
     overflow: 'visible',
+    ...forcedCursorStyle,
   };
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
@@ -283,9 +303,9 @@ const PointsPreview = (props: Props) => {
 
   return (
     <div
-      style={styles.containerStyle}
-      onPointerMove={onPointerMove}
-      onPointerUp={onEndDragPoint}
+      style={containerStyle}
+      onPointerMove={deactivateControls ? null : onPointerMove}
+      onPointerUp={deactivateControls ? null : onEndDragPoint}
     >
       <svg style={svgStyle} ref={svgRef}>
         {/* Z index does not apply in SVG. To display selected and highlighted points

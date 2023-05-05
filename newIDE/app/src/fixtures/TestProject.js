@@ -612,6 +612,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   someAlreadyInstalledExtension.setFullName(
     'Some fake already installed extension'
   );
+  someAlreadyInstalledExtension.setVersion('1.2.3');
 
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(

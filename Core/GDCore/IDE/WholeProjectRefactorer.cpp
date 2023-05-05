@@ -845,9 +845,21 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
     return;
   };
 
+  AddRequiredBehaviorsFor(project, object, behaviorName);
+}
+
+void WholeProjectRefactorer::AddRequiredBehaviorsFor(
+    gd::Project& project,
+    gd::Object& object,
+    const gd::String& behaviorName) {
+  if (!object.HasBehaviorNamed(behaviorName)) {
+    return;
+  };
+  gd::Behavior& behavior = object.GetBehavior(behaviorName);
+
   const gd::Platform& platform = project.GetCurrentPlatform();
   const gd::BehaviorMetadata& behaviorMetadata =
-      MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+      MetadataProvider::GetBehaviorMetadata(platform, behavior.GetTypeName());
   if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
     // Should not happen because the behavior was added successfully (so its
     // metadata are valid) - but double check anyway and bail out if the
@@ -855,7 +867,6 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
     return;
   }
 
-  gd::Behavior& behavior = object.GetBehavior(behaviorName);
   for (auto const& keyValue : behavior.GetProperties()) {
     const gd::String& propertyName = keyValue.first;
     const gd::PropertyDescriptor& property = keyValue.second;

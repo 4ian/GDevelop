@@ -106,8 +106,8 @@ export const isCloudProjectVersionSane = async (
         { responseType: 'blob' }
       )
   );
-  const projectFile = await unzipFirstEntryOfBlob(response.data);
   try {
+    const projectFile = await unzipFirstEntryOfBlob(response.data);
     JSON.parse(projectFile);
     return true;
   } catch (error) {

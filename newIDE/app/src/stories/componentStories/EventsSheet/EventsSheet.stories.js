@@ -8,8 +8,7 @@ import EventsSheet from '../../../EventsSheet';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'EventsSheet/EventsSheet',
@@ -27,13 +26,7 @@ export const DefaultNoScope = () => (
         objectsContainer={testProject.testLayout}
         events={testProject.testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         onOpenLayout={action('open layout')}
         onOpenSettings={action('open settings')}
         setToolbar={() => {}}
@@ -56,13 +49,7 @@ export const EmptyNoScope = () => (
         objectsContainer={testProject.emptyLayout}
         events={testProject.emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         onOpenLayout={action('open layout')}
         onOpenSettings={action('open settings')}
         setToolbar={() => {}}

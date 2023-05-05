@@ -171,6 +171,41 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "world\").");
     }
     {
+      auto node = parser.ParseExpression("abcd[0]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Variables must be surrounded by VariableString().");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd.efg.hij");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Variables must be surrounded by VariableString().");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      // It could be an object function call, so the error is more generic.
+      auto node = parser.ParseExpression("abcd.efg");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must wrap your text inside double quotes (example: \"Hello "
+              "world\").");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
       auto node = parser.ParseExpression("123");
       REQUIRE(node != nullptr);
 
@@ -650,6 +685,40 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression("abcd");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "You must enter a number.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd[0]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Variables must be surrounded by Variable().");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("abcd.efg.hij");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "Variables must be surrounded by Variable().");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      // It could be an object function call, so the error is more generic.
+      auto node = parser.ParseExpression("abcd.efg");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");

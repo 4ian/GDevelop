@@ -29,13 +29,15 @@ const makeMarkdownCustomComponents = (
     ) : (
       props.children
     ),
-  // Add paragraphs only if we explictly opt in.
+  // Add paragraphs only if we explicitly opt in.
   p: props =>
     isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (
       props.children
     ),
+  // eslint-disable-next-line jsx-a11y/alt-text
+  img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
 });
 
 type Props = {|

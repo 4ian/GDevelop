@@ -289,6 +289,12 @@ namespace gdjs {
     isFocused() {
       return this._input === document.activeElement;
     }
+
+    focus() {
+      if (!this._input) return;
+
+      this._input.focus();
+    }
   }
 
   export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;

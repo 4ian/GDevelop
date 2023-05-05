@@ -55,6 +55,7 @@ export const create = (authentication: Authentication) => {
         >
           {({
             getStorageProviderOperations,
+            getStorageProviderResourceOperations,
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
@@ -80,6 +81,7 @@ export const create = (authentication: Authentication) => {
               resourceMover={BrowserResourceMover}
               resourceFetcher={BrowserResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProviderResourceOperations={getStorageProviderResourceOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}

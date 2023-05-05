@@ -53,7 +53,7 @@ class JsCodeEvent : public gd::BaseEvent {
  private:
   void Init(const JsCodeEvent& event);
 
-  gd::String inlineCode;            ///< Contains the Javacript code of the event.
+  gd::String inlineCode;            ///< Contains the Javascript code of the event.
   gd::Expression parameterObjects;  ///< Name of the (group of) objects to pass as
                                     ///< parameter.
   bool useStrict;  ///< Should the generated JS function have "use strict". true

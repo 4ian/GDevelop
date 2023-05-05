@@ -274,7 +274,7 @@ namespace gdjs {
             }
           } catch {
             logger.error(
-              'Some metadata of resources can not be succesfully parsed.'
+              'Some metadata of resources can not be successfully parsed.'
             );
           }
         }

@@ -9,6 +9,7 @@ declare class gdNamedPropertyDescriptorsList {
   remove(name: string): void;
   move(oldIndex: number, newIndex: number): void;
   getCount(): number;
+  getPosition(item: gdNamedPropertyDescriptor): number;
   size(): number;
   at(index: number): gdNamedPropertyDescriptor;
   delete(): void;

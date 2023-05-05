@@ -16,6 +16,7 @@ import {
   uncompatibleFireBulletExtensionShortHeader,
   alreadyInstalledExtensionShortHeader,
   alreadyInstalledCommunityExtensionShortHeader,
+  newerVersionExtensionShortHeader,
 } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -108,6 +109,19 @@ export const AlreadyInstalled = () => (
 );
 AlreadyInstalled.decorators = [withMock];
 AlreadyInstalled.parameters = apiDataFakeFireBulletExtension;
+
+export const Outdated = () => (
+  <ExtensionInstallDialog
+    project={testProject.project}
+    extensionShortHeader={newerVersionExtensionShortHeader}
+    isInstalling={false}
+    onClose={action('close')}
+    onInstall={() => Promise.resolve()}
+    onEdit={action('edit')}
+  />
+);
+Outdated.decorators = [withMock];
+Outdated.parameters = apiDataFakeFireBulletExtension;
 
 export const AlreadyInstalledCommunityExtension = () => (
   <ExtensionInstallDialog

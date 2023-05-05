@@ -53,6 +53,8 @@ export default class StandardEvent extends React.Component<
             renderObjectThumbnail={this.props.renderObjectThumbnail}
             screenType={this.props.screenType}
             windowWidth={this.props.windowWidth}
+            scope={this.props.scope}
+            resourcesManager={this.props.project.getResourcesManager()}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             idPrefix={this.props.idPrefix}
@@ -82,6 +84,8 @@ export default class StandardEvent extends React.Component<
             renderObjectThumbnail={this.props.renderObjectThumbnail}
             screenType={this.props.screenType}
             windowWidth={this.props.windowWidth}
+            scope={this.props.scope}
+            resourcesManager={this.props.project.getResourcesManager()}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             idPrefix={this.props.idPrefix}

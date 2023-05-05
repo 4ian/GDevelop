@@ -373,6 +373,7 @@ const OnlineGameLink = ({
               }}
               game={game}
               isLoading={isGameLoading}
+              i18n={i18n}
             />
           )}
         </>

@@ -154,6 +154,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
       this
     ),
+    setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -378,6 +381,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseShortcutToClosePreviewWindow(
+    useShortcutToClosePreviewWindow: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useShortcutToClosePreviewWindow,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

@@ -112,7 +112,7 @@ module.exports = {
         .setLabel(_('How to set up the face orientation'))
         .setDescription(
           _(
-            'When set to Z, the faces are oriented so that their up side is towards the player. When set to Y, the faces are oriented towards the top of the screen.'
+            'When set to Z, the left, right and top faces are oriented so that their up side is towards the player. When set to Y, those same faces are oriented towards the top of the screen.'
           )
         )
         .setGroup(_('Face orientation'));

@@ -401,7 +401,7 @@ module.exports = {
         _('Z (elevation)'),
         _('the Z position (the "elevation")'),
         _('the Z position'),
-        '',
+        _('Position'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -416,7 +416,7 @@ module.exports = {
         _('Depth (size on Z axis)'),
         _('the depth (size on Z axis)'),
         _('the depth'),
-        '',
+        _('Size'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -431,7 +431,7 @@ module.exports = {
         _('Width'),
         _('the width'),
         _('the width'),
-        '',
+        _('Size'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -446,7 +446,7 @@ module.exports = {
         _('Height'),
         _('the height'),
         _('the height'),
-        '',
+        _('Size'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -461,7 +461,7 @@ module.exports = {
         _('Rotation on X axis'),
         _('the rotation on X axis'),
         _('the rotation on X axis'),
-        '',
+        _('Angle'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -476,7 +476,7 @@ module.exports = {
         _('Rotation on Y axis'),
         _('the rotation on Y axis'),
         _('the rotation on Y axis'),
-        '',
+        _('Angle'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -491,7 +491,7 @@ module.exports = {
         _('Face visibility'),
         _('the face visibility'), // TODO (3D) - face visibility: fix the sentence.
         _('the _PARAM1_ face visibility'),
-        '',
+        _('Face'),
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
@@ -565,7 +565,7 @@ module.exports = {
         _('Face image'),
         _('Change the image of the face.'),
         _('Change the image of _PARAM1_ face of _PARAM0_ to _PARAM2_'),
-        '',
+        _('Face'),
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )

@@ -26,7 +26,6 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
       version: '1.0.0',
       name: 'Test game with real assets',
       author: '',
-      enable3d: false,
       windowWidth: 800,
       windowHeight: 600,
       latestCompilationDirectory: '',

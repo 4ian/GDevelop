@@ -65,7 +65,6 @@ type ProjectProperties = {|
   sizeOnStartupMode: string,
   minFPS: number,
   maxFPS: number,
-  enable3d: boolean,
   isFolderProject: boolean,
   useDeprecatedZeroAsDefaultZOrder: boolean,
 |};
@@ -88,7 +87,6 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     sizeOnStartupMode: project.getSizeOnStartupMode(),
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
-    enable3d: project.is3dEnabled(),
     isFolderProject: project.isFolderProject(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
@@ -116,7 +114,6 @@ function applyPropertiesToProject(
     sizeOnStartupMode,
     minFPS,
     maxFPS,
-    enable3d,
     isFolderProject,
     useDeprecatedZeroAsDefaultZOrder,
   } = newProperties;
@@ -141,7 +138,6 @@ function applyPropertiesToProject(
   project.setSizeOnStartupMode(sizeOnStartupMode);
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
-  project.setEnable3d(enable3d);
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
@@ -193,9 +189,6 @@ const ProjectPropertiesDialog = (props: Props) => {
   );
   let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
-  const [enable3d, setEnable3d] = React.useState<boolean>(
-    initialProperties.enable3d
-  );
   let [isFolderProject, setIsFolderProject] = React.useState(
     initialProperties.isFolderProject
   );
@@ -253,7 +246,6 @@ const ProjectPropertiesDialog = (props: Props) => {
         sizeOnStartupMode,
         minFPS,
         maxFPS,
-        enable3d,
         isFolderProject,
         useDeprecatedZeroAsDefaultZOrder,
       }
@@ -641,33 +633,6 @@ const ProjectPropertiesDialog = (props: Props) => {
                   checked={pixelsRounding}
                   onCheck={(e, checked) => {
                     setPixelsRounding(checked);
-                    notifyOfChange();
-                  }}
-                />
-                <Checkbox
-                  label={<Trans>Enable 3D rendering (experimental)</Trans>}
-                  checked={enable3d}
-                  onCheck={(e, checked) => {
-                    if (!checked) {
-                      const usedExtensionsNames = gd.UsedExtensionsFinder.scanProject(
-                        project
-                      )
-                        .getUsedExtensions()
-                        .toNewVectorString()
-                        .toJSArray();
-                      if (usedExtensionsNames.includes('Scene3D')) {
-                        showErrorBox({
-                          message: i18n._(
-                            t`3D cannot be disabled for the project. Remove all 3D related objects and events first.`
-                          ),
-                          errorId: '',
-                          rawError: undefined,
-                          doNotReport: true,
-                        });
-                        return;
-                      }
-                    }
-                    setEnable3d(checked);
                     notifyOfChange();
                   }}
                 />

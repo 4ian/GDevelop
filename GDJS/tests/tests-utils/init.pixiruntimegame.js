@@ -22,7 +22,6 @@ gdjs.getPixiRuntimeGame = (settings) => {
       version: '1.0.0',
       name: 'Test game',
       author: '',
-      enable3d: false,
       windowWidth: 800,
       windowHeight: 600,
       latestCompilationDirectory: '',

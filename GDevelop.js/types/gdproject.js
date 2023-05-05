@@ -40,8 +40,6 @@ declare class gdProject extends gdObjectsContainer {
   getPixelsRounding(): boolean;
   setSizeOnStartupMode(orientation: string): void;
   getSizeOnStartupMode(): string;
-  is3dEnabled(): boolean;
-  setEnable3d(enable: boolean): void;
   getMaximumFPS(): number;
   setMaximumFPS(fps: number): void;
   getMinimumFPS(): number;

@@ -248,7 +248,7 @@ const LayerEditorDialog = (props: Props) => {
               </Trans>
             }
           />
-          {props.project.is3dEnabled() && (
+          {
             <>
               <Text size="block-title">
                 <Trans>3D settings</Trans>
@@ -311,7 +311,7 @@ const LayerEditorDialog = (props: Props) => {
                 </ResponsiveLineStackLayout>
               )}
             </>
-          )}
+          }
           {layer.isLightingLayer() ? (
             <React.Fragment>
               <Text size="block-title">

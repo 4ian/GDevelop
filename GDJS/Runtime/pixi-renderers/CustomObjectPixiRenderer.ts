@@ -33,8 +33,7 @@ namespace gdjs {
       // And same, in reverse, for 2D only objects.
       this._pixiContainer = new PIXI.Container();
       this._threeGroup =
-        typeof THREE !== 'undefined' &&
-        this._object.getRuntimeScene().getGame().is3dEnabled()
+        typeof THREE !== 'undefined'
           ? new THREE.Group()
           : null;
       this._debugDrawRenderedObjectsPoints = {};

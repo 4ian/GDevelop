@@ -65,7 +65,7 @@ namespace gdjs {
      */
     createStandardCanvas(parentElement: HTMLElement) {
       let gameCanvas: HTMLCanvasElement;
-      if (typeof THREE !== 'undefined' && this._game.is3dEnabled()) {
+      if (typeof THREE !== 'undefined') {
         gameCanvas = document.createElement('canvas');
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,

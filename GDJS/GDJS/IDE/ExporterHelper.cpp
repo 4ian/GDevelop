@@ -119,9 +119,16 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject.GetResourcesManager(), options.exportPath);
   // end of compatibility code
 
+  auto usedExtensionsResult =
+      gd::UsedExtensionsFinder::ScanProject(exportedProject);
+
+  bool isUsingScene3DExtension =
+      usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
+      usedExtensionsResult.GetUsedExtensions().end();
+
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 /*pixiInThreeRenderers=*/exportedProject.Is3dEnabled(),
+                 /*pixiInThreeRenderers=*/isUsingScene3DExtension,
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
@@ -130,8 +137,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  includesFiles);
 
   // Export files for free function, object and behaviors
-  auto usedExtensionsResult =
-      gd::UsedExtensionsFinder::ScanProject(exportedProject);
   for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
     InsertUnique(includesFiles, includeFile);
   }

@@ -341,15 +341,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   int GetMaximumFPS() const { return maxFPS; }
 
   /**
-   * Return true if 3d is enabled on the project.
-   */
-  bool Is3dEnabled() const { return enable3d; }
-  /**
-   * Set if 3d should be enabled on the project.
-   */
-  void SetEnable3d(bool enable) { enable3d = enable; }
-
-  /**
    * Change the default minimum number of frames allowed to be rendered per
    * seconds
    */
@@ -1037,7 +1028,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String version;         ///< Game version number (used for some exports)
   unsigned int windowWidth;   ///< Window default width
   unsigned int windowHeight;  ///< Window default height
-  bool enable3d;              ///< If true, enable 3D in project
   int maxFPS;                 ///< Maximum Frame Per Seconds, -1 for unlimited
   unsigned int minFPS;  ///< Minimum Frame Per Seconds ( slow down game if FPS
                         ///< are below this number )

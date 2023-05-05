@@ -382,8 +382,8 @@ module.exports = {
     const object = extension
       .addObject(
         'Cube3DObject',
-        _('3D Shape'),
-        _('A 3D shape.'),
+        _('3D Cube'),
+        _('A 3D cube.'),
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )

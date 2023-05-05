@@ -124,6 +124,10 @@ namespace gdjs {
       );
     }
 
+    updateVisibility() {
+      this._boxMesh.visible = !this._object.hidden;
+    }
+
     updateSize() {
       this._boxMesh.scale.set(
         this._object.getWidth(),

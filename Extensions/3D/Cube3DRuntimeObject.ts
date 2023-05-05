@@ -149,6 +149,18 @@ namespace gdjs {
     }
 
     /**
+     * Hide (or show) the cube.
+     * @param enable true to hide the object, false to show it again.
+     */
+    hide(enable: boolean): void {
+      if (enable === undefined) {
+        enable = true;
+      }
+      this.hidden = enable;
+      this._renderer.updateVisibility();
+    }
+
+    /**
      * Sets the texture repeat of a face of the 3D box.
      *
      * @param faceName - The name of the face to set visibility for.

@@ -19,6 +19,7 @@ import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import BackgroundColor from './BackgroundColor';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
@@ -109,6 +110,7 @@ export default class InstancesEditor extends Component<Props> {
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
+  threeRenderer: THREE.WebGLRenderer;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
@@ -167,18 +169,58 @@ export default class InstancesEditor extends Component<Props> {
       },
     });
 
-    //Create the renderer and setup the rendering area for scene editor.
-    //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-    this.pixiRenderer = PIXI.autoDetectRenderer(
-      {
+    let gameCanvas: HTMLCanvasElement;
+    // TODO add a setting
+    if (true) {
+      gameCanvas = document.createElement('canvas');
+      this.threeRenderer = new THREE.WebGLRenderer({
+        canvas: gameCanvas,
+      });
+      this.threeRenderer.autoClear = false;
+      // this._threeRenderer.setPixelRatio(0.05);
+      this.threeRenderer.setSize(
+        this.props.width,
+        this.props.height
+      );
+
+      // Create a PixiJS renderer that use the same GL context as Three.js
+      // so that both can render to the canvas and even have PixiJS rendering
+      // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+      this.pixiRenderer = new PIXI.Renderer({
         width: this.props.width,
         height: this.props.height,
+        view: gameCanvas,
+        // @ts-ignore - reuse the context from Three.js.
+        context: this.threeRenderer.getContext(),
+        clearBeforeRender: false,
         preserveDrawingBuffer: true,
         antialias: false,
-      }
-      // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
-    );
-    canvasArea.appendChild(this.pixiRenderer.view);
+        backgroundAlpha: 0,
+        // TODO (3D): `resolution: window.devicePixelRatio`?
+      });
+
+      gameCanvas = this.threeRenderer.domElement;
+    } else {
+      //Create the renderer and setup the rendering area for scene editor.
+      //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+      this.pixiRenderer = PIXI.autoDetectRenderer(
+        {
+          width: this.props.width,
+          height: this.props.height,
+          preserveDrawingBuffer: true,
+          antialias: false,
+          clearBeforeRender: false,
+          backgroundAlpha: 0,
+        }
+        // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
+      );
+
+      gameCanvas = this.pixiRenderer.view;
+    }
+
+    // Add the renderer view element to the DOM
+    canvasArea.appendChild(gameCanvas);
+
     this.pixiRenderer.view.style.outline = 'none';
 
     this.longTouchHandler = new LongTouchHandler({
@@ -292,7 +334,6 @@ export default class InstancesEditor extends Component<Props> {
       height: this.props.height,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
-    this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
     this.grid = new Grid({
       viewPosition: this.viewPosition,
@@ -345,8 +386,7 @@ export default class InstancesEditor extends Component<Props> {
       this.pixiContainer.removeChild(this.selectedInstances.getPixiContainer());
     }
     if (this.instancesRenderer) {
-      this.viewPosition
-        .getPixiContainer()
+      this.pixiContainer
         .removeChild(this.instancesRenderer.getPixiContainer());
       this.instancesRenderer.delete();
     }
@@ -366,7 +406,6 @@ export default class InstancesEditor extends Component<Props> {
 
     this.backgroundColor = new BackgroundColor({
       layout: props.layout,
-      pixiRenderer: this.pixiRenderer,
     });
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
@@ -429,9 +468,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
-    this.viewPosition
-      .getPixiContainer()
-      .addChild(this.instancesRenderer.getPixiContainer());
+    this.pixiContainer.addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.windowBorder.getPixiObject());
     this.pixiContainer.addChild(this.windowMask.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
@@ -988,11 +1025,11 @@ export default class InstancesEditor extends Component<Props> {
       this.fpsLimiter.shouldUpdate() &&
       !shouldPreventRenderingInstanceEditors()
     ) {
-      this.backgroundColor.render();
-      this.viewPosition.render();
+      // FIXME Splitting the rendering make impossible to select instances
+      // because they are not part of the last render call.
+      this.instancesRenderer.render(this.pixiRenderer, this.viewPosition, this.backgroundColor);
       this.canvasCursor.render();
       this.grid.render();
-      this.instancesRenderer.render();
       this.highlightedInstance.render();
       this.selectedInstances.render();
       this.selectionRectangle.render();

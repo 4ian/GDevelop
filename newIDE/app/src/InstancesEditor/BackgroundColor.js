@@ -4,20 +4,17 @@ import { rgbToHex } from '../Utils/ColorTransformer';
 
 type Props = {|
   layout: gdLayout,
-  pixiRenderer: PIXI.Renderer,
 |};
 
 export default class BackgroundColor {
   layout: gdLayout;
-  pixiRenderer: PIXI.Renderer;
 
-  constructor({ layout, pixiRenderer }: Props) {
+  constructor({ layout }: Props) {
     this.layout = layout;
-    this.pixiRenderer = pixiRenderer;
   }
 
-  render() {
-    this.pixiRenderer.backgroundColor = parseInt(
+  setBackgroundColorForPixi(pixiRenderer: PIXI.Renderer) {
+    pixiRenderer.backgroundColor = parseInt(
       parseInt(
         rgbToHex(
           this.layout.getBackgroundColorRed(),

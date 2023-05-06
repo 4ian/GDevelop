@@ -56,6 +56,7 @@
     "node-require-function": "^1.2.0",
     "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",
     "pixi.js-legacy": "^6.1.2",
+    "three": "0.151.2",
     "posthog-js": "^1.34.0",
     "prop-types": "^15.5.10",
     "react": "16.14.0",

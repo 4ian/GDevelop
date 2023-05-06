@@ -30,6 +30,12 @@ export default class InstancesRenderer {
 
   layersRenderers: { [string]: LayerRenderer };
 
+  /**
+   * This container contains all the layers.
+   * Layers are rendered one by one.
+   * But, as only the last rendered container is used for interactions,
+   * all layers are included in the last render call with an opacity of 0.
+   */
   pixiContainer: PIXI.Container;
 
   temporaryRectangle: Rectangle;
@@ -82,7 +88,10 @@ export default class InstancesRenderer {
 
     this.layersRenderers = {};
 
+    // This container is only used for user interactions.
+    // Its content is not actually displayed.
     this.pixiContainer = new PIXI.Container();
+    this.pixiContainer.alpha = 0;
 
     this.temporaryRectangle = new Rectangle();
     //TODO extract this to a class to have type checking (maybe rethink it)
@@ -124,7 +133,11 @@ export default class InstancesRenderer {
     return this.instanceMeasurer;
   }
 
-  render() {
+  render(pixiRenderer: PIXI.Renderer, viewPosition: ViewPosition, backgroundColor: BackgroundColor) {
+    // Render the background color.
+    backgroundColor.setBackgroundColorForPixi(pixiRenderer);
+    pixiRenderer.backgroundAlpha = 1;
+    pixiRenderer.clear();
     for (let i = 0; i < this.layout.getLayersCount(); i++) {
       const layer = this.layout.getLayerAt(i);
       const layerName = layer.getName();
@@ -157,6 +170,9 @@ export default class InstancesRenderer {
       layerRenderer.wasUsed = true;
       layerRenderer.getPixiContainer().zOrder = i;
       layerRenderer.render();
+      const layerContainer = layerRenderer.getPixiContainer();
+      viewPosition.applyTransformationToPixi(layerContainer);
+      pixiRenderer.render(layerContainer);
     }
 
     this._updatePixiObjectsZOrder();
@@ -193,7 +209,6 @@ export default class InstancesRenderer {
       if (this.layersRenderers.hasOwnProperty(i)) {
         const layerRenderer = this.layersRenderers[i];
         if (!layerRenderer.wasUsed) {
-          this.pixiContainer.removeChild(layerRenderer.getPixiContainer());
           layerRenderer.delete();
           delete this.layersRenderers[i];
         } else layerRenderer.wasUsed = false;
@@ -208,8 +223,5 @@ export default class InstancesRenderer {
         this.layersRenderers[i].delete();
       }
     }
-
-    // Finish by the pixi container.
-    this.pixiContainer.destroy();
   }
 }

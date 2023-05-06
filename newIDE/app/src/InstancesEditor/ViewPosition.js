@@ -135,18 +135,14 @@ export default class ViewPosition {
     return this.viewY;
   }
 
-  getPixiContainer() {
-    return this._pixiContainer;
-  }
-
-  render() {
-    this._pixiContainer.position.x =
+  applyTransformationToPixi(container: PIXI.Container) {
+    container.position.x =
       -this.viewX * this.instancesEditorSettings.zoomFactor;
-    this._pixiContainer.position.y =
+    container.position.y =
       -this.viewY * this.instancesEditorSettings.zoomFactor;
-    this._pixiContainer.position.x += this._width / 2;
-    this._pixiContainer.position.y += this._height / 2;
-    this._pixiContainer.scale.x = this.instancesEditorSettings.zoomFactor;
-    this._pixiContainer.scale.y = this.instancesEditorSettings.zoomFactor;
+    container.position.x += this._width / 2;
+    container.position.y += this._height / 2;
+    container.scale.x = this.instancesEditorSettings.zoomFactor;
+    container.scale.y = this.instancesEditorSettings.zoomFactor;
   }
 }

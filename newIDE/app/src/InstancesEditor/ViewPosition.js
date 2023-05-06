@@ -1,7 +1,10 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
+
 
 type Props = {|
   initialViewX: number,
@@ -144,5 +147,43 @@ export default class ViewPosition {
     container.position.y += this._height / 2;
     container.scale.x = this.instancesEditorSettings.zoomFactor;
     container.scale.y = this.instancesEditorSettings.zoomFactor;
+  }
+
+  applyTransformationToThree(threeCamera: THREE.Camera) {
+    if (!threeCamera) {
+      return;
+    }
+    threeCamera.aspect = this._width / this._height;
+    threeCamera.updateProjectionMatrix();
+
+    const zoomFactor = this.instancesEditorSettings.zoomFactor;
+
+    if (threeCamera) {
+      threeCamera.position.x = this.viewX;
+      threeCamera.position.y = -this.viewY; // Inverted because the scene is mirrored on Y axis.
+      threeCamera.rotation.z = 0;
+
+      // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
+      // The Z position is computed by taking the half height of the displayed rendering,
+      // and using the angle of the triangle defined by the field of view to compute the length
+      // of the triangle defining the distance between the camera and the rendering plane.
+      const cameraFovInRadians = RenderedInstance.toRad(threeCamera.fov);
+      const cameraZPosition =
+        (0.5 * this._height) / zoomFactor /
+        Math.tan(0.5 * cameraFovInRadians);
+      threeCamera.position.z = cameraZPosition;
+
+      // TODO There is one per layer
+      // if (threePlaneMesh) {
+      //   // Adapt the plane size so that it covers the whole screen.
+      //   threePlaneMesh.scale.x = this._width / zoomFactor;
+      //   threePlaneMesh.scale.y = this._height / zoomFactor;
+
+      //   // Adapt the plane position so that it's always displayed on the whole screen.
+      //   threePlaneMesh.position.x = threeCamera.position.x;
+      //   threePlaneMesh.position.y = -threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
+      //   threePlaneMesh.rotation.z = 0;
+      // }
+    }
   }
 }

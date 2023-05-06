@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import { rgbToHexNumber } from '../../Utils/ColorTransformer';
 const gd: libGDevelop = global.gd;
 
@@ -16,6 +17,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -24,6 +26,7 @@ export default class RenderedParticleEmitterInstance extends RenderedInstance {
       instance,
       associatedObjectConfiguration,
       pixiContainer,
+      threeGroup,
       pixiResourcesLoader
     );
 

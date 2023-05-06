@@ -1027,7 +1027,7 @@ export default class InstancesEditor extends Component<Props> {
     ) {
       // FIXME Splitting the rendering make impossible to select instances
       // because they are not part of the last render call.
-      this.instancesRenderer.render(this.pixiRenderer, this.viewPosition, this.backgroundColor);
+      this.instancesRenderer.render(this.pixiRenderer, this.threeRenderer, this.viewPosition, this.backgroundColor);
       this.canvasCursor.render();
       this.grid.render();
       this.highlightedInstance.render();

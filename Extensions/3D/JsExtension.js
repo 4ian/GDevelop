@@ -873,6 +873,7 @@ module.exports = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
+        threeGroup,
         pixiResourcesLoader
       ) {
         super(
@@ -881,6 +882,7 @@ module.exports = {
           instance,
           associatedObjectConfiguration,
           pixiContainer,
+          threeGroup,
           pixiResourcesLoader
         );
         /**

@@ -73,7 +73,7 @@ namespace gdjs {
 
         /**
          * true if the last layer rendered 3D objects using Three.js, false otherwise.
-         * Useful to avoid needlessly reseting the WebGL states between layers (which can be expensive).
+         * Useful to avoid needlessly resetting the WebGL states between layers (which can be expensive).
          */
         let lastRenderWas3d = true;
 

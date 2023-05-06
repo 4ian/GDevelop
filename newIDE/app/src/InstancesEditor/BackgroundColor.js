@@ -1,5 +1,6 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import { rgbToHex } from '../Utils/ColorTransformer';
 
 type Props = {|
@@ -25,5 +26,21 @@ export default class BackgroundColor {
       ),
       10
     );
+  }
+
+  setBackgroundColorForThree(threeRenderer:THREE.Renderer, threeScene: THREE.Scene) {
+    const colorCode = parseInt(
+      parseInt(
+        rgbToHex(
+          this.layout.getBackgroundColorRed(),
+          this.layout.getBackgroundColorGreen(),
+          this.layout.getBackgroundColorBlue()
+        ),
+        16
+      ),
+      10
+    );
+    threeRenderer.setClearColor(colorCode);
+    threeScene.background = new THREE.Color(colorCode);
   }
 }

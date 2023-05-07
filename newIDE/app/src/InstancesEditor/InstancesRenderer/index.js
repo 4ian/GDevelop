@@ -135,7 +135,7 @@ export default class InstancesRenderer {
     return this.instanceMeasurer;
   }
 
-  render(pixiRenderer: PIXI.Renderer, threeRenderer: THREE.WebGLRenderer, viewPosition: ViewPosition, backgroundColor: BackgroundColor) {
+  render(pixiRenderer: PIXI.Renderer, threeRenderer: THREE.WebGLRenderer | null, viewPosition: ViewPosition, backgroundColor: BackgroundColor) {
     /** Useful to render the background color. */
     let isFirstRender = true;
 
@@ -187,12 +187,14 @@ export default class InstancesRenderer {
         viewPosition.applyTransformationToThree(threeCamera, threePlaneMesh);
       }
 
-      if (layer.getRenderingType() === '2d') {
+      if (layer.getRenderingType() === '2d' || !threeRenderer) {
         // Render a layer with 2D rendering (PixiJS) only.
 
         if (lastRenderWas3d) {
           // Ensure the state is clean for PixiJS to render.
-          threeRenderer.resetState();
+          if (threeRenderer) {
+            threeRenderer.resetState();
+          }
           pixiRenderer.reset();
         }
 

@@ -110,7 +110,7 @@ export default class InstancesEditor extends Component<Props> {
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
-  threeRenderer: THREE.WebGLRenderer;
+  threeRenderer: THREE.WebGLRenderer | null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
@@ -170,7 +170,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     let gameCanvas: HTMLCanvasElement;
-    // TODO add a setting
+    // TODO Decide if a 2D mode should be a setting.
     if (true) {
       gameCanvas = document.createElement('canvas');
       this.threeRenderer = new THREE.WebGLRenderer({
@@ -498,6 +498,12 @@ export default class InstancesEditor extends Component<Props> {
       nextProps.height !== this.props.height
     ) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
+      if (this.threeRenderer) {
+        this.threeRenderer.setSize(
+          nextProps.width,
+          nextProps.height
+        );
+      }
       this.viewPosition.resize(nextProps.width, nextProps.height);
       this.statusBar.resize(nextProps.width, nextProps.height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(

@@ -971,8 +971,7 @@ module.exports = {
         this._backFaceUpThroughWhichAxisRotation = properties.get('backFaceUpThroughWhichAxisRotation').getValue();
         this._shouldUseTransparentTexture = properties.get('enableTextureTransparency').getValue() === 'true';
         if (this._threeGroup) {
-          this._depth = parseFloat(properties.get('depth').getValue());
-          this._z = parseFloat(properties.get('z').getValue()) || 0;
+          this._defaultDepth = parseFloat(properties.get('depth').getValue());
           const geometry = new THREE.BoxGeometry(1, 1, 1);
           // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
           // TODO (3D) - feature: support color instead of texture?
@@ -1120,11 +1119,15 @@ module.exports = {
         const height = this._instance.hasCustomSize()
           ? this._instance.getCustomHeight()
           : this.getDefaultHeight();
+        const depth = this._instance.hasCustomSize()
+          ? this._instance.getRawDoubleProperty('depth') || this._defaultDepth
+          : this._defaultDepth;
+        const z = this._instance.getRawDoubleProperty('z');
 
         this._threeObject.position.set(
           this._instance.getX() + width / 2,
           this._instance.getY() + height / 2,
-          this._z + this._depth / 2
+          z + depth / 2
         );
   
         this._threeObject.rotation.set(
@@ -1136,7 +1139,7 @@ module.exports = {
         this._threeObject.scale.set(
           width,
           height,
-          this._depth
+          depth
         );
         this.updateTextureUvMapping();
       }

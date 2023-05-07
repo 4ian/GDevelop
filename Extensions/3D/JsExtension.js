@@ -876,6 +876,20 @@ module.exports = {
       5: 1,
     };
 
+    const noRepeatTextureVertexIndexToUvMapping = {
+      0: [0, 0],
+      1: [1, 0],
+      2: [0, 1],
+      3: [1, 1],
+    };
+
+    const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
+      0: [0, 1],
+      1: [0, 0],
+      2: [1, 1],
+      3: [1, 0],
+    };
+
     let transparentMaterial = null;
     const getTransparentMaterial = () => {
       if (!transparentMaterial)
@@ -945,6 +959,16 @@ module.exports = {
           properties.get('topFaceVisible').getValue() === 'true',
           properties.get('bottomFaceVisible').getValue() === 'true',
         ];
+        this._shouldRepeatTextureOnFace = [
+          properties.get('frontFaceResourceRepeat').getValue() === 'true',
+          properties.get('backFaceResourceRepeat').getValue() === 'true',
+          properties.get('leftFaceResourceRepeat').getValue() === 'true',
+          properties.get('rightFaceResourceRepeat').getValue() === 'true',
+          properties.get('topFaceResourceRepeat').getValue() === 'true',
+          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
+        ];
+        this._facesOrientation = properties.get('facesOrientation').getValue();
+        this._backFaceUpThroughWhichAxisRotation = properties.get('backFaceUpThroughWhichAxisRotation').getValue();
         this._shouldUseTransparentTexture = properties.get('enableTextureTransparency').getValue() === 'true';
         if (this._threeGroup) {
           this._depth = parseFloat(properties.get('depth').getValue());
@@ -1114,6 +1138,204 @@ module.exports = {
           height,
           this._depth
         );
+        this.updateTextureUvMapping();
+      }
+      
+      /**
+       * Updates the UV mapping of the geometry in order to repeat a material
+       * over the different faces of the cube.
+       * The mesh must be configured with a list of materials in order
+       * for the method to work.
+       * @param faceIndex The face index to update. If undefined, updates all the faces.
+       */
+      updateTextureUvMapping(faceIndex) {
+        // @ts-ignore - position is stored as a Float32BufferAttribute
+        /** @type {THREE.BufferAttribute} */
+        const pos = this._threeObject.geometry.getAttribute(
+          'position'
+        );
+        // @ts-ignore - uv is stored as a Float32BufferAttribute
+        /** @type {THREE.BufferAttribute} */
+        const uvMapping = this._threeObject.geometry.getAttribute(
+          'uv'
+        );
+        const startIndex =
+          faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
+        const endIndex =
+          faceIndex === undefined
+            ? 23
+            : faceIndexToMaterialIndex[faceIndex] * 4 + 3;
+        for (
+          var vertexIndex = startIndex;
+          vertexIndex <= endIndex;
+          vertexIndex++
+        ) {
+          const materialIndex = Math.floor(
+            vertexIndex /
+              // Each face of the cube has 4 points
+              4
+          );
+          const material = this._threeObject.material[materialIndex];
+          if (!material || !material.map) {
+            continue;
+          }
+
+          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
+            materialIndexToFaceIndex[materialIndex]
+          ];
+
+          const shouldOrientateFacesTowardsY =
+            this._facesOrientation === 'Y';
+
+          let x = 0
+          let y = 0;
+          switch (materialIndex) {
+            case 0:
+              // Right face
+              if (shouldRepeatTexture) {
+                if (shouldOrientateFacesTowardsY) {
+                  x =
+                    -(this._threeObject.scale.z / material.map.source.data.width) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                  y =
+                    -(this._threeObject.scale.y / material.map.source.data.height) *
+                    (pos.getY(vertexIndex) + 0.5);
+                } else {
+                  x =
+                    -(this._threeObject.scale.y / material.map.source.data.width) *
+                    (pos.getY(vertexIndex) - 0.5);
+                  y =
+                    (this._threeObject.scale.z / material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                }
+              } else {
+                if (shouldOrientateFacesTowardsY) {
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                } else {
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
+                }
+              }
+              break;
+            case 1:
+              // Left face
+              if (shouldRepeatTexture) {
+                if (shouldOrientateFacesTowardsY) {
+                  x =
+                    (this._threeObject.scale.z / material.map.source.data.width) *
+                    (pos.getZ(vertexIndex) + 0.5);
+                  y =
+                    -(this._threeObject.scale.y / material.map.source.data.height) *
+                    (pos.getY(vertexIndex) + 0.5);
+                } else {
+                  x =
+                    (this._threeObject.scale.y / material.map.source.data.width) *
+                    (pos.getY(vertexIndex) + 0.5);
+                  y =
+                    (this._threeObject.scale.z / material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                }
+              } else {
+                if (shouldOrientateFacesTowardsY) {
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                } else {
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
+                  x = -x;
+                  y = -y;
+                }
+              }
+              break;
+            case 2:
+              // Bottom face
+              if (shouldRepeatTexture) {
+                x =
+                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) + 0.5);
+                y =
+                  (this._threeObject.scale.z / material.map.source.data.height) *
+                  (pos.getZ(vertexIndex) - 0.5);
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              }
+              break;
+            case 3:
+              // Top face
+              if (shouldRepeatTexture) {
+                if (shouldOrientateFacesTowardsY) {
+                  x =
+                    (this._threeObject.scale.x / material.map.source.data.width) *
+                    (pos.getX(vertexIndex) + 0.5);
+                  y =
+                    -(this._threeObject.scale.z / material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) + 0.5);
+                } else {
+                  x =
+                    -(this._threeObject.scale.x / material.map.source.data.width) *
+                    (pos.getX(vertexIndex) - 0.5);
+                  y =
+                    (this._threeObject.scale.z / material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                }
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                if (!shouldOrientateFacesTowardsY) {
+                  x = -x;
+                  y = -y;
+                }
+              }
+              break;
+            case 4:
+              // Front face
+              if (shouldRepeatTexture) {
+                x =
+                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) + 0.5);
+                y =
+                  -(this._threeObject.scale.y / material.map.source.data.height) *
+                  (pos.getY(vertexIndex) + 0.5);
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              }
+              break;
+            case 5:
+              // Back face
+              const shouldBackFaceBeUpThroughXAxisRotation =
+                this._backFaceUpThroughWhichAxisRotation === 'X';
+
+              if (shouldRepeatTexture) {
+                x =
+                  (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) +
+                    (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) * 0.5);
+                y =
+                  (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+                  (this._threeObject.scale.y / material.map.source.data.height) *
+                  (pos.getY(vertexIndex) +
+                    (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                if (shouldBackFaceBeUpThroughXAxisRotation) {
+                  x = -x;
+                  y = -y;
+                }
+              }
+              break;
+            default:
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+          }
+          uvMapping.setXY(vertexIndex, x, y);
+        }
+        uvMapping.needsUpdate = true;
       }
 
       updateFallbackObject() {

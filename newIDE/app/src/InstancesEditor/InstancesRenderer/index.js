@@ -180,7 +180,12 @@ export default class InstancesRenderer {
       layerRenderer.render();
       const layerContainer = layerRenderer.getPixiContainer();
       viewPosition.applyTransformationToPixi(layerContainer);
-      viewPosition.applyTransformationToThree(layerRenderer.getThreeCamera());
+
+      const threeCamera = layerRenderer.getThreeCamera();
+      const threePlaneMesh = layerRenderer.getThreePlaneMesh();
+      if (threeCamera && threePlaneMesh) {
+        viewPosition.applyTransformationToThree(threeCamera, threePlaneMesh);
+      }
 
       if (layer.getRenderingType() === '2d') {
         // Render a layer with 2D rendering (PixiJS) only.
@@ -212,23 +217,21 @@ export default class InstancesRenderer {
         if (threeScene && threeCamera) {
           // TODO (3D) - optimization: do this at the beginning for all layers that are 2d+3d?
           // So the second pass is clearer (just rendering 2d or 3d layers without doing PixiJS renders in between).
-          if (layer.getRenderingType() === '2d+3d') {
-            if (lastRenderWas3d) {
-              // Ensure the state is clean for PixiJS to render.
-              threeRenderer.resetState();
-              pixiRenderer.reset();
-            }
-            // Do the rendering of the PixiJS objects of the layer on the render texture.
-            // Then, update the texture of the plane showing the PixiJS rendering,
-            // so that the 2D rendering made by PixiJS can be shown in the 3D world.
-            layerRenderer.renderOnPixiRenderTexture(pixiRenderer);
-            layerRenderer.updateThreePlaneTextureFromPixiRenderTexture(
-              // The renderers are needed to find the internal WebGL texture.
-              threeRenderer,
-              pixiRenderer
-            );
-            lastRenderWas3d = false;
+          if (lastRenderWas3d) {
+            // Ensure the state is clean for PixiJS to render.
+            threeRenderer.resetState();
+            pixiRenderer.reset();
           }
+          // Do the rendering of the PixiJS objects of the layer on the render texture.
+          // Then, update the texture of the plane showing the PixiJS rendering,
+          // so that the 2D rendering made by PixiJS can be shown in the 3D world.
+          layerRenderer.renderOnPixiRenderTexture(pixiRenderer);
+          layerRenderer.updateThreePlaneTextureFromPixiRenderTexture(
+            // The renderers are needed to find the internal WebGL texture.
+            threeRenderer,
+            pixiRenderer
+          );
+          lastRenderWas3d = false;
 
           if (!lastRenderWas3d) {
             // It's important to reset the internal WebGL state of PixiJS, then Three.js

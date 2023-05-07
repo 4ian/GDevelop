@@ -229,6 +229,7 @@ const ObjectsRenderingService = {
   rgbOrHexToHexNumber, // Expose a ColorTransformer function, useful to manage different color types for the extensions
   gd, // Expose gd so that it can be used by renderers
   PIXI, // Expose PIXI so that it can be used by renderers
+  THREE, // Expose THREE so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
 };
 

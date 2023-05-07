@@ -865,6 +865,30 @@ module.exports = {
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
+    const THREE = objectsRenderingService.THREE;
+
+    const materialIndexToFaceIndex = {
+      0: 3,
+      1: 2,
+      2: 5,
+      3: 4,
+      4: 0,
+      5: 1,
+    };
+
+    let transparentMaterial = null;
+    const getTransparentMaterial = () => {
+      if (!transparentMaterial)
+        transparentMaterial = new THREE.MeshBasicMaterial({
+          transparent: true,
+          opacity: 0,
+          // Set the alpha test to to ensure the faces behind are rendered
+          // (no "back face culling" that would still be done if alphaTest is not set).
+          alphaTest: 1,
+        });
+  
+      return transparentMaterial;
+    };
 
     class RenderedThreeDShapeObjectInstance extends RenderedInstance {
       constructor(
@@ -904,6 +928,53 @@ module.exports = {
         this._pixiContainer.addChild(this._pixiObject);
         this._renderFallbackObject = false;
         this.updateTexture();
+
+        this._faceResourceNames = [
+          properties.get('frontFaceResourceName').getValue(),
+          properties.get('backFaceResourceName').getValue(),
+          properties.get('leftFaceResourceName').getValue(),
+          properties.get('rightFaceResourceName').getValue(),
+          properties.get('topFaceResourceName').getValue(),
+          properties.get('bottomFaceResourceName').getValue(),
+        ];
+        this._faceVisibilities = [
+          properties.get('frontFaceVisible').getValue() === 'true',
+          properties.get('backFaceVisible').getValue() === 'true',
+          properties.get('leftFaceVisible').getValue() === 'true',
+          properties.get('rightFaceVisible').getValue() === 'true',
+          properties.get('topFaceVisible').getValue() === 'true',
+          properties.get('bottomFaceVisible').getValue() === 'true',
+        ];
+        this._shouldUseTransparentTexture = properties.get('enableTextureTransparency').getValue() === 'true';
+        if (this._threeGroup) {
+          const defaultDepth = parseFloat(properties.get('depth').getValue());
+          const geometry = new THREE.BoxGeometry(this._defaultWidth, this._defaultHeight, defaultDepth);
+          // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
+          // TODO (3D) - feature: support color instead of texture?
+          const materials = [
+            this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[1]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[2]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[3]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[4]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[5]),
+          ];
+          this._threeObject = new THREE.Mesh(geometry, materials);
+          this._threeObject.rotation.order = 'ZYX';
+
+          this._threeGroup.add(this._threeObject);
+        }
+      }
+
+      _getFaceMaterial(project, faceIndex) {
+        // TODO (3D) - feature: support tiling of texture.
+        if (!this._faceVisibilities[faceIndex])
+          return getTransparentMaterial();
+
+        return this._pixiResourcesLoader
+          .getThreeMaterial(project, this._faceResourceNames[faceIndex], {
+            useTransparentTexture: this._shouldUseTransparentTexture,
+          });
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {

@@ -947,8 +947,9 @@ module.exports = {
         ];
         this._shouldUseTransparentTexture = properties.get('enableTextureTransparency').getValue() === 'true';
         if (this._threeGroup) {
-          const defaultDepth = parseFloat(properties.get('depth').getValue());
-          const geometry = new THREE.BoxGeometry(this._defaultWidth, this._defaultHeight, defaultDepth);
+          this._depth = parseFloat(properties.get('depth').getValue());
+          this._z = parseFloat(properties.get('z').getValue()) || 0;
+          const geometry = new THREE.BoxGeometry(1, 1, 1);
           // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
           // TODO (3D) - feature: support color instead of texture?
           const materials = [
@@ -1082,10 +1083,37 @@ module.exports = {
 
         this._pixiTexturedObject.position.x =
           this._instance.getX() +
-          +this._centerX * Math.abs(this._pixiTexturedObject.scale.x);
+          this._centerX * Math.abs(this._pixiTexturedObject.scale.x);
         this._pixiTexturedObject.position.y =
           this._instance.getY() +
-          +this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
+          this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
+      }
+
+      updateThreeObject() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+
+        this._threeObject.position.set(
+          this._instance.getX() + width / 2,
+          this._instance.getY() + height / 2,
+          this._z + this._depth / 2
+        );
+  
+        this._threeObject.rotation.set(
+          0,
+          0,
+          this._instance.getAngle() * Math.PI / 180
+        );
+  
+        this._threeObject.scale.set(
+          width,
+          height,
+          this._depth
+        );
       }
 
       updateFallbackObject() {
@@ -1121,6 +1149,7 @@ module.exports = {
           this.updateFallbackObject();
         } else {
           this.updatePIXISprite();
+          this.updateThreeObject();
         }
       }
 

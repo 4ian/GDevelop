@@ -1,7 +1,7 @@
 // @flow
 import { makeTestProject } from '../fixtures/TestProject';
 import optionalRequire from '../Utils/OptionalRequire';
-import path from 'path';
+import path from 'path-browserify';
 import {
   downloadUrlsToBlobs,
   convertBlobToDataURL,

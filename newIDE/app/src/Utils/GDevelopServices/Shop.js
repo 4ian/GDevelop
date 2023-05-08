@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import path from 'path';
+import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
 
 const client = axios.create({

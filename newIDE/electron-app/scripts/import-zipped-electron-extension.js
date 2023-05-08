@@ -8,7 +8,7 @@
  */
 var shell = require('shelljs');
 var fs = require('fs');
-var unzipper = require('unzipper');
+var AdmZip = require('adm-zip');
 var process = require('process');
 var path = require('path');
 
@@ -18,15 +18,10 @@ const basePath = path.join(relativeExtractPath, fileName);
 const zipFilePath = basePath + '.zip';
 
 try {
-  fs.createReadStream(zipFilePath)
-    .pipe(
-      unzipper.Extract({
-        path: relativeExtractPath,
-      })
-    )
-    .on('close', function() {
-      shell.echo('✅ Extracted ' + zipFilePath + ' to ' + basePath + ' folder');
-    });
+  const zip = new AdmZip(zipFilePath);
+  zip.extractAllTo(relativeExtractPath, /*overwrite=*/ true);
+
+  shell.echo('✅ Extracted ' + zipFilePath + ' to ' + basePath + ' folder');
 } catch (e) {
   shell.echo(
     '❌ Error while extracting ' + zipFilePath + ' to ' + basePath + ' folder:',

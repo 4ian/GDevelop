@@ -1,8 +1,7 @@
 name: GDevelop Issues automatic workflow
 on:
   pull_request:
-    types:
-      - opened
+    types: [opened]
 jobs:
   read-locales-metadata:
     if: contains(github.event.pull_request.title, '[Auto PR] Update translations')

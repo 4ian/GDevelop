@@ -1,8 +1,7 @@
 name: GDevelop Issues automatic workflow
 on:
   issues:
-    types:
-      - opened
+    types: [opened]
 jobs:
   moderate:
     runs-on: ubuntu-latest

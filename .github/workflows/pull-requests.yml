@@ -21,7 +21,7 @@ jobs:
           done
       - name: Store sumup in outputs
         id: sumup
-        run: echo "::set-output name=sumupFileContent::$(cat sumup.txt)"
+        run: echo "sumupFileContent=$(cat sumup.txt)" >> $GITHUB_OUTPUT
       - name: Autocomment pull request with sumup
         uses: peter-evans/create-or-update-comment@v3
         with:

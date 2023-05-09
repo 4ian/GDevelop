@@ -93,6 +93,10 @@ export default class InstancesRenderer {
     // This container is only used for user interactions.
     // Its content is not actually displayed.
     // TODO Check that it doesn't make the rendering slower.
+    // TODO Should this container be used for the 2d editor
+    //      instead of rendering layer one by one?
+    // TODO Should this container be used instead of THREE
+    //      when the scene is zoomed out?
     this.pixiContainer = new PIXI.Container();
     this.pixiContainer.alpha = 0;
 

@@ -139,12 +139,6 @@ export default class InstancesRenderer {
     /** Useful to render the background color. */
     let isFirstRender = true;
 
-    /**
-     * true if the last layer rendered 3D objects using Three.js, false otherwise.
-     * Useful to avoid needlessly resetting the WebGL states between layers (which can be expensive).
-     */
-    let lastRenderWas3d = true;
-
     for (let i = 0; i < this.layout.getLayersCount(); i++) {
       const layer = this.layout.getLayerAt(i);
       const layerName = layer.getName();
@@ -190,15 +184,10 @@ export default class InstancesRenderer {
       if (!threeRenderer) {
         // Render a layer with 2D rendering (PixiJS) only.
 
-        if (lastRenderWas3d) {
-          // Ensure the state is clean for PixiJS to render.
-          if (threeRenderer) {
-            threeRenderer.resetState();
-          }
-          pixiRenderer.reset();
-        }
-
         if (isFirstRender) {
+          // Ensure the state is clean for PixiJS to render.
+          pixiRenderer.reset();
+
           // Render the background color.
           backgroundColor.setBackgroundColorForPixi(pixiRenderer);
           pixiRenderer.backgroundAlpha = 1;
@@ -208,8 +197,6 @@ export default class InstancesRenderer {
         }
 
         pixiRenderer.render(layerContainer, { clear: false });
-
-        lastRenderWas3d = false;
       } else {
         // Render a layer with 3D rendering, and possibly some 2D rendering too.
         const threeScene = layerRenderer.getThreeScene();
@@ -219,10 +206,16 @@ export default class InstancesRenderer {
         if (threeScene && threeCamera) {
           // TODO (3D) - optimization: do this at the beginning for all layers that are 2d+3d?
           // So the second pass is clearer (just rendering 2d or 3d layers without doing PixiJS renders in between).
-          if (lastRenderWas3d) {
+          if (isFirstRender) {
             // Ensure the state is clean for PixiJS to render.
-            threeRenderer.resetState();
             pixiRenderer.reset();
+
+            // Render the background color.
+            backgroundColor.setBackgroundColorForThree(threeRenderer, threeScene);
+            threeRenderer.resetState();
+            threeRenderer.clear();
+
+            isFirstRender = false;
           }
           // Do the rendering of the PixiJS objects of the layer on the render texture.
           // Then, update the texture of the plane showing the PixiJS rendering,
@@ -233,30 +226,16 @@ export default class InstancesRenderer {
             threeRenderer,
             pixiRenderer
           );
-          lastRenderWas3d = false;
 
-          if (!lastRenderWas3d) {
-            // It's important to reset the internal WebGL state of PixiJS, then Three.js
-            // to ensure the 3D rendering is made properly by Three.js
-            pixiRenderer.reset();
-            threeRenderer.resetState();
-          }
-
-          if (isFirstRender) {
-            // Render the background color.
-            backgroundColor.setBackgroundColorForThree(threeRenderer, threeScene);
-            threeRenderer.resetState();
-            threeRenderer.clear();
-
-            isFirstRender = false;
-          }
+          // It's important to reset the internal WebGL state of PixiJS, then Three.js
+          // to ensure the 3D rendering is made properly by Three.js
+          pixiRenderer.reset();
+          threeRenderer.resetState();
 
           // Clear the depth as each layer is independent and display on top of the previous one,
           // even 3D objects.
           threeRenderer.clearDepth();
           threeRenderer.render(threeScene, threeCamera);
-
-          lastRenderWas3d = true;
         }
       }
     }

@@ -6,20 +6,25 @@ import {
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
 
+// This mirrors the internals of gdjs.Timer.
+type Timer = {| _name: string, _time: number, _paused: boolean |};
 // This mirrors the internals of Hashtable<gdjs.Timer>.
 type TimersHashtable = {|
   items: {
-    [timerName: string]: {| _name: string, _time: float, _paused: boolean |},
+    [timerName: string]: Timer,
   },
 |};
 
 const transform = (timersHashtable: TimersHashtable) => {
   if (!timersHashtable) return null;
-  return Object.entries(timersHashtable.items).map(([timerName, timer]) => ({
-    'Timer name': timer._name,
-    'Time (in seconds)': timer._time / 1000,
-    'Is paused': timer._paused,
-  }));
+  return Object.entries(timersHashtable.items).map(
+    // $FlowExpectedError - Object.entries does not infer well the type of the value.
+    ([timerName, timer]: [string, Timer]) => ({
+      'Timer name': timer._name,
+      'Time (in seconds)': timer._time / 1000,
+      'Is paused': timer._paused,
+    })
+  );
 };
 
 type Props = {|

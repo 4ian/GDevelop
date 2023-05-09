@@ -9,6 +9,8 @@ import EffectsList from '../../../EffectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
+import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 
 export const withSomeEffectsForALayer = () => (
   <DragAndDropContextProvider>
@@ -67,6 +69,7 @@ export const withoutEffectsForALayer2D = () => (
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
+          getStorageProviderResourceOperations: () => null,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),
@@ -89,6 +92,7 @@ export const withoutEffectsForALayer3D = () => (
         project={testProject.project}
         resourceManagementProps={{
           getStorageProvider: () => emptyStorageProvider,
+          getStorageProviderResourceOperations: () => null,
           onFetchNewlyAddedResources: async () => {},
           resourceSources: [],
           onChooseResource: () => Promise.reject('Unimplemented'),

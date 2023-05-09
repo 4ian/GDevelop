@@ -112,7 +112,7 @@ module.exports = {
         .setLabel(_('How to set up the face orientation'))
         .setDescription(
           _(
-            'When set to Z, the faces are oriented so that their up side is towards the player. When set to Y, the faces are oriented towards the top of the screen.'
+            'When set to Z, the left, right and top faces are oriented so that their up side is towards the player. When set to Y, those same faces are oriented towards the top of the screen.'
           )
         )
         .setGroup(_('Face orientation'));
@@ -206,84 +206,84 @@ module.exports = {
         .getOrCreate('frontFaceResourceRepeat')
         .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Front face resource repeat'))
+        .setLabel(_('Tile front face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('backFaceResourceRepeat')
         .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Back face resource repeat'))
+        .setLabel(_('Tile back face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('leftFaceResourceRepeat')
         .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Left face resource repeat'))
+        .setLabel(_('Tile left face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('rightFaceResourceRepeat')
         .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Right face resource repeat'))
+        .setLabel(_('Tile right face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('topFaceResourceRepeat')
         .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Top face resource repeat'))
+        .setLabel(_('Tile top face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('bottomFaceResourceRepeat')
         .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Bottom face resource repeat'))
+        .setLabel(_('Tile bottom face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceVisible')
         .setValue(objectContent.frontFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Front face visible'))
+        .setLabel(_('Show front face'))
         .setGroup(_('Face visibility'));
 
       objectProperties
         .getOrCreate('backFaceVisible')
         .setValue(objectContent.backFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Back face visible'))
+        .setLabel(_('Show back face'))
         .setGroup(_('Face visibility'));
 
       objectProperties
         .getOrCreate('leftFaceVisible')
         .setValue(objectContent.leftFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Left face visible'))
+        .setLabel(_('Show left face'))
         .setGroup(_('Face visibility'));
 
       objectProperties
         .getOrCreate('rightFaceVisible')
         .setValue(objectContent.rightFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Right face visible'))
+        .setLabel(_('Show right face'))
         .setGroup(_('Face visibility'));
 
       objectProperties
         .getOrCreate('topFaceVisible')
         .setValue(objectContent.topFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Top face visible'))
+        .setLabel(_('Show top face'))
         .setGroup(_('Face visibility'));
 
       objectProperties
         .getOrCreate('bottomFaceVisible')
         .setValue(objectContent.bottomFaceVisible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Bottom face visible'))
+        .setLabel(_('Show bottom face'))
         .setGroup(_('Face visibility'));
 
       return objectProperties;
@@ -776,51 +776,51 @@ module.exports = {
       .setGetter('gdjs.scene3d.camera.getFov')
       .setIncludeFile('Extensions/3D/Scene3DTools.js');
 
-      {
-        const effect = extension
-          .addEffect('LinearFog')
-          .setFullName(_('Fog (linear)'))
-          .setDescription(_('Linear fog for 3D objects.'))
-          .markAsNotWorkingForObjects()
-          .markAsOnlyWorkingFor3D()
-          .addIncludeFile('Extensions/3D/LinearFog.js');
-        const properties = effect.getProperties();
-        properties
-          .getOrCreate('color')
-          .setValue('255;255;255')
-          .setLabel(_('Fog color'))
-          .setType('color');
-        properties
-          .getOrCreate('near')
-          .setValue('200')
-          .setLabel(_('Distance where the fog starts'))
-          .setType('number');
-        properties
-          .getOrCreate('far')
-          .setValue('2000')
-          .setLabel(_('Distance where the fog is fully opaque'))
-          .setType('number');
-      }
-      {
-        const effect = extension
-          .addEffect('ExponentialFog')
-          .setFullName(_('Fog (exponential)'))
-          .setDescription(_('Exponential fog for 3D objects.'))
-          .markAsNotWorkingForObjects()
-          .markAsOnlyWorkingFor3D()
-          .addIncludeFile('Extensions/3D/ExponentialFog.js');
-        const properties = effect.getProperties();
-        properties
-          .getOrCreate('color')
-          .setValue('255;255;255')
-          .setLabel(_('Fog color'))
-          .setType('color');
-        properties
-          .getOrCreate('density')
-          .setValue('0.0012')
-          .setLabel(_('Density'))
-          .setType('number');
-      }
+    {
+      const effect = extension
+        .addEffect('LinearFog')
+        .setFullName(_('Fog (linear)'))
+        .setDescription(_('Linear fog for 3D objects.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/LinearFog.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Fog color'))
+        .setType('color');
+      properties
+        .getOrCreate('near')
+        .setValue('200')
+        .setLabel(_('Distance where the fog starts'))
+        .setType('number');
+      properties
+        .getOrCreate('far')
+        .setValue('2000')
+        .setLabel(_('Distance where the fog is fully opaque'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('ExponentialFog')
+        .setFullName(_('Fog (exponential)'))
+        .setDescription(_('Exponential fog for 3D objects.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ExponentialFog.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Fog color'))
+        .setType('color');
+      properties
+        .getOrCreate('density')
+        .setValue('0.0012')
+        .setLabel(_('Density'))
+        .setType('number');
+    }
 
     return extension;
   },

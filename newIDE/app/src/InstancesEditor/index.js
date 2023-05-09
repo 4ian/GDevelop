@@ -111,7 +111,7 @@ export default class InstancesEditor extends Component<Props> {
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
-  threeRenderer: THREE.WebGLRenderer | null;
+  threeRenderer: THREE.WebGLRenderer | null = null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;

@@ -162,13 +162,13 @@ export default class LayerRenderer {
       if (isVisible) renderedInstance.update();
 
       const threeObject = renderedInstance.getThreeObject();
-      if (this._threeGroup) {
+      if (this._threeGroup && threeObject) {
         this._threeGroup.add(threeObject);
       }
 
       renderedInstance.wasUsed = true;
     };
-    
+
     this._setup3dRendering(pixiRenderer);
   }
 

@@ -83,7 +83,6 @@ namespace gdjs {
     }
 
     _getFaceMaterial(faceIndex: integer) {
-      // TODO (3D) - feature: support tiling of texture.
       if (!this._object.isFaceAtIndexVisible(faceIndex))
         return getTransparentMaterial();
 

@@ -991,7 +991,6 @@ module.exports = {
       }
 
       _getFaceMaterial(project, faceIndex) {
-        // TODO (3D) - feature: support tiling of texture.
         if (!this._faceVisibilities[faceIndex])
           return getTransparentMaterial();
 

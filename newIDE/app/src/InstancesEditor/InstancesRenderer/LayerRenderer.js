@@ -344,7 +344,6 @@ export default class LayerRenderer {
               viewPoint.x,
               viewPoint.y
             );
-            console.log("onDownInstance");
             this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
           }
         }

@@ -192,44 +192,39 @@ const Cube3DEditor = ({
         <React.Fragment key={faceProperty.id}>
           <Text size="block-title">{faceProperty.blockName}</Text>
           <ColumnStackLayout noMargin>
-            <ResponsiveLineStackLayout noColumnMargin>
-              <Column expand noMargin>
-                <Checkbox
-                  checked={
-                    properties
-                      .get(faceProperty.visibilityProperty)
-                      .getValue() === 'true'
-                  }
-                  label={properties
-                    .get(faceProperty.visibilityProperty)
-                    .getLabel()}
-                  onCheck={(_, value) => {
-                    onChangeProperty(
-                      faceProperty.visibilityProperty,
-                      value ? '1' : '0'
-                    );
-                  }}
-                />
-              </Column>
-              <Column expand noMargin>
-                <Checkbox
-                  checked={
-                    properties
-                      .get(faceProperty.resourceRepeatProperty)
-                      .getValue() === 'true'
-                  }
-                  label={properties
+            <ColumnStackLayout noMargin>
+              <Checkbox
+                checked={
+                  properties.get(faceProperty.visibilityProperty).getValue() ===
+                  'true'
+                }
+                label={properties
+                  .get(faceProperty.visibilityProperty)
+                  .getLabel()}
+                onCheck={(_, value) => {
+                  onChangeProperty(
+                    faceProperty.visibilityProperty,
+                    value ? '1' : '0'
+                  );
+                }}
+              />
+              <Checkbox
+                checked={
+                  properties
                     .get(faceProperty.resourceRepeatProperty)
-                    .getLabel()}
-                  onCheck={(_, value) => {
-                    onChangeProperty(
-                      faceProperty.resourceRepeatProperty,
-                      value ? '1' : '0'
-                    );
-                  }}
-                />
-              </Column>
-            </ResponsiveLineStackLayout>
+                    .getValue() === 'true'
+                }
+                label={properties
+                  .get(faceProperty.resourceRepeatProperty)
+                  .getLabel()}
+                onCheck={(_, value) => {
+                  onChangeProperty(
+                    faceProperty.resourceRepeatProperty,
+                    value ? '1' : '0'
+                  );
+                }}
+              />
+            </ColumnStackLayout>
             <ResourceSelectorWithThumbnail
               project={project}
               resourceKind="image"

@@ -158,7 +158,7 @@ namespace gdjs {
           ? 23
           : faceIndexToMaterialIndex[faceIndex] * 4 + 3;
       for (
-        var vertexIndex = startIndex;
+        let vertexIndex = startIndex;
         vertexIndex <= endIndex;
         vertexIndex++
       ) {

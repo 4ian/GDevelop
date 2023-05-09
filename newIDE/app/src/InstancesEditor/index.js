@@ -174,15 +174,12 @@ export default class InstancesEditor extends Component<Props> {
     // TODO Should it handle preference changes without needing to reopen tabs?
     if (this.props.showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
-      this.threeRenderer = new THREE.WebGLRenderer({
+      const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
       });
-      this.threeRenderer.autoClear = false;
+      threeRenderer.autoClear = false;
       // this._threeRenderer.setPixelRatio(0.05);
-      this.threeRenderer.setSize(
-        this.props.width,
-        this.props.height
-      );
+      threeRenderer.setSize(this.props.width, this.props.height);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
       // so that both can render to the canvas and even have PixiJS rendering
@@ -192,7 +189,7 @@ export default class InstancesEditor extends Component<Props> {
         height: this.props.height,
         view: gameCanvas,
         // @ts-ignore - reuse the context from Three.js.
-        context: this.threeRenderer.getContext(),
+        context: threeRenderer.getContext(),
         clearBeforeRender: false,
         preserveDrawingBuffer: true,
         antialias: false,
@@ -200,7 +197,9 @@ export default class InstancesEditor extends Component<Props> {
         // TODO (3D): `resolution: window.devicePixelRatio`?
       });
 
-      gameCanvas = this.threeRenderer.domElement;
+      gameCanvas = threeRenderer.domElement;
+
+      this.threeRenderer = threeRenderer;
     } else {
       //Create the renderer and setup the rendering area for scene editor.
       //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
@@ -387,8 +386,7 @@ export default class InstancesEditor extends Component<Props> {
       this.pixiContainer.removeChild(this.selectedInstances.getPixiContainer());
     }
     if (this.instancesRenderer) {
-      this.pixiContainer
-        .removeChild(this.instancesRenderer.getPixiContainer());
+      this.pixiContainer.removeChild(this.instancesRenderer.getPixiContainer());
       this.instancesRenderer.delete();
     }
     if (this.selectionRectangle) {
@@ -500,10 +498,7 @@ export default class InstancesEditor extends Component<Props> {
     ) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
       if (this.threeRenderer) {
-        this.threeRenderer.setSize(
-          nextProps.width,
-          nextProps.height
-        );
+        this.threeRenderer.setSize(nextProps.width, nextProps.height);
       }
       this.viewPosition.resize(nextProps.width, nextProps.height);
       this.statusBar.resize(nextProps.width, nextProps.height);
@@ -1046,7 +1041,8 @@ export default class InstancesEditor extends Component<Props> {
         this.threeRenderer,
         this.viewPosition,
         this.backgroundColor,
-        this.pixiContainer);
+        this.pixiContainer
+      );
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };

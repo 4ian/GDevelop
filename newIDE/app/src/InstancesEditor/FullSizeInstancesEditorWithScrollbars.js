@@ -34,6 +34,7 @@ const noop = () => {};
 
 const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const { wrappedEditorRef, ...otherProps } = props;
+  const { values } = React.useContext(PreferencesContext);
 
   const editorRef = React.useRef<?InstancesEditor>(null);
   const xScrollbarTrack = React.useRef<?HTMLDivElement>(null);
@@ -364,42 +365,38 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
       {({ width, height }) => (
         <div style={styles.container}>
           {width !== undefined && height !== undefined && (
-            <PreferencesContext.Consumer>
-            {({ values: preferences }) => (
-                <InstancesEditor
-                  onViewPositionChanged={
-                    screenType !== 'touch' ? handleViewPositionChange : noop
+            <InstancesEditor
+              onViewPositionChanged={
+                screenType !== 'touch' ? handleViewPositionChange : noop
+              }
+              ref={(editor: ?InstancesEditor) => {
+                wrappedEditorRef && wrappedEditorRef(editor);
+                editorRef.current = editor;
+              }}
+              width={width}
+              height={height}
+              screenType={screenType}
+              onMouseMove={onMouseMoveOverInstanceEditor}
+              onMouseLeave={(event: MouseEvent) => {
+                const { relatedTarget } = event;
+                if (!isDragging.current && relatedTarget) {
+                  if (
+                    // Flow says className is not present in ElementTarget but this piece
+                    // of code cannot break.
+                    // $FlowFixMe
+                    relatedTarget.className &&
+                    typeof relatedTarget.className === 'string' &&
+                    // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
+                    // $FlowFixMe
+                    !relatedTarget.className.includes('canvas-scrollbar-thumb')
+                  ) {
+                    hideScrollbarsAfterDelay();
                   }
-                  ref={(editor: ?InstancesEditor) => {
-                    wrappedEditorRef && wrappedEditorRef(editor);
-                    editorRef.current = editor;
-                  }}
-                  width={width}
-                  height={height}
-                  screenType={screenType}
-                  onMouseMove={onMouseMoveOverInstanceEditor}
-                  onMouseLeave={(event: MouseEvent) => {
-                    const { relatedTarget } = event;
-                    if (!isDragging.current && relatedTarget) {
-                      if (
-                        // Flow says className is not present in ElementTarget but this piece
-                        // of code cannot break.
-                        // $FlowFixMe
-                        relatedTarget.className &&
-                        typeof relatedTarget.className === 'string' &&
-                        // Hide only if the mouse is not leaving to go on one of the scrollbars' thumb.
-                        // $FlowFixMe
-                        !relatedTarget.className.includes('canvas-scrollbar-thumb')
-                      ) {
-                        hideScrollbarsAfterDelay();
-                      }
-                    }
-                  }}
-                  showObjectInstancesIn3D={preferences.showObjectInstancesIn3D}
-                  {...otherProps}
-                />
-              )}
-            </PreferencesContext.Consumer>
+                }
+              }}
+              showObjectInstancesIn3D={values.showObjectInstancesIn3D}
+              {...otherProps}
+            />
           )}
           {screenType !== 'touch' && (
             <div

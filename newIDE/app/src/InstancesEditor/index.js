@@ -100,6 +100,7 @@ type Props = {|
   onMouseMove: MouseEvent => void,
   onMouseLeave: MouseEvent => void,
   screenType: ScreenType,
+  showObjectInstancesIn3D: boolean,
 |};
 
 export default class InstancesEditor extends Component<Props> {
@@ -170,8 +171,8 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     let gameCanvas: HTMLCanvasElement;
-    // TODO Add a setting to switch between 2D or 3D mode.
-    if (true) {
+    // TODO Should it handle preference changes without needing to reopen tabs?
+    if (this.props.showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
       this.threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,

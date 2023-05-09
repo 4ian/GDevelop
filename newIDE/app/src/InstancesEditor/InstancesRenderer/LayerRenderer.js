@@ -169,8 +169,8 @@ export default class LayerRenderer {
       renderedInstance.wasUsed = true;
     };
 
-    // TODO Add a setting to switch between 2D or 3D mode.
-    // This should probably not check the setting directly (cf the same TODO).
+    // TODO Use showObjectInstancesIn3D.
+    // TODO Should it handle preference changes without needing to reopen tabs?
     if (true) {
       this._setup3dRendering(pixiRenderer);
     }

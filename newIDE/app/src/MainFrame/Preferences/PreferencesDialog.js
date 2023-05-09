@@ -64,6 +64,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setShowObjectInstancesIn3D,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
   } = React.useContext(PreferencesContext);
@@ -346,6 +347,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             label={
               <Trans>
                 Show custom objects in the extension editor (experimental)
+              </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setShowObjectInstancesIn3D(check)}
+            toggled={values.showObjectInstancesIn3D}
+            labelPosition="right"
+            label={
+              <Trans>
+                Show objects in 3D in the scene editor (experimental)
               </Trans>
             }
           />

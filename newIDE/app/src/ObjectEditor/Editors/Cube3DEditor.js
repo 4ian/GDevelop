@@ -165,6 +165,28 @@ const Cube3DEditor = ({
             />
           ))}
         </SelectField>
+        <SelectField
+          value={properties
+            .get('backFaceUpThroughWhichAxisRotation')
+            .getValue()}
+          floatingLabelText={properties
+            .get('backFaceUpThroughWhichAxisRotation')
+            .getLabel()}
+          helperMarkdownText={properties
+            .get('backFaceUpThroughWhichAxisRotation')
+            .getDescription()}
+          onChange={(event, index, newValue) => {
+            onChangeProperty('backFaceUpThroughWhichAxisRotation', newValue);
+          }}
+        >
+          {backFaceUpThroughWhichAxisRotationChoices.map(choice => (
+            <SelectOption
+              label={choice.label}
+              value={choice.value}
+              key={choice.value}
+            />
+          ))}
+        </SelectField>
       </ColumnStackLayout>
       {facesProperties.map(faceProperty => (
         <React.Fragment key={faceProperty.id}>
@@ -222,33 +244,6 @@ const Cube3DEditor = ({
                 onChangeProperty(faceProperty.resourceNameProperty, value)
               }
             />
-            {faceProperty.id === 'backFace' && (
-              <SelectField
-                value={properties
-                  .get('backFaceUpThroughWhichAxisRotation')
-                  .getValue()}
-                floatingLabelText={properties
-                  .get('backFaceUpThroughWhichAxisRotation')
-                  .getLabel()}
-                helperMarkdownText={properties
-                  .get('backFaceUpThroughWhichAxisRotation')
-                  .getDescription()}
-                onChange={(event, index, newValue) => {
-                  onChangeProperty(
-                    'backFaceUpThroughWhichAxisRotation',
-                    newValue
-                  );
-                }}
-              >
-                {backFaceUpThroughWhichAxisRotationChoices.map(choice => (
-                  <SelectOption
-                    label={choice.label}
-                    value={choice.value}
-                    key={choice.value}
-                  />
-                ))}
-              </SelectField>
-            )}
           </ColumnStackLayout>
         </React.Fragment>
       ))}

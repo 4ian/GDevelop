@@ -146,7 +146,7 @@ module.exports = {
         .setValue(objectContent.frontFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Front face texture'))
+        .setLabel(_('Front face image'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -154,7 +154,7 @@ module.exports = {
         .setValue(objectContent.backFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Back face texture'))
+        .setLabel(_('Back face image'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -175,7 +175,7 @@ module.exports = {
         .setValue(objectContent.leftFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Left face texture'))
+        .setLabel(_('Left face image'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -183,7 +183,7 @@ module.exports = {
         .setValue(objectContent.rightFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Right face texture'))
+        .setLabel(_('Right face image'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -191,7 +191,7 @@ module.exports = {
         .setValue(objectContent.topFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Top face texture'))
+        .setLabel(_('Top face image'))
         .setGroup(_('Textures'));
 
       objectProperties
@@ -199,49 +199,49 @@ module.exports = {
         .setValue(objectContent.bottomFaceResourceName || '')
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bottom face texture'))
+        .setLabel(_('Bottom face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('frontFaceResourceRepeat')
         .setValue(objectContent.frontFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Repeat front face texture'))
+        .setLabel(_('Tile front face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('backFaceResourceRepeat')
         .setValue(objectContent.backFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Repeat back face texture'))
+        .setLabel(_('Tile back face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('leftFaceResourceRepeat')
         .setValue(objectContent.leftFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Repeat left face texture'))
+        .setLabel(_('Tile left face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('rightFaceResourceRepeat')
         .setValue(objectContent.rightFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Repeat right face texture'))
+        .setLabel(_('Tile right face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('topFaceResourceRepeat')
         .setValue(objectContent.topFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Repeat top face texture'))
+        .setLabel(_('Tile top face image'))
         .setGroup(_('Textures'));
 
       objectProperties
         .getOrCreate('bottomFaceResourceRepeat')
         .setValue(objectContent.bottomFaceResourceRepeat ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Repeat bottom face texture'))
+        .setLabel(_('Tile bottom face image'))
         .setGroup(_('Textures'));
 
       objectProperties

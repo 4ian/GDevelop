@@ -1136,12 +1136,14 @@ module.exports = {
           this._instance.getAngle() * Math.PI / 180
         );
   
-        this._threeObject.scale.set(
-          width,
-          height,
-          depth
-        );
-        this.updateTextureUvMapping();
+        if (
+          width !== this._threeObject.scale.width ||
+          height !== this._threeObject.scale.height ||
+          depth !== this._threeObject.scale.depth
+        ) {
+          this._threeObject.scale.set(width, height, depth);
+          this.updateTextureUvMapping();
+        }
       }
       
       /**

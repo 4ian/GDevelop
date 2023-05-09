@@ -868,25 +868,39 @@ module.exports = {
     const THREE = objectsRenderingService.THREE;
 
     const materialIndexToFaceIndex = {
+      // $FlowFixMe
       0: 3,
+      // $FlowFixMe
       1: 2,
+      // $FlowFixMe
       2: 5,
+      // $FlowFixMe
       3: 4,
+      // $FlowFixMe
       4: 0,
+      // $FlowFixMe
       5: 1,
     };
 
     const noRepeatTextureVertexIndexToUvMapping = {
+      // $FlowFixMe
       0: [0, 0],
+      // $FlowFixMe
       1: [1, 0],
+      // $FlowFixMe
       2: [0, 1],
+      // $FlowFixMe
       3: [1, 1],
     };
 
     const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
+      // $FlowFixMe
       0: [0, 1],
+      // $FlowFixMe
       1: [0, 0],
+      // $FlowFixMe
       2: [1, 1],
+      // $FlowFixMe
       3: [1, 0],
     };
 
@@ -900,7 +914,7 @@ module.exports = {
           // (no "back face culling" that would still be done if alphaTest is not set).
           alphaTest: 1,
         });
-  
+
       return transparentMaterial;
     };
 
@@ -968,8 +982,11 @@ module.exports = {
           properties.get('bottomFaceResourceRepeat').getValue() === 'true',
         ];
         this._facesOrientation = properties.get('facesOrientation').getValue();
-        this._backFaceUpThroughWhichAxisRotation = properties.get('backFaceUpThroughWhichAxisRotation').getValue();
-        this._shouldUseTransparentTexture = properties.get('enableTextureTransparency').getValue() === 'true';
+        this._backFaceUpThroughWhichAxisRotation = properties
+          .get('backFaceUpThroughWhichAxisRotation')
+          .getValue();
+        this._shouldUseTransparentTexture =
+          properties.get('enableTextureTransparency').getValue() === 'true';
         if (this._threeGroup) {
           this._defaultDepth = parseFloat(properties.get('depth').getValue());
           const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -991,13 +1008,15 @@ module.exports = {
       }
 
       _getFaceMaterial(project, faceIndex) {
-        if (!this._faceVisibilities[faceIndex])
-          return getTransparentMaterial();
+        if (!this._faceVisibilities[faceIndex]) return getTransparentMaterial();
 
-        return this._pixiResourcesLoader
-          .getThreeMaterial(project, this._faceResourceNames[faceIndex], {
+        return this._pixiResourcesLoader.getThreeMaterial(
+          project,
+          this._faceResourceNames[faceIndex],
+          {
             useTransparentTexture: this._shouldUseTransparentTexture,
-          });
+          }
+        );
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {
@@ -1128,13 +1147,13 @@ module.exports = {
           this._instance.getY() + height / 2,
           z + depth / 2
         );
-  
+
         this._threeObject.rotation.set(
           0,
           0,
-          this._instance.getAngle() * Math.PI / 180
+          (this._instance.getAngle() * Math.PI) / 180
         );
-  
+
         if (
           width !== this._threeObject.scale.width ||
           height !== this._threeObject.scale.height ||
@@ -1144,31 +1163,22 @@ module.exports = {
           this.updateTextureUvMapping();
         }
       }
-      
+
       /**
        * Updates the UV mapping of the geometry in order to repeat a material
        * over the different faces of the cube.
        * The mesh must be configured with a list of materials in order
        * for the method to work.
-       * @param faceIndex The face index to update. If undefined, updates all the faces.
        */
-      updateTextureUvMapping(faceIndex) {
+      updateTextureUvMapping() {
         // @ts-ignore - position is stored as a Float32BufferAttribute
         /** @type {THREE.BufferAttribute} */
-        const pos = this._threeObject.geometry.getAttribute(
-          'position'
-        );
+        const pos = this._threeObject.geometry.getAttribute('position');
         // @ts-ignore - uv is stored as a Float32BufferAttribute
         /** @type {THREE.BufferAttribute} */
-        const uvMapping = this._threeObject.geometry.getAttribute(
-          'uv'
-        );
-        const startIndex =
-          faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
-        const endIndex =
-          faceIndex === undefined
-            ? 23
-            : faceIndexToMaterialIndex[faceIndex] * 4 + 3;
+        const uvMapping = this._threeObject.geometry.getAttribute('uv');
+        const startIndex = 0;
+        const endIndex = 23;
         for (
           let vertexIndex = startIndex;
           vertexIndex <= endIndex;
@@ -1184,14 +1194,14 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
-            materialIndexToFaceIndex[materialIndex]
-          ];
+          const shouldRepeatTexture =
+            this._shouldRepeatTextureOnFace[
+              materialIndexToFaceIndex[materialIndex]
+            ];
 
-          const shouldOrientateFacesTowardsY =
-            this._facesOrientation === 'Y';
+          const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
-          let x = 0
+          let x = 0;
           let y = 0;
           switch (materialIndex) {
             case 0:
@@ -1199,29 +1209,36 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    -(this._threeObject.scale.z / material.map.source.data.width) *
+                    -(
+                      this._threeObject.scale.z / material.map.source.data.width
+                    ) *
                     (pos.getZ(vertexIndex) - 0.5);
                   y =
-                    -(this._threeObject.scale.y / material.map.source.data.height) *
+                    -(
+                      this._threeObject.scale.y /
+                      material.map.source.data.height
+                    ) *
                     (pos.getY(vertexIndex) + 0.5);
                 } else {
                   x =
-                    -(this._threeObject.scale.y / material.map.source.data.width) *
+                    -(
+                      this._threeObject.scale.y / material.map.source.data.width
+                    ) *
                     (pos.getY(vertexIndex) - 0.5);
                   y =
-                    (this._threeObject.scale.z / material.map.source.data.height) *
+                    (this._threeObject.scale.z /
+                      material.map.source.data.height) *
                     (pos.getZ(vertexIndex) - 0.5);
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                 }
               }
               break;
@@ -1230,29 +1247,34 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    (this._threeObject.scale.z / material.map.source.data.width) *
+                    (this._threeObject.scale.z /
+                      material.map.source.data.width) *
                     (pos.getZ(vertexIndex) + 0.5);
                   y =
-                    -(this._threeObject.scale.y / material.map.source.data.height) *
+                    -(
+                      this._threeObject.scale.y /
+                      material.map.source.data.height
+                    ) *
                     (pos.getY(vertexIndex) + 0.5);
                 } else {
                   x =
-                    (this._threeObject.scale.y / material.map.source.data.width) *
+                    (this._threeObject.scale.y /
+                      material.map.source.data.width) *
                     (pos.getY(vertexIndex) + 0.5);
                   y =
-                    (this._threeObject.scale.z / material.map.source.data.height) *
+                    (this._threeObject.scale.z /
+                      material.map.source.data.height) *
                     (pos.getZ(vertexIndex) - 0.5);
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                   x = -x;
                   y = -y;
                 }
@@ -1265,7 +1287,8 @@ module.exports = {
                   (this._threeObject.scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) + 0.5);
                 y =
-                  (this._threeObject.scale.z / material.map.source.data.height) *
+                  (this._threeObject.scale.z /
+                    material.map.source.data.height) *
                   (pos.getZ(vertexIndex) - 0.5);
               } else {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -1276,17 +1299,24 @@ module.exports = {
               if (shouldRepeatTexture) {
                 if (shouldOrientateFacesTowardsY) {
                   x =
-                    (this._threeObject.scale.x / material.map.source.data.width) *
+                    (this._threeObject.scale.x /
+                      material.map.source.data.width) *
                     (pos.getX(vertexIndex) + 0.5);
                   y =
-                    -(this._threeObject.scale.z / material.map.source.data.height) *
+                    -(
+                      this._threeObject.scale.z /
+                      material.map.source.data.height
+                    ) *
                     (pos.getZ(vertexIndex) + 0.5);
                 } else {
                   x =
-                    -(this._threeObject.scale.x / material.map.source.data.width) *
+                    -(
+                      this._threeObject.scale.x / material.map.source.data.width
+                    ) *
                     (pos.getX(vertexIndex) - 0.5);
                   y =
-                    (this._threeObject.scale.z / material.map.source.data.height) *
+                    (this._threeObject.scale.z /
+                      material.map.source.data.height) *
                     (pos.getZ(vertexIndex) - 0.5);
                 }
               } else {
@@ -1304,7 +1334,9 @@ module.exports = {
                   (this._threeObject.scale.x / material.map.source.data.width) *
                   (pos.getX(vertexIndex) + 0.5);
                 y =
-                  -(this._threeObject.scale.y / material.map.source.data.height) *
+                  -(
+                    this._threeObject.scale.y / material.map.source.data.height
+                  ) *
                   (pos.getY(vertexIndex) + 0.5);
               } else {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
@@ -1323,7 +1355,8 @@ module.exports = {
                     (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) * 0.5);
                 y =
                   (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
-                  (this._threeObject.scale.y / material.map.source.data.height) *
+                  (this._threeObject.scale.y /
+                    material.map.source.data.height) *
                   (pos.getY(vertexIndex) +
                     (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
               } else {

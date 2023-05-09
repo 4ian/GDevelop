@@ -17,6 +17,7 @@
 export type ObjectsRenderingService = {
   gd: libGDevelop,
   PIXI: any,
+  THREE: any,
   RenderedInstance: any,
   registerInstanceRenderer: (objectType: string, renderer: any) => void,
   requireModule: (dirname: string, moduleName: string) => any,

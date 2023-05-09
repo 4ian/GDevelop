@@ -18,9 +18,22 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
+type RuntimeObjectData = {|
+  'X position': number,
+  'Y position': number,
+  'Z position'?: number,
+  Angle?: number,
+  'Rotation around X axis'?: number,
+  'Rotation around Y axis'?: number,
+  'Rotation around Z axis (Angle)'?: number,
+  Layer: string,
+  'Z order': number,
+  'Is hidden?': boolean,
+|};
+
 const transform = runtimeObject => {
   if (!runtimeObject) return null;
-  const runtimeObjectData = {
+  const runtimeObjectData: RuntimeObjectData = {
     'X position': runtimeObject.x,
     'Y position': runtimeObject.y,
     Angle: runtimeObject.angle,

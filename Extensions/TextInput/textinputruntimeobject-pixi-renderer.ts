@@ -58,6 +58,7 @@ namespace gdjs {
       this._input.style.outline = 'none';
       this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._input.style.display = 'none'; // Hide while object is being set up.
+      this._input.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;

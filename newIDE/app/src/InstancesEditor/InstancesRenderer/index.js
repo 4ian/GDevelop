@@ -135,7 +135,13 @@ export default class InstancesRenderer {
     return this.instanceMeasurer;
   }
 
-  render(pixiRenderer: PIXI.Renderer, threeRenderer: THREE.WebGLRenderer | null, viewPosition: ViewPosition, backgroundColor: BackgroundColor) {
+  render(
+    pixiRenderer: PIXI.Renderer,
+    threeRenderer: THREE.WebGLRenderer | null,
+    viewPosition: ViewPosition,
+    backgroundColor: BackgroundColor,
+    uiPixiContainer: PIXI.Container
+  ) {
     /** Useful to render the background color. */
     let isFirstRender = true;
 
@@ -241,6 +247,14 @@ export default class InstancesRenderer {
     }
     this._updatePixiObjectsZOrder();
     this._cleanUnusedLayerRenderers();
+
+    if (threeRenderer) {
+      // Ensure the state is clean for PixiJS to render.
+      threeRenderer.resetState();
+      pixiRenderer.reset();
+    }
+
+    pixiRenderer.render(uiPixiContainer);
   }
 
   _updatePixiObjectsZOrder() {

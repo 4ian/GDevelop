@@ -1031,9 +1031,6 @@ export default class InstancesEditor extends Component<Props> {
       this.fpsLimiter.shouldUpdate() &&
       !shouldPreventRenderingInstanceEditors()
     ) {
-      // FIXME Splitting the rendering make impossible to select instances
-      // because they are not part of the last render call.
-      this.instancesRenderer.render(this.pixiRenderer, this.threeRenderer, this.viewPosition, this.backgroundColor);
       this.canvasCursor.render();
       this.grid.render();
       this.highlightedInstance.render();
@@ -1042,7 +1039,13 @@ export default class InstancesEditor extends Component<Props> {
       this.windowBorder.render();
       this.windowMask.render();
       this.statusBar.render();
-      this.pixiRenderer.render(this.pixiContainer);
+
+      this.instancesRenderer.render(
+        this.pixiRenderer,
+        this.threeRenderer,
+        this.viewPosition,
+        this.backgroundColor,
+        this.pixiContainer);
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };

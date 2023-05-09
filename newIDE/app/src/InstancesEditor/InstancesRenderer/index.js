@@ -92,6 +92,7 @@ export default class InstancesRenderer {
 
     // This container is only used for user interactions.
     // Its content is not actually displayed.
+    // TODO Check that it doesn't make the rendering slower.
     this.pixiContainer = new PIXI.Container();
     this.pixiContainer.alpha = 0;
 

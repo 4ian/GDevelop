@@ -448,9 +448,7 @@ export default class LayerRenderer {
   /**
    * Create, or re-create, Three.js objects for 3D rendering of this layer.
    */
-  _setup3dRendering(
-    pixiRenderer: PIXI.Renderer
-  ): void {
+  _setup3dRendering(pixiRenderer: PIXI.Renderer): void {
     if (this._threeScene || this._threeGroup || this._threeCamera) {
       throw new Error(
         'Tried to setup 3D rendering for a layer that is already set up.'
@@ -514,7 +512,8 @@ export default class LayerRenderer {
     this._threePlaneTexture = threePlaneTexture;
 
     threePlaneTexture.generateMipmaps = false;
-    const filter = this.project.getScaleMode() === 'nearest'
+    const filter =
+      this.project.getScaleMode() === 'nearest'
         ? THREE.NearestFilter
         : THREE.LinearFilter;
     threePlaneTexture.minFilter = filter;
@@ -631,7 +630,11 @@ export default class LayerRenderer {
   }
 
   _updateVisibility() {
-    this.pixiContainer.visible = this.layer.getVisibility();
+    const isVisible = this.layer.getVisibility();
+    this.pixiContainer.visible = isVisible;
+    if (this._threeScene) {
+      this._threeScene.visible = isVisible;
+    }
   }
 
   /**

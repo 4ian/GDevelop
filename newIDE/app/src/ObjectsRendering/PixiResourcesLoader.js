@@ -189,7 +189,6 @@ export default class PixiResourcesLoader {
     threeTexture.wrapT = THREE.RepeatWrapping;
     threeTexture.needsUpdate = true;
 
-    
     const resource = project.getResourcesManager().getResource(resourceName);
     PixiResourcesLoader._applyThreeTextureSettings(resource, threeTexture);
 
@@ -206,7 +205,7 @@ export default class PixiResourcesLoader {
    * @returns The requested material.
    */
   static getThreeMaterial(
-    project: gdProject, 
+    project: gdProject,
     resourceName: string,
     { useTransparentTexture }: { useTransparentTexture: boolean }
   ) {

@@ -187,7 +187,7 @@ export default class InstancesRenderer {
         viewPosition.applyTransformationToThree(threeCamera, threePlaneMesh);
       }
 
-      if (layer.getRenderingType() === '2d' || !threeRenderer) {
+      if (!threeRenderer) {
         // Render a layer with 2D rendering (PixiJS) only.
 
         if (lastRenderWas3d) {
@@ -259,13 +259,7 @@ export default class InstancesRenderer {
           lastRenderWas3d = true;
         }
       }
-
-
-
-
-
     }
-
     this._updatePixiObjectsZOrder();
     this._cleanUnusedLayerRenderers();
   }

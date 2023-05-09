@@ -170,7 +170,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     let gameCanvas: HTMLCanvasElement;
-    // TODO Decide if a 2D mode should be a setting.
+    // TODO Add a setting to switch between 2D or 3D mode.
     if (true) {
       gameCanvas = document.createElement('canvas');
       this.threeRenderer = new THREE.WebGLRenderer({

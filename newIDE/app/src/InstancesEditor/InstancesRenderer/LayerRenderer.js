@@ -169,7 +169,11 @@ export default class LayerRenderer {
       renderedInstance.wasUsed = true;
     };
 
-    this._setup3dRendering(pixiRenderer);
+    // TODO Add a setting to switch between 2D or 3D mode.
+    // This should probably not check the setting directly (cf the same TODO).
+    if (true) {
+      this._setup3dRendering(pixiRenderer);
+    }
   }
 
   getPixiContainer() {
@@ -446,92 +450,87 @@ export default class LayerRenderer {
    * Create, or re-create, Three.js objects for 3D rendering of this layer.
    */
   _setup3dRendering(
-    pixiRenderer: PIXI.Renderer | null
+    pixiRenderer: PIXI.Renderer
   ): void {
-    if (
-      this.layer.getRenderingType() === '3d' ||
-      this.layer.getRenderingType() === '2d+3d'
-    ) {
-      if (this._threeScene || this._threeGroup || this._threeCamera) {
-        throw new Error(
-          'Tried to setup 3D rendering for a layer that is already set up.'
-        );
-      }
-
-      const threeScene = new THREE.Scene();
-      this._threeScene = threeScene;
-
-      // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
-      // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-      threeScene.scale.y = -1;
-
-      this._threeGroup = new THREE.Group();
-      threeScene.add(this._threeGroup);
-
-      const threeCamera = new THREE.PerspectiveCamera(
-        this.layer.getThreeDFieldOfView(),
-        1,
-        // TODO Update the near and far plan with the zoom factor.
-        0.1,
-        2000
+    if (this._threeScene || this._threeGroup || this._threeCamera) {
+      throw new Error(
+        'Tried to setup 3D rendering for a layer that is already set up.'
       );
-      threeCamera.rotation.order = 'ZYX';
-      this._threeCamera = threeCamera;
-
-      if (
-        this._renderTexture ||
-        this._threePlaneGeometry ||
-        this._threePlaneMaterial ||
-        this._threePlaneTexture ||
-        this._threePlaneMesh
-      ) {
-        throw new Error(
-          'Tried to setup PixiJS plane for 2D rendering in 3D for a layer that is already set up.'
-        );
-      }
-
-      // If we have both 2D and 3D objects to be rendered, create a render texture that PixiJS will use
-      // to render, and that will be projected on a plane by Three.js
-      this._createPixiRenderTexture(pixiRenderer);
-
-      // Create the plane that will show this texture.
-      const threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
-      this._threePlaneGeometry = threePlaneGeometry;
-      const threePlaneMaterial = new THREE.MeshBasicMaterial({
-        side: THREE.FrontSide,
-        transparent: true,
-      });
-      this._threePlaneMaterial = threePlaneMaterial;
-
-      // Create the texture to project on the plane.
-      // Use a buffer to create a "fake" DataTexture, just so the texture
-      // is considered initialized by Three.js.
-      const width = 1;
-      const height = 1;
-      const size = width * height;
-      const data = new Uint8Array(4 * size);
-      const threePlaneTexture = new THREE.DataTexture(data, width, height);
-      threePlaneTexture.needsUpdate = true;
-      this._threePlaneTexture = threePlaneTexture;
-
-      threePlaneTexture.generateMipmaps = false;
-      const filter = this.project.getScaleMode() === 'nearest'
-          ? THREE.NearestFilter
-          : THREE.LinearFilter;
-      threePlaneTexture.minFilter = filter;
-      threePlaneTexture.magFilter = filter;
-      threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
-      threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
-      threePlaneMaterial.map = threePlaneTexture;
-
-      // Finally, create the mesh shown in the scene.
-      const threePlaneMesh = new THREE.Mesh(
-        threePlaneGeometry,
-        threePlaneMaterial
-      );
-      threeScene.add(threePlaneMesh);
-      this._threePlaneMesh = threePlaneMesh;
     }
+
+    const threeScene = new THREE.Scene();
+    this._threeScene = threeScene;
+
+    // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+    // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+    threeScene.scale.y = -1;
+
+    this._threeGroup = new THREE.Group();
+    threeScene.add(this._threeGroup);
+
+    const threeCamera = new THREE.PerspectiveCamera(
+      this.layer.getThreeDFieldOfView(),
+      1,
+      // TODO Update the near and far plan with the zoom factor.
+      0.1,
+      2000
+    );
+    threeCamera.rotation.order = 'ZYX';
+    this._threeCamera = threeCamera;
+
+    if (
+      this._renderTexture ||
+      this._threePlaneGeometry ||
+      this._threePlaneMaterial ||
+      this._threePlaneTexture ||
+      this._threePlaneMesh
+    ) {
+      throw new Error(
+        'Tried to setup PixiJS plane for 2D rendering in 3D for a layer that is already set up.'
+      );
+    }
+
+    // If we have both 2D and 3D objects to be rendered, create a render texture that PixiJS will use
+    // to render, and that will be projected on a plane by Three.js
+    this._createPixiRenderTexture(pixiRenderer);
+
+    // Create the plane that will show this texture.
+    const threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
+    this._threePlaneGeometry = threePlaneGeometry;
+    const threePlaneMaterial = new THREE.MeshBasicMaterial({
+      side: THREE.FrontSide,
+      transparent: true,
+    });
+    this._threePlaneMaterial = threePlaneMaterial;
+
+    // Create the texture to project on the plane.
+    // Use a buffer to create a "fake" DataTexture, just so the texture
+    // is considered initialized by Three.js.
+    const width = 1;
+    const height = 1;
+    const size = width * height;
+    const data = new Uint8Array(4 * size);
+    const threePlaneTexture = new THREE.DataTexture(data, width, height);
+    threePlaneTexture.needsUpdate = true;
+    this._threePlaneTexture = threePlaneTexture;
+
+    threePlaneTexture.generateMipmaps = false;
+    const filter = this.project.getScaleMode() === 'nearest'
+        ? THREE.NearestFilter
+        : THREE.LinearFilter;
+    threePlaneTexture.minFilter = filter;
+    threePlaneTexture.magFilter = filter;
+    threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
+    threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
+    threePlaneMaterial.map = threePlaneTexture;
+
+    // Finally, create the mesh shown in the scene.
+    const threePlaneMesh = new THREE.Mesh(
+      threePlaneGeometry,
+      threePlaneMaterial
+    );
+    threeScene.add(threePlaneMesh);
+    this._threePlaneMesh = threePlaneMesh;
   }
 
   /**

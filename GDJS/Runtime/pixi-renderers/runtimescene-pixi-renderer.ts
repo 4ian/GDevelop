@@ -161,7 +161,6 @@ namespace gdjs {
                 threeRenderer.setClearColor(
                   this._runtimeScene.getBackgroundColor()
                 );
-                threeRenderer.resetState();
                 threeRenderer.clear();
                 threeScene.background = new THREE.Color(
                   this._runtimeScene.getBackgroundColor()

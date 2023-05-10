@@ -277,7 +277,7 @@ const LayerEditorDialog = (props: Props) => {
                   disabled={layer.isLightingLayer()}
                 />
               </SelectField>
-              {layer.getRenderingType() !== '2d' && (
+              {layer.getRenderingType().includes('3d') && (
                 <ResponsiveLineStackLayout>
                   <SemiControlledTextField
                     commitOnBlur

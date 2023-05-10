@@ -38,6 +38,7 @@ export type NewProjectSetup = {|
   orientation?: 'landscape' | 'portrait' | 'default',
   optimizeForPixelArt?: boolean,
   allowPlayersToLogIn?: boolean,
+  templateSlug?: string,
 |};
 
 export type NewProjectSource = {|
@@ -46,7 +47,17 @@ export type NewProjectSource = {|
   fileMetadata: ?FileMetadata,
 |};
 
-export const createNewProject = async (): Promise<?NewProjectSource> => {
+const getNewProjectSourceFromUrl = (projectUrl: string): NewProjectSource => {
+  return {
+    project: null,
+    storageProvider: UrlStorageProvider,
+    fileMetadata: {
+      fileIdentifier: projectUrl,
+    },
+  };
+};
+
+export const createNewEmptyProject = (): NewProjectSource => {
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
 
   sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
@@ -57,32 +68,34 @@ export const createNewProject = async (): Promise<?NewProjectSource> => {
   };
 };
 
-export const createNewProjectWithDefaultLogin = async (): Promise<?NewProjectSource> => {
+export const createNewProjectWithDefaultLogin = (): NewProjectSource => {
   const url =
     'https://resources.gdevelop-app.com/examples-database/login-template.json';
   sendNewGameCreated({
     exampleUrl: url,
     exampleSlug: 'login-template',
   });
-  return {
-    project: null,
-    storageProvider: UrlStorageProvider,
-    fileMetadata: {
-      fileIdentifier: url,
-    },
-  };
+  return getNewProjectSourceFromUrl(url);
 };
 
-export const createNewProjectFromTutorialTemplate = async (
-  templateUrl: string
-): Promise<?NewProjectSource> => {
-  return {
-    project: null,
-    storageProvider: UrlStorageProvider,
-    fileMetadata: {
-      fileIdentifier: templateUrl,
-    },
-  };
+export const createNewProjectFromAIGeneratedProject = (
+  generatedProjectUrl: string
+): NewProjectSource => {
+  sendNewGameCreated({
+    exampleUrl: generatedProjectUrl,
+    exampleSlug: 'generated-project',
+  });
+  return getNewProjectSourceFromUrl(generatedProjectUrl);
+};
+
+export const createNewProjectFromTutorialTemplate = (
+  tutorialTemplateUrl: string
+): NewProjectSource => {
+  sendNewGameCreated({
+    exampleUrl: tutorialTemplateUrl,
+    exampleSlug: 'tutorial-template',
+  });
+  return getNewProjectSourceFromUrl(tutorialTemplateUrl);
 };
 
 export const createNewProjectFromExampleShortHeader = async ({
@@ -94,18 +107,13 @@ export const createNewProjectFromExampleShortHeader = async ({
 |}): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
+    console.log('example', example);
 
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,
       exampleSlug: exampleShortHeader.slug,
     });
-    return {
-      project: null,
-      storageProvider: UrlStorageProvider,
-      fileMetadata: {
-        fileIdentifier: example.projectFileUrl,
-      },
-    };
+    return getNewProjectSourceFromUrl(example.projectFileUrl);
   } catch (error) {
     showErrorBox({
       message:

@@ -14,7 +14,7 @@ type Props = {|
  * Helper for Mainframe to open a dialog when the component is mounted.
  * This corresponds to when a user opens the app on web, with a parameter in the URL.
  */
-export const useOpenInitialDialog = ({
+const useOpenInitialDialog = ({
   openInAppTutorialDialog,
   openProfileDialog,
 }: Props) => {
@@ -78,3 +78,5 @@ export const useOpenInitialDialog = ({
     ]
   );
 };
+
+export default useOpenInitialDialog;

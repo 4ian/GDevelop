@@ -83,15 +83,7 @@ import PreferencesContext, {
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import CreateProjectDialog, {
-  createNewProjectFromTutorialTemplate,
-  createNewProjectWithDefaultLogin,
-  type NewProjectSetup,
-} from '../ProjectCreation/CreateProjectDialog';
-import {
-  createNewProjectFromExampleShortHeader,
-  createNewProject,
-} from '../ProjectCreation/CreateProjectDialog';
+import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -161,11 +153,10 @@ import {
 } from '../ProjectsStorage/ResourceFetcher';
 import QuitInAppTutorialDialog from '../InAppTutorial/QuitInAppTutorialDialog';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
-import { useOpenInitialDialog } from '../Utils/UseOpenInitialDialog';
+import useOpenInitialDialog from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import TabsTitlebar from './TabsTitlebar';
-import { registerGame } from '../Utils/GDevelopServices/Game';
 import RouterContext from './RouterContext';
 import {
   useStableUpToDateCallback,
@@ -180,6 +171,7 @@ import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
+import useCreateProject from '../Utils/UseCreateProject';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -995,6 +987,48 @@ const MainFrame = (props: Props) => {
       showAlert,
     ]
   );
+
+  const {
+    createEmptyProject,
+    createProjectFromExample,
+    createProjectFromInAppTutorial,
+    createProjectWithLogin,
+    createProjectFromAIGeneration,
+  } = useCreateProject({
+    beforeCreatingProject: () => {
+      setIsProjectOpening(true);
+      setIsProjectClosedSoAvoidReloadingExtensions(false);
+    },
+    getStorageProviderOperations,
+    afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
+      setNewProjectSetupDialogOpen(false);
+      setSelectedExampleShortHeader(null);
+      await setState(state => ({ ...state, createDialogOpen: false }));
+      findLeaderboardsToReplace(project, oldProjectId);
+      openSceneOrProjectManager({
+        currentProject: project,
+        editorTabs: editorTabs,
+      });
+    },
+    onError: () => {
+      setIsProjectClosedSoAvoidReloadingExtensions(true);
+    },
+    onSuccessOrError: () => {
+      // Stop the loading when we're successful or have failed.
+      setIsProjectOpening(false);
+      setIsLoadingProject(false);
+      setLoaderModalProgress(null, null);
+    },
+    loadFromProject,
+    openFromFileMetadata,
+    resourceMover,
+    onProjectSaved: fileMetadata => {
+      setState(state => ({
+        ...state,
+        currentFileMetadata: fileMetadata,
+      }));
+    },
+  });
 
   const closeApp = React.useCallback((): void => {
     return Window.quit();
@@ -2509,215 +2543,221 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const createProject = React.useCallback(
-    async (i18n: I18n, newProjectSetup: NewProjectSetup) => {
-      setIsProjectOpening(true);
+  // const createProject = React.useCallback(
+  //   async (
+  //     i18n: I18n,
+  //     newProjectSetup: NewProjectSetup,
+  //     projectFileUrl?: string
+  //   ) => {
+  //     setIsProjectOpening(true);
+  //     setIsProjectClosedSoAvoidReloadingExtensions(false);
 
-      // 4 cases when creating a project:
-      // - From an example
-      // - From an in-app tutorial
-      // - With the default login enabled
-      // - Empty project
+  //     // 4 cases when creating a project:
+  //     // - From an example
+  //     // - From an in-app tutorial
+  //     // - With the default login enabled
+  //     // - Empty project
+  //     // - From a generated project
 
-      const selectedInAppTutorialShortHeader = selectedInAppTutorialInfo
-        ? getInAppTutorialShortHeader(selectedInAppTutorialInfo.tutorialId)
-        : null;
+  //     const selectedInAppTutorialShortHeader = selectedInAppTutorialInfo
+  //       ? getInAppTutorialShortHeader(selectedInAppTutorialInfo.tutorialId)
+  //       : null;
 
-      try {
-        const source = selectedExampleShortHeader
-          ? await createNewProjectFromExampleShortHeader({
-              i18n,
-              exampleShortHeader: selectedExampleShortHeader,
-            })
-          : selectedInAppTutorialShortHeader &&
-            selectedInAppTutorialShortHeader.initialTemplateUrl
-          ? await createNewProjectFromTutorialTemplate(
-              selectedInAppTutorialShortHeader.initialTemplateUrl
-            )
-          : newProjectSetup.allowPlayersToLogIn
-          ? await createNewProjectWithDefaultLogin()
-          : await createNewProject();
+  //     try {
+  //       const source = selectedExampleShortHeader
+  //         ? await createNewProjectFromExampleShortHeader({
+  //             i18n,
+  //             exampleShortHeader: selectedExampleShortHeader,
+  //           })
+  //         : selectedInAppTutorialShortHeader &&
+  //           selectedInAppTutorialShortHeader.initialTemplateUrl
+  //         ? await createNewProjectFromTutorialTemplate(
+  //             selectedInAppTutorialShortHeader.initialTemplateUrl
+  //           )
+  //         : newProjectSetup.allowPlayersToLogIn
+  //         ? await createNewProjectWithDefaultLogin()
+  //         : projectFileUrl
+  //         ? await createNewProjectFromTutorialTemplate(projectFileUrl) // fix that rename & refacto the whole thing.
+  //         : await createNewEmptyProject();
 
-        if (!source) return; // New project creation aborted.
+  //       if (!source) return; // New project creation aborted.
 
-        let state: ?State;
-        const sourceStorageProvider = source.storageProvider;
-        const sourceStorageProviderOperations = sourceStorageProvider
-          ? getStorageProviderOperations(source.storageProvider)
-          : null;
-        if (source.project) {
-          state = await loadFromProject(source.project, null);
-        } else if (source.fileMetadata && sourceStorageProvider) {
-          state = await openFromFileMetadata(source.fileMetadata);
-        }
+  //       let state: ?State;
+  //       const sourceStorageProvider = source.storageProvider;
+  //       const sourceStorageProviderOperations = sourceStorageProvider
+  //         ? getStorageProviderOperations(source.storageProvider)
+  //         : null;
+  //       if (source.project) {
+  //         state = await loadFromProject(source.project, null);
+  //       } else if (source.fileMetadata && sourceStorageProvider) {
+  //         state = await openFromFileMetadata(source.fileMetadata);
+  //       }
 
-        if (!state) {
-          throw new Error(
-            'Neither a project nor a file metadata to load was provided for the new project'
-          );
-        }
+  //       if (!state) {
+  //         throw new Error(
+  //           'Neither a project nor a file metadata to load was provided for the new project'
+  //         );
+  //       }
 
-        const { currentProject, editorTabs } = state;
-        if (!currentProject) {
-          throw new Error('The new project could not be opened.');
-        }
+  //       const { currentProject, editorTabs } = state;
+  //       if (!currentProject) {
+  //         throw new Error('The new project could not be opened.');
+  //       }
 
-        const oldProjectId = currentProject.getProjectUuid();
-        currentProject.resetProjectUuid();
+  //       const oldProjectId = currentProject.getProjectUuid();
+  //       currentProject.resetProjectUuid();
 
-        currentProject.setVersion('1.0.0');
-        currentProject.getAuthorIds().clear();
-        currentProject.setAuthor('');
-        if (selectedExampleShortHeader) {
-          // Use the project settings of the example and add template slug to project
-          currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
-        } else if (selectedInAppTutorialShortHeader) {
-          // Don't do anything, the project settings are already set by the tutorial.
-        } else {
-          // Use the project settings requested by the user
-          if (newProjectSetup.width && newProjectSetup.height) {
-            currentProject.setGameResolutionSize(
-              newProjectSetup.width,
-              newProjectSetup.height
-            );
-          }
-          if (newProjectSetup.orientation)
-            currentProject.setOrientation(newProjectSetup.orientation);
-          if (newProjectSetup.optimizeForPixelArt) {
-            currentProject.setPixelsRounding(true);
-            currentProject.setScaleMode('nearest');
-          }
-        }
+  //       currentProject.setVersion('1.0.0');
+  //       currentProject.getAuthorIds().clear();
+  //       currentProject.setAuthor('');
+  //       if (selectedExampleShortHeader) {
+  //         // Use the project settings of the example and add template slug to project
+  //         currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
+  //       } else if (selectedInAppTutorialShortHeader) {
+  //         // Don't do anything, the project settings are already set by the tutorial.
+  //       } else {
+  //         // Use the project settings requested by the user
+  //         if (newProjectSetup.width && newProjectSetup.height) {
+  //           currentProject.setGameResolutionSize(
+  //             newProjectSetup.width,
+  //             newProjectSetup.height
+  //           );
+  //         }
+  //         if (newProjectSetup.orientation)
+  //           currentProject.setOrientation(newProjectSetup.orientation);
+  //         if (newProjectSetup.optimizeForPixelArt) {
+  //           currentProject.setPixelsRounding(true);
+  //           currentProject.setScaleMode('nearest');
+  //         }
+  //       }
 
-        if (!selectedInAppTutorialShortHeader) {
-          // If the project is a tutorial, keep the project name.
-          currentProject.setName(newProjectSetup.projectName || 'New game');
-        }
+  //       if (!selectedInAppTutorialShortHeader) {
+  //         // If the project is a tutorial, keep the project name.
+  //         currentProject.setName(newProjectSetup.projectName || 'New game');
+  //       }
 
-        if (authenticatedUser.profile) {
-          // if the user is connected, try to register the game to avoid
-          // any gdevelop services to ask the user to register the game.
-          // (for instance, leaderboards, player authentication, ...)
-          try {
-            await registerGame(
-              authenticatedUser.getAuthorizationHeader,
-              authenticatedUser.profile.id,
-              {
-                gameId: currentProject.getProjectUuid(),
-                authorName:
-                  currentProject.getAuthor() || 'Unspecified publisher',
-                gameName: currentProject.getName() || 'Untitled game',
-                templateSlug: currentProject.getTemplateSlug(),
-              }
-            );
-          } catch (error) {
-            // Do not prevent the user from opening the game if the registration failed.
-            console.error(
-              'Unable to register the game to the user profile, the game will not be listed in the user profile.',
-              error
-            );
-          }
-        }
+  //       if (authenticatedUser.profile) {
+  //         // if the user is connected, try to register the game to avoid
+  //         // any gdevelop services to ask the user to register the game.
+  //         // (for instance, leaderboards, player authentication, ...)
+  //         try {
+  //           await registerGame(
+  //             authenticatedUser.getAuthorizationHeader,
+  //             authenticatedUser.profile.id,
+  //             {
+  //               gameId: currentProject.getProjectUuid(),
+  //               authorName:
+  //                 currentProject.getAuthor() || 'Unspecified publisher',
+  //               gameName: currentProject.getName() || 'Untitled game',
+  //               templateSlug: currentProject.getTemplateSlug(),
+  //             }
+  //           );
+  //         } catch (error) {
+  //           // Do not prevent the user from opening the game if the registration failed.
+  //           console.error(
+  //             'Unable to register the game to the user profile, the game will not be listed in the user profile.',
+  //             error
+  //           );
+  //         }
+  //       }
 
-        const destinationStorageProviderOperations = getStorageProviderOperations(
-          newProjectSetup.storageProvider
-        );
+  //       const destinationStorageProviderOperations = getStorageProviderOperations(
+  //         newProjectSetup.storageProvider
+  //       );
 
-        const { onSaveProjectAs } = destinationStorageProviderOperations;
+  //       const { onSaveProjectAs } = destinationStorageProviderOperations;
 
-        if (onSaveProjectAs) {
-          const { wasSaved, fileMetadata } = await onSaveProjectAs(
-            currentProject,
-            newProjectSetup.saveAsLocation,
-            {
-              onStartSaving: () => {
-                console.log('Start saving as the new project...');
-              },
-              onMoveResources: async ({ newFileMetadata }) => {
-                if (
-                  !sourceStorageProvider ||
-                  !sourceStorageProviderOperations ||
-                  !source.fileMetadata
-                ) {
-                  console.log(
-                    'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
-                  );
-                  return;
-                }
+  //       if (onSaveProjectAs) {
+  //         const { wasSaved, fileMetadata } = await onSaveProjectAs(
+  //           currentProject,
+  //           newProjectSetup.saveAsLocation,
+  //           {
+  //             onStartSaving: () => {
+  //               console.log('Start saving as the new project...');
+  //             },
+  //             onMoveResources: async ({ newFileMetadata }) => {
+  //               if (
+  //                 !sourceStorageProvider ||
+  //                 !sourceStorageProviderOperations ||
+  //                 !source.fileMetadata
+  //               ) {
+  //                 console.log(
+  //                   'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
+  //                 );
+  //                 return;
+  //               }
 
-                await ensureResourcesAreMoved({
-                  project: currentProject,
-                  newFileMetadata,
-                  newStorageProvider: newProjectSetup.storageProvider,
-                  newStorageProviderOperations: destinationStorageProviderOperations,
-                  oldFileMetadata: source.fileMetadata,
-                  oldStorageProvider: sourceStorageProvider,
-                  oldStorageProviderOperations: sourceStorageProviderOperations,
-                  authenticatedUser,
-                });
-              },
-            }
-          );
+  //               await ensureResourcesAreMoved({
+  //                 project: currentProject,
+  //                 newFileMetadata,
+  //                 newStorageProvider: newProjectSetup.storageProvider,
+  //                 newStorageProviderOperations: destinationStorageProviderOperations,
+  //                 oldFileMetadata: source.fileMetadata,
+  //                 oldStorageProvider: sourceStorageProvider,
+  //                 oldStorageProviderOperations: sourceStorageProviderOperations,
+  //                 authenticatedUser,
+  //               });
+  //             },
+  //           }
+  //         );
 
-          if (wasSaved) {
-            setState(state => ({
-              ...state,
-              currentFileMetadata: fileMetadata,
-            }));
-            unsavedChanges.sealUnsavedChanges();
-            if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
-              preferences.setHasProjectOpened(true);
-            }
-          }
-        }
+  //         if (wasSaved) {
+  //           setState(state => ({
+  //             ...state,
+  //             currentFileMetadata: fileMetadata,
+  //           }));
+  //           unsavedChanges.sealUnsavedChanges();
+  //           if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
+  //             preferences.setHasProjectOpened(true);
+  //           }
+  //         }
+  //       }
 
-        // We were able to load and then save the project. We can now close the dialog,
-        // open the project editors and check if leaderboards must be replaced.
-        setNewProjectSetupDialogOpen(false);
-        setSelectedExampleShortHeader(null);
-        await setState(state => ({ ...state, createDialogOpen: false }));
-        findLeaderboardsToReplace(currentProject, oldProjectId);
-        openSceneOrProjectManager({
-          currentProject: currentProject,
-          editorTabs: editorTabs,
-        });
+  //       // We were able to load and then save the project. We can now close the dialog,
+  //       // open the project editors and check if leaderboards must be replaced.
+  //       setNewProjectSetupDialogOpen(false);
+  //       setSelectedExampleShortHeader(null);
+  //       await setState(state => ({ ...state, createDialogOpen: false }));
+  //       findLeaderboardsToReplace(currentProject, oldProjectId);
+  //       openSceneOrProjectManager({
+  //         currentProject: currentProject,
+  //         editorTabs: editorTabs,
+  //       });
+  //     } catch (rawError) {
+  //       const { getWriteErrorMessage } = getStorageProviderOperations();
+  //       const errorMessage = getWriteErrorMessage
+  //         ? getWriteErrorMessage(rawError)
+  //         : t`An error occurred when opening or saving the project. Try again later or choose another location to save the project to.`;
 
-        setIsProjectClosedSoAvoidReloadingExtensions(false);
-      } catch (rawError) {
-        const { getWriteErrorMessage } = getStorageProviderOperations();
-        const errorMessage = getWriteErrorMessage
-          ? getWriteErrorMessage(rawError)
-          : t`An error occurred when opening or saving the project. Try again later or choose another location to save the project to.`;
-
-        showErrorBox({
-          message: i18n._(errorMessage),
-          rawError,
-          errorId: 'project-creation-save-as-error',
-        });
-        setIsProjectClosedSoAvoidReloadingExtensions(true);
-      } finally {
-        // Stop the loading when we're successful or have failed.
-        setIsProjectOpening(false);
-        setIsLoadingProject(false);
-        setLoaderModalProgress(null, null);
-      }
-    },
-    [
-      ensureResourcesAreMoved,
-      findLeaderboardsToReplace,
-      getStorageProviderOperations,
-      openSceneOrProjectManager,
-      preferences,
-      setState,
-      unsavedChanges,
-      authenticatedUser,
-      loadFromProject,
-      openFromFileMetadata,
-      selectedExampleShortHeader,
-      getInAppTutorialShortHeader,
-      selectedInAppTutorialInfo,
-    ]
-  );
+  //       showErrorBox({
+  //         message: i18n._(errorMessage),
+  //         rawError,
+  //         errorId: 'project-creation-save-as-error',
+  //       });
+  //       setIsProjectClosedSoAvoidReloadingExtensions(true);
+  //     } finally {
+  //       // Stop the loading when we're successful or have failed.
+  //       setIsProjectOpening(false);
+  //       setIsLoadingProject(false);
+  //       setLoaderModalProgress(null, null);
+  //     }
+  //   },
+  //   [
+  //     ensureResourcesAreMoved,
+  //     findLeaderboardsToReplace,
+  //     getStorageProviderOperations,
+  //     openSceneOrProjectManager,
+  //     preferences,
+  //     setState,
+  //     unsavedChanges,
+  //     authenticatedUser,
+  //     loadFromProject,
+  //     openFromFileMetadata,
+  //     selectedExampleShortHeader,
+  //     getInAppTutorialShortHeader,
+  //     selectedInAppTutorialInfo,
+  //   ]
+  // );
 
   const startSelectedTutorial = React.useCallback(
     async (scenario: 'resume' | 'startOver' | 'start') => {
@@ -2775,11 +2815,14 @@ const MainFrame = (props: Props) => {
         selectedInAppTutorialShortHeader.initialTemplateUrl;
       if (initialTemplateUrl) {
         try {
-          await createProject(i18n, {
-            storageProvider: emptyStorageProvider,
-            saveAsLocation: null,
-            // Remaining will be set by the template.
-          });
+          await createProjectFromInAppTutorial(
+            selectedInAppTutorialShortHeader.id,
+            {
+              storageProvider: emptyStorageProvider,
+              saveAsLocation: null,
+              // Remaining will be set by the template.
+            }
+          );
         } catch (error) {
           showErrorBox({
             message: i18n._(
@@ -2812,7 +2855,7 @@ const MainFrame = (props: Props) => {
     [
       i18n,
       getInAppTutorialShortHeader,
-      createProject,
+      createProjectFromInAppTutorial,
       askToCloseProject,
       startTutorial,
       selectedInAppTutorialInfo,
@@ -3294,16 +3337,14 @@ const MainFrame = (props: Props) => {
       {newProjectSetupDialogOpen && (
         <NewProjectSetupDialog
           authenticatedUser={authenticatedUser}
-          isOpening={isProjectOpening}
+          isOpeningProject={isProjectOpening}
           onClose={() => setNewProjectSetupDialogOpen(false)}
-          onCreate={projectSettings => createProject(i18n, projectSettings)}
+          onCreateEmptyProject={createEmptyProject}
+          onCreateFromExample={createProjectFromExample}
+          onCreateWithLogin={createProjectWithLogin}
+          onCreateFromAIGeneration={createProjectFromAIGeneration}
           storageProviders={props.storageProviders}
-          isFromExample={!!selectedExampleShortHeader}
-          sourceExampleName={
-            selectedExampleShortHeader
-              ? selectedExampleShortHeader.name
-              : undefined
-          }
+          selectedExampleShortHeader={selectedExampleShortHeader}
         />
       )}
       {cloudProjectFileMetadataToRecover && (

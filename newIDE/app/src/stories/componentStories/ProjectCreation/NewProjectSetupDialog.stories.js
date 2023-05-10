@@ -13,6 +13,7 @@ import {
   fakeSilverAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects,
   fakeNotAuthenticatedUser,
+  geometryMonsterExampleShortHeader,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -24,7 +25,6 @@ export default {
 export const OpenAndAuthenticated = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
       authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -33,7 +33,11 @@ export const OpenAndAuthenticated = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
     />
   );
 };
@@ -41,7 +45,6 @@ export const OpenAndAuthenticated = () => {
 export const TooManyCloudProjects = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
       authenticatedUser={
         fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects
       }
@@ -52,7 +55,11 @@ export const TooManyCloudProjects = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
     />
   );
 };
@@ -60,8 +67,6 @@ export const TooManyCloudProjects = () => {
 export const FromExample = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample
-      sourceExampleName="RPG story"
       authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -70,7 +75,11 @@ export const FromExample = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={geometryMonsterExampleShortHeader}
     />
   );
 };
@@ -78,7 +87,6 @@ export const FromExample = () => {
 export const OpenAndNotAuthenticated = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
       authenticatedUser={fakeNotAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -87,7 +95,11 @@ export const OpenAndNotAuthenticated = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
     />
   );
 };
@@ -95,9 +107,8 @@ export const OpenAndNotAuthenticated = () => {
 export const Opening = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
       authenticatedUser={fakeSilverAuthenticatedUser}
-      isOpening
+      isOpeningProject
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -105,7 +116,11 @@ export const Opening = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
     />
   );
 };

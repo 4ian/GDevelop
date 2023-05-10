@@ -197,8 +197,6 @@ export default class InstancesEditor extends Component<Props> {
         // TODO (3D): `resolution: window.devicePixelRatio`?
       });
 
-      gameCanvas = threeRenderer.domElement;
-
       this.threeRenderer = threeRenderer;
     } else {
       //Create the renderer and setup the rendering area for scene editor.

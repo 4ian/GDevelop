@@ -918,7 +918,7 @@ module.exports = {
       return transparentMaterial;
     };
 
-    class RenderedThreeDShapeObjectInstance extends RenderedInstance {
+    class RenderedCube3DObjectInstance extends RenderedInstance {
       constructor(
         project,
         layout,
@@ -1050,7 +1050,7 @@ module.exports = {
         const instance = this._instance;
 
         const textureResourceName =
-          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObjectInstance._getResourceNameToDisplay(
             objectConfiguration
           );
         if (textureResourceName) {
@@ -1065,7 +1065,7 @@ module.exports = {
 
       updateTextureIfNeeded() {
         const textureName =
-          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObjectInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
         if (textureName === this._renderedResourceName) return;
@@ -1075,7 +1075,7 @@ module.exports = {
 
       updateTexture() {
         const textureName =
-          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObjectInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
 
@@ -1447,7 +1447,7 @@ module.exports = {
 
     objectsRenderingService.registerInstanceRenderer(
       'Scene3D::Cube3DObject',
-      RenderedThreeDShapeObjectInstance
+      RenderedCube3DObjectInstance
     );
   },
 };

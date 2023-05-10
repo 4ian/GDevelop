@@ -74,8 +74,8 @@ const ObjectsRenderingService = {
     layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    pixiContainer: any,
-    threeGroup: THREE.Group,
+    pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group
   ): RenderedInstance {
     const objectType = associatedObjectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))

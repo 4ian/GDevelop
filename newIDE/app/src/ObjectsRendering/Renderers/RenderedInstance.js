@@ -74,8 +74,7 @@ export default class RenderedInstance {
   onRemovedFromScene() {
     if (this._pixiObject !== null)
       this._pixiContainer.removeChild(this._pixiObject);
-    if (this._threeObject !== null)
-      this._threeGroup.remove(this._threeObject);
+    if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
   getOriginX() {

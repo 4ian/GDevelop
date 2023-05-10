@@ -370,8 +370,8 @@ namespace gdjs {
       this._pixiContainer.removeChild(child);
     }
 
-    get3dObjectsRenderingGroup() {
-      return this._threeGroup;
+    has3DObjects() {
+      return this._threeGroup && this._threeGroup.children.length > 0;
     }
 
     add3dRendererObject(object: THREE.Object3D): void {

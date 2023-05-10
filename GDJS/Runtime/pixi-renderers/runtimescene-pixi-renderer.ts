@@ -94,9 +94,7 @@ namespace gdjs {
 
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
-          const threeGroup = runtimeLayerRenderer.get3dObjectsRenderingGroup();
-          const layerHas3dObjectsToRender =
-            threeGroup && threeGroup.children.length > 0;
+          const layerHas3dObjectsToRender = runtimeLayerRenderer.has3DObjects();
           if (
             runtimeLayerRenderingType ===
               gdjs.RuntimeLayerRenderingType.TWO_D ||

@@ -221,6 +221,12 @@ namespace gdjs {
       this._threeCameraDirty = enable;
     }
 
+    show2dRenderingPlane(enable: boolean) {
+      if (!this._threePlaneMesh) return;
+      if (this._threePlaneMesh.visible === enable) return;
+      this._threePlaneMesh.visible = enable;
+    }
+
     onGameResolutionResized() {
       if (this._threeCamera) {
         this._threeCamera.aspect =
@@ -364,7 +370,11 @@ namespace gdjs {
       this._pixiContainer.removeChild(child);
     }
 
-    add3dRendererObject(object: THREE.Object3D) {
+    get3dObjectsRenderingGroup() {
+      return this._threeGroup;
+    }
+
+    add3dRendererObject(object: THREE.Object3D): void {
       if (!this._threeGroup) return;
 
       this._threeGroup.add(object);

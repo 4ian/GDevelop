@@ -15,7 +15,7 @@ namespace gdjs {
   ) =>
     renderingTypeAsString === '3d'
       ? RuntimeLayerRenderingType.THREE_D
-      : renderingTypeAsString === '2d+3d'
+      : renderingTypeAsString === '2d+3d' || renderingTypeAsString === ''
       ? RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
       : RuntimeLayerRenderingType.TWO_D;
 

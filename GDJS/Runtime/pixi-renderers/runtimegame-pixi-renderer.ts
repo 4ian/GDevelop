@@ -579,7 +579,7 @@ namespace gdjs {
             ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
             : e.button === 1
             ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            : gdjs.InputManager.MOUSE_LEFT_BUTTON
+            : e.button
         );
         if (window.focus !== undefined) {
           window.focus();
@@ -592,7 +592,7 @@ namespace gdjs {
             ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
             : e.button === 1
             ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            : gdjs.InputManager.MOUSE_LEFT_BUTTON
+            : e.button
         );
         return false;
       };
@@ -603,42 +603,21 @@ namespace gdjs {
         manager.onMouseEnter();
         // There is no mouse event when the cursor is outside of the canvas.
         // We catchup what happened.
-        {
-          const leftIsPressed = (e.buttons & 1) !== 0;
-          const leftWasPressed = manager.isMouseButtonPressed(
-            gdjs.InputManager.MOUSE_LEFT_BUTTON
-          );
-          if (leftIsPressed && !leftWasPressed) {
-            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-          }
-          if (!leftIsPressed && leftWasPressed) {
-            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-          }
-        }
-        {
-          const rightIsPressed = (e.buttons & 2) !== 0;
-          const rightWasPressed = manager.isMouseButtonPressed(
-            gdjs.InputManager.MOUSE_RIGHT_BUTTON
-          );
-          if (rightIsPressed && !rightWasPressed) {
-            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-          }
-          if (!rightIsPressed && rightWasPressed) {
-            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-          }
-        }
-        {
-          const middleIsPressed = (e.buttons & 4) !== 0;
-          const middleWasPressed = manager.isMouseButtonPressed(
-            gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-          );
-          if (middleIsPressed && !middleWasPressed) {
-            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
-          }
-          if (!middleIsPressed && middleWasPressed) {
-            manager.onMouseButtonReleased(
-              gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            );
+        const buttons = [
+          gdjs.InputManager.MOUSE_LEFT_BUTTON,
+          gdjs.InputManager.MOUSE_RIGHT_BUTTON,
+          gdjs.InputManager.MOUSE_MIDDLE_BUTTON,
+          gdjs.InputManager.MOUSE_BACK_BUTTON,
+          gdjs.InputManager.MOUSE_FORWARD_BUTTON,
+        ];
+        for (let i = 0, len = buttons.length; i < len; ++i) {
+          const button = buttons[i];
+          const buttonIsPressed = (e.buttons & (1 << i)) !== 0;
+          const buttonWasPressed = manager.isMouseButtonPressed(button);
+          if (buttonIsPressed && !buttonWasPressed) {
+            manager.onMouseButtonPressed(button);
+          } else if (!buttonIsPressed && buttonWasPressed) {
+            manager.onMouseButtonReleased(button);
           }
         }
       };

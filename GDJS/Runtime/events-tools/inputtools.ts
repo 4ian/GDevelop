@@ -210,19 +210,31 @@ namespace gdjs {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(0);
+            .isMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
         }
         if (button === 'Right') {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(1);
+            .isMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
         }
         if (button === 'Middle') {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(2);
+            .isMouseButtonPressed(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
+        }
+        if (button === 'Back') {
+          return instanceContainer
+            .getGame()
+            .getInputManager()
+            .isMouseButtonPressed(gdjs.InputManager.MOUSE_BACK_BUTTON);
+        }
+        if (button === 'Forward') {
+          return instanceContainer
+            .getGame()
+            .getInputManager()
+            .isMouseButtonPressed(gdjs.InputManager.MOUSE_FORWARD_BUTTON);
         }
         return false;
       };
@@ -235,19 +247,31 @@ namespace gdjs {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(0);
+            .isMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
         }
         if (button === 'Right') {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(1);
+            .isMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
         }
         if (button === 'Middle') {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(2);
+            .isMouseButtonReleased(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
+        }
+        if (button === 'Back') {
+          return instanceContainer
+            .getGame()
+            .getInputManager()
+            .isMouseButtonReleased(gdjs.InputManager.MOUSE_BACK_BUTTON);
+        }
+        if (button === 'Forward') {
+          return instanceContainer
+            .getGame()
+            .getInputManager()
+            .isMouseButtonReleased(gdjs.InputManager.MOUSE_FORWARD_BUTTON);
         }
         return false;
       };

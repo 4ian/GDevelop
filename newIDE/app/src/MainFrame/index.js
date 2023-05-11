@@ -2512,7 +2512,6 @@ const MainFrame = (props: Props) => {
   const createProject = React.useCallback(
     async (i18n: I18n, newProjectSetup: NewProjectSetup) => {
       setIsProjectOpening(true);
-      setIsProjectClosedSoAvoidReloadingExtensions(false);
 
       // 4 cases when creating a project:
       // - From an example
@@ -2682,6 +2681,8 @@ const MainFrame = (props: Props) => {
           currentProject: currentProject,
           editorTabs: editorTabs,
         });
+
+        setIsProjectClosedSoAvoidReloadingExtensions(false);
       } catch (rawError) {
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage

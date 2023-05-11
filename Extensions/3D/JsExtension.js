@@ -990,8 +990,6 @@ module.exports = {
         if (this._threeGroup) {
           this._defaultDepth = parseFloat(properties.get('depth').getValue());
           const geometry = new THREE.BoxGeometry(1, 1, 1);
-          // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
-          // TODO (3D) - feature: support color instead of texture?
           const materials = [
             this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
             this._getFaceMaterial(project, materialIndexToFaceIndex[1]),

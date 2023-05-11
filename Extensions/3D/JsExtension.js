@@ -489,8 +489,8 @@ module.exports = {
         'boolean',
         'FaceVisibility',
         _('Face visibility'),
-        _('the face visibility'), // TODO (3D) - face visibility: fix the sentence.
-        _('the _PARAM1_ face visibility'),
+        _('a face should be visible'),
+        _('having its _PARAM1_ face visible'),
         _('Face'),
         'res/conditions/3d_box.svg'
       )

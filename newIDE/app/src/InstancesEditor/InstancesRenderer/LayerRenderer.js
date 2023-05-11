@@ -468,7 +468,6 @@ export default class LayerRenderer {
     const threeCamera = new THREE.PerspectiveCamera(
       this.layer.getThreeDFieldOfView(),
       1,
-      // TODO Update the near and far plan with the zoom factor.
       0.1,
       2000
     );

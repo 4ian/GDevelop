@@ -5,7 +5,6 @@ import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import RenderedInstance from '../ObjectsRendering/Renderers/RenderedInstance';
 
-
 type Props = {|
   initialViewX: number,
   initialViewY: number,
@@ -149,9 +148,11 @@ export default class ViewPosition {
     container.scale.y = this.instancesEditorSettings.zoomFactor;
   }
 
-  applyTransformationToThree(threeCamera: THREE.Camera, threePlaneMesh: THREE.Mesh) {
+  applyTransformationToThree(
+    threeCamera: THREE.Camera,
+    threePlaneMesh: THREE.Mesh
+  ) {
     threeCamera.aspect = this._width / this._height;
-    threeCamera.updateProjectionMatrix();
 
     const zoomFactor = this.instancesEditorSettings.zoomFactor;
 
@@ -165,9 +166,10 @@ export default class ViewPosition {
     // of the triangle defining the distance between the camera and the rendering plane.
     const cameraFovInRadians = RenderedInstance.toRad(threeCamera.fov);
     const cameraZPosition =
-      (0.5 * this._height) / zoomFactor /
-      Math.tan(0.5 * cameraFovInRadians);
+      (0.5 * this._height) / zoomFactor / Math.tan(0.5 * cameraFovInRadians);
     threeCamera.position.z = cameraZPosition;
+    threeCamera.far = cameraZPosition + 2000;
+    threeCamera.updateProjectionMatrix();
 
     // Adapt the plane size so that it covers the whole screen.
     threePlaneMesh.scale.x = this._width / zoomFactor;

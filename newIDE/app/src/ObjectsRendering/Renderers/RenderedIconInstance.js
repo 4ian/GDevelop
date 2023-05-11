@@ -24,7 +24,7 @@ export default function makeRenderer(iconPath: string) {
         layout,
         instance,
         associatedObjectConfiguration,
-        pixiContainer,  
+        pixiContainer,
         threeGroup,
         pixiResourcesLoader
       );

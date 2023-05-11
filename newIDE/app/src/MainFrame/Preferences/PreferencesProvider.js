@@ -148,12 +148,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
-    setShowObjectInstancesIn3D: this._setShowObjectInstancesIn3D.bind(
-      this
-    ),
-    getShowObjectInstancesIn3D: this._getShowObjectInstancesIn3D.bind(
-      this
-    ),
+    setShowObjectInstancesIn3D: this._setShowObjectInstancesIn3D.bind(this),
+    getShowObjectInstancesIn3D: this._getShowObjectInstancesIn3D.bind(this),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),

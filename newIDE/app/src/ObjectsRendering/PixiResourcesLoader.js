@@ -42,7 +42,10 @@ export default class PixiResourcesLoader {
     }
   }
 
-  static _applyThreeTextureSettings(resource: gdResource, threeTexture: THREE.Texture) {
+  static _applyThreeTextureSettings(
+    resource: gdResource,
+    threeTexture: THREE.Texture
+  ) {
     if (resource.getKind() !== 'image') return;
 
     const imageResource = gd.asImageResource(resource);
@@ -165,14 +168,20 @@ export default class PixiResourcesLoader {
    * @param resourceName The name of the resource
    * @returns The requested texture, or a placeholder if not found.
    */
-  static getThreeTexture(project: gdProject, resourceName: string): THREE.Texture {
+  static getThreeTexture(
+    project: gdProject,
+    resourceName: string
+  ): THREE.Texture {
     const loadedThreeTexture = loadedThreeTextures[resourceName];
     if (loadedThreeTexture) return loadedThreeTexture;
 
     // Texture is not loaded, load it now from the PixiJS texture.
     // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
     // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
-    const pixiTexture = PixiResourcesLoader.getPIXITexture(project, resourceName);
+    const pixiTexture = PixiResourcesLoader.getPIXITexture(
+      project,
+      resourceName
+    );
 
     // @ts-ignore - source does exist on resource.
     const image = pixiTexture.baseTexture.resource.source;

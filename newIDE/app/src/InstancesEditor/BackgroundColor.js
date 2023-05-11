@@ -28,7 +28,10 @@ export default class BackgroundColor {
     );
   }
 
-  setBackgroundColorForThree(threeRenderer:THREE.Renderer, threeScene: THREE.Scene) {
+  setBackgroundColorForThree(
+    threeRenderer: THREE.Renderer,
+    threeScene: THREE.Scene
+  ) {
     const colorCode = parseInt(
       parseInt(
         rgbToHex(

@@ -569,17 +569,26 @@ namespace gdjs {
       };
 
       // Mouse:
+      
+      // Converts HTML mouse button to InputManager mouse button.
+      // This function is used to align HTML button values with GDevelop 3 C++ SFML Mouse button enum values,
+      // notably the middle and right buttons.
+      function convertHtmlMouseButtonToInputManagerMouseButton(button: number) {
+        switch (button) {
+          case 1: // Middle button
+            return gdjs.InputManager.MOUSE_MIDDLE_BUTTON;
+          case 2: // Right button
+            return gdjs.InputManager.MOUSE_RIGHT_BUTTON;
+        }
+        return button;
+      }
       canvas.onmousemove = function (e) {
         const pos = getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
       };
       canvas.onmousedown = function (e) {
         manager.onMouseButtonPressed(
-          e.button === 2
-            ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
-            : e.button === 1
-            ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            : e.button
+          convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
         if (window.focus !== undefined) {
           window.focus();
@@ -588,11 +597,7 @@ namespace gdjs {
       };
       canvas.onmouseup = function (e) {
         manager.onMouseButtonReleased(
-          e.button === 2
-            ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
-            : e.button === 1
-            ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON
-            : e.button
+          convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
         return false;
       };

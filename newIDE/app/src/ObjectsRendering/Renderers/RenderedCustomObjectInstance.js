@@ -15,7 +15,6 @@ import {
   getProportionalPositionY,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
-import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
@@ -37,7 +36,6 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -46,7 +44,6 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       instance,
       associatedObjectConfiguration,
       pixiContainer,
-      threeGroup,
       pixiResourcesLoader
     );
 
@@ -121,7 +118,6 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         childInstance,
         childObjectConfiguration,
         this._pixiObject,
-        threeGroup
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
@@ -133,7 +129,9 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       }
       this.childrenInstances.push(childInstance);
       this.childrenLayouts.push(childLayout);
+      // $FlowFixMe - Make it possible for custom object renderer to add Three object in three group.
       this.childrenRenderedInstances.push(renderer);
+      // $FlowFixMe - Make it possible for custom object renderer to add Three object in three group.
       this.childrenRenderedInstanceByNames.set(childObject.getName(), renderer);
     });
 

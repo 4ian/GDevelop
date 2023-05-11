@@ -137,6 +137,7 @@ export default class InstancesEditor extends Component<Props> {
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
+  _showObjectInstancesIn3D: boolean = false;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -171,8 +172,9 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     let gameCanvas: HTMLCanvasElement;
+    this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
-    if (this.props.showObjectInstancesIn3D) {
+    if (this._showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
@@ -414,6 +416,7 @@ export default class InstancesEditor extends Component<Props> {
       onInstanceClicked: this._onInstanceClicked,
       onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
+      showObjectInstancesIn3D: this._showObjectInstancesIn3D,
     });
     this.selectionRectangle = new SelectionRectangle({
       instances: props.initialInstances,

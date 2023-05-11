@@ -1,19 +1,23 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
-import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import * as THREE from 'three';
+import PixiResourcesLoader from '../PixiResourcesLoader';
 
 /**
- * RenderedInstance is the base class used for creating 2D renderers of instances,
- * which display on the scene editor, using Pixi.js, the instance of an object (see InstancesEditor).
+ * Rendered3DInstance is the base class used for creating 3D renderers of instances,
+ * which display on the scene editor, using Three.js, the instance of an object (see InstancesEditor).
+ * It can also display 2D artifacts on Pixi 2D plane (3D object shadow projected on the plane for instance).
  */
-export default class RenderedInstance {
+export default class Rendered3DInstance {
   _project: gdProject;
   _layout: gdLayout;
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
+  _threeGroup: THREE.Group;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
   _pixiObject: any;
+  _threeObject: THREE.Object3D;
   wasUsed: boolean;
 
   constructor(
@@ -22,12 +26,15 @@ export default class RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     this._pixiObject = null;
+    this._threeObject = null;
     this._instance = instance;
     this._associatedObjectConfiguration = associatedObjectConfiguration;
     this._pixiContainer = pixiContainer;
+    this._threeGroup = threeGroup;
     this._project = project;
     this._layout = layout;
     this._pixiResourcesLoader = pixiResourcesLoader;
@@ -52,6 +59,10 @@ export default class RenderedInstance {
     return this._pixiObject;
   }
 
+  getThreeObject() {
+    return this._threeObject;
+  }
+
   getInstance() {
     return this._instance;
   }
@@ -64,6 +75,7 @@ export default class RenderedInstance {
   onRemovedFromScene() {
     if (this._pixiObject !== null)
       this._pixiContainer.removeChild(this._pixiObject);
+    if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
   getOriginX() {

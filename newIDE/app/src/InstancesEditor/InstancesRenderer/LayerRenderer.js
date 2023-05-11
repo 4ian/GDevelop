@@ -11,6 +11,7 @@ import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle';
 import { rotatePolygon, type Polygon } from '../../Utils/PolygonHelper';
+import Rendered3DInstance from '../../ObjectsRendering/Renderers/Rendered3DInstance';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -40,7 +41,7 @@ export default class LayerRenderer {
   /** Used for instances culling on rendering */
   viewBottomRight: [number, number];
 
-  renderedInstances: { [number]: RenderedInstance } = {};
+  renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
   pixiContainer: PIXI.Container;
 
   /** Functor used to render an instance */
@@ -75,6 +76,8 @@ export default class LayerRenderer {
   _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
   _threePlaneMesh: THREE.Mesh | null = null;
 
+  _showObjectInstancesIn3D: boolean;
+
   constructor({
     project,
     layout,
@@ -90,6 +93,7 @@ export default class LayerRenderer {
     onMoveInstanceEnd,
     onDownInstance,
     pixiRenderer,
+    showObjectInstancesIn3D,
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
@@ -110,6 +114,7 @@ export default class LayerRenderer {
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
     pixiRenderer: PIXI.Renderer,
+    showObjectInstancesIn3D: boolean,
   }) {
     this.project = project;
     this.instances = instances;
@@ -131,6 +136,8 @@ export default class LayerRenderer {
 
     this.pixiContainer = new PIXI.Container();
 
+    this._showObjectInstancesIn3D = showObjectInstancesIn3D;
+
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
@@ -142,9 +149,10 @@ export default class LayerRenderer {
       );
 
       //Get the "RenderedInstance" object associated to the instance and tell it to update.
-      var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
-        instance
-      );
+      var renderedInstance:
+        | RenderedInstance
+        | Rendered3DInstance
+        | null = this.getRendererOfInstance(instance);
       if (!renderedInstance) return;
 
       const pixiObject = renderedInstance.getPixiObject();
@@ -161,17 +169,18 @@ export default class LayerRenderer {
       }
       if (isVisible) renderedInstance.update();
 
-      const threeObject = renderedInstance.getThreeObject();
-      if (this._threeGroup && threeObject) {
-        this._threeGroup.add(threeObject);
+      if (renderedInstance instanceof Rendered3DInstance) {
+        const threeObject = renderedInstance.getThreeObject();
+        if (this._threeGroup && threeObject) {
+          this._threeGroup.add(threeObject);
+        }
       }
 
       renderedInstance.wasUsed = true;
     };
 
-    // TODO (3D) Use showObjectInstancesIn3D.
     // TODO (3D) Should it handle preference changes without needing to reopen tabs?
-    if (true) {
+    if (this._showObjectInstancesIn3D) {
       this._setup3dRendering(pixiRenderer);
     }
   }

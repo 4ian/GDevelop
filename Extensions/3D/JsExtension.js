@@ -1137,9 +1137,17 @@ module.exports = {
         const height = this._instance.hasCustomSize()
           ? this._instance.getCustomHeight()
           : this.getDefaultHeight();
-        const depth = this._instance.hasCustomSize()
-          ? this._instance.getRawDoubleProperty('depth') || this._defaultDepth
-          : this._defaultDepth;
+        let depth;
+        if (this._instance.hasCustomSize()) {
+          const instancePropertyDepth =
+            this._instance.getRawDoubleProperty('depth');
+          depth =
+            typeof instancePropertyDepth === 'number'
+              ? instancePropertyDepth
+              : this._defaultDepth;
+        } else {
+          depth = this._defaultDepth;
+        }
         const z = this._instance.getRawDoubleProperty('z');
 
         this._threeObject.position.set(

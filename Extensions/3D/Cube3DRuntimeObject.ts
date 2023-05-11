@@ -436,7 +436,7 @@ namespace gdjs {
         if (property.name === 'z') {
           this.setZ(property.value);
         } else if (property.name === 'depth') {
-          this.setDepth(property.value);
+          if (initialInstanceData.customSize) this.setDepth(property.value);
         } else if (property.name === 'rotationX') {
           this.setRotationX(property.value);
         } else if (property.name === 'rotationY') {

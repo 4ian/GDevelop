@@ -1157,7 +1157,7 @@ module.exports = {
         this._threeObject.rotation.set(
           0,
           0,
-          (this._instance.getAngle() * Math.PI) / 180
+          RenderedInstance.toRad(this._instance.getAngle())
         );
 
         if (

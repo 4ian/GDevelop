@@ -98,6 +98,7 @@ const LoginDialog = ({
       }}
       maxWidth="sm"
       open
+      flexColumnBody
     >
       <ColumnStackLayout
         noMargin

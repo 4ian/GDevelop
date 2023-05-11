@@ -163,6 +163,7 @@ const CreateAccountDialog = ({
       }}
       maxWidth="sm"
       open
+      flexColumnBody
     >
       <ColumnStackLayout
         noMargin

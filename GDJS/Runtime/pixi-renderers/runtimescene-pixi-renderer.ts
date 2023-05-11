@@ -77,6 +77,12 @@ namespace gdjs {
          */
         let lastRenderWas3d = true;
 
+        // Even if no rendering at all has been made already, setting up the Three.js/PixiJS renderers
+        // might have changed some WebGL states already. Reset the state for the very first frame.
+        // And, out of caution, keep doing it for every frame.
+        // TODO (3D): optimization - check if this can be done only on the very first frame.
+        threeRenderer.resetState();
+
         // Render each layer one by one.
         for (let i = 0; i < this._runtimeScene._orderedLayers.length; ++i) {
           const runtimeLayer = this._runtimeScene._orderedLayers[i];

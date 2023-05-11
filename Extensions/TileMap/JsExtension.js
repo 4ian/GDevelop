@@ -514,7 +514,8 @@ const defineTileMap = function (
     )
     .markAsAdvanced()
     .getCodeExtraInformation()
-    .setFunctionName('setScale');
+    .setFunctionName('setScale')
+    .setGetter('getScale');
 
   object
     .addExpressionAndConditionAndAction(
@@ -905,7 +906,8 @@ const defineCollisionMask = function (
     )
     .markAsAdvanced()
     .getCodeExtraInformation()
-    .setFunctionName('setScale');
+    .setFunctionName('setScale')
+    .setGetter('getScale');
 
   object
     .addExpressionAndConditionAndAction(

@@ -259,6 +259,17 @@ namespace gdjs {
     }
 
     /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): number {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
+    }
+
+    /**
      * Change the scale on X and Y axis of the object.
      *
      * @param scale The new scale (must be greater than 0).

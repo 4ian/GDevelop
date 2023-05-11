@@ -24,7 +24,7 @@ namespace gdjs {
 
     getRendererObject(): PIXI.Container;
 
-    get3dRendererObject(): THREE.Object3D | null;
+    get3DRendererObject(): THREE.Object3D | null;
   }
 
   // Register the class to let the engine use it.

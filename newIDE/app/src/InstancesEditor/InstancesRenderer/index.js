@@ -92,16 +92,16 @@ export default class InstancesRenderer {
 
     // This container is only used for user interactions.
     // Its content is not actually displayed.
-    // TODO Check that it doesn't make the rendering slower.
-    // TODO Should this container be used for the 2d editor
-    //      instead of rendering layer one by one?
-    // TODO Should this container be used instead of THREE
-    //      when the scene is zoomed out?
+    // TODO (3D) Check that it doesn't make the rendering slower.
+    // TODO (3D) Should this container be used for the 2d editor
+    //           instead of rendering layer one by one?
+    // TODO (3D) Should this container be used instead of THREE
+    //           when the scene is zoomed out?
     this.pixiContainer = new PIXI.Container();
     this.pixiContainer.alpha = 0;
 
     this.temporaryRectangle = new Rectangle();
-    //TODO extract this to a class to have type checking (maybe rethink it)
+    // TODO extract this to a class to have type checking (maybe rethink it)
     this.instanceMeasurer = {
       getInstanceAABB: (instance, bounds) => {
         const layerName = instance.getLayer();

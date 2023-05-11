@@ -171,7 +171,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     let gameCanvas: HTMLCanvasElement;
-    // TODO Should it handle preference changes without needing to reopen tabs?
+    // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this.props.showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
       const threeRenderer = new THREE.WebGLRenderer({
@@ -199,19 +199,17 @@ export default class InstancesEditor extends Component<Props> {
 
       this.threeRenderer = threeRenderer;
     } else {
-      //Create the renderer and setup the rendering area for scene editor.
-      //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-      this.pixiRenderer = PIXI.autoDetectRenderer(
-        {
-          width: this.props.width,
-          height: this.props.height,
-          preserveDrawingBuffer: true,
-          antialias: false,
-          clearBeforeRender: false,
-          backgroundAlpha: 0,
-        }
-        // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
-      );
+      // Create the renderer and setup the rendering area for scene editor.
+      this.pixiRenderer = PIXI.autoDetectRenderer({
+        width: this.props.width,
+        height: this.props.height,
+        // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+        preserveDrawingBuffer: true,
+        // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
+        antialias: false,
+        clearBeforeRender: false,
+        backgroundAlpha: 0,
+      });
 
       gameCanvas = this.pixiRenderer.view;
     }

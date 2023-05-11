@@ -46,7 +46,7 @@ namespace gdjs {
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
         if (this._threeGroup) {
-          layer.getRenderer().add3dRendererObject(this._threeGroup);
+          layer.getRenderer().add3DRendererObject(this._threeGroup);
         }
       }
     }
@@ -63,7 +63,7 @@ namespace gdjs {
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
         if (this._threeGroup) {
-          layer.getRenderer().add3dRendererObject(this._threeGroup);
+          layer.getRenderer().add3DRendererObject(this._threeGroup);
         }
       }
     }
@@ -72,7 +72,7 @@ namespace gdjs {
       return this._pixiContainer;
     }
 
-    get3dRendererObject(): THREE.Object3D | null {
+    get3DRendererObject(): THREE.Object3D | null {
       return this._threeGroup;
     }
 

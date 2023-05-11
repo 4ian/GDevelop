@@ -79,7 +79,7 @@ namespace gdjs {
       instanceContainer
         .getLayer('')
         .getRenderer()
-        .add3dRendererObject(this._boxMesh);
+        .add3DRendererObject(this._boxMesh);
     }
 
     _getFaceMaterial(faceIndex: integer) {
@@ -103,7 +103,7 @@ namespace gdjs {
       }
     }
 
-    get3dRendererObject() {
+    get3DRendererObject() {
       return this._boxMesh;
     }
 

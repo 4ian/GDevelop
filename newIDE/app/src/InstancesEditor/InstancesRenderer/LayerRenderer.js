@@ -169,8 +169,8 @@ export default class LayerRenderer {
       renderedInstance.wasUsed = true;
     };
 
-    // TODO Use showObjectInstancesIn3D.
-    // TODO Should it handle preference changes without needing to reopen tabs?
+    // TODO (3D) Use showObjectInstancesIn3D.
+    // TODO (3D) Should it handle preference changes without needing to reopen tabs?
     if (true) {
       this._setup3dRendering(pixiRenderer);
     }
@@ -446,7 +446,7 @@ export default class LayerRenderer {
   }
 
   /**
-   * Create, or re-create, Three.js objects for 3D rendering of this layer.
+   * Create Three.js objects for 3D rendering of this layer.
    */
   _setup3dRendering(pixiRenderer: PIXI.Renderer): void {
     if (this._threeScene || this._threeGroup || this._threeCamera) {

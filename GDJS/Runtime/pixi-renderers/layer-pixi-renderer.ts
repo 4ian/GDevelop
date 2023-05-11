@@ -203,7 +203,7 @@ namespace gdjs {
       } else {
         // This is a layer of a custom object.
 
-        const parentThreeObject = runtimeInstanceContainerRenderer.get3dRendererObject();
+        const parentThreeObject = runtimeInstanceContainerRenderer.get3DRendererObject();
         if (!parentThreeObject) {
           // No parent 3D renderer object, 3D is disabled.
           return;
@@ -221,7 +221,7 @@ namespace gdjs {
       this._threeCameraDirty = enable;
     }
 
-    show2dRenderingPlane(enable: boolean) {
+    show2DRenderingPlane(enable: boolean) {
       if (!this._threePlaneMesh) return;
       if (this._threePlaneMesh.visible === enable) return;
       this._threePlaneMesh.visible = enable;
@@ -370,17 +370,21 @@ namespace gdjs {
       this._pixiContainer.removeChild(child);
     }
 
-    has3DObjects() {
-      return this._threeGroup && this._threeGroup.children.length > 0;
+    has3DObjects(): boolean {
+      return !!this._threeGroup && this._threeGroup.children.length > 0;
     }
 
-    add3dRendererObject(object: THREE.Object3D): void {
+    has2DObjects(): boolean {
+      return this._pixiContainer.children.length > 0;
+    }
+
+    add3DRendererObject(object: THREE.Object3D): void {
       if (!this._threeGroup) return;
 
       this._threeGroup.add(object);
     }
 
-    remove3dRendererObject(object: THREE.Object3D): void {
+    remove3DRendererObject(object: THREE.Object3D): void {
       if (!this._threeGroup) return;
 
       this._threeGroup.remove(object);

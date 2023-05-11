@@ -224,8 +224,8 @@ namespace gdjs {
       return null;
     }
 
-    get3dRendererObject() {
-      return this._renderer.get3dRendererObject();
+    get3DRendererObject() {
+      return this._renderer.get3DRendererObject();
     }
 
     getBackFaceUpThroughWhichAxisRotation(): 'X' | 'Y' {
@@ -514,7 +514,7 @@ namespace gdjs {
       const axisX = gdjs.Cube3DRuntimeObject._temporaryVector;
       axisX.set(1, 0, 0);
 
-      const mesh = this._renderer.get3dRendererObject();
+      const mesh = this._renderer.get3DRendererObject();
       mesh.rotateOnWorldAxis(axisX, gdjs.toRad(deltaAngle));
       this._rotationX = gdjs.toDegrees(mesh.rotation.x);
       this._rotationY = gdjs.toDegrees(mesh.rotation.y);
@@ -529,7 +529,7 @@ namespace gdjs {
       const axisY = gdjs.Cube3DRuntimeObject._temporaryVector;
       axisY.set(0, 1, 0);
 
-      const mesh = this._renderer.get3dRendererObject();
+      const mesh = this._renderer.get3DRendererObject();
       mesh.rotateOnWorldAxis(axisY, gdjs.toRad(deltaAngle));
       this._rotationX = gdjs.toDegrees(mesh.rotation.x);
       this._rotationY = gdjs.toDegrees(mesh.rotation.y);
@@ -544,7 +544,7 @@ namespace gdjs {
       const axisZ = gdjs.Cube3DRuntimeObject._temporaryVector;
       axisZ.set(0, 0, 1);
 
-      const mesh = this._renderer.get3dRendererObject();
+      const mesh = this._renderer.get3DRendererObject();
       mesh.rotateOnWorldAxis(axisZ, gdjs.toRad(deltaAngle));
       this._rotationX = gdjs.toDegrees(mesh.rotation.x);
       this._rotationY = gdjs.toDegrees(mesh.rotation.y);

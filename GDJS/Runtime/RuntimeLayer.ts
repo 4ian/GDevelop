@@ -95,7 +95,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    get3dRendererObject() {
+    get3DRendererObject() {
       return this._renderer.getThreeScene();
     }
 

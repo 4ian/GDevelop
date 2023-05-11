@@ -569,7 +569,7 @@ namespace gdjs {
       };
 
       // Mouse:
-      
+
       // Converts HTML mouse button to InputManager mouse button.
       // This function is used to align HTML button values with GDevelop 3 C++ SFML Mouse button enum values,
       // notably the middle and right buttons.

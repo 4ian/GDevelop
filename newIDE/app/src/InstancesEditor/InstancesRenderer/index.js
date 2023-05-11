@@ -150,6 +150,11 @@ export default class InstancesRenderer {
     /** Useful to render the background color. */
     let isFirstRender = true;
 
+    // Even if no rendering at all has been made already, setting up the Three.js/PixiJS renderers
+    // might have changed some WebGL states already. Reset the state for the very first frame.
+    // And, out of caution, keep doing it for every frame.
+    if (threeRenderer) threeRenderer.resetState();
+
     for (let i = 0; i < this.layout.getLayersCount(); i++) {
       const layer = this.layout.getLayerAt(i);
       const layerName = layer.getName();

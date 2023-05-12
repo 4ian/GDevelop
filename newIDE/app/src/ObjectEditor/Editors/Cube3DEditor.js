@@ -10,10 +10,14 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import Checkbox from '../../UI/Checkbox';
 import { Column, Line } from '../../UI/Grid';
-import { FormHelperText } from '@material-ui/core';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Tooltip from '@material-ui/core/Tooltip';
 import { MarkdownText } from '../../UI/MarkdownText';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+import MeasurementUnitDocumentation from '../../PropertiesEditor/MeasurementUnitDocumentation';
+import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const facesProperties = [
   {
@@ -93,33 +97,38 @@ const Cube3DEditor = ({
         <Trans>Default size</Trans>
       </Text>
       <ResponsiveLineStackLayout expand noColumnMargin>
-        <Column noMargin expand>
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelFixed
-            floatingLabelText={properties.get('width').getLabel()}
-            onChange={value => onChangeProperty('width', value)}
-            value={properties.get('width').getValue()}
-          />
-        </Column>
-        <Column noMargin expand>
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelFixed
-            floatingLabelText={properties.get('height').getLabel()}
-            onChange={value => onChangeProperty('height', value)}
-            value={properties.get('height').getValue()}
-          />
-        </Column>
-        <Column noMargin expand>
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelFixed
-            floatingLabelText={properties.get('depth').getLabel()}
-            onChange={value => onChangeProperty('depth', value)}
-            value={properties.get('depth').getValue()}
-          />
-        </Column>
+        {['width', 'height', 'depth'].map(propertyName => {
+          const property = properties.get(propertyName);
+          const measurementUnit = property.getMeasurementUnit();
+          const endAdornment = {
+            label: getMeasurementUnitShortLabel(measurementUnit),
+            tooltipContent: (
+              <MeasurementUnitDocumentation
+                label={measurementUnit.getLabel()}
+                description={measurementUnit.getDescription()}
+                elementsWithWords={measurementUnit.getElementsWithWords()}
+              />
+            ),
+          };
+          return (
+            <Column noMargin expand key={propertyName}>
+              <SemiControlledTextField
+                commitOnBlur
+                floatingLabelFixed
+                floatingLabelText={property.getLabel()}
+                onChange={value => onChangeProperty(propertyName, value)}
+                value={property.getValue()}
+                endAdornment={
+                  <Tooltip title={endAdornment.tooltipContent}>
+                    <InputAdornment position="end">
+                      {endAdornment.label}
+                    </InputAdornment>
+                  </Tooltip>
+                }
+              />
+            </Column>
+          );
+        })}
       </ResponsiveLineStackLayout>
       <Text size="block-title" noMargin>
         <Trans>Settings</Trans>

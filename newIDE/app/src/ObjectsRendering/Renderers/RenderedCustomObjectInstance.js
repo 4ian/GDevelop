@@ -120,7 +120,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         // $FlowFixMe Use real object instances.
         childInstance,
         childObjectConfiguration,
-        this._pixiObject
+        this._pixiObject,
+        threeGroup
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);

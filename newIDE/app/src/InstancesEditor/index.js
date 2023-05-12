@@ -188,7 +188,6 @@ export default class InstancesEditor extends Component<Props> {
         width: this.props.width,
         height: this.props.height,
         view: gameCanvas,
-        // @ts-ignore - reuse the context from Three.js.
         context: threeRenderer.getContext(),
         clearBeforeRender: false,
         preserveDrawingBuffer: true,

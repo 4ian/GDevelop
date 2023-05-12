@@ -231,7 +231,7 @@ const propertyKeywordCouples: Array<Array<string>> = [
 const uncapitalize = str => {
   if (!str) return str;
   return str[0].toLowerCase() + str.substr(1);
-}
+};
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.

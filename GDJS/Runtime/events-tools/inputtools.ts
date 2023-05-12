@@ -141,6 +141,18 @@ namespace gdjs {
       }
 
       /**
+       * A hashmap associates each name of a mouse button with its respective code.
+       * @memberof gdjs.evtTools
+       */
+      export const mouseButtonsNameToCode = {
+        Left: gdjs.InputManager.MOUSE_LEFT_BUTTON,
+        Right: gdjs.InputManager.MOUSE_RIGHT_BUTTON,
+        Middle: gdjs.InputManager.MOUSE_MIDDLE_BUTTON,
+        Back: gdjs.InputManager.MOUSE_BACK_BUTTON,
+        Forward: gdjs.InputManager.MOUSE_FORWARD_BUTTON,
+      };
+
+      /**
        * Return true if the specified key is pressed
        *
        */
@@ -206,35 +218,11 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
-        if (button === 'Left') {
+        if (gdjs.evtTools.input.mouseButtonsNameToCode.hasOwnProperty(button)) {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-        }
-        if (button === 'Right') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-        }
-        if (button === 'Middle') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
-        }
-        if (button === 'Back') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(gdjs.InputManager.MOUSE_BACK_BUTTON);
-        }
-        if (button === 'Forward') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(gdjs.InputManager.MOUSE_FORWARD_BUTTON);
+            .isMouseButtonPressed(gdjs.evtTools.input.mouseButtonsNameToCode[button]);
         }
         return false;
       };
@@ -243,35 +231,11 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
-        if (button === 'Left') {
+        if (gdjs.evtTools.input.mouseButtonsNameToCode.hasOwnProperty(button)) {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-        }
-        if (button === 'Right') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-        }
-        if (button === 'Middle') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
-        }
-        if (button === 'Back') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(gdjs.InputManager.MOUSE_BACK_BUTTON);
-        }
-        if (button === 'Forward') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(gdjs.InputManager.MOUSE_FORWARD_BUTTON);
+            .isMouseButtonReleased(gdjs.evtTools.input.mouseButtonsNameToCode[button]);
         }
         return false;
       };

@@ -864,6 +864,7 @@ module.exports = {
     objectsRenderingService /*: ObjectsRenderingService */
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
+    const Rendered3DInstance = objectsRenderingService.Rendered3DInstance;
     const PIXI = objectsRenderingService.PIXI;
     const THREE = objectsRenderingService.THREE;
 
@@ -904,6 +905,33 @@ module.exports = {
       3: [1, 0],
     };
 
+    const getFirstVisibleFaceResourceName = (objectConfiguration) => {
+      const properties = objectConfiguration.getProperties();
+
+      const orderedFaces = [
+        ['frontFaceVisible', 'frontFaceResourceName'],
+        ['backFaceVisible', 'backFaceResourceName'],
+        ['leftFaceVisible', 'leftFaceResourceName'],
+        ['rightFaceVisible', 'rightFaceResourceName'],
+        ['topFaceVisible', 'topFaceResourceName'],
+        ['bottomFaceVisible', 'bottomFaceResourceName'],
+      ];
+
+      for (const [
+        faceVisibleProperty,
+        faceResourceNameProperty,
+      ] of orderedFaces) {
+        if (properties.get(faceVisibleProperty).getValue() === 'true') {
+          const textureResource = properties
+            .get(faceResourceNameProperty)
+            .getValue();
+          if (textureResource) return textureResource;
+        }
+      }
+
+      return null;
+    };
+
     let transparentMaterial = null;
     const getTransparentMaterial = () => {
       if (!transparentMaterial)
@@ -918,14 +946,13 @@ module.exports = {
       return transparentMaterial;
     };
 
-    class RenderedCube3DObjectInstance extends RenderedInstance {
+    class RenderedCube3DObject2DInstance extends RenderedInstance {
       constructor(
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        threeGroup,
         pixiResourcesLoader
       ) {
         super(
@@ -934,7 +961,6 @@ module.exports = {
           instance,
           associatedObjectConfiguration,
           pixiContainer,
-          threeGroup,
           pixiResourcesLoader
         );
         /**
@@ -956,99 +982,17 @@ module.exports = {
         this._pixiContainer.addChild(this._pixiObject);
         this._renderFallbackObject = false;
         this.updateTexture();
-
-        this._faceResourceNames = [
-          properties.get('frontFaceResourceName').getValue(),
-          properties.get('backFaceResourceName').getValue(),
-          properties.get('leftFaceResourceName').getValue(),
-          properties.get('rightFaceResourceName').getValue(),
-          properties.get('topFaceResourceName').getValue(),
-          properties.get('bottomFaceResourceName').getValue(),
-        ];
-        this._faceVisibilities = [
-          properties.get('frontFaceVisible').getValue() === 'true',
-          properties.get('backFaceVisible').getValue() === 'true',
-          properties.get('leftFaceVisible').getValue() === 'true',
-          properties.get('rightFaceVisible').getValue() === 'true',
-          properties.get('topFaceVisible').getValue() === 'true',
-          properties.get('bottomFaceVisible').getValue() === 'true',
-        ];
-        this._shouldRepeatTextureOnFace = [
-          properties.get('frontFaceResourceRepeat').getValue() === 'true',
-          properties.get('backFaceResourceRepeat').getValue() === 'true',
-          properties.get('leftFaceResourceRepeat').getValue() === 'true',
-          properties.get('rightFaceResourceRepeat').getValue() === 'true',
-          properties.get('topFaceResourceRepeat').getValue() === 'true',
-          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
-        ];
-        this._facesOrientation = properties.get('facesOrientation').getValue();
-        this._backFaceUpThroughWhichAxisRotation = properties
-          .get('backFaceUpThroughWhichAxisRotation')
-          .getValue();
-        this._shouldUseTransparentTexture =
-          properties.get('enableTextureTransparency').getValue() === 'true';
-        if (this._threeGroup) {
-          this._defaultDepth = parseFloat(properties.get('depth').getValue());
-          const geometry = new THREE.BoxGeometry(1, 1, 1);
-          const materials = [
-            this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
-            this._getFaceMaterial(project, materialIndexToFaceIndex[1]),
-            this._getFaceMaterial(project, materialIndexToFaceIndex[2]),
-            this._getFaceMaterial(project, materialIndexToFaceIndex[3]),
-            this._getFaceMaterial(project, materialIndexToFaceIndex[4]),
-            this._getFaceMaterial(project, materialIndexToFaceIndex[5]),
-          ];
-          this._threeObject = new THREE.Mesh(geometry, materials);
-          this._threeObject.rotation.order = 'ZYX';
-
-          this._threeGroup.add(this._threeObject);
-        }
-      }
-
-      _getFaceMaterial(project, faceIndex) {
-        if (!this._faceVisibilities[faceIndex]) return getTransparentMaterial();
-
-        return this._pixiResourcesLoader.getThreeMaterial(
-          project,
-          this._faceResourceNames[faceIndex],
-          {
-            useTransparentTexture: this._shouldUseTransparentTexture,
-          }
-        );
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {
-        const properties = objectConfiguration.getProperties();
-
-        const orderedFaces = [
-          ['frontFaceVisible', 'frontFaceResourceName'],
-          ['backFaceVisible', 'backFaceResourceName'],
-          ['leftFaceVisible', 'leftFaceResourceName'],
-          ['rightFaceVisible', 'rightFaceResourceName'],
-          ['topFaceVisible', 'topFaceResourceName'],
-          ['bottomFaceVisible', 'bottomFaceResourceName'],
-        ];
-
-        for (const [
-          faceVisibleProperty,
-          faceResourceNameProperty,
-        ] of orderedFaces) {
-          if (properties.get(faceVisibleProperty).getValue() === 'true') {
-            const textureResource = properties
-              .get(faceResourceNameProperty)
-              .getValue();
-            if (textureResource) return textureResource;
-          }
-        }
-
-        return null;
+        return getFirstVisibleFaceResourceName(objectConfiguration);
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         const instance = this._instance;
 
         const textureResourceName =
-          RenderedCube3DObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
             objectConfiguration
           );
         if (textureResourceName) {
@@ -1063,7 +1007,7 @@ module.exports = {
 
       updateTextureIfNeeded() {
         const textureName =
-          RenderedCube3DObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
         if (textureName === this._renderedResourceName) return;
@@ -1073,7 +1017,7 @@ module.exports = {
 
       updateTexture() {
         const textureName =
-          RenderedCube3DObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
 
@@ -1126,6 +1070,168 @@ module.exports = {
         this._pixiTexturedObject.position.y =
           this._instance.getY() +
           this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
+      }
+
+      updateFallbackObject() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+
+        this._pixiFallbackObject.clear();
+        this._pixiFallbackObject.beginFill(0x0033ff);
+        this._pixiFallbackObject.lineStyle(1, 0xffd900, 1);
+        this._pixiFallbackObject.moveTo(-width / 2, -height / 2);
+        this._pixiFallbackObject.lineTo(width / 2, -height / 2);
+        this._pixiFallbackObject.lineTo(width / 2, height / 2);
+        this._pixiFallbackObject.lineTo(-width / 2, height / 2);
+        this._pixiFallbackObject.endFill();
+
+        this._pixiFallbackObject.position.x = this._instance.getX() + width / 2;
+        this._pixiFallbackObject.position.y =
+          this._instance.getY() + height / 2;
+        this._pixiFallbackObject.angle = this._instance.getAngle();
+      }
+
+      update() {
+        this.updateTextureIfNeeded();
+
+        this._pixiFallbackObject.visible = this._renderFallbackObject;
+        this._pixiTexturedObject.visible = !this._renderFallbackObject;
+
+        if (this._renderFallbackObject) {
+          this.updateFallbackObject();
+        } else {
+          this.updatePIXISprite();
+        }
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+
+      getCenterX() {
+        if (this._renderFallbackObject) {
+          if (this._instance.hasCustomSize()) {
+            return this._instance.getCustomWidth() / 2;
+          } else {
+            return this.getDefaultWidth() / 2;
+          }
+        } else {
+          return this._centerX * this._pixiTexturedObject.scale.x;
+        }
+      }
+
+      getCenterY() {
+        if (this._renderFallbackObject) {
+          if (this._instance.hasCustomSize()) {
+            return this._instance.getCustomHeight() / 2;
+          } else {
+            return this.getDefaultHeight() / 2;
+          }
+        } else {
+          return this._centerY * this._pixiTexturedObject.scale.y;
+        }
+      }
+    }
+
+    class RenderedCube3DObject3DInstance extends Rendered3DInstance {
+      constructor(
+        project,
+        layout,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        threeGroup,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          threeGroup,
+          pixiResourcesLoader
+        );
+        /**
+         * Name of the resource that is rendered.
+         * If no face is visible, this will be null.
+         */
+        this._renderedResourceName = undefined;
+        const properties = associatedObjectConfiguration.getProperties();
+        this._defaultWidth = parseFloat(properties.get('width').getValue());
+        this._defaultHeight = parseFloat(properties.get('height').getValue());
+
+        this._pixiObject = new PIXI.Graphics();
+        this._pixiContainer.addChild(this._pixiObject);
+
+        this._faceResourceNames = [
+          properties.get('frontFaceResourceName').getValue(),
+          properties.get('backFaceResourceName').getValue(),
+          properties.get('leftFaceResourceName').getValue(),
+          properties.get('rightFaceResourceName').getValue(),
+          properties.get('topFaceResourceName').getValue(),
+          properties.get('bottomFaceResourceName').getValue(),
+        ];
+        this._faceVisibilities = [
+          properties.get('frontFaceVisible').getValue() === 'true',
+          properties.get('backFaceVisible').getValue() === 'true',
+          properties.get('leftFaceVisible').getValue() === 'true',
+          properties.get('rightFaceVisible').getValue() === 'true',
+          properties.get('topFaceVisible').getValue() === 'true',
+          properties.get('bottomFaceVisible').getValue() === 'true',
+        ];
+        this._shouldRepeatTextureOnFace = [
+          properties.get('frontFaceResourceRepeat').getValue() === 'true',
+          properties.get('backFaceResourceRepeat').getValue() === 'true',
+          properties.get('leftFaceResourceRepeat').getValue() === 'true',
+          properties.get('rightFaceResourceRepeat').getValue() === 'true',
+          properties.get('topFaceResourceRepeat').getValue() === 'true',
+          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
+        ];
+        this._facesOrientation = properties.get('facesOrientation').getValue();
+        this._backFaceUpThroughWhichAxisRotation = properties
+          .get('backFaceUpThroughWhichAxisRotation')
+          .getValue();
+        this._shouldUseTransparentTexture =
+          properties.get('enableTextureTransparency').getValue() === 'true';
+        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const materials = [
+          this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
+          this._getFaceMaterial(project, materialIndexToFaceIndex[1]),
+          this._getFaceMaterial(project, materialIndexToFaceIndex[2]),
+          this._getFaceMaterial(project, materialIndexToFaceIndex[3]),
+          this._getFaceMaterial(project, materialIndexToFaceIndex[4]),
+          this._getFaceMaterial(project, materialIndexToFaceIndex[5]),
+        ];
+        this._threeObject = new THREE.Mesh(geometry, materials);
+        this._threeObject.rotation.order = 'ZYX';
+
+        this._threeGroup.add(this._threeObject);
+      }
+
+      _getFaceMaterial(project, faceIndex) {
+        if (!this._faceVisibilities[faceIndex]) return getTransparentMaterial();
+
+        return this._pixiResourcesLoader.getThreeMaterial(
+          project,
+          this._faceResourceNames[faceIndex],
+          {
+            useTransparentTexture: this._shouldUseTransparentTexture,
+          }
+        );
+      }
+
+      static _getResourceNameToDisplay(objectConfiguration) {
+        return getFirstVisibleFaceResourceName(objectConfiguration);
       }
 
       updateThreeObject() {
@@ -1381,7 +1487,7 @@ module.exports = {
         uvMapping.needsUpdate = true;
       }
 
-      updateFallbackObject() {
+      updatePixiObject() {
         const width = this._instance.hasCustomSize()
           ? this._instance.getCustomWidth()
           : this.getDefaultWidth();
@@ -1389,33 +1495,23 @@ module.exports = {
           ? this._instance.getCustomHeight()
           : this.getDefaultHeight();
 
-        this._pixiFallbackObject.clear();
-        this._pixiFallbackObject.beginFill(0x0033ff);
-        this._pixiFallbackObject.lineStyle(1, 0xffd900, 1);
-        this._pixiFallbackObject.moveTo(-width / 2, -height / 2);
-        this._pixiFallbackObject.lineTo(width / 2, -height / 2);
-        this._pixiFallbackObject.lineTo(width / 2, height / 2);
-        this._pixiFallbackObject.lineTo(-width / 2, height / 2);
-        this._pixiFallbackObject.endFill();
+        this._pixiObject.clear();
+        this._pixiObject.beginFill(0x999999, 0.2);
+        this._pixiObject.lineStyle(1, 0xffd900, 0);
+        this._pixiObject.moveTo(-width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, height / 2);
+        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.endFill();
 
-        this._pixiFallbackObject.position.x = this._instance.getX() + width / 2;
-        this._pixiFallbackObject.position.y =
-          this._instance.getY() + height / 2;
-        this._pixiFallbackObject.angle = this._instance.getAngle();
+        this._pixiObject.position.x = this._instance.getX() + width / 2;
+        this._pixiObject.position.y = this._instance.getY() + height / 2;
+        this._pixiObject.angle = this._instance.getAngle();
       }
 
       update() {
-        this.updateTextureIfNeeded();
-
-        this._pixiFallbackObject.visible = this._renderFallbackObject;
-        this._pixiTexturedObject.visible = !this._renderFallbackObject;
-
-        if (this._renderFallbackObject) {
-          this.updateFallbackObject();
-        } else {
-          this.updatePIXISprite();
-          this.updateThreeObject();
-        }
+        this.updatePixiObject();
+        this.updateThreeObject();
       }
 
       getDefaultWidth() {
@@ -1427,33 +1523,29 @@ module.exports = {
       }
 
       getCenterX() {
-        if (this._renderFallbackObject) {
-          if (this._instance.hasCustomSize()) {
-            return this._instance.getCustomWidth() / 2;
-          } else {
-            return this.getDefaultWidth() / 2;
-          }
+        if (this._instance.hasCustomSize()) {
+          return this._instance.getCustomWidth() / 2;
         } else {
-          return this._centerX * this._pixiTexturedObject.scale.x;
+          return this.getDefaultWidth() / 2;
         }
       }
 
       getCenterY() {
-        if (this._renderFallbackObject) {
-          if (this._instance.hasCustomSize()) {
-            return this._instance.getCustomHeight() / 2;
-          } else {
-            return this.getDefaultHeight() / 2;
-          }
+        if (this._instance.hasCustomSize()) {
+          return this._instance.getCustomHeight() / 2;
         } else {
-          return this._centerY * this._pixiTexturedObject.scale.y;
+          return this.getDefaultHeight() / 2;
         }
       }
     }
 
     objectsRenderingService.registerInstanceRenderer(
       'Scene3D::Cube3DObject',
-      RenderedCube3DObjectInstance
+      RenderedCube3DObject2DInstance
+    );
+    objectsRenderingService.registerInstance3DRenderer(
+      'Scene3D::Cube3DObject',
+      RenderedCube3DObject3DInstance
     );
   },
 };

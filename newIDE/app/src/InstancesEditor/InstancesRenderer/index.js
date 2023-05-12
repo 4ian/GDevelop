@@ -23,6 +23,7 @@ export default class InstancesRenderer {
     x: number,
     y: number,
   |}) => void;
+  _showObjectInstancesIn3D: boolean;
   onInstanceDoubleClicked: gdInitialInstance => void;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
@@ -56,6 +57,7 @@ export default class InstancesRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+    showObjectInstancesIn3D,
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
@@ -74,6 +76,7 @@ export default class InstancesRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
+    showObjectInstancesIn3D: boolean,
   }) {
     this.project = project;
     this.instances = instances;
@@ -88,6 +91,7 @@ export default class InstancesRenderer {
     this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
 
+    this._showObjectInstancesIn3D = showObjectInstancesIn3D;
     this.layersRenderers = {};
 
     // This container is only used for user interactions.
@@ -176,6 +180,7 @@ export default class InstancesRenderer {
           onMoveInstanceEnd: this.onMoveInstanceEnd,
           onDownInstance: this.onDownInstance,
           pixiRenderer: pixiRenderer,
+          showObjectInstancesIn3D: this._showObjectInstancesIn3D,
         });
         this.pixiContainer.addChild(layerRenderer.getPixiContainer());
       }

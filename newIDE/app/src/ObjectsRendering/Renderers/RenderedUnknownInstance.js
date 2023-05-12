@@ -3,7 +3,6 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
-import * as THREE from 'three';
 
 /**
  * Objects with an unknown type are rendered with a placeholder rectangle.
@@ -15,7 +14,6 @@ export default class RenderedUnknownInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -24,7 +22,6 @@ export default class RenderedUnknownInstance extends RenderedInstance {
       instance,
       associatedObjectConfiguration,
       pixiContainer,
-      threeGroup,
       pixiResourcesLoader
     );
 

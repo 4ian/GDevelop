@@ -1,5 +1,6 @@
 // @flow
 import RenderedInstance from './RenderedInstance';
+import Rendered3DInstance from './Rendered3DInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
@@ -22,12 +23,15 @@ const gd: libGDevelop = global.gd;
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
-export default class RenderedCustomObjectInstance extends RenderedInstance
-  implements LayoutedParent<RenderedInstance> {
+export default class RenderedCustomObjectInstance extends Rendered3DInstance
+  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];
-  childrenRenderedInstances: RenderedInstance[];
-  childrenRenderedInstanceByNames: Map<string, RenderedInstance>;
+  childrenRenderedInstances: Array<RenderedInstance | Rendered3DInstance>;
+  childrenRenderedInstanceByNames: Map<
+    string,
+    RenderedInstance | Rendered3DInstance
+  >;
   _proportionalOriginX: number;
   _proportionalOriginY: number;
 
@@ -53,6 +57,9 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     //Setup the PIXI object:
     this._pixiObject = new PIXI.Container();
     this._pixiContainer.addChild(this._pixiObject);
+
+    this._threeObject = new THREE.Group();
+    this._threeGroup.add(this._threeObject);
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
@@ -90,7 +97,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     this.childrenInstances = [];
     this.childrenLayouts = [];
     this.childrenRenderedInstances = [];
-    this.childrenRenderedInstanceByNames = new Map<string, RenderedInstance>();
+    this.childrenRenderedInstanceByNames = new Map<
+      string,
+      RenderedInstance | Rendered3DInstance
+    >();
 
     if (!eventBasedObject) {
       return;
@@ -121,7 +131,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         childInstance,
         childObjectConfiguration,
         this._pixiObject,
-        threeGroup
+        this._threeObject
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
@@ -206,6 +216,18 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     this._pixiObject.scale.y = 1;
     this._pixiObject.position.x = this._instance.getX() + centerX - originX;
     this._pixiObject.position.y = this._instance.getY() + centerY - originY;
+
+    this._threeObject.position.set(
+      this._instance.getX(),
+      this._instance.getY(),
+      0
+    );
+    // TODO (3D) Handle rotation center for the three group.
+    // this._threeObject.rotation.set(
+    //   0,
+    //   0,
+    //   RenderedInstance.toRad(this._instance.getAngle())
+    // );
   }
 
   getWidth() {

@@ -11,6 +11,7 @@ import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstan
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
+import Rendered3DInstance from './Renderers/Rendered3DInstance';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -44,6 +45,7 @@ const ObjectsRenderingService = {
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
+  renderers3D: {},
   getThumbnail: function(
     project: gdProject,
     objectConfiguration: gdObjectConfiguration
@@ -75,17 +77,26 @@ const ObjectsRenderingService = {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
-    threeGroup: THREE.Group
-  ): RenderedInstance {
+    threeGroup: THREE.Group | null
+  ): RenderedInstance | Rendered3DInstance {
     const objectType = associatedObjectConfiguration.getType();
-    if (this.renderers.hasOwnProperty(objectType))
-      return new this.renderers[objectType](
+    if (threeGroup && this.renderers3D.hasOwnProperty(objectType)) {
+      return new this.renderers3D[objectType](
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
         threeGroup,
+        PixiResourcesLoader
+      );
+    } else if (this.renderers.hasOwnProperty(objectType))
+      return new this.renderers[objectType](
+        project,
+        layout,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
         PixiResourcesLoader
       );
     else {
@@ -135,6 +146,19 @@ const ObjectsRenderingService = {
     }
 
     this.renderers[objectType] = renderer;
+  },
+  registerInstance3DRenderer: function(objectType: string, renderer: any) {
+    if (this.renderers3D.hasOwnProperty(objectType)) {
+      console.warn(
+        `Tried to register 3D renderer for object "${objectType}", but a renderer already exists.`
+      );
+
+      // If you want to update a 3D renderer, this is currently unsupported.
+      // See comment in registerInstanceRenderer.
+      return;
+    }
+
+    this.renderers3D[objectType] = renderer;
   },
   /**
    * Register a module that can be then required using `requireModule`.
@@ -231,6 +255,7 @@ const ObjectsRenderingService = {
   PIXI, // Expose PIXI so that it can be used by renderers
   THREE, // Expose THREE so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
+  Rendered3DInstance, // Expose the base class for 3D renderers so that it can be used by renderers
 };
 
 export default ObjectsRenderingService;

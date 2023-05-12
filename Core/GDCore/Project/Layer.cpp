@@ -14,7 +14,7 @@ namespace gd {
 Camera Layer::badCamera;
 
 Layer::Layer()
-    : renderingType("2d"),
+    : renderingType(""),
       isVisible(true),
       isLocked(false),
       isLightingLayer(false),
@@ -72,7 +72,7 @@ void Layer::SerializeTo(SerializerElement& element) const {
  */
 void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
-  SetRenderingType(element.GetStringAttribute("renderingType", "2d"));
+  SetRenderingType(element.GetStringAttribute("renderingType", ""));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
   SetLocked(element.GetBoolAttribute("isLocked", false));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));

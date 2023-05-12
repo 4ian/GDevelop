@@ -204,7 +204,7 @@ class GD_CORE_API Layer {
 
  private:
   gd::String name;       ///< The name of the layer
-  gd::String renderingType;  ///< The rendering type: "2d", "3d" or "2d+3d".
+  gd::String renderingType;  ///< The rendering type: "" (empty), "2d", "3d" or "2d+3d".
   bool isVisible;        ///< True if the layer is visible
   bool isLocked;        ///< True if the layer is locked
   bool isLightingLayer;  ///< True if the layer is used to display lights and

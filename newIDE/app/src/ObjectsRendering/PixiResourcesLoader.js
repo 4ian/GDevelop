@@ -2,6 +2,7 @@
 import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
@@ -11,6 +12,8 @@ const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
+const loadedThreeTextures = {};
+const loadedThreeMaterials = {};
 
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
@@ -30,12 +33,25 @@ const determineCrossOrigin = (url: string) => {
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
-  static _initializeTexture(resource: gdResource, texture: any) {
+  static _applyTextureSettings(resource: gdResource, texture: any) {
     if (resource.getKind() !== 'image') return;
 
     const imageResource = gd.asImageResource(resource);
     if (!imageResource.isSmooth()) {
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+    }
+  }
+
+  static _applyThreeTextureSettings(
+    resource: gdResource,
+    threeTexture: THREE.Texture
+  ) {
+    if (resource.getKind() !== 'image') return;
+
+    const imageResource = gd.asImageResource(resource);
+    if (!imageResource.isSmooth()) {
+      threeTexture.magFilter = THREE.NearestFilter;
+      threeTexture.minFilter = THREE.NearestFilter;
     }
   }
 
@@ -95,7 +111,7 @@ export default class PixiResourcesLoader {
           const texture = loadedResources[resourceName].texture;
           if (texture) {
             loadedTextures[resourceName] = texture;
-            PixiResourcesLoader._initializeTexture(
+            PixiResourcesLoader._applyTextureSettings(
               resource,
               loadedTextures[resourceName]
             );
@@ -138,11 +154,82 @@ export default class PixiResourcesLoader {
       },
     });
 
-    PixiResourcesLoader._initializeTexture(
+    PixiResourcesLoader._applyTextureSettings(
       resource,
       loadedTextures[resourceName]
     );
     return loadedTextures[resourceName];
+  }
+
+  /**
+   * Return the three.js texture associated to the specified resource name.
+   * Returns a placeholder texture if not found.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @returns The requested texture, or a placeholder if not found.
+   */
+  static getThreeTexture(
+    project: gdProject,
+    resourceName: string
+  ): THREE.Texture {
+    const loadedThreeTexture = loadedThreeTextures[resourceName];
+    if (loadedThreeTexture) return loadedThreeTexture;
+
+    // Texture is not loaded, load it now from the PixiJS texture.
+    // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
+    // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
+    const pixiTexture = PixiResourcesLoader.getPIXITexture(
+      project,
+      resourceName
+    );
+
+    // @ts-ignore - source does exist on resource.
+    const image = pixiTexture.baseTexture.resource.source;
+    if (!(image instanceof HTMLImageElement)) {
+      throw new Error(
+        `Can't load texture for resource "${resourceName}" as it's not an image.`
+      );
+    }
+
+    const threeTexture = new THREE.Texture(image);
+    threeTexture.magFilter = THREE.LinearFilter;
+    threeTexture.minFilter = THREE.LinearFilter;
+    threeTexture.wrapS = THREE.RepeatWrapping;
+    threeTexture.wrapT = THREE.RepeatWrapping;
+    threeTexture.needsUpdate = true;
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    PixiResourcesLoader._applyThreeTextureSettings(resource, threeTexture);
+
+    loadedThreeTextures[resourceName] = threeTexture;
+
+    return threeTexture;
+  }
+
+  /**
+   * Return the three.js material associated to the specified resource name.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @param options
+   * @returns The requested material.
+   */
+  static getThreeMaterial(
+    project: gdProject,
+    resourceName: string,
+    { useTransparentTexture }: { useTransparentTexture: boolean }
+  ) {
+    const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
+    const loadedThreeMaterial = loadedThreeMaterials[cacheKey];
+    if (loadedThreeMaterial) return loadedThreeMaterial;
+
+    const material = new THREE.MeshBasicMaterial({
+      map: this.getThreeTexture(project, resourceName),
+      side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+      transparent: useTransparentTexture,
+    });
+
+    loadedThreeMaterials[cacheKey] = material;
+    return material;
   }
 
   /**

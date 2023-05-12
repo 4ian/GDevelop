@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react';
 import ReactJsonView from 'react-json-view';
-import {
-  type EditFunction,
-  type CallFunction,
-} from '../GDJSInspectorDescriptions';
 
 // This mirrors the internals of gdjs.Timer.
 type Timer = {| _name: string, _time: number, _paused: boolean |};
@@ -29,8 +25,6 @@ const transform = (timersHashtable: TimersHashtable) => {
 
 type Props = {|
   timers: ?TimersHashtable,
-  onCall: CallFunction,
-  onEdit: EditFunction,
 |};
 
 const TimersInspector = (props: Props) => (

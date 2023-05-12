@@ -15,6 +15,7 @@ import {
   getProportionalPositionY,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
@@ -36,6 +37,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -44,6 +46,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       instance,
       associatedObjectConfiguration,
       pixiContainer,
+      threeGroup,
       pixiResourcesLoader
     );
 
@@ -117,7 +120,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         // $FlowFixMe Use real object instances.
         childInstance,
         childObjectConfiguration,
-        this._pixiObject
+        this._pixiObject,
+        threeGroup
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);

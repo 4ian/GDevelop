@@ -450,9 +450,9 @@ namespace gdjs {
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
       }
-      const rendererObject3d = this.get3dRendererObject();
-      if (rendererObject3d) {
-        theLayer.getRenderer().remove3dRendererObject(rendererObject3d);
+      const rendererObject3D = this.get3DRendererObject();
+      if (rendererObject3D) {
+        theLayer.getRenderer().remove3DRendererObject(rendererObject3D);
       }
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
@@ -488,7 +488,7 @@ namespace gdjs {
     /**
      * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
      */
-    get3dRendererObject(): THREE.Object3D | null | undefined {
+    get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;
     }
 
@@ -728,10 +728,10 @@ namespace gdjs {
         oldLayer.getRenderer().removeRendererObject(rendererObject);
         newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
       }
-      const rendererObject3d = this.get3dRendererObject();
-      if (rendererObject3d) {
-        oldLayer.getRenderer().remove3dRendererObject(rendererObject3d);
-        newLayer.getRenderer().add3dRendererObject(rendererObject3d);
+      const rendererObject3D = this.get3DRendererObject();
+      if (rendererObject3D) {
+        oldLayer.getRenderer().remove3DRendererObject(rendererObject3D);
+        newLayer.getRenderer().add3DRendererObject(rendererObject3D);
       }
     }
 

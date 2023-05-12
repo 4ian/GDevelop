@@ -18,7 +18,7 @@ namespace gdjs {
     isLightingLayer?: () => boolean;
     getName: () => string;
     getRendererObject: () => RendererObjectInterface | null | undefined;
-    get3dRendererObject: () => THREE.Object3D | null | undefined;
+    get3DRendererObject: () => THREE.Object3D | null | undefined;
   }
 
   /**

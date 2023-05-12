@@ -14,7 +14,7 @@ namespace gdjs {
           }
 
           isEnabled(target: EffectsTarget): boolean {
-            const scene = target.get3dRendererObject() as
+            const scene = target.get3DRendererObject() as
               | THREE.Scene
               | null
               | undefined;
@@ -28,7 +28,7 @@ namespace gdjs {
             }
           }
           applyEffect(target: EffectsTarget): boolean {
-            const scene = target.get3dRendererObject() as
+            const scene = target.get3DRendererObject() as
               | THREE.Scene
               | null
               | undefined;
@@ -39,7 +39,7 @@ namespace gdjs {
             return true;
           }
           removeEffect(target: EffectsTarget): boolean {
-            const scene = target.get3dRendererObject() as
+            const scene = target.get3DRendererObject() as
               | THREE.Scene
               | null
               | undefined;

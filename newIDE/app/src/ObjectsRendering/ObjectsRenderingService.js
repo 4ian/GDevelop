@@ -12,6 +12,7 @@ import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import optionalRequire from '../Utils/OptionalRequire';
 import { rgbOrHexToHexNumber } from '../Utils/ColorTransformer';
 const path = optionalRequire('path');
@@ -73,7 +74,8 @@ const ObjectsRenderingService = {
     layout: gdLayout,
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
-    pixiContainer: any
+    pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group
   ): RenderedInstance {
     const objectType = associatedObjectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
@@ -83,6 +85,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
+        threeGroup,
         PixiResourcesLoader
       );
     else {
@@ -93,6 +96,7 @@ const ObjectsRenderingService = {
           instance,
           associatedObjectConfiguration,
           pixiContainer,
+          threeGroup,
           PixiResourcesLoader
         );
       }
@@ -106,6 +110,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
+        threeGroup,
         PixiResourcesLoader
       );
     }
@@ -224,6 +229,7 @@ const ObjectsRenderingService = {
   rgbOrHexToHexNumber, // Expose a ColorTransformer function, useful to manage different color types for the extensions
   gd, // Expose gd so that it can be used by renderers
   PIXI, // Expose PIXI so that it can be used by renderers
+  THREE, // Expose THREE so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
 };
 

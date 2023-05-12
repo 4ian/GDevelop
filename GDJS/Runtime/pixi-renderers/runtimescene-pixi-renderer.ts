@@ -12,6 +12,13 @@ namespace gdjs {
     private _profilerText: PIXI.Text | null = null;
     private _showCursorAtNextRender: boolean = false;
     private _threeRenderer: THREE.WebGLRenderer | null = null;
+    private _layerRenderingMetrics: {
+      rendered2DLayersCount: number;
+      rendered3DLayersCount: number;
+    } = {
+      rendered2DLayersCount: 0,
+      rendered3DLayersCount: 0,
+    };
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -63,6 +70,9 @@ namespace gdjs {
 
       const threeRenderer = this._threeRenderer;
 
+      this._layerRenderingMetrics.rendered2DLayersCount = 0;
+      this._layerRenderingMetrics.rendered3DLayersCount = 0;
+
       if (threeRenderer) {
         // Layered 2D, 3D or 2D+3D rendering.
         threeRenderer.info.autoReset = false;
@@ -73,9 +83,9 @@ namespace gdjs {
 
         /**
          * true if the last layer rendered 3D objects using Three.js, false otherwise.
-         * Useful to avoid needlessly reseting the WebGL states between layers (which can be expensive).
+         * Useful to avoid needlessly resetting the WebGL states between layers (which can be expensive).
          */
-        let lastRenderWas3d = true;
+        let lastRenderWas3D = true;
 
         // Even if no rendering at all has been made already, setting up the Three.js/PixiJS renderers
         // might have changed some WebGL states already. Reset the state for the very first frame.
@@ -90,12 +100,16 @@ namespace gdjs {
 
           const runtimeLayerRenderer = runtimeLayer.getRenderer();
           const runtimeLayerRenderingType = runtimeLayer.getRenderingType();
+          const layerHas3DObjectsToRender = runtimeLayerRenderer.has3DObjects();
           if (
-            runtimeLayerRenderingType === gdjs.RuntimeLayerRenderingType.TWO_D
+            runtimeLayerRenderingType ===
+              gdjs.RuntimeLayerRenderingType.TWO_D ||
+            !layerHas3DObjectsToRender
           ) {
-            // Render a layer with 2D rendering (PixiJS) only.
+            // Render a layer with 2D rendering (PixiJS) only if layer is configured as is
+            // or if there is no 3D object to render.
 
-            if (lastRenderWas3d) {
+            if (lastRenderWas3D) {
               // Ensure the state is clean for PixiJS to render.
               threeRenderer.resetState();
               pixiRenderer.reset();
@@ -121,8 +135,9 @@ namespace gdjs {
                 runtimeLayerRenderer.getLightingSprite()) ||
               runtimeLayerRenderer.getRendererObject();
             pixiRenderer.render(pixiContainer, { clear: false });
+            this._layerRenderingMetrics.rendered2DLayersCount++;
 
-            lastRenderWas3d = false;
+            lastRenderWas3D = false;
           } else {
             // Render a layer with 3D rendering, and possibly some 2D rendering too.
             const threeScene = runtimeLayerRenderer.getThreeScene();
@@ -136,26 +151,34 @@ namespace gdjs {
                 runtimeLayerRenderingType ===
                 gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
               ) {
-                if (lastRenderWas3d) {
-                  // Ensure the state is clean for PixiJS to render.
-                  threeRenderer.resetState();
-                  pixiRenderer.reset();
+                const layerHas2DObjectsToRender = runtimeLayerRenderer.has2DObjects();
+
+                if (layerHas2DObjectsToRender) {
+                  if (lastRenderWas3D) {
+                    // Ensure the state is clean for PixiJS to render.
+                    threeRenderer.resetState();
+                    pixiRenderer.reset();
+                  }
+
+                  // Do the rendering of the PixiJS objects of the layer on the render texture.
+                  // Then, update the texture of the plane showing the PixiJS rendering,
+                  // so that the 2D rendering made by PixiJS can be shown in the 3D world.
+                  runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
+                  runtimeLayerRenderer.updateThreePlaneTextureFromPixiRenderTexture(
+                    // The renderers are needed to find the internal WebGL texture.
+                    threeRenderer,
+                    pixiRenderer
+                  );
+                  this._layerRenderingMetrics.rendered2DLayersCount++;
+
+                  lastRenderWas3D = false;
                 }
-
-                // Do the rendering of the PixiJS objects of the layer on the render texture.
-                // Then, update the texture of the plane showing the PixiJS rendering,
-                // so that the 2D rendering made by PixiJS can be shown in the 3D world.
-                runtimeLayerRenderer.renderOnPixiRenderTexture(pixiRenderer);
-                runtimeLayerRenderer.updateThreePlaneTextureFromPixiRenderTexture(
-                  // The renderers are needed to find the internal WebGL texture.
-                  threeRenderer,
-                  pixiRenderer
+                runtimeLayerRenderer.show2DRenderingPlane(
+                  layerHas2DObjectsToRender
                 );
-
-                lastRenderWas3d = false;
               }
 
-              if (!lastRenderWas3d) {
+              if (!lastRenderWas3D) {
                 // It's important to reset the internal WebGL state of PixiJS, then Three.js
                 // to ensure the 3D rendering is made properly by Three.js
                 pixiRenderer.reset();
@@ -180,13 +203,14 @@ namespace gdjs {
               // even 3D objects.
               threeRenderer.clearDepth();
               threeRenderer.render(threeScene, threeCamera);
+              this._layerRenderingMetrics.rendered3DLayersCount++;
 
-              lastRenderWas3d = true;
+              lastRenderWas3D = true;
             }
           }
         }
 
-        if (!lastRenderWas3d) {
+        if (!lastRenderWas3D) {
           // Out of caution, reset the WebGL states from PixiJS to start again
           // with a 3D rendering on the next frame.
           pixiRenderer.reset();
@@ -212,6 +236,7 @@ namespace gdjs {
         // TODO: replace by a loop like in 3D?
         pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
         pixiRenderer.render(this._pixiContainer);
+        this._layerRenderingMetrics.rendered2DLayersCount++;
       }
 
       // synchronize showing the cursor with rendering (useful to reduce
@@ -221,6 +246,9 @@ namespace gdjs {
         if (canvas) canvas.style.cursor = '';
         this._showCursorAtNextRender = false;
       }
+
+      // Uncomment to check the number of 2D&3D rendering done
+      // console.log(this._layerRenderingMetrics);
     }
 
     _renderProfileText() {
@@ -265,7 +293,7 @@ namespace gdjs {
       return this._pixiContainer;
     }
 
-    get3dRendererObject() {
+    get3DRendererObject() {
       // There is no notion of a container for all 3D objects. Each 3D object is
       // added to their layer container.
       return null;

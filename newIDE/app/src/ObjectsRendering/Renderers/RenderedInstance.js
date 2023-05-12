@@ -1,5 +1,6 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 
 /**
@@ -12,8 +13,10 @@ export default class RenderedInstance {
   _instance: gdInitialInstance;
   _associatedObjectConfiguration: gdObjectConfiguration;
   _pixiContainer: PIXI.Container;
+  _threeGroup: THREE.Group;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
   _pixiObject: any;
+  _threeObject: THREE.Object3D;
   wasUsed: boolean;
 
   constructor(
@@ -22,12 +25,15 @@ export default class RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     this._pixiObject = null;
+    this._threeObject = null;
     this._instance = instance;
     this._associatedObjectConfiguration = associatedObjectConfiguration;
     this._pixiContainer = pixiContainer;
+    this._threeGroup = threeGroup;
     this._project = project;
     this._layout = layout;
     this._pixiResourcesLoader = pixiResourcesLoader;
@@ -52,6 +58,10 @@ export default class RenderedInstance {
     return this._pixiObject;
   }
 
+  getThreeObject() {
+    return this._threeObject;
+  }
+
   getInstance() {
     return this._instance;
   }
@@ -64,6 +74,7 @@ export default class RenderedInstance {
   onRemovedFromScene() {
     if (this._pixiObject !== null)
       this._pixiContainer.removeChild(this._pixiObject);
+    if (this._threeObject !== null) this._threeGroup.remove(this._threeObject);
   }
 
   getOriginX() {

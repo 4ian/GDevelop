@@ -19,6 +19,7 @@ import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import BackgroundColor from './BackgroundColor';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
@@ -99,6 +100,7 @@ type Props = {|
   onMouseMove: MouseEvent => void,
   onMouseLeave: MouseEvent => void,
   screenType: ScreenType,
+  showObjectInstancesIn3D: boolean,
 |};
 
 export default class InstancesEditor extends Component<Props> {
@@ -109,6 +111,7 @@ export default class InstancesEditor extends Component<Props> {
   fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
+  threeRenderer: THREE.WebGLRenderer | null = null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
@@ -167,18 +170,52 @@ export default class InstancesEditor extends Component<Props> {
       },
     });
 
-    //Create the renderer and setup the rendering area for scene editor.
-    //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-    this.pixiRenderer = PIXI.autoDetectRenderer(
-      {
+    let gameCanvas: HTMLCanvasElement;
+    // TODO (3D): Should it handle preference changes without needing to reopen tabs?
+    if (this.props.showObjectInstancesIn3D) {
+      gameCanvas = document.createElement('canvas');
+      const threeRenderer = new THREE.WebGLRenderer({
+        canvas: gameCanvas,
+      });
+      threeRenderer.autoClear = false;
+      // this._threeRenderer.setPixelRatio(0.05);
+      threeRenderer.setSize(this.props.width, this.props.height);
+
+      // Create a PixiJS renderer that use the same GL context as Three.js
+      // so that both can render to the canvas and even have PixiJS rendering
+      // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+      this.pixiRenderer = new PIXI.Renderer({
         width: this.props.width,
         height: this.props.height,
+        view: gameCanvas,
+        context: threeRenderer.getContext(),
+        clearBeforeRender: false,
         preserveDrawingBuffer: true,
         antialias: false,
-      }
-      // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
-    );
-    canvasArea.appendChild(this.pixiRenderer.view);
+        backgroundAlpha: 0,
+        // TODO (3D): `resolution: window.devicePixelRatio`?
+      });
+
+      this.threeRenderer = threeRenderer;
+    } else {
+      // Create the renderer and setup the rendering area for scene editor.
+      this.pixiRenderer = PIXI.autoDetectRenderer({
+        width: this.props.width,
+        height: this.props.height,
+        // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+        preserveDrawingBuffer: true,
+        // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
+        antialias: false,
+        clearBeforeRender: false,
+        backgroundAlpha: 0,
+      });
+
+      gameCanvas = this.pixiRenderer.view;
+    }
+
+    // Add the renderer view element to the DOM
+    canvasArea.appendChild(gameCanvas);
+
     this.pixiRenderer.view.style.outline = 'none';
 
     this.longTouchHandler = new LongTouchHandler({
@@ -292,7 +329,6 @@ export default class InstancesEditor extends Component<Props> {
       height: this.props.height,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
-    this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
     this.grid = new Grid({
       viewPosition: this.viewPosition,
@@ -345,9 +381,7 @@ export default class InstancesEditor extends Component<Props> {
       this.pixiContainer.removeChild(this.selectedInstances.getPixiContainer());
     }
     if (this.instancesRenderer) {
-      this.viewPosition
-        .getPixiContainer()
-        .removeChild(this.instancesRenderer.getPixiContainer());
+      this.pixiContainer.removeChild(this.instancesRenderer.getPixiContainer());
       this.instancesRenderer.delete();
     }
     if (this.selectionRectangle) {
@@ -366,7 +400,6 @@ export default class InstancesEditor extends Component<Props> {
 
     this.backgroundColor = new BackgroundColor({
       layout: props.layout,
-      pixiRenderer: this.pixiRenderer,
     });
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
@@ -429,9 +462,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
-    this.viewPosition
-      .getPixiContainer()
-      .addChild(this.instancesRenderer.getPixiContainer());
+    this.pixiContainer.addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.windowBorder.getPixiObject());
     this.pixiContainer.addChild(this.windowMask.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
@@ -461,6 +492,9 @@ export default class InstancesEditor extends Component<Props> {
       nextProps.height !== this.props.height
     ) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
+      if (this.threeRenderer) {
+        this.threeRenderer.setSize(nextProps.width, nextProps.height);
+      }
       this.viewPosition.resize(nextProps.width, nextProps.height);
       this.statusBar.resize(nextProps.width, nextProps.height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(
@@ -988,18 +1022,22 @@ export default class InstancesEditor extends Component<Props> {
       this.fpsLimiter.shouldUpdate() &&
       !shouldPreventRenderingInstanceEditors()
     ) {
-      this.backgroundColor.render();
-      this.viewPosition.render();
       this.canvasCursor.render();
       this.grid.render();
-      this.instancesRenderer.render();
       this.highlightedInstance.render();
       this.selectedInstances.render();
       this.selectionRectangle.render();
       this.windowBorder.render();
       this.windowMask.render();
       this.statusBar.render();
-      this.pixiRenderer.render(this.pixiContainer);
+
+      this.instancesRenderer.render(
+        this.pixiRenderer,
+        this.threeRenderer,
+        this.viewPosition,
+        this.backgroundColor,
+        this.pixiContainer
+      );
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };

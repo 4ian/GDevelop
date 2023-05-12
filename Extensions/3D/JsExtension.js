@@ -865,14 +865,67 @@ module.exports = {
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
+    const THREE = objectsRenderingService.THREE;
 
-    class RenderedThreeDShapeObjectInstance extends RenderedInstance {
+    const materialIndexToFaceIndex = {
+      // $FlowFixMe
+      0: 3,
+      // $FlowFixMe
+      1: 2,
+      // $FlowFixMe
+      2: 5,
+      // $FlowFixMe
+      3: 4,
+      // $FlowFixMe
+      4: 0,
+      // $FlowFixMe
+      5: 1,
+    };
+
+    const noRepeatTextureVertexIndexToUvMapping = {
+      // $FlowFixMe
+      0: [0, 0],
+      // $FlowFixMe
+      1: [1, 0],
+      // $FlowFixMe
+      2: [0, 1],
+      // $FlowFixMe
+      3: [1, 1],
+    };
+
+    const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
+      // $FlowFixMe
+      0: [0, 1],
+      // $FlowFixMe
+      1: [0, 0],
+      // $FlowFixMe
+      2: [1, 1],
+      // $FlowFixMe
+      3: [1, 0],
+    };
+
+    let transparentMaterial = null;
+    const getTransparentMaterial = () => {
+      if (!transparentMaterial)
+        transparentMaterial = new THREE.MeshBasicMaterial({
+          transparent: true,
+          opacity: 0,
+          // Set the alpha test to to ensure the faces behind are rendered
+          // (no "back face culling" that would still be done if alphaTest is not set).
+          alphaTest: 1,
+        });
+
+      return transparentMaterial;
+    };
+
+    class RenderedCube3DObjectInstance extends RenderedInstance {
       constructor(
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
+        threeGroup,
         pixiResourcesLoader
       ) {
         super(
@@ -881,6 +934,7 @@ module.exports = {
           instance,
           associatedObjectConfiguration,
           pixiContainer,
+          threeGroup,
           pixiResourcesLoader
         );
         /**
@@ -902,6 +956,65 @@ module.exports = {
         this._pixiContainer.addChild(this._pixiObject);
         this._renderFallbackObject = false;
         this.updateTexture();
+
+        this._faceResourceNames = [
+          properties.get('frontFaceResourceName').getValue(),
+          properties.get('backFaceResourceName').getValue(),
+          properties.get('leftFaceResourceName').getValue(),
+          properties.get('rightFaceResourceName').getValue(),
+          properties.get('topFaceResourceName').getValue(),
+          properties.get('bottomFaceResourceName').getValue(),
+        ];
+        this._faceVisibilities = [
+          properties.get('frontFaceVisible').getValue() === 'true',
+          properties.get('backFaceVisible').getValue() === 'true',
+          properties.get('leftFaceVisible').getValue() === 'true',
+          properties.get('rightFaceVisible').getValue() === 'true',
+          properties.get('topFaceVisible').getValue() === 'true',
+          properties.get('bottomFaceVisible').getValue() === 'true',
+        ];
+        this._shouldRepeatTextureOnFace = [
+          properties.get('frontFaceResourceRepeat').getValue() === 'true',
+          properties.get('backFaceResourceRepeat').getValue() === 'true',
+          properties.get('leftFaceResourceRepeat').getValue() === 'true',
+          properties.get('rightFaceResourceRepeat').getValue() === 'true',
+          properties.get('topFaceResourceRepeat').getValue() === 'true',
+          properties.get('bottomFaceResourceRepeat').getValue() === 'true',
+        ];
+        this._facesOrientation = properties.get('facesOrientation').getValue();
+        this._backFaceUpThroughWhichAxisRotation = properties
+          .get('backFaceUpThroughWhichAxisRotation')
+          .getValue();
+        this._shouldUseTransparentTexture =
+          properties.get('enableTextureTransparency').getValue() === 'true';
+        if (this._threeGroup) {
+          this._defaultDepth = parseFloat(properties.get('depth').getValue());
+          const geometry = new THREE.BoxGeometry(1, 1, 1);
+          const materials = [
+            this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[1]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[2]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[3]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[4]),
+            this._getFaceMaterial(project, materialIndexToFaceIndex[5]),
+          ];
+          this._threeObject = new THREE.Mesh(geometry, materials);
+          this._threeObject.rotation.order = 'ZYX';
+
+          this._threeGroup.add(this._threeObject);
+        }
+      }
+
+      _getFaceMaterial(project, faceIndex) {
+        if (!this._faceVisibilities[faceIndex]) return getTransparentMaterial();
+
+        return this._pixiResourcesLoader.getThreeMaterial(
+          project,
+          this._faceResourceNames[faceIndex],
+          {
+            useTransparentTexture: this._shouldUseTransparentTexture,
+          }
+        );
       }
 
       static _getResourceNameToDisplay(objectConfiguration) {
@@ -935,7 +1048,7 @@ module.exports = {
         const instance = this._instance;
 
         const textureResourceName =
-          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObjectInstance._getResourceNameToDisplay(
             objectConfiguration
           );
         if (textureResourceName) {
@@ -950,7 +1063,7 @@ module.exports = {
 
       updateTextureIfNeeded() {
         const textureName =
-          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObjectInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
         if (textureName === this._renderedResourceName) return;
@@ -960,7 +1073,7 @@ module.exports = {
 
       updateTexture() {
         const textureName =
-          RenderedThreeDShapeObjectInstance._getResourceNameToDisplay(
+          RenderedCube3DObjectInstance._getResourceNameToDisplay(
             this._associatedObjectConfiguration
           );
 
@@ -1009,10 +1122,263 @@ module.exports = {
 
         this._pixiTexturedObject.position.x =
           this._instance.getX() +
-          +this._centerX * Math.abs(this._pixiTexturedObject.scale.x);
+          this._centerX * Math.abs(this._pixiTexturedObject.scale.x);
         this._pixiTexturedObject.position.y =
           this._instance.getY() +
-          +this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
+          this._centerY * Math.abs(this._pixiTexturedObject.scale.y);
+      }
+
+      updateThreeObject() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+        let depth;
+        if (this._instance.hasCustomSize()) {
+          const instancePropertyDepth =
+            this._instance.getRawDoubleProperty('depth');
+          depth =
+            typeof instancePropertyDepth === 'number'
+              ? instancePropertyDepth
+              : this._defaultDepth;
+        } else {
+          depth = this._defaultDepth;
+        }
+        const z = this._instance.getRawDoubleProperty('z');
+
+        this._threeObject.position.set(
+          this._instance.getX() + width / 2,
+          this._instance.getY() + height / 2,
+          z + depth / 2
+        );
+
+        this._threeObject.rotation.set(
+          0,
+          0,
+          RenderedInstance.toRad(this._instance.getAngle())
+        );
+
+        if (
+          width !== this._threeObject.scale.width ||
+          height !== this._threeObject.scale.height ||
+          depth !== this._threeObject.scale.depth
+        ) {
+          this._threeObject.scale.set(width, height, depth);
+          this.updateTextureUvMapping();
+        }
+      }
+
+      /**
+       * Updates the UV mapping of the geometry in order to repeat a material
+       * over the different faces of the cube.
+       * The mesh must be configured with a list of materials in order
+       * for the method to work.
+       */
+      updateTextureUvMapping() {
+        // @ts-ignore - position is stored as a Float32BufferAttribute
+        /** @type {THREE.BufferAttribute} */
+        const pos = this._threeObject.geometry.getAttribute('position');
+        // @ts-ignore - uv is stored as a Float32BufferAttribute
+        /** @type {THREE.BufferAttribute} */
+        const uvMapping = this._threeObject.geometry.getAttribute('uv');
+        const startIndex = 0;
+        const endIndex = 23;
+        for (
+          let vertexIndex = startIndex;
+          vertexIndex <= endIndex;
+          vertexIndex++
+        ) {
+          const materialIndex = Math.floor(
+            vertexIndex /
+              // Each face of the cube has 4 points
+              4
+          );
+          const material = this._threeObject.material[materialIndex];
+          if (!material || !material.map) {
+            continue;
+          }
+
+          const shouldRepeatTexture =
+            this._shouldRepeatTextureOnFace[
+              materialIndexToFaceIndex[materialIndex]
+            ];
+
+          const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
+
+          let x = 0;
+          let y = 0;
+          switch (materialIndex) {
+            case 0:
+              // Right face
+              if (shouldRepeatTexture) {
+                if (shouldOrientateFacesTowardsY) {
+                  x =
+                    -(
+                      this._threeObject.scale.z / material.map.source.data.width
+                    ) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                  y =
+                    -(
+                      this._threeObject.scale.y /
+                      material.map.source.data.height
+                    ) *
+                    (pos.getY(vertexIndex) + 0.5);
+                } else {
+                  x =
+                    -(
+                      this._threeObject.scale.y / material.map.source.data.width
+                    ) *
+                    (pos.getY(vertexIndex) - 0.5);
+                  y =
+                    (this._threeObject.scale.z /
+                      material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                }
+              } else {
+                if (shouldOrientateFacesTowardsY) {
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                } else {
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
+                }
+              }
+              break;
+            case 1:
+              // Left face
+              if (shouldRepeatTexture) {
+                if (shouldOrientateFacesTowardsY) {
+                  x =
+                    (this._threeObject.scale.z /
+                      material.map.source.data.width) *
+                    (pos.getZ(vertexIndex) + 0.5);
+                  y =
+                    -(
+                      this._threeObject.scale.y /
+                      material.map.source.data.height
+                    ) *
+                    (pos.getY(vertexIndex) + 0.5);
+                } else {
+                  x =
+                    (this._threeObject.scale.y /
+                      material.map.source.data.width) *
+                    (pos.getY(vertexIndex) + 0.5);
+                  y =
+                    (this._threeObject.scale.z /
+                      material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                }
+              } else {
+                if (shouldOrientateFacesTowardsY) {
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                } else {
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
+                  x = -x;
+                  y = -y;
+                }
+              }
+              break;
+            case 2:
+              // Bottom face
+              if (shouldRepeatTexture) {
+                x =
+                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) + 0.5);
+                y =
+                  (this._threeObject.scale.z /
+                    material.map.source.data.height) *
+                  (pos.getZ(vertexIndex) - 0.5);
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              }
+              break;
+            case 3:
+              // Top face
+              if (shouldRepeatTexture) {
+                if (shouldOrientateFacesTowardsY) {
+                  x =
+                    (this._threeObject.scale.x /
+                      material.map.source.data.width) *
+                    (pos.getX(vertexIndex) + 0.5);
+                  y =
+                    -(
+                      this._threeObject.scale.z /
+                      material.map.source.data.height
+                    ) *
+                    (pos.getZ(vertexIndex) + 0.5);
+                } else {
+                  x =
+                    -(
+                      this._threeObject.scale.x / material.map.source.data.width
+                    ) *
+                    (pos.getX(vertexIndex) - 0.5);
+                  y =
+                    (this._threeObject.scale.z /
+                      material.map.source.data.height) *
+                    (pos.getZ(vertexIndex) - 0.5);
+                }
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                if (!shouldOrientateFacesTowardsY) {
+                  x = -x;
+                  y = -y;
+                }
+              }
+              break;
+            case 4:
+              // Front face
+              if (shouldRepeatTexture) {
+                x =
+                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) + 0.5);
+                y =
+                  -(
+                    this._threeObject.scale.y / material.map.source.data.height
+                  ) *
+                  (pos.getY(vertexIndex) + 0.5);
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+              }
+              break;
+            case 5:
+              // Back face
+              const shouldBackFaceBeUpThroughXAxisRotation =
+                this._backFaceUpThroughWhichAxisRotation === 'X';
+
+              if (shouldRepeatTexture) {
+                x =
+                  (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+                  (this._threeObject.scale.x / material.map.source.data.width) *
+                  (pos.getX(vertexIndex) +
+                    (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) * 0.5);
+                y =
+                  (shouldBackFaceBeUpThroughXAxisRotation ? 1 : -1) *
+                  (this._threeObject.scale.y /
+                    material.map.source.data.height) *
+                  (pos.getY(vertexIndex) +
+                    (shouldBackFaceBeUpThroughXAxisRotation ? -1 : 1) * 0.5);
+              } else {
+                [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                if (shouldBackFaceBeUpThroughXAxisRotation) {
+                  x = -x;
+                  y = -y;
+                }
+              }
+              break;
+            default:
+              [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+          }
+          uvMapping.setXY(vertexIndex, x, y);
+        }
+        uvMapping.needsUpdate = true;
       }
 
       updateFallbackObject() {
@@ -1048,6 +1414,7 @@ module.exports = {
           this.updateFallbackObject();
         } else {
           this.updatePIXISprite();
+          this.updateThreeObject();
         }
       }
 
@@ -1086,7 +1453,7 @@ module.exports = {
 
     objectsRenderingService.registerInstanceRenderer(
       'Scene3D::Cube3DObject',
-      RenderedThreeDShapeObjectInstance
+      RenderedCube3DObjectInstance
     );
   },
 };

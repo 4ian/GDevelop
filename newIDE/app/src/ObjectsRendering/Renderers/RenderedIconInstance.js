@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 
 /**
  * Create a renderer for an type of object displayed as an icon
@@ -15,6 +16,7 @@ export default function makeRenderer(iconPath: string) {
       instance: gdInitialInstance,
       associatedObjectConfiguration: gdObjectConfiguration,
       pixiContainer: PIXI.Container,
+      threeGroup: THREE.Group,
       pixiResourcesLoader: Class<PixiResourcesLoader>
     ) {
       super(
@@ -23,6 +25,7 @@ export default function makeRenderer(iconPath: string) {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
+        threeGroup,
         pixiResourcesLoader
       );
 

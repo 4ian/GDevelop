@@ -3,6 +3,7 @@ import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 const gd: libGDevelop = global.gd;
 
 type StretchedSprite = PIXI.Sprite | PIXI.TilingSprite;
@@ -28,6 +29,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -36,6 +38,7 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
       instance,
       associatedObjectConfiguration,
       pixiContainer,
+      threeGroup,
       pixiResourcesLoader
     );
 

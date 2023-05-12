@@ -170,7 +170,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
           {verticesCount === 3 && <Trans>Triangle</Trans>}
           {verticesCount === 4 && <Trans>Quadrilateral</Trans>}
           {verticesCount >= 5 && (
-            <Trans>Polygon with ${verticesCount} vertices</Trans>
+            <Trans>Polygon with {verticesCount} vertices</Trans>
           )}
         </Text>
       </AccordionHeader>

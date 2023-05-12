@@ -259,8 +259,8 @@ export default class PixiResourcesLoader {
     });
 
     const loader = new GLTFLoader();
-
-    // TODO Check that `load` calls don't stack for the same resource.
+    // TODO Cache promises that are not yet resolved to void `load` being
+    // called more than once for the same resource.
     return new Promise((resolve, reject) => {
       loader.load(
         url,

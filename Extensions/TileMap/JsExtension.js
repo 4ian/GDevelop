@@ -239,7 +239,7 @@ const defineTileMap = function (
       _(
         'Set the Tiled or LDtk file containing the Tilemap data to display. This is usually the main file exported from Tiled/LDtk.'
       ),
-      _('Set the tilemape file of _PARAM0_ to _PARAM1_'),
+      _('Set the tilemap file of _PARAM0_ to _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
@@ -274,7 +274,7 @@ const defineTileMap = function (
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
-        'Set the JSON file with the tileset data (sometimes that is embeded in the Tilemap, so not needed)'
+        'Set the JSON file with the tileset data (sometimes that is embedded in the Tilemap, so not needed)'
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',

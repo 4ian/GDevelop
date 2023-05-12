@@ -89,7 +89,7 @@ module.exports = {
         _('Change user UID'),
         _(
           "Changes the current user's analytics identifier. " +
-            'This is what let Analytics differienciate user, ' +
+            'This is what let Analytics differentiate user, ' +
             'so it should always be unique for each user. ' +
             'For advanced usage only.'
         ),
@@ -178,9 +178,9 @@ module.exports = {
     extension
       .addAction(
         'SetRemoteConfigAutoUpdateInterval',
-        _('Set Remote Config Auto Update Inteval'),
-        _('Sets Remote Config Auto Update Inteval.'),
-        _('Set Remote Config Auto Update Inteval to _PARAM0_'),
+        _('Set Remote Config Auto Update Interval'),
+        _('Sets Remote Config Auto Update Interval.'),
+        _('Set Remote Config Auto Update Interval to _PARAM0_'),
         _('Remote Config'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
@@ -400,9 +400,9 @@ module.exports = {
     extension
       .addStrExpression(
         'GetAuthToken',
-        _('Get the user authentififcation token'),
+        _('Get the user authentication token'),
         _(
-          'Get the user authentififcation token. The token is the proof of authentication.'
+          'Get the user authentication token. The token is the proof of authentication.'
         ),
         _('Authentication'),
         'JsPlatform/Extensions/firebase.png'

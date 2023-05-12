@@ -326,7 +326,7 @@ namespace gdjs {
           };
 
           /**
-           * Send an email to the users email adress to verify it.
+           * Send an email to the users email address to verify it.
            * @note Even though this function is redundant, we keep it for consistency.
            * @see currentUser.sendEmailVerification
            */

@@ -101,7 +101,6 @@ const ObjectsRenderingService = {
       );
     else {
       if (project.hasEventsBasedObject(objectType)) {
-        // TODO: Make it possible for custom object renderer to add Three object in three group.
         return new RenderedCustomObjectInstance(
           project,
           layout,

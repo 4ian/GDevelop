@@ -263,17 +263,21 @@ const LayerEditorDialog = (props: Props) => {
                 }}
               >
                 <SelectOption
+                  value={''}
+                  label={t`Display both 2D and 3D objects (default)`}
+                />
+                <SelectOption
                   value={'2d'}
-                  label={t`Display only 2D objects (default)`}
+                  label={t`Force display only 2D objects`}
                 />
                 <SelectOption
                   value={'3d'}
-                  label={t`Display only 3D objects`}
+                  label={t`Force display only 3D objects`}
                   disabled={layer.isLightingLayer()}
                 />
                 <SelectOption
                   value={'2d+3d'}
-                  label={t`Display both 2D and 3D objects (slower)`}
+                  label={t`Force display both 2D and 3D objects`}
                   disabled={layer.isLightingLayer()}
                 />
               </SelectField>

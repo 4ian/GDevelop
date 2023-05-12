@@ -222,7 +222,9 @@ namespace gdjs {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(gdjs.evtTools.input.mouseButtonsNameToCode[button]);
+            .isMouseButtonPressed(
+              gdjs.evtTools.input.mouseButtonsNameToCode[button]
+            );
         }
         return false;
       };
@@ -235,7 +237,9 @@ namespace gdjs {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(gdjs.evtTools.input.mouseButtonsNameToCode[button]);
+            .isMouseButtonReleased(
+              gdjs.evtTools.input.mouseButtonsNameToCode[button]
+            );
         }
         return false;
       };

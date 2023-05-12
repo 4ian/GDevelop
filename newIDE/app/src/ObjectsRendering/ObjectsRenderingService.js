@@ -108,6 +108,7 @@ const ObjectsRenderingService = {
           instance,
           associatedObjectConfiguration,
           pixiContainer,
+          threeGroup,
           PixiResourcesLoader
         );
       }

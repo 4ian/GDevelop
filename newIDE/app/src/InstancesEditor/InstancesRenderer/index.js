@@ -180,7 +180,7 @@ export default class InstancesRenderer {
           onMoveInstanceEnd: this.onMoveInstanceEnd,
           onDownInstance: this.onDownInstance,
           pixiRenderer: pixiRenderer,
-          showObjectInstancesIn3D: this._showObjectInstancesIn3D
+          showObjectInstancesIn3D: this._showObjectInstancesIn3D,
         });
         this.pixiContainer.addChild(layerRenderer.getPixiContainer());
       }

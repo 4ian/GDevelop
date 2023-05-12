@@ -45,7 +45,7 @@ export default class Rendered3DInstance {
    * Convert an angle from degrees to radians.
    */
   static toRad(angleInDegrees: number) {
-    return (angleInDegrees / 180) * 3.14159;
+    return (angleInDegrees / 180) * Math.PI;
   }
 
   /**

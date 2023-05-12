@@ -46,95 +46,61 @@ namespace gdjs {
     return transparentMaterial;
   };
 
-  class Cube3DRuntimeObjectPixiRenderer {
-    private _object: gdjs.Cube3DRuntimeObject;
-    private _runtimeGame: gdjs.RuntimeGame;
+  const getFaceMaterial = (
+    runtimeObject: gdjs.Cube3DRuntimeObject,
+    faceIndex: integer
+  ) => {
+    if (!runtimeObject.isFaceAtIndexVisible(faceIndex))
+      return getTransparentMaterial();
+
+    return runtimeObject
+      .getInstanceContainer()
+      .getGame()
+      .getImageManager()
+      .getThreeMaterial(runtimeObject.getFaceAtIndexResourceName(faceIndex), {
+        useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
+      });
+  };
+
+  class Cube3DRuntimeObjectPixiRenderer extends gdjs.RuntimeObject3DRenderer {
+    private _cube3DRuntimeObject: gdjs.Cube3DRuntimeObject;
     private _boxMesh: THREE.Mesh;
 
     constructor(
       runtimeObject: gdjs.Cube3DRuntimeObject,
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
-      this._object = runtimeObject;
-      this._runtimeGame = instanceContainer.getGame();
-
       const geometry = new THREE.BoxGeometry(1, 1, 1);
       // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
       // TODO (3D) - feature: support color instead of texture?
       const materials = [
-        this._getFaceMaterial(materialIndexToFaceIndex[0]),
-        this._getFaceMaterial(materialIndexToFaceIndex[1]),
-        this._getFaceMaterial(materialIndexToFaceIndex[2]),
-        this._getFaceMaterial(materialIndexToFaceIndex[3]),
-        this._getFaceMaterial(materialIndexToFaceIndex[4]),
-        this._getFaceMaterial(materialIndexToFaceIndex[5]),
+        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),
+        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[1]),
+        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[2]),
+        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[3]),
+        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[4]),
+        getFaceMaterial(runtimeObject, materialIndexToFaceIndex[5]),
       ];
-      this._boxMesh = new THREE.Mesh(geometry, materials);
-      this._boxMesh.rotation.order = 'ZYX';
+      const boxMesh = new THREE.Mesh(geometry, materials);
 
-      this.updateSize();
-      this.updatePosition();
-      this.updateRotation();
+      super(runtimeObject, instanceContainer, boxMesh);
+      this._boxMesh = boxMesh;
+      this._cube3DRuntimeObject = runtimeObject;
 
-      instanceContainer
-        .getLayer('')
-        .getRenderer()
-        .add3DRendererObject(this._boxMesh);
-    }
-
-    _getFaceMaterial(faceIndex: integer) {
-      if (!this._object.isFaceAtIndexVisible(faceIndex))
-        return getTransparentMaterial();
-
-      return this._runtimeGame
-        .getImageManager()
-        .getThreeMaterial(this._object.getFaceAtIndexResourceName(faceIndex), {
-          useTransparentTexture: this._object.shouldUseTransparentTexture(),
-        });
+      this.updateTextureUvMapping();
     }
 
     updateFace(faceIndex: integer) {
       const materialIndex = faceIndexToMaterialIndex[faceIndex];
       if (materialIndex === undefined) return;
 
-      this._boxMesh.material[materialIndex] = this._getFaceMaterial(faceIndex);
-      if (this._object.isFaceAtIndexVisible(faceIndex)) {
+      this._boxMesh.material[materialIndex] = getFaceMaterial(
+        this._cube3DRuntimeObject,
+        faceIndex
+      );
+      if (this._cube3DRuntimeObject.isFaceAtIndexVisible(faceIndex)) {
         this.updateTextureUvMapping(faceIndex);
       }
-    }
-
-    get3DRendererObject() {
-      return this._boxMesh;
-    }
-
-    updatePosition() {
-      this._boxMesh.position.set(
-        this._object.x + this._object.getWidth() / 2,
-        this._object.y + this._object.getHeight() / 2,
-        this._object.getZ() + this._object.getDepth() / 2
-      );
-    }
-
-    updateRotation() {
-      this._boxMesh.rotation.set(
-        gdjs.toRad(this._object.getRotationX()),
-        gdjs.toRad(this._object.getRotationY()),
-        gdjs.toRad(this._object.angle)
-      );
-    }
-
-    updateVisibility() {
-      this._boxMesh.visible = !this._object.hidden;
-    }
-
-    updateSize() {
-      this._boxMesh.scale.set(
-        this._object.getWidth(),
-        this._object.getHeight(),
-        this._object.getDepth()
-      );
-      this.updatePosition();
-      this.updateTextureUvMapping();
     }
 
     /**
@@ -146,11 +112,13 @@ namespace gdjs {
      */
     updateTextureUvMapping(faceIndex?: number) {
       // @ts-ignore - position is stored as a Float32BufferAttribute
-      const pos: THREE.BufferAttribute =
-        this._boxMesh.geometry.getAttribute('position');
+      const pos: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
+        'position'
+      );
       // @ts-ignore - uv is stored as a Float32BufferAttribute
-      const uvMapping: THREE.BufferAttribute =
-        this._boxMesh.geometry.getAttribute('uv');
+      const uvMapping: THREE.BufferAttribute = this._boxMesh.geometry.getAttribute(
+        'uv'
+      );
       const startIndex =
         faceIndex === undefined ? 0 : faceIndexToMaterialIndex[faceIndex] * 4;
       const endIndex =
@@ -172,13 +140,12 @@ namespace gdjs {
           continue;
         }
 
-        const shouldRepeatTexture =
-          this._object.shouldRepeatTextureOnFaceAtIndex(
-            materialIndexToFaceIndex[materialIndex]
-          );
+        const shouldRepeatTexture = this._cube3DRuntimeObject.shouldRepeatTextureOnFaceAtIndex(
+          materialIndexToFaceIndex[materialIndex]
+        );
 
         const shouldOrientateFacesTowardsY =
-          this._object.getFacesOrientation() === 'Y';
+          this._cube3DRuntimeObject.getFacesOrientation() === 'Y';
 
         let x: float, y: float;
         switch (materialIndex) {
@@ -204,10 +171,12 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [x, y] =
-                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                [
+                  x,
+                  y,
+                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                  vertexIndex % 4
+                ];
               }
             }
             break;
@@ -233,10 +202,12 @@ namespace gdjs {
               if (shouldOrientateFacesTowardsY) {
                 [x, y] = noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
               } else {
-                [x, y] =
-                  noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                [
+                  x,
+                  y,
+                ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                  vertexIndex % 4
+                ];
                 x = -x;
                 y = -y;
               }
@@ -297,7 +268,8 @@ namespace gdjs {
           case 5:
             // Back face
             const shouldBackFaceBeUpThroughXAxisRotation =
-              this._object.getBackFaceUpThroughWhichAxisRotation() === 'X';
+              this._cube3DRuntimeObject.getBackFaceUpThroughWhichAxisRotation() ===
+              'X';
 
             if (shouldRepeatTexture) {
               x =

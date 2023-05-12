@@ -1021,6 +1021,11 @@ interface TilesetResource {
 };
 TilesetResource implements Resource;
 
+interface Model3DResource {
+    void Model3DResource();
+};
+Model3DResource implements Resource;
+
 interface InitialInstance {
     void InitialInstance();
 

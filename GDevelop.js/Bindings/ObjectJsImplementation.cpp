@@ -193,6 +193,8 @@ void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker
         worker.ExposeTileset(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
+      } else if (resourceType == "model3D") {
+        worker.ExposeModel3D(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

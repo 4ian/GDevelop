@@ -23,7 +23,8 @@ export type ResourceKind =
   | 'json'
   | 'tilemap'
   | 'tileset'
-  | 'bitmapFont';
+  | 'bitmapFont'
+  | 'model3D';
 
 export const allResourceKindsAndMetadata = [
   {
@@ -73,6 +74,12 @@ export const allResourceKindsAndMetadata = [
     displayName: t`Bitmap Font`,
     fileExtensions: ['fnt', 'xml'],
     createNewResource: () => new gd.BitmapFontResource(),
+  },
+  {
+    kind: 'model3D',
+    displayName: t`3D model`,
+    fileExtensions: ['glb'],
+    createNewResource: () => new gd.Model3DResource(),
   },
 ];
 

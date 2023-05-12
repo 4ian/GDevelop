@@ -86,6 +86,11 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeTileset(gd::String &tilesetName);
 
   /**
+   * \brief Expose a 3D model, which is always a reference to a "model3D" resource.
+   */
+  virtual void ExposeModel3D(gd::String &resourceName);
+
+  /**
    * \brief Expose a video, which is always a reference to a "video" resource.
    */
   virtual void ExposeVideo(gd::String &videoName);

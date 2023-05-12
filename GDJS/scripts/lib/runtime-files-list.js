@@ -30,6 +30,7 @@ const untransformedPaths = [
   'GDJS/Runtime/FacebookInstantGames',
   'GDJS/Runtime/libs/CocoonJS',
   'GDJS/Runtime/libs/rbush.js',
+  'GDJS/Runtime/libs/ThreeAddons.js',
 
   // Extensions pre-built files:
   'Extensions/Leaderboards/sha256.js',

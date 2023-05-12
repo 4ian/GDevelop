@@ -260,4 +260,5 @@ declare type ResourceKind =
   | 'json'
   | 'tilemap'
   | 'tileset'
-  | 'bitmapFont';
+  | 'bitmapFont'
+  | 'model3D';

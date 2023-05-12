@@ -86,7 +86,7 @@ namespace gdjs {
 
       export const turnCameraTowardObject = (
         runtimeScene: RuntimeScene,
-        object: gdjs.Cube3DRuntimeObject,
+        object: gdjs.RuntimeObject,
         layerName: string,
         cameraIndex: integer,
         isStandingOnY: boolean
@@ -105,7 +105,8 @@ namespace gdjs {
         threeCamera.lookAt(
           object.getCenterXInScene(),
           -object.getCenterYInScene(),
-          object.getZ()
+          //@ts-ignore
+          object.getZ ? object.getZ() : 0
         );
         // The layer angle takes over the 3D camera Z rotation.
         layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));

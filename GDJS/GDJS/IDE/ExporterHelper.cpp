@@ -590,6 +590,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "AsyncTasksManager.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
+  InsertUnique(includesFiles, "Model3DManager.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
@@ -650,6 +651,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
 
   if (pixiInThreeRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/three.js");
+    InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
   }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");

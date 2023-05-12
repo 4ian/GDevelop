@@ -17,6 +17,7 @@ import BitmapFontResourceField from '../../../EventsSheet/ParameterFields/Bitmap
 import FontResourceField from '../../../EventsSheet/ParameterFields/FontResourceField';
 import JsonResourceField from '../../../EventsSheet/ParameterFields/JsonResourceField';
 import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField';
+import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DResourceField';
 
 export const AllResourceFields = () => (
   <Column expand>
@@ -127,6 +128,23 @@ export const AllResourceFields = () => (
         initialValue={''}
         render={(value, onChange) => (
           <TilemapResourceField
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            value={value}
+            onChange={onChange}
+            parameterRenderingService={ParameterRenderingService}
+            resourceManagementProps={fakeResourceManagementProps}
+          />
+        )}
+      />
+    </Line>
+    <Line expand>
+      <ValueStateHolder
+        initialValue={''}
+        render={(value, onChange) => (
+          <Model3DResourceField
             project={testProject.project}
             scope={{ layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}

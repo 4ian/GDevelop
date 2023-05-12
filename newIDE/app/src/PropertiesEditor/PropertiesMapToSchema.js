@@ -213,11 +213,12 @@ const createField = (
   }
 };
 
-const propertyKeywordCouples: Array<[string, string]> = [
-  ['X', 'Y'],
-  ['Width', 'Height'],
+const propertyKeywordCouples: Array<Array<string>> = [
+  ['X', 'Y', 'Z'],
+  ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
+  ['Front', 'Back'],
   ['Up', 'Down'],
   ['Min', 'Max'],
   ['Low', 'High'],
@@ -226,6 +227,11 @@ const propertyKeywordCouples: Array<[string, string]> = [
   ['Acceleration', 'Deceleration'],
   ['Duration', 'Easing'],
 ];
+
+const uncapitalize = str => {
+  if (!str) return str;
+  return str[0].toLowerCase() + str.substr(1);
+}
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -264,51 +270,71 @@ const propertiesMapToSchema = (
     // Search a property couple that can be put in a row.
     let field: ?Field = null;
     for (const propertyKeywords of propertyKeywordCouples) {
-      const firstKeyword = propertyKeywords[0];
-      const secondKeyword = propertyKeywords[1];
+      const rowPropertyNames: string[] = [];
+      for (let index = 0; index < propertyKeywords.length; index++) {
+        const keyword = propertyKeywords[index];
 
-      let firstName: ?string = null;
-      let secondName: ?string = null;
-      if (name.includes(firstKeyword)) {
-        const otherPropertyName = name.replace(firstKeyword, secondKeyword);
-        if (properties.has(otherPropertyName)) {
-          firstName = name;
-          secondName = otherPropertyName;
+        if (name.includes(keyword)) {
+          const rowAllPropertyNames = propertyKeywords.map(otherKeyword =>
+            name.replace(keyword, otherKeyword)
+          );
+          for (const rowPropertyName of rowAllPropertyNames) {
+            if (properties.has(rowPropertyName)) {
+              rowPropertyNames.push(rowPropertyName);
+            }
+          }
         }
-      } else if (name.includes(secondKeyword)) {
-        const otherPropertyName = name.replace(secondKeyword, firstKeyword);
-        if (properties.has(otherPropertyName)) {
-          firstName = otherPropertyName;
-          secondName = name;
+        const uncapitalizeKeyword = uncapitalize(keyword);
+        if (name.startsWith(uncapitalizeKeyword)) {
+          const rowAllPropertyNames = propertyKeywords.map(otherKeyword =>
+            name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
+          );
+          for (const rowPropertyName of rowAllPropertyNames) {
+            if (properties.has(rowPropertyName)) {
+              rowPropertyNames.push(rowPropertyName);
+            }
+          }
         }
       }
+      if (rowPropertyNames.length > 1) {
+        const rowProperties = rowPropertyNames.map(name =>
+          properties.get(name)
+        );
+        if (
+          rowProperties.every(
+            property => property.getGroup() === rowProperties[0].getGroup()
+          )
+        ) {
+          const rowFields: Field[] = [];
+          for (
+            let index = 0;
+            index < rowProperties.length && index < rowPropertyNames.length;
+            index++
+          ) {
+            const rowProperty = rowProperties[index];
+            const rowPropertyName = rowPropertyNames[index];
 
-      if (firstName && secondName) {
-        const firstProperty = properties.get(firstName);
-        const secondProperty = properties.get(secondName);
-        if (firstProperty.getGroup() === secondProperty.getGroup()) {
-          const firstField = createField(
-            firstName,
-            firstProperty,
-            getProperties,
-            onUpdateProperty,
-            object
-          );
-          const secondField = createField(
-            secondName,
-            secondProperty,
-            getProperties,
-            onUpdateProperty,
-            object
-          );
-          if (firstField && secondField) {
+            const field = createField(
+              rowPropertyName,
+              rowProperty,
+              getProperties,
+              onUpdateProperty,
+              object
+            );
+
+            if (field) {
+              rowFields.push(field);
+            }
+          }
+          if (rowFields.length === rowProperties.length) {
             field = {
-              name: firstName + '-' + secondName,
+              name: rowPropertyNames.join('-'),
               type: 'row',
-              children: [firstField, secondField],
+              children: rowFields,
             };
-            alreadyHandledProperties.add(firstName);
-            alreadyHandledProperties.add(secondName);
+            rowPropertyNames.forEach(propertyName => {
+              alreadyHandledProperties.add(propertyName);
+            });
           }
         }
       }

@@ -39,6 +39,7 @@ const resourceKindToInputAcceptedMimes = {
   tilemap: ['application/json'],
   tileset: ['application/json'],
   bitmapFont: [],
+  model3D: ['model/gltf-binary'],
 };
 
 export const getInputAcceptedMimesAndExtensions = (

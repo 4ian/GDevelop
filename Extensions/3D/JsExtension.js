@@ -38,6 +38,565 @@ module.exports = {
       .addInstructionOrExpressionGroupMetadata(_('3D'))
       .setIcon('res/conditions/3d_box.svg');
 
+    {
+      const Model3DObject = new gd.ObjectJsImplementation();
+      // $FlowExpectedError - ignore Flow warning as we're creating an object
+      Model3DObject.updateProperty = function (
+        objectContent,
+        propertyName,
+        newValue
+      ) {
+        if (
+          propertyName === 'width' ||
+          propertyName === 'height' ||
+          propertyName === 'depth' ||
+          propertyName === 'rotationX' ||
+          propertyName === 'rotationY' ||
+          propertyName === 'rotationZ'
+        ) {
+          objectContent[propertyName] = parseFloat(newValue);
+          return true;
+        }
+        if (propertyName === 'modelResourceName') {
+          objectContent[propertyName] = newValue;
+          return true;
+        }
+        if (propertyName === 'keepAspectRatio') {
+          objectContent[propertyName] = newValue === '1';
+          return true;
+        }
+
+        return false;
+      };
+      // $FlowExpectedError - ignore Flow warning as we're creating an object
+      Model3DObject.getProperties = function (objectContent) {
+        const objectProperties = new gd.MapStringPropertyDescriptor();
+
+        objectProperties
+          .getOrCreate('width')
+          .setValue((objectContent.width || 0).toString())
+          .setType('number')
+          .setLabel(_('Width'))
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setGroup(_('Default size'));
+
+        objectProperties
+          .getOrCreate('height')
+          .setValue((objectContent.height || 0).toString())
+          .setType('number')
+          .setLabel(_('Height'))
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setGroup(_('Default size'));
+
+        objectProperties
+          .getOrCreate('depth')
+          .setValue((objectContent.depth || 0).toString())
+          .setType('number')
+          .setLabel(_('Depth'))
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setGroup(_('Default size'));
+
+        objectProperties
+          .getOrCreate('keepAspectRatio')
+          .setValue(objectContent.keepAspectRatio ? 'true' : 'false')
+          .setType('boolean')
+          .setLabel(_('Reduce initial dimensions to keep aspect ratio'))
+          .setGroup(_('Default size'));
+
+        objectProperties
+          .getOrCreate('rotationX')
+          .setValue((objectContent.rotationX || 0).toString())
+          .setType('number')
+          .setLabel(_('Rotation around X axis'))
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setGroup(_('Default orientation'));
+
+        objectProperties
+          .getOrCreate('rotationY')
+          .setValue((objectContent.rotationY || 0).toString())
+          .setType('number')
+          .setLabel(_('Rotation around Y axis'))
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setGroup(_('Default orientation'));
+
+        objectProperties
+          .getOrCreate('rotationZ')
+          .setValue((objectContent.rotationZ || 0).toString())
+          .setType('number')
+          .setLabel(_('Rotation around Z axis'))
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setGroup(_('Default orientation'));
+
+        objectProperties
+          .getOrCreate('modelResourceName')
+          .setValue(objectContent.modelResourceName || '')
+          .setType('resource')
+          .addExtraInfo('model3D')
+          .setLabel(_('3D model'));
+
+        return objectProperties;
+      };
+      Model3DObject.setRawJSONContent(
+        JSON.stringify({
+          width: 100,
+          height: 100,
+          depth: 100,
+          keepAspectRatio: true,
+          rotationX: 0,
+          rotationY: 0,
+          rotationZ: 0,
+          modelResourceName: '',
+        })
+      );
+
+      // $FlowExpectedError
+      Model3DObject.updateInitialInstanceProperty = function (
+        objectContent,
+        instance,
+        propertyName,
+        newValue,
+        project,
+        layout
+      ) {
+        if (propertyName === 'z') {
+          instance.setRawDoubleProperty('z', parseFloat(newValue));
+          return true;
+        } else if (propertyName === 'rotationX') {
+          instance.setRawDoubleProperty('rotationX', parseFloat(newValue));
+          return true;
+        } else if (propertyName === 'rotationY') {
+          instance.setRawDoubleProperty('rotationY', parseFloat(newValue));
+          return true;
+        } else if (propertyName === 'depth') {
+          instance.setRawDoubleProperty('depth', parseFloat(newValue));
+          return true;
+        }
+
+        return false;
+      };
+
+      // $FlowExpectedError
+      Model3DObject.getInitialInstanceProperties = function (
+        content,
+        instance,
+        project,
+        layout
+      ) {
+        const instanceProperties = new gd.MapStringPropertyDescriptor();
+
+        instanceProperties
+          .getOrCreate('z')
+          .setValue(instance.getRawDoubleProperty('z').toString())
+          .setType('number')
+          .setLabel(_('Z (elevation)'));
+
+        instanceProperties
+          .getOrCreate('rotationX')
+          .setValue(instance.getRawDoubleProperty('rotationX').toString())
+          .setType('number')
+          .setLabel(_('Rotation on X axis'));
+
+        instanceProperties
+          .getOrCreate('rotationY')
+          .setValue(instance.getRawDoubleProperty('rotationY').toString())
+          .setType('number')
+          .setLabel(_('Rotation on Y axis'));
+
+        instanceProperties
+          .getOrCreate('depth')
+          .setValue(instance.getRawDoubleProperty('depth').toString())
+          .setType('number')
+          .setLabel(_('Depth'));
+
+        return instanceProperties;
+      };
+
+      const object = extension
+        .addObject(
+          'Model3DObject',
+          _('3D Model'),
+          _('A 3D model.'),
+          'JsPlatform/Extensions/3d_box.svg',
+          Model3DObject
+        )
+        .setCategoryFullName(_('3D'))
+        .addUnsupportedBaseObjectCapability('effect')
+        // .addUnsupportedBaseObjectCapability('effect') // TODO: are there more unsupported features?
+        .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
+        .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
+        .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
+        .addIncludeFile('Extensions/3D/Model3DRuntimeObject3DRenderer.js');
+
+      // Properties expressions/conditions/actions:
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Z',
+          _('Z (elevation)'),
+          _('the Z position (the "elevation")'),
+          _('the Z position'),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setZ')
+        .setGetter('getZ');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Depth',
+          _('Depth (size on Z axis)'),
+          _('the depth (size on Z axis)'),
+          _('the depth'),
+          _('Size'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setDepth')
+        .setGetter('getDepth');
+
+      object
+        .addScopedAction(
+          'SetWidth',
+          _('Width'),
+          _('Change the width of an object.'),
+          _('the width'),
+          _('Size'),
+          'res/actions/scaleWidth24_black.png',
+          'res/actions/scaleWidth_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions()
+        )
+        .markAsAdvanced()
+        .setFunctionName('setWidth')
+        .setGetter('getWidth');
+
+      object
+        .addScopedCondition(
+          'Width',
+          _('Width'),
+          _('Compare the width of an object.'),
+          _('the width'),
+          _('Size'),
+          'res/actions/scaleWidth24_black.png',
+          'res/actions/scaleWidth_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardRelationalOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions()
+        )
+        .markAsAdvanced()
+        .setFunctionName('getWidth');
+
+      object
+        .addScopedAction(
+          'SetHeight',
+          _('Height'),
+          _('Change the height of an object.'),
+          _('the height'),
+          _('Size'),
+          'res/actions/scaleHeight24_black.png',
+          'res/actions/scaleHeight_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions()
+        )
+        .markAsAdvanced()
+        .setFunctionName('setHeight')
+        .setGetter('getHeight');
+
+      object
+        .addScopedCondition(
+          'Height',
+          _('Height'),
+          _('Compare the height of an object.'),
+          _('the height'),
+          _('Size'),
+          'res/actions/scaleHeight24_black.png',
+          'res/actions/scaleHeight_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardRelationalOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions()
+        )
+        .markAsAdvanced()
+        .setFunctionName('getHeight');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Height',
+          _('Height'),
+          _('the height'),
+          _('the height'),
+          _('Size'),
+          'res/actions/scaleHeight24_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setHeight')
+        .setGetter('getHeight');
+
+      object
+        .addScopedAction(
+          'Scale',
+          _('Scale'),
+          _('Modify the scale of the specified object.'),
+          _('the scale'),
+          _('Size'),
+          'res/actions/scale24_black.png',
+          'res/actions/scale_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardOperatorParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Scale (1 by default)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setScale')
+        .setGetter('getScale');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ScaleX',
+          _('Scale on X axis'),
+          _("the width's scale of an object"),
+          _("the width's scale"),
+          _('Size'),
+          'res/actions/scaleWidth24_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Scale (1 by default)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setScaleX')
+        .setGetter('getScaleX');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ScaleY',
+          _('Scale on Y axis'),
+          _("the height's scale of an object"),
+          _("the height's scale"),
+          _('Size'),
+          'res/actions/scaleHeight24_black.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Scale (1 by default)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setScaleY')
+        .setGetter('getScaleY');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ScaleZ',
+          _('Scale on Z axis'),
+          _("the depth's scale of an object"),
+          _("the depth's scale"),
+          _('Size'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Scale (1 by default)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setScaleZ')
+        .setGetter('getScaleZ');
+
+      object
+        .addScopedAction(
+          'FlipX',
+          _('Flip the object horizontally'),
+          _('Flip the object horizontally'),
+          _('Flip horizontally _PARAM0_: _PARAM1_'),
+          _('Effects'),
+          'res/actions/flipX24.png',
+          'res/actions/flipX.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('yesorno', _('Activate flipping'))
+        .markAsSimple()
+        .setFunctionName('flipX');
+
+      object
+        .addScopedAction(
+          'FlipY',
+          _('Flip the object vertically'),
+          _('Flip the object vertically'),
+          _('Flip vertically _PARAM0_: _PARAM1_'),
+          _('Effects'),
+          'res/actions/flipY24.png',
+          'res/actions/flipY.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('yesorno', _('Activate flipping'))
+        .markAsSimple()
+        .setFunctionName('flipY');
+
+      object
+        .addScopedAction(
+          'FlipZ',
+          _('Flip the object on Z'),
+          _('Flip the object on Z axis'),
+          _('Flip on Z axis _PARAM0_: _PARAM1_'),
+          _('Effects'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .addParameter('yesorno', _('Activate flipping'))
+        .markAsSimple()
+        .setFunctionName('flipZ');
+
+      object
+        .addScopedCondition(
+          'FlippedX',
+          _('Horizontally flipped'),
+          _('Check if the object is horizontally flipped'),
+          _('_PARAM0_ is horizontally flipped'),
+          _('Effects'),
+          'res/actions/flipX24.png',
+          'res/actions/flipX.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .setFunctionName('isFlippedX');
+
+      object
+        .addScopedCondition(
+          'FlippedY',
+          _('Vertically flipped'),
+          _('Check if the object is vertically flipped'),
+          _('_PARAM0_ is vertically flipped'),
+          _('Effects'),
+          'res/actions/flipY24.png',
+          'res/actions/flipY.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .setFunctionName('isFlippedY');
+
+      object
+        .addScopedCondition(
+          'FlippedZ',
+          _('Flipped on Z'),
+          _('Check if the object is flipped on Z axis'),
+          _('_PARAM0_ is flipped on Z axis'),
+          _('Effects'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .setFunctionName('isFlippedZ');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'RotationX',
+          _('Rotation on X axis'),
+          _('the rotation on X axis'),
+          _('the rotation on X axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRotationX')
+        .setGetter('getRotationX');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'RotationY',
+          _('Rotation on Y axis'),
+          _('the rotation on Y axis'),
+          _('the rotation on Y axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRotationY')
+        .setGetter('getRotationY');
+
+      object
+        .addScopedAction(
+          'TurnAroundX',
+          _('Turn around X axis'),
+          _(
+            "Turn the object around X axis. This axis doesn't move with the object rotation."
+          ),
+          _('Turn _PARAM0_ from _PARAM1_° around X axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Rotation angle'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundX');
+
+      object
+        .addScopedAction(
+          'TurnAroundY',
+          _('Turn around Y axis'),
+          _(
+            "Turn the object around Y axis. This axis doesn't move with the object rotation."
+          ),
+          _('Turn _PARAM0_ from _PARAM1_° around Y axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Rotation angle'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundY');
+
+      object
+        .addScopedAction(
+          'TurnAroundZ',
+          _('Turn around Z axis'),
+          _(
+            "Turn the object around Z axis. This axis doesn't move with the object rotation."
+          ),
+          _('Turn _PARAM0_ from _PARAM1_° around Z axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('number', _('Rotation angle'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundZ');
+    }
+
     const Cube3DObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.updateProperty = function (
@@ -105,7 +664,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('facesOrientation')
-        .setValue(objectContent.facesOrientation)
+        .setValue(objectContent.facesOrientation || 'Y')
         .setType('choice')
         .addExtraInfo('Y')
         .addExtraInfo('Z')
@@ -159,7 +718,7 @@ module.exports = {
 
       objectProperties
         .getOrCreate('backFaceUpThroughWhichAxisRotation')
-        .setValue(objectContent.backFaceUpThroughWhichAxisRotation)
+        .setValue(objectContent.backFaceUpThroughWhichAxisRotation || 'X')
         .setType('choice')
         .addExtraInfo('X')
         .addExtraInfo('Y')
@@ -404,7 +963,7 @@ module.exports = {
         _('Position'),
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setZ')
       .setGetter('getZ');
@@ -419,40 +978,252 @@ module.exports = {
         _('Size'),
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDepth')
       .setGetter('getDepth');
 
     object
-      .addExpressionAndConditionAndAction(
-        'number',
-        'Width',
+      .addScopedAction(
+        'SetWidth',
         _('Width'),
-        _('the width'),
+        _('Change the width of an object.'),
         _('the width'),
         _('Size'),
-        'res/conditions/3d_box.svg'
+        'res/actions/scaleWidth24_black.png',
+        'res/actions/scaleWidth_black.png'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
-      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions()
+      )
+      .markAsAdvanced()
       .setFunctionName('setWidth')
       .setGetter('getWidth');
 
     object
-      .addExpressionAndConditionAndAction(
+      .addScopedCondition(
+        'Width',
+        _('Width'),
+        _('Compare the width of an object.'),
+        _('the width'),
+        _('Size'),
+        'res/actions/scaleWidth24_black.png',
+        'res/actions/scaleWidth_black.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardRelationalOperatorParameters(
         'number',
+        gd.ParameterOptions.makeNewOptions()
+      )
+      .markAsAdvanced()
+      .setFunctionName('getWidth');
+
+    object
+      .addScopedAction(
+        'SetHeight',
+        _('Height'),
+        _('Change the height of an object.'),
+        _('the height'),
+        _('Size'),
+        'res/actions/scaleHeight24_black.png',
+        'res/actions/scaleHeight_black.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions()
+      )
+      .markAsAdvanced()
+      .setFunctionName('setHeight')
+      .setGetter('getHeight');
+
+    object
+      .addScopedCondition(
         'Height',
         _('Height'),
+        _('Compare the height of an object.'),
         _('the height'),
-        _('the height'),
+        _('Size'),
+        'res/actions/scaleHeight24_black.png',
+        'res/actions/scaleHeight_black.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions()
+      )
+      .markAsAdvanced()
+      .setFunctionName('getHeight');
+
+    object
+      .addScopedAction(
+        'Scale',
+        _('Scale'),
+        _('Modify the scale of the specified object.'),
+        _('the scale'),
+        _('Size'),
+        'res/actions/scale24_black.png',
+        'res/actions/scale_black.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
+      .markAsAdvanced()
+      .setFunctionName('setScale')
+      .setGetter('getScale');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'ScaleX',
+        _('Scale on X axis'),
+        _("the width's scale of an object"),
+        _("the width's scale"),
+        _('Size'),
+        'res/actions/scaleWidth24_black.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
+      .markAsAdvanced()
+      .setFunctionName('setScaleX')
+      .setGetter('getScaleX');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'ScaleY',
+        _('Scale on Y axis'),
+        _("the height's scale of an object"),
+        _("the height's scale"),
+        _('Size'),
+        'res/actions/scaleHeight24_black.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
+      .markAsAdvanced()
+      .setFunctionName('setScaleY')
+      .setGetter('getScaleY');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'ScaleZ',
+        _('Scale on Z axis'),
+        _("the depth's scale of an object"),
+        _("the depth's scale"),
         _('Size'),
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
-      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-      .setFunctionName('setHeight')
-      .setGetter('getHeight');
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Scale (1 by default)')
+        )
+      )
+      .markAsAdvanced()
+      .setFunctionName('setScaleZ')
+      .setGetter('getScaleZ');
+
+    object
+      .addScopedAction(
+        'FlipX',
+        _('Flip the object horizontally'),
+        _('Flip the object horizontally'),
+        _('Flip horizontally _PARAM0_: _PARAM1_'),
+        _('Effects'),
+        'res/actions/flipX24.png',
+        'res/actions/flipX.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('yesorno', _('Activate flipping'))
+      .markAsSimple()
+      .setFunctionName('flipX');
+
+    object
+      .addScopedAction(
+        'FlipY',
+        _('Flip the object vertically'),
+        _('Flip the object vertically'),
+        _('Flip vertically _PARAM0_: _PARAM1_'),
+        _('Effects'),
+        'res/actions/flipY24.png',
+        'res/actions/flipY.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('yesorno', _('Activate flipping'))
+      .markAsSimple()
+      .setFunctionName('flipY');
+
+    object
+      .addScopedAction(
+        'FlipZ',
+        _('Flip the object on Z'),
+        _('Flip the object on Z axis'),
+        _('Flip on Z axis _PARAM0_: _PARAM1_'),
+        _('Effects'),
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .addParameter('yesorno', _('Activate flipping'))
+      .markAsSimple()
+      .setFunctionName('flipZ');
+
+    object
+      .addScopedCondition(
+        'FlippedX',
+        _('Horizontally flipped'),
+        _('Check if the object is horizontally flipped'),
+        _('_PARAM0_ is horizontally flipped'),
+        _('Effects'),
+        'res/actions/flipX24.png',
+        'res/actions/flipX.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .setFunctionName('isFlippedX');
+
+    object
+      .addScopedCondition(
+        'FlippedY',
+        _('Vertically flipped'),
+        _('Check if the object is vertically flipped'),
+        _('_PARAM0_ is vertically flipped'),
+        _('Effects'),
+        'res/actions/flipY24.png',
+        'res/actions/flipY.png'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .setFunctionName('isFlippedY');
+
+    object
+      .addScopedCondition(
+        'FlippedZ',
+        _('Flipped on Z'),
+        _('Check if the object is flipped on Z axis'),
+        _('_PARAM0_ is flipped on Z axis'),
+        _('Effects'),
+        'res/conditions/3d_box.svg',
+        'res/conditions/3d_box.svg'
+      )
+      .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .setFunctionName('isFlippedZ');
 
     object
       .addExpressionAndConditionAndAction(
@@ -464,7 +1235,7 @@ module.exports = {
         _('Angle'),
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setRotationX')
       .setGetter('getRotationX');
@@ -479,7 +1250,7 @@ module.exports = {
         _('Angle'),
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setRotationY')
       .setGetter('getRotationY');
@@ -494,7 +1265,7 @@ module.exports = {
         _('Face'),
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter(
         'stringWithSelector',
         _('Face'),
@@ -509,7 +1280,7 @@ module.exports = {
       .setGetter('isFaceVisible');
 
     object
-      .addAction(
+      .addScopedAction(
         'TurnAroundX',
         _('Turn around X axis'),
         _(
@@ -520,13 +1291,13 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('number', _('Rotation angle'), '', false)
       .markAsAdvanced()
       .setFunctionName('turnAroundX');
 
     object
-      .addAction(
+      .addScopedAction(
         'TurnAroundY',
         _('Turn around Y axis'),
         _(
@@ -537,13 +1308,13 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('number', _('Rotation angle'), '', false)
       .markAsAdvanced()
       .setFunctionName('turnAroundY');
 
     object
-      .addAction(
+      .addScopedAction(
         'TurnAroundZ',
         _('Turn around Z axis'),
         _(
@@ -554,13 +1325,13 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('number', _('Rotation angle'), '', false)
       .markAsAdvanced()
       .setFunctionName('turnAroundZ');
 
     object
-      .addAction(
+      .addScopedAction(
         'SetFaceResource',
         _('Face image'),
         _('Change the image of the face.'),
@@ -569,7 +1340,7 @@ module.exports = {
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
-      .addParameter('object', _('3D Shape'), 'Cube3DObject', false)
+      .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter(
         'stringWithSelector',
         _('Face'),
@@ -665,7 +1436,7 @@ module.exports = {
         'res/conditions/3d_box.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('objectPtr', _('Object'), 'Scene3D::Cube3DObject')
+      .addParameter('objectPtr', _('Object'), '')
       .addParameter('layer', _('Layer'), '', true)
       .setDefaultValue('""')
       .addParameter('expression', _('Camera number (default : 0)'), '', true)
@@ -1546,6 +2317,77 @@ module.exports = {
     objectsRenderingService.registerInstance3DRenderer(
       'Scene3D::Cube3DObject',
       RenderedCube3DObject3DInstance
+    );
+
+    class Model3DRendered2DInstance extends RenderedInstance {
+      constructor(
+        project,
+        layout,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
+        const properties = associatedObjectConfiguration.getProperties();
+        this._defaultWidth = parseFloat(properties.get('width').getValue());
+        this._defaultHeight = parseFloat(properties.get('height').getValue());
+
+        // This renderer shows a placeholder for the object:
+        this._pixiObject = new PIXI.Graphics();
+        this._pixiContainer.addChild(this._pixiObject);
+      }
+
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/3d_box.svg';
+      }
+
+      update() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this._defaultWidth;
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this._defaultHeight;
+
+        this._pixiObject.clear();
+        this._pixiObject.beginFill(0x0033ff);
+        this._pixiObject.lineStyle(1, 0xffd900, 1);
+        this._pixiObject.moveTo(-width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, height / 2);
+        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.endFill();
+
+        this._pixiObject.moveTo(-width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, height / 2);
+        this._pixiObject.moveTo(width / 2, -height / 2);
+        this._pixiObject.lineTo(-width / 2, height / 2);
+
+        this._pixiObject.position.x = this._instance.getX() + width / 2;
+        this._pixiObject.position.y = this._instance.getY() + height / 2;
+        this._pixiObject.angle = this._instance.getAngle();
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+    }
+
+    objectsRenderingService.registerInstanceRenderer(
+      'Scene3D::Model3DObject',
+      Model3DRendered2DInstance
     );
   },
 };

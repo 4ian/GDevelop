@@ -3,6 +3,7 @@ import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
@@ -14,6 +15,7 @@ const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
+const loaded3DModels = {};
 
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
@@ -230,6 +232,72 @@ export default class PixiResourcesLoader {
 
     loadedThreeMaterials[cacheKey] = material;
     return material;
+  }
+
+  /**
+   * Return the three.js material associated to the specified resource name.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @param options
+   * @returns The requested material.
+   */
+  static get3DModel(
+    project: gdProject,
+    resourceName: string
+  ): Promise<THREE.Object3D> {
+    const loaded3DModel = loaded3DModels[resourceName];
+    if (loaded3DModel) return Promise.resolve(loaded3DModel);
+
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return invalidTexture;
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'model3D') return invalidTexture;
+
+    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+      isResourceForPixi: false,
+    });
+
+    const loader = new GLTFLoader();
+
+    // TODO Check that `load` calls don't stack for the same resource.
+    return new Promise((resolve, reject) => {
+      loader.load(
+        url,
+        gltf => {
+          this._replaceMaterials(gltf.scene);
+          loaded3DModels[resourceName] = gltf.scene;
+          resolve(gltf.scene);
+        },
+        undefined,
+        error => {
+          reject(error);
+        }
+      );
+    });
+  }
+
+  /**
+   * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
+   */
+  static _replaceMaterials(object3D: THREE.Object3D) {
+    object3D.traverse(node => {
+      if (node.type === 'Mesh') {
+        const mesh: THREE.Mesh = node;
+        const basicMaterial = new THREE.MeshBasicMaterial();
+        //@ts-ignore
+        if (mesh.material.color) {
+          //@ts-ignore
+          basicMaterial.color = mesh.material.color;
+        }
+        //@ts-ignore
+        if (mesh.material.map) {
+          //@ts-ignore
+          basicMaterial.map = mesh.material.map;
+        }
+        mesh.material = basicMaterial;
+      }
+    });
   }
 
   /**

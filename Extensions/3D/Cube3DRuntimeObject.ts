@@ -396,7 +396,6 @@ namespace gdjs {
     shouldUseTransparentTexture(): boolean {
       return this._shouldUseTransparentTexture;
     }
-
   }
   gdjs.registerObject('Scene3D::Cube3DObject', gdjs.Cube3DRuntimeObject);
 }

@@ -448,7 +448,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           ],
         });
 
-        // Query with selector fitler
+        // Query with selector filter
         gdjs.evtTools.firebaseTools.firestore.startQueryFrom(
           'selector',
           'main'
@@ -549,7 +549,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         errors = true;
       }
 
-      // No error was throwm, there is an issue
+      // No error was thrown, there is an issue
       if (!errors)
         throw new Error('Expected wrong credentials to prevent login');
 

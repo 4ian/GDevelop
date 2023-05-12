@@ -703,7 +703,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         codeGenerator.AddGlobalDeclaration(forEachObjectsList + " = [];\n");
 
         if (realObjects.size() !=
-            1)  //(We write a slighty more simple ( and optimized ) output code
+            1)  //(We write a slightly more simple ( and optimized ) output code
                 // when only one object list is used.)
         {
           outputCode += forEachTotalCountVar + " = 0;\n";
@@ -732,7 +732,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // For loop declaration
         if (realObjects.size() ==
-            1)  // We write a slighty more simple ( and optimized ) output code
+            1)  // We write a slightly more simple ( and optimized ) output code
                 // when only one object list is used.
           outputCode +=
               "for (" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
@@ -748,7 +748,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Pick one object
         if (realObjects.size() == 1) {
-          // We write a slighty more simple ( and optimized ) output code
+          // We write a slightly more simple ( and optimized ) output code
           // when only one object list is used.
           gd::String temporary = codeGenerator.GetCodeNamespaceAccessor() +
                                  "forEachTemporary" +

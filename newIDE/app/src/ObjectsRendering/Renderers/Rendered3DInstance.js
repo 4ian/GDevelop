@@ -17,7 +17,7 @@ export default class Rendered3DInstance {
   _threeGroup: THREE.Group;
   _pixiResourcesLoader: Class<PixiResourcesLoader>;
   _pixiObject: any;
-  _threeObject: THREE.Object3D;
+  _threeObject: THREE.Object3D | null;
   wasUsed: boolean;
 
   constructor(

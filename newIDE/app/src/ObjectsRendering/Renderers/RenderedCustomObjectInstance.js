@@ -54,12 +54,15 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       pixiResourcesLoader
     );
 
-    //Setup the PIXI object:
+    // Setup the PIXI object:
     this._pixiObject = new PIXI.Container();
     this._pixiContainer.addChild(this._pixiObject);
 
-    this._threeObject = new THREE.Group();
-    this._threeGroup.add(this._threeObject);
+    if (this._threeGroup) {
+      // No Three group means the instance should only be rendered in 2D.
+      this._threeObject = new THREE.Group();
+      this._threeGroup.add(this._threeObject);
+    }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
@@ -217,17 +220,19 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     this._pixiObject.position.x = this._instance.getX() + centerX - originX;
     this._pixiObject.position.y = this._instance.getY() + centerY - originY;
 
-    this._threeObject.position.set(
-      this._instance.getX(),
-      this._instance.getY(),
-      0
-    );
-    // TODO (3D) Handle rotation center for the three group.
-    // this._threeObject.rotation.set(
-    //   0,
-    //   0,
-    //   RenderedInstance.toRad(this._instance.getAngle())
-    // );
+    if (this._threeObject) {
+      this._threeObject.position.set(
+        this._instance.getX(),
+        this._instance.getY(),
+        0
+      );
+      // TODO (3D) Handle rotation center for the three group.
+      // this._threeObject.rotation.set(
+      //   0,
+      //   0,
+      //   RenderedInstance.toRad(this._instance.getAngle())
+      // );
+    }
   }
 
   getWidth() {

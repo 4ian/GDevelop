@@ -14,6 +14,8 @@ namespace gdjs {
     static MOUSE_LEFT_BUTTON: integer = 0;
     static MOUSE_RIGHT_BUTTON: integer = 1;
     static MOUSE_MIDDLE_BUTTON: integer = 2;
+    static MOUSE_BACK_BUTTON: integer = 3;
+    static MOUSE_FORWARD_BUTTON: integer = 4;
     static MOUSE_TOUCH_ID: integer = 1;
 
     /**

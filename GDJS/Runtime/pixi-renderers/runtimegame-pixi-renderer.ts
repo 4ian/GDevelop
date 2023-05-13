@@ -71,7 +71,6 @@ namespace gdjs {
           canvas: gameCanvas,
         });
         this._threeRenderer.autoClear = false;
-        // this._threeRenderer.setPixelRatio(0.05);
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
@@ -90,7 +89,7 @@ namespace gdjs {
           preserveDrawingBuffer: true,
           antialias: false,
           backgroundAlpha: 0,
-          // TODO (3D): `resolution: window.devicePixelRatio`?
+          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
         });
 
         gameCanvas = this._threeRenderer.domElement;

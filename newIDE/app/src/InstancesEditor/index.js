@@ -180,7 +180,6 @@ export default class InstancesEditor extends Component<Props> {
         canvas: gameCanvas,
       });
       threeRenderer.autoClear = false;
-      // this._threeRenderer.setPixelRatio(0.05);
       threeRenderer.setSize(this.props.width, this.props.height);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
@@ -195,7 +194,7 @@ export default class InstancesEditor extends Component<Props> {
         preserveDrawingBuffer: true,
         antialias: false,
         backgroundAlpha: 0,
-        // TODO (3D): `resolution: window.devicePixelRatio`?
+        // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
       });
 
       this.threeRenderer = threeRenderer;

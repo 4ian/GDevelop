@@ -16,6 +16,7 @@ const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
 const loaded3DModels = {};
+const invalidModel = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1));
 
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
@@ -249,13 +250,13 @@ export default class PixiResourcesLoader {
     if (loaded3DModel) return Promise.resolve(loaded3DModel);
 
     if (!project.getResourcesManager().hasResource(resourceName))
-      return invalidTexture;
+      return Promise.resolve(invalidModel);
 
     const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'model3D') return invalidTexture;
+    if (resource.getKind() !== 'model3D') return Promise.resolve(invalidModel);
 
     const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-      isResourceForPixi: false,
+      isResourceForPixi: true,
     });
 
     const loader = new GLTFLoader();

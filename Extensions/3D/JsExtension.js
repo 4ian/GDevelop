@@ -2404,11 +2404,6 @@ module.exports = {
           threeGroup,
           pixiResourcesLoader
         );
-        /**
-         * Name of the resource that is rendered.
-         * If no face is visible, this will be null.
-         */
-        this._renderedResourceName = undefined;
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
         this._defaultHeight = parseFloat(properties.get('height').getValue());

@@ -109,6 +109,9 @@ namespace gdjs {
       pixiRenderer: PIXI.Renderer | null,
       runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer
     ): void {
+      if (typeof THREE === 'undefined') {
+        return;
+      }
       // TODO (3D): ideally we would avoid the need for this check at all,
       // maybe by having separate rendering classes for custom object layers and scene layers.
       if (this._layer instanceof gdjs.Layer) {

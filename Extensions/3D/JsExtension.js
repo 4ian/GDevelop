@@ -221,7 +221,6 @@ module.exports = {
         )
         .setCategoryFullName(_('3D'))
         .addUnsupportedBaseObjectCapability('effect')
-        // .addUnsupportedBaseObjectCapability('effect') // TODO: are there more unsupported features?
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
@@ -948,7 +947,6 @@ module.exports = {
       )
       .setCategoryFullName(_('3D'))
       .addUnsupportedBaseObjectCapability('effect')
-      // .addUnsupportedBaseObjectCapability('effect') // TODO: are there more unsupported features?
       .setIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
       .addIncludeFile('Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js');
 

@@ -41,7 +41,7 @@ namespace gdjs {
    * Shows a 3D box object.
    */
   export class Cube3DRuntimeObject extends gdjs.RuntimeObject3D {
-    _renderer: Cube3DRuntimeObjectRenderer;
+    private _renderer: Cube3DRuntimeObjectRenderer;
     private _facesOrientation: 'Y' | 'Z';
     private _backFaceUpThroughWhichAxisRotation: 'X' | 'Y';
     private _shouldUseTransparentTexture: boolean;

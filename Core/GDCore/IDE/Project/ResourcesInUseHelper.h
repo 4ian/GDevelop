@@ -54,7 +54,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
     if (resourceType == "tileset") return allTilesets;
     if (resourceType == "video") return allVideos;
     if (resourceType == "bitmapFont") return allBitmapFonts;
-    if (resourceType == "model3D") return all3DModels;
+    if (resourceType == "model3D") return allModel3Ds;
 
     return emptyResources;
   };
@@ -87,7 +87,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
     allBitmapFonts.insert(bitmapFontResourceName);
   };
   virtual void ExposeModel3D(gd::String& resourceName) override {
-    all3DModels.insert(resourceName);
+    allModel3Ds.insert(resourceName);
   };
 
  protected:
@@ -99,7 +99,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String> allTilesets;
   std::set<gd::String> allVideos;
   std::set<gd::String> allBitmapFonts;
-  std::set<gd::String> all3DModels;
+  std::set<gd::String> allModel3Ds;
   std::set<gd::String> emptyResources;
 };
 

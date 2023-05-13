@@ -53,7 +53,7 @@ namespace gdjs {
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'near') {
               this.fog.near = value;
-            } else if (parameterName === 'far ') {
+            } else if (parameterName === 'far') {
               this.fog.far = value;
             }
           }

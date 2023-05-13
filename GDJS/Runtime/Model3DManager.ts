@@ -81,8 +81,9 @@ namespace gdjs {
         this._loader.load(
           resource.file,
           (gltf) => {
-            this._loadedThreeModels.set(resource.name, gltf.scene);
             this._replaceMaterials(gltf.scene);
+            gltf.scene.rotation.order = 'ZYX';
+            this._loadedThreeModels.set(resource.name, gltf.scene);
 
             loaded++;
             if (loaded === model3DResources.length) {

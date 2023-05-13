@@ -2379,9 +2379,228 @@ module.exports = {
       }
     }
 
+    class Model3DRendered3DInstance extends Rendered3DInstance {
+      constructor(
+        project,
+        layout,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        threeGroup,
+        pixiResourcesLoader
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          threeGroup,
+          pixiResourcesLoader
+        );
+        const properties = associatedObjectConfiguration.getProperties();
+        this._defaultWidth = parseFloat(properties.get('width').getValue());
+        this._defaultHeight = parseFloat(properties.get('height').getValue());
+        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+        const rotationX = parseFloat(properties.get('rotationX').getValue());
+        const rotationY = parseFloat(properties.get('rotationY').getValue());
+        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
+        const keepAspectRatio =
+          properties.get('keepAspectRatio').getValue() === 'true';
+        const modelResourceName = properties
+          .get('modelResourceName')
+          .getValue();
+
+        this._pixiObject = new PIXI.Graphics();
+        this._pixiContainer.addChild(this._pixiObject);
+
+        this._threeObject = new THREE.Group();
+        this._threeObject.rotation.order = 'ZYX';
+        this._threeGroup.add(this._threeObject);
+
+        this._pixiResourcesLoader
+          .get3DModel(project, modelResourceName)
+          .then((model3d) => {
+            const clonedModel3D = model3d.clone();
+            clonedModel3D.rotation.order = 'ZYX';
+            this._updateDefaultTransformation(
+              clonedModel3D,
+              rotationX,
+              rotationY,
+              rotationZ,
+              this._defaultWidth,
+              this._defaultHeight,
+              this._defaultDepth,
+              keepAspectRatio
+            );
+            this._threeObject.add(clonedModel3D);
+          });
+      }
+
+      _updateDefaultTransformation(
+        model3D,
+        rotationX,
+        rotationY,
+        rotationZ,
+        originalWidth,
+        originalHeight,
+        originalDepth,
+        keepAspectRatio
+      ) {
+        const boundingBox = this._getModelAABB(
+          model3D,
+          rotationX,
+          rotationY,
+          rotationZ
+        );
+
+        // Center the model.
+        model3D.position.set(
+          -(boundingBox.min.x + boundingBox.max.x) / 2,
+          (model3D.position.y = -(boundingBox.min.y + boundingBox.max.y) / 2),
+          (model3D.position.z = -(boundingBox.min.z + boundingBox.max.z) / 2)
+        );
+
+        // Rotate the model.
+        model3D.scale.set(1, 1, 1);
+        model3D.rotation.set(
+          (rotationX * Math.PI) / 180,
+          (rotationY * Math.PI) / 180,
+          (rotationZ * Math.PI) / 180
+        );
+
+        // Stretch the model in a 1x1x1 cube.
+        const modelWidth = boundingBox.max.x - boundingBox.min.x;
+        const modelHeight = boundingBox.max.y - boundingBox.min.y;
+        const modelDepth = boundingBox.max.z - boundingBox.min.z;
+
+        const scaleX = 1 / modelWidth;
+        const scaleY = 1 / modelHeight;
+        const scaleZ = 1 / modelDepth;
+
+        const scaleMatrix = new THREE.Matrix4();
+        scaleMatrix.makeScale(scaleX, scaleY, scaleZ);
+        model3D.updateMatrix();
+        model3D.applyMatrix4(scaleMatrix);
+
+        if (keepAspectRatio) {
+          // Reduce the object dimensions to keep aspect ratio.
+          const widthRatio = originalWidth / modelWidth;
+          const heightRatio = originalHeight / modelHeight;
+          const depthRatio = originalDepth / modelDepth;
+          const scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+
+          this._defaultWidth = scaleRatio * modelWidth;
+          this._defaultHeight = scaleRatio * modelHeight;
+          this._defaultDepth = scaleRatio * modelDepth;
+        }
+
+        model3D.updateMatrix();
+      }
+
+      _getModelAABB(model3D, rotationX, rotationY, rotationZ) {
+        // The original model is used because `setFromObject` is working in
+        // world transformation.
+
+        model3D.rotation.set(
+          (rotationX * Math.PI) / 180,
+          (rotationY * Math.PI) / 180,
+          (rotationZ * Math.PI) / 180
+        );
+
+        const aabb = new THREE.Box3().setFromObject(model3D);
+
+        // Revert changes.
+        model3D.rotation.set(0, 0, 0);
+
+        return aabb;
+      }
+
+      updateThreeObject() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+        let depth;
+        if (this._instance.hasCustomSize()) {
+          const instancePropertyDepth =
+            this._instance.getRawDoubleProperty('depth');
+          depth =
+            typeof instancePropertyDepth === 'number'
+              ? instancePropertyDepth
+              : this._defaultDepth;
+        } else {
+          depth = this._defaultDepth;
+        }
+        const z = this._instance.getRawDoubleProperty('z');
+
+        this._threeObject.position.set(
+          this._instance.getX() + width / 2,
+          this._instance.getY() + height / 2,
+          z + depth / 2
+        );
+
+        this._threeObject.rotation.set(
+          0,
+          0,
+          RenderedInstance.toRad(this._instance.getAngle())
+        );
+
+        if (
+          width !== this._threeObject.scale.width ||
+          height !== this._threeObject.scale.height ||
+          depth !== this._threeObject.scale.depth
+        ) {
+          this._threeObject.scale.set(width, height, depth);
+        }
+      }
+
+      updatePixiObject() {
+        const width = this._instance.hasCustomSize()
+          ? this._instance.getCustomWidth()
+          : this.getDefaultWidth();
+        const height = this._instance.hasCustomSize()
+          ? this._instance.getCustomHeight()
+          : this.getDefaultHeight();
+
+        this._pixiObject.clear();
+        this._pixiObject.beginFill(0x999999, 0.2);
+        this._pixiObject.lineStyle(1, 0xffd900, 0);
+        this._pixiObject.moveTo(-width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, -height / 2);
+        this._pixiObject.lineTo(width / 2, height / 2);
+        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.endFill();
+
+        this._pixiObject.position.x = this._instance.getX() + width / 2;
+        this._pixiObject.position.y = this._instance.getY() + height / 2;
+        this._pixiObject.angle = this._instance.getAngle();
+      }
+
+      update() {
+        this.updatePixiObject();
+        this.updateThreeObject();
+      }
+
+      getDefaultWidth() {
+        return this._defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return this._defaultHeight;
+      }
+    }
+
     objectsRenderingService.registerInstanceRenderer(
       'Scene3D::Model3DObject',
       Model3DRendered2DInstance
+    );
+
+    objectsRenderingService.registerInstance3DRenderer(
+      'Scene3D::Model3DObject',
+      Model3DRendered3DInstance
     );
   },
 };

@@ -10,7 +10,7 @@ You can download these here - **replace XX by the current version number**:
 
 > ⚠️ Be sure to check if the latest build was successfully done: [![Build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop). If this icon is not green, wait a bit before downloading the latest version.
 
-> ⚠️ In theory, the builds from `master` branch should always be stable and working well. In practice, they are not tested and can contain bugs or regressions. Make backups of your games and **use them at your own risk**. The software is provided "as is", **without warranty of any kind**. For more information, read the [license under which GDevelop is provided](https://github.com/4ian/GDevelop/blob/master/license.txt).
+> ⚠️ In theory, the builds from `master` branch should always be stable and working well. In practice, they are not tested and can contain bugs or regressions. Make backups of your games and **use them at your own risk**. The software is provided "as is", **without warranty of any kind**. For more information, read the [license under which GDevelop is provided](https://github.com/4ian/GDevelop/blob/master/LICENSE.md).
 
 ## About Nightly Builds and continuous deployment
 

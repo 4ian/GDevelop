@@ -49,7 +49,7 @@ npm install
 npm start
 ```
 
-More information in [GDevelop 5 readme](https://github.com/4ian/GD/blob/master/newIDE/README.md).
+More information in [GDevelop 5 README](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md).
 
 ### Tests
 

@@ -940,8 +940,8 @@ module.exports = {
     const object = extension
       .addObject(
         'Cube3DObject',
-        _('3D Cube'),
-        _('A 3D cube.'),
+        _('3D Box'),
+        _('A 3D box.'),
         'JsPlatform/Extensions/3d_box.svg',
         Cube3DObject
       )
@@ -1618,9 +1618,9 @@ module.exports = {
     objectsEditorService /*: ObjectsEditorService */
   ) {
     objectsEditorService.registerEditorConfiguration(
-      'Scene3D::Cube3DObject',
+      'Scene3D::Model3DObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/3d_shape',
+        helpPagePath: '/objects/3d-model',
       })
     );
   },

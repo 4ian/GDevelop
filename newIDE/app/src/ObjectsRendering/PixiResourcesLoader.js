@@ -29,6 +29,28 @@ const determineCrossOrigin = (url: string) => {
   return 'anonymous';
 };
 
+const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
+  if (resource.getKind() !== 'image') return;
+
+  const imageResource = gd.asImageResource(resource);
+  if (!imageResource.isSmooth()) {
+    texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+  }
+};
+
+const applyThreeTextureSettings = (
+  resource: gdResource,
+  threeTexture: THREE.Texture
+) => {
+  if (resource.getKind() !== 'image') return;
+
+  const imageResource = gd.asImageResource(resource);
+  if (!imageResource.isSmooth()) {
+    threeTexture.magFilter = THREE.NearestFilter;
+    threeTexture.minFilter = THREE.NearestFilter;
+  }
+};
+
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
  * resources and a gd.Project.
@@ -36,28 +58,6 @@ const determineCrossOrigin = (url: string) => {
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
-  static _applyTextureSettings(resource: gdResource, texture: any) {
-    if (resource.getKind() !== 'image') return;
-
-    const imageResource = gd.asImageResource(resource);
-    if (!imageResource.isSmooth()) {
-      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-    }
-  }
-
-  static _applyThreeTextureSettings(
-    resource: gdResource,
-    threeTexture: THREE.Texture
-  ) {
-    if (resource.getKind() !== 'image') return;
-
-    const imageResource = gd.asImageResource(resource);
-    if (!imageResource.isSmooth()) {
-      threeTexture.magFilter = THREE.NearestFilter;
-      threeTexture.minFilter = THREE.NearestFilter;
-    }
-  }
-
   /**
    * (Re)load the PIXI texture represented by the given resources.
    */
@@ -114,10 +114,7 @@ export default class PixiResourcesLoader {
           const texture = loadedResources[resourceName].texture;
           if (texture) {
             loadedTextures[resourceName] = texture;
-            PixiResourcesLoader._applyTextureSettings(
-              resource,
-              loadedTextures[resourceName]
-            );
+            applyPixiTextureSettings(resource, loadedTextures[resourceName]);
           }
         }
       }
@@ -157,10 +154,7 @@ export default class PixiResourcesLoader {
       },
     });
 
-    PixiResourcesLoader._applyTextureSettings(
-      resource,
-      loadedTextures[resourceName]
-    );
+    applyPixiTextureSettings(resource, loadedTextures[resourceName]);
     return loadedTextures[resourceName];
   }
 
@@ -202,7 +196,7 @@ export default class PixiResourcesLoader {
     threeTexture.needsUpdate = true;
 
     const resource = project.getResourcesManager().getResource(resourceName);
-    PixiResourcesLoader._applyThreeTextureSettings(resource, threeTexture);
+    applyThreeTextureSettings(resource, threeTexture);
 
     loadedThreeTextures[resourceName] = threeTexture;
 
@@ -213,13 +207,13 @@ export default class PixiResourcesLoader {
    * Return the three.js material associated to the specified resource name.
    * @param project The project
    * @param resourceName The name of the resource
-   * @param options
+   * @param options Set if the material should be transparent or not.
    * @returns The requested material.
    */
   static getThreeMaterial(
     project: gdProject,
     resourceName: string,
-    { useTransparentTexture }: { useTransparentTexture: boolean }
+    { useTransparentTexture }: {| useTransparentTexture: boolean |}
   ) {
     const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
     const loadedThreeMaterial = loadedThreeMaterials[cacheKey];

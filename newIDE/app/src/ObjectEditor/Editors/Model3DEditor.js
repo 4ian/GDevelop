@@ -53,10 +53,10 @@ export const hasLight = (layout: ?gd.Layout) => {
   return false;
 };
 
-type PropertyFieldProps = {
+type PropertyFieldProps = {|
   objectConfiguration: gdObjectConfiguration,
   propertyName: string,
-};
+|};
 
 const PropertyField = ({
   objectConfiguration,
@@ -137,12 +137,12 @@ const PropertyCheckbox = ({
   );
 };
 
-type PropertyResourceSelectorProps = {
+type PropertyResourceSelectorProps = {|
   objectConfiguration: gdObjectConfiguration,
   propertyName: string,
   project: gd.Project,
   resourceManagementProps: ResourceManagementProps,
-};
+|};
 
 const PropertyResourceSelector = ({
   objectConfiguration,

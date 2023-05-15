@@ -218,17 +218,17 @@ namespace gdjs {
       resourceName: string,
       {
         useTransparentTexture,
-        isAlwaysLighted,
-      }: { useTransparentTexture: boolean; isAlwaysLighted: boolean }
+        hasNoLighting,
+      }: { useTransparentTexture: boolean; hasNoLighting: boolean }
     ) {
       const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
-        isAlwaysLighted ? 1 : 0
+        hasNoLighting ? 1 : 0
       }`;
 
       const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
       if (loadedThreeMaterial) return loadedThreeMaterial;
 
-      const material = isAlwaysLighted
+      const material = hasNoLighting
         ? new THREE.MeshBasicMaterial({
             map: this.getThreeTexture(resourceName),
             side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,

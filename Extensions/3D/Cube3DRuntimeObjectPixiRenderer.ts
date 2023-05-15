@@ -59,9 +59,9 @@ namespace gdjs {
       .getImageManager()
       .getThreeMaterial(runtimeObject.getFaceAtIndexResourceName(faceIndex), {
         useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
-        isAlwaysLighted:
+        hasNoLighting:
           runtimeObject._materialType ===
-          gdjs.Cube3DRuntimeObject.MaterialType.AlwaysLighted,
+          gdjs.Cube3DRuntimeObject.MaterialType.NoLighting,
       });
   };
 

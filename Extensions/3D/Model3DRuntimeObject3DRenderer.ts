@@ -152,7 +152,7 @@ namespace gdjs {
         });
       } else if (
         this._model3DRuntimeObject._materialType ===
-        gdjs.Model3DRuntimeObject.MaterialType.AlwaysLighted
+        gdjs.Model3DRuntimeObject.MaterialType.NoLighting
       ) {
         this._threeObject.traverse((node) => {
           if (node.type === 'Mesh') {

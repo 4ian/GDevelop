@@ -24,7 +24,7 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
-      materialType: 'AlwaysLighted' | 'EmitAllAmbientLight';
+      materialType: 'NoLighting' | 'EmitAllAmbientLight';
     };
   }
 
@@ -58,7 +58,7 @@ namespace gdjs {
       string
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
-      gdjs.Cube3DRuntimeObject.MaterialType.AlwaysLighted;
+      gdjs.Cube3DRuntimeObject.MaterialType.NoLighting;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -415,7 +415,7 @@ namespace gdjs {
       if (materialTypeString === 'EmitAllAmbientLight') {
         return gdjs.Cube3DRuntimeObject.MaterialType.EmitAllAmbientLight;
       } else {
-        return gdjs.Cube3DRuntimeObject.MaterialType.AlwaysLighted;
+        return gdjs.Cube3DRuntimeObject.MaterialType.NoLighting;
       }
     }
 
@@ -427,7 +427,7 @@ namespace gdjs {
 
   export namespace Cube3DRuntimeObject {
     export enum MaterialType {
-      AlwaysLighted,
+      NoLighting,
       EmitAllAmbientLight,
     }
   }

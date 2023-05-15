@@ -240,24 +240,27 @@ const Model3DEditor = ({
           }}
         >
           <SelectOption
-            label={t`Always lighted (no light needed)`}
-            value="AlwaysLighted"
-            key="AlwaysLighted"
+            label={t`No lighting effect`}
+            value="NoLighting"
+            key="NoLighting"
           />
           <SelectOption
             label={t`Emit all ambient light`}
             value="EmitAllAmbientLight"
             key="EmitAllAmbientLight"
           />
-          <SelectOption label={t`No change`} value="NoChange" key="NoChange" />
+          <SelectOption
+            label={t`Keep model material`}
+            value="KeepOriginalMaterial"
+            key="KeepOriginalMaterial"
+          />
         </SelectField>
-        {properties.get('materialType').getValue() !== 'AlwaysLighted' &&
+        {properties.get('materialType').getValue() !== 'NoLighting' &&
           !hasLight(layout) && (
             <AlertMessage kind="error">
               <Trans>
-                For standard materials reacting to lights, make sure to set up a
-                light in the effects of the layer - otherwise the object will be
-                black.
+                Make sure to set up a light in the effects of the layer or chose
+                "No lighting effect" - otherwise the object will appear black.
               </Trans>
             </AlertMessage>
           )}

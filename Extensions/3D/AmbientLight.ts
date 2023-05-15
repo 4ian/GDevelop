@@ -37,6 +37,7 @@ namespace gdjs {
               return false;
             }
             scene.add(this.light);
+            this._isEnabled = true;
             return true;
           }
           removeEffect(target: EffectsTarget): boolean {
@@ -48,6 +49,7 @@ namespace gdjs {
               return false;
             }
             scene.remove(this.light);
+            this._isEnabled = false;
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {}

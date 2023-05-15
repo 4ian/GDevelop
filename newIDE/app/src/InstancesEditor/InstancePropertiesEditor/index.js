@@ -8,7 +8,9 @@ import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema, {
+  reorganizeSchemaFor3DInstance,
+} from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
@@ -22,6 +24,7 @@ import VariablesList, {
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import cloneDeep from 'lodash/cloneDeep';
 
 type Props = {|
   project: gdProject,
@@ -105,12 +108,18 @@ const InstancePropertiesEditor = React.forwardRef<
           ],
         },
         {
-          name: 'Angle',
-          getLabel: () => i18n._(t`Angle`),
-          valueType: 'number',
-          getValue: (instance: gdInitialInstance) => instance.getAngle(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setAngle(newValue),
+          name: 'Angles',
+          type: 'row',
+          children: [
+            {
+              name: 'Angle',
+              getLabel: () => i18n._(t`Angle`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) => instance.getAngle(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setAngle(newValue),
+            },
+          ],
         },
         {
           name: 'Lock instance position angle',
@@ -198,6 +207,23 @@ const InstancePropertiesEditor = React.forwardRef<
       [i18n, layout, onEditObjectByName, onGetInstanceSize]
     );
 
+    const getSchema3D = React.useCallback(
+      () => {
+        const baseSchema = cloneDeep(schema);
+        const zOrderFieldIndex = baseSchema.findIndex(
+          field =>
+            field.valueType &&
+            field.valueType === 'number' &&
+            field.name &&
+            field.name === 'Z Order'
+        );
+        if (!zOrderFieldIndex) return baseSchema;
+        baseSchema.splice(zOrderFieldIndex, 1);
+        return baseSchema;
+      },
+      [schema]
+    );
+
     const renderEmpty = () => {
       return (
         <EmptyMessage>
@@ -212,15 +238,23 @@ const InstancePropertiesEditor = React.forwardRef<
       const instance = instances[0];
       const associatedObjectName = instance.getObjectName();
       const object = getObjectByName(project, layout, associatedObjectName);
-      //TODO: multiple instances support
+      // TODO: multiple instances support
       const properties = instance.getCustomProperties(project, layout);
-      const instanceSchema = propertiesMapToSchema(
+      // TODO: Reorganize fields if any of the selected instances is 3D.
+      const is3DInstance = properties.has('z');
+      const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
           instance.getCustomProperties(project, layout),
         (instance: gdInitialInstance, name, value) =>
           instance.updateCustomProperty(name, value, project, layout)
       );
+      let instanceSchema = is3DInstance
+        ? reorganizeSchemaFor3DInstance(
+            getSchema3D(),
+            instanceSchemaForCustomProperties
+          )
+        : schema.concat(instanceSchemaForCustomProperties);
 
       return (
         <ScrollView
@@ -233,7 +267,7 @@ const InstancePropertiesEditor = React.forwardRef<
             <Column>
               <PropertiesEditor
                 unsavedChanges={unsavedChanges}
-                schema={schema.concat(instanceSchema)}
+                schema={instanceSchema}
                 instances={instances}
                 onInstancesModified={onInstancesModified}
               />

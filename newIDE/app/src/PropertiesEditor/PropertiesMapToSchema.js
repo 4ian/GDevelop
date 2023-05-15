@@ -391,4 +391,72 @@ export const getMeasurementUnitShortLabel = (
   }).join(' · ');
 };
 
+export const reorganizeSchemaFor3DInstance = (
+  baseSchema: Schema,
+  customPropertiesSchema: Schema
+): Schema => {
+  const positionRow = baseSchema.find(
+    field =>
+      field.type === 'row' &&
+      field.children &&
+      field.name &&
+      field.name === 'Position'
+  );
+  if (positionRow && positionRow.children) {
+    const zField = customPropertiesSchema.splice(
+      customPropertiesSchema.findIndex(
+        field =>
+          field.name &&
+          field.name === 'Z' &&
+          field.valueType &&
+          field.valueType === 'number'
+      ),
+      1
+    )[0];
+    positionRow.children.push(zField);
+  }
+  const sizeRow = baseSchema.find(
+    field =>
+      field.type === 'row' &&
+      field.children &&
+      field.name &&
+      field.name === 'custom-size-row'
+  );
+  if (sizeRow && sizeRow.children) {
+    const depthField = customPropertiesSchema.splice(
+      customPropertiesSchema.findIndex(
+        field =>
+          field.name &&
+          field.name === 'depth' &&
+          field.valueType &&
+          field.valueType === 'number'
+      ),
+      1
+    )[0];
+    sizeRow.children.push(depthField);
+  }
+  const anglesPropertyRow = baseSchema.find(
+    field =>
+      field.type === 'row' &&
+      field.children &&
+      field.name &&
+      field.name === 'Angles'
+  );
+  const rotationXAndYRow = customPropertiesSchema.splice(
+    customPropertiesSchema.findIndex(
+      field =>
+        field.type === 'row' &&
+        field.children &&
+        field.name &&
+        field.name === 'rotationX-rotationY'
+    ),
+    1
+  )[0];
+  // $FlowFixMe - Both rows have children
+  anglesPropertyRow.children.unshift(...rotationXAndYRow.children);
+
+  // Add the remaining custom properties that were not reorganized by this method.
+  return baseSchema.concat(customPropertiesSchema);
+};
+
 export default propertiesMapToSchema;

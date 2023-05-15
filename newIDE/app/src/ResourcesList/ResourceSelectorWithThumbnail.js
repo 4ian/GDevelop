@@ -6,10 +6,13 @@ import {
   type ResourceManagementProps,
   type ResourceKind,
 } from './ResourceSource';
-import ResourceThumbnail from './ResourceThumbnail';
+import ResourceThumbnail, {
+  resourcesKindsWithThumbnail,
+} from './ResourceThumbnail';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { LineStackLayout } from '../UI/Layout';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { Line } from '../UI/Grid';
 
 type Props = {|
   project: gdProject,
@@ -36,29 +39,40 @@ const ResourceSelectorWithThumbnail = ({
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const itemsAlignment = windowWidth === 'small' ? 'center' : 'flex-end';
+  const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
 
+  const resourcesSelector = (
+    <ResourceSelector
+      project={project}
+      resourceManagementProps={resourceManagementProps}
+      resourcesLoader={ResourcesLoader}
+      resourceKind={resourceKind}
+      fullWidth
+      initialResourceName={resourceName}
+      onChange={onChange}
+      floatingLabelText={floatingLabelText}
+      hintText={hintText}
+      helperMarkdownText={helperMarkdownText}
+      fallbackResourceKind={fallbackResourceKind}
+    />
+  );
+  if (displayThumbnail) {
+    return (
+      <LineStackLayout noMargin expand alignItems={itemsAlignment}>
+        <ResourceThumbnail
+          resourceName={resourceName}
+          resourcesLoader={ResourcesLoader}
+          project={project}
+          resourceKind={resourceKind}
+        />
+        {resourcesSelector}
+      </LineStackLayout>
+    );
+  }
   return (
-    <LineStackLayout noMargin expand alignItems={itemsAlignment}>
-      <ResourceThumbnail
-        resourceName={resourceName}
-        resourcesLoader={ResourcesLoader}
-        project={project}
-        resourceKind={resourceKind}
-      />
-      <ResourceSelector
-        project={project}
-        resourceManagementProps={resourceManagementProps}
-        resourcesLoader={ResourcesLoader}
-        resourceKind={resourceKind}
-        fullWidth
-        initialResourceName={resourceName}
-        onChange={onChange}
-        floatingLabelText={floatingLabelText}
-        hintText={hintText}
-        helperMarkdownText={helperMarkdownText}
-        fallbackResourceKind={fallbackResourceKind}
-      />
-    </LineStackLayout>
+    <Line noMargin expand>
+      {resourcesSelector}
+    </Line>
   );
 };
 

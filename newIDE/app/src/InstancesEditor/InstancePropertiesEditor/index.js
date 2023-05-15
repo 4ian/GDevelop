@@ -24,7 +24,6 @@ import VariablesList, {
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import cloneDeep from 'lodash/cloneDeep';
 
 type Props = {|
   project: gdProject,
@@ -207,116 +206,112 @@ const InstancePropertiesEditor = React.forwardRef<
       [i18n, layout, onEditObjectByName, onGetInstanceSize]
     );
 
-    const getSchema3D = React.useCallback(
-      () => {
-        const baseSchema = cloneDeep(schema);
-        const zOrderFieldIndex = baseSchema.findIndex(
-          field =>
-            field.valueType &&
-            field.valueType === 'number' &&
-            field.name &&
-            field.name === 'Z Order'
-        );
-        if (!zOrderFieldIndex) return baseSchema;
-        baseSchema.splice(zOrderFieldIndex, 1);
-        return baseSchema;
-      },
-      [schema]
+    const instance = instances[0];
+    const associatedObjectName = instance.getObjectName();
+    const object = getObjectByName(project, layout, associatedObjectName);
+    // TODO: multiple instances support
+    const properties = instance.getCustomProperties(project, layout);
+    // TODO: Reorganize fields if any of the selected instances is 3D.
+    const is3DInstance = properties.has('z');
+    const instanceSchemaForCustomProperties = propertiesMapToSchema(
+      properties,
+      (instance: gdInitialInstance) =>
+        instance.getCustomProperties(project, layout),
+      (instance: gdInitialInstance, name, value) =>
+        instance.updateCustomProperty(name, value, project, layout)
+    );
+    let instanceSchema = React.useMemo(
+      () =>
+        is3DInstance
+          ? reorganizeSchemaFor3DInstance(
+              schema,
+              instanceSchemaForCustomProperties
+            )
+          : schema.concat(instanceSchemaForCustomProperties),
+      [is3DInstance, instanceSchemaForCustomProperties, schema]
     );
 
-    const renderEmpty = () => {
-      return (
+    return (
+      <ScrollView
+        autoHideScrollbar
+        key={instances
+          .map((instance: gdInitialInstance) => '' + instance.ptr)
+          .join(';')}
+      >
+        <Column expand noMargin id="instance-properties-editor">
+          <Column>
+            <PropertiesEditor
+              unsavedChanges={unsavedChanges}
+              schema={instanceSchema}
+              instances={instances}
+              onInstancesModified={onInstancesModified}
+            />
+            <Line alignItems="center" justifyContent="space-between">
+              <Text>
+                <Trans>Instance Variables</Trans>
+              </Text>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  editInstanceVariables(instance);
+                }}
+              >
+                <ShareExternal />
+              </IconButton>
+            </Line>
+          </Column>
+          {object ? (
+            <VariablesList
+              commitChangesOnBlur={false}
+              inheritedVariablesContainer={object.getVariables()}
+              variablesContainer={instance.getVariables()}
+              size="small"
+              onComputeAllVariableNames={() =>
+                object
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      object
+                    )
+                  : []
+              }
+              historyHandler={historyHandler}
+            />
+          ) : null}
+        </Column>
+      </ScrollView>
+    );
+  }
+);
+
+const InstancePropertiesEditorContainer = React.forwardRef<
+  Props,
+  InstancePropertiesEditorInterface
+>((props, ref) => {
+  const editorRef = React.useRef<?InstancePropertiesEditorInterface>(null);
+  const forceUpdate = React.useCallback(() => {
+    if (editorRef.current) {
+      editorRef.current.forceUpdate();
+    }
+  }, []);
+  React.useImperativeHandle(ref, () => ({
+    forceUpdate,
+  }));
+
+  return (
+    <Background>
+      {!props.instances || !props.instances.length ? (
         <EmptyMessage>
           <Trans>
             Click on an instance in the scene to display its properties
           </Trans>
         </EmptyMessage>
-      );
-    };
+      ) : (
+        <InstancePropertiesEditor {...props} ref={editorRef} />
+      )}
+    </Background>
+  );
+});
 
-    const renderInstancesProperties = () => {
-      const instance = instances[0];
-      const associatedObjectName = instance.getObjectName();
-      const object = getObjectByName(project, layout, associatedObjectName);
-      // TODO: multiple instances support
-      const properties = instance.getCustomProperties(project, layout);
-      // TODO: Reorganize fields if any of the selected instances is 3D.
-      const is3DInstance = properties.has('z');
-      const instanceSchemaForCustomProperties = propertiesMapToSchema(
-        properties,
-        (instance: gdInitialInstance) =>
-          instance.getCustomProperties(project, layout),
-        (instance: gdInitialInstance, name, value) =>
-          instance.updateCustomProperty(name, value, project, layout)
-      );
-      let instanceSchema = is3DInstance
-        ? reorganizeSchemaFor3DInstance(
-            getSchema3D(),
-            instanceSchemaForCustomProperties
-          )
-        : schema.concat(instanceSchemaForCustomProperties);
-
-      return (
-        <ScrollView
-          autoHideScrollbar
-          key={instances
-            .map((instance: gdInitialInstance) => '' + instance.ptr)
-            .join(';')}
-        >
-          <Column expand noMargin id="instance-properties-editor">
-            <Column>
-              <PropertiesEditor
-                unsavedChanges={unsavedChanges}
-                schema={instanceSchema}
-                instances={instances}
-                onInstancesModified={onInstancesModified}
-              />
-              <Line alignItems="center" justifyContent="space-between">
-                <Text>
-                  <Trans>Instance Variables</Trans>
-                </Text>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    editInstanceVariables(instance);
-                  }}
-                >
-                  <ShareExternal />
-                </IconButton>
-              </Line>
-            </Column>
-            {object ? (
-              <VariablesList
-                commitChangesOnBlur={false}
-                inheritedVariablesContainer={object.getVariables()}
-                variablesContainer={instance.getVariables()}
-                size="small"
-                onComputeAllVariableNames={() =>
-                  object
-                    ? EventsRootVariablesFinder.findAllObjectVariables(
-                        project.getCurrentPlatform(),
-                        project,
-                        layout,
-                        object
-                      )
-                    : []
-                }
-                historyHandler={historyHandler}
-              />
-            ) : null}
-          </Column>
-        </ScrollView>
-      );
-    };
-
-    return (
-      <Background>
-        {!instances || !instances.length
-          ? renderEmpty()
-          : renderInstancesProperties()}
-      </Background>
-    );
-  }
-);
-
-export default InstancePropertiesEditor;
+export default InstancePropertiesEditorContainer;

@@ -1,10 +1,11 @@
 // @flow
+import * as React from 'react';
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
 import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
-import * as React from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 
 const createField = (
   name: string,
@@ -395,7 +396,22 @@ export const reorganizeSchemaFor3DInstance = (
   baseSchema: Schema,
   customPropertiesSchema: Schema
 ): Schema => {
-  const positionRow = baseSchema.find(
+  console.log("SALUT")
+  // Remove Z order field that is not used in 3D.
+  const schema = cloneDeep(baseSchema);
+  const zOrderFieldIndex = schema.findIndex(
+    field =>
+      field.valueType &&
+      field.valueType === 'number' &&
+      field.name &&
+      field.name === 'Z Order'
+  );
+  if (zOrderFieldIndex) {
+    schema.splice(zOrderFieldIndex, 1);
+  }
+
+  // Add Z position to X and Y positions row
+  const positionRow = schema.find(
     field =>
       field.type === 'row' &&
       field.children &&
@@ -415,7 +431,9 @@ export const reorganizeSchemaFor3DInstance = (
     )[0];
     positionRow.children.push(zField);
   }
-  const sizeRow = baseSchema.find(
+
+  // Add Depth to Width and Height row
+  const sizeRow = schema.find(
     field =>
       field.type === 'row' &&
       field.children &&
@@ -435,7 +453,9 @@ export const reorganizeSchemaFor3DInstance = (
     )[0];
     sizeRow.children.push(depthField);
   }
-  const anglesPropertyRow = baseSchema.find(
+
+  // Add rotations on X and Y to Angles row
+  const anglesPropertyRow = schema.find(
     field =>
       field.type === 'row' &&
       field.children &&
@@ -456,7 +476,7 @@ export const reorganizeSchemaFor3DInstance = (
   anglesPropertyRow.children.unshift(...rotationXAndYRow.children);
 
   // Add the remaining custom properties that were not reorganized by this method.
-  return baseSchema.concat(customPropertiesSchema);
+  return schema.concat(customPropertiesSchema);
 };
 
 export default propertiesMapToSchema;

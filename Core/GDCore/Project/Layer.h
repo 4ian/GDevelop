@@ -211,8 +211,8 @@ class GD_CORE_API Layer {
                          ///< renders an ambient light.
   bool followBaseLayerCamera;  ///< True if the layer automatically follows the
                                ///< base layer
-  double threeDNearPlaneDistance;  ///< 3D camera frustrum near plan distance
-  double threeDFarPlaneDistance;   ///< 3D camera frustrum far plan distance
+  double threeDNearPlaneDistance;  ///< 3D camera frustum near plan distance
+  double threeDFarPlaneDistance;   ///< 3D camera frustum far plan distance
   double threeDFieldOfView;        ///< 3D camera field of view (fov) in degrees
   unsigned int ambientLightColorR;  ///< Ambient light color Red component
   unsigned int ambientLightColorG;  ///< Ambient light color Green component

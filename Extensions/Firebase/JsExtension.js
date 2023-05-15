@@ -395,7 +395,7 @@ module.exports = {
       .addIncludeFile('Extensions/Firebase/A_firebasejs/B_firebase-auth.js')
       .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
       .addIncludeFile('Extensions/Firebase/B_firebasetools/D_authtools.js')
-      .setFunctionName('gdjs.evtTools.firebaseTools.auth.isAuthentified');
+      .setFunctionName('gdjs.evtTools.firebaseTools.auth.isAuthenticated');
 
     extension
       .addStrExpression(

@@ -387,7 +387,7 @@ const defineTileMap = function (
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
-    .setFunctionName('getLevelndex');
+    .setFunctionName('getLevelIndex');
 
   object
     .addCondition(
@@ -1531,7 +1531,7 @@ module.exports = {
         this._loadTiledMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
-        0, // leveIndex
+        0, // levelIndex
         pako,
         (tileMap) => {
           if (!tileMap) {

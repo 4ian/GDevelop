@@ -114,9 +114,6 @@ namespace gdjs {
       return aabb;
     }
 
-    /**
-     * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
-     */
     _updateMaterials() {
       // @ts-ignore It can't be null if THREE exists.
       const originalModelMesh: THREE.Object3D = this._model3DRuntimeObject
@@ -135,7 +132,7 @@ namespace gdjs {
     }
 
     /**
-     * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
+     * Replace materials to better work with lights (or no light).
      */
     _replaceMaterials() {
       if (

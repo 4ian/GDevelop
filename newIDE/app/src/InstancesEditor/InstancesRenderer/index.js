@@ -9,7 +9,7 @@ import Rectangle from '../../Utils/Rectangle';
 export type InstanceMeasurer = {|
   getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
   getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
-  getUnrotatedInstanceSize: (gdInitialInstance) => [number, number],
+  getUnrotatedInstanceSize: gdInitialInstance => [number, number],
 |};
 
 export default class InstancesRenderer {
@@ -134,7 +134,7 @@ export default class InstancesRenderer {
 
         return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
       },
-      getUnrotatedInstanceSize: (instance) => {
+      getUnrotatedInstanceSize: instance => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) {

@@ -1059,6 +1059,12 @@ export default class InstancesEditor extends Component<Props> {
     startPIXITicker();
   };
 
+  getInstanceSize = (initialInstance: gdInitialInstance): [number, number] => {
+    return this.instancesRenderer
+      .getInstanceMeasurer()
+      .getUnrotatedInstanceSize(initialInstance);
+  };
+
   render() {
     if (!this.props.project) return null;
 

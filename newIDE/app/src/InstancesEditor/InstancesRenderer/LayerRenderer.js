@@ -219,39 +219,37 @@ export default class LayerRenderer {
     );
   };
 
-  getUnrotatedInstanceWidth = (instance: gdInitialInstance) => {
-    if (instance.hasCustomSize()) return instance.getCustomWidth();
+  getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
+    if (instance.hasCustomSize())
+      return [instance.getCustomWidth(), instance.getCustomHeight()];
 
     return this.renderedInstances[instance.ptr]
-      ? this.renderedInstances[instance.ptr].getDefaultWidth()
-      : 0;
-  };
-
-  getUnrotatedInstanceHeight = (instance: gdInitialInstance) => {
-    if (instance.hasCustomSize()) return instance.getCustomHeight();
-
-    return this.renderedInstances[instance.ptr]
-      ? this.renderedInstances[instance.ptr].getDefaultHeight()
-      : 0;
+      ? [
+          this.renderedInstances[instance.ptr].getDefaultWidth(),
+          this.renderedInstances[instance.ptr].getDefaultHeight(),
+        ]
+      : [0, 0];
   };
 
   getUnrotatedInstanceAABB(
     instance: gdInitialInstance,
     bounds: Rectangle
   ): Rectangle {
+    const size = this.getUnrotatedInstanceSize(instance);
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
-    const right = left + this.getUnrotatedInstanceWidth(instance);
-    const bottom = top + this.getUnrotatedInstanceHeight(instance);
+    const right = left + size[0];
+    const bottom = top + size[1];
     bounds.set({ left, top, right, bottom });
     return bounds;
   }
 
   _getInstanceRotatedRectangle(instance: gdInitialInstance): Polygon {
+    const size = this.getUnrotatedInstanceSize(instance);
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
-    const right = left + this.getUnrotatedInstanceWidth(instance);
-    const bottom = top + this.getUnrotatedInstanceHeight(instance);
+    const right = left + size[0];
+    const bottom = top + size[1];
 
     const rectangle = this._temporaryRectanglePath;
 

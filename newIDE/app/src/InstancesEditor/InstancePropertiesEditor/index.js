@@ -28,6 +28,7 @@ type Props = {|
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onGetInstanceSize: (gdInitialInstance) => [number, number],
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
@@ -129,8 +130,14 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
       getLabel: () => this.props.i18n._(t`Custom size`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setHasCustomSize(newValue),
+      setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        if (newValue) {
+          const [width, height] = this.props.onGetInstanceSize(instance);
+          instance.setCustomWidth(width);
+          instance.setCustomHeight(height);
+        }
+        instance.setHasCustomSize(newValue)
+      },
     },
     {
       name: 'custom-size-row',
@@ -141,16 +148,20 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           getLabel: () => this.props.i18n._(t`Width`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomWidth(Math.max(newValue, 0)),
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            instance.setHasCustomSize(true);
+            instance.setCustomWidth(Math.max(newValue, 0));
+          }
         },
         {
           name: 'Height',
           getLabel: () => this.props.i18n._(t`Height`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomHeight(Math.max(newValue, 0)),
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            instance.setHasCustomSize(true);
+            instance.setCustomHeight(Math.max(newValue, 0));
+          }
         },
       ],
     },

@@ -251,15 +251,16 @@ const Model3DEditor = ({
           />
           <SelectOption label={t`No change`} value="NoChange" key="NoChange" />
         </SelectField>
-        {!hasLight(layout) && (
-          <AlertMessage kind="error">
-            <Trans>
-              For standard materials reacting to lights, make sure to set up a
-              light in the effects of the layer - otherwise the object will be
-              black.
-            </Trans>
-          </AlertMessage>
-        )}
+        {properties.get('materialType').getValue() !== 'AlwaysLighted' &&
+          !hasLight(layout) && (
+            <AlertMessage kind="error">
+              <Trans>
+                For standard materials reacting to lights, make sure to set up a
+                light in the effects of the layer - otherwise the object will be
+                black.
+              </Trans>
+            </AlertMessage>
+          )}
       </ColumnStackLayout>
     </ColumnStackLayout>
   );

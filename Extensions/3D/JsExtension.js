@@ -57,8 +57,10 @@ module.exports = {
           objectContent[propertyName] = parseFloat(newValue);
           return true;
         }
-        if (propertyName === 'modelResourceName' ||
-            propertyName === 'materialType') {
+        if (
+          propertyName === 'modelResourceName' ||
+          propertyName === 'materialType'
+        ) {
           objectContent[propertyName] = newValue;
           return true;
         }
@@ -157,7 +159,7 @@ module.exports = {
           rotationY: 0,
           rotationZ: 0,
           modelResourceName: '',
-          materialType:'AlwaysLighted'
+          materialType: 'AlwaysLighted',
         })
       );
 
@@ -894,7 +896,7 @@ module.exports = {
         rightFaceResourceRepeat: false,
         topFaceResourceRepeat: false,
         bottomFaceResourceRepeat: false,
-        materialType:'AlwaysLighted'
+        materialType: 'AlwaysLighted',
       })
     );
 
@@ -1617,7 +1619,9 @@ module.exports = {
       const effect = extension
         .addEffect('AmbientLight')
         .setFullName(_('Ambient light'))
-        .setDescription(_('A light that illuminates all objects from every direction.'))
+        .setDescription(
+          _('A light that illuminates all objects from every direction.')
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/AmbientLight.js');
@@ -1709,7 +1713,7 @@ module.exports = {
    */
   registerEditorConfigurations: function (
     objectsEditorService /*: ObjectsEditorService */
-  ) { },
+  ) {},
   /**
    * Register renderers for instance of objects on the scene editor.
    *

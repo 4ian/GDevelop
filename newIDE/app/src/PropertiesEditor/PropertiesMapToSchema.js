@@ -396,7 +396,6 @@ export const reorganizeSchemaFor3DInstance = (
   baseSchema: Schema,
   customPropertiesSchema: Schema
 ): Schema => {
-  console.log("SALUT")
   // Remove Z order field that is not used in 3D.
   const schema = cloneDeep(baseSchema);
   const zOrderFieldIndex = schema.findIndex(

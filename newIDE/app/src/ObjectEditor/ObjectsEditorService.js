@@ -163,7 +163,7 @@ const ObjectsEditorService = {
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
-      helpPagePath: '/objects/3d_model',
+      helpPagePath: '/objects/3d-model',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,

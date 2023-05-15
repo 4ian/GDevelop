@@ -1709,20 +1709,7 @@ module.exports = {
    */
   registerEditorConfigurations: function (
     objectsEditorService /*: ObjectsEditorService */
-  ) {
-    objectsEditorService.registerEditorConfiguration(
-      'Scene3D::Model3DObject',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/3d-model',
-      })
-    );
-    objectsEditorService.registerEditorConfiguration(
-      'Scene3D::Model3DObject',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/3d_model',
-      })
-    );
-  },
+  ) { },
   /**
    * Register renderers for instance of objects on the scene editor.
    *

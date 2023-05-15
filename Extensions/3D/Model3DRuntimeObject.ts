@@ -97,7 +97,9 @@ namespace gdjs {
     }
 
     _updateMaterialType(objectData: Model3DObjectData) {
-      this._materialType = this._convertMaterialType(objectData.content.materialType);
+      this._materialType = this._convertMaterialType(
+        objectData.content.materialType
+      );
       this._renderer._updateMaterials();
       this._updateDefaultTransformation(objectData);
     }

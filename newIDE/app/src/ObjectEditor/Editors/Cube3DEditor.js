@@ -203,9 +203,7 @@ const Cube3DEditor = ({
         <SelectField
           value={properties.get('materialType').getValue()}
           floatingLabelText={properties.get('materialType').getLabel()}
-          helperMarkdownText={properties
-            .get('materialType')
-            .getDescription()}
+          helperMarkdownText={properties.get('materialType').getDescription()}
           onChange={(event, index, newValue) => {
             onChangeProperty('materialType', newValue);
           }}
@@ -222,11 +220,14 @@ const Cube3DEditor = ({
           />
         </SelectField>
         {!hasLight(layout) && (
-        <AlertMessage kind="error">
-                  <Trans>
-                     For standard materials reacting to lights, make sure to set up a light in the effects of the layer - otherwise the object will be black.
-                  </Trans>
-        </AlertMessage>)}
+          <AlertMessage kind="error">
+            <Trans>
+              For standard materials reacting to lights, make sure to set up a
+              light in the effects of the layer - otherwise the object will be
+              black.
+            </Trans>
+          </AlertMessage>
+        )}
       </ColumnStackLayout>
       {facesProperties.map(faceProperty => (
         <React.Fragment key={faceProperty.id}>

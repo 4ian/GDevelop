@@ -105,7 +105,9 @@ namespace gdjs {
         objectData.content.topFaceResourceName,
         objectData.content.bottomFaceResourceName,
       ];
-      this._materialType = this._convertMaterialType(objectData.content.materialType);
+      this._materialType = this._convertMaterialType(
+        objectData.content.materialType
+      );
 
       this._renderer = new gdjs.Cube3DRuntimeObjectRenderer(
         this,

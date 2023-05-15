@@ -119,7 +119,8 @@ namespace gdjs {
      */
     _updateMaterials() {
       // @ts-ignore It can't be null if THREE exists.
-      const originalModelMesh: THREE.Object3D = this._model3DRuntimeObject.getInstanceContainer()
+      const originalModelMesh: THREE.Object3D = this._model3DRuntimeObject
+        .getInstanceContainer()
         .getGame()
         .getModel3DManager()
         .getModel(this._model3DRuntimeObject._modelResourceName);

@@ -165,17 +165,17 @@ const PropertyResourceSelector = ({
   const property = properties.get(propertyName);
   const extraInfos = property.getExtraInfo();
   return (
-      <ResourceSelector
-        project={project}
-        // $FlowExpectedError
-        resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
-        floatingLabelText={property.getLabel()}
-        resourceManagementProps={resourceManagementProps}
-        initialResourceName={property.getValue()}
-        onChange={value => onChangeProperty(propertyName, value)}
-        resourcesLoader={resourcesLoader}
-        fullWidth
-      />
+    <ResourceSelector
+      project={project}
+      // $FlowExpectedError
+      resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
+      floatingLabelText={property.getLabel()}
+      resourceManagementProps={resourceManagementProps}
+      initialResourceName={property.getValue()}
+      onChange={value => onChangeProperty(propertyName, value)}
+      resourcesLoader={resourcesLoader}
+      fullWidth
+    />
   );
 };
 

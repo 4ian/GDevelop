@@ -144,8 +144,7 @@ module.exports = {
           .addExtraInfo('AlwaysLighted')
           .addExtraInfo('EmitAllAmbientLight')
           .addExtraInfo('NoChange')
-          .setLabel(_('Material modifier'))
-          .setDescription(_('"Always lighted" doesn\'t need any light.'));
+          .setLabel(_('Material modifier'));
 
         return objectProperties;
       };
@@ -865,8 +864,7 @@ module.exports = {
         .setType('choice')
         .addExtraInfo('AlwaysLighted')
         .addExtraInfo('EmitAllAmbientLight')
-        .setLabel(_('Material type'))
-        .setDescription(_('"Always lighted" doesn\'t need any light.'));
+        .setLabel(_('Material type'));
 
       return objectProperties;
     };

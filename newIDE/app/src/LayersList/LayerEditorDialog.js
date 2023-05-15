@@ -59,16 +59,16 @@ const LayerEditorDialog = (props: Props) => {
     onCancel: onClose,
   });
   const [
-    threeDFieldOfViewError,
-    setThreeDFieldOfViewError,
+    camera3DFieldOfViewError,
+    setCamera3DFieldOfViewError,
   ] = React.useState<?React.Node>(null);
   const [
-    threeDFarPlaneDistanceError,
-    setThreeDFarPlaneDistanceError,
+    camera3DFarPlaneDistanceError,
+    setCamera3DFarPlaneDistanceError,
   ] = React.useState<?React.Node>(null);
   const [
-    threeDNearPlaneDistanceError,
-    setThreeDNearPlaneDistanceError,
+    camera3DNearPlaneDistanceError,
+    setCamera3DNearPlaneDistanceError,
   ] = React.useState<?React.Node>(null);
   const [currentTab, setCurrentTab] = React.useState(initialTab);
   const { instancesCount, highestZOrder } = React.useMemo(
@@ -85,32 +85,32 @@ const LayerEditorDialog = (props: Props) => {
     [layer, initialInstances]
   );
 
-  const onChangeThreeDFieldOfView = React.useCallback(
+  const onChangeCamera3DFieldOfView = React.useCallback(
     value => {
-      setThreeDFieldOfViewError(null);
+      setCamera3DFieldOfViewError(null);
       const newValue = parseFloat(value) || 0;
       if (newValue <= 0 || newValue > 180) {
-        setThreeDFieldOfViewError(
+        setCamera3DFieldOfViewError(
           <Trans>
             The field of view cannot be lower than 0° or greater than 180°.
           </Trans>
         );
         return;
       }
-      if (newValue === layer.getThreeDFieldOfView()) return;
-      layer.setThreeDFieldOfView(newValue);
+      if (newValue === layer.getCamera3DFieldOfView()) return;
+      layer.setCamera3DFieldOfView(newValue);
       forceUpdate();
       notifyOfChange();
     },
     [forceUpdate, layer, notifyOfChange]
   );
 
-  const onChangeThreeDNearPlaneDistance = React.useCallback(
+  const onChangeCamera3DNearPlaneDistance = React.useCallback(
     value => {
-      setThreeDNearPlaneDistanceError(null);
+      setCamera3DNearPlaneDistanceError(null);
       const newValue = parseFloat(value) || 0;
-      if (newValue <= 0 || newValue >= layer.getThreeDFarPlaneDistance()) {
-        setThreeDNearPlaneDistanceError(
+      if (newValue <= 0 || newValue >= layer.getCamera3DFarPlaneDistance()) {
+        setCamera3DNearPlaneDistanceError(
           <Trans>
             The near plane distance must be strictly greater than 0 and lower
             than the far plan distance.
@@ -118,20 +118,20 @@ const LayerEditorDialog = (props: Props) => {
         );
         return;
       }
-      if (newValue === layer.getThreeDNearPlaneDistance()) return;
-      layer.setThreeDNearPlaneDistance(newValue);
+      if (newValue === layer.getCamera3DNearPlaneDistance()) return;
+      layer.setCamera3DNearPlaneDistance(newValue);
       forceUpdate();
       notifyOfChange();
     },
     [forceUpdate, layer, notifyOfChange]
   );
 
-  const onChangeThreeDFarPlaneDistance = React.useCallback(
+  const onChangeCamera3DFarPlaneDistance = React.useCallback(
     value => {
-      setThreeDFarPlaneDistanceError(null);
+      setCamera3DFarPlaneDistanceError(null);
       const newValue = parseFloat(value) || 0;
-      if (newValue <= layer.getThreeDNearPlaneDistance()) {
-        setThreeDFarPlaneDistanceError(
+      if (newValue <= layer.getCamera3DNearPlaneDistance()) {
+        setCamera3DFarPlaneDistanceError(
           <Trans>
             The far plane distance must be greater than the near plan distance.
           </Trans>
@@ -139,8 +139,8 @@ const LayerEditorDialog = (props: Props) => {
 
         return;
       }
-      if (newValue === layer.getThreeDFarPlaneDistance()) return;
-      layer.setThreeDFarPlaneDistance(newValue);
+      if (newValue === layer.getCamera3DFarPlaneDistance()) return;
+      layer.setCamera3DFarPlaneDistance(newValue);
       forceUpdate();
       notifyOfChange();
     },
@@ -286,9 +286,9 @@ const LayerEditorDialog = (props: Props) => {
                   <SemiControlledTextField
                     commitOnBlur
                     fullWidth
-                    errorText={threeDFieldOfViewError}
-                    onChange={onChangeThreeDFieldOfView}
-                    value={layer.getThreeDFieldOfView().toString(10)}
+                    errorText={camera3DFieldOfViewError}
+                    onChange={onChangeCamera3DFieldOfView}
+                    value={layer.getCamera3DFieldOfView().toString(10)}
                     floatingLabelText={
                       <Trans>Field of view (in degrees)</Trans>
                     }
@@ -297,18 +297,18 @@ const LayerEditorDialog = (props: Props) => {
                   <SemiControlledTextField
                     commitOnBlur
                     fullWidth
-                    errorText={threeDNearPlaneDistanceError}
-                    onChange={onChangeThreeDNearPlaneDistance}
-                    value={layer.getThreeDNearPlaneDistance().toString(10)}
+                    errorText={camera3DNearPlaneDistanceError}
+                    onChange={onChangeCamera3DNearPlaneDistance}
+                    value={layer.getCamera3DNearPlaneDistance().toString(10)}
                     floatingLabelText={<Trans>Near plane distance</Trans>}
                     floatingLabelFixed
                   />
                   <SemiControlledTextField
                     commitOnBlur
                     fullWidth
-                    errorText={threeDFarPlaneDistanceError}
-                    onChange={onChangeThreeDFarPlaneDistance}
-                    value={layer.getThreeDFarPlaneDistance().toString(10)}
+                    errorText={camera3DFarPlaneDistanceError}
+                    onChange={onChangeCamera3DFarPlaneDistance}
+                    value={layer.getCamera3DFarPlaneDistance().toString(10)}
                     floatingLabelText={<Trans>Far plane distance</Trans>}
                     floatingLabelFixed
                   />

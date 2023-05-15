@@ -137,10 +137,10 @@ namespace gdjs {
           this._threeScene.add(this._threeGroup);
 
           this._threeCamera = new THREE.PerspectiveCamera(
-            this._layer.getInitialThreeDFieldOfView(),
+            this._layer.getInitialCamera3DFieldOfView(),
             1,
-            this._layer.getInitialThreeDNearPlaneDistance(),
-            this._layer.getInitialThreeDFarPlaneDistance()
+            this._layer.getInitialCamera3DNearPlaneDistance(),
+            this._layer.getInitialCamera3DFarPlaneDistance()
           );
           this._threeCamera.rotation.order = 'ZYX';
 

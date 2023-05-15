@@ -34,9 +34,9 @@ namespace gdjs {
 
     // TODO EBO Don't store scene layer related data in layers used by custom objects.
     // (both these 3D settings and the lighting layer properties below).
-    _initialThreeDFieldOfView: float;
-    _initialThreeDFarPlaneDistance: float;
-    _initialThreeDNearPlaneDistance: float;
+    _initialCamera3DFieldOfView: float;
+    _initialCamera3DFarPlaneDistance: float;
+    _initialCamera3DNearPlaneDistance: float;
 
     _runtimeScene: gdjs.RuntimeInstanceContainer;
     _effectsManager: gdjs.EffectsManager;
@@ -60,11 +60,11 @@ namespace gdjs {
       this._name = layerData.name;
       this._renderingType = getRenderingTypeFromString(layerData.renderingType);
       this._hidden = !layerData.visibility;
-      this._initialThreeDFieldOfView = layerData.threeDFieldOfView || 45;
-      this._initialThreeDFarPlaneDistance =
-        layerData.threeDFarPlaneDistance || 0.1;
-      this._initialThreeDNearPlaneDistance =
-        layerData.threeDNearPlaneDistance || 2000;
+      this._initialCamera3DFieldOfView = layerData.camera3DFieldOfView || 45;
+      this._initialCamera3DFarPlaneDistance =
+        layerData.camera3DFarPlaneDistance || 0.1;
+      this._initialCamera3DNearPlaneDistance =
+        layerData.camera3DNearPlaneDistance || 2000;
       this._initialEffectsData = layerData.effects || [];
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
@@ -351,14 +351,14 @@ namespace gdjs {
       return this._runtimeScene.getViewportHeight();
     }
 
-    getInitialThreeDFieldOfView(): float {
-      return this._initialThreeDFieldOfView;
+    getInitialCamera3DFieldOfView(): float {
+      return this._initialCamera3DFieldOfView;
     }
-    getInitialThreeDNearPlaneDistance(): float {
-      return this._initialThreeDNearPlaneDistance;
+    getInitialCamera3DNearPlaneDistance(): float {
+      return this._initialCamera3DNearPlaneDistance;
     }
-    getInitialThreeDFarPlaneDistance(): float {
-      return this._initialThreeDFarPlaneDistance;
+    getInitialCamera3DFarPlaneDistance(): float {
+      return this._initialCamera3DFarPlaneDistance;
     }
 
     /**

@@ -475,7 +475,7 @@ export default class LayerRenderer {
     threeScene.add(this._threeGroup);
 
     const threeCamera = new THREE.PerspectiveCamera(
-      this.layer.getThreeDFieldOfView(),
+      this.layer.getCamera3DFieldOfView(),
       1,
       0.1,
       2000

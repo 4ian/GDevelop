@@ -48,7 +48,9 @@ class GD_CORE_API Layer {
   const gd::String& GetName() const { return name; }
 
   const gd::String& GetRenderingType() const { return renderingType; }
-  void SetRenderingType(const gd::String& renderingType_) { renderingType = renderingType_; }
+  void SetRenderingType(const gd::String& renderingType_) {
+    renderingType = renderingType_;
+  }
 
   /**
    * \brief Change if layer is displayed or not
@@ -97,16 +99,20 @@ class GD_CORE_API Layer {
   /** \name 3D
    */
   ///@{
-  double GetThreeDNearPlaneDistance() const { return threeDNearPlaneDistance; }
-  void SetThreeDNearPlaneDistance(double distance) {
-    threeDNearPlaneDistance = distance;
+  double GetCamera3DNearPlaneDistance() const {
+    return camera3DNearPlaneDistance;
   }
-  double GetThreeDFarPlaneDistance() const { return threeDFarPlaneDistance; }
-  void SetThreeDFarPlaneDistance(double distance) {
-    threeDFarPlaneDistance = distance;
+  void SetCamera3DNearPlaneDistance(double distance) {
+    camera3DNearPlaneDistance = distance;
   }
-  double GetThreeDFieldOfView() const { return threeDFieldOfView; }
-  void SetThreeDFieldOfView(double angle) { threeDFieldOfView = angle; }
+  double GetCamera3DFarPlaneDistance() const {
+    return camera3DFarPlaneDistance;
+  }
+  void SetCamera3DFarPlaneDistance(double distance) {
+    camera3DFarPlaneDistance = distance;
+  }
+  double GetCamera3DFieldOfView() const { return camera3DFieldOfView; }
+  void SetCamera3DFieldOfView(double angle) { camera3DFieldOfView = angle; }
   ///@}
 
   /** \name Cameras
@@ -203,21 +209,22 @@ class GD_CORE_API Layer {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
-  gd::String name;       ///< The name of the layer
-  gd::String renderingType;  ///< The rendering type: "" (empty), "2d", "3d" or "2d+3d".
-  bool isVisible;        ///< True if the layer is visible
-  bool isLocked;        ///< True if the layer is locked
+  gd::String name;           ///< The name of the layer
+  gd::String renderingType;  ///< The rendering type: "" (empty), "2d", "3d" or
+                             ///< "2d+3d".
+  bool isVisible;            ///< True if the layer is visible
+  bool isLocked;             ///< True if the layer is locked
   bool isLightingLayer;  ///< True if the layer is used to display lights and
                          ///< renders an ambient light.
   bool followBaseLayerCamera;  ///< True if the layer automatically follows the
                                ///< base layer
-  double threeDNearPlaneDistance;  ///< 3D camera frustum near plan distance
-  double threeDFarPlaneDistance;   ///< 3D camera frustum far plan distance
-  double threeDFieldOfView;        ///< 3D camera field of view (fov) in degrees
-  unsigned int ambientLightColorR;  ///< Ambient light color Red component
-  unsigned int ambientLightColorG;  ///< Ambient light color Green component
-  unsigned int ambientLightColorB;  ///< Ambient light color Blue component
-  std::vector<gd::Camera> cameras;  ///< The camera displayed by the layer
+  double camera3DNearPlaneDistance;  ///< 3D camera frustum near plan distance
+  double camera3DFarPlaneDistance;   ///< 3D camera frustum far plan distance
+  double camera3DFieldOfView;        ///< 3D camera field of view (fov) in degrees
+  unsigned int ambientLightColorR;   ///< Ambient light color Red component
+  unsigned int ambientLightColorG;   ///< Ambient light color Green component
+  unsigned int ambientLightColorB;   ///< Ambient light color Blue component
+  std::vector<gd::Camera> cameras;   ///< The camera displayed by the layer
   gd::EffectsContainer effectsContainer;  ///< The effects applied to the layer.
 
   static gd::Camera badCamera;

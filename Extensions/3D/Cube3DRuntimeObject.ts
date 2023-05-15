@@ -1,7 +1,7 @@
 namespace gdjs {
   /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
   export interface Cube3DObjectData extends Object3DData {
-    /** The base parameters of the ThreeDShape */
+    /** The base parameters of the Cube3D object */
     content: Object3DDataContent & {
       enableTextureTransparency: boolean;
       facesOrientation: 'Y' | 'Z';

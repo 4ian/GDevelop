@@ -19,9 +19,9 @@ Layer::Layer()
       isLocked(false),
       isLightingLayer(false),
       followBaseLayerCamera(false),
-      threeDNearPlaneDistance(0.1),
-      threeDFarPlaneDistance(10000),
-      threeDFieldOfView(45) {}
+      camera3DNearPlaneDistance(0.1),
+      camera3DFarPlaneDistance(10000),
+      camera3DFieldOfView(45) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -43,9 +43,11 @@ void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("ambientLightColorR", (int)GetAmbientLightColorRed());
   element.SetAttribute("ambientLightColorG", (int)GetAmbientLightColorGreen());
   element.SetAttribute("ambientLightColorB", (int)GetAmbientLightColorBlue());
-  element.SetAttribute("threeDNearPlaneDistance", GetThreeDNearPlaneDistance());
-  element.SetAttribute("threeDFarPlaneDistance", GetThreeDFarPlaneDistance());
-  element.SetAttribute("threeDFieldOfView", GetThreeDFieldOfView());
+  element.SetAttribute("camera3DNearPlaneDistance",
+                       GetCamera3DNearPlaneDistance());
+  element.SetAttribute("camera3DFarPlaneDistance",
+                       GetCamera3DFarPlaneDistance());
+  element.SetAttribute("camera3DFieldOfView", GetCamera3DFieldOfView());
 
   SerializerElement& camerasElement = element.AddChild("cameras");
   camerasElement.ConsiderAsArrayOf("camera");
@@ -81,11 +83,12 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200),
                        element.GetIntAttribute("ambientLightColorG", 200),
                        element.GetIntAttribute("ambientLightColorB", 200));
-  SetThreeDNearPlaneDistance(
-      element.GetDoubleAttribute("threeDNearPlaneDistance", 0.1));
-  SetThreeDFarPlaneDistance(
-      element.GetDoubleAttribute("threeDFarPlaneDistance", 10000));
-  SetThreeDFieldOfView(element.GetDoubleAttribute("threeDFieldOfView", 45));
+  SetCamera3DNearPlaneDistance(element.GetDoubleAttribute(
+      "camera3DNearPlaneDistance", 0.1, "threeDNearPlaneDistance"));
+  SetCamera3DFarPlaneDistance(element.GetDoubleAttribute(
+      "camera3DFarPlaneDistance", 10000, "threeDFarPlaneDistance"));
+  SetCamera3DFieldOfView(element.GetDoubleAttribute(
+      "camera3DFieldOfView", 45, "threeDFieldOfView"));
 
   cameras.clear();
   SerializerElement& camerasElement = element.GetChild("cameras");

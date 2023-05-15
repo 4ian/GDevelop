@@ -811,12 +811,12 @@ interface Layer {
     boolean IsLightingLayer();
     void SetFollowBaseLayerCamera(boolean followBaseLayerCamera);
     boolean IsFollowingBaseLayerCamera();
-    double GetThreeDNearPlaneDistance();
-    void SetThreeDNearPlaneDistance(double distance);
-    double GetThreeDFarPlaneDistance();
-    void SetThreeDFarPlaneDistance(double distance);
-    double GetThreeDFieldOfView();
-    void SetThreeDFieldOfView(double angle);
+    double GetCamera3DNearPlaneDistance();
+    void SetCamera3DNearPlaneDistance(double distance);
+    double GetCamera3DFarPlaneDistance();
+    void SetCamera3DFarPlaneDistance(double distance);
+    double GetCamera3DFieldOfView();
+    void SetCamera3DFieldOfView(double angle);
 
     void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetAmbientLightColorRed();

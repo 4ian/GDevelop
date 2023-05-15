@@ -1,7 +1,7 @@
 namespace gdjs {
   /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
   export interface Model3DObjectData extends Object3DData {
-    /** The base parameters of the ThreeDShape */
+    /** The base parameters of the Model3D object */
     content: Object3DDataContent & {
       modelResourceName: string;
       rotationX: number;

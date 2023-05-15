@@ -113,6 +113,68 @@ namespace gdjs {
 
       return aabb;
     }
+
+    /**
+     * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
+     */
+    _updateMaterials() {
+      // @ts-ignore It can't be null if THREE exists.
+      const originalModelMesh: THREE.Object3D = this._model3DRuntimeObject.getInstanceContainer()
+        .getGame()
+        .getModel3DManager()
+        .getModel(this._model3DRuntimeObject._modelResourceName);
+      const modelObject3D = originalModelMesh.clone();
+
+      this.get3DRendererObject().remove(this._threeObject);
+      this.get3DRendererObject().add(modelObject3D);
+
+      this._threeObject = modelObject3D;
+
+      this._replaceMaterials();
+    }
+
+    /**
+     * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
+     */
+    _replaceMaterials() {
+      if (
+        this._model3DRuntimeObject._materialType ===
+        gdjs.Model3DRuntimeObject.MaterialType.EmitAllAmbientLight
+      ) {
+        this._threeObject.traverse((node) => {
+          if (node.type === 'Mesh') {
+            const mesh = node as THREE.Mesh;
+            const material = mesh.material as THREE.MeshStandardMaterial;
+            //@ts-ignore
+            if (material.metalness) {
+              //@ts-ignore
+              material.metalness = 0;
+            }
+          }
+        });
+      } else if (
+        this._model3DRuntimeObject._materialType ===
+        gdjs.Model3DRuntimeObject.MaterialType.AlwaysLighted
+      ) {
+        this._threeObject.traverse((node) => {
+          if (node.type === 'Mesh') {
+            const mesh = node as THREE.Mesh;
+            const basicMaterial = new THREE.MeshBasicMaterial();
+            //@ts-ignore
+            if (mesh.material.color) {
+              //@ts-ignore
+              basicMaterial.color = mesh.material.color;
+            }
+            //@ts-ignore
+            if (mesh.material.map) {
+              //@ts-ignore
+              basicMaterial.map = mesh.material.map;
+            }
+            mesh.material = basicMaterial;
+          }
+        });
+      }
+    }
   }
 
   export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;

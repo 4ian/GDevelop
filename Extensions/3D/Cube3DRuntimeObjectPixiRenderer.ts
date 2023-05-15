@@ -59,6 +59,8 @@ namespace gdjs {
       .getImageManager()
       .getThreeMaterial(runtimeObject.getFaceAtIndexResourceName(faceIndex), {
         useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
+        isAlwaysLighted: runtimeObject._materialType ===
+        gdjs.Cube3DRuntimeObject.MaterialType.AlwaysLighted
       });
   };
 
@@ -296,6 +298,12 @@ namespace gdjs {
         uvMapping.setXY(vertexIndex, x, y);
       }
       uvMapping.needsUpdate = true;
+    }
+
+    _updateMaterials() {
+      for (let index = 0; index < 6; index++) {
+        this.updateFace(index);
+      }
     }
   }
 

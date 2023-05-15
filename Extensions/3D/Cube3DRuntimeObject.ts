@@ -24,6 +24,7 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
+      materialType: 'AlwaysLighted' | 'EmitAllAmbientLight';
     };
   }
 
@@ -56,6 +57,8 @@ namespace gdjs {
       string,
       string
     ];
+    _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
+      gdjs.Cube3DRuntimeObject.MaterialType.AlwaysLighted;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -102,6 +105,7 @@ namespace gdjs {
         objectData.content.topFaceResourceName,
         objectData.content.bottomFaceResourceName,
       ];
+      this._materialType = this._convertMaterialType(objectData.content.materialType);
 
       this._renderer = new gdjs.Cube3DRuntimeObjectRenderer(
         this,
@@ -386,6 +390,12 @@ namespace gdjs {
       ) {
         this.setFacesOrientation(newObjectData.content.facesOrientation);
       }
+      if (
+        oldObjectData.content.materialType !==
+        newObjectData.content.materialType
+      ) {
+        this.setMaterialType(newObjectData.content.materialType);
+      }
 
       return true;
     }
@@ -395,6 +405,28 @@ namespace gdjs {
      */
     shouldUseTransparentTexture(): boolean {
       return this._shouldUseTransparentTexture;
+    }
+
+    _convertMaterialType(
+      materialTypeString: string
+    ): gdjs.Cube3DRuntimeObject.MaterialType {
+      if (materialTypeString === 'EmitAllAmbientLight') {
+        return gdjs.Cube3DRuntimeObject.MaterialType.EmitAllAmbientLight;
+      } else {
+        return gdjs.Cube3DRuntimeObject.MaterialType.AlwaysLighted;
+      }
+    }
+
+    setMaterialType(materialTypeString: string) {
+      this._materialType = this._convertMaterialType(materialTypeString);
+      this._renderer._updateMaterials();
+    }
+  }
+
+  export namespace Cube3DRuntimeObject {
+    export enum MaterialType {
+      AlwaysLighted,
+      EmitAllAmbientLight,
     }
   }
   gdjs.registerObject('Scene3D::Cube3DObject', gdjs.Cube3DRuntimeObject);

@@ -57,7 +57,8 @@ module.exports = {
           objectContent[propertyName] = parseFloat(newValue);
           return true;
         }
-        if (propertyName === 'modelResourceName') {
+        if (propertyName === 'modelResourceName' ||
+            propertyName === 'materialType') {
           objectContent[propertyName] = newValue;
           return true;
         }
@@ -134,6 +135,16 @@ module.exports = {
           .addExtraInfo('model3D')
           .setLabel(_('3D model'));
 
+        objectProperties
+          .getOrCreate('materialType')
+          .setValue(objectContent.materialType || 'Always lighted')
+          .setType('choice')
+          .addExtraInfo('AlwaysLighted')
+          .addExtraInfo('EmitAllAmbientLight')
+          .addExtraInfo('NoChange')
+          .setLabel(_('Material modifier'))
+          .setDescription(_('"Always lighted" doesn\'t need any light.'));
+
         return objectProperties;
       };
       Model3DObject.setRawJSONContent(
@@ -146,6 +157,7 @@ module.exports = {
           rotationY: 0,
           rotationZ: 0,
           modelResourceName: '',
+          materialType:'AlwaysLighted'
         })
       );
 
@@ -619,7 +631,8 @@ module.exports = {
         propertyName === 'topFaceResourceName' ||
         propertyName === 'bottomFaceResourceName' ||
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
-        propertyName === 'facesOrientation'
+        propertyName === 'facesOrientation' ||
+        propertyName === 'materialType'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -844,6 +857,15 @@ module.exports = {
         .setLabel(_('Show bottom face'))
         .setGroup(_('Face visibility'));
 
+      objectProperties
+        .getOrCreate('materialType')
+        .setValue(objectContent.materialType || 'AlwaysLighted')
+        .setType('choice')
+        .addExtraInfo('AlwaysLighted')
+        .addExtraInfo('EmitAllAmbientLight')
+        .setLabel(_('Material type'))
+        .setDescription(_('"Always lighted" doesn\'t need any light.'));
+
       return objectProperties;
     };
     Cube3DObject.setRawJSONContent(
@@ -872,6 +894,7 @@ module.exports = {
         rightFaceResourceRepeat: false,
         topFaceResourceRepeat: false,
         bottomFaceResourceRepeat: false,
+        materialType:'AlwaysLighted'
       })
     );
 
@@ -1590,6 +1613,76 @@ module.exports = {
         .setLabel(_('Density'))
         .setType('number');
     }
+    {
+      const effect = extension
+        .addEffect('AmbientLight')
+        .setFullName(_('Ambient light'))
+        .setDescription(_('A light that illuminates all objects from every direction.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/AmbientLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Light color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('1')
+        .setLabel(_('Intensity'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('DirectionalLight')
+        .setFullName(_('Directional light'))
+        .setDescription(_('A very far light source like the sun.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/DirectionalLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Light color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('1')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('originX')
+        .setValue('0')
+        .setLabel(_('Origin on X axis'))
+        .setType('number');
+      properties
+        .getOrCreate('originY')
+        .setValue('0')
+        .setLabel(_('Origin on Y axis'))
+        .setType('number');
+      properties
+        .getOrCreate('originZ')
+        .setValue('1')
+        .setLabel(_('Origin on Z axis'))
+        .setType('number');
+      properties
+        .getOrCreate('targetX')
+        .setValue('0')
+        .setLabel(_('Target on X axis'))
+        .setType('number');
+      properties
+        .getOrCreate('targetY')
+        .setValue('0')
+        .setLabel(_('Target on Y axis'))
+        .setType('number');
+      properties
+        .getOrCreate('targetZ')
+        .setValue('0')
+        .setLabel(_('Target on Z axis'))
+        .setType('number');
+    }
 
     return extension;
   },
@@ -1621,6 +1714,12 @@ module.exports = {
       'Scene3D::Model3DObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
         helpPagePath: '/objects/3d-model',
+      })
+    );
+    objectsEditorService.registerEditorConfiguration(
+      'Scene3D::Model3DObject',
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+        helpPagePath: '/objects/3d_model',
       })
     );
   },

@@ -9,6 +9,7 @@ import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
 import CustomObjectPropertiesEditor from './Editors/CustomObjectPropertiesEditor';
 import Cube3DEditor from './Editors/Cube3DEditor';
+import Model3DEditor from './Editors/Model3DEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -148,6 +149,21 @@ const ObjectsEditorService = {
       ): gdObjectJsImplementation =>
         gd.asObjectJsImplementation(objectConfiguration),
       helpPagePath: '/objects/3d-box',
+    },
+    'Scene3D::Model3DObject': {
+      component: Model3DEditor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
+        gd
+          .asObjectJsImplementation(objectConfiguration)
+          .clone()
+          .release(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: '/objects/3d_model',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,

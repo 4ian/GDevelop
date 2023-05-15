@@ -81,7 +81,6 @@ namespace gdjs {
         this._loader.load(
           resource.file,
           (gltf) => {
-            this._replaceMaterials(gltf.scene);
             gltf.scene.rotation.order = 'ZYX';
             this._loadedThreeModels.set(resource.name, gltf.scene);
 
@@ -105,29 +104,6 @@ namespace gdjs {
           }
         );
       }
-    }
-
-    /**
-     * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
-     */
-    _replaceMaterials(object3D: THREE.Object3D) {
-      object3D.traverse((node) => {
-        if (node.type === 'Mesh') {
-          const mesh = node as THREE.Mesh;
-          const basicMaterial = new THREE.MeshBasicMaterial();
-          //@ts-ignore
-          if (mesh.material.color) {
-            //@ts-ignore
-            basicMaterial.color = mesh.material.color;
-          }
-          //@ts-ignore
-          if (mesh.material.map) {
-            //@ts-ignore
-            basicMaterial.map = mesh.material.map;
-          }
-          mesh.material = basicMaterial;
-        }
-      });
     }
 
     /**

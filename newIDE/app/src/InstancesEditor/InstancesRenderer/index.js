@@ -316,5 +316,6 @@ export default class InstancesRenderer {
         this.layersRenderers[i].delete();
       }
     }
+    this.pixiContainer.destroy();
   }
 }

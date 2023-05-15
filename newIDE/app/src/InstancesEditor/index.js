@@ -484,6 +484,7 @@ export default class InstancesEditor extends Component<Props> {
     this.longTouchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
+    this.pixiContainer.destroy();
     this.pixiRenderer.destroy();
   }
 

@@ -319,8 +319,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
                                     const gd::String& type,
                                     gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
-    return "!(" + predicat + ")";
+  virtual gd::String GenerateNegatedPredicate(const gd::String& predicate) const {
+    return "!(" + predicate + ")";
   };
 
   virtual gd::String GenerateObjectsDeclarationCode(

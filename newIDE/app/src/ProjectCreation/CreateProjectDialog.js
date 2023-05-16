@@ -107,7 +107,6 @@ export const createNewProjectFromExampleShortHeader = async ({
 |}): Promise<?NewProjectSource> => {
   try {
     const example = await getExample(exampleShortHeader);
-    console.log('example', example);
 
     sendNewGameCreated({
       exampleUrl: example.projectFileUrl,

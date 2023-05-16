@@ -272,7 +272,6 @@ const useCreateProject = ({
         i18n,
         exampleShortHeader,
       });
-      console.log(newProjectSource);
       await createProject(newProjectSource, {
         ...newProjectSetup,
         templateSlug: exampleShortHeader.slug,

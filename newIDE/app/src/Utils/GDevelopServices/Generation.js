@@ -42,7 +42,6 @@ export const getGeneratedProject = async (
       },
     }
   );
-  console.log(response);
   return response.data;
 };
 

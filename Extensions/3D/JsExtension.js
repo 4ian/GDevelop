@@ -1657,9 +1657,9 @@ module.exports = {
       properties
         .getOrCreate('top')
         .setValue('Y+')
-        .setLabel(_('Top'))
+        .setLabel(_('3D world top'))
         .setType('choice')
-        .addExtraInfo('Y+')
+        .addExtraInfo('Y-')
         .addExtraInfo('Z+')
         .setGroup(_('Orientation'));
       properties
@@ -1667,7 +1667,8 @@ module.exports = {
         .setValue('45')
         .setLabel(_('Elevation (in degrees)'))
         .setType('number')
-        .setGroup(_('Orientation'));
+        .setGroup(_('Orientation'))
+        .setDescription(_("Maximal elevation is reached at 90°."));
       properties
         .getOrCreate('rotation')
         .setValue('0')

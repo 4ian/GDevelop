@@ -10,7 +10,7 @@ namespace gdjs {
           light: THREE.DirectionalLight;
           rotationObject: THREE.Group;
           _isEnabled: boolean = false;
-          top: string = 'Y+';
+          top: string = 'Y-';
           elevation: float = 45;
           rotation: float = 0;
 

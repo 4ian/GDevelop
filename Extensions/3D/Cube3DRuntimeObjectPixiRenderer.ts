@@ -74,7 +74,6 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
       // TODO (3D) - feature: support color instead of texture?
       const materials = [
         getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),

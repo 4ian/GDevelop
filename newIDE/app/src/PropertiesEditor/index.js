@@ -354,9 +354,8 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'color') {
         const { setValue } = field;
         return (
-          <Column expand noMargin>
+          <Column key={field.name} expand noMargin>
             <ColorField
-              key={field.name}
               id={field.name}
               floatingLabelText={getFieldLabel({ instances, field })}
               helperMarkdownText={getFieldDescription(field)}

@@ -139,7 +139,7 @@ module.exports = {
 
         objectProperties
           .getOrCreate('materialType')
-          .setValue(objectContent.materialType || 'Always lighted')
+          .setValue(objectContent.materialType || 'Basic')
           .setType('choice')
           .addExtraInfo('Basic')
           .addExtraInfo('StandardWithoutMetalness')

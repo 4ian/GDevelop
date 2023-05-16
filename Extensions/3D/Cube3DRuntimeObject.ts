@@ -420,7 +420,12 @@ namespace gdjs {
     }
 
     setMaterialType(materialTypeString: string) {
-      this._materialType = this._convertMaterialType(materialTypeString);
+      const newMaterialType = this._convertMaterialType(materialTypeString);
+      if (this._materialType === newMaterialType) {
+        return;
+      }
+
+      this._materialType = newMaterialType;
       this._renderer._updateMaterials();
     }
   }

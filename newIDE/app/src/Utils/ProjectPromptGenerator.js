@@ -118,59 +118,14 @@ const goals = [
   'the weapon',
 ];
 
-const enemies = [
-  'monsters',
-  'zombies',
-  'skeletons',
-  'ghosts',
-  'demons',
-  'dragons',
-  'aliens',
-  'robots',
-  'pirates',
-  'ninjas',
-  'clowns',
-  'vampires',
-  'werewolves',
-  'goblins',
-  'orcs',
-  'trolls',
-  'spiders',
-];
-
-const badThings = [
-  'traps',
-  'spikes',
-  'lava',
-  'fire',
-  'water',
-  'poison',
-  'acid',
-  'electricity',
-  'lasers',
-  'explosions',
-  'meteors',
-  'rocks',
-  'arrows',
-  'bullets',
-  'missiles',
-  'lasers',
-  'fireballs',
-  'ice',
-  'snowballs',
-  'bombs',
-];
-
 const generatePrompt = (): string => {
   const mainCharacter = sample(mainCharacters);
   const startWithVowel = ['a', 'e', 'i', 'o', 'u'].includes(
     mainCharacter[0].toLowerCase()
   );
-  return `I am ${startWithVowel ? 'an' : 'a'} ${mainCharacter} in a ${sample(
+  return `${startWithVowel ? 'an' : 'a'} ${mainCharacter} in a ${sample(
     places
-  )} collecting ${sample(things)} and trying to reach ${sample(
-    goals
-  )} while avoiding ${sample(enemies)} and ${sample(badThings)}.`;
+  )} collecting ${sample(things)} and trying to reach ${sample(goals)}`;
 };
 
 export default generatePrompt;

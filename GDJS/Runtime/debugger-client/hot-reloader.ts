@@ -1060,7 +1060,19 @@ namespace gdjs {
         }
       }
 
-      // TODO: cameras
+      // Rendering type can't be easily changed at runtime.
+      if (oldLayer.renderingType !== newLayer.renderingType) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not change the rendering type (2D, 3D...) layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
+      if (newLayer.isLightingLayer !== oldLayer.isLightingLayer) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not add/remove a lighting layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
 
       // Effects
       this._hotReloadRuntimeLayerEffects(

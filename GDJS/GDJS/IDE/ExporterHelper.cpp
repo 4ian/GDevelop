@@ -143,8 +143,16 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject.GetResourcesManager(), options.exportPath);
   // end of compatibility code
 
+  auto usedExtensionsResult =
+      gd::UsedExtensionsFinder::ScanProject(exportedProject);
+
+  bool isUsingScene3DExtension =
+      usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
+      usedExtensionsResult.GetUsedExtensions().end();
+
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
+                 /*pixiInThreeRenderers=*/isUsingScene3DExtension,
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
@@ -153,8 +161,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  includesFiles);
 
   // Export files for free function, object and behaviors
-  auto usedExtensionsResult =
-      gd::UsedExtensionsFinder::ScanProject(exportedProject);
   for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
     InsertUnique(includesFiles, includeFile);
   }
@@ -604,6 +610,7 @@ bool ExporterHelper::CompleteIndexFile(
 }
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
+                                    bool pixiInThreeRenderers,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     gd::String gdevelopLogoStyle,
@@ -617,6 +624,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "AsyncTasksManager.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
+  InsertUnique(includesFiles, "Model3DManager.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
@@ -675,6 +683,10 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "debugger-client/window-message-debugger-client.js");
   }
 
+  if (pixiInThreeRenderers) {
+    InsertUnique(includesFiles, "pixi-renderers/three.js");
+    InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
+  }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");

@@ -727,6 +727,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
              metadata.GetType() == "tilemapResource" ||
              metadata.GetType() == "tilesetResource" ||
              metadata.GetType() == "videoResource" ||
+             metadata.GetType() == "model3DResource" ||
              // Deprecated, old parameter names:
              metadata.GetType() == "password" || metadata.GetType() == "musicfile" ||
              metadata.GetType() == "soundfile" || metadata.GetType() == "police") {

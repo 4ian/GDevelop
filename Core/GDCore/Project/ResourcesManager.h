@@ -482,6 +482,32 @@ class GD_CORE_API BitmapFontResource : public Resource {
 };
 
 /**
+ * \brief Describe a 3D model file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API Model3DResource : public Resource {
+ public:
+  Model3DResource() : Resource() { SetKind("model3D"); };
+  virtual ~Model3DResource(){};
+  virtual Model3DResource* Clone() const override {
+    return new Model3DResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+  virtual bool UseFile() const override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource

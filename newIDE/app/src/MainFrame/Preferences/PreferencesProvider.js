@@ -148,6 +148,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setShowObjectInstancesIn3D: this._setShowObjectInstancesIn3D.bind(this),
+    getShowObjectInstancesIn3D: this._getShowObjectInstancesIn3D.bind(this),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
@@ -427,6 +429,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setShowObjectInstancesIn3D(showObjectInstancesIn3D: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showObjectInstancesIn3D,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowObjectInstancesIn3D() {
+    return this.state.values.showObjectInstancesIn3D;
   }
 
   _checkUpdates(forceDownload?: boolean) {

@@ -283,7 +283,6 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       },
     ],
   };
-
   installedEnumeratedObjectMetadatas.forEach(
     installedEnumeratedObjectMetadata => {
       const category = translateExtensionCategory(

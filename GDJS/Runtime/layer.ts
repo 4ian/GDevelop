@@ -6,14 +6,17 @@
 namespace gdjs {
   /**
    * Represents a layer of a scene, used to display objects.
-   *
-   * Viewports and multiple cameras are not supported.
    */
   export class Layer extends gdjs.RuntimeLayer {
     _cameraRotation: float = 0;
     _zoomFactor: float = 1;
     _cameraX: float;
     _cameraY: float;
+    _cameraZ: float = 0;
+    /**
+     * `_cameraZ` is dirty when the zoom factor is set last.
+     */
+    _isCameraZDirty: boolean = true;
 
     /**
      * @param layerData The data used to initialize the layer
@@ -127,6 +130,7 @@ namespace gdjs {
      */
     setCameraZoom(newZoom: float, cameraId?: integer): void {
       this._zoomFactor = newZoom;
+      this._isCameraZDirty = true;
       this._renderer.updatePosition();
     }
 
@@ -138,6 +142,56 @@ namespace gdjs {
      */
     getCameraZoom(cameraId?: integer): float {
       return this._zoomFactor;
+    }
+
+    /**
+     * Set the camera center Z position.
+     *
+     * @param z The new y position.
+     * @param fov The field of view.
+     * @param cameraId The camera number. Currently ignored.
+     */
+    setCameraZ(z: float, fov: float = 45, cameraId?: integer): void {
+      const cameraFovInRadians = gdjs.toRad(fov);
+
+      // The zoom factor is capped to a not too big value to avoid infinity.
+      // MAX_SAFE_INTEGER is an arbitrary choice. It's big but not too big.
+      const zoomFactor = Math.min(
+        Number.MAX_SAFE_INTEGER,
+        (0.5 * this.getHeight()) / (z * Math.tan(0.5 * cameraFovInRadians))
+      );
+
+      if (zoomFactor > 0) {
+        this._zoomFactor = zoomFactor;
+      }
+
+      this._cameraZ = z;
+      this._isCameraZDirty = false;
+      this._renderer.updatePosition();
+    }
+
+    /**
+     * Get the camera center Z position.
+     *
+     * @param fov The field of view.
+     * @param cameraId The camera number. Currently ignored.
+     * @return The z position of the camera
+     */
+    getCameraZ(fov: float = 45, cameraId?: integer): float {
+      if (!this._isCameraZDirty) {
+        return this._cameraZ;
+      }
+
+      // Set the camera so that it displays the whole PixiJS plane, as if it was a 2D rendering.
+      // The Z position is computed by taking the half height of the displayed rendering,
+      // and using the angle of the triangle defined by the field of view to compute the length
+      // of the triangle defining the distance between the camera and the rendering plane.
+      const cameraZPosition =
+        (0.5 * this.getHeight()) /
+        this.getCameraZoom() /
+        Math.tan(0.5 * gdjs.toRad(fov));
+
+      return cameraZPosition;
     }
 
     /**

@@ -12,7 +12,7 @@ namespace gdjs {
     max: FloatPoint;
   };
 
-  type RendererObjectInterface = {
+  export type RendererObjectInterface = {
     visible: boolean;
   };
 
@@ -193,7 +193,10 @@ namespace gdjs {
     protected _variables: gdjs.VariablesContainer;
 
     //Effects:
-    protected _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
+    protected _rendererEffects: Record<
+      string,
+      gdjs.PixiFiltersTools.Filter
+    > = {};
 
     //Forces:
     protected _forces: gdjs.Force[] = [];
@@ -258,11 +261,7 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         for (const effectName in this._rendererEffects) {
-          this._runtimeScene
-            .getGame()
-            .getEffectsManager()
-            // @ts-expect-error - the effects manager is typed with the PIXI object.
-            .applyEffect(rendererObject, this._rendererEffects[effectName]);
+          this._rendererEffects[effectName].applyEffect(this);
         }
       }
 
@@ -451,6 +450,10 @@ namespace gdjs {
       if (rendererObject) {
         theLayer.getRenderer().removeRendererObject(rendererObject);
       }
+      const rendererObject3D = this.get3DRendererObject();
+      if (rendererObject3D) {
+        theLayer.getRenderer().remove3DRendererObject(rendererObject3D);
+      }
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
@@ -476,12 +479,16 @@ namespace gdjs {
 
     //Rendering:
     /**
-     * Called with a callback function that should be called with the internal
-     * object used for rendering by the object (PIXI.DisplayObject...)
-     *
-     * @return The internal rendered object (PIXI.DisplayObject...)
+     * @return The internal object for a 2D rendering (PIXI.DisplayObject...)
      */
     getRendererObject(): RendererObjectInterface | null | undefined {
+      return undefined;
+    }
+
+    /**
+     * @return The internal object for a 3D rendering (PIXI.DisplayObject...)
+     */
+    get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;
     }
 
@@ -720,6 +727,11 @@ namespace gdjs {
       if (rendererObject) {
         oldLayer.getRenderer().removeRendererObject(rendererObject);
         newLayer.getRenderer().addRendererObject(rendererObject, this.zOrder);
+      }
+      const rendererObject3D = this.get3DRendererObject();
+      if (rendererObject3D) {
+        oldLayer.getRenderer().remove3DRendererObject(rendererObject3D);
+        newLayer.getRenderer().add3DRendererObject(rendererObject3D);
       }
     }
 
@@ -1007,13 +1019,10 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return (
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          // @ts-expect-error - the effects manager is typed with the PIXI object.
-          .addEffect(effectData, this._rendererEffects, rendererObject, this)
-      );
+      return this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        .addEffect(effectData, this._rendererEffects, this);
     }
 
     /**
@@ -1024,13 +1033,10 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return (
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          // @ts-expect-error - the effects manager is typed with the PIXI object.
-          .removeEffect(this._rendererEffects, rendererObject, effectName)
-      );
+      return this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        .removeEffect(this._rendererEffects, this, effectName);
     }
 
     /**
@@ -1136,7 +1142,7 @@ namespace gdjs {
       this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .enableEffect(this._rendererEffects, name, enable);
+        .enableEffect(this._rendererEffects, this, name, enable);
     }
 
     /**
@@ -1148,7 +1154,7 @@ namespace gdjs {
       return this._runtimeScene
         .getGame()
         .getEffectsManager()
-        .isEffectEnabled(this._rendererEffects, name);
+        .isEffectEnabled(this._rendererEffects, this, name);
     }
 
     /**

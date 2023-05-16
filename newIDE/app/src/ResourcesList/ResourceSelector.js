@@ -39,7 +39,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
-  fallbackResourceKind?: ResourceKind,
+  fallbackResourceKind?: ?ResourceKind,
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,
@@ -275,9 +275,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
   };
 
   render() {
-    const errorText = this.state.notExistingError
-      ? 'This resource does not exist in the game'
-      : null;
+    const errorText = this.state.notExistingError ? (
+      <Trans>This resource does not exist in the game</Trans>
+    ) : null;
 
     const externalEditors = this.props.resourceManagementProps.resourceExternalEditors.filter(
       externalEditor => externalEditor.kind === this.props.resourceKind

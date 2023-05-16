@@ -8,7 +8,9 @@ import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema, {
+  reorganizeSchemaFor3DInstance,
+} from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
@@ -21,6 +23,7 @@ import VariablesList, {
   type HistoryHandler,
 } from '../../VariablesList/VariablesList';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 type Props = {|
   project: gdProject,
@@ -28,157 +31,204 @@ type Props = {|
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onGetInstanceSize: gdInitialInstance => [number, number],
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
 |};
 
-export default class InstancePropertiesEditor extends React.Component<Props> {
-  schema: Schema = [
-    {
-      name: this.props.i18n._(t`Object`),
-      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-      nonFieldType: 'sectionTitle',
-      defaultValue: this.props.i18n._(t`Different objects`),
-    },
-    {
-      label: this.props.i18n._(t`Edit object`),
-      disabled: 'onValuesDifferent',
-      nonFieldType: 'button',
-      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-      onClick: (instance: gdInitialInstance) =>
-        this.props.onEditObjectByName(instance.getObjectName()),
-    },
-    {
-      name: this.props.i18n._(t`Instance`),
-      nonFieldType: 'sectionTitle',
-    },
-    {
-      name: 'Position',
-      type: 'row',
-      children: [
-        {
-          name: 'X',
-          getLabel: () => this.props.i18n._(t`X`),
-          valueType: 'number',
-          getValue: (instance: gdInitialInstance) => instance.getX(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setX(newValue),
-        },
-        {
-          name: 'Y',
-          getLabel: () => this.props.i18n._(t`Y`),
-          valueType: 'number',
-          getValue: (instance: gdInitialInstance) => instance.getY(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setY(newValue),
-        },
-      ],
-    },
-    {
-      name: 'Angle',
-      getLabel: () => this.props.i18n._(t`Angle`),
-      valueType: 'number',
-      getValue: (instance: gdInitialInstance) => instance.getAngle(),
-      setValue: (instance: gdInitialInstance, newValue: number) =>
-        instance.setAngle(newValue),
-    },
-    {
-      name: 'Lock instance position angle',
-      getLabel: () => this.props.i18n._(t`Lock position/angle in the editor`),
-      valueType: 'boolean',
-      getValue: (instance: gdInitialInstance) => instance.isLocked(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) => {
-        instance.setLocked(newValue);
-        if (!newValue) {
-          instance.setSealed(newValue);
-        }
-      },
-    },
-    {
-      name: 'Prevent instance selection',
-      getLabel: () => this.props.i18n._(t`Prevent selection in the editor`),
-      valueType: 'boolean',
-      disabled: (instances: gdInitialInstance[]) => {
-        return instances.some(instance => !instance.isLocked());
-      },
-      getValue: (instance: gdInitialInstance) => instance.isSealed(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setSealed(newValue),
-    },
-    {
-      name: 'Z Order',
-      getLabel: () => this.props.i18n._(t`Z Order`),
-      valueType: 'number',
-      getValue: (instance: gdInitialInstance) => instance.getZOrder(),
-      setValue: (instance: gdInitialInstance, newValue: number) =>
-        instance.setZOrder(newValue),
-    },
-    {
-      name: 'Layer',
-      getLabel: () => this.props.i18n._(t`Layer`),
-      valueType: 'string',
-      getChoices: () => enumerateLayers(this.props.layout),
-      getValue: (instance: gdInitialInstance) => instance.getLayer(),
-      setValue: (instance: gdInitialInstance, newValue: string) =>
-        instance.setLayer(newValue),
-    },
-    {
-      name: 'Custom size',
-      getLabel: () => this.props.i18n._(t`Custom size`),
-      valueType: 'boolean',
-      getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setHasCustomSize(newValue),
-    },
-    {
-      name: 'custom-size-row',
-      type: 'row',
-      children: [
-        {
-          name: 'Width',
-          getLabel: () => this.props.i18n._(t`Width`),
-          valueType: 'number',
-          getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomWidth(Math.max(newValue, 0)),
-        },
-        {
-          name: 'Height',
-          getLabel: () => this.props.i18n._(t`Height`),
-          valueType: 'number',
-          getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
-          setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomHeight(Math.max(newValue, 0)),
-        },
-      ],
-    },
-  ];
+export type InstancePropertiesEditorInterface = {| forceUpdate: () => void |};
 
-  _renderEmpty() {
-    return (
-      <EmptyMessage>
-        <Trans>
-          Click on an instance in the scene to display its properties
-        </Trans>
-      </EmptyMessage>
+const InstancePropertiesEditor = React.forwardRef<
+  Props,
+  InstancePropertiesEditorInterface
+>(
+  (
+    {
+      instances,
+      i18n,
+      project,
+      layout,
+      unsavedChanges,
+      historyHandler,
+      onEditObjectByName,
+      onGetInstanceSize,
+      editInstanceVariables,
+      onInstancesModified,
+    },
+    ref
+  ) => {
+    const forceUpdate = useForceUpdate();
+    React.useImperativeHandle(ref, () => ({
+      forceUpdate,
+    }));
+
+    const schema: Schema = React.useMemo(
+      () => [
+        {
+          name: i18n._(t`Object`),
+          getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+          nonFieldType: 'sectionTitle',
+          defaultValue: i18n._(t`Different objects`),
+        },
+        {
+          label: i18n._(t`Edit object`),
+          disabled: 'onValuesDifferent',
+          nonFieldType: 'button',
+          getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+          onClick: (instance: gdInitialInstance) =>
+            onEditObjectByName(instance.getObjectName()),
+        },
+        {
+          name: i18n._(t`Instance`),
+          nonFieldType: 'sectionTitle',
+        },
+        {
+          name: 'Position',
+          type: 'row',
+          children: [
+            {
+              name: 'X',
+              getLabel: () => i18n._(t`X`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) => instance.getX(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setX(newValue),
+            },
+            {
+              name: 'Y',
+              getLabel: () => i18n._(t`Y`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) => instance.getY(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setY(newValue),
+            },
+          ],
+        },
+        {
+          name: 'Angles',
+          type: 'row',
+          children: [
+            {
+              name: 'Angle',
+              getLabel: () => i18n._(t`Angle`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) => instance.getAngle(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setAngle(newValue),
+            },
+          ],
+        },
+        {
+          name: 'Lock instance position angle',
+          getLabel: () => i18n._(t`Lock position/angle in the editor`),
+          valueType: 'boolean',
+          getValue: (instance: gdInitialInstance) => instance.isLocked(),
+          setValue: (instance: gdInitialInstance, newValue: boolean) => {
+            instance.setLocked(newValue);
+            if (!newValue) {
+              instance.setSealed(newValue);
+            }
+          },
+        },
+        {
+          name: 'Prevent instance selection',
+          getLabel: () => i18n._(t`Prevent selection in the editor`),
+          valueType: 'boolean',
+          disabled: (instances: gdInitialInstance[]) => {
+            return instances.some(instance => !instance.isLocked());
+          },
+          getValue: (instance: gdInitialInstance) => instance.isSealed(),
+          setValue: (instance: gdInitialInstance, newValue: boolean) =>
+            instance.setSealed(newValue),
+        },
+        {
+          name: 'Z Order',
+          getLabel: () => i18n._(t`Z Order`),
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getZOrder(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setZOrder(newValue),
+        },
+        {
+          name: 'Layer',
+          getLabel: () => i18n._(t`Layer`),
+          valueType: 'string',
+          getChoices: () => enumerateLayers(layout),
+          getValue: (instance: gdInitialInstance) => instance.getLayer(),
+          setValue: (instance: gdInitialInstance, newValue: string) =>
+            instance.setLayer(newValue),
+        },
+        {
+          name: 'Custom size',
+          getLabel: () => i18n._(t`Custom size`),
+          valueType: 'boolean',
+          getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
+          setValue: (instance: gdInitialInstance, newValue: boolean) => {
+            if (newValue) {
+              const [width, height] = onGetInstanceSize(instance);
+              instance.setCustomWidth(width);
+              instance.setCustomHeight(height);
+            }
+            instance.setHasCustomSize(newValue);
+          },
+        },
+        {
+          name: 'custom-size-row',
+          type: 'row',
+          children: [
+            {
+              name: 'Width',
+              getLabel: () => i18n._(t`Width`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) =>
+                instance.getCustomWidth(),
+              setValue: (instance: gdInitialInstance, newValue: number) => {
+                instance.setHasCustomSize(true);
+                instance.setCustomWidth(Math.max(newValue, 0));
+              },
+            },
+            {
+              name: 'Height',
+              getLabel: () => i18n._(t`Height`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) =>
+                instance.getCustomHeight(),
+              setValue: (instance: gdInitialInstance, newValue: number) => {
+                instance.setHasCustomSize(true);
+                instance.setCustomHeight(Math.max(newValue, 0));
+              },
+            },
+          ],
+        },
+      ],
+      [i18n, layout, onEditObjectByName, onGetInstanceSize]
     );
-  }
 
-  _renderInstancesProperties() {
-    const { project, layout, instances } = this.props;
     const instance = instances[0];
     const associatedObjectName = instance.getObjectName();
     const object = getObjectByName(project, layout, associatedObjectName);
-    //TODO: multiple instances support
+    // TODO: multiple instances support
     const properties = instance.getCustomProperties(project, layout);
-    const instanceSchema = propertiesMapToSchema(
+    // TODO: Reorganize fields if any of the selected instances is 3D.
+    const is3DInstance = properties.has('z');
+    const instanceSchemaForCustomProperties = propertiesMapToSchema(
       properties,
       (instance: gdInitialInstance) =>
         instance.getCustomProperties(project, layout),
       (instance: gdInitialInstance, name, value) =>
         instance.updateCustomProperty(name, value, project, layout)
+    );
+    let instanceSchema = React.useMemo(
+      () =>
+        is3DInstance
+          ? reorganizeSchemaFor3DInstance(
+              schema,
+              instanceSchemaForCustomProperties
+            )
+          : schema.concat(instanceSchemaForCustomProperties),
+      [is3DInstance, instanceSchemaForCustomProperties, schema]
     );
 
     return (
@@ -191,10 +241,10 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         <Column expand noMargin id="instance-properties-editor">
           <Column>
             <PropertiesEditor
-              unsavedChanges={this.props.unsavedChanges}
-              schema={this.schema.concat(instanceSchema)}
+              unsavedChanges={unsavedChanges}
+              schema={instanceSchema}
               instances={instances}
-              onInstancesModified={this.props.onInstancesModified}
+              onInstancesModified={onInstancesModified}
             />
             <Line alignItems="center" justifyContent="space-between">
               <Text>
@@ -203,7 +253,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
               <IconButton
                 size="small"
                 onClick={() => {
-                  this.props.editInstanceVariables(instance);
+                  editInstanceVariables(instance);
                 }}
               >
                 <ShareExternal />
@@ -226,23 +276,42 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                     )
                   : []
               }
-              historyHandler={this.props.historyHandler}
+              historyHandler={historyHandler}
             />
           ) : null}
         </Column>
       </ScrollView>
     );
   }
+);
 
-  render() {
-    const { instances } = this.props;
+const InstancePropertiesEditorContainer = React.forwardRef<
+  Props,
+  InstancePropertiesEditorInterface
+>((props, ref) => {
+  const editorRef = React.useRef<?InstancePropertiesEditorInterface>(null);
+  const forceUpdate = React.useCallback(() => {
+    if (editorRef.current) {
+      editorRef.current.forceUpdate();
+    }
+  }, []);
+  React.useImperativeHandle(ref, () => ({
+    forceUpdate,
+  }));
 
-    return (
-      <Background>
-        {!instances || !instances.length
-          ? this._renderEmpty()
-          : this._renderInstancesProperties()}
-      </Background>
-    );
-  }
-}
+  return (
+    <Background>
+      {!props.instances || !props.instances.length ? (
+        <EmptyMessage>
+          <Trans>
+            Click on an instance in the scene to display its properties
+          </Trans>
+        </EmptyMessage>
+      ) : (
+        <InstancePropertiesEditor {...props} ref={editorRef} />
+      )}
+    </Background>
+  );
+});
+
+export default InstancePropertiesEditorContainer;

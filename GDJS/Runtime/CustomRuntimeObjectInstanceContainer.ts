@@ -44,10 +44,9 @@ namespace gdjs {
     }
 
     addLayer(layerData: LayerData) {
-      this._layers.put(
-        layerData.name,
-        new gdjs.RuntimeCustomObjectLayer(layerData, this)
-      );
+      const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
+      this._layers.put(layerData.name, layer);
+      this._orderedLayers.push(layer);
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {
@@ -204,6 +203,7 @@ namespace gdjs {
      */
     _updateObjectsPreRender() {
       const allInstancesList = this.getAdhocListOfAllInstances();
+      // TODO (3D) culling - add support for 3D object culling?
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
         const rendererObject = object.getRendererObject();

@@ -64,6 +64,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setShowObjectInstancesIn3D,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
   } = React.useContext(PreferencesContext);
@@ -349,6 +350,19 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
+          {/* TODO (3D) Remove development flag when the scene editor supports 3D display. */}
+          {Window.isDev() && (
+            <Toggle
+              onToggle={(e, check) => setShowObjectInstancesIn3D(check)}
+              toggled={values.showObjectInstancesIn3D}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Show objects in 3D in the scene editor (experimental)
+                </Trans>
+              }
+            />
+          )}
           {electron && (
             <>
               <ColumnStackLayout expand noMargin>

@@ -801,6 +801,8 @@ interface Layer {
     void Layer();
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetRenderingType([Const] DOMString renderingType);
+    [Const, Ref] DOMString GetRenderingType();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
     void SetLocked(boolean isLocked);
@@ -809,6 +811,12 @@ interface Layer {
     boolean IsLightingLayer();
     void SetFollowBaseLayerCamera(boolean followBaseLayerCamera);
     boolean IsFollowingBaseLayerCamera();
+    double GetCamera3DNearPlaneDistance();
+    void SetCamera3DNearPlaneDistance(double distance);
+    double GetCamera3DFarPlaneDistance();
+    void SetCamera3DFarPlaneDistance(double distance);
+    double GetCamera3DFieldOfView();
+    void SetCamera3DFieldOfView(double angle);
 
     void SetAmbientLightColor(unsigned long r, unsigned long g, unsigned long b);
     unsigned long GetAmbientLightColorRed();
@@ -1012,6 +1020,11 @@ interface TilesetResource {
     void TilesetResource();
 };
 TilesetResource implements Resource;
+
+interface Model3DResource {
+    void Model3DResource();
+};
+Model3DResource implements Resource;
 
 interface InitialInstance {
     void InitialInstance();
@@ -1698,12 +1711,18 @@ interface EffectMetadata {
     [Ref] EffectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] EffectMetadata AddIncludeFile([Const] DOMString includeFile);
     [Ref] EffectMetadata MarkAsNotWorkingForObjects();
+    [Ref] EffectMetadata MarkAsOnlyWorkingFor2D();
+    [Ref] EffectMetadata MarkAsOnlyWorkingFor3D();
+    [Ref] EffectMetadata MarkAsUnique();
 
     [Const, Ref] DOMString GetType();
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetHelpPath();
     boolean IsMarkedAsNotWorkingForObjects();
+    boolean IsMarkedAsOnlyWorkingFor2D();
+    boolean IsMarkedAsOnlyWorkingFor3D();
+    boolean IsMarkedAsUnique();
 
     [Ref] MapStringPropertyDescriptor GetProperties();
 };

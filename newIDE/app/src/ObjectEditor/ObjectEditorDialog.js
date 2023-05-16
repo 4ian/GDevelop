@@ -287,6 +287,8 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'effects' && (
         <EffectsList
           target="object"
+          // TODO (3D): declare the renderer type in object metadata.
+          layerRenderingType="2d"
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}

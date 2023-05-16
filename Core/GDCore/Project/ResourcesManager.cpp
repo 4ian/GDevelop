@@ -91,6 +91,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<TilesetResource>();
   else if (kind == "bitmapFont")
     return std::make_shared<BitmapFontResource>();
+  else if (kind == "model3D")
+    return std::make_shared<Model3DResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -732,6 +734,20 @@ void BitmapFontResource::UnserializeFrom(const SerializerElement& element) {
 }
 
 void BitmapFontResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute("file", GetFile());
+}
+
+void Model3DResource::SetFile(const gd::String& newFile) {
+  file = NormalizePathSeparator(newFile);
+}
+
+void Model3DResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+void Model3DResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }

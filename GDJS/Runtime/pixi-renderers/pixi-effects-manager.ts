@@ -6,7 +6,7 @@
 namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
-  type RendererEffects = Record<string, PixiFiltersTools.Filter>;
+  type RendererEffects = Record<string, gdjs.PixiFiltersTools.Filter>;
 
   export interface EffectsTarget {
     getRuntimeScene: () => gdjs.RuntimeInstanceContainer;
@@ -17,6 +17,8 @@ namespace gdjs {
     getWidth: () => number;
     isLightingLayer?: () => boolean;
     getName: () => string;
+    getRendererObject: () => RendererObjectInterface | null | undefined;
+    get3DRendererObject: () => THREE.Object3D | null | undefined;
   }
 
   /**
@@ -50,34 +52,9 @@ namespace gdjs {
         return false;
       }
 
-      const filter: PixiFiltersTools.Filter = {
-        pixiFilter: filterCreator.makePIXIFilter(target, effectData),
-        updateDoubleParameter: filterCreator.updateDoubleParameter,
-        updateStringParameter: filterCreator.updateStringParameter,
-        updateBooleanParameter: filterCreator.updateBooleanParameter,
-        updatePreRender: filterCreator.updatePreRender,
-      };
-
-      if (target.isLightingLayer && target.isLightingLayer()) {
-        filter.pixiFilter.blendMode = PIXI.BLEND_MODES.ADD;
-      }
-
-      rendererEffects[effectData.name] = filter;
-      return true;
-    }
-
-    /**
-     * Apply the effect on the PixiJS DisplayObject.
-     * Called after the effect is initialized.
-     * @param rendererObject The renderer object
-     * @param effect The effect to be applied.
-     */
-    applyEffect(
-      rendererObject: PIXI.DisplayObject,
-      effect: PixiFiltersTools.Filter
-    ): boolean {
-      rendererObject.filters = (rendererObject.filters || []).concat(
-        effect.pixiFilter
+      rendererEffects[effectData.name] = filterCreator.makeFilter(
+        target,
+        effectData
       );
       return true;
     }
@@ -93,7 +70,7 @@ namespace gdjs {
     updatePreRender(rendererEffects: RendererEffects, target: EffectsTarget) {
       for (const filterName in rendererEffects) {
         const filter = rendererEffects[filterName];
-        filter.updatePreRender(filter.pixiFilter, target);
+        filter.updatePreRender(target);
       }
     }
 
@@ -102,13 +79,11 @@ namespace gdjs {
      * with the same name.
      * @param effectData The effect data
      * @param rendererEffects The renderer effects
-     * @param rendererObject The renderer object
      * @param target The effects target
      */
     addEffect(
       effectData: EffectData,
       rendererEffects: RendererEffects,
-      rendererObject: PIXI.DisplayObject,
       target: EffectsTarget
     ): boolean {
       let effectAdded = true;
@@ -121,8 +96,7 @@ namespace gdjs {
 
       if (rendererEffects[effectData.name]) {
         effectAdded =
-          this.applyEffect(rendererObject, rendererEffects[effectData.name]) &&
-          effectAdded;
+          rendererEffects[effectData.name].applyEffect(target) && effectAdded;
       }
       return effectAdded;
     }
@@ -135,14 +109,14 @@ namespace gdjs {
      */
     removeEffect(
       rendererEffects: RendererEffects,
-      rendererObject: PIXI.DisplayObject,
+      target: EffectsTarget,
       effectName: string
     ): boolean {
       const filter = rendererEffects[effectName];
       if (!filter) return false;
-      rendererObject.filters = (rendererObject.filters || []).filter(
-        (pixiFilter) => pixiFilter !== filter.pixiFilter
-      );
+
+      filter.removeEffect(target);
+
       delete rendererEffects[effectName];
       return true;
     }
@@ -173,7 +147,7 @@ namespace gdjs {
     ): boolean {
       const filter = rendererEffects[name];
       if (!filter) return false;
-      filter.updateDoubleParameter(filter.pixiFilter, parameterName, value);
+      filter.updateDoubleParameter(parameterName, value);
       return true;
     }
 
@@ -192,7 +166,7 @@ namespace gdjs {
     ): boolean {
       const filter = rendererEffects[name];
       if (!filter) return false;
-      filter.updateStringParameter(filter.pixiFilter, parameterName, value);
+      filter.updateStringParameter(parameterName, value);
       return true;
     }
 
@@ -211,7 +185,7 @@ namespace gdjs {
     ): boolean {
       const filter = rendererEffects[name];
       if (!filter) return false;
-      filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
+      filter.updateBooleanParameter(parameterName, value);
       return true;
     }
 
@@ -276,12 +250,13 @@ namespace gdjs {
      */
     enableEffect(
       rendererEffects: RendererEffects,
+      target: EffectsTarget,
       name: string,
       value: boolean
     ): void {
       const filter = rendererEffects[name];
       if (!filter) return;
-      gdjs.PixiFiltersTools.enableEffect(filter, value);
+      filter.setEnabled(target, value);
     }
 
     /**
@@ -290,10 +265,14 @@ namespace gdjs {
      * @param name The effect name
      * @return true if the filter is enabled
      */
-    isEffectEnabled(rendererEffects: RendererEffects, name: string): boolean {
+    isEffectEnabled(
+      rendererEffects: RendererEffects,
+      target: EffectsTarget,
+      name: string
+    ): boolean {
       const filter = rendererEffects[name];
       if (!filter) return false;
-      return gdjs.PixiFiltersTools.isEffectEnabled(filter);
+      return filter.isEnabled(target);
     }
   }
 

@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js-legacy';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 
 /**
- * RenderedInstance is the base class used for creating renderers of instances,
+ * RenderedInstance is the base class used for creating 2D renderers of instances,
  * which display on the scene editor, using Pixi.js, the instance of an object (see InstancesEditor).
  */
 export default class RenderedInstance {
@@ -38,7 +38,7 @@ export default class RenderedInstance {
    * Convert an angle from degrees to radians.
    */
   static toRad(angleInDegrees: number) {
-    return (angleInDegrees / 180) * 3.14159;
+    return (angleInDegrees / 180) * Math.PI;
   }
 
   /**

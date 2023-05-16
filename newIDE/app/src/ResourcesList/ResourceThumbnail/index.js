@@ -16,6 +16,8 @@ type Props = {|
   onContextMenu?: (number, number) => void,
 |};
 
+export const resourcesKindsWithThumbnail = ['image'];
+
 /**
  * Display the right thumbnail for any given resource of a project
  */

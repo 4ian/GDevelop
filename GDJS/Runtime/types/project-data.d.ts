@@ -133,12 +133,16 @@ declare interface InstanceStringProperty {
 
 declare interface LayerData {
   name: string;
+  renderingType?: '' | '2d' | '3d' | '2d+3d';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
+  camera3DFieldOfView?: float;
+  camera3DFarPlaneDistance?: float;
+  camera3DNearPlaneDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
 }
@@ -256,4 +260,5 @@ declare type ResourceKind =
   | 'json'
   | 'tilemap'
   | 'tileset'
-  | 'bitmapFont';
+  | 'bitmapFont'
+  | 'model3D';

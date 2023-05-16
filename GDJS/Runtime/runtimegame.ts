@@ -140,6 +140,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
@@ -229,9 +230,13 @@ namespace gdjs {
         this._resourcesLoader,
         this._imageManager
       );
+      this._model3DManager = new gdjs.Model3DManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      );
       this._effectsManager = new gdjs.EffectsManager();
-      this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
-      this._minFPS = this._data ? this._data.properties.minFPS : 15;
+      this._maxFPS = this._data.properties.maxFPS;
+      this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
@@ -309,6 +314,7 @@ namespace gdjs {
       this._fontManager.setResources(this._data.resources.resources);
       this._jsonManager.setResources(this._data.resources.resources);
       this._bitmapFontManager.setResources(this._data.resources.resources);
+      this._model3DManager.setResources(this._data.resources.resources);
     }
 
     /**
@@ -380,6 +386,15 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    /**
+     * Get the 3D model manager of the game, used to load 3D model from game
+     * resources.
+     * @return The 3D model manager for the game
+     */
+    getModel3DManager(): gdjs.Model3DManager {
+      return this._model3DManager;
     }
 
     /**
@@ -709,9 +724,9 @@ namespace gdjs {
                       }
                     },
                     function (jsonTotalCount) {
-                      that._bitmapFontManager
-                        .loadBitmapFontData((count) => {
-                          var percent = Math.floor(
+                      that._model3DManager.loadModels(
+                        function (count, total) {
+                          const percent = Math.floor(
                             ((texturesTotalCount +
                               audioTotalCount +
                               fontTotalCount +
@@ -721,15 +736,35 @@ namespace gdjs {
                               100
                           );
                           loadingScreen.setPercent(percent);
-                          if (progressCallback) progressCallback(percent);
-                        })
-                        .then(() => loadingScreen.unload())
-                        .then(() =>
-                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                        )
-                        .then(() => {
-                          callback();
-                        });
+                          if (progressCallback) {
+                            progressCallback(percent);
+                          }
+                        },
+                        function (model3DTotalCount) {
+                          that._bitmapFontManager
+                            .loadBitmapFontData((count) => {
+                              var percent = Math.floor(
+                                ((texturesTotalCount +
+                                  audioTotalCount +
+                                  fontTotalCount +
+                                  jsonTotalCount +
+                                  model3DTotalCount +
+                                  count) /
+                                  allAssetsTotal) *
+                                  100
+                              );
+                              loadingScreen.setPercent(percent);
+                              if (progressCallback) progressCallback(percent);
+                            })
+                            .then(() => loadingScreen.unload())
+                            .then(() =>
+                              gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                            )
+                            .then(() => {
+                              callback();
+                            });
+                        }
+                      );
                     }
                   );
                 }

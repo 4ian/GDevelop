@@ -15,6 +15,8 @@ export type GeneratedProject = {
   height: number,
   projectName: string,
   fileUrl?: string,
+  synopsis?: string,
+  layoutExplanation?: string,
   error?: string,
 };
 

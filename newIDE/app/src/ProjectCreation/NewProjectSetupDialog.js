@@ -18,7 +18,7 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
-import { Line } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import LeftLoader from '../UI/LeftLoader';
 import {
   checkIfHasTooManyCloudProjects,
@@ -32,7 +32,10 @@ import { MarkdownText } from '../UI/MarkdownText';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { useOnlineStatus } from '../Utils/OnlineStatus';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
-import { createGeneratedProject } from '../Utils/GDevelopServices/Generation';
+import {
+  createGeneratedProject,
+  type GeneratedProject,
+} from '../Utils/GDevelopServices/Generation';
 import ResolutionOptions, {
   type ResolutionOption,
   resolutionOptions,
@@ -46,6 +49,7 @@ import RobotIcon from './RobotIcon';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
+import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -62,7 +66,7 @@ type Props = {|
   ) => Promise<void>,
   onCreateWithLogin: (newProjectSetup: NewProjectSetup) => Promise<void>,
   onCreateFromAIGeneration: (
-    projectFileUrl: string,
+    generatedProject: GeneratedProject,
     newProjectSetup: NewProjectSetup
   ) => Promise<void>,
   selectedExampleShortHeader: ?ExampleShortHeader,
@@ -166,7 +170,13 @@ const NewProjectSetupDialog = ({
     }
   );
 
-  const needUserAuthentication =
+  const generationCurrentUsage = authenticatedUser.limits
+    ? authenticatedUser.limits.limits['ai-project-generation']
+    : null;
+  const canGenerateProjectFromPrompt =
+    generationCurrentUsage && !generationCurrentUsage.limitReached;
+
+  const needUserAuthenticationForStorage =
     storageProvider.needUserAuthentication && !authenticatedUser.authenticated;
   const { limits } = authenticatedUser;
   const hasTooManyCloudProjects =
@@ -176,7 +186,7 @@ const NewProjectSetupDialog = ({
   const generateProject = React.useCallback(
     async () => {
       if (isOpeningProject) return;
-      if (needUserAuthentication || !profile) return;
+      if (needUserAuthenticationForStorage || !profile) return;
 
       setIsGeneratingProject(true);
       try {
@@ -191,24 +201,34 @@ const NewProjectSetupDialog = ({
           }
         );
         setGeneratingProjectId(generatedProject.id);
-      } catch (err) {
-        console.error(err);
-        showAlert({
-          title: t`Unable to generate project`,
-          message: t`Looks like the AI service is not available. Please try again later or create a project without a prompt.`,
-        });
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.code === 'project-generation/quota-exceeded'
+        ) {
+          setGenerationPrompt('');
+          // Fetch the user again to update the limits and show the subscription info.
+          await authenticatedUser.onSubscriptionUpdated();
+        } else {
+          showAlert({
+            title: t`Unable to generate project`,
+            message: t`Looks like the AI service is not available. Please try again later or create a project without a prompt.`,
+          });
+        }
         setIsGeneratingProject(false);
       }
     },
     [
       isOpeningProject,
-      needUserAuthentication,
+      needUserAuthenticationForStorage,
       getAuthorizationHeader,
       generationPrompt,
       profile,
       resolutionOption,
       projectName,
       showAlert,
+      authenticatedUser,
     ]
   );
 
@@ -220,7 +240,7 @@ const NewProjectSetupDialog = ({
       }
 
       if (isOpeningProject) return;
-      if (needUserAuthentication) return;
+      if (needUserAuthenticationForStorage) return;
 
       setProjectNameError(null);
       if (!projectName) {
@@ -258,7 +278,7 @@ const NewProjectSetupDialog = ({
     },
     [
       isOpeningProject,
-      needUserAuthentication,
+      needUserAuthenticationForStorage,
       projectName,
       storageProvider,
       saveAsLocation,
@@ -303,7 +323,9 @@ const NewProjectSetupDialog = ({
               <DialogPrimaryButton
                 primary
                 disabled={
-                  isLoading || needUserAuthentication || hasTooManyCloudProjects
+                  isLoading ||
+                  needUserAuthenticationForStorage ||
+                  hasTooManyCloudProjects
                 }
                 label={<Trans>Create project</Trans>}
                 onClick={() => onValidate(i18n)}
@@ -386,7 +408,7 @@ const NewProjectSetupDialog = ({
                 />
               )}
             </SelectField>
-            {needUserAuthentication && (
+            {needUserAuthenticationForStorage && (
               <Paper background="dark" variant="outlined">
                 <Line justifyContent="center">
                   <CreateProfile
@@ -401,7 +423,7 @@ const NewProjectSetupDialog = ({
                 </Line>
               </Paper>
             )}
-            {!needUserAuthentication &&
+            {!needUserAuthenticationForStorage &&
               storageProvider.onRenderNewProjectSaveAsLocationChooser &&
               storageProvider.onRenderNewProjectSaveAsLocationChooser({
                 projectName,
@@ -429,24 +451,53 @@ const NewProjectSetupDialog = ({
                     multiline
                     maxLength={200}
                     fullWidth
-                    disabled={isLoading}
+                    disabled={
+                      isLoading ||
+                      !authenticatedUser.authenticated ||
+                      !isOnline ||
+                      !canGenerateProjectFromPrompt
+                    }
                     value={generationPrompt}
                     onChange={(e, text) => setGenerationPrompt(text)}
                     floatingLabelText={<Trans>AI prompt</Trans>}
                     floatingLabelFixed
-                    translatableHintText={t`Type a prompt yourself or generate a random one`}
+                    translatableHintText={
+                      !authenticatedUser.authenticated || !isOnline
+                        ? t`Log in to generate a project from a prompt`
+                        : t`Type a prompt yourself or generate a random one`
+                    }
                     endAdornment={
                       <IconButton
                         size="small"
                         onClick={() => setGenerationPrompt(generatePrompt())}
                         tooltip={t`Generate random prompt`}
-                        disabled={isLoading}
+                        disabled={
+                          isLoading ||
+                          !authenticatedUser.authenticated ||
+                          !isOnline ||
+                          !canGenerateProjectFromPrompt
+                        }
                       >
                         <Refresh />
                       </IconButton>
                     }
                   />
                 </LineStackLayout>
+                {authenticatedUser.authenticated &&
+                  !canGenerateProjectFromPrompt && (
+                    <GetSubscriptionCard subscriptionDialogOpeningReason="Generate project from prompt">
+                      <Line>
+                        <Column noMargin>
+                          <Text noMargin>
+                            <Trans>
+                              You've used all your daily pre-made AI scenes!
+                              Generate as many as you want with a subscription.
+                            </Trans>
+                          </Text>
+                        </Column>
+                      </Line>
+                    </GetSubscriptionCard>
+                  )}
                 <Text size="sub-title">
                   <Trans>Advanced File options</Trans>
                 </Text>
@@ -464,7 +515,7 @@ const NewProjectSetupDialog = ({
                   onCheck={(e, checked) => {
                     setAllowPlayersToLogIn(checked);
                   }}
-                  disabled={isLoading}
+                  disabled={isLoading || !isOnline}
                   tooltipOrHelperText={
                     <MarkdownText
                       translatableSource={t`Learn more about [player authentication](https://wiki.gdevelop.io/gdevelop5/all-features/player-authentication).`}

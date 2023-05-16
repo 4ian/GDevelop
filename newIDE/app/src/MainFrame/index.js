@@ -172,6 +172,8 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
+import { type GeneratedProject } from '../Utils/GDevelopServices/Generation';
+import GeneratedProjectInformationDialog from '../ProjectCreation/GeneratedProjectInformationDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -355,6 +357,10 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
+  const [
+    loadedGeneratedProject,
+    setLoadedGeneratedProject,
+  ] = React.useState<?GeneratedProject>(null);
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
@@ -3342,9 +3348,20 @@ const MainFrame = (props: Props) => {
           onCreateEmptyProject={createEmptyProject}
           onCreateFromExample={createProjectFromExample}
           onCreateWithLogin={createProjectWithLogin}
-          onCreateFromAIGeneration={createProjectFromAIGeneration}
+          onCreateFromAIGeneration={async (generatedProject, projectSetup) => {
+            const projectFileUrl = generatedProject.fileUrl;
+            if (!projectFileUrl) return;
+            setLoadedGeneratedProject(generatedProject);
+            await createProjectFromAIGeneration(projectFileUrl, projectSetup);
+          }}
           storageProviders={props.storageProviders}
           selectedExampleShortHeader={selectedExampleShortHeader}
+        />
+      )}
+      {loadedGeneratedProject && (
+        <GeneratedProjectInformationDialog
+          generatedProject={loadedGeneratedProject}
+          onClose={() => setLoadedGeneratedProject(null)}
         />
       )}
       {cloudProjectFileMetadataToRecover && (

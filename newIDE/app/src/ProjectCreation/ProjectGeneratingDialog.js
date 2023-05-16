@@ -8,7 +8,10 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type NewProjectSetup } from './CreateProjectDialog';
 import { ColumnStackLayout } from '../UI/Layout';
 import { LargeSpacer } from '../UI/Grid';
-import { getGeneratedProject } from '../Utils/GDevelopServices/Generation';
+import {
+  getGeneratedProject,
+  type GeneratedProject,
+} from '../Utils/GDevelopServices/Generation';
 import { useInterval } from '../Utils/UseInterval';
 import Text from '../UI/Text';
 import ErrorFilled from '../UI/CustomSvgIcons/ErrorFilled';
@@ -18,7 +21,10 @@ import RobotIcon from './RobotIcon';
 
 type Props = {|
   onClose: () => void,
-  onCreate: (fileUrl: string, projectSetup: NewProjectSetup) => Promise<void>,
+  onCreate: (
+    generatedProject: GeneratedProject,
+    projectSetup: NewProjectSetup
+  ) => Promise<void>,
   storageProvider: StorageProvider,
   saveAsLocation: ?SaveAsLocation,
   generatingProjectId: ?string,
@@ -32,10 +38,11 @@ const loadingMessages = [
   <Trans>It is now thinking about the best way to create your game...</Trans>,
   <Trans>The AI is now choosing objects from the asset store...</Trans>,
   <Trans>The AI is now choosing behaviors for the objects...</Trans>,
+  <Trans>It is now placing everything in the scene...</Trans>,
   <Trans>Almost done...</Trans>,
 ];
-const loadingMessagesInterval = 7;
-const timeBeforeShowingError = 60;
+const loadingMessagesInterval = 8;
+const timeBeforeShowingError = 80;
 
 const ProjectGeneratingDialog = ({
   generatingProjectId,
@@ -83,7 +90,7 @@ const ProjectGeneratingDialog = ({
           if (!generatedProject.fileUrl) {
             throw new Error('Generated project has no fileUrl');
           }
-          await onCreate(generatedProject.fileUrl, {
+          await onCreate(generatedProject, {
             projectName: generatedProject.projectName,
             storageProvider,
             saveAsLocation,
@@ -171,7 +178,7 @@ const ProjectGeneratingDialog = ({
           <Text size="sub-title" align="center">
             {hasProbablyTimedOut ? (
               <Trans>
-                This is taking longer than expected... Looks like we lost
+                This is taking longer than expected... We might have lost
                 contact with the AI.
               </Trans>
             ) : (
@@ -181,7 +188,9 @@ const ProjectGeneratingDialog = ({
           {hasProbablyTimedOut && (
             <>
               <Text size="sub-title" align="center">
-                <Trans>Try making your prompt more specific.</Trans>
+                <Trans>
+                  You can wait a bit more, or try refining your prompt.
+                </Trans>
               </Text>
               <RaisedButton
                 label={<Trans>Try again</Trans>}

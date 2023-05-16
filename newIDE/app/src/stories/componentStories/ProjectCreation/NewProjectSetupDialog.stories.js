@@ -22,6 +22,26 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
+export const OpenAndNotAuthenticated = () => {
+  return (
+    <NewProjectSetupDialog
+      authenticatedUser={fakeNotAuthenticatedUser}
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
+    />
+  );
+};
+
 export const OpenAndAuthenticated = () => {
   return (
     <NewProjectSetupDialog
@@ -42,7 +62,28 @@ export const OpenAndAuthenticated = () => {
   );
 };
 
-export const TooManyCloudProjects = () => {
+export const Opening = () => {
+  return (
+    <NewProjectSetupDialog
+      authenticatedUser={fakeSilverAuthenticatedUser}
+      isOpeningProject
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
+    />
+  );
+};
+
+export const LimitsReached = () => {
   return (
     <NewProjectSetupDialog
       authenticatedUser={
@@ -80,47 +121,6 @@ export const FromExample = () => {
       onCreateWithLogin={() => action('create with login')()}
       onCreateFromAIGeneration={() => action('create from AI generation')()}
       selectedExampleShortHeader={geometryMonsterExampleShortHeader}
-    />
-  );
-};
-
-export const OpenAndNotAuthenticated = () => {
-  return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeNotAuthenticatedUser}
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      selectedExampleShortHeader={null}
-    />
-  );
-};
-
-export const Opening = () => {
-  return (
-    <NewProjectSetupDialog
-      authenticatedUser={fakeSilverAuthenticatedUser}
-      isOpeningProject
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreateEmptyProject={() => action('create empty')()}
-      onCreateFromExample={() => action('create from example')()}
-      onCreateWithLogin={() => action('create with login')()}
-      onCreateFromAIGeneration={() => action('create from AI generation')()}
-      selectedExampleShortHeader={null}
     />
   );
 };

@@ -89,7 +89,9 @@ namespace gdjs {
       this._boxMesh = boxMesh;
       this._cube3DRuntimeObject = runtimeObject;
 
-      this.updateTextureUvMapping();
+      this.updateSize();
+      this.updatePosition();
+      this.updateRotation();
     }
 
     updateFace(faceIndex: integer) {
@@ -103,6 +105,11 @@ namespace gdjs {
       if (this._cube3DRuntimeObject.isFaceAtIndexVisible(faceIndex)) {
         this.updateTextureUvMapping(faceIndex);
       }
+    }
+
+    updateSize(): void {
+      super.updateSize();
+      this.updateTextureUvMapping();
     }
 
     /**

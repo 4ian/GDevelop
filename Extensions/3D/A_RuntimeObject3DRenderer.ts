@@ -12,10 +12,6 @@ namespace gdjs {
       this._threeObject3D = threeObject3D;
       this._threeObject3D.rotation.order = 'ZYX';
 
-      this.updateSize();
-      this.updatePosition();
-      this.updateRotation();
-
       instanceContainer
         .getLayer('')
         .getRenderer()

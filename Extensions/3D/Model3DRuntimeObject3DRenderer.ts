@@ -26,6 +26,10 @@ namespace gdjs {
 
       this._model3DRuntimeObject = runtimeObject;
       this._threeObject = modelObject3D;
+
+      this.updateSize();
+      this.updatePosition();
+      this.updateRotation();
     }
 
     _updateDefaultTransformation(

@@ -214,7 +214,7 @@ const Cube3DEditor = ({
             key="Basic"
           />
           <SelectOption
-            label={t`Lighting effect`}
+            label={t`React to lights`}
             value="StandardWithoutMetalness"
             key="StandardWithoutMetalness"
           />

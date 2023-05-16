@@ -1,10 +1,11 @@
 // @flow
+import * as React from 'react';
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
 import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
-import * as React from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 
 const createField = (
   name: string,
@@ -389,6 +390,92 @@ export const getMeasurementUnitShortLabel = (
       (showPower ? exponents[absPower] : '')
     );
   }).join(' · ');
+};
+
+export const reorganizeSchemaFor3DInstance = (
+  baseSchema: Schema,
+  customPropertiesSchema: Schema
+): Schema => {
+  // Remove Z order field that is not used in 3D.
+  const schema = cloneDeep(baseSchema);
+  const zOrderFieldIndex = schema.findIndex(
+    field =>
+      field.valueType &&
+      field.valueType === 'number' &&
+      field.name &&
+      field.name === 'Z Order'
+  );
+  if (zOrderFieldIndex) {
+    schema.splice(zOrderFieldIndex, 1);
+  }
+
+  // Add Z position to X and Y positions row
+  const positionRow = schema.find(
+    field =>
+      field.type === 'row' &&
+      field.children &&
+      field.name &&
+      field.name === 'Position'
+  );
+  if (positionRow && positionRow.children) {
+    const zField = customPropertiesSchema.splice(
+      customPropertiesSchema.findIndex(
+        field =>
+          field.name &&
+          field.name === 'Z' &&
+          field.valueType &&
+          field.valueType === 'number'
+      ),
+      1
+    )[0];
+    positionRow.children.push(zField);
+  }
+
+  // Add Depth to Width and Height row
+  const sizeRow = schema.find(
+    field =>
+      field.type === 'row' &&
+      field.children &&
+      field.name &&
+      field.name === 'custom-size-row'
+  );
+  if (sizeRow && sizeRow.children) {
+    const depthField = customPropertiesSchema.splice(
+      customPropertiesSchema.findIndex(
+        field =>
+          field.name &&
+          field.name === 'depth' &&
+          field.valueType &&
+          field.valueType === 'number'
+      ),
+      1
+    )[0];
+    sizeRow.children.push(depthField);
+  }
+
+  // Add rotations on X and Y to Angles row
+  const anglesPropertyRow = schema.find(
+    field =>
+      field.type === 'row' &&
+      field.children &&
+      field.name &&
+      field.name === 'Angles'
+  );
+  const rotationXAndYRow = customPropertiesSchema.splice(
+    customPropertiesSchema.findIndex(
+      field =>
+        field.type === 'row' &&
+        field.children &&
+        field.name &&
+        field.name === 'rotationX-rotationY'
+    ),
+    1
+  )[0];
+  // $FlowFixMe - Both rows have children
+  anglesPropertyRow.children.unshift(...rotationXAndYRow.children);
+
+  // Add the remaining custom properties that were not reorganized by this method.
+  return schema.concat(customPropertiesSchema);
 };
 
 export default propertiesMapToSchema;

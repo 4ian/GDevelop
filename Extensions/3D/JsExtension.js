@@ -194,13 +194,13 @@ module.exports = {
           .getOrCreate('rotationX')
           .setValue(instance.getRawDoubleProperty('rotationX').toString())
           .setType('number')
-          .setLabel(_('Rotation on X axis'));
+          .setLabel(_('Rotation X'));
 
         instanceProperties
           .getOrCreate('rotationY')
           .setValue(instance.getRawDoubleProperty('rotationY').toString())
           .setType('number')
-          .setLabel(_('Rotation on Y axis'));
+          .setLabel(_('Rotation Y'));
 
         instanceProperties
           .getOrCreate('depth')
@@ -920,13 +920,13 @@ module.exports = {
         .getOrCreate('rotationX')
         .setValue(instance.getRawDoubleProperty('rotationX').toString())
         .setType('number')
-        .setLabel(_('Rotation on X axis'));
+        .setLabel(_('Rotation X'));
 
       instanceProperties
         .getOrCreate('rotationY')
         .setValue(instance.getRawDoubleProperty('rotationY').toString())
         .setType('number')
-        .setLabel(_('Rotation on Y axis'));
+        .setLabel(_('Rotation Y'));
 
       instanceProperties
         .getOrCreate('depth')

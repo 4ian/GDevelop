@@ -10,7 +10,9 @@ import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import InstancesEditor from '../InstancesEditor';
-import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import InstancePropertiesEditor, {
+  type InstancePropertiesEditorInterface,
+} from '../InstancesEditor/InstancePropertiesEditor';
 import InstancesList from '../InstancesEditor/InstancesList';
 import LayersList, { type LayersListInterface } from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
@@ -179,7 +181,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _objectGroupsList: ?ObjectGroupsList;
   _objectsList: ?ObjectsListInterface;
   _layersList: ?LayersListInterface;
-  _propertiesEditor: ?InstancePropertiesEditor;
+  _propertiesEditor: ?InstancePropertiesEditorInterface;
   _instancesList: ?InstancesList;
 
   constructor(props: Props) {
@@ -577,7 +579,6 @@ export default class SceneEditor extends React.Component<Props, State> {
         selectedObjectsWithContext,
       },
       () => {
-        this.forceUpdatePropertiesEditor();
         this.updateToolbar();
       }
     );
@@ -1452,6 +1453,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _getInstanceSize = (initialInstance: gdInitialInstance) => {
+    if (!this.editor) return [0, 0];
+
+    return this.editor.getInstanceSize(initialInstance);
+  };
+
   render() {
     const {
       project,
@@ -1502,6 +1509,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onInstancesModified={instances =>
                   this.forceUpdateInstancesList()
                 }
+                onGetInstanceSize={this._getInstanceSize}
                 ref={propertiesEditor =>
                   (this._propertiesEditor = propertiesEditor)
                 }

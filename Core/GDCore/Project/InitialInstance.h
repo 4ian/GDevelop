@@ -193,7 +193,6 @@ class GD_CORE_API InitialInstance {
    * \see gd::Object
    */
   ///@{
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a map containing the properties names (as keys) and their
    * values.
@@ -213,7 +212,6 @@ class GD_CORE_API InitialInstance {
                             const gd::String& value,
                             gd::Project& project,
                             gd::Layout& layout);
-#endif
 
   /**
    * \brief Get the value of a double property stored in the instance.

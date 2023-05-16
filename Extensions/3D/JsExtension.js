@@ -970,7 +970,9 @@ module.exports = {
       )
       .setCategoryFullName(_('3D'))
       .addUnsupportedBaseObjectCapability('effect')
-      .setIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
+      .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
+      .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
+      .addIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
       .addIncludeFile('Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js');
 
     // Properties expressions/conditions/actions:
@@ -1668,7 +1670,7 @@ module.exports = {
         .setLabel(_('Elevation (in degrees)'))
         .setType('number')
         .setGroup(_('Orientation'))
-        .setDescription(_("Maximal elevation is reached at 90°."));
+        .setDescription(_('Maximal elevation is reached at 90°.'));
       properties
         .getOrCreate('rotation')
         .setValue('0')

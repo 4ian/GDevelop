@@ -8,11 +8,18 @@ namespace gdjs {
       ): gdjs.PixiFiltersTools.Filter {
         return new (class implements gdjs.PixiFiltersTools.Filter {
           light: THREE.DirectionalLight;
-          _isEnabled: boolean;
+          rotationObject: THREE.Group;
+          _isEnabled: boolean = false;
+          top: string = 'Y+';
+          elevation: float = 45;
+          rotation: float = 0;
 
           constructor() {
             this.light = new THREE.DirectionalLight();
-            this._isEnabled = false;
+            this.light.position.set(1, 0, 0);
+            this.rotationObject = new THREE.Group();
+            this.rotationObject.add(this.light);
+            this.updateRotation();
           }
 
           isEnabled(target: EffectsTarget): boolean {
@@ -36,8 +43,7 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.add(this.light);
-            scene.add(this.light.target);
+            scene.add(this.rotationObject);
             this._isEnabled = true;
             return true;
           }
@@ -49,8 +55,7 @@ namespace gdjs {
             if (!scene) {
               return false;
             }
-            scene.remove(this.light);
-            scene.remove(this.light.target);
+            scene.remove(this.rotationObject);
             this._isEnabled = false;
             return true;
           }
@@ -58,18 +63,12 @@ namespace gdjs {
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
               this.light.intensity = value;
-            } else if (parameterName === 'originX') {
-              this.light.position.x = value;
-            } else if (parameterName === 'originY') {
-              this.light.position.y = value;
-            } else if (parameterName === 'originZ') {
-              this.light.position.z = value;
-            } else if (parameterName === 'targetX') {
-              this.light.target.position.x = value;
-            } else if (parameterName === 'targetY') {
-              this.light.target.position.y = value;
-            } else if (parameterName === 'targetZ') {
-              this.light.target.position.z = value;
+            } else if (parameterName === 'elevation') {
+              this.elevation = value;
+              this.updateRotation();
+            } else if (parameterName === 'rotation') {
+              this.rotation = value;
+              this.updateRotation();
             }
           }
           updateStringParameter(parameterName: string, value: string): void {
@@ -78,8 +77,23 @@ namespace gdjs {
                 gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value)
               );
             }
+            if (parameterName === 'top') {
+              this.top = value;
+              this.updateRotation();
+            }
           }
           updateBooleanParameter(parameterName: string, value: boolean): void {}
+          updateRotation() {
+            if (this.top === 'Z+') {
+              // 0° is a light from the right of the screen.
+              this.rotationObject.rotation.z = gdjs.toRad(this.rotation);
+              this.rotationObject.rotation.y = -gdjs.toRad(this.elevation);
+            } else {
+              // 0° becomes a light from Z+.
+              this.rotationObject.rotation.y = gdjs.toRad(this.rotation) - 90;
+              this.rotationObject.rotation.z = -gdjs.toRad(this.elevation);
+            }
+          }
         })();
       }
     })()

@@ -1631,7 +1631,7 @@ module.exports = {
         .setType('color');
       properties
         .getOrCreate('intensity')
-        .setValue('1')
+        .setValue('0.75')
         .setLabel(_('Intensity'))
         .setType('number');
     }
@@ -1651,39 +1651,29 @@ module.exports = {
         .setType('color');
       properties
         .getOrCreate('intensity')
-        .setValue('1')
+        .setValue('0.5')
         .setLabel(_('Intensity'))
         .setType('number');
       properties
-        .getOrCreate('originX')
-        .setValue('0')
-        .setLabel(_('Origin on X axis'))
-        .setType('number');
+        .getOrCreate('top')
+        .setValue('Y+')
+        .setLabel(_('Top'))
+        .setType('choice')
+        .addExtraInfo('Y+')
+        .addExtraInfo('Z+')
+        .setGroup(_('Orientation'));
       properties
-        .getOrCreate('originY')
-        .setValue('0')
-        .setLabel(_('Origin on Y axis'))
-        .setType('number');
+        .getOrCreate('elevation')
+        .setValue('45')
+        .setLabel(_('Elevation (in degrees)'))
+        .setType('number')
+        .setGroup(_('Orientation'));
       properties
-        .getOrCreate('originZ')
-        .setValue('1')
-        .setLabel(_('Origin on Z axis'))
-        .setType('number');
-      properties
-        .getOrCreate('targetX')
+        .getOrCreate('rotation')
         .setValue('0')
-        .setLabel(_('Target on X axis'))
-        .setType('number');
-      properties
-        .getOrCreate('targetY')
-        .setValue('0')
-        .setLabel(_('Target on Y axis'))
-        .setType('number');
-      properties
-        .getOrCreate('targetZ')
-        .setValue('0')
-        .setLabel(_('Target on Z axis'))
-        .setType('number');
+        .setLabel(_('Rotation (in degrees)'))
+        .setType('number')
+        .setGroup(_('Orientation'));
     }
 
     return extension;

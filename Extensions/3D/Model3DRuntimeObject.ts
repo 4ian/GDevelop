@@ -8,10 +8,7 @@ namespace gdjs {
       rotationY: number;
       rotationZ: number;
       keepAspectRatio: boolean;
-      materialType:
-        | 'Basic'
-        | 'StandardWithoutMetalness'
-        | 'KeepOriginal';
+      materialType: 'Basic' | 'StandardWithoutMetalness' | 'KeepOriginal';
     };
   }
 

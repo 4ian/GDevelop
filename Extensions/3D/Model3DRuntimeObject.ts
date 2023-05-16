@@ -9,9 +9,9 @@ namespace gdjs {
       rotationZ: number;
       keepAspectRatio: boolean;
       materialType:
-        | 'NoLighting'
-        | 'EmitAllAmbientLight'
-        | 'KeepOriginalMaterial';
+        | 'Basic'
+        | 'StandardWithoutMetalness'
+        | 'KeepOriginal';
     };
   }
 
@@ -23,7 +23,7 @@ namespace gdjs {
 
     _modelResourceName: string;
     _materialType: gdjs.Model3DRuntimeObject.MaterialType =
-      gdjs.Model3DRuntimeObject.MaterialType.NoLighting;
+      gdjs.Model3DRuntimeObject.MaterialType.Basic;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -90,12 +90,12 @@ namespace gdjs {
     _convertMaterialType(
       materialTypeString: string
     ): gdjs.Model3DRuntimeObject.MaterialType {
-      if (materialTypeString === 'KeepOriginalMaterial') {
-        return gdjs.Model3DRuntimeObject.MaterialType.KeepOriginalMaterial;
-      } else if (materialTypeString === 'EmitAllAmbientLight') {
-        return gdjs.Model3DRuntimeObject.MaterialType.EmitAllAmbientLight;
+      if (materialTypeString === 'KeepOriginal') {
+        return gdjs.Model3DRuntimeObject.MaterialType.KeepOriginal;
+      } else if (materialTypeString === 'StandardWithoutMetalness') {
+        return gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness;
       } else {
-        return gdjs.Model3DRuntimeObject.MaterialType.NoLighting;
+        return gdjs.Model3DRuntimeObject.MaterialType.Basic;
       }
     }
 
@@ -110,9 +110,9 @@ namespace gdjs {
 
   export namespace Model3DRuntimeObject {
     export enum MaterialType {
-      NoLighting,
-      EmitAllAmbientLight,
-      KeepOriginalMaterial,
+      Basic,
+      StandardWithoutMetalness,
+      KeepOriginal,
     }
   }
   gdjs.registerObject('Scene3D::Model3DObject', gdjs.Model3DRuntimeObject);

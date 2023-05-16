@@ -141,9 +141,9 @@ module.exports = {
           .getOrCreate('materialType')
           .setValue(objectContent.materialType || 'Always lighted')
           .setType('choice')
-          .addExtraInfo('NoLighting')
-          .addExtraInfo('EmitAllAmbientLight')
-          .addExtraInfo('KeepOriginalMaterial')
+          .addExtraInfo('Basic')
+          .addExtraInfo('StandardWithoutMetalness')
+          .addExtraInfo('KeepOriginal')
           .setLabel(_('Material modifier'));
 
         return objectProperties;
@@ -158,7 +158,7 @@ module.exports = {
           rotationY: 0,
           rotationZ: 0,
           modelResourceName: '',
-          materialType: 'NoLighting',
+          materialType: 'Basic',
         })
       );
 
@@ -860,10 +860,10 @@ module.exports = {
 
       objectProperties
         .getOrCreate('materialType')
-        .setValue(objectContent.materialType || 'NoLighting')
+        .setValue(objectContent.materialType || 'Basic')
         .setType('choice')
-        .addExtraInfo('NoLighting')
-        .addExtraInfo('EmitAllAmbientLight')
+        .addExtraInfo('Basic')
+        .addExtraInfo('StandardWithoutMetalness')
         .setLabel(_('Material type'));
 
       return objectProperties;
@@ -894,7 +894,7 @@ module.exports = {
         rightFaceResourceRepeat: false,
         topFaceResourceRepeat: false,
         bottomFaceResourceRepeat: false,
-        materialType: 'NoLighting',
+        materialType: 'Basic',
       })
     );
 

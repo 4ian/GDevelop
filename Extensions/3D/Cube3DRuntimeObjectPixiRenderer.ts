@@ -61,7 +61,7 @@ namespace gdjs {
         useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
         hasNoLighting:
           runtimeObject._materialType ===
-          gdjs.Cube3DRuntimeObject.MaterialType.NoLighting,
+          gdjs.Cube3DRuntimeObject.MaterialType.Basic,
       });
   };
 

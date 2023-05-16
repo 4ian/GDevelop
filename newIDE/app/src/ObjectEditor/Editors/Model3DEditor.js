@@ -241,21 +241,21 @@ const Model3DEditor = ({
         >
           <SelectOption
             label={t`No lighting effect`}
-            value="NoLighting"
-            key="NoLighting"
+            value="Basic"
+            key="Basic"
           />
           <SelectOption
             label={t`Emit all ambient light`}
-            value="EmitAllAmbientLight"
-            key="EmitAllAmbientLight"
+            value="StandardWithoutMetalness"
+            key="StandardWithoutMetalness"
           />
           <SelectOption
             label={t`Keep model material`}
-            value="KeepOriginalMaterial"
-            key="KeepOriginalMaterial"
+            value="KeepOriginal"
+            key="KeepOriginal"
           />
         </SelectField>
-        {properties.get('materialType').getValue() !== 'NoLighting' &&
+        {properties.get('materialType').getValue() !== 'Basic' &&
           !hasLight(layout) && (
             <AlertMessage kind="error">
               <Trans>

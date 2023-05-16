@@ -137,7 +137,7 @@ namespace gdjs {
     _replaceMaterials() {
       if (
         this._model3DRuntimeObject._materialType ===
-        gdjs.Model3DRuntimeObject.MaterialType.EmitAllAmbientLight
+        gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness
       ) {
         this._threeObject.traverse((node) => {
           if (node.type === 'Mesh') {
@@ -152,7 +152,7 @@ namespace gdjs {
         });
       } else if (
         this._model3DRuntimeObject._materialType ===
-        gdjs.Model3DRuntimeObject.MaterialType.NoLighting
+        gdjs.Model3DRuntimeObject.MaterialType.Basic
       ) {
         this._threeObject.traverse((node) => {
           if (node.type === 'Mesh') {

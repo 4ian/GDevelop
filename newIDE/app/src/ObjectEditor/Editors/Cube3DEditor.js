@@ -210,16 +210,16 @@ const Cube3DEditor = ({
         >
           <SelectOption
             label={t`No lighting effect`}
-            value="NoLighting"
-            key="NoLighting"
+            value="Basic"
+            key="Basic"
           />
           <SelectOption
             label={t`Lighting effect`}
-            value="EmitAllAmbientLight"
-            key="EmitAllAmbientLight"
+            value="StandardWithoutMetalness"
+            key="StandardWithoutMetalness"
           />
         </SelectField>
-        {properties.get('materialType').getValue() !== 'NoLighting' &&
+        {properties.get('materialType').getValue() !== 'Basic' &&
           !hasLight(layout) && (
             <AlertMessage kind="error">
               <Trans>

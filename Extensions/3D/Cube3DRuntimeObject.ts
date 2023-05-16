@@ -24,7 +24,7 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
-      materialType: 'NoLighting' | 'EmitAllAmbientLight';
+      materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
 
@@ -58,7 +58,7 @@ namespace gdjs {
       string
     ];
     _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
-      gdjs.Cube3DRuntimeObject.MaterialType.NoLighting;
+      gdjs.Cube3DRuntimeObject.MaterialType.Basic;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -412,10 +412,10 @@ namespace gdjs {
     _convertMaterialType(
       materialTypeString: string
     ): gdjs.Cube3DRuntimeObject.MaterialType {
-      if (materialTypeString === 'EmitAllAmbientLight') {
-        return gdjs.Cube3DRuntimeObject.MaterialType.EmitAllAmbientLight;
+      if (materialTypeString === 'StandardWithoutMetalness') {
+        return gdjs.Cube3DRuntimeObject.MaterialType.StandardWithoutMetalness;
       } else {
-        return gdjs.Cube3DRuntimeObject.MaterialType.NoLighting;
+        return gdjs.Cube3DRuntimeObject.MaterialType.Basic;
       }
     }
 
@@ -427,8 +427,8 @@ namespace gdjs {
 
   export namespace Cube3DRuntimeObject {
     export enum MaterialType {
-      NoLighting,
-      EmitAllAmbientLight,
+      Basic,
+      StandardWithoutMetalness,
     }
   }
   gdjs.registerObject('Scene3D::Cube3DObject', gdjs.Cube3DRuntimeObject);

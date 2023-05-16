@@ -103,6 +103,23 @@ export const enumerateEffectsMetadata = (
                   getDescription,
                   getExtraDescription,
                 };
+              } else if (valueType === 'choice') {
+                const choices = property
+                  .getExtraInfo()
+                  .toJSArray()
+                  .map(value => ({ value, label: value }));
+                return {
+                  name: parameterName,
+                  valueType: 'string',
+                  getChoices: () => choices,
+                  getValue: (effect: gdEffect) =>
+                    effect.getStringParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: string) =>
+                    effect.setStringParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                  getExtraDescription,
+                };
               } else {
                 console.error(
                   `A property with type=${valueType} could not be mapped to a field for effect ${effectType}. Ensure that this type is correct.`

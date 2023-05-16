@@ -59,6 +59,9 @@ namespace gdjs {
       .getImageManager()
       .getThreeMaterial(runtimeObject.getFaceAtIndexResourceName(faceIndex), {
         useTransparentTexture: runtimeObject.shouldUseTransparentTexture(),
+        forceBasicMaterial:
+          runtimeObject._materialType ===
+          gdjs.Cube3DRuntimeObject.MaterialType.Basic,
       });
   };
 
@@ -71,7 +74,6 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       const geometry = new THREE.BoxGeometry(1, 1, 1);
-      // TODO (3D) - feature: investigate using MeshStandardMaterial to support lights.
       // TODO (3D) - feature: support color instead of texture?
       const materials = [
         getFaceMaterial(runtimeObject, materialIndexToFaceIndex[0]),
@@ -296,6 +298,12 @@ namespace gdjs {
         uvMapping.setXY(vertexIndex, x, y);
       }
       uvMapping.needsUpdate = true;
+    }
+
+    _updateMaterials() {
+      for (let index = 0; index < 6; index++) {
+        this.updateFace(index);
+      }
     }
   }
 

@@ -8,6 +8,7 @@ namespace gdjs {
       rotationY: number;
       rotationZ: number;
       keepAspectRatio: boolean;
+      materialType: 'Basic' | 'StandardWithoutMetalness' | 'KeepOriginal';
     };
   }
 
@@ -18,6 +19,8 @@ namespace gdjs {
     _renderer: gdjs.Model3DRuntimeObjectRenderer;
 
     _modelResourceName: string;
+    _materialType: gdjs.Model3DRuntimeObject.MaterialType =
+      gdjs.Model3DRuntimeObject.MaterialType.Basic;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -29,7 +32,7 @@ namespace gdjs {
         this,
         instanceContainer
       );
-      this._updateDefaultTransformation(objectData);
+      this._updateMaterialType(objectData);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -52,6 +55,12 @@ namespace gdjs {
       ) {
         this._updateDefaultTransformation(newObjectData);
       }
+      if (
+        oldObjectData.content.materialType !==
+        newObjectData.content.materialType
+      ) {
+        this._updateMaterialType(newObjectData);
+      }
       return true;
     }
 
@@ -73,6 +82,34 @@ namespace gdjs {
 
     getRenderer(): RuntimeObject3DRenderer {
       return this._renderer;
+    }
+
+    _convertMaterialType(
+      materialTypeString: string
+    ): gdjs.Model3DRuntimeObject.MaterialType {
+      if (materialTypeString === 'KeepOriginal') {
+        return gdjs.Model3DRuntimeObject.MaterialType.KeepOriginal;
+      } else if (materialTypeString === 'StandardWithoutMetalness') {
+        return gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness;
+      } else {
+        return gdjs.Model3DRuntimeObject.MaterialType.Basic;
+      }
+    }
+
+    _updateMaterialType(objectData: Model3DObjectData) {
+      this._materialType = this._convertMaterialType(
+        objectData.content.materialType
+      );
+      this._renderer._updateMaterials();
+      this._updateDefaultTransformation(objectData);
+    }
+  }
+
+  export namespace Model3DRuntimeObject {
+    export enum MaterialType {
+      Basic,
+      StandardWithoutMetalness,
+      KeepOriginal,
     }
   }
   gdjs.registerObject('Scene3D::Model3DObject', gdjs.Model3DRuntimeObject);

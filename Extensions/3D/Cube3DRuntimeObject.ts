@@ -24,6 +24,7 @@ namespace gdjs {
       rightFaceVisible: boolean;
       topFaceVisible: boolean;
       bottomFaceVisible: boolean;
+      materialType: 'Basic' | 'StandardWithoutMetalness';
     };
   }
 
@@ -56,6 +57,8 @@ namespace gdjs {
       string,
       string
     ];
+    _materialType: gdjs.Cube3DRuntimeObject.MaterialType =
+      gdjs.Cube3DRuntimeObject.MaterialType.Basic;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -102,6 +105,9 @@ namespace gdjs {
         objectData.content.topFaceResourceName,
         objectData.content.bottomFaceResourceName,
       ];
+      this._materialType = this._convertMaterialType(
+        objectData.content.materialType
+      );
 
       this._renderer = new gdjs.Cube3DRuntimeObjectRenderer(
         this,
@@ -386,6 +392,12 @@ namespace gdjs {
       ) {
         this.setFacesOrientation(newObjectData.content.facesOrientation);
       }
+      if (
+        oldObjectData.content.materialType !==
+        newObjectData.content.materialType
+      ) {
+        this.setMaterialType(newObjectData.content.materialType);
+      }
 
       return true;
     }
@@ -395,6 +407,33 @@ namespace gdjs {
      */
     shouldUseTransparentTexture(): boolean {
       return this._shouldUseTransparentTexture;
+    }
+
+    _convertMaterialType(
+      materialTypeString: string
+    ): gdjs.Cube3DRuntimeObject.MaterialType {
+      if (materialTypeString === 'StandardWithoutMetalness') {
+        return gdjs.Cube3DRuntimeObject.MaterialType.StandardWithoutMetalness;
+      } else {
+        return gdjs.Cube3DRuntimeObject.MaterialType.Basic;
+      }
+    }
+
+    setMaterialType(materialTypeString: string) {
+      const newMaterialType = this._convertMaterialType(materialTypeString);
+      if (this._materialType === newMaterialType) {
+        return;
+      }
+
+      this._materialType = newMaterialType;
+      this._renderer._updateMaterials();
+    }
+  }
+
+  export namespace Cube3DRuntimeObject {
+    export enum MaterialType {
+      Basic,
+      StandardWithoutMetalness,
     }
   }
   gdjs.registerObject('Scene3D::Cube3DObject', gdjs.Cube3DRuntimeObject);

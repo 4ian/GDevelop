@@ -1,10 +1,11 @@
 // @flow
 
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { type EditorProps } from './EditorProps.flow';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
-import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
@@ -18,6 +19,8 @@ import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import MeasurementUnitDocumentation from '../../PropertiesEditor/MeasurementUnitDocumentation';
 import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
+import AlertMessage from '../../UI/AlertMessage';
+import { hasLight } from './Model3DEditor';
 
 const facesProperties = [
   {
@@ -67,6 +70,7 @@ const facesProperties = [
 const Cube3DEditor = ({
   objectConfiguration,
   project,
+  layout,
   resourceManagementProps,
 }: EditorProps) => {
   const forceUpdate = useForceUpdate();
@@ -196,6 +200,34 @@ const Cube3DEditor = ({
             />
           ))}
         </SelectField>
+        <SelectField
+          value={properties.get('materialType').getValue()}
+          floatingLabelText={properties.get('materialType').getLabel()}
+          helperMarkdownText={properties.get('materialType').getDescription()}
+          onChange={(event, index, newValue) => {
+            onChangeProperty('materialType', newValue);
+          }}
+        >
+          <SelectOption
+            label={t`No lighting effect`}
+            value="Basic"
+            key="Basic"
+          />
+          <SelectOption
+            label={t`React to lights`}
+            value="StandardWithoutMetalness"
+            key="StandardWithoutMetalness"
+          />
+        </SelectField>
+        {properties.get('materialType').getValue() !== 'Basic' &&
+          !hasLight(layout) && (
+            <AlertMessage kind="error">
+              <Trans>
+                Make sure to set up a light in the effects of the layer or chose
+                "No lighting effect" - otherwise the object will appear black.
+              </Trans>
+            </AlertMessage>
+          )}
       </ColumnStackLayout>
       {facesProperties.map(faceProperty => (
         <React.Fragment key={faceProperty.id}>

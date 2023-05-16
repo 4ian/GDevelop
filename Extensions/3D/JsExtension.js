@@ -57,7 +57,10 @@ module.exports = {
           objectContent[propertyName] = parseFloat(newValue);
           return true;
         }
-        if (propertyName === 'modelResourceName') {
+        if (
+          propertyName === 'modelResourceName' ||
+          propertyName === 'materialType'
+        ) {
           objectContent[propertyName] = newValue;
           return true;
         }
@@ -134,6 +137,15 @@ module.exports = {
           .addExtraInfo('model3D')
           .setLabel(_('3D model'));
 
+        objectProperties
+          .getOrCreate('materialType')
+          .setValue(objectContent.materialType || 'Basic')
+          .setType('choice')
+          .addExtraInfo('Basic')
+          .addExtraInfo('StandardWithoutMetalness')
+          .addExtraInfo('KeepOriginal')
+          .setLabel(_('Material modifier'));
+
         return objectProperties;
       };
       Model3DObject.setRawJSONContent(
@@ -146,6 +158,7 @@ module.exports = {
           rotationY: 0,
           rotationZ: 0,
           modelResourceName: '',
+          materialType: 'Basic',
         })
       );
 
@@ -619,7 +632,8 @@ module.exports = {
         propertyName === 'topFaceResourceName' ||
         propertyName === 'bottomFaceResourceName' ||
         propertyName === 'backFaceUpThroughWhichAxisRotation' ||
-        propertyName === 'facesOrientation'
+        propertyName === 'facesOrientation' ||
+        propertyName === 'materialType'
       ) {
         objectContent[propertyName] = newValue;
         return true;
@@ -844,6 +858,14 @@ module.exports = {
         .setLabel(_('Show bottom face'))
         .setGroup(_('Face visibility'));
 
+      objectProperties
+        .getOrCreate('materialType')
+        .setValue(objectContent.materialType || 'Basic')
+        .setType('choice')
+        .addExtraInfo('Basic')
+        .addExtraInfo('StandardWithoutMetalness')
+        .setLabel(_('Material type'));
+
       return objectProperties;
     };
     Cube3DObject.setRawJSONContent(
@@ -872,6 +894,7 @@ module.exports = {
         rightFaceResourceRepeat: false,
         topFaceResourceRepeat: false,
         bottomFaceResourceRepeat: false,
+        materialType: 'Basic',
       })
     );
 
@@ -1590,6 +1613,69 @@ module.exports = {
         .setLabel(_('Density'))
         .setType('number');
     }
+    {
+      const effect = extension
+        .addEffect('AmbientLight')
+        .setFullName(_('Ambient light'))
+        .setDescription(
+          _('A light that illuminates all objects from every direction.')
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/AmbientLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Light color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.75')
+        .setLabel(_('Intensity'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('DirectionalLight')
+        .setFullName(_('Directional light'))
+        .setDescription(_('A very far light source like the sun.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/DirectionalLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel(_('Light color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.5')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('top')
+        .setValue('Y+')
+        .setLabel(_('3D world top'))
+        .setType('choice')
+        .addExtraInfo('Y-')
+        .addExtraInfo('Z+')
+        .setGroup(_('Orientation'));
+      properties
+        .getOrCreate('elevation')
+        .setValue('45')
+        .setLabel(_('Elevation (in degrees)'))
+        .setType('number')
+        .setGroup(_('Orientation'))
+        .setDescription(_("Maximal elevation is reached at 90°."));
+      properties
+        .getOrCreate('rotation')
+        .setValue('0')
+        .setLabel(_('Rotation (in degrees)'))
+        .setType('number')
+        .setGroup(_('Orientation'));
+    }
 
     return extension;
   },
@@ -1616,14 +1702,7 @@ module.exports = {
    */
   registerEditorConfigurations: function (
     objectsEditorService /*: ObjectsEditorService */
-  ) {
-    objectsEditorService.registerEditorConfiguration(
-      'Scene3D::Model3DObject',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/3d-model',
-      })
-    );
-  },
+  ) {},
   /**
    * Register renderers for instance of objects on the scene editor.
    *

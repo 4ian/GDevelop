@@ -997,7 +997,6 @@ const MainFrame = (props: Props) => {
   } = useCreateProject({
     beforeCreatingProject: () => {
       setIsProjectOpening(true);
-      setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     getStorageProviderOperations,
     afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
@@ -1009,6 +1008,7 @@ const MainFrame = (props: Props) => {
         currentProject: project,
         editorTabs: editorTabs,
       });
+      setIsProjectClosedSoAvoidReloadingExtensions(false);
     },
     onError: () => {
       setIsProjectClosedSoAvoidReloadingExtensions(true);

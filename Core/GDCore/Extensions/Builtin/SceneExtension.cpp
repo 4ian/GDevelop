@@ -55,6 +55,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition("IsSceneExist",
+                    _("Is the scene exist"),
+                    _("Check if the scene exist."),
+                    _("Is the scene exist"),
+                    "",
+                    "res/actions/texte.png",
+                    "res/actions/texte.png")
+      .SetHelpPath("/interface/scene-editor/events")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("sceneName", _("Name of the scene to check"))
+      .MarkAsSimple();
+
+  extension
       .AddAction("Scene",
                  _("Change the scene"),
                  _("Stop this scene and start the specified one instead."),

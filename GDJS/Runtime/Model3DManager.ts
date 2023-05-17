@@ -16,7 +16,7 @@ namespace gdjs {
     /**
      * Map associating a resource name to the loaded Three.js model.
      */
-    private _loadedThreeModels = new Map<String, THREE.Object3D>();
+    private _loadedThreeModels = new Map<String, THREE_ADDONS.GLTF>();
 
     _resourcesLoader: RuntimeGameResourcesLoader;
     _resources: ResourceData[];
@@ -24,7 +24,8 @@ namespace gdjs {
     _loader: THREE_ADDONS.GLTFLoader | null = null;
     _dracoLoader: THREE_ADDONS.DRACOLoader | null = null;
 
-    _invalidModel: THREE.Object3D | null = null;
+    //@ts-ignore Can only be null if THREE is not loaded.
+    _invalidModel: THREE_ADDONS.GLTF;
 
     /**
      * @param resources The resources data of the game.
@@ -48,9 +49,21 @@ namespace gdjs {
          * The invalid model is a box with magenta (#ff00ff) faces, to be
          * easily spotted if rendered on screen.
          */
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({ color: '#ff00ff' });
-        this._invalidModel = new THREE.Mesh(geometry, material);
+        const group = new THREE.Group();
+        group.add(new THREE.Mesh(
+			    new THREE.BoxGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({ color: '#ff00ff' })
+        ));
+        this._invalidModel = {
+          scene: group,
+          animations: [],
+          cameras: [],
+          scenes: [],
+          asset: {},
+          userData: {},
+          //@ts-ignore
+          parser: null,
+        };
       }
     }
 
@@ -108,7 +121,7 @@ namespace gdjs {
               }
             });
             gltf.scene.rotation.order = 'ZYX';
-            this._loadedThreeModels.set(resource.name, gltf.scene);
+            this._loadedThreeModels.set(resource.name, gltf);
 
             loaded++;
             if (loaded === model3DResources.length) {
@@ -140,7 +153,7 @@ namespace gdjs {
      * @param resourceName The name of the json resource.
      * @returns a 3D model if it exists.
      */
-    getModel(resourceName: string): THREE.Object3D | null {
+    getModel(resourceName: string): THREE_ADDONS.GLTF {
       return this._loadedThreeModels.get(resourceName) || this._invalidModel;
     }
   }

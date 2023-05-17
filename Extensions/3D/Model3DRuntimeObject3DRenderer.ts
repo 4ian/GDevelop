@@ -67,31 +67,46 @@ namespace gdjs {
      * The 3D model stretched in a 1x1x1 cube.
      */
     private _threeObject: THREE.Object3D;
+    private _originalModel: THREE_ADDONS.GLTF;
+    private _animationMixer: THREE.AnimationMixer;
+    private _action: THREE.AnimationAction;
 
     constructor(
       runtimeObject: gdjs.Model3DRuntimeObject,
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
-      // @ts-ignore It can't be null if THREE exists.
-      const originalModelMesh: THREE.Object3D = instanceContainer
+      const originalModel = instanceContainer
         .getGame()
         .getModel3DManager()
         .getModel(runtimeObject._modelResourceName);
-      const modelObject3D = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
+      const model = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
 
       // Create a group to transform the object according to
       // position, angle and dimensions.
       const group = new THREE.Group();
       group.rotation.order = 'ZYX';
-      group.add(modelObject3D);
+      group.add(model);
       super(runtimeObject, instanceContainer, group);
 
       this._model3DRuntimeObject = runtimeObject;
-      this._threeObject = modelObject3D;
+      this._threeObject = model;
+      this._originalModel = originalModel;
 
       this.updateSize();
       this.updatePosition();
       this.updateRotation();
+
+      this._animationMixer = new THREE.AnimationMixer(model);
+      const clip = THREE.AnimationClip.findByName(
+        this._originalModel.animations,
+        'Anim_0'
+      );
+      this._action = this._animationMixer.clipAction(clip);
+      this._action.play();
+    }
+
+    updateAnimation(timeDelta: float) {
+      this._animationMixer.update(timeDelta);
     }
 
     _updateDefaultTransformation(
@@ -158,13 +173,7 @@ namespace gdjs {
     ) {
       // The original model is used because `setFromObject` is working in
       // world transformation.
-
-      // @ts-ignore It can't be null if THREE exists.
-      const originalModelMesh: THREE.Object3D = this._object
-        .getInstanceContainer()
-        .getGame()
-        .getModel3DManager()
-        .getModel(this._model3DRuntimeObject._modelResourceName);
+      const originalModelMesh = this._originalModel.scene;
 
       originalModelMesh.rotation.set(
         gdjs.toRad(rotationX),
@@ -181,18 +190,20 @@ namespace gdjs {
     }
 
     _updateMaterials() {
-      // @ts-ignore It can't be null if THREE exists.
-      const originalModelMesh: THREE.Object3D = this._model3DRuntimeObject
-        .getInstanceContainer()
-        .getGame()
-        .getModel3DManager()
-        .getModel(this._model3DRuntimeObject._modelResourceName);
+      const originalModelMesh = this._originalModel.scene;
       const modelObject3D = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
-
+      
       this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(modelObject3D);
-
+      
       this._threeObject = modelObject3D;
+      this._animationMixer = new THREE.AnimationMixer(modelObject3D);
+      const clip = THREE.AnimationClip.findByName(
+        this._originalModel.animations,
+        'Anim_0'
+      );
+      this._action = this._animationMixer.clipAction(clip);
+      this._action.play();
 
       this._replaceMaterials();
     }

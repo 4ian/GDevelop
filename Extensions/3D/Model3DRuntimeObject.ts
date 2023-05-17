@@ -103,6 +103,11 @@ namespace gdjs {
       this._renderer._updateMaterials();
       this._updateDefaultTransformation(objectData);
     }
+
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+      const elapsedTime = this.getElapsedTime() / 1000;
+      this._renderer.updateAnimation(elapsedTime);
+    }
   }
 
   export namespace Model3DRuntimeObject {

@@ -38,7 +38,7 @@ void CommentEvent::SerializeTo(SerializerElement &element) const {
       .SetAttribute("textB", textB);
 
   element.AddChild("comment").SetValue(com1);
-  element.AddChild("comment2").SetValue(com2);
+  if (!com2.empty()) element.AddChild("comment2").SetValue(com2);
 }
 
 void CommentEvent::UnserializeFrom(gd::Project &project,
@@ -53,7 +53,9 @@ void CommentEvent::UnserializeFrom(gd::Project &project,
   textB = colorElement.GetIntAttribute("textB");
 
   com1 = element.GetChild("comment", 0, "Com1").GetValue().GetString();
-  com2 = element.GetChild("comment2", 0, "Com2").GetValue().GetString();
+  if (element.HasChild("comment2")) {
+    com2 = element.GetChild("comment2", 0, "Com2").GetValue().GetString();
+  }
 }
 
 }  // namespace gd

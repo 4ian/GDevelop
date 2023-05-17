@@ -78,7 +78,28 @@ namespace gdjs {
           runtimeInstanceContainerRenderer
         );
       } else {
-        this._setup3dRendering(pixiRenderer, runtimeInstanceContainerRenderer);
+        this._setup3DRendering(pixiRenderer, runtimeInstanceContainerRenderer);
+      }
+    }
+
+    onCreated() {
+      // The layer is now fully initialized. Adapt the 3D camera position
+      // (which we could not do before in `_setup3DRendering`).
+      this._update3DCameraAspectAndPosition();
+    }
+
+    onGameResolutionResized() {
+      // Ensure the 3D camera aspect is updated:
+      this._update3DCameraAspectAndPosition();
+    }
+
+    private _update3DCameraAspectAndPosition() {
+      if (this._threeCamera) {
+        this._threeCamera.aspect =
+          this._layer.getWidth() / this._layer.getHeight();
+        this._threeCamera.updateProjectionMatrix();
+
+        this.updatePosition();
       }
     }
 
@@ -105,7 +126,7 @@ namespace gdjs {
     /**
      * Create, or re-create, Three.js objects for 3D rendering of this layer.
      */
-    private _setup3dRendering(
+    private _setup3DRendering(
       pixiRenderer: PIXI.Renderer | null,
       runtimeInstanceContainerRenderer: gdjs.RuntimeInstanceContainerRenderer
     ): void {
@@ -200,9 +221,11 @@ namespace gdjs {
             );
             this._threeScene.add(this._threePlaneMesh);
           }
-        }
 
-        this.onGameResolutionResized();
+          // Note: we can not update the position of the camera at this point,
+          // because the layer might not be fully constructed.
+          // See `onCreated`.
+        }
       } else {
         // This is a layer of a custom object.
 
@@ -228,16 +251,6 @@ namespace gdjs {
       if (!this._threePlaneMesh) return;
       if (this._threePlaneMesh.visible === enable) return;
       this._threePlaneMesh.visible = enable;
-    }
-
-    onGameResolutionResized() {
-      if (this._threeCamera) {
-        this._threeCamera.aspect =
-          this._layer.getWidth() / this._layer.getHeight();
-        this._threeCamera.updateProjectionMatrix();
-
-        this.updatePosition();
-      }
     }
 
     /**

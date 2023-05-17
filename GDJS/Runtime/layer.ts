@@ -30,6 +30,9 @@ namespace gdjs {
 
       this._cameraX = this.getWidth() / 2;
       this._cameraY = this.getHeight() / 2;
+
+      // Let the renderer do its final set up:
+      this._renderer.onCreated();
     }
 
     /**

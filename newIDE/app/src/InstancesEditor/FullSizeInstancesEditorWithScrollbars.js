@@ -11,6 +11,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { useDebounce } from '../Utils/UseDebounce';
 import Rectangle from '../Utils/Rectangle';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { useIsMounted } from '../Utils/UseIsMounted';
 
 const SCROLLBAR_DETECTION_WIDTH = 50;
 // Those scrollbar dimensions should be the same as in the CSS file Scrollbar.css
@@ -35,6 +36,7 @@ const noop = () => {};
 const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   const { wrappedEditorRef, ...otherProps } = props;
   const { values } = React.useContext(PreferencesContext);
+  const isMounted = useIsMounted();
 
   const editorRef = React.useRef<?InstancesEditor>(null);
   const xScrollbarTrack = React.useRef<?HTMLDivElement>(null);
@@ -75,11 +77,12 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         clearTimeout(timeoutHidingScrollbarsId.current);
       }
       timeoutHidingScrollbarsId.current = setTimeout(() => {
+        if (!isMounted.current) return;
         showScrollbars.current = false;
         forceUpdate();
       }, 1500);
     },
-    [forceUpdate]
+    [forceUpdate, isMounted]
   );
 
   const hideScrollbarsAfterDelayDebounced = useDebounce(() => {
@@ -277,6 +280,16 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
         'mousedown',
         mouseDownYThumbHandler
       );
+      return () => {
+        xScrollbarThumbElement.removeEventListener(
+          'mousedown',
+          mouseDownXThumbHandler
+        );
+        yScrollbarThumbElement.removeEventListener(
+          'mousedown',
+          mouseDownYThumbHandler
+        );
+      };
     },
     [mouseDownXThumbHandler, mouseDownYThumbHandler]
   );

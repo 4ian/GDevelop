@@ -311,10 +311,9 @@ namespace gdjs {
       };
 
       /**
-       * Check if a scene exists
+       * Check if a scene exists.
        */
-
-      export const doesSceneExist= (
+      export const doesSceneExist = (
         runtimeScene: gdjs.RuntimeScene,
         sceneName: string
       ): boolean => {

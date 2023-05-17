@@ -18,6 +18,9 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       super(layerData, instanceContainer);
+
+      // Let the renderer do its final set up:
+      this._renderer.onCreated();
     }
 
     onGameResolutionResized(

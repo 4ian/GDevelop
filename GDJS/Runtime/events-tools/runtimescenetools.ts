@@ -311,14 +311,14 @@ namespace gdjs {
       };
 
       /**
-       * Check if a scene exist
+       * Check if a scene exists
        */
 
-      export const isSceneExist = (
+      export const doesSceneExist= (
         runtimeScene: gdjs.RuntimeScene,
         sceneName: string
       ): boolean => {
-        return runtimeScene.getGame().hasScene(sceneName) ? true : false;
+        return runtimeScene.getGame().hasScene(sceneName);
       };
     }
   }

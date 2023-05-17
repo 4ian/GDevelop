@@ -55,10 +55,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("IsSceneExist",
-                    _("Is the scene exist"),
-                    _("Check if the scene exist."),
-                    _("Check if the _PARAM1_ scene exist"),
+      .AddCondition("DoesSceneExist",
+                    _("Does scene exist"),
+                    _("Check if scene exists."),
+                    _("Scene _PARAM1_ exists"),
                     "",
                     "res/actions/texte.png",
                     "res/actions/texte.png")

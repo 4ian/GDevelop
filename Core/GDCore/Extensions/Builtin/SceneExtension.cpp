@@ -58,7 +58,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCondition("IsSceneExist",
                     _("Is the scene exist"),
                     _("Check if the scene exist."),
-                    _("Is the scene exist"),
+                    _("Check if the _PARAM1_ scene exist"),
                     "",
                     "res/actions/texte.png",
                     "res/actions/texte.png")

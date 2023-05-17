@@ -208,23 +208,35 @@ const Model3DEditor = ({
         <Trans>Default orientation</Trans>
       </Text>
       <ResponsiveLineStackLayout expand noColumnMargin>
-        {['rotationX', 'rotationY', 'rotationZ'].map(propertyName => (
-          <PropertyField
-            objectConfiguration={objectConfiguration}
-            propertyName={propertyName}
-          />
-        ))}
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="rotationX"
+        />
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="rotationY"
+        />
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="rotationZ"
+        />
       </ResponsiveLineStackLayout>
       <Text size="block-title" noMargin>
         <Trans>Default size</Trans>
       </Text>
       <ResponsiveLineStackLayout expand noColumnMargin>
-        {['width', 'height', 'depth'].map(propertyName => (
-          <PropertyField
-            objectConfiguration={objectConfiguration}
-            propertyName={propertyName}
-          />
-        ))}
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="width"
+        />
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="height"
+        />
+        <PropertyField
+          objectConfiguration={objectConfiguration}
+          propertyName="depth"
+        />
       </ResponsiveLineStackLayout>
       <ColumnStackLayout noMargin expand>
         <PropertyCheckbox

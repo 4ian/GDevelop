@@ -214,7 +214,6 @@ const InstancePropertiesEditor = ({
       );
       return {
         object,
-        instance,
         instanceSchema: is3DInstance
           ? reorganizeSchemaFor3DInstance(
               schema,

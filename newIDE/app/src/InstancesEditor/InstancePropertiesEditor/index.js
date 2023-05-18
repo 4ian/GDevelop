@@ -284,7 +284,6 @@ const InstancePropertiesEditorContainer = React.forwardRef<
   Props,
   InstancePropertiesEditorInterface
 >((props, ref) => {
-  const editorRef = React.useRef<?InstancePropertiesEditorInterface>(null);
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({
     forceUpdate,
@@ -299,7 +298,7 @@ const InstancePropertiesEditorContainer = React.forwardRef<
           </Trans>
         </EmptyMessage>
       ) : (
-        <InstancePropertiesEditor {...props} ref={editorRef} />
+        <InstancePropertiesEditor {...props} />
       )}
     </Background>
   );

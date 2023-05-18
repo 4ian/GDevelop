@@ -195,29 +195,38 @@ const InstancePropertiesEditor = ({
   );
 
   const instance = instances[0];
-  const associatedObjectName = instance.getObjectName();
-  const object = getObjectByName(project, layout, associatedObjectName);
-  // TODO: multiple instances support
-  const properties = instance.getCustomProperties(project, layout);
-  // TODO: Reorganize fields if any of the selected instances is 3D.
-  const is3DInstance = properties.has('z');
-  const instanceSchemaForCustomProperties = propertiesMapToSchema(
-    properties,
-    (instance: gdInitialInstance) =>
-      instance.getCustomProperties(project, layout),
-    (instance: gdInitialInstance, name, value) =>
-      instance.updateCustomProperty(name, value, project, layout)
+
+  const { object, instanceSchema } = React.useMemo(
+    () => {
+      if (!instance) return {};
+      const associatedObjectName = instance.getObjectName();
+      const object = getObjectByName(project, layout, associatedObjectName);
+      // TODO: multiple instances support
+      const properties = instance.getCustomProperties(project, layout);
+      // TODO: Reorganize fields if any of the selected instances is 3D.
+      const is3DInstance = properties.has('z');
+      const instanceSchemaForCustomProperties = propertiesMapToSchema(
+        properties,
+        (instance: gdInitialInstance) =>
+          instance.getCustomProperties(project, layout),
+        (instance: gdInitialInstance, name, value) =>
+          instance.updateCustomProperty(name, value, project, layout)
+      );
+      return {
+        object,
+        instance,
+        instanceSchema: is3DInstance
+          ? reorganizeSchemaFor3DInstance(
+              schema,
+              instanceSchemaForCustomProperties
+            )
+          : schema.concat(instanceSchemaForCustomProperties),
+      };
+    },
+    [project, layout, instance, schema]
   );
-  let instanceSchema = React.useMemo(
-    () =>
-      is3DInstance
-        ? reorganizeSchemaFor3DInstance(
-            schema,
-            instanceSchemaForCustomProperties
-          )
-        : schema.concat(instanceSchemaForCustomProperties),
-    [is3DInstance, instanceSchemaForCustomProperties, schema]
-  );
+
+  if (!object || !instance || !instanceSchema) return null;
 
   return (
     <ScrollView

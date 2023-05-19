@@ -374,6 +374,7 @@ namespace gdjs {
       const distance = (worldZ - camera.position.z) / vector.z;
       vector.multiplyScalar(distance);
 
+      // The plane z == worldZ may not be visible on the camera.
       if (!Number.isFinite(vector.x) || !Number.isFinite(vector.y)) {
         result[0] = 0;
         result[1] = 0;

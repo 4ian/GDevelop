@@ -353,7 +353,7 @@ namespace gdjs {
       );
     }
 
-    transformToWorld(
+    transformTo3DWorld(
       screenX: float,
       screenY: float,
       worldZ: float,

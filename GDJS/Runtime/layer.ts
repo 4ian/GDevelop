@@ -223,6 +223,8 @@ namespace gdjs {
      * Convert a point from the canvas coordinates (for example,
      * the mouse position) to the container coordinates.
      *
+     * This method handles 3D rotations.
+     *
      * @param x The x position, in canvas coordinates.
      * @param y The y position, in canvas coordinates.
      * @param cameraId The camera number. Currently ignored.
@@ -238,6 +240,11 @@ namespace gdjs {
 
       // The result parameter used to be optional.
       let position = result || [0, 0];
+
+      if (this._renderer.isCameraRotatedIn3D()) {
+        return this._renderer.transformTo3DWorld(x, y, 0, cameraId, result);
+      }
+
       x -= this.getRuntimeScene()._cachedGameResolutionWidth / 2;
       y -= this.getRuntimeScene()._cachedGameResolutionHeight / 2;
       x /= Math.abs(this._zoomFactor);
@@ -260,6 +267,8 @@ namespace gdjs {
      * in layer local coordinates (as opposed to the parent coordinates).
      *
      * All transformations (scale, rotation) are supported.
+     *
+     * This method doesn't handle 3D rotations.
      *
      * @param x The X position of the point, in parent coordinates.
      * @param y The Y position of the point, in parent coordinates.
@@ -294,6 +303,8 @@ namespace gdjs {
     /**
      * Convert a point from the container coordinates (for example,
      * an object position) to the canvas coordinates.
+     *
+     * This method doesn't handle 3D rotations.
      *
      * @param x The x position, in container coordinates.
      * @param y The y position, in container coordinates.
@@ -332,6 +343,8 @@ namespace gdjs {
      * in parent coordinate coordinates (as opposed to the layer local coordinates).
      *
      * All transformations (scale, rotation) are supported.
+     *
+     * This method doesn't handle 3D rotations.
      *
      * @param x The X position of the point, in layer coordinates.
      * @param y The Y position of the point, in layer coordinates.

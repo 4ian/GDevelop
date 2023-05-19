@@ -51,6 +51,8 @@ namespace gdjs {
      */
     private static readonly zeroZOrderForPixi = Math.pow(2, -24);
 
+    private static vectorForProjections: THREE.Vector3 | null = null;
+
     /**
      * @param layer The layer
      * @param runtimeInstanceContainerRenderer The scene renderer
@@ -341,6 +343,46 @@ namespace gdjs {
           this._threePlaneMesh.rotation.z = -angle;
         }
       }
+    }
+
+    transformToWorld(
+      screenX: float,
+      screenY: float,
+      worldZ: float,
+      cameraId: integer,
+      result: FloatPoint
+    ) {
+      const camera = this._threeCamera;
+      if (!camera) {
+        result[0] = 0;
+        result[1] = 0;
+        return result;
+      }
+      const width = this._layer.getWidth();
+      const height = this._layer.getHeight();
+
+      let vector = LayerPixiRenderer.vectorForProjections;
+      if (!vector) {
+        vector = new THREE.Vector3();
+        LayerPixiRenderer.vectorForProjections = vector;
+      }
+
+      // https://stackoverflow.com/questions/13055214/mouse-canvas-x-y-to-three-js-world-x-y-z
+      vector.set((screenX / width) * 2 - 1, -(screenY / height) * 2 + 1, 0.5);
+      vector.unproject(camera);
+      vector.sub(camera.position).normalize();
+      const distance = (worldZ - camera.position.z) / vector.z;
+      vector.multiplyScalar(distance);
+
+      if (!Number.isFinite(vector.x) || !Number.isFinite(vector.y)) {
+        result[0] = 0;
+        result[1] = 0;
+        return result;
+      }
+
+      result[0] = camera.position.x + vector.x;
+      result[1] = -(camera.position.y + vector.y);
+      return result;
     }
 
     updateVisibility(visible: boolean): void {

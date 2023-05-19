@@ -17,7 +17,10 @@ import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import BackgroundText from '../../UI/BackgroundText';
-import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../../UI/KeyboardShortcuts/InteractionKeys';
 import { LineStackLayout } from '../../UI/Layout';
 import Card from '../../UI/Card';
 
@@ -282,6 +285,13 @@ export const BuildCard = ({
                       onKeyPress={event => {
                         if (shouldValidate(event) && nameInput.current)
                           nameInput.current.blur();
+                      }}
+                      onKeyDown={event => {
+                        if (shouldCloseOrCancel(event)) {
+                          event.stopPropagation();
+                          setIsEditingName(false);
+                          setName(build.name || buildName);
+                        }
                       }}
                       maxLength={50}
                     />

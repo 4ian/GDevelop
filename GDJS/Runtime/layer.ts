@@ -241,25 +241,25 @@ namespace gdjs {
       // The result parameter used to be optional.
       let position = result || [0, 0];
 
-      if (typeof THREE === 'undefined') {
-        x -= this.getRuntimeScene()._cachedGameResolutionWidth / 2;
-        y -= this.getRuntimeScene()._cachedGameResolutionHeight / 2;
-        x /= Math.abs(this._zoomFactor);
-        y /= Math.abs(this._zoomFactor);
-
-        // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
-        const angleInRadians = (this._cameraRotation / 180) * Math.PI;
-        const tmp = x;
-        const cosValue = Math.cos(angleInRadians);
-        const sinValue = Math.sin(angleInRadians);
-        x = cosValue * x - sinValue * y;
-        y = sinValue * tmp + cosValue * y;
-        position[0] = x + this.getCameraX(cameraId);
-        position[1] = y + this.getCameraY(cameraId);
-        return position;
-      } else {
+      if (this._renderer.isCameraRotatedIn3D()) {
         return this._renderer.transformToWorld(x, y, 0, cameraId, result);
       }
+
+      x -= this.getRuntimeScene()._cachedGameResolutionWidth / 2;
+      y -= this.getRuntimeScene()._cachedGameResolutionHeight / 2;
+      x /= Math.abs(this._zoomFactor);
+      y /= Math.abs(this._zoomFactor);
+
+      // Only compute angle and cos/sin once (allow heavy optimization from JS engines).
+      const angleInRadians = (this._cameraRotation / 180) * Math.PI;
+      const tmp = x;
+      const cosValue = Math.cos(angleInRadians);
+      const sinValue = Math.sin(angleInRadians);
+      x = cosValue * x - sinValue * y;
+      y = sinValue * tmp + cosValue * y;
+      position[0] = x + this.getCameraX(cameraId);
+      position[1] = y + this.getCameraY(cameraId);
+      return position;
     }
 
     /**

@@ -21,7 +21,10 @@ Layer::Layer()
       followBaseLayerCamera(false),
       camera3DNearPlaneDistance(0.1),
       camera3DFarPlaneDistance(10000),
-      camera3DFieldOfView(45) {}
+      camera3DFieldOfView(45),
+      ambientLightColorR(200),
+      ambientLightColorG(200),
+      ambientLightColorB(200) {}
 
 /**
  * Change cameras count, automatically adding/removing them.

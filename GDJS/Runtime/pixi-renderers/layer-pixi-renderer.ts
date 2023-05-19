@@ -66,7 +66,6 @@ namespace gdjs {
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
       this._isLightingLayer = layer.isLightingLayer();
-      this._clearColor = layer.getClearColor();
       runtimeInstanceContainerRenderer
         .getRendererObject()
         .addChild(this._pixiContainer);
@@ -75,11 +74,19 @@ namespace gdjs {
       // Setup rendering for lighting or 3D rendering:
       const pixiRenderer = runtimeGameRenderer.getPIXIRenderer();
       if (this._isLightingLayer) {
+        this._clearColor = layer.getClearColor();
         this._setupLightingRendering(
           pixiRenderer,
           runtimeInstanceContainerRenderer
         );
       } else {
+        // Clear color is used as background color of transparent sprites.
+        this._clearColor = [
+          ...gdjs.hexNumberToRGBArray(
+            this._layer.getRuntimeScene().getBackgroundColor()
+          ),
+          0,
+        ];
         this._setup3DRendering(pixiRenderer, runtimeInstanceContainerRenderer);
       }
     }

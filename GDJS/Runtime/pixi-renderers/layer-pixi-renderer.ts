@@ -349,7 +349,7 @@ namespace gdjs {
       return (
         this._threeCamera &&
         (this._threeCamera.rotation.x !== 0 ||
-        this._threeCamera.rotation.y !== 0)
+          this._threeCamera.rotation.y !== 0)
       );
     }
 

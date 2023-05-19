@@ -144,7 +144,7 @@ export const BuildCard = ({
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 
   const [isEditingName, setIsEditingName] = React.useState(false);
-  const [name, setName] = React.useState(build.name || buildName);
+  const [name, setName] = React.useState(buildName);
 
   const onCopyUuid = () => {
     navigator.clipboard.writeText(build.id);
@@ -297,7 +297,7 @@ export const BuildCard = ({
                         if (shouldCloseOrCancel(event)) {
                           event.stopPropagation();
                           setIsEditingName(false);
-                          setName(build.name || buildName);
+                          setName(buildName);
                         }
                       }}
                       maxLength={BUILD_NAME_MAX_LENGTH}

@@ -309,6 +309,16 @@ namespace gdjs {
       ): boolean => {
         return instanceContainer.getGame().hasJustResumed();
       };
+
+      /**
+       * Check if a scene exists.
+       */
+      export const doesSceneExist = (
+        runtimeScene: gdjs.RuntimeScene,
+        sceneName: string
+      ): boolean => {
+        return runtimeScene.getGame().hasScene(sceneName);
+      };
     }
   }
 }

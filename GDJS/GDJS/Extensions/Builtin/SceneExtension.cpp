@@ -36,6 +36,8 @@ SceneExtension::SceneExtension() {
       "gdjs.evtTools.runtimeScene.stopGame");
   GetAllConditions()["HasGameJustResumed"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.hasGameJustResumed");
+  GetAllConditions()["DoesSceneExist"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.doesSceneExist");
 
   StripUnimplementedInstructionsAndExpressions();
 }

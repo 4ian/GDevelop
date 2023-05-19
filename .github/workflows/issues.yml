@@ -3,45 +3,6 @@ on:
   issues:
     types: [opened]
 jobs:
-  moderate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Autoclose issues about adding a bug without changing the bug report template
-        uses: tachiyomiorg/issue-moderator-action@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-close-rules: |
-            [
-              {
-                "type": "body",
-                "regex": ".*Scroll down to '\\.\\.\\.\\.'.*",
-                "message": "Hi @${issue.user.login}! 👋 This issue was automatically closed because it seems that you have not included any steps to reproduce the bug.\n\nGitHub is a place for the technical development of GDevelop itself - you may want to go on the [forum](https://forum.gdevelop.io/), the Discord chat or [read the documentation](https://wiki.gdevelop.io/gdevelop5/) to learn more about GDevelop. Thanks!"
-              }
-            ]
-      - name: Autoclose known beta 105 web-app update bug
-        uses: tachiyomiorg/issue-moderator-action@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-close-rules: |
-            [
-              {
-                "type": "body",
-                "regex": ".*_instance.getRawFloatProperty is not a function.*",
-                "message": "Hi @${issue.user.login}! 👋 This issue was automatically closed as this seems to be a known bug. It can be solved by **closing entirely the web-app and opening it again**. This will allow the web-app to auto-update and the problem should be gone."
-              }
-            ]
-      - name: Autoclose known beta 114 web-app update bug
-        uses: tachiyomiorg/issue-moderator-action@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-close-rules: |
-            [
-              {
-                "type": "body",
-                "regex": ".*getAssociatedSettings is not a function.*",
-                "message": "Hi @${issue.user.login}! 👋 This issue was automatically closed as this seems to be a known bug. It can be solved by **closing entirely the web-app and opening it again**. This will allow the web-app to auto-update and the problem should be gone."
-              }
-            ]
   autocomment:
     runs-on: ubuntu-latest
     if: contains(github.event.issue.body, 'The node to be removed is not a child of this node')

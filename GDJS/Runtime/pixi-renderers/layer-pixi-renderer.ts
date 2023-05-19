@@ -80,8 +80,13 @@ namespace gdjs {
           runtimeInstanceContainerRenderer
         );
       } else {
-        // Clear color is used to compute transparency of transparent sprites.
-        this._clearColor = [255, 255, 255, 0];
+        // Clear color is used as background color of transparent sprites.
+        this._clearColor = [
+          ...gdjs.hexNumberToRGBArray(
+            this._layer.getRuntimeScene().getBackgroundColor()
+          ),
+          0,
+        ];
         this._setup3DRendering(pixiRenderer, runtimeInstanceContainerRenderer);
       }
     }

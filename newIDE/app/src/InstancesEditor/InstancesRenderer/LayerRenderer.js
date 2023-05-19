@@ -163,7 +163,7 @@ export default class LayerRenderer {
       if (pixiObject) {
         pixiObject.visible = isVisible;
         pixiObject.interactive = !(
-          layer.isLocked() ||
+          this.layer.isLocked() ||
           (instance.isLocked() && instance.isSealed())
         );
       }

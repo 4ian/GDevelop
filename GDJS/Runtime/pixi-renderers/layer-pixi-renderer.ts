@@ -359,7 +359,7 @@ namespace gdjs {
       worldZ: float,
       cameraId: integer,
       result: FloatPoint
-    ) {
+    ): FloatPoint {
       const camera = this._threeCamera;
       if (!camera) {
         result[0] = 0;

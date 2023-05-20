@@ -109,7 +109,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         }
         renderButton={style =>
-          props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
+          isExpressionField ? (
             <FlatButton
               id="switch-expression-select"
               leftIcon={<TypeCursorSelect />}

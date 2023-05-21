@@ -9,7 +9,7 @@ import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire';
 import FlatButton from '../FlatButton';
 import IconButton from '../IconButton';
-import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import UndoIcon from '../CustomSvgIcons/Undo';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
 
 const electron = optionalRequire('electron');
@@ -77,10 +77,10 @@ const LocalFolderPicker = ({
     onChange(textValue);
   };
 
-  const resetToDefault = () => {
-    const filePath = findDefaultFolder(app);
-    onChange(filePath);
-    setTextValue(filePath);
+  const workspacePathDefaultFolder = findDefaultFolder(app);
+  const resetWorkspacePathToDefaultFolder = () => {
+    onChange(workspacePathDefaultFolder);
+    setTextValue(workspacePathDefaultFolder);
   };
 
   const getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
@@ -129,10 +129,11 @@ const LocalFolderPicker = ({
                 }}
               >
                 <IconButton
-                  onClick={() => resetToDefault()}
+                  onClick={resetWorkspacePathToDefaultFolder}
                   tooltip={t`Reset to default`}
+                  disabled={workspacePathDefaultFolder === textValue}
                 >
-                  <RotateLeftIcon />
+                  <UndoIcon />
                 </IconButton>
               </div>
             )}

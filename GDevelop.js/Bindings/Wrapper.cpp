@@ -44,6 +44,7 @@
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
+#include <GDCore/IDE/Events/EventsFunctionSelfCallChecker.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ProjectResourcesAdder.h>
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
@@ -620,6 +621,11 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllLayoutVariables FindAllLayoutVariables
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_FindAllIdentifierExpressions FindAllIdentifierExpressions
+
+#define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
+#define STATIC_IsBehaviorFunctionOnlyCallingItself IsBehaviorFunctionOnlyCallingItself
+#define STATIC_IsObjectFunctionOnlyCallingItself IsObjectFunctionOnlyCallingItself
+
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
 #define STATIC_FoldAll FoldAll

@@ -152,6 +152,9 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
    */
   void Launch(const gd::EventsList& events) { VisitEventList(events); };
 
+protected:
+  void StopAnyEventIteration() override;
+
  private:
   void VisitEventList(const gd::EventsList& events);
   void VisitEvent(const gd::BaseEvent& event) override;
@@ -188,6 +191,8 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
    */
   virtual void DoVisitInstruction(const gd::Instruction& instruction,
                                   bool isCondition) {};
+
+  bool shouldStopIteration;
 };
 
 /**

@@ -19,6 +19,7 @@ import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import BackgroundColor from './BackgroundColor';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';
@@ -35,13 +36,14 @@ import {
   type InstancesEditorSettings,
 } from './InstancesEditorSettings';
 import Rectangle from '../Utils/Rectangle';
-import { isNoDialogOpened } from '../UI/MaterialUISpecificUtil';
+import { shouldPreventRenderingInstanceEditors } from '../UI/MaterialUISpecificUtil';
 import {
   clampInstancesEditorZoom,
   getWheelStepZoomFactor,
 } from '../Utils/ZoomUtils';
 const gd: libGDevelop = global.gd;
 
+export const instancesEditorId = 'instances-editor-canvas';
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
   dropCursor: { cursor: 'copy' },
@@ -54,6 +56,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
+  onDuplicate: () => void,
   onUndo: () => void,
   onRedo: () => void,
   onZoomOut: () => void,
@@ -66,9 +69,10 @@ export type InstancesEditorShortcutsCallbacks = {|
 export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout,
+  selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
-  onChangeInstancesEditorSettings: (
+  onInstancesEditorSettingsMutated: (
     instancesEditorSettings: InstancesEditorSettings
   ) => void,
   instancesSelection: InstancesSelection,
@@ -96,6 +100,7 @@ type Props = {|
   onMouseMove: MouseEvent => void,
   onMouseLeave: MouseEvent => void,
   screenType: ScreenType,
+  showObjectInstancesIn3D: boolean,
 |};
 
 export default class InstancesEditor extends Component<Props> {
@@ -103,9 +108,10 @@ export default class InstancesEditor extends Component<Props> {
   lastContextMenuY = 0;
   lastCursorX = 0;
   lastCursorY = 0;
-  fpsLimiter = new FpsLimiter(28);
+  fpsLimiter = new FpsLimiter({ maxFps: 60, idleFps: 10 });
   canvasArea: ?HTMLDivElement;
   pixiRenderer: PIXI.Renderer;
+  threeRenderer: THREE.WebGLRenderer | null = null;
   keyboardShortcuts: KeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;
@@ -130,6 +136,8 @@ export default class InstancesEditor extends Component<Props> {
   _renderingPaused = false;
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
+  hasCursorMovedSinceItIsDown = false;
+  _showObjectInstancesIn3D: boolean = false;
 
   componentDidMount() {
     // Initialize the PIXI renderer, if possible
@@ -163,18 +171,52 @@ export default class InstancesEditor extends Component<Props> {
       },
     });
 
-    //Create the renderer and setup the rendering area for scene editor.
-    //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
-    this.pixiRenderer = PIXI.autoDetectRenderer(
-      {
+    let gameCanvas: HTMLCanvasElement;
+    this._showObjectInstancesIn3D = this.props.showObjectInstancesIn3D;
+    // TODO (3D): Should it handle preference changes without needing to reopen tabs?
+    if (this._showObjectInstancesIn3D) {
+      gameCanvas = document.createElement('canvas');
+      const threeRenderer = new THREE.WebGLRenderer({
+        canvas: gameCanvas,
+      });
+      threeRenderer.autoClear = false;
+      threeRenderer.setSize(this.props.width, this.props.height);
+
+      // Create a PixiJS renderer that use the same GL context as Three.js
+      // so that both can render to the canvas and even have PixiJS rendering
+      // reused in Three.js (by using a RenderTexture and the same internal WebGL texture).
+      this.pixiRenderer = new PIXI.Renderer({
         width: this.props.width,
         height: this.props.height,
+        view: gameCanvas,
+        context: threeRenderer.getContext(),
+        clearBeforeRender: false,
         preserveDrawingBuffer: true,
         antialias: false,
-      }
-      // Disable anti-aliasing(default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
-    );
-    canvasArea.appendChild(this.pixiRenderer.view);
+        backgroundAlpha: 0,
+        // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+      });
+
+      this.threeRenderer = threeRenderer;
+    } else {
+      // Create the renderer and setup the rendering area for scene editor.
+      this.pixiRenderer = PIXI.autoDetectRenderer({
+        width: this.props.width,
+        height: this.props.height,
+        // "preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+        preserveDrawingBuffer: true,
+        // Disable anti-aliasing (default) to avoid rendering issue (1px width line of extra pixels) when rendering pixel perfect tiled sprites.
+        antialias: false,
+        clearBeforeRender: false,
+        backgroundAlpha: 0,
+      });
+
+      gameCanvas = this.pixiRenderer.view;
+    }
+
+    // Add the renderer view element to the DOM
+    canvasArea.appendChild(gameCanvas);
+
     this.pixiRenderer.view.style.outline = 'none';
 
     this.longTouchHandler = new LongTouchHandler({
@@ -183,9 +225,10 @@ export default class InstancesEditor extends Component<Props> {
         this.props.onContextMenu(event.clientX, event.clientY),
     });
 
-    this.pixiRenderer.view.onwheel = (event: any) => {
+    this.pixiRenderer.view.onwheel = (event: WheelEvent) => {
+      this.fpsLimiter.notifyInteractionHappened();
       const zoomFactor = this.getZoomFactor();
-      if (this.keyboardShortcuts.shouldZoom()) {
+      if (this.keyboardShortcuts.shouldZoom(event)) {
         this.zoomOnCursorBy(getWheelStepZoomFactor(-event.deltaY));
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
         const deltaX = event.deltaY / (5 * zoomFactor);
@@ -215,11 +258,16 @@ export default class InstancesEditor extends Component<Props> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
-    this.pixiRenderer.view.addEventListener('mousemove', event =>
-      this.props.onMouseMove(event)
-    );
+    this.pixiRenderer.view.addEventListener('mousemove', event => {
+      this.props.onMouseMove(event);
+    });
     this.pixiRenderer.view.addEventListener('mouseout', event => {
       this.props.onMouseLeave(event);
+    });
+    this.pixiRenderer.view.addEventListener('focusout', event => {
+      if (this.keyboardShortcuts) {
+        this.keyboardShortcuts.resetModifiers();
+      }
     });
 
     this.pixiContainer = new PIXI.Container();
@@ -282,7 +330,6 @@ export default class InstancesEditor extends Component<Props> {
       height: this.props.height,
       instancesEditorSettings: this.props.instancesEditorSettings,
     });
-    this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
     this.grid = new Grid({
       viewPosition: this.viewPosition,
@@ -335,9 +382,7 @@ export default class InstancesEditor extends Component<Props> {
       this.pixiContainer.removeChild(this.selectedInstances.getPixiContainer());
     }
     if (this.instancesRenderer) {
-      this.viewPosition
-        .getPixiContainer()
-        .removeChild(this.instancesRenderer.getPixiContainer());
+      this.pixiContainer.removeChild(this.instancesRenderer.getPixiContainer());
       this.instancesRenderer.delete();
     }
     if (this.selectionRectangle) {
@@ -356,7 +401,6 @@ export default class InstancesEditor extends Component<Props> {
 
     this.backgroundColor = new BackgroundColor({
       layout: props.layout,
-      pixiRenderer: this.pixiRenderer,
     });
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
@@ -371,6 +415,7 @@ export default class InstancesEditor extends Component<Props> {
       onInstanceClicked: this._onInstanceClicked,
       onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
+      showObjectInstancesIn3D: this._showObjectInstancesIn3D,
     });
     this.selectionRectangle = new SelectionRectangle({
       instances: props.initialInstances,
@@ -419,9 +464,7 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     this.pixiContainer.addChild(this.selectionRectangle.getPixiObject());
-    this.viewPosition
-      .getPixiContainer()
-      .addChild(this.instancesRenderer.getPixiContainer());
+    this.pixiContainer.addChild(this.instancesRenderer.getPixiContainer());
     this.pixiContainer.addChild(this.windowBorder.getPixiObject());
     this.pixiContainer.addChild(this.windowMask.getPixiObject());
     this.pixiContainer.addChild(this.selectedInstances.getPixiContainer());
@@ -430,7 +473,7 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   componentWillUnmount() {
-    // This is an antipattern and is theorically not needed, but help
+    // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
@@ -441,6 +484,7 @@ export default class InstancesEditor extends Component<Props> {
     this.longTouchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
+    this.pixiContainer.destroy();
     this.pixiRenderer.destroy();
   }
 
@@ -451,6 +495,9 @@ export default class InstancesEditor extends Component<Props> {
       nextProps.height !== this.props.height
     ) {
       this.pixiRenderer.resize(nextProps.width, nextProps.height);
+      if (this.threeRenderer) {
+        this.threeRenderer.setSize(nextProps.width, nextProps.height);
+      }
       this.viewPosition.resize(nextProps.width, nextProps.height);
       this.statusBar.resize(nextProps.width, nextProps.height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(
@@ -542,10 +589,13 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   setZoomFactor = (zoomFactor: number) => {
-    this.props.onChangeInstancesEditorSettings({
-      ...this.props.instancesEditorSettings,
-      zoomFactor: clampInstancesEditorZoom(zoomFactor),
-    });
+    this.props.instancesEditorSettings.zoomFactor = clampInstancesEditorZoom(
+      zoomFactor
+    );
+
+    this.props.onInstancesEditorSettingsMutated(
+      this.props.instancesEditorSettings
+    );
   };
 
   /**
@@ -568,9 +618,10 @@ export default class InstancesEditor extends Component<Props> {
    */
   addInstances = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ): Array<gdInitialInstance> => {
-    return this._instancesAdder.addInstances(pos, objectNames);
+    return this._instancesAdder.addInstances(pos, objectNames, layer);
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -602,6 +653,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {
+    this.fpsLimiter.notifyInteractionHappened();
     if (this.keyboardShortcuts.shouldMoveView()) {
       const sceneDeltaX = deltaX / this.getZoomFactor();
       const sceneDeltaY = deltaY / this.getZoomFactor();
@@ -612,15 +664,15 @@ export default class InstancesEditor extends Component<Props> {
     }
   };
 
-  _getLayersVisibility = () => {
+  _getLayersLocks = () => {
     const { layout } = this.props;
-    const layersVisibility = {};
+    const layersLocks = {};
     for (let i = 0; i < layout.getLayersCount(); i++) {
-      layersVisibility[layout.getLayerAt(i).getName()] = layout
-        .getLayerAt(i)
-        .getVisibility();
+      const layer = layout.getLayerAt(i);
+      layersLocks[layout.getLayerAt(i).getName()] =
+        !layer.getVisibility() || layer.isLocked();
     }
-    return layersVisibility;
+    return layersLocks;
   };
 
   _onPanEnd = () => {
@@ -632,7 +684,7 @@ export default class InstancesEditor extends Component<Props> {
       this.props.instancesSelection.selectInstances({
         instances: instancesSelected,
         multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-        layersVisibility: this._getLayersVisibility(),
+        layersLocks: this._getLayersLocks(),
       });
       instancesSelected = this.props.instancesSelection.getSelectedInstances();
       this.props.onInstancesSelected(instancesSelected);
@@ -640,6 +692,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onInstanceClicked = (instance: gdInitialInstance) => {
+    this.fpsLimiter.notifyInteractionHappened();
     this.pixiRenderer.view.focus();
   };
 
@@ -676,7 +729,9 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
-    this.props.onInstanceDoubleClicked(instance);
+    if (!this.keyboardShortcuts.shouldIgnoreDoubleClick()) {
+      this.props.onInstanceDoubleClicked(instance);
+    }
   };
 
   _onOverInstance = (instance: gdInitialInstance) => {
@@ -688,34 +743,26 @@ export default class InstancesEditor extends Component<Props> {
     sceneX: number,
     sceneY: number
   ) => {
+    this.fpsLimiter.notifyInteractionHappened();
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
       // it's just the beginning of the user panning the view.
       return;
     }
 
-    if (this.keyboardShortcuts.shouldCloneInstances()) {
-      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-      for (var i = 0; i < selectedInstances.length; i++) {
-        const instance = selectedInstances[i];
-        this.props.initialInstances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
-      }
-    } else {
-      this.props.instancesSelection.selectInstance({
-        instance,
-        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-        layersVisibility: this._getLayersVisibility(),
-      });
+    this.props.instancesSelection.selectInstance({
+      instance,
+      multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+      layersLocks: this._getLayersLocks(),
+    });
 
-      if (this.props.onInstancesSelected) {
-        this.props.onInstancesSelected(
-          this.props.instancesSelection.getSelectedInstances()
-        );
-      }
+    if (this.props.onInstancesSelected) {
+      this.props.onInstancesSelected(
+        this.props.instancesSelection.getSelectedInstances()
+      );
     }
 
+    this.hasCursorMovedSinceItIsDown = false;
     this.instancesMover.startMove(sceneX, sceneY);
   };
 
@@ -729,6 +776,22 @@ export default class InstancesEditor extends Component<Props> {
     deltaX: number,
     deltaY: number
   ) => {
+    this.fpsLimiter.notifyInteractionHappened();
+    if (
+      !this.hasCursorMovedSinceItIsDown &&
+      this.keyboardShortcuts.shouldCloneInstances()
+    ) {
+      this.hasCursorMovedSinceItIsDown = true;
+
+      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+      for (var i = 0; i < selectedInstances.length; i++) {
+        const instance = selectedInstances[i];
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
+      }
+    }
+
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -766,6 +829,7 @@ export default class InstancesEditor extends Component<Props> {
     deltaY: number,
     grabbingLocation: ResizeGrabbingLocation
   ) => {
+    this.fpsLimiter.notifyInteractionHappened();
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -781,7 +845,8 @@ export default class InstancesEditor extends Component<Props> {
       sceneDeltaX,
       sceneDeltaY,
       grabbingLocation,
-      proportional
+      proportional,
+      this.keyboardShortcuts.shouldNotSnapToGrid()
     );
   };
 
@@ -793,6 +858,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onRotate = (deltaX: number, deltaY: number) => {
+    this.fpsLimiter.notifyInteractionHappened();
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -817,6 +883,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   moveSelection = (x: number, y: number) => {
+    this.fpsLimiter.notifyInteractionHappened();
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     const unlockedSelectedInstances = selectedInstances.filter(
       instance => !instance.isLocked()
@@ -829,6 +896,7 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   scrollBy(x: number, y: number) {
+    this.fpsLimiter.notifyInteractionHappened();
     this.viewPosition.scrollBy(x, y);
 
     if (this.props.onViewPositionChanged) {
@@ -837,6 +905,7 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   scrollTo(x: number, y: number) {
+    this.fpsLimiter.notifyInteractionHappened();
     this.viewPosition.scrollTo(x, y);
     if (this.props.onViewPositionChanged) {
       this.props.onViewPositionChanged(this.viewPosition);
@@ -952,19 +1021,26 @@ export default class InstancesEditor extends Component<Props> {
     if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
-    if (this.fpsLimiter.shouldUpdate() && isNoDialogOpened()) {
-      this.backgroundColor.render();
-      this.viewPosition.render();
+    if (
+      this.fpsLimiter.shouldUpdate() &&
+      !shouldPreventRenderingInstanceEditors()
+    ) {
       this.canvasCursor.render();
       this.grid.render();
-      this.instancesRenderer.render();
       this.highlightedInstance.render();
       this.selectedInstances.render();
       this.selectionRectangle.render();
       this.windowBorder.render();
       this.windowMask.render();
       this.statusBar.render();
-      this.pixiRenderer.render(this.pixiContainer);
+
+      this.instancesRenderer.render(
+        this.pixiRenderer,
+        this.threeRenderer,
+        this.viewPosition,
+        this.backgroundColor,
+        this.pixiContainer
+      );
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };
@@ -983,6 +1059,12 @@ export default class InstancesEditor extends Component<Props> {
     startPIXITicker();
   };
 
+  getInstanceSize = (initialInstance: gdInitialInstance): [number, number] => {
+    return this.instancesRenderer
+      .getInstanceMeasurer()
+      .getUnrotatedInstanceSize(initialInstance);
+  };
+
   render() {
     if (!this.props.project) return null;
 
@@ -990,6 +1072,7 @@ export default class InstancesEditor extends Component<Props> {
       <DropTarget
         canDrop={() => true}
         hover={monitor => {
+          this.fpsLimiter.notifyInteractionHappened();
           const { _instancesAdder, viewPosition, canvasArea } = this;
           if (!_instancesAdder || !canvasArea || !viewPosition) return;
 
@@ -1001,10 +1084,13 @@ export default class InstancesEditor extends Component<Props> {
           );
           _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
             pos,
-            this.props.selectedObjectNames
+            this.props.selectedObjectNames,
+            this.props.selectedLayer
           );
         }}
         drop={monitor => {
+          this.fpsLimiter.notifyInteractionHappened();
+
           const { _instancesAdder, viewPosition, canvasArea } = this;
           if (!_instancesAdder || !canvasArea || !viewPosition) return;
 
@@ -1040,6 +1126,7 @@ export default class InstancesEditor extends Component<Props> {
             <div
               ref={canvasArea => (this.canvasArea = canvasArea)}
               style={styles.canvasArea}
+              id={instancesEditorId}
             />
           );
         }}

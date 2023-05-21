@@ -6,21 +6,23 @@ import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemIcon from '@material-ui/core/ListItemIcon';
 import MUIListItemText from '@material-ui/core/ListItemText';
 import MUIListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
-import Refresh from '@material-ui/icons/Refresh';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import Remove from '@material-ui/icons/Remove';
 import ElementWithMenu from './Menu/ElementWithMenu';
 import Tooltip from '@material-ui/core/Tooltip';
-import Add from '@material-ui/icons/Add';
-import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 import { useLongTouch } from '../Utils/UseLongTouch';
-import { Collapse } from '@material-ui/core';
+import Collapse from '@material-ui/core/Collapse';
+
 import ThreeDotsMenu from './CustomSvgIcons/ThreeDotsMenu';
+import ShareExternal from './CustomSvgIcons/ShareExternal';
+import ChevronTop from './CustomSvgIcons/ChevronArrowTop';
+import ChevronBottom from './CustomSvgIcons/ChevronArrowBottom';
+import Search from './CustomSvgIcons/Search';
+import Refresh from './CustomSvgIcons/Refresh';
+import Add from './CustomSvgIcons/Add';
+import Remove from './CustomSvgIcons/Remove';
+
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
 export const listItemWithoutIconHeight = 29;
@@ -184,7 +186,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               aria-label="open link"
               onClick={props.onOpenLink}
             >
-              <OpenInNew style={{ color: props.rightIconColor }} />
+              <ShareExternal style={{ color: props.rightIconColor }} />
             </IconButton>
           </MUIListItemSecondaryAction>
         );
@@ -239,7 +241,13 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           {...dataObjectToProps(props.data)}
         >
           {props.leftIcon && (
-            <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
+            <MUIListItemIcon
+              style={{
+                marginTop: 0, // MUI applies an unnecessary marginTop when items are aligned to the top.
+              }}
+            >
+              {props.leftIcon}
+            </MUIListItemIcon>
           )}
           <MUIListItemText
             style={styles.listItemText}
@@ -299,7 +307,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
                     aria-label="collapse"
                     onClick={onClickItem}
                   >
-                    <ExpandLess />
+                    <ChevronTop />
                   </IconButton>
                 </MUIListItemSecondaryAction>
               ) : (
@@ -310,7 +318,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
                     aria-label="expand"
                     onClick={onClickItem}
                   >
-                    <ExpandMore />
+                    <ChevronBottom />
                   </IconButton>
                 </MUIListItemSecondaryAction>
               )

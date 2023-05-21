@@ -11,6 +11,7 @@ declare class gdProject extends gdObjectsContainer {
   setAuthor(authorName: string): void;
   getAuthor(): string;
   getAuthorIds(): gdVectorString;
+  getAuthorUsernames(): gdVectorString;
   isPlayableWithKeyboard(): boolean;
   setPlayableWithKeyboard(playable: boolean): void;
   isPlayableWithGamepad(): boolean;
@@ -54,6 +55,7 @@ declare class gdProject extends gdObjectsContainer {
   getCurrentPlatform(): gdPlatform;
   getPlatformSpecificAssets(): gdPlatformSpecificAssets;
   getLoadingScreen(): gdLoadingScreen;
+  getWatermark(): gdWatermark;
   hasLayoutNamed(name: string): boolean;
   getLayout(name: string): gdLayout;
   getLayoutAt(index: number): gdLayout;
@@ -89,6 +91,8 @@ declare class gdProject extends gdObjectsContainer {
   insertNewEventsFunctionsExtension(name: string, position: number): gdEventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: gdEventsFunctionsExtension, position: number): gdEventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  hasEventsBasedBehavior(type: string): boolean;
+  getEventsBasedBehavior(type: string): gdEventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;

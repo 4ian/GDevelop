@@ -31,6 +31,7 @@ const privateAssetPackListingData = {
   listing: 'ASSET_PACK',
   description: '5 assets',
   name: 'French Food',
+  categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
 };
 
@@ -100,6 +101,42 @@ export const Default = () => {
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
       onAssetPackOpen={() => action('open asset pack')()}
+      privateAssetPacksFromSameCreatorListingData={[
+        {
+          id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
+          sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+          productType: 'ASSET_PACK',
+          thumbnailUrls: [
+            'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+          ],
+          updatedAt: '2022-09-14T12:43:51.329Z',
+          createdAt: '2022-09-14T12:43:51.329Z',
+          listing: 'ASSET_PACK',
+          description: '5 assets',
+          name: 'French Food',
+          categories: ['props'],
+          prices: [
+            { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
+          ],
+        },
+        {
+          id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
+          sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+          productType: 'ASSET_PACK',
+          thumbnailUrls: [
+            'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+          ],
+          updatedAt: '2022-09-14T12:43:51.329Z',
+          createdAt: '2022-09-14T12:43:51.329Z',
+          listing: 'ASSET_PACK',
+          description: '8 assets',
+          name: 'French Sounds',
+          categories: ['sounds'],
+          prices: [
+            { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
+          ],
+        },
+      ]}
     />
   );
 };

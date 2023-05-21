@@ -2,6 +2,7 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 const {
   generateCompiledEventsForEventsFunction,
   generateCompiledEventsFromSerializedEvents,
+  generateCompiledEventsForSerializedEventsBasedExtension,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks');
 const { makeTestExtensions } = require('../TestUtils/TestExtensions');
@@ -37,7 +38,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         ])
       );
 
-      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
         gd,
         eventsSerializerElement
       );
@@ -80,7 +81,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         ])
       );
 
-      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
         gd,
         eventsSerializerElement
       );
@@ -115,7 +116,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         ])
       );
 
-      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
         gd,
         eventsSerializerElement
       );
@@ -165,7 +166,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         ])
       );
 
-      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
         gd,
         eventsSerializerElement
       );
@@ -290,30 +291,13 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         ])
       );
 
-      const project = new gd.ProjectHelper.createNewGDJSProject();
-      const eventsFunction = new gd.EventsFunction();
-
-      eventsFunction
-        .getEvents()
-        .unserializeFrom(project, eventsSerializerElement);
-
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
-
-      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+      const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
         gd,
-        project,
-        eventsFunction
+        eventsSerializerElement,
+        {
+          parameterTypes: { IncreaseValue: 'number', MyParamObject: 'object' },
+        }
       );
-
-      eventsFunction.delete();
-      project.delete();
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock();
       const myObjectA = runtimeScene.createObject('MyObjectA');
@@ -418,7 +402,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runCompiledEvents(gdjs, runtimeScene, [5, myObjectALists]);
 
       // Initial state is unchanged because the first wait task is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -430,7 +416,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       // Initial state is still unchanged because the condition ran but the second wait task
       // is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -441,7 +429,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
       // Only the "myObjectA2" instance was modified by the action.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         6
@@ -540,7 +530,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       // Initial state is still unchanged because the condition ran but the second wait task
       // is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -551,7 +543,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
       // Only the "myObjectA2" instance was modified by the action.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         6
@@ -667,7 +661,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runCompiledEvents(gdjs, runtimeScene, [5, myObjectALists]);
 
       // Initial state is unchanged because the first wait task is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -685,7 +681,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       // Initial state is still unchanged because the conditions ran but the second wait task
       // is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -702,7 +700,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
       // Only the "myObjectA3" instance was modified by the action.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -841,7 +841,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runCompiledEvents(gdjs, runtimeScene, [5, myObjectALists]);
 
       // Initial state is unchanged because the first wait task is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -859,7 +861,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       // Initial state is still unchanged because the conditions ran but the second wait task
       // is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -876,7 +880,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
       // Only the "myObjectA3" instance was modified by the action.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -1020,7 +1026,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       // Initial state is still unchanged because the conditions ran but the second wait task
       // is not done.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -1034,7 +1042,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
       // Only the "myObjectA3" instance was modified by the action.
-      expect(myObjectA1.getVariables().has('TestVariable')).toBe(false);
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
       expect(myObjectA2.getVariables().has('TestVariable')).toBe(true);
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1
@@ -1486,7 +1496,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
-      // All the remaining objects, refered by "MyGroup" in the function, should have their variable increased.
+      // All the remaining objects, referred by "MyGroup" in the function, should have their variable increased.
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         1 + 5 + 5
       );
@@ -1654,7 +1664,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
 
-      // All the remaining objects, refered by "MyGroup" in the function, should have their variable increased.
+      // All the remaining objects, referred by "MyGroup" in the function, should have their variable increased.
       expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
         10
       );
@@ -2315,7 +2325,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     });
 
     describe('async object actions, waiting for all objects to be finished', () => {
-      const expectProgressivelyResolvedTasksForObjects = (runCompiledEvents) => {
+      const expectProgressivelyResolvedTasksForObjects = (
+        runCompiledEvents
+      ) => {
         const { gdjs, runtimeScene } = makeMinimalGDJSMock();
         const myObjectA1 = runtimeScene.createObject('MyObjectA');
         const myObjectA2 = runtimeScene.createObject('MyObjectA');
@@ -3566,6 +3578,79 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       expect(myObjectC2.getVariables().get('TestVariable').getAsNumber()).toBe(
         4 + 4
       );
+    });
+  });
+
+  describe('Events based asynchronous functions', () => {
+    it('Resolves after awaiting an async action', () => {
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const extensionModule =
+        generateCompiledEventsForSerializedEventsBasedExtension(
+          gd,
+          require('./extensions/EBAsyncAction.json'),
+          gdjs,
+          runtimeScene
+        );
+
+      const {
+        freeFunctions: { wait },
+        behaviors: { Behavior },
+        objects: { Object },
+      } = extensionModule;
+
+      const freeFunctionExtensionTask = wait();
+      expect(freeFunctionExtensionTask.update()).toBe(false);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks();
+      expect(freeFunctionExtensionTask.update()).toBe(true);
+
+      const object = new Object(runtimeScene, {});
+      const objectExtensionTask = object.wait();
+      expect(objectExtensionTask.update()).toBe(false);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks();
+      expect(objectExtensionTask.update()).toBe(true);
+
+      const behavior = new Behavior(runtimeScene, {});
+      const behaviorExtensionTask = behavior.wait();
+      expect(behaviorExtensionTask.update()).toBe(false);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(1);
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks();
+      expect(behaviorExtensionTask.update()).toBe(true);
+    });
+
+    it('Resolves without awaiting an async action', () => {
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const extensionModule =
+        generateCompiledEventsForSerializedEventsBasedExtension(
+          gd,
+          require('./extensions/EBAsyncAction.json'),
+          gdjs,
+          runtimeScene
+        );
+
+      const {
+        freeFunctions: { noWait },
+        behaviors: { Behavior },
+        objects: { Object },
+      } = extensionModule;
+
+      const extensionTask = noWait();
+      expect(extensionTask.update()).toBe(true);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(0);
+
+      const obj = new Object(runtimeScene, {});
+      const objectExtensionTask = obj.noWait();
+      expect(objectExtensionTask.update()).toBe(true);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(0);
+
+      const behavior = new Behavior(runtimeScene, {});
+      const behaviorExtensionTask = behavior.noWait();
+      expect(behaviorExtensionTask.update()).toBe(true);
+      expect(runtimeScene.getAsyncTasksManager().tasks.size).toBe(0);
     });
   });
 });

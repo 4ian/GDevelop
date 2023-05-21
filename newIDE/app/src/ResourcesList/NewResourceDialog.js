@@ -64,6 +64,7 @@ export const NewResourceDialog = ({
   );
   const isInitialSourceHeadless =
     initialSource && initialSource.selectResourcesHeadless;
+
   const [currentTab, setCurrentTab] = React.useState(() => {
     if (!initialSource) return 'import';
 
@@ -74,7 +75,15 @@ export const NewResourceDialog = ({
 
     return 'import';
   });
+  const [hasChangedTabs, setHasChangedTabs] = React.useState(false);
   const [isShowingAdvanced, setIsShowingAdvanced] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      return () => setHasChangedTabs(true);
+    },
+    [currentTab]
+  );
 
   React.useEffect(
     () => {
@@ -179,6 +188,12 @@ export const NewResourceDialog = ({
                   getLastUsedPath: preferences.getLastUsedPath,
                   setLastUsedPath: preferences.setLastUsedPath,
                   onChooseResources,
+
+                  // Ask the component to try to automatically open the dialog to import file(s),
+                  // but only if tabs were not changed, meaning the user navigated out of it already.
+                  // In other words, only do this at the dialog opening.
+                  automaticallyOpenIfPossible:
+                    initialSource === source && !hasChangedTabs,
                 })}
               </React.Fragment>
             ))}

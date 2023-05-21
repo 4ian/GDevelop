@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const highlightText = (
   text: string,

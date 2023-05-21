@@ -300,6 +300,25 @@ namespace gdjs {
           false
         );
       };
+
+      /**
+       * Check if the game has just resumed from being hidden
+       */
+      export const hasGameJustResumed = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        return instanceContainer.getGame().hasJustResumed();
+      };
+
+      /**
+       * Check if a scene exists.
+       */
+      export const doesSceneExist = (
+        runtimeScene: gdjs.RuntimeScene,
+        sceneName: string
+      ): boolean => {
+        return runtimeScene.getGame().hasScene(sceneName);
+      };
     }
   }
 }

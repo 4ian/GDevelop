@@ -116,14 +116,20 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   launchExport: async (
     context: ExportPipelineContext<ExportState>,
-    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter
+    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter,
+    fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
-    const exportOptions = new gd.MapStringBoolean();
-    exporter.exportWholePixiProject(
+    const exportOptions = new gd.ExportOptions(
       context.project,
-      temporaryOutputDir,
-      exportOptions
+      temporaryOutputDir
     );
+    if (fallbackAuthor) {
+      exportOptions.setFallbackAuthor(
+        fallbackAuthor.id,
+        fallbackAuthor.username
+      );
+    }
+    exporter.exportWholePixiProject(exportOptions);
     exportOptions.delete();
     exporter.delete();
 

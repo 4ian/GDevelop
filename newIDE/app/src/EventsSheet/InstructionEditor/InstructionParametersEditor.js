@@ -18,8 +18,6 @@ import Window from '../../Utils/Window';
 import { getExtraInstructionInformation } from '../../Hints';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import IconButton from '../../UI/IconButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { getObjectParameterIndex } from '../../InstructionOrExpression/EnumerateInstructions';
 import Text from '../../UI/Text';
@@ -29,7 +27,14 @@ import { setupInstructionParameters } from '../../InstructionOrExpression/SetupI
 import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import FlatButton from '../../UI/FlatButton';
+import {
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from '../ParameterFields/ParameterFieldCommons';
+import Edit from '../../UI/CustomSvgIcons/Edit';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -58,7 +63,7 @@ const styles = {
 };
 
 export type InstructionParametersEditorInterface = {|
-  focus: () => void,
+  focus: FieldFocusFunction,
 |};
 
 type Props = {|
@@ -114,7 +119,7 @@ const InstructionParametersEditor = React.forwardRef<
     },
     ref
   ) => {
-    const firstVisibleField = React.useRef<?{ +focus?: () => void }>(null);
+    const firstVisibleField = React.useRef<?ParameterFieldInterface>(null);
     const [isDirty, setIsDirty] = React.useState<boolean>(false);
     const {
       palette: { type: paletteType },
@@ -122,7 +127,7 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
-    const focus = () => {
+    const focus: FieldFocusFunction = options => {
       // Verify that there is a field to focus.
       if (
         getVisibleParametersCount(
@@ -135,7 +140,7 @@ const InstructionParametersEditor = React.forwardRef<
         ) !== 0
       ) {
         if (firstVisibleField.current && firstVisibleField.current.focus) {
-          firstVisibleField.current.focus();
+          firstVisibleField.current.focus(options);
         }
       }
     };
@@ -259,16 +264,6 @@ const InstructionParametersEditor = React.forwardRef<
                     {instructionMetadata.getDescription()}
                   </Text>
                 </Column>
-                {isAnEventFunctionMetadata(instructionMetadata) && (
-                  <IconButton
-                    tooltip={t`Open extension events`}
-                    onClick={() => {
-                      openExtension(i18n);
-                    }}
-                  >
-                    <OpenInNew />
-                  </IconButton>
-                )}
               </Line>
               {instructionExtraInformation && (
                 <Line>
@@ -396,6 +391,24 @@ const InstructionParametersEditor = React.forwardRef<
                       forceUpdate();
                     }}
                   />
+                )}
+                {isAnEventFunctionMetadata(instructionMetadata) && (
+                  <Line>
+                    <FlatButton
+                      key={'open-extension'}
+                      label={
+                        isCondition ? (
+                          <Trans>Edit this condition events</Trans>
+                        ) : (
+                          <Trans>Edit this action events</Trans>
+                        )
+                      }
+                      onClick={() => {
+                        openExtension(i18n);
+                      }}
+                      leftIcon={<Edit />}
+                    />
+                  </Line>
                 )}
               </div>
               <Line>

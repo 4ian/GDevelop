@@ -11,7 +11,7 @@ type Props = {|
   onCancel: () => void | Promise<void>,
 |};
 
-const changesBeforeShowingWarning = 3;
+const changesBeforeShowingWarning = 1;
 
 /**
  * Custom hook serializing the object and allowing to restore back
@@ -53,6 +53,10 @@ export const useSerializableObjectCancelableEditor = ({
 
   const notifyOfChange = React.useCallback(() => {
     numberOfChangesRef.current++;
+  }, []);
+
+  const hasUnsavedChanges = React.useCallback(() => {
+    return numberOfChangesRef.current > 0;
   }, []);
 
   const onCancelChanges = React.useCallback(
@@ -105,5 +109,5 @@ export const useSerializableObjectCancelableEditor = ({
     ]
   );
 
-  return { onCancelChanges, notifyOfChange };
+  return { onCancelChanges, notifyOfChange, hasUnsavedChanges };
 };

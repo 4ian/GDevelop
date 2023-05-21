@@ -17,7 +17,6 @@ import HelpIcon from '../UI/HelpIcon';
 import AboutDialog from '../MainFrame/AboutDialog';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
-import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
@@ -36,7 +35,7 @@ import ForceMultiplierField from '../EventsSheet/ParameterFields/ForceMultiplier
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import muiDecorator from './ThemeDecorator';
-import paperDecorator from './PaperDecorator';
+import paperDecorator, { getPaperDecorator } from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
@@ -47,14 +46,13 @@ import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfile
 import CurrentUsageDisplayer from '../Profile/CurrentUsageDisplayer';
 import {
   subscriptionForIndieUser,
-  limitsForIndieUser,
+  silverSubscriptionWithRedemptionCode,
+  silverSubscriptionWithExpiredRedemptionCode,
+  limitsForSilverUser,
   limitsReached,
   noSubscription,
-  fakeNoSubscriptionAuthenticatedUser,
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
-  fakeAuthenticatedButLoadingAuthenticatedUser,
-  fakeAuthenticatedAndEmailVerifiedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserLoggingIn,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -65,9 +63,6 @@ import {
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
-import SubscriptionDetails from '../Profile/Subscription/SubscriptionDetails';
-import SubscriptionDialog from '../Profile/Subscription/SubscriptionDialog';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
@@ -78,15 +73,15 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import ProjectManager from '../ProjectManager';
-import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
@@ -94,8 +89,6 @@ import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/Instru
 import InstructionEditorDialog from '../EventsSheet/InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from '../EventsSheet/InstructionEditor/InstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import SubscriptionPendingDialog from '../Profile/Subscription/SubscriptionPendingDialog';
-import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
@@ -111,9 +104,6 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import Brush from '@material-ui/icons/Brush';
-import Delete from '@material-ui/icons/Delete';
-import fakeResourceExternalEditors from './FakeResourceExternalEditors';
-import fakeHotReloadPreviewButtonProps from './FakeHotReloadPreviewButtonProps';
 import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
@@ -126,11 +116,6 @@ import {
   makeFakeExpressionAutocompletions,
   makeFakeExactExpressionAutocompletion,
 } from '../fixtures/TestExpressionAutocompletions';
-import AutocompletePicker from '../CommandPalette/CommandPalette/AutocompletePicker';
-import {
-  type NamedCommand,
-  type CommandOption,
-} from '../CommandPalette/CommandManager';
 import HotReloadPreviewButton from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import ScrollView from '../UI/ScrollView';
@@ -151,7 +136,8 @@ import {
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
 import subscriptionSuggestionDecorator from './SubscriptionSuggestionDecorator';
-import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import Trash from '../UI/CustomSvgIcons/Trash';
+import fakeResourceManagementProps from './FakeResourceManagement';
 
 configureActions({
   depth: 2,
@@ -179,10 +165,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -198,10 +184,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
           floatingLabelText="This is a floating label"
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -216,10 +202,10 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
         >
-          <SelectOption value="1" primaryText="Choice 1" />
-          <SelectOption value="2" primaryText="Choice 2" />
-          <SelectOption value="3" primaryText="Choice 3" />
-          <SelectOption value="4" primaryText="Choice 4" />
+          <SelectOption value="1" label="Choice 1" />
+          <SelectOption value="2" label="Choice 2" />
+          <SelectOption value="3" label="Choice 3" />
+          <SelectOption value="4" label="Choice 4" />
         </SelectField>
       )}
     />
@@ -317,7 +303,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
   })
   .add('forceSetValue and forceSetSelection', () => {
     const [value, setValue] = React.useState('Hello World!');
-    const field = React.useRef(null);
+    const field = React.useRef<?SemiControlledTextFieldInterface>(null);
 
     return (
       <React.Fragment>
@@ -1021,7 +1007,7 @@ storiesOf('UI Building Blocks/Accordion', module)
                   action('Header action')();
                 }}
               >
-                <Delete />
+                <Trash />
               </IconButton>,
             ]}
           >
@@ -1130,69 +1116,6 @@ storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <BackgroundText>Hello World, this is a background text</BackgroundText>
-  ));
-
-storiesOf('UI Building Blocks/AlertMessage', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AlertMessage kind="info">Hello World, this is an alert text</AlertMessage>
-  ))
-  .add('default with button', () => (
-    <AlertMessage kind="info" onHide={() => {}}>
-      Hello World, this is an alert text
-    </AlertMessage>
-  ))
-  .add('long text', () => (
-    <AlertMessage kind="info">
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('long text with button', () => (
-    <AlertMessage kind="info" onHide={() => {}}>
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('long text with icon', () => (
-    <AlertMessage
-      kind="info"
-      renderLeftIcon={() => (
-        <img
-          src="res/tutorial_icons/tween-behavior.jpg"
-          alt=""
-          style={{
-            maxWidth: 128,
-            maxHeight: 128,
-          }}
-        />
-      )}
-      onHide={() => {}}
-    >
-      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
-      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
-      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
-      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
-      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
-      inimicus.
-    </AlertMessage>
-  ))
-  .add('warning', () => (
-    <AlertMessage kind="warning">
-      Hello World, this is an alert text
-    </AlertMessage>
-  ))
-  .add('error', () => (
-    <AlertMessage kind="error">Hello World, this is an alert text</AlertMessage>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)
@@ -1415,11 +1338,6 @@ storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
-
-storiesOf('HelpFinder', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)
@@ -2145,6 +2063,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
           logsManager={consoleTestData}
+          onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2164,6 +2083,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
           logsManager={consoleTestData}
+          onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2449,16 +2369,7 @@ storiesOf('InstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceExternalEditors: fakeResourceExternalEditors,
-        onChooseResource: () => {
-          action('onChooseResource');
-          return Promise.reject();
-        },
-        resourceSources: [],
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2476,16 +2387,7 @@ storiesOf('InstructionEditorDialog', module)
       isCondition
       isNewInstruction={false}
       instruction={testProject.testInstruction}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceExternalEditors: fakeResourceExternalEditors,
-        onChooseResource: () => {
-          action('onChooseResource');
-          return Promise.reject();
-        },
-        resourceSources: [],
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
       openInstructionOrExpression={action('open instruction or expression')}
       onCancel={action('cancel')}
       onSubmit={action('submit')}
@@ -2510,16 +2412,7 @@ storiesOf('InstructionEditorDialog', module)
         isCondition
         isNewInstruction={true}
         instruction={testProject.testInstruction}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceExternalEditors: fakeResourceExternalEditors,
-          onChooseResource: () => {
-            action('onChooseResource');
-            return Promise.reject();
-          },
-          resourceSources: [],
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         openInstructionOrExpression={action('open instruction or expression')}
         onCancel={action('cancel')}
         onSubmit={action('submit')}
@@ -2551,13 +2444,7 @@ storiesOf('InstructionEditorMenu', module)
             isCondition
             isNewInstruction={false}
             instruction={testProject.testInstruction}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
             openInstructionOrExpression={action(
               'open instruction or expression'
             )}
@@ -2617,7 +2504,11 @@ storiesOf('ErrorBoundary', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ErrorFallbackComponent componentStack="Fake stack" error={fakeError} />
+    <ErrorFallbackComponent
+      componentStack="Fake stack"
+      error={fakeError}
+      title="Error customizable title"
+    />
   ));
 
 storiesOf('Changelog', module)
@@ -2679,7 +2570,21 @@ storiesOf('CurrentUsageDisplayer', module)
   .add('default', () => (
     <CurrentUsageDisplayer
       subscription={subscriptionForIndieUser}
-      currentUsage={limitsForIndieUser.limits['cordova-build']}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
+      onChangeSubscription={action('on change subscription callback')}
+    />
+  ))
+  .add('with redemption code', () => (
+    <CurrentUsageDisplayer
+      subscription={silverSubscriptionWithRedemptionCode}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
+      onChangeSubscription={action('on change subscription callback')}
+    />
+  ))
+  .add('with expired redemption code', () => (
+    <CurrentUsageDisplayer
+      subscription={silverSubscriptionWithExpiredRedemptionCode}
+      currentUsage={limitsForSilverUser.limits['cordova-build']}
       onChangeSubscription={action('on change subscription callback')}
     />
   ))
@@ -2703,120 +2608,16 @@ storiesOf('AuthenticatedUserProfileDetails', module)
   .addDecorator(muiDecorator)
   .add('profile', () => (
     <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
     />
   ))
   .add('loading', () => (
     <AuthenticatedUserProfileDetails
-      authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
+      authenticatedUser={fakeAuthenticatedUserLoggingIn}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
-    />
-  ));
-
-storiesOf('Subscription/SubscriptionDetails', module)
-  .addDecorator(subscriptionSuggestionDecorator)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SubscriptionDetails
-      subscription={subscriptionForIndieUser}
-      onManageSubscription={action('manage subscription')}
-      isManageSubscriptionLoading={false}
-    />
-  ))
-  .add('no subscription', () => (
-    <SubscriptionDetails
-      subscription={noSubscription}
-      onManageSubscription={action('manage subscription')}
-      isManageSubscriptionLoading={false}
-    />
-  ))
-  .add('loading manage subscription', () => (
-    <SubscriptionDetails
-      subscription={subscriptionForIndieUser}
-      onManageSubscription={action('manage subscription')}
-      isManageSubscriptionLoading={true}
-    />
-  ));
-
-storiesOf('Subscription/SubscriptionDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('not authenticated', () => (
-    <AuthenticatedUserContext.Provider
-      value={fakeNotAuthenticatedAuthenticatedUser}
-    >
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ))
-  .add('authenticated but loading', () => (
-    <AuthenticatedUserContext.Provider
-      value={fakeAuthenticatedButLoadingAuthenticatedUser}
-    >
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ))
-  .add('authenticated user with subscription', () => (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ))
-  .add('authenticated user with no subscription', () => (
-    <AuthenticatedUserContext.Provider
-      value={fakeNoSubscriptionAuthenticatedUser}
-    >
-      <SubscriptionDialog
-        open
-        onClose={action('on close')}
-        analyticsMetadata={{ reason: 'Debugger' }}
-      />
-    </AuthenticatedUserContext.Provider>
-  ));
-
-storiesOf('Subscription/SubscriptionPendingDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default (no subscription)', () => (
-    <SubscriptionPendingDialog
-      authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
-      onClose={action('on close')}
-    />
-  ))
-  .add('authenticated user with subscription', () => (
-    <SubscriptionPendingDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
-      onClose={action('on close')}
-    />
-  ));
-
-storiesOf('EmailVerificationPendingDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('non verified user - loading', () => (
-    <EmailVerificationPendingDialog
-      authenticatedUser={fakeIndieAuthenticatedUser}
-      onClose={action('on close')}
-    />
-  ))
-  .add('verified user', () => (
-    <EmailVerificationPendingDialog
-      authenticatedUser={fakeAuthenticatedAndEmailVerifiedUser}
-      onClose={action('on close')}
     />
   ));
 
@@ -2950,68 +2751,6 @@ storiesOf('ObjectTypeSelector', module)
     />
   ));
 
-storiesOf('CommandPalette', module)
-  .addDecorator(muiDecorator)
-  .add('commands', () => (
-    <I18n>
-      {({ i18n }) => (
-        <AutocompletePicker
-          i18n={i18n}
-          items={
-            ([
-              {
-                name: 'OPEN_PROJECT',
-                handler: () => {},
-              },
-              {
-                name: 'OPEN_PROJECT_PROPERTIES',
-                handler: () => {},
-              },
-              {
-                name: 'EDIT_OBJECT',
-                handler: () => {},
-              },
-            ]: Array<NamedCommand>)
-          }
-          onClose={() => {}}
-          onSelect={action('Open command')}
-          placeholder="Start typing a command..."
-        />
-      )}
-    </I18n>
-  ))
-  .add('command options', () => (
-    <I18n>
-      {({ i18n }) => (
-        <AutocompletePicker
-          i18n={i18n}
-          items={
-            ([
-              {
-                text: 'Player',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-              {
-                text: 'Platform',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-              {
-                text: 'Enemy',
-                handler: () => {},
-                iconSrc: 'res/unknown32.png',
-              },
-            ]: Array<CommandOption>)
-          }
-          onClose={() => {}}
-          onSelect={action('Select command option')}
-          placeholder="Edit object..."
-        />
-      )}
-    </I18n>
-  ));
-
 storiesOf('HotReloadPreviewButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -3060,39 +2799,33 @@ storiesOf('ProjectPropertiesDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ProjectPropertiesDialog
-      open
-      initialTab="properties"
-      project={testProject.project}
-      onClose={action('onClose')}
-      onApply={async () => true}
-      onPropertiesApplied={action('onPropertiesApplied')}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <ProjectPropertiesDialog
+          open
+          initialTab="properties"
+          project={testProject.project}
+          onClose={action('onClose')}
+          onApply={async () => true}
+          onPropertiesApplied={action('onPropertiesApplied')}
+          resourceManagementProps={fakeResourceManagementProps}
+          i18n={i18n}
+        />
+      )}
+    </I18n>
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
-  .addDecorator(paperDecorator)
+  .addDecorator(getPaperDecorator('medium'))
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor
       loadingScreen={testProject.project.getLoadingScreen()}
+      watermark={testProject.project.getWatermark()}
       onLoadingScreenUpdated={action('onLoadingscreenUpdated')}
       onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      resourceManagementProps={fakeResourceManagementProps}
     />
   ));
 

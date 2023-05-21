@@ -17,10 +17,11 @@ import Text from './Text';
 import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
 import { Line } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
 const electron = optionalRequire('electron');
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -85,6 +86,8 @@ const styles = {
   titleContainer: {
     paddingBottom: dialogTitlePadding,
     textAlign: 'left',
+    // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
+    overflowWrap: 'anywhere',
   },
   fixedContentContainer: {
     paddingBottom: 8,
@@ -151,7 +154,7 @@ type DialogProps = {|
    * Callback called when the dialog is asking to be closed
    * (either by Escape key or a click outside, according to preferences).
    * This is the default way of closing a dialog and should almost always be
-   * specified - unless your dialog is representing an uninteruptible process.
+   * specified - unless your dialog is representing an uninterruptible process.
    *
    * If `onApply` is also specified, this must be interpreted as a "cancelling"
    * of changes.
@@ -172,6 +175,12 @@ type DialogProps = {|
    * or for dialogs that may apply significant changes and we don't want the user to misclick.
    */
   cannotBeDismissed?: boolean,
+
+  /**
+   * Indicates that even when this dialog is opened, the instances editor should still continue to render.
+   * Useful to see changes in realtime.
+   */
+  exceptionallyStillAllowRenderingInstancesEditors?: boolean,
 
   children: React.Node, // The content of the dialog
 
@@ -209,6 +218,7 @@ const Dialog = ({
   fullHeight,
   id,
   cannotBeDismissed,
+  exceptionallyStillAllowRenderingInstancesEditors,
   noMobileFullScreen,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
@@ -313,6 +323,7 @@ const Dialog = ({
       fullScreen={isFullScreen}
       className={classNames({
         'safe-area-aware-container': isFullScreen,
+        [classNameToStillAllowRenderingInstancesEditor]: exceptionallyStillAllowRenderingInstancesEditors,
       })}
       PaperProps={{
         id,
@@ -333,7 +344,11 @@ const Dialog = ({
       <div style={dialogContainerStyle}>
         {title && (
           <div style={styles.titleContainer}>
-            <Line noMargin justifyContent="space-between">
+            <Line
+              noMargin
+              justifyContent="space-between"
+              alignItems="flex-start"
+            >
               <Text noMargin size="section-title">
                 {title}
               </Text>

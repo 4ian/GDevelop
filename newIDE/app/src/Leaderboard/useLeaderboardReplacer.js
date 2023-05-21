@@ -35,9 +35,7 @@ export const ReplacePromptDialog = ({
   onClose,
   onTriggerReplace,
 }: ReplacePromptDialogProps) => {
-  const { authenticated, onCreateAccount } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { authenticated, onLogin } = React.useContext(AuthenticatedUserContext);
 
   return (
     <Dialog
@@ -56,6 +54,7 @@ export const ReplacePromptDialog = ({
                 key="register-game-now"
                 label={<Trans>Create new leaderboards now</Trans>}
                 onClick={onTriggerReplace}
+                id="create-and-replace-new-leaderboard"
               />,
             ]
           : [
@@ -68,8 +67,9 @@ export const ReplacePromptDialog = ({
               <DialogPrimaryButton
                 label={<Trans>Login now</Trans>}
                 primary
-                onClick={() => onCreateAccount()}
+                onClick={() => onLogin()}
                 key="login-now"
+                id="login-now"
               />,
             ]
       }
@@ -306,12 +306,16 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
 
       // Replace leaderboards in events.
       if (Object.keys(replacedLeaderboardsMap).length) {
+        const renamedLeaderboardsMap = toNewGdMapStringString(
+          replacedLeaderboardsMap
+        );
         const eventsLeaderboardReplacer = new gd.EventsLeaderboardsRenamer(
           project,
-          toNewGdMapStringString(replacedLeaderboardsMap)
+          renamedLeaderboardsMap
         );
+        renamedLeaderboardsMap.delete();
 
-        gd.WholeProjectRefactorer.exposeProjectEvents(
+        gd.ProjectBrowserHelper.exposeProjectEvents(
           project,
           eventsLeaderboardReplacer
         );
@@ -367,10 +371,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
       setGameId(sourceGameId);
 
       const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
-      gd.WholeProjectRefactorer.exposeProjectEvents(
-        project,
-        leaderboardsLister
-      );
+      gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
       const leaderboardIds = leaderboardsLister.getLeaderboardIds();
       setLeaderboardsToReplace(leaderboardIds.toNewVectorString().toJSArray());
       leaderboardsLister.delete();

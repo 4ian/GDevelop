@@ -60,6 +60,7 @@ type Props = {|
   loading?: boolean,
   disabled?: boolean,
   optionsLimit?: number, // Allow limiting the number of options by disabling the autocomplete.
+  disableAutoTranslate?: boolean,
 |};
 
 export default function SemiControlledMultiAutoComplete(props: Props) {
@@ -86,6 +87,9 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           }
           getOptionSelected={(option, value) => option.value === value.value}
           loading={props.loading}
+          ListboxProps={{
+            className: props.disableAutoTranslate ? 'notranslate' : '',
+          }}
           renderInput={params => (
             <TextField
               {...params}
@@ -104,17 +108,18 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           fullWidth={props.fullWidth}
           disabled={props.disabled || props.loading}
           noOptionsText={
-            <Text>
+            <Text noMargin>
               <Trans>No options</Trans>
             </Text>
           }
           loadingText={
-            <Text>
+            <Text noMargin>
               <Trans>Loading...</Trans>
             </Text>
           }
           ChipProps={{
             classes: chipStyles,
+            className: props.disableAutoTranslate ? 'notranslate' : '',
           }}
         />
       )}

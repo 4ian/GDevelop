@@ -10,7 +10,7 @@ import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import { themes } from '../../UI/Theme';
+import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -23,6 +23,9 @@ import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { adaptAcceleratorString } from '../../UI/AcceleratorString';
+import { getElectronAccelerator } from '../../KeyboardShortcuts';
+import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -61,7 +64,9 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
+    setShowObjectInstancesIn3D,
     setNewProjectsDefaultFolder,
+    setUseShortcutToClosePreviewWindow,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -117,7 +122,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               {Object.keys(themes).map(themeName => (
                 <SelectOption
                   value={themeName}
-                  primaryText={themeName}
+                  label={themeName}
                   key={themeName}
                 />
               ))}
@@ -131,7 +136,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               {getAllThemes().map(codeEditorTheme => (
                 <SelectOption
                   value={codeEditorTheme.themeName}
-                  primaryText={codeEditorTheme.name}
+                  label={codeEditorTheme.name}
                   key={codeEditorTheme.themeName}
                 />
               ))}
@@ -211,9 +216,9 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             onChange={(e, i, value: string) => setBackdropClickBehavior(value)}
             fullWidth
           >
-            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-            <SelectOption value="apply" primaryText={t`Apply changes`} />
-            <SelectOption value="nothing" primaryText={t`Do nothing`} />
+            <SelectOption value="cancel" label={t`Cancel changes`} />
+            <SelectOption value="apply" label={t`Apply changes`} />
+            <SelectOption value="nothing" label={t`Do nothing`} />
           </SelectField>
           <Text size="block-title">
             <Trans>Updates</Trans>
@@ -276,8 +281,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             }}
             fullWidth
           >
-            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-            <SelectOption value="apply" primaryText={t`Apply changes`} />
+            <SelectOption value="cancel" label={t`Cancel changes`} />
+            <SelectOption value="apply" label={t`Apply changes`} />
           </SelectField>
           <Text size="block-title">
             <Trans>Embedded help and tutorials</Trans>
@@ -345,6 +350,19 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
+          {/* TODO (3D) Remove development flag when the scene editor supports 3D display. */}
+          {Window.isDev() && (
+            <Toggle
+              onToggle={(e, check) => setShowObjectInstancesIn3D(check)}
+              toggled={values.showObjectInstancesIn3D}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Show objects in 3D in the scene editor (experimental)
+                </Trans>
+              }
+            />
+          )}
           {electron && (
             <>
               <ColumnStackLayout expand noMargin>
@@ -361,6 +379,25 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   label={
                     <Trans>
                       Always display the preview window on top of the editor
+                    </Trans>
+                  }
+                />
+                <Toggle
+                  onToggle={(e, check) =>
+                    setUseShortcutToClosePreviewWindow(check)
+                  }
+                  toggled={values.useShortcutToClosePreviewWindow}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Enable "Close project" shortcut (
+                      {adaptAcceleratorString(
+                        getElectronAccelerator(
+                          values.userShortcutMap['CLOSE_PROJECT'] ||
+                            defaultShortcuts['CLOSE_PROJECT']
+                        )
+                      )}
+                      ) to close preview window
                     </Trans>
                   }
                 />

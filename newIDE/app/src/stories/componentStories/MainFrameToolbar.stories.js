@@ -31,6 +31,9 @@ const fakeEditorToolbar = (
     <IconButton size="small" tooltip={'Test tooltip'} color="default">
       <DebugIcon />
     </IconButton>
+    <IconButton size="small" tooltip={'Test tooltip'} color="default" selected>
+      <DebugIcon />
+    </IconButton>
     <IconButton size="small" tooltip={'Test tooltip'} disabled color="default">
       <DebugIcon />
     </IconButton>
@@ -53,6 +56,8 @@ const defaultProps: MainFrameToolbarProps = {
   canDoNetworkPreview: true,
   isPreviewEnabled: false,
   hasPreviewsRunning: false,
+  canSave: true,
+  onSave: async () => {},
   previewState: {
     isPreviewOverriden: false,
     previewLayoutName: null,

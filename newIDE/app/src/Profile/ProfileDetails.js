@@ -3,8 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import { Line, Spacer } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -13,7 +12,6 @@ import {
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
-import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
@@ -26,13 +24,47 @@ import { GridList } from '@material-ui/core';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
+import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
+import Link from '../UI/Link';
+import {
+  communityLinksConfig,
+  type CommunityLinks,
+} from '../Utils/GDevelopServices/User';
+
+const CommunityLinksLines = ({
+  isAuthenticatedUserProfile,
+  communityLinks,
+}: {|
+  isAuthenticatedUserProfile: boolean,
+  communityLinks: Array<{ url: ?string, icon: React.Node }>,
+|}) => (
+  <ColumnStackLayout expand noMargin>
+    {communityLinks.map(({ url, icon }) =>
+      url ? (
+        <LineStackLayout noMargin alignItems="center">
+          {icon}
+          {isAuthenticatedUserProfile ? (
+            <Text noMargin>{url}</Text>
+          ) : (
+            <Link href={url} onClick={() => Window.openExternalURL(url)}>
+              <Text noMargin color="inherit">
+                {url}
+              </Text>
+            </Link>
+          )}
+        </LineStackLayout>
+      ) : null
+    )}
+  </ColumnStackLayout>
+);
 
 type DisplayedProfile = {
   id: string,
-  +email?: string,
+  +email?: string, // the "+" allows handling both public and private profile
+  username: ?string,
   description: ?string,
   donateLink: ?string,
-  username: ?string,
+  +communityLinks?: CommunityLinks, // the "+" allows handling both public and private profile
 };
 
 type Props = {|
@@ -57,6 +89,21 @@ const ProfileDetails = ({
   onAssetPackOpen,
 }: Props) => {
   const donateLink = profile ? profile.donateLink : null;
+  const communityLinks = (profile && profile.communityLinks) || {};
+  const personalWebsiteLink = communityLinks
+    ? communityLinks.personalWebsiteLink
+    : null;
+  const personalWebsite2Link = profile
+    ? communityLinks.personalWebsite2Link
+    : null;
+  const twitterUsername = profile ? communityLinks.twitterUsername : null;
+  const facebookUsername = profile ? communityLinks.facebookUsername : null;
+  const youtubeUsername = profile ? communityLinks.youtubeUsername : null;
+  const tiktokUsername = profile ? communityLinks.tiktokUsername : null;
+  const instagramUsername = profile ? communityLinks.instagramUsername : null;
+  const redditUsername = profile ? communityLinks.redditUsername : null;
+  const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
+  const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
 
   if (error)
@@ -76,15 +123,10 @@ const ProfileDetails = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <ColumnStackLayout noMargin>
-          <ResponsiveLineStackLayout
-            alignItems="center"
-            justifyContent="space-between"
-            noMargin
-          >
-            <Line noMargin alignItems="center">
-              <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
-              <Spacer />
+        <ResponsiveLineStackLayout>
+          <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
+          <ColumnStackLayout noMargin expand>
+            <ResponsiveLineStackLayout justifyContent="space-between" noMargin>
               <Text
                 size="block-title"
                 allowBrowserAutoTranslate={!profile.username}
@@ -97,18 +139,120 @@ const ProfileDetails = ({
                     ? i18n._(t`Edit your profile to pick a username!`)
                     : i18n._(t`No username`))}
               </Text>
-            </Line>
-            {profile.id && (
-              <LineStackLayout justifyContent="space-between">
-                {!isAuthenticatedUserProfile && // Only show on Public Profile.
-                  !!donateLink && (
-                    <RaisedButton
-                      label={<Trans>Buy me a coffee</Trans>}
-                      primary
-                      onClick={() => Window.openExternalURL(donateLink)}
-                      icon={<Coffee />}
-                    />
-                  )}
+              {profile.id &&
+              !isAuthenticatedUserProfile &&
+              !!donateLink && ( // Only show on Public Profile.
+                  <RaisedButton
+                    label={<Trans>Buy me a coffee</Trans>}
+                    primary
+                    onClick={() => Window.openExternalURL(donateLink)}
+                    icon={<Coffee />}
+                  />
+                )}
+            </ResponsiveLineStackLayout>
+            {isAuthenticatedUserProfile && profile.email && (
+              <Column noMargin>
+                <Text noMargin size="body-small">
+                  <Trans>Email</Trans>
+                </Text>
+                <Text>{profile.email}</Text>
+              </Column>
+            )}
+            <Column noMargin>
+              <Text noMargin size="body-small">
+                <Trans>Bio</Trans>
+              </Text>
+              <Text>
+                {profile.description || <Trans>No bio defined.</Trans>}
+              </Text>
+            </Column>
+            <CommunityLinksLines
+              communityLinks={[
+                {
+                  url: personalWebsiteLink,
+                  icon: communityLinksConfig.personalWebsiteLink.icon,
+                },
+                {
+                  url: personalWebsite2Link,
+                  icon: communityLinksConfig.personalWebsite2Link.icon,
+                },
+                {
+                  url: twitterUsername
+                    ? communityLinksConfig.twitterUsername.prefix +
+                      twitterUsername
+                    : undefined,
+                  icon: communityLinksConfig.twitterUsername.icon,
+                },
+                {
+                  url: facebookUsername
+                    ? communityLinksConfig.facebookUsername.prefix +
+                      facebookUsername
+                    : undefined,
+                  icon: communityLinksConfig.facebookUsername.icon,
+                },
+                {
+                  url: youtubeUsername
+                    ? communityLinksConfig.youtubeUsername.prefix +
+                      youtubeUsername
+                    : undefined,
+                  icon: communityLinksConfig.youtubeUsername.icon,
+                },
+                {
+                  url: tiktokUsername
+                    ? communityLinksConfig.tiktokUsername.prefix +
+                      tiktokUsername
+                    : undefined,
+                  icon: communityLinksConfig.tiktokUsername.icon,
+                },
+                {
+                  url: instagramUsername
+                    ? communityLinksConfig.instagramUsername.prefix +
+                      instagramUsername
+                    : undefined,
+                  icon: communityLinksConfig.instagramUsername.icon,
+                },
+                {
+                  url: redditUsername
+                    ? communityLinksConfig.redditUsername.prefix +
+                      redditUsername
+                    : undefined,
+                  icon: communityLinksConfig.redditUsername.icon,
+                },
+                {
+                  url: snapchatUsername
+                    ? communityLinksConfig.snapchatUsername.prefix +
+                      snapchatUsername
+                    : undefined,
+                  icon: communityLinksConfig.snapchatUsername.icon,
+                },
+                {
+                  url: discordServerLink,
+                  icon: communityLinksConfig.discordServerLink.icon,
+                },
+              ]}
+              isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
+            />
+            {isAuthenticatedUserProfile && (
+              <Column noMargin>
+                <Text noMargin size="body-small">
+                  <Trans>Donate link</Trans>
+                </Text>
+                <Text>
+                  {profile.donateLink || <Trans>No link defined.</Trans>}
+                </Text>
+              </Column>
+            )}
+            {isAuthenticatedUserProfile && (
+              <ResponsiveLineStackLayout justifyContent="flex-start" noMargin>
+                <RaisedButton
+                  label={<Trans>Edit my profile</Trans>}
+                  primary
+                  onClick={onEditProfile}
+                />
+                <FlatButton
+                  label={<Trans>Change my email</Trans>}
+                  onClick={onChangeEmail}
+                />
                 <FlatButton
                   label={<Trans>Access public profile</Trans>}
                   onClick={() =>
@@ -119,102 +263,49 @@ const ProfileDetails = ({
                       )
                     )
                   }
-                  leftIcon={<OpenInNew />}
+                  leftIcon={<ShareExternal />}
                 />
-              </LineStackLayout>
+              </ResponsiveLineStackLayout>
             )}
-          </ResponsiveLineStackLayout>
-          {isAuthenticatedUserProfile && profile.email && (
-            <Line noMargin>
-              <TextField
-                value={profile.email}
-                readOnly
-                fullWidth
-                floatingLabelText={<Trans>Email</Trans>}
-                floatingLabelFixed
-              />
-            </Line>
-          )}
-          <Line noMargin>
-            <TextField
-              value={profile.description || ''}
-              readOnly
-              fullWidth
-              multiline
-              floatingLabelText={<Trans>Bio</Trans>}
-              floatingLabelFixed
-              translatableHintText={
-                isAuthenticatedUserProfile
-                  ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
-                  : t`No bio defined.`
-              }
-              rows={3}
-              rowsMax={5}
-            />
-          </Line>
-          {isAuthenticatedUserProfile && (
-            <Line noMargin>
-              <TextField
-                value={profile.donateLink || ''}
-                readOnly
-                fullWidth
-                floatingLabelText={<Trans>Donate link</Trans>}
-                floatingLabelFixed
-                translatableHintText={t`No link defined.`}
-              />
-            </Line>
-          )}
-          {isAuthenticatedUserProfile && (
-            <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
-              <FlatButton
-                label={<Trans>Change my email</Trans>}
-                onClick={onChangeEmail}
-              />
-              <RaisedButton
-                label={<Trans>Edit my profile</Trans>}
-                primary
-                onClick={onEditProfile}
-              />
-            </ResponsiveLineStackLayout>
-          )}
-          {!isAuthenticatedUserProfile &&
-            onAssetPackOpen &&
-            assetPacksListingData &&
-            assetPacksListingData.length > 0 && (
-              <ColumnStackLayout expand noMargin>
-                <Line noMargin>
-                  <Text size="block-title">
-                    <Trans>Asset packs</Trans>
-                  </Text>
-                </Line>
-                <Line expand noMargin justifyContent="center">
-                  <GridList
-                    cols={windowWidth === 'small' ? 1 : 3}
-                    cellHeight="auto"
-                    spacing={2}
-                  >
-                    {assetPacksListingData.map(assetPackListingData => (
-                      <PrivateAssetPackTile
-                        assetPackListingData={assetPackListingData}
-                        onSelect={() => {
-                          sendAssetPackOpened({
-                            assetPackName: assetPackListingData.name,
-                            assetPackId: assetPackListingData.id,
-                            assetPackTag: null,
-                            assetPackKind: 'private',
-                            source: 'author-profile',
-                          });
-                          onAssetPackOpen(assetPackListingData);
-                        }}
-                        owned={false}
-                        key={assetPackListingData.id}
-                      />
-                    ))}
-                  </GridList>
-                </Line>
-              </ColumnStackLayout>
-            )}
-        </ColumnStackLayout>
+            {!isAuthenticatedUserProfile &&
+              onAssetPackOpen &&
+              assetPacksListingData &&
+              assetPacksListingData.length > 0 && (
+                <ColumnStackLayout expand noMargin>
+                  <Line noMargin>
+                    <Text size="block-title">
+                      <Trans>Asset packs</Trans>
+                    </Text>
+                  </Line>
+                  <Line expand noMargin justifyContent="start">
+                    <GridList
+                      cols={windowWidth === 'small' ? 1 : 3}
+                      cellHeight="auto"
+                      spacing={2}
+                    >
+                      {assetPacksListingData.map(assetPackListingData => (
+                        <PrivateAssetPackTile
+                          assetPackListingData={assetPackListingData}
+                          onSelect={() => {
+                            sendAssetPackOpened({
+                              assetPackName: assetPackListingData.name,
+                              assetPackId: assetPackListingData.id,
+                              assetPackTag: null,
+                              assetPackKind: 'private',
+                              source: 'author-profile',
+                            });
+                            onAssetPackOpen(assetPackListingData);
+                          }}
+                          owned={false}
+                          key={assetPackListingData.id}
+                        />
+                      ))}
+                    </GridList>
+                  </Line>
+                </ColumnStackLayout>
+              )}
+          </ColumnStackLayout>
+        </ResponsiveLineStackLayout>
       )}
     </I18n>
   );

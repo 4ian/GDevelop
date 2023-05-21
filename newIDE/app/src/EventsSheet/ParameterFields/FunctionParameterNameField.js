@@ -1,49 +1,87 @@
 // @flow
-import React, { Component } from 'react';
-import GenericExpressionField from './GenericExpressionField';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
+import React from 'react';
+import { t } from '@lingui/macro';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParameters';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
-export default class FunctionParameterNameField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _field: ?GenericExpressionField;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function FunctionParameterNameField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?SelectFieldInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
-    const eventsBasedEntity =
-      this.props.scope.eventsBasedBehavior ||
-      this.props.scope.eventsBasedObject;
-    const functionsContainer = eventsBasedEntity
-      ? eventsBasedEntity.getEventsFunctions()
-      : this.props.scope.eventsFunctionsExtension;
-    const parameterNames: Array<ExpressionAutocompletion> =
-      this.props.scope.eventsFunction && functionsContainer
-        ? enumerateParametersUsableInExpressions(
-            functionsContainer,
-            this.props.scope.eventsFunction
-          ).map(parameterMetadata => ({
-            kind: 'Text',
-            completion: `"${parameterMetadata.getName()}"`,
-          }))
+    const { parameterMetadata } = props;
+    const allowedParameterTypes =
+      parameterMetadata && parameterMetadata.getExtraInfo()
+        ? parameterMetadata.getExtraInfo().split(',')
         : [];
 
-    return (
-      <GenericExpressionField
-        expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
-          parameterNames.filter(
-            ({ completion }) => completion.indexOf(expression) === 0
+    const eventsBasedEntity =
+      props.scope.eventsBasedBehavior || props.scope.eventsBasedObject;
+    const functionsContainer = eventsBasedEntity
+      ? eventsBasedEntity.getEventsFunctions()
+      : props.scope.eventsFunctionsExtension;
+    const parameters: Array<gdParameterMetadata> =
+      props.scope.eventsFunction && functionsContainer
+        ? enumerateParametersUsableInExpressions(
+            functionsContainer,
+            props.scope.eventsFunction,
+            allowedParameterTypes
           )
+        : [];
+
+    const selectOptions = parameters.map(parameter => {
+      const parameterName = parameter.getName();
+      return (
+        <SelectOption
+          key={parameterName}
+          value={`"${parameterName}"`}
+          label={parameterName}
+          shouldNotTranslate={true}
+        />
+      );
+    });
+
+    const onChangeSelectValue = (event, value) => {
+      props.onChange(event.target.value);
+    };
+
+    const fieldLabel = props.parameterMetadata
+      ? props.parameterMetadata.getDescription()
+      : undefined;
+
+    return (
+      <SelectField
+        ref={field}
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-function-parameter-field`
+            : undefined
         }
-        ref={field => (this._field = field)}
-        {...this.props}
-      />
+        value={props.value}
+        onChange={onChangeSelectValue}
+        margin={props.isInline ? 'none' : 'dense'}
+        fullWidth
+        floatingLabelText={fieldLabel}
+        translatableHintText={t`Choose a parameter`}
+        helperMarkdownText={
+          (props.parameterMetadata &&
+            props.parameterMetadata.getLongDescription()) ||
+          null
+        }
+      >
+        {selectOptions}
+      </SelectField>
     );
   }
-}
+);

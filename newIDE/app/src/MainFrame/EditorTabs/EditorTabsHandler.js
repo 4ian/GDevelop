@@ -270,14 +270,15 @@ export const closeExternalEventsTabs = (
 
 export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
-  eventsFunctionsExtension: gdEventsFunctionsExtension
+  eventsFunctionsExtensionName: string
 ) => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
       return (
-        !editor.getEventsFunctionsExtension() ||
-        editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
+        !editor.getEventsFunctionsExtensionName() ||
+        editor.getEventsFunctionsExtensionName() !==
+          eventsFunctionsExtensionName
       );
     }
 

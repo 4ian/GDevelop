@@ -2,14 +2,12 @@
 import * as React from 'react';
 
 import muiDecorator from '../../ThemeDecorator';
-import paperDecorator from '../../PaperDecorator';
 
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ValueStateHolder from '../../ValueStateHolder';
 
 import ParameterRenderingService from '../../../EventsSheet/ParameterRenderingService';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { Column, Line } from '../../../UI/Grid';
 
 import AudioResourceField from '../../../EventsSheet/ParameterFields/AudioResourceField';
@@ -19,8 +17,7 @@ import BitmapFontResourceField from '../../../EventsSheet/ParameterFields/Bitmap
 import FontResourceField from '../../../EventsSheet/ParameterFields/FontResourceField';
 import JsonResourceField from '../../../EventsSheet/ParameterFields/JsonResourceField';
 import TilemapResourceField from '../../../EventsSheet/ParameterFields/TilemapResourceField';
-
-const gd: libGDevelop = global.gd;
+import Model3DResourceField from '../../../EventsSheet/ParameterFields/Model3DResourceField';
 
 export const AllResourceFields = () => (
   <Column expand>
@@ -36,13 +33,7 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />
@@ -59,13 +50,7 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />
@@ -82,13 +67,7 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />
@@ -105,13 +84,7 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />
@@ -128,13 +101,7 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />
@@ -151,13 +118,7 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />
@@ -174,13 +135,24 @@ export const AllResourceFields = () => (
             value={value}
             onChange={onChange}
             parameterRenderingService={ParameterRenderingService}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
+          />
+        )}
+      />
+    </Line>
+    <Line expand>
+      <ValueStateHolder
+        initialValue={''}
+        render={(value, onChange) => (
+          <Model3DResourceField
+            project={testProject.project}
+            scope={{ layout: testProject.testLayout }}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            value={value}
+            onChange={onChange}
+            parameterRenderingService={ParameterRenderingService}
+            resourceManagementProps={fakeResourceManagementProps}
           />
         )}
       />

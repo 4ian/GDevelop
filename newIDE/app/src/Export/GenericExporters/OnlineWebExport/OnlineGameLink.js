@@ -19,9 +19,7 @@ import {
   getGameUrl,
   updateGame,
   setGameSlug,
-  getGameSlugs,
   type Game,
-  type GameSlug,
   getAclsFromUserIds,
   setGameUserAcls,
 } from '../../../Utils/GDevelopServices/Game';
@@ -35,6 +33,7 @@ import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
 import LinearProgress from '../../../UI/LinearProgress';
 import CircularProgress from '../../../UI/CircularProgress';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -62,7 +61,6 @@ const OnlineGameLink = ({
     setIsOnlineGamePropertiesDialogOpen,
   ] = React.useState<boolean>(false);
   const [game, setGame] = React.useState<?Game>(null);
-  const [slug, setSlug] = React.useState<?GameSlug>(null);
   const [isGameLoading, setIsGameLoading] = React.useState<boolean>(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -71,7 +69,7 @@ const OnlineGameLink = ({
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
-  const gameUrl = getGameUrl(game, slug);
+  const gameUrl = getGameUrl(game);
   const buildUrl =
     exportPending || !isBuildComplete
       ? null
@@ -87,16 +85,8 @@ const OnlineGameLink = ({
       const { id } = profile;
       try {
         setIsGameLoading(true);
-        const [game, slugs] = await Promise.all([
-          getGame(getAuthorizationHeader, id, gameId),
-          getGameSlugs(getAuthorizationHeader, id, gameId).catch(err => {
-            console.error('Unable to get the game slug', err);
-          }),
-        ]);
+        const game = await getGame(getAuthorizationHeader, id, gameId);
         setGame(game);
-        if (slugs && slugs.length > 0) {
-          setSlug(slugs[0]);
-        }
       } catch (err) {
         console.error('Unable to load the game', err);
       } finally {
@@ -155,7 +145,6 @@ const OnlineGameLink = ({
             userSlug,
             gameSlug
           );
-          setSlug({ username: userSlug, gameSlug: gameSlug, createdAt: 0 });
         } catch (error) {
           console.error(
             'Unable to update the game slug:',
@@ -210,29 +199,26 @@ const OnlineGameLink = ({
       try {
         setIsGameLoading(true);
         // First update the game.
-        const updatedGame = await updateGame(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          {
-            gameName: project.getName(),
-            description: project.getDescription(),
-            categories: project.getCategories().toJSArray(),
-            playWithGamepad: project.isPlayableWithGamepad(),
-            playWithKeyboard: project.isPlayableWithKeyboard(),
-            playWithMobile: project.isPlayableWithMobile(),
-            orientation: project.getOrientation(),
-            publicWebBuildId: build.id,
-            thumbnailUrl: getWebBuildThumbnailUrl(project, build.id),
-            discoverable: partialGameChange.discoverable,
-          }
-        );
-        setGame(updatedGame);
+        await updateGame(getAuthorizationHeader, id, game.id, {
+          gameName: project.getName(),
+          description: project.getDescription(),
+          categories: project.getCategories().toJSArray(),
+          playWithGamepad: project.isPlayableWithGamepad(),
+          playWithKeyboard: project.isPlayableWithKeyboard(),
+          playWithMobile: project.isPlayableWithMobile(),
+          orientation: project.getOrientation(),
+          publicWebBuildId: build.id,
+          thumbnailUrl: getWebBuildThumbnailUrl(project, build.id),
+          discoverable: partialGameChange.discoverable,
+        });
         // Then set authors and slug in parrallel.
         const [authorsUpdated, slugUpdated] = await Promise.all([
           tryUpdateAuthors(i18n),
           tryUpdateSlug(partialGameChange, i18n),
         ]);
+        // Update game again as cached values on the game entity might have changed.
+        await loadGame();
+        // If one of the update failed, return false so that the dialog is not closed.
         if (!authorsUpdated || !slugUpdated) {
           return false;
         }
@@ -260,6 +246,7 @@ const OnlineGameLink = ({
       project,
       tryUpdateAuthors,
       tryUpdateSlug,
+      loadGame,
     ]
   );
 
@@ -276,7 +263,7 @@ const OnlineGameLink = ({
     game && buildUrl && !isBuildPublished && (
       <DialogPrimaryButton
         key="publish"
-        label={<Trans>Verify and Publish to Liluo.io</Trans>}
+        label={<Trans>Verify and Publish to gd.games</Trans>}
         primary
         onClick={() => setIsOnlineGamePropertiesDialogOpen(true)}
       />
@@ -316,17 +303,28 @@ const OnlineGameLink = ({
                     <ShareButton url={buildUrl} />
                   )}
                   {isBuildPublished && !navigator.share && (
-                    <Line justifyContent="space-between">
-                      <Column justifyContent="center">
-                        <AlertMessage kind="info">
-                          <Trans>
-                            Your game is published! Share it with the community!
-                          </Trans>
-                        </AlertMessage>
-                      </Column>
-                      <Column justifyContent="flex-end">
-                        <SocialShareButtons url={buildUrl} />
-                      </Column>
+                    <Line expand>
+                      <ResponsiveLineStackLayout
+                        expand
+                        justifyContent="space-between"
+                        noMargin
+                      >
+                        <Column justifyContent="center" noMargin>
+                          <AlertMessage kind="info">
+                            <Trans>
+                              Your game is published! Share it with the
+                              community!
+                            </Trans>
+                          </AlertMessage>
+                        </Column>
+                        <Column
+                          justifyContent="flex-end"
+                          noMargin
+                          alignItems="center"
+                        >
+                          <SocialShareButtons url={buildUrl} />
+                        </Column>
+                      </ResponsiveLineStackLayout>
                     </Line>
                   )}
                   {!isBuildPublished && game && (
@@ -335,7 +333,7 @@ const OnlineGameLink = ({
                         <Trans>
                           This link is private so you can share it with friends
                           and testers. When you're ready you can update your
-                          Liluo.io game page.
+                          gd.games game page.
                         </Trans>
                       </AlertMessage>
                     </Line>
@@ -374,8 +372,8 @@ const OnlineGameLink = ({
                 }
               }}
               game={game}
-              slug={slug}
               isLoading={isGameLoading}
+              i18n={i18n}
             />
           )}
         </>

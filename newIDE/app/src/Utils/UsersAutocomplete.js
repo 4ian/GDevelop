@@ -15,7 +15,7 @@ import useForceUpdate from './UseForceUpdate';
 
 type Props = {|
   userIds: Array<string>,
-  onChange: (Array<string>) => void,
+  onChange: (Array<{| userId: string, username: string |}>) => void,
   floatingLabelText?: React.Node,
   helperText: React.Node,
   disabled?: boolean,
@@ -127,7 +127,12 @@ export const UsersAutocomplete = ({
         // change users in state
         setUsers(values);
         // call top onChange on user ids
-        onChange(values.map(option => option.value));
+        onChange(
+          values.map(option => ({
+            username: option.text,
+            userId: option.value,
+          }))
+        );
         forceUpdate();
       }}
       inputValue={userInput}
@@ -149,6 +154,7 @@ export const UsersAutocomplete = ({
       loading={loading || disabled}
       fullWidth
       error={getErrorMessage(error)}
+      disableAutoTranslate
     />
   );
 };

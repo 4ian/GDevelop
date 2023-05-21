@@ -71,6 +71,17 @@
         }
       }
     },
+    "icon-button": {
+      "selected": {
+        "color": {
+          "value": "#25252E",
+          "comment": "Palette/Grey/90"
+        },
+        "background-color": {
+          "value": "#56B6C2"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#81CFFF"
@@ -323,6 +334,21 @@
         }
       }
     },
+    "example": {
+      "difficulty": {
+        "color": {
+          "simple": {
+            "value": "#8BE7C4"
+          },
+          "advanced": {
+            "value": "#FFD28F"
+          },
+          "expert": {
+            "value": "#FFA38F"
+          }
+        }
+      }
+    },
     "tabs": {
       "text-color": {
         "value": "#7F7F85",
@@ -452,7 +478,7 @@
           "value": "#98C379"
         }
       },
-      "expression": {
+      "number": {
         "color": {
           "value": "#E5C07B"
         }
@@ -544,7 +570,8 @@
         "value": "#3E4452"
       },
       "background-color": {
-        "value": "#21252B"
+        "value": "#25252E",
+        "comment": "Palette/Grey/90"
       }
     },
     "toolbar": {

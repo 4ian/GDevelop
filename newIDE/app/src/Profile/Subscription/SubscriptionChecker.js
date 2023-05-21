@@ -14,6 +14,8 @@ import {
 } from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import Text from '../../UI/Text';
+import { hasValidSubscriptionPlan } from '../../Utils/GDevelopServices/Usage';
+import { isNativeMobileApp } from '../../Utils/Platform';
 
 export type SubscriptionCheckerInterface = {|
   checkUserHasSubscription: () => boolean,
@@ -51,16 +53,17 @@ const SubscriptionChecker = React.forwardRef<
   };
 
   const checkUserHasSubscription = () => {
-    if (authenticatedUser.subscription) {
-      const hasPlan = !!authenticatedUser.subscription.planId;
-      if (hasPlan) {
-        setDialogOpen(false);
-        return true;
-      }
+    if (hasValidSubscriptionPlan(authenticatedUser.subscription)) {
+      setDialogOpen(false);
+      return true;
     }
 
-    setDialogOpen(true);
-    sendSubscriptionCheckDialogShown({ mode, id });
+    if (isNativeMobileApp()) {
+      // Would present App Store screen.
+    } else {
+      setDialogOpen(true);
+      sendSubscriptionCheckDialogShown({ mode, id });
+    }
 
     return false;
   };
@@ -72,6 +75,18 @@ const SubscriptionChecker = React.forwardRef<
       open={dialogOpen}
       title={mode === 'try' ? <Trans>We need your support!</Trans> : title}
       actions={[
+        <FlatButton
+          label={
+            mode === 'try' ? (
+              <Trans>Continue anyway</Trans>
+            ) : (
+              <Trans>Not now, thanks!</Trans>
+            )
+          }
+          key="close"
+          primary={false}
+          onClick={closeDialog}
+        />,
         <DialogPrimaryButton
           label={<Trans>Get a subscription or login</Trans>}
           key="subscribe"
@@ -86,21 +101,8 @@ const SubscriptionChecker = React.forwardRef<
           }}
         />,
       ]}
-      secondaryActions={[
-        <FlatButton
-          label={
-            mode === 'try' ? (
-              <Trans>Continue anyway</Trans>
-            ) : (
-              <Trans>Not now, thanks!</Trans>
-            )
-          }
-          key="close"
-          primary={false}
-          onClick={closeDialog}
-        />,
-      ]}
       onRequestClose={closeDialog}
+      maxWidth="sm"
     >
       <Column noMargin>
         <Line noMargin alignItems="center">

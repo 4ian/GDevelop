@@ -44,7 +44,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
     //Setup the PIXI object:
     this._pixiObject = new PIXI.Sprite(
-      PixiResourcesLoader.getInvalidPIXITexture()
+      this._pixiResourcesLoader.getInvalidPIXITexture()
     );
     this._pixiContainer.addChild(this._pixiObject);
     this.updatePIXITextureAndSprite();
@@ -73,7 +73,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
         .getDirection(0)
         .getSprite(0)
         .getImageName();
-      return ResourcesLoader.getResourceFullUrl(project, imageName, {});
+      return resourcesLoader.getResourceFullUrl(project, imageName, {});
     }
 
     return 'res/unknown32.png';
@@ -146,7 +146,7 @@ export default class RenderedSpriteInstance extends RenderedInstance {
     const sprite = this._sprite;
     if (!sprite) return;
 
-    const texture = PixiResourcesLoader.getPIXITexture(
+    const texture = this._pixiResourcesLoader.getPIXITexture(
       this._project,
       sprite.getImageName()
     );
@@ -201,5 +201,15 @@ export default class RenderedSpriteInstance extends RenderedInstance {
 
   getDefaultHeight(): number {
     return Math.abs(this._pixiObject.texture.frame.height);
+  }
+
+  getCenterX(): number {
+    if (!this._sprite || !this._pixiObject) return 0;
+    return this._centerX * this._pixiObject.scale.x; // This is equivalent to `this._animationFrame.center.x * Math.abs(this._scaleX)` in the runtime.
+  }
+
+  getCenterY(): number {
+    if (!this._sprite || !this._pixiObject) return 0;
+    return this._centerY * this._pixiObject.scale.y; // This is equivalent to `this._animationFrame.center.y * Math.abs(this._scaleY)` in the runtime.
   }
 }

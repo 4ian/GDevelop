@@ -89,7 +89,7 @@ module.exports = {
       .addExtraInfo('image');
     dummyEffectProperties
       .getOrCreate('someColor')
-      .setValue('#0022FF')
+      .setValue('255;3;62')
       .setLabel(_("Color (won't be used, just for demonstration purpose)"))
       .setType('color')
       .setDescription(_('Another optional description.'));
@@ -438,7 +438,7 @@ module.exports = {
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.

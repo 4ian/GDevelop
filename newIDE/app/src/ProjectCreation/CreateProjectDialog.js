@@ -30,14 +30,14 @@ export type CreateProjectDialogProps = {|
 |};
 
 export type NewProjectSetup = {|
-  projectName: string,
   storageProvider: StorageProvider,
   saveAsLocation: ?SaveAsLocation,
-  height: number,
-  width: number,
-  orientation: 'landscape' | 'portrait' | 'default',
-  optimizeForPixelArt: boolean,
-  allowPlayersToLogIn: boolean,
+  projectName?: string,
+  height?: number,
+  width?: number,
+  orientation?: 'landscape' | 'portrait' | 'default',
+  optimizeForPixelArt?: boolean,
+  allowPlayersToLogIn?: boolean,
 |};
 
 export type NewProjectSource = {|
@@ -59,7 +59,7 @@ export const createNewProject = async (): Promise<?NewProjectSource> => {
 
 export const createNewProjectWithDefaultLogin = async (): Promise<?NewProjectSource> => {
   const url =
-    'https://resources.gdevelop.io/examples-database/login-template.json';
+    'https://resources.gdevelop-app.com/examples-database/login-template.json';
   sendNewGameCreated({
     exampleUrl: url,
     exampleSlug: 'login-template',
@@ -69,6 +69,18 @@ export const createNewProjectWithDefaultLogin = async (): Promise<?NewProjectSou
     storageProvider: UrlStorageProvider,
     fileMetadata: {
       fileIdentifier: url,
+    },
+  };
+};
+
+export const createNewProjectFromTutorialTemplate = async (
+  templateUrl: string
+): Promise<?NewProjectSource> => {
+  return {
+    project: null,
+    storageProvider: UrlStorageProvider,
+    fileMetadata: {
+      fileIdentifier: templateUrl,
     },
   };
 };

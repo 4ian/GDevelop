@@ -28,6 +28,10 @@ type AxisLayout = {
    */
   anchorDelta?: number,
   /**
+   * Scale proportionally to the target when anchored.
+   */
+  isScaledProportionally?: boolean,
+  /**
    * The left or top margin in pixels.
    */
   minSideAbsoluteMargin?: number,
@@ -76,45 +80,76 @@ const layoutFields = [
   'AnchorTarget',
   'AnchorDeltaX',
   'AnchorDeltaY',
+  'IsScaledProportionallyOnX',
+  'IsScaledProportionallyOnY',
+  'IsScaledProportionally',
 ];
+
+/**
+ * @param positionName Accepted values are: 'left', 'center' or 'right', but
+ * also values like 'top-left'.
+ * @returns a value between 0 and 1.
+ */
+export const getProportionalPositionX = (
+  positionName: string
+): number | null => {
+  const horizontalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[1]
+    : positionName
+  ).toLowerCase();
+  return horizontalPositionName === 'left'
+    ? 0
+    : horizontalPositionName === 'right'
+    ? 1
+    : horizontalPositionName === 'center'
+    ? 0.5
+    : null;
+};
+
+/**
+ * @param positionName Accepted values are: 'top', 'center' or 'bottom', but
+ * also values like 'top-left'.
+ * @returns a value between 0 and 1.
+ */
+export const getProportionalPositionY = (
+  positionName: string
+): number | null => {
+  const verticalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[0]
+    : positionName
+  ).toLowerCase();
+  return verticalPositionName === 'top'
+    ? 0
+    : verticalPositionName === 'bottom'
+    ? 1
+    : verticalPositionName === 'center'
+    ? 0.5
+    : null;
+};
 
 const getHorizontalAnchorValue = (
   anchorName: string,
-  properties: ?gdMapStringPropertyDescriptor
-): ?number => {
-  const horizontalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[1]
-    : anchorName
-  ).toLowerCase();
-  return horizontalAnchorName === 'left'
-    ? 0
-    : horizontalAnchorName === 'right'
-    ? 1
-    : horizontalAnchorName === 'center'
-    ? 0.5
+  properties: gdMapStringPropertyDescriptor
+): number | null => {
+  const proportionalX = getProportionalPositionX(anchorName);
+  return proportionalX !== null
+    ? proportionalX
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
-    ? getHorizontalAnchorValue(properties.get(anchorName).getValue(), null)
+    ? getProportionalPositionX(properties.get(anchorName).getValue())
     : null;
 };
 
 const getVerticalAnchorValue = (
   anchorName: string,
-  properties: ?gdMapStringPropertyDescriptor
-): ?number => {
-  const verticalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[0]
-    : anchorName
-  ).toLowerCase();
-  return verticalAnchorName === 'top'
-    ? 0
-    : verticalAnchorName === 'bottom'
-    ? 1
-    : verticalAnchorName === 'center'
-    ? 0.5
+  properties: gdMapStringPropertyDescriptor
+): number | null => {
+  const proportionalY = getProportionalPositionY(anchorName);
+  return proportionalY !== null
+    ? proportionalY
     : // Reference to another property to allow to expose a Choice property.
     properties && properties.has(anchorName)
-    ? getVerticalAnchorValue(properties.get(anchorName).getValue(), null)
+    ? getProportionalPositionY(properties.get(anchorName).getValue())
     : null;
 };
 
@@ -125,15 +160,15 @@ const getVerticalAnchorValue = (
 const getHorizontalOriginAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: ?number
-): ?number => {
+  targetAnchorValue: number | null
+): number | null => {
   const horizontalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[1]
     : anchorName
   ).toLowerCase();
   return horizontalAnchorName === 'same'
     ? targetAnchorValue
-    : horizontalAnchorName === 'opposite' && targetAnchorValue != null
+    : horizontalAnchorName === 'opposite' && targetAnchorValue !== null
     ? 1 - targetAnchorValue
     : getHorizontalAnchorValue(horizontalAnchorName, properties);
 };
@@ -145,15 +180,15 @@ const getHorizontalOriginAnchorValue = (
 const getVerticalOriginAnchorValue = (
   anchorName: string,
   properties: gdMapStringPropertyDescriptor,
-  targetAnchorValue: ?number
-): ?number => {
+  targetAnchorValue: number | null
+): number | null => {
   const verticalAnchorName = (anchorName.includes('-')
     ? anchorName.split('-')[0]
     : anchorName
   ).toLowerCase();
   return verticalAnchorName === 'same'
     ? targetAnchorValue
-    : verticalAnchorName === 'opposite' && targetAnchorValue != null
+    : verticalAnchorName === 'opposite' && targetAnchorValue !== null
     ? 1 - targetAnchorValue
     : getVerticalAnchorValue(verticalAnchorName, properties);
 };
@@ -192,6 +227,7 @@ export const getLayouts = (
     // new types to make the layout configuration easier.
     const name = property.getName();
     const propertyValueString = instanceProperties.get(name).getValue();
+    const propertyValueBoolean = propertyValueString === 'true';
     const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
     const layoutField = layoutFields.find(field => name.includes(field));
 
@@ -199,8 +235,8 @@ export const getLayouts = (
     // but the child that is the target of the anchor.
     // The extraInfos from the AnchorOrigin is used to get this child-object list
     let targetObjectName = '';
-    let horizontalAnchorTarget: ?number = null;
-    let verticalAnchorTarget: ?number = null;
+    let horizontalAnchorTarget: number | null = null;
+    let verticalAnchorTarget: number | null = null;
     if (
       layoutField === 'HorizontalAnchorOrigin' ||
       layoutField === 'VerticalAnchorOrigin' ||
@@ -268,6 +304,13 @@ export const getLayouts = (
         layout.horizontalLayout.anchorDelta = propertyValueNumber;
       } else if (layoutField === 'AnchorDeltaY') {
         layout.verticalLayout.anchorDelta = propertyValueNumber;
+      } else if (layoutField === 'IsScaledProportionallyOnX') {
+        layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
+      } else if (layoutField === 'IsScaledProportionallyOnY') {
+        layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
+      } else if (layoutField === 'IsScaledProportionally') {
+        layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
+        layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
       } else {
         if (
           layoutField === 'HorizontalAnchorOrigin' ||
@@ -505,12 +548,17 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         ? targetInstance.getCustomWidth()
         : targetRenderedInstance.getDefaultWidth();
 
+      const width = childLayout.horizontalLayout.isScaledProportionally
+        ? (targetInstanceWidth * renderedInstance.getDefaultWidth()) /
+          targetRenderedInstance.getDefaultWidth()
+        : renderedInstance.getDefaultWidth();
+
       childInstance.x =
         targetInstance.getX() +
         (childLayout.horizontalLayout.anchorDelta || 0) +
         anchorTarget * targetInstanceWidth -
-        anchorOrigin * renderedInstance.getDefaultWidth();
-      childInstance.setCustomWidth(renderedInstance.getDefaultWidth());
+        anchorOrigin * width;
+      childInstance.setCustomWidth(width);
     }
 
     if (childLayout.verticalLayout.anchorOrigin == null) {
@@ -545,12 +593,17 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         ? targetInstance.getCustomHeight()
         : targetRenderedInstance.getDefaultHeight();
 
+      const height = childLayout.horizontalLayout.isScaledProportionally
+        ? (targetInstanceHeight * renderedInstance.getDefaultHeight()) /
+          targetRenderedInstance.getDefaultHeight()
+        : renderedInstance.getDefaultHeight();
+
       childInstance.y =
         targetInstance.getY() +
         (childLayout.verticalLayout.anchorDelta || 0) +
         anchorTarget * targetInstanceHeight -
-        anchorOrigin * renderedInstance.getDefaultHeight();
-      childInstance.setCustomHeight(renderedInstance.getDefaultHeight());
+        anchorOrigin * height;
+      childInstance.setCustomHeight(height);
     }
     renderedInstance.update();
   }

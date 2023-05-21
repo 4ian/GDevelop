@@ -2,8 +2,9 @@
 
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
-import { type InAppTutorial } from '../../InAppTutorial/InAppTutorialContext';
 import optionalRequire from '../OptionalRequire';
+import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 import Window from '../Window';
 const fs = optionalRequire('fs');
 const fsPromises = fs ? fs.promises : null;
@@ -11,10 +12,123 @@ const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
 
+export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
+export const PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID = 'plinkoMultiplier';
+export const CAMERA_PARALLAX_IN_APP_TUTORIAL_ID = 'cameraParallax';
+export const HEALTH_BAR_IN_APP_TUTORIAL_ID = 'healthBar';
+export const JOYSTICK_IN_APP_TUTORIAL_ID = 'joystick';
+export const TIMER_IN_APP_TUTORIAL_ID = 'timer';
+
+export const guidedLessonsIds = [
+  PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+  TIMER_IN_APP_TUTORIAL_ID,
+  CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+  HEALTH_BAR_IN_APP_TUTORIAL_ID,
+  JOYSTICK_IN_APP_TUTORIAL_ID,
+];
+
+const fullTutorialIds = [FLING_GAME_IN_APP_TUTORIAL_ID];
+
+export const allInAppTutorialIds = [...guidedLessonsIds, ...fullTutorialIds];
+
 export type InAppTutorialShortHeader = {|
   id: string,
   contentUrl: string,
   availableLocales: Array<string>,
+  initialTemplateUrl?: string,
+  initialProjectData?: { [key: string]: string },
+|};
+
+export type EditorIdentifier =
+  | 'Scene'
+  | 'EventsSheet'
+  | 'Home'
+  | 'ExternalEvents'
+  | 'ExternalLayout'
+  | 'Extension'
+  | 'Resources';
+
+export type TranslatedText =
+  | {| messageDescriptor: MessageDescriptor |}
+  | {| messageByLocale: MessageByLocale |};
+
+type InAppTutorialFlowStepDOMChangeTrigger =
+  | {| presenceOfElement: string |}
+  | {| absenceOfElement: string |};
+
+export type InAppTutorialFlowStepTrigger =
+  | InAppTutorialFlowStepDOMChangeTrigger
+  | {| editorIsActive: string |}
+  | {| valueHasChanged: true |}
+  | {| valueEquals: string |}
+  | {| instanceAddedOnScene: string, instancesCount?: number |}
+  | {| previewLaunched: true |}
+  | {| clickOnTooltipButton: TranslatedText |};
+
+export type InAppTutorialFlowStepFormattedTrigger =
+  | InAppTutorialFlowStepDOMChangeTrigger
+  | {| valueEquals: string |}
+  | {| valueHasChanged: true |}
+  | {| instanceAddedOnScene: string, instancesCount?: number |}
+  | {| previewLaunched: true |}
+  | {| clickOnTooltipButton: string |};
+
+export type InAppTutorialTooltip = {|
+  standalone?: true,
+  placement?: 'bottom' | 'left' | 'right' | 'top',
+  title?: TranslatedText,
+  description?: TranslatedText,
+  touchDescription?: TranslatedText,
+  image?: { dataUrl: string, width?: string },
+|};
+
+export type InAppTutorialFormattedTooltip = {|
+  ...InAppTutorialTooltip,
+  title?: string,
+  description?: string,
+|};
+
+export type InAppTutorialDialog = {|
+  content: Array<
+    TranslatedText | {| image: {| imageSource: string, linkHref?: string |} |}
+  >,
+|};
+
+export type InAppTutorialFlowStep = {|
+  elementToHighlightId?: string,
+  id?: string,
+  isTriggerFlickering?: true,
+  isCheckpoint?: true,
+  deprecated?: true,
+  nextStepTrigger?: InAppTutorialFlowStepTrigger,
+  shortcuts?: Array<{|
+    stepId: string,
+    // TODO: Adapt provider to make it possible to use other triggers as shortcuts
+    trigger: InAppTutorialFlowStepDOMChangeTrigger,
+  |}>,
+  dialog?: InAppTutorialDialog,
+  mapProjectData?: {
+    [key: string]: 'projectLastSceneName' | string, // string represents accessors with parameters such as lastSceneObjectName:{sceneName}
+  },
+  tooltip?: InAppTutorialTooltip,
+  skippable?: true,
+  isOnClosableDialog?: true,
+|};
+
+export type InAppTutorialFlowFormattedStep = {|
+  ...InAppTutorialFlowStep,
+  tooltip?: InAppTutorialFormattedTooltip,
+  nextStepTrigger?: InAppTutorialFlowStepFormattedTrigger,
+|};
+
+export type InAppTutorial = {|
+  id: string,
+  flow: Array<InAppTutorialFlowStep>,
+  editorSwitches: {
+    [stepId: string]: {| editor: EditorIdentifier, scene?: string |},
+  },
+  endDialog: InAppTutorialDialog,
+  availableLocales?: Array<string>,
 |};
 
 const readJSONFile = async (filepath: string): Promise<Object> => {
@@ -30,8 +144,8 @@ const readJSONFile = async (filepath: string): Promise<Object> => {
 };
 
 const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
-  const shouldFetchTutorials = !!remote && !Window.isDev();
-  if (!shouldFetchTutorials) return null;
+  const shouldRetrieveTutorialsLocally = !!remote && !Window.isDev();
+  if (!shouldRetrieveTutorialsLocally) return null;
 
   const appPath = app ? app.getAppPath() : process.cwd();
   // If on desktop released version, find json in resources.
@@ -40,7 +154,7 @@ const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
   const filePath = path.join(
     appPath,
     '..', // If on dev env, replace with '../../app/resources' to test.
-    `in-app-tutorials/${filename}.json`
+    `inAppTutorials/${filename}.json`
   );
   const data = await readJSONFile(filePath);
   return data;
@@ -51,7 +165,7 @@ export const fetchInAppTutorialShortHeaders = async (): Promise<
 > => {
   try {
     const inAppTutorialShortHeadersStoredLocally = await fetchLocalFileIfDesktop(
-      'in-app-tutorial-short-header'
+      'inAppTutorialShortHeaders'
     );
     if (inAppTutorialShortHeadersStoredLocally)
       return inAppTutorialShortHeadersStoredLocally;
@@ -84,3 +198,12 @@ export const fetchInAppTutorial = async (
   const response = await axios.get(shortHeader.contentUrl);
   return response.data;
 };
+
+export const isMiniTutorial = (tutorialId: string) =>
+  [
+    PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
+    TIMER_IN_APP_TUTORIAL_ID,
+    CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
+    HEALTH_BAR_IN_APP_TUTORIAL_ID,
+    JOYSTICK_IN_APP_TUTORIAL_ID,
+  ].includes(tutorialId);

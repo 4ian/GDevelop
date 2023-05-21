@@ -2,6 +2,7 @@
 import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import SemiControlledAutoComplete, {
   type DataSource,
   type SemiControlledAutoCompleteInterface,
@@ -27,7 +28,7 @@ type Props = {|
 
   noGroups?: boolean,
 
-  /** A list of object names to exclude from the autocomplete list (for exasmple if they have already been selected). */
+  /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
 
   onChoose?: string => void,
@@ -147,9 +148,9 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
   // Don't add a componentWillUnmount that would call onChange. This can lead to
   // calling callbacks that would then update a deleted instruction parameters.
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
+  focus: FieldFocusFunction = options => {
+    if (this._field) this._field.focus(options);
+  };
 
   render() {
     const {

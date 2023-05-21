@@ -16,6 +16,10 @@ export type EventsFunctionsExtensionsState = {|
   reloadProjectEventsFunctionsExtensions: (
     project: ?gdProject
   ) => Promise<void>,
+  reloadProjectEventsFunctionsExtensionMetadata: (
+    project: ?gdProject,
+    extension: gdEventsFunctionsExtension
+  ) => void,
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
   ensureLoadFinished: () => Promise<void>,
@@ -29,6 +33,9 @@ const defaultState = {
   unloadProjectEventsFunctionsExtensions: () => {},
   reloadProjectEventsFunctionsExtensions: () =>
     Promise.reject(new Error('Use a provider')),
+  reloadProjectEventsFunctionsExtensionMetadata: () => {
+    throw new Error('Use a provider');
+  },
   unloadProjectEventsFunctionsExtension: () => {},
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,

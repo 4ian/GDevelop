@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -10,12 +11,11 @@ import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import CollisionMasksEditor from '../../../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from '../../../ObjectEditor/Editors/SpriteEditor/PointsEditor';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'ObjectEditor/SpriteEditor',
@@ -29,14 +29,10 @@ export const Default = () => (
       <SpriteEditor
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        layout={testProject.testLayout}
+        resourceManagementProps={fakeResourceManagementProps}
         onSizeUpdated={() => {}}
+        object={testProject.spriteObject}
         objectName="FakeObjectName"
       />
     </DragAndDropContextProvider>
@@ -50,14 +46,10 @@ export const AnimationLocked = () => (
         isAnimationListLocked
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        layout={testProject.testLayout}
+        resourceManagementProps={fakeResourceManagementProps}
         onSizeUpdated={() => {}}
+        object={testProject.spriteObject}
         objectName="FakeObjectName"
       />
     </DragAndDropContextProvider>
@@ -72,6 +64,7 @@ export const Points = () => (
           objectConfiguration={testProject.spriteObjectConfiguration}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
+          onRenamedPoint={action('Renamed a point')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

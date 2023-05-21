@@ -31,15 +31,10 @@ export type AlertMessageIdentifier =
   | 'effects-usage'
   | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
-  | 'instance-drag-n-drop-explanation'
-  | 'objects-panel-explanation'
-  | 'instance-properties-panel-explanation'
-  | 'layers-panel-explanation'
-  | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
-  | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
-  | 'p2p-broker-recommendation'
+  | 'p2p-is-networking'
+  | 'p2p-dataloss'
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
@@ -56,7 +51,7 @@ export type InAppTutorialUserProgress = {|
   step: number,
   /** Rounded progress in percentage */
   progress: Array<number>,
-  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+  fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
   projectData: {| [key: string]: string |},
 |};
 
@@ -135,40 +130,22 @@ export const allAlertMessages: Array<{
     label: <Trans>Using the resource properties panel</Trans>,
   },
   {
-    key: 'instance-drag-n-drop-explanation',
-    label: <Trans>Using instance drag'n'drop</Trans>,
-  },
-  {
-    key: 'objects-panel-explanation',
-    label: <Trans>Using the objects panel</Trans>,
-  },
-  {
-    key: 'instance-properties-panel-explanation',
-    label: <Trans>Using the instance properties panel</Trans>,
-  },
-  {
-    key: 'layers-panel-explanation',
-    label: <Trans>Using the layers panel</Trans>,
-  },
-  {
-    key: 'instances-panel-explanation',
-    label: <Trans>Using the instances panel</Trans>,
-  },
-  {
     key: 'physics2-shape-collisions',
     label: <Trans>Collisions handling with the Physics engine</Trans>,
-  },
-  {
-    key: 'edit-instruction-explanation',
-    label: <Trans>How to edit instructions</Trans>,
   },
   {
     key: 'lifecycle-events-function-included-only-if-extension-used',
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
   },
   {
-    key: 'p2p-broker-recommendation',
-    label: <Trans>Peer to peer broker server recommendation</Trans>,
+    key: 'p2p-is-networking',
+    label: (
+      <Trans>Peer to peer IP address leak warning/THNK recommendation</Trans>
+    ),
+  },
+  {
+    key: 'p2p-dataloss',
+    label: <Trans>Peer to peer data-loss notice</Trans>,
   },
   {
     key: 'command-palette-shortcut',
@@ -224,9 +201,11 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
+  showObjectInstancesIn3D: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
+  useShortcutToClosePreviewWindow: boolean,
 |};
 
 /**
@@ -290,6 +269,8 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setShowObjectInstancesIn3D: (enabled: boolean) => void,
+  getShowObjectInstancesIn3D: () => boolean,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
@@ -301,6 +282,7 @@ export type Preferences = {|
     userId: ?string,
   |}) => ?InAppTutorialUserProgress,
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
+  setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -340,9 +322,11 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
+    showObjectInstancesIn3D: false,
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
+    useShortcutToClosePreviewWindow: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -392,10 +376,13 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  setShowObjectInstancesIn3D: (enabled: boolean) => {},
+  getShowObjectInstancesIn3D: () => false,
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
+  setUseShortcutToClosePreviewWindow: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

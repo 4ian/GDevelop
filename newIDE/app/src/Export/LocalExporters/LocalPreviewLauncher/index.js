@@ -80,6 +80,11 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
+  closePreview = (windowId: number) => {
+    if (!ipcRenderer) return;
+    ipcRenderer.invoke('preview-close', { windowId });
+  };
+
   _openPreviewWindow = (
     project: gdProject,
     gamePath: string,
@@ -240,6 +245,13 @@ export default class LocalPreviewLauncher extends React.Component<
             previewExportOptions.setFullLoadingScreen(
               previewOptions.fullLoadingScreen
             );
+
+            if (previewOptions.fallbackAuthor) {
+              previewExportOptions.setFallbackAuthor(
+                previewOptions.fallbackAuthor.id,
+                previewOptions.fallbackAuthor.username
+              );
+            }
 
             exporter.exportProjectForPixiPreview(previewExportOptions);
             previewExportOptions.delete();

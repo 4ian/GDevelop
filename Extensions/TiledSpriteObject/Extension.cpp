@@ -210,6 +210,13 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetXOffset");
 
+  obj.AddExpression("XOffset",
+                    _("Image X Offset"),
+                    _("Return the offset used on the X axis when displaying the image."),
+                    _("Image offset"),
+                    "res/actions/scaleWidth_black.png")
+      .AddParameter("object", _("Object"), "TiledSprite");
+
   obj.AddAction(
          "YOffset",
          _("Image Y Offset"),
@@ -238,4 +245,11 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
       .SetFunctionName("GetYOffset");
+
+  obj.AddExpression("YOffset",
+                    _("Image Y Offset"),
+                    _("Return the offset used on the Y axis when displaying the image."),
+                    _("Image offset"),
+                    "res/actions/scaleWidth_black.png")
+      .AddParameter("object", _("Object"), "TiledSprite");
 }

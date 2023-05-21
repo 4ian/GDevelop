@@ -46,7 +46,7 @@ class GD_CORE_API ObjectMetadata {
                  std::shared_ptr<gd::ObjectConfiguration> blueprintObject_);
   /**
    * \brief Construct an object metadata, without "blueprint" object
-   * 
+   *
    * \note This is used by events based objects.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
@@ -57,7 +57,7 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Construct an object metadata, with a function that will be called
-   * to instanciate a new object.
+   * to instantiate a new object.
    */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
@@ -224,7 +224,7 @@ class GD_CORE_API ObjectMetadata {
   /**
    * \brief The "capabilities" that are offered by the base object that are
    * *not* supported by this object, and should be hidden in the editor
-   * inferface.
+   * interface.
    */
   const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
     return unsupportedBaseObjectCapabilities;
@@ -232,7 +232,7 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Add a "capability" that is offered by the base object that is *not*
-   * supported by this object, and should be hidden in the editor inferface.
+   * supported by this object, and should be hidden in the editor interface.
    */
   ObjectMetadata& AddUnsupportedBaseObjectCapability(
       const gd::String& capability) {
@@ -242,7 +242,7 @@ class GD_CORE_API ObjectMetadata {
 
   /**
    * \brief Check if a "capability" that is offered by the base object is *not*
-   * supported by this object, and should be hidden in the editor inferface.
+   * supported by this object, and should be hidden in the editor interface.
    */
   bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
     return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
@@ -295,6 +295,22 @@ class GD_CORE_API ObjectMetadata {
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
 
+  /**
+   * \brief Set the object to be hidden in the IDE.
+   *
+   * Used mainly when an object is deprecated.
+   */
+  ObjectMetadata &SetHidden() {
+    hidden = true;
+    return *this;
+  }
+
+
+  /**
+   * \brief Return true if the instruction must be hidden in the IDE.
+   */
+  bool IsHidden() const { return hidden; }
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -314,6 +330,7 @@ class GD_CORE_API ObjectMetadata {
   gd::String iconFilename;
   gd::String categoryFullName;
   std::set<gd::String> unsupportedBaseObjectCapabilities;
+  bool hidden = false;
 
   std::shared_ptr<gd::ObjectConfiguration>
       blueprintObject;  ///< The "blueprint" object to be copied when a new

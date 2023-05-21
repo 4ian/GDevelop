@@ -502,7 +502,10 @@ module.exports = {
         'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Read-only?'))
+      )
       .setFunctionName('setReadOnly')
       .setGetter('isReadOnly');
 
@@ -558,11 +561,25 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
+    object
+      .addScopedAction(
+        'Focus',
+        _('Focus'),
+        _('Focus the input so that text can be entered (like if it was touched/clicked).'),
+        _('Focus _PARAM0_'),
+        _(''),
+        'res/conditions/surObjet24.png',
+        'res/conditions/surObjet.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('focus');
+
     return extension;
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.

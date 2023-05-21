@@ -41,6 +41,8 @@
       "showGDevelopSplash": true,
       "showProgressBar": true
     },
+    "authorIds": [],
+    "authorUsernames": [],
     "extensionProperties": [],
     "platforms": [
       {
@@ -2977,7 +2979,7 @@
                                     "textG": 0,
                                     "textR": 0
                                   },
-                                  "comment": "Calculate the fraction of shake that occured during this frame",
+                                  "comment": "Calculate the fraction of shake that occurred during this frame",
                                   "comment2": ""
                                 },
                                 {
@@ -5711,7 +5713,7 @@
                                     "textG": 0,
                                     "textR": 0
                                   },
-                                  "comment": "Calculate the fraction of shake that occured during this frame",
+                                  "comment": "Calculate the fraction of shake that occurred during this frame",
                                   "comment2": ""
                                 },
                                 {

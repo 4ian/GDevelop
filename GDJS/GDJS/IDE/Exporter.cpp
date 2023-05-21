@@ -50,25 +50,29 @@ bool Exporter::ExportProjectForPixiPreview(
   return helper.ExportProjectForPixiPreview(options);
 }
 
-bool Exporter::ExportWholePixiProject(
-    gd::Project &project,
-    gd::String exportDir,
-    std::map<gd::String, bool> &exportOptions) {
+bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-  gd::Project exportedProject = project;
+  gd::Project exportedProject = options.project;
 
-  auto usedExtensionsResult = gd::UsedExtensionsFinder::ScanProject(project);
-  auto& usedExtensions = usedExtensionsResult.GetUsedExtensions();
+  auto usedExtensionsResult =
+      gd::UsedExtensionsFinder::ScanProject(options.project);
+  auto &usedExtensions = usedExtensionsResult.GetUsedExtensions();
 
-  auto exportProject = [this, &exportedProject, &exportOptions, &helper,
+  auto exportProject = [this,
+                        &exportedProject,
+                        &options,
+                        &helper,
                         &usedExtensionsResult](gd::String exportDir) {
-    bool exportForCordova = exportOptions["exportForCordova"];
-    bool exportForFacebookInstantGames =
-        exportOptions["exportForFacebookInstantGames"];
-
-    // Always disable the splash for Facebook Instant Games
-    if (exportForFacebookInstantGames)
-      exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
+    // Use project properties fallback to set empty properties
+    if (exportedProject.GetAuthorIds().empty() &&
+        !options.fallbackAuthorId.empty()) {
+      exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
+    }
+    if (exportedProject.GetAuthorUsernames().empty() &&
+        !options.fallbackAuthorUsername.empty()) {
+      exportedProject.GetAuthorUsernames().push_back(
+          options.fallbackAuthorUsername);
+    }
 
     // Prepare the export directory
     fs.MkDir(exportDir);
@@ -86,9 +90,14 @@ bool Exporter::ExportWholePixiProject(
         fs, exportedProject.GetResourcesManager(), exportDir);
     // end of compatibility code
 
+    bool isUsingScene3DExtension =
+        usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
+        usedExtensionsResult.GetUsedExtensions().end();
+
     // Export engine libraries
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
+        /*pixiInThreeRenderers=*/isUsingScene3DExtension,
         /*includeWebsocketDebuggerClient=*/false,
         /*includeWindowMessageDebuggerClient=*/false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
@@ -143,9 +152,9 @@ bool Exporter::ExportWholePixiProject(
     helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
-    if (exportForCordova)
+    if (options.target == "cordova")
       source = gdjsRoot + "/Runtime/Cordova/www/index.html";
-    else if (exportForFacebookInstantGames)
+    else if (options.target == "facebookInstantGames")
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
     if (!helper.ExportPixiIndexFile(exportedProject,
@@ -161,28 +170,31 @@ bool Exporter::ExportWholePixiProject(
     return true;
   };
 
-  if (exportOptions["exportForCordova"]) {
-    fs.MkDir(exportDir);
-    fs.MkDir(exportDir + "/www");
+  if (options.target == "cordova") {
+    fs.MkDir(options.exportPath);
+    fs.MkDir(options.exportPath + "/www");
 
-    if (!exportProject(exportDir + "/www")) return false;
+    if (!exportProject(options.exportPath + "/www")) return false;
 
-    if (!helper.ExportCordovaFiles(exportedProject, exportDir, usedExtensions))
+    if (!helper.ExportCordovaFiles(
+            exportedProject, options.exportPath, usedExtensions))
       return false;
-  } else if (exportOptions["exportForElectron"]) {
-    fs.MkDir(exportDir);
+  } else if (options.target == "electron") {
+    fs.MkDir(options.exportPath);
 
-    if (!exportProject(exportDir + "/app")) return false;
+    if (!exportProject(options.exportPath + "/app")) return false;
 
-    if (!helper.ExportElectronFiles(exportedProject, exportDir, usedExtensions))
+    if (!helper.ExportElectronFiles(
+            exportedProject, options.exportPath, usedExtensions))
       return false;
-  } else if (exportOptions["exportForFacebookInstantGames"]) {
-    if (!exportProject(exportDir)) return false;
+  } else if (options.target == "facebookInstantGames") {
+    if (!exportProject(options.exportPath)) return false;
 
-    if (!helper.ExportFacebookInstantGamesFiles(exportedProject, exportDir))
+    if (!helper.ExportFacebookInstantGamesFiles(exportedProject,
+                                                options.exportPath))
       return false;
   } else {
-    if (!exportProject(exportDir)) return false;
+    if (!exportProject(options.exportPath)) return false;
   }
 
   return true;

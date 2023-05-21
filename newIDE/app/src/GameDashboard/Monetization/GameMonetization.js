@@ -68,13 +68,13 @@ export const GameMonetization = ({ game, onGameUpdated }: Props) => {
             }}
             label={
               <Trans>
-                Allow to display advertisments on the game page on Liluo.io.
+                Allow to display advertisements on the game page on gd.games.
               </Trans>
             }
             tooltipOrHelperText={
               <Trans>
                 This is recommended as this allows to maintain free publishing
-                on Liluo.io and allow to analyze if you could benefit from
+                on gd.games and allow to analyze if you could benefit from
                 revenue sharing.
               </Trans>
             }

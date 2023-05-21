@@ -7,6 +7,7 @@ import {
 } from '.';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type AppArguments } from '../Utils/Window';
+import { type ResourcesActionsMenuBuilder } from '.';
 
 /**
  * An empty StorageProvider doing nothing.
@@ -25,6 +26,7 @@ type Props = {|
   defaultStorageProvider?: StorageProvider,
   children: ({
     storageProviders: Array<StorageProvider>,
+    getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
     getStorageProviderOperations: (
       newStorageProvider?: ?StorageProvider
     ) => StorageProviderOperations,
@@ -73,6 +75,9 @@ const ProjectStorageProviders = (props: Props) => {
   const storageProviderOperations = React.useRef<?StorageProviderOperations>(
     null
   );
+  const storageProviderResourceOperations = React.useRef<?ResourcesActionsMenuBuilder>(
+    null
+  );
   const [renderDialog, setRenderDialog] = React.useState<?() => React.Node>(
     null
   );
@@ -86,60 +91,76 @@ const ProjectStorageProviders = (props: Props) => {
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const setDialog = (_renderDialog: () => React.Node) => {
-    setRenderDialog((): (() => React.Node) => _renderDialog);
-  };
+  /** Wrapper around setRenderDialog to allow passing a function without confusing React. */
+  const setDialog = React.useCallback(
+    (_renderDialog: () => React.Node) => {
+      setRenderDialog((): (() => React.Node) => _renderDialog);
+    },
+    [setRenderDialog]
+  );
 
-  const closeDialog = () => {
+  /** Wrapper around setRenderDialog to close the dialog. */
+  const closeDialog = React.useCallback(() => {
     setRenderDialog(null);
-  };
+  }, []);
 
-  const getStorageProviderOperations = (
-    newStorageProvider?: ?StorageProvider
-  ): StorageProviderOperations => {
-    if (!newStorageProvider) {
-      if (!storageProviderOperations.current) {
-        currentStorageProvider.current = emptyStorageProvider;
-        storageProviderOperations.current = emptyStorageProvider.createOperations(
-          {
-            setDialog,
-            closeDialog,
-            authenticatedUser,
-          }
-        );
+  const getStorageProviderOperations = React.useCallback(
+    (newStorageProvider?: ?StorageProvider): StorageProviderOperations => {
+      if (!newStorageProvider) {
+        if (!storageProviderOperations.current) {
+          currentStorageProvider.current = emptyStorageProvider;
+          storageProviderResourceOperations.current = null;
+          storageProviderOperations.current = emptyStorageProvider.createOperations(
+            {
+              setDialog,
+              closeDialog,
+              authenticatedUser,
+            }
+          );
+        }
+        return storageProviderOperations.current;
       }
-      return storageProviderOperations.current;
-    }
 
-    // Avoid creating a new storageProviderOperations
-    // if we're not changing the storage provider.
-    if (
-      newStorageProvider === currentStorageProvider.current &&
-      storageProviderOperations.current
-    ) {
-      return storageProviderOperations.current;
-    }
+      // Avoid creating a new storageProviderOperations
+      // if we're not changing the storage provider.
+      if (
+        newStorageProvider === currentStorageProvider.current &&
+        storageProviderOperations.current
+      ) {
+        return storageProviderOperations.current;
+      }
 
-    const storageProviderOperationsToUse = newStorageProvider.createOperations({
-      setDialog,
-      closeDialog,
-      authenticatedUser,
-    });
+      const storageProviderOperationsToUse = newStorageProvider.createOperations(
+        {
+          setDialog,
+          closeDialog,
+          authenticatedUser,
+        }
+      );
 
-    // If the storage provider is unable to open a project, we won't keep it, we just
-    // return it for a one time usage (example: DownloadFileStorageProvider).
-    const keepForNextOperations = !!storageProviderOperationsToUse.onOpen;
-    if (keepForNextOperations) {
-      currentStorageProvider.current = newStorageProvider;
-      storageProviderOperations.current = storageProviderOperationsToUse;
-    }
+      // If the storage provider is unable to open a project, we won't keep it, we just
+      // return it for a one time usage (example: DownloadFileStorageProvider).
+      const keepForNextOperations = !!storageProviderOperationsToUse.onOpen;
+      if (keepForNextOperations) {
+        currentStorageProvider.current = newStorageProvider;
+        storageProviderOperations.current = storageProviderOperationsToUse;
+        storageProviderResourceOperations.current = newStorageProvider.createResourceOperations
+          ? newStorageProvider.createResourceOperations({ authenticatedUser })
+          : null;
+      }
 
-    return storageProviderOperationsToUse;
-  };
+      return storageProviderOperationsToUse;
+    },
+    [authenticatedUser, setDialog, closeDialog]
+  );
 
-  const getStorageProvider = () => {
+  const getStorageProvider = React.useCallback(() => {
     return currentStorageProvider.current || emptyStorageProvider;
-  };
+  }, []);
+
+  const getStorageProviderResourceOperations = React.useCallback(() => {
+    return storageProviderResourceOperations.current;
+  }, []);
 
   // Some storage providers might need the current authenticated user
   // to create their operations. This effect makes sure operations are always
@@ -153,8 +174,11 @@ const ProjectStorageProviders = (props: Props) => {
         closeDialog,
         authenticatedUser,
       });
+      storageProviderResourceOperations.current = storageProvider.createResourceOperations
+        ? storageProvider.createResourceOperations({ authenticatedUser })
+        : null;
     },
-    [authenticatedUser]
+    [authenticatedUser, setDialog, closeDialog]
   );
 
   return (
@@ -165,6 +189,7 @@ const ProjectStorageProviders = (props: Props) => {
         initialFileMetadataToOpen:
           defaultConfiguration.initialFileMetadataToOpen,
         getStorageProvider,
+        getStorageProviderResourceOperations,
       })}
       {renderDialog && renderDialog()}
     </React.Fragment>

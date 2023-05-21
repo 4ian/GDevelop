@@ -2,6 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
+import { type RequiredExtension } from '../AssetStore/InstallAsset';
 const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
@@ -12,6 +13,8 @@ export type EnumeratedObjectMetadata = {|
   description: string,
   iconFilename: string,
   categoryFullName: string,
+  assetStorePackTag?: string,
+  requiredExtensions?: Array<RequiredExtension>,
 |};
 
 export type ObjectWithContext = {|
@@ -138,6 +141,7 @@ export const enumerateObjectTypes = (
         .getExtensionObjectsTypes()
         .toJSArray()
         .map(objectType => extension.getObjectMetadata(objectType))
+        .filter(objectMetadata => !objectMetadata.isHidden())
         .map(objectMetadata => ({
           extension,
           objectMetadata,

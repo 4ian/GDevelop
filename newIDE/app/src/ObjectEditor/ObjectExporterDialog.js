@@ -5,7 +5,6 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import { Column, Line } from '../UI/Grid';
-import CloudUpload from '@material-ui/icons/CloudUpload';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
@@ -13,6 +12,7 @@ import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Window from '../Utils/Window';
+import Upload from '../UI/CustomSvgIcons/Upload';
 
 const exportCustomObject = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -89,7 +89,7 @@ const ObjectExporterDialog = (props: Props) => {
         </Line>
         <ResponsiveLineStackLayout>
           <RaisedButton
-            icon={<CloudUpload />}
+            icon={<Upload />}
             primary
             label={<Trans>Export to a file</Trans>}
             onClick={() => {

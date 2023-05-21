@@ -10,16 +10,17 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import { type InAppTutorialFormattedTooltip } from './InAppTutorialContext';
+import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -135,36 +136,58 @@ const TooltipBody = ({
   buttonLabel,
   goToNextStep,
 }: TooltipBodyProps) => {
-  return (
-    <>
+  const screenWidth = useResponsiveWindowWidth();
+  const titleAndDescription = (
+    <Column noMargin>
       {tooltip.title && (
-        <Typography style={styles.title} variant="subtitle">
+        <Typography style={styles.title} variant="subtitle1" translate="no">
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}
       {tooltip.title && tooltip.description && <span style={styles.divider} />}
       {tooltip.description && (
-        <Typography style={styles.description}>
+        <Typography style={styles.description} translate="no">
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}
-      {tooltip.image && (
-        <img
-          src={tooltip.image.dataUrl}
-          alt="Tutorial helper"
-          style={{
-            ...styles.descriptionImage,
-            width: tooltip.image.width || '100%',
-          }}
-        />
-      )}
-      {buttonLabel && (
-        <>
-          {tooltip.image ? <Spacer /> : null}
-          <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
-        </>
-      )}
-    </>
+    </Column>
+  );
+  const image = tooltip.image && (
+    <img
+      src={tooltip.image.dataUrl}
+      alt="Tutorial helper"
+      style={{
+        ...styles.descriptionImage,
+        width: tooltip.image.width || '100%',
+        maxWidth: screenWidth === 'small' ? 150 : '100%',
+        maxHeight: screenWidth === 'small' ? 150 : '100%',
+      }}
+    />
+  );
+  const button = buttonLabel && (
+    <Column noMargin expand>
+      {tooltip.image ? <Spacer /> : null}
+      <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
+    </Column>
+  );
+  const imageAndButton =
+    screenWidth === 'small' ? (
+      <LineStackLayout noMargin alignItems="center">
+        {image}
+        {button}
+      </LineStackLayout>
+    ) : (
+      <Column noMargin alignItems="center">
+        {image}
+        {button}
+      </Column>
+    );
+
+  return (
+    <Column noMargin>
+      {titleAndDescription}
+      {imageAndButton}
+    </Column>
   );
 };
 
@@ -205,7 +228,10 @@ const TooltipHeader = ({
       noMargin
       justifyContent={tooltipContent ? undefined : 'space-between'}
     >
-      <Typography style={{ ...styles.headerText, color: progressColor }}>
+      <Typography
+        style={{ ...styles.headerText, color: progressColor }}
+        translate="no"
+      >
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
@@ -222,7 +248,7 @@ const TooltipHeader = ({
               }}
             >
               <Cross />
-              <Typography style={styles.headerText}>
+              <Typography style={styles.headerText} translate="no">
                 <Trans>Quit tutorial</Trans>
               </Typography>
             </div>
@@ -232,6 +258,7 @@ const TooltipHeader = ({
           <Typography
             variant="body2"
             style={{ ...styles.headerContentPreview, ...textEllipsisStyle }}
+            translate="no"
           >
             {tooltipContent}
           </Typography>
@@ -272,6 +299,7 @@ const InAppTutorialTooltipDisplayer = ({
   endTutorial,
   goToNextStep,
 }: Props) => {
+  const screenWidth = useResponsiveWindowWidth();
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -321,17 +349,28 @@ const InAppTutorialTooltipDisplayer = ({
               enabled: true,
               offset: '0,10',
             },
+            preventOverflow: {
+              enabled: true,
+              boundariesElement: document.querySelector('.main-frame'),
+            },
           },
         }}
         style={{
           zIndex: getDisplayZIndexForHighlighter(anchorElement),
-          maxWidth: 300,
+          maxWidth: 'min(90%, 300px)',
+          width: screenWidth === 'small' ? '100%' : undefined,
         }}
       >
         {({ TransitionProps }) => (
           <>
             <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
-              <Paper style={{ ...styles.paper, backgroundColor }} elevation={4}>
+              <Paper
+                style={{
+                  ...styles.paper,
+                  backgroundColor,
+                }}
+                elevation={4}
+              >
                 <Column noMargin>
                   <TooltipHeader
                     paletteType={paletteType}

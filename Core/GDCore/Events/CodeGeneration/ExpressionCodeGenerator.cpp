@@ -51,8 +51,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
                                     codeGenerator.GetObjectsAndGroups(),
                                     rootType);
   node->Visit(validator);
-  if (!validator.GetErrors().empty()) {
-    std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
+  if (!validator.GetFatalErrors().empty()) {
+    std::cout << "Error: \"" << validator.GetFatalErrors()[0]->GetMessage()
               << "\" in: \"" << expression.GetPlainString() << "\" ("
               << rootType << ")" << std::endl;
 
@@ -170,7 +170,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   }
   else {
     // This is for function names that are put in IdentifierNode
-    // because the type is needed to tell them appart from variables.
+    // because the type is needed to tell them apart from variables.
     output += GenerateDefaultValue(type);
   }
 }

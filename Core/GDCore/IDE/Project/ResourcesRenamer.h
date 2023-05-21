@@ -4,9 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_RESOURCESRENAMER_H
-#define GDCORE_RESOURCESRENAMER_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -61,6 +59,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeBitmapFont(gd::String& bitmapFontName) override {
     RenameIfNeeded(bitmapFontName);
   };
+  virtual void ExposeModel3D(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
 
  private:
   void RenameIfNeeded(gd::String& resourceName) {
@@ -72,6 +73,3 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_RESOURCESRENAMER_H
-#endif

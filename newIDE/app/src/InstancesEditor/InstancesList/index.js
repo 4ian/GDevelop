@@ -9,11 +9,11 @@ import {
 } from 'react-virtualized';
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
-import Lock from '@material-ui/icons/Lock';
-import LockOpen from '@material-ui/icons/LockOpen';
-import NotInterested from '@material-ui/icons/NotInterested';
+import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
+import Lock from '../../UI/CustomSvgIcons/Lock';
+import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 const gd = global.gd;
 
 type State = {|
@@ -150,7 +150,7 @@ export default class InstancesList extends Component<Props, State> {
         }}
       >
         {instance.isLocked() && instance.isSealed() ? (
-          <NotInterested />
+          <RemoveCircle />
         ) : instance.isLocked() ? (
           <Lock />
         ) : (
@@ -221,8 +221,8 @@ export default class InstancesList extends Component<Props, State> {
     const tableKey = instances.ptr;
 
     return (
-      <ThemeConsumer>
-        {muiTheme => (
+      <GDevelopThemeContext.Consumer>
+        {gdevelopTheme => (
           <div style={styles.container}>
             <div
               style={{ flex: 1 }}
@@ -236,7 +236,7 @@ export default class InstancesList extends Component<Props, State> {
                     key={tableKey}
                     headerHeight={30}
                     height={height}
-                    className={`gd-table ${muiTheme.tableRootClassName}`}
+                    className={`gd-table ${gdevelopTheme.tableRootClassName}`}
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}
@@ -310,7 +310,7 @@ export default class InstancesList extends Component<Props, State> {
             />
           </div>
         )}
-      </ThemeConsumer>
+      </GDevelopThemeContext.Consumer>
     );
   }
 }

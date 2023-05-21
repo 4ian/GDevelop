@@ -3,9 +3,9 @@ declare class gdObjectGroup {
   constructor(): void;
   getName(): string;
   setName(name: string): void;
-  addObject(obj: string): void;
-  removeObject(obj: string): void;
-  find(obj: string): boolean;
+  addObject(objectName: string): void;
+  removeObject(objectName: string): void;
+  find(objectName: string): boolean;
   getAllObjectsNames(): gdVectorString;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;

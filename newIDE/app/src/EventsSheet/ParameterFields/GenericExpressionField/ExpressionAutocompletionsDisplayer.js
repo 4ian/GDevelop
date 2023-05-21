@@ -15,6 +15,7 @@ import { Column, Line, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import Paper from '../../../UI/Paper';
 import { mapVector } from '../../../Utils/MapFor';
+import { Trans } from '@lingui/macro';
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -414,7 +415,9 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
               {remainingCount > 0 && (
                 <Column justifyContent="flex-start">
-                  <Text>And others...</Text>
+                  <Text>
+                    <Trans>And others...</Trans>
+                  </Text>
                 </Column>
               )}
             </ScrollView>

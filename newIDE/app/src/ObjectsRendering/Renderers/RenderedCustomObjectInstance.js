@@ -1,5 +1,6 @@
 // @flow
 import RenderedInstance from './RenderedInstance';
+import Rendered3DInstance from './Rendered3DInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
@@ -11,20 +12,28 @@ import {
   ChildInstance,
   type ChildLayout,
   LayoutedParent,
+  getProportionalPositionX,
+  getProportionalPositionY,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
-export default class RenderedCustomObjectInstance extends RenderedInstance
-  implements LayoutedParent<RenderedInstance> {
+export default class RenderedCustomObjectInstance extends Rendered3DInstance
+  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];
-  childrenRenderedInstances: RenderedInstance[];
-  childrenRenderedInstanceByNames: Map<string, RenderedInstance>;
+  childrenRenderedInstances: Array<RenderedInstance | Rendered3DInstance>;
+  childrenRenderedInstanceByNames: Map<
+    string,
+    RenderedInstance | Rendered3DInstance
+  >;
+  _proportionalOriginX: number;
+  _proportionalOriginY: number;
 
   constructor(
     project: gdProject,
@@ -32,6 +41,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -40,16 +50,46 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       instance,
       associatedObjectConfiguration,
       pixiContainer,
+      threeGroup,
       pixiResourcesLoader
     );
 
-    //Setup the PIXI object:
+    // Setup the PIXI object:
     this._pixiObject = new PIXI.Container();
     this._pixiContainer.addChild(this._pixiObject);
+
+    if (this._threeGroup) {
+      // No Three group means the instance should only be rendered in 2D.
+      this._threeObject = new THREE.Group();
+      this._threeGroup.add(this._threeObject);
+    }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
     );
+
+    const properties = customObjectConfiguration.getProperties();
+    const parentOriginPositionName =
+      properties.has('ParentOrigin') &&
+      properties.get('ParentOrigin').getValue();
+    const parentOriginXPositionName =
+      properties.has('ParentOriginX') &&
+      properties.get('ParentOriginX').getValue();
+    const parentOriginYPositionName =
+      properties.has('ParentOriginY') &&
+      properties.get('ParentOriginY').getValue();
+    this._proportionalOriginX =
+      (parentOriginPositionName &&
+        getProportionalPositionX(parentOriginPositionName)) ||
+      (parentOriginXPositionName &&
+        getProportionalPositionX(parentOriginXPositionName)) ||
+      0;
+    this._proportionalOriginY =
+      (parentOriginPositionName &&
+        getProportionalPositionY(parentOriginPositionName)) ||
+      (parentOriginYPositionName &&
+        getProportionalPositionY(parentOriginYPositionName)) ||
+      0;
 
     const eventBasedObject = project.hasEventsBasedObject(
       customObjectConfiguration.getType()
@@ -60,7 +100,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     this.childrenInstances = [];
     this.childrenLayouts = [];
     this.childrenRenderedInstances = [];
-    this.childrenRenderedInstanceByNames = new Map<string, RenderedInstance>();
+    this.childrenRenderedInstanceByNames = new Map<
+      string,
+      RenderedInstance | Rendered3DInstance
+    >();
 
     if (!eventBasedObject) {
       return;
@@ -90,7 +133,8 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         // $FlowFixMe Use real object instances.
         childInstance,
         childObjectConfiguration,
-        this._pixiObject
+        this._pixiObject,
+        this._threeObject
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
@@ -159,12 +203,12 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
   update() {
     applyChildLayouts(this);
 
-    const defaultWidth = this.getDefaultWidth();
-    const defaultHeight = this.getDefaultHeight();
-    const originX = 0;
-    const originY = 0;
-    const centerX = defaultWidth / 2;
-    const centerY = defaultHeight / 2;
+    const width = this.getWidth();
+    const height = this.getHeight();
+    const originX = this._proportionalOriginX * width;
+    const originY = this._proportionalOriginY * height;
+    const centerX = width / 2;
+    const centerY = height / 2;
 
     this._pixiObject.pivot.x = centerX;
     this._pixiObject.pivot.y = centerY;
@@ -173,12 +217,22 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     );
     this._pixiObject.scale.x = 1;
     this._pixiObject.scale.y = 1;
-    this._pixiObject.position.x =
-      this._instance.getX() +
-      (centerX - originX) * Math.abs(this._pixiObject.scale.x);
-    this._pixiObject.position.y =
-      this._instance.getY() +
-      (centerY - originY) * Math.abs(this._pixiObject.scale.y);
+    this._pixiObject.position.x = this._instance.getX() + centerX - originX;
+    this._pixiObject.position.y = this._instance.getY() + centerY - originY;
+
+    if (this._threeObject) {
+      this._threeObject.position.set(
+        this._instance.getX(),
+        this._instance.getY(),
+        0
+      );
+      // TODO (3D) Handle rotation center for the three group.
+      // this._threeObject.rotation.set(
+      //   0,
+      //   0,
+      //   RenderedInstance.toRad(this._instance.getAngle())
+      // );
+    }
   }
 
   getWidth() {
@@ -203,5 +257,13 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultHeight()
       : 48;
+  }
+
+  getOriginX(): number {
+    return this._proportionalOriginX * this.getWidth();
+  }
+
+  getOriginY(): number {
+    return this._proportionalOriginY * this.getHeight();
   }
 }

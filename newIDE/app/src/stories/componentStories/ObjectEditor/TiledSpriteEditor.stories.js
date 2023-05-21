@@ -9,8 +9,7 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import TiledSpriteEditor from '../../../ObjectEditor/Editors/TiledSpriteEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'ObjectEditor/TiledSpriteEditor',
@@ -23,14 +22,11 @@ export const Default = () => (
     <TiledSpriteEditor
       objectConfiguration={testProject.tiledSpriteObjectConfiguration}
       project={testProject.project}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      layout={testProject.testLayout}
+      resourceManagementProps={fakeResourceManagementProps}
       onSizeUpdated={() => {}}
+      // It would be used for refactoring but this kind of object has none.
+      object={testProject.spriteObject}
       objectName="FakeObjectName"
     />
   </SerializedObjectDisplay>

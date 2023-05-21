@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import DeleteIcon from '@material-ui/icons/Delete';
-import WarningIcon from '@material-ui/icons/Warning';
-import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -26,9 +23,12 @@ import FlatButton from '../../../../UI/FlatButton';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu';
 import AlertMessage from '../../../../UI/AlertMessage';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
 import { addVertexOnLongestEdge } from './PolygonHelper';
+import Add from '../../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../../UI/CustomSvgIcons/Trash';
+import Warning from '../../../../UI/CustomSvgIcons/Warning';
 
 const gd = global.gd;
 
@@ -106,7 +106,7 @@ const VerticesTable = (props: VerticesTableProps) => {
       )}
       <Line justifyContent="center">
         <FlatButton
-          leftIcon={<AddIcon size="small" />}
+          leftIcon={<Add />}
           label={<Trans>Add a vertex</Trans>}
           onClick={() => {
             addVertexOnLongestEdge(props.vertices);
@@ -147,7 +147,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
         size="small"
         tooltip={t`Polygon is not convex!`}
       >
-        <WarningIcon style={{ color: warningColor }} />
+        <Warning style={{ color: warningColor }} />
       </IconButton>
     ),
     <IconButton
@@ -159,7 +159,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
       }}
       tooltip={t`Delete collision mask`}
     >
-      <DeleteIcon />
+      <Trash />
     </IconButton>,
   ];
 
@@ -167,9 +167,11 @@ const PolygonSection = (props: PolygonSectionProps) => {
     <Accordion defaultExpanded>
       <AccordionHeader actions={polygonActions}>
         <Text displayInlineAsSpan>
-          {verticesCount === 3 && `Triangle`}
-          {verticesCount === 4 && `Quadrilateral`}
-          {verticesCount >= 5 && `Polygon with ${verticesCount} vertices`}
+          {verticesCount === 3 && <Trans>Triangle</Trans>}
+          {verticesCount === 4 && <Trans>Quadrilateral</Trans>}
+          {verticesCount >= 5 && (
+            <Trans>Polygon with {verticesCount} vertices</Trans>
+          )}
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
@@ -264,7 +266,7 @@ const PolygonsList = (props: PolygonsListProps) => {
           <Line alignItems="center" justifyContent="center">
             <RaisedButtonWithSplitMenu
               primary
-              icon={<AddIcon />}
+              icon={<Add />}
               label={<Trans>Add collision mask</Trans>}
               onClick={() => {
                 addCollisionMask();

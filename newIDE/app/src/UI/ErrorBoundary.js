@@ -19,11 +19,22 @@ import {
   getUserAgent,
 } from '../Utils/Platform';
 
-const errorHandler = (error: Error, componentStack: string) => {
-  console.error('Error catched by Boundary:', error, componentStack);
+type ErrorBoundaryScope =
+  | 'mainframe'
+  | 'list-search-result'
+  | 'box-search-result'
+  | 'app';
+
+const errorHandler = (
+  error: Error,
+  componentStack: string,
+  scope: ErrorBoundaryScope
+) => {
+  console.error('Error caught by Boundary:', error, componentStack);
   sendErrorMessage(
-    'Error catched by error boundary',
-    'error-boundary',
+    'Error caught by error boundary',
+    // $FlowFixMe - Flow does not infer string type possibilities from interpolation.
+    `error-boundary_${scope}`,
     {
       error,
       componentStack,
@@ -35,15 +46,17 @@ const errorHandler = (error: Error, componentStack: string) => {
 export const ErrorFallbackComponent = ({
   componentStack,
   error,
+  title,
 }: {
   componentStack: string,
   error: Error,
+  title: string,
 }) => (
   <PlaceholderMessage>
     <Line>
       <BugReport fontSize="large" />
       <Spacer />
-      <Text size="block-title">This editor encountered a problem.</Text>
+      <Text size="block-title">{title}</Text>
     </Line>
     <Divider />
     <Text>
@@ -62,7 +75,7 @@ export const ErrorFallbackComponent = ({
       label={<Trans>Report the issue on GitHub</Trans>}
       onClick={() => {
         const body = `
-=> Please write here a short description of when the error occured and how to reproduce it.
+=> Please write here a short description of when the error occurred and how to reproduce it.
 You also may have to create an account on GitHub before posting.
 
 When you're ready, click on "Submit new issue". Don't change the rest of the message. Thanks!
@@ -96,12 +109,18 @@ ${componentStack || 'No component stack found'}
 
 type Props = {|
   children: React.Node,
+  title: string,
+  scope: ErrorBoundaryScope,
 |};
 
 const ErrorBoundary = (props: Props) => (
   <ReactErrorBoundary
-    FallbackComponent={ErrorFallbackComponent}
-    onError={errorHandler}
+    FallbackComponent={fallbackComponentProps => (
+      <ErrorFallbackComponent {...fallbackComponentProps} title={props.title} />
+    )}
+    onError={(error, componentStack) =>
+      errorHandler(error, componentStack, props.scope)
+    }
   >
     {props.children}
   </ReactErrorBoundary>

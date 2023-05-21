@@ -55,6 +55,7 @@ type Props = {|
   setDescription: string => void,
   description: ?string,
   setAuthorIds: (string[]) => void,
+  setAuthorUsernames: (string[]) => void,
   authorIds: string[],
   setOrientation: string => void,
   orientation: string,
@@ -89,6 +90,7 @@ export function PublicGameProperties({
   setDescription,
   description,
   setAuthorIds,
+  setAuthorUsernames,
   authorIds,
   setOwnerIds,
   ownerIds,
@@ -166,8 +168,8 @@ export function PublicGameProperties({
                   floatingLabelText={<Trans>Genres</Trans>}
                   helperText={
                     <Trans>
-                      Select up to 4 genres for the game to be visible on
-                      Liluo.io's categories pages!
+                      Select up to 3 genres for the game to be visible on
+                      gd.games's categories pages!
                     </Trans>
                   }
                   value={
@@ -199,14 +201,14 @@ export function PublicGameProperties({
                     disabled: category.type === 'admin-only',
                   }))}
                   fullWidth
-                  optionsLimit={4}
+                  optionsLimit={3}
                   disabled={disabled}
                   loading={allGameCategories.length === 0}
                 />
               )}
               {setDiscoverable && (
                 <Checkbox
-                  label={<Trans>Make your game discoverable on Liluo.io</Trans>}
+                  label={<Trans>Make your game discoverable on gd.games</Trans>}
                   checked={!!discoverable}
                   onCheck={(e, checked) => setDiscoverable(checked)}
                   disabled={disabled}
@@ -248,11 +250,16 @@ export function PublicGameProperties({
                   {profile && profile.username && (
                     <SelectOption
                       value={profile.username}
-                      primaryText={profile.username}
+                      label={profile.username}
+                      shouldNotTranslate
                     />
                   )}
                   {userSlug && (!profile || userSlug !== profile.username) && (
-                    <SelectOption value={userSlug} primaryText={userSlug} />
+                    <SelectOption
+                      value={userSlug}
+                      label={userSlug}
+                      shouldNotTranslate
+                    />
                   )}
                 </SelectField>
                 <Spacer />
@@ -277,7 +284,18 @@ export function PublicGameProperties({
           )}
           <UsersAutocomplete
             userIds={authorIds}
-            onChange={setAuthorIds}
+            onChange={userIdAndUsernames => {
+              setAuthorIds(
+                userIdAndUsernames.map(
+                  userIdAndUsername => userIdAndUsername.userId
+                )
+              );
+              setAuthorUsernames(
+                userIdAndUsernames.map(
+                  userIdAndUsername => userIdAndUsername.username
+                )
+              );
+            }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
               <Trans>
@@ -291,7 +309,9 @@ export function PublicGameProperties({
           {setOwnerIds && (
             <UsersAutocomplete
               userIds={ownerIds || []}
-              onChange={setOwnerIds}
+              onChange={userData =>
+                setOwnerIds(userData.map(data => data.userId))
+              }
               floatingLabelText={<Trans>Owners</Trans>}
               helperText={
                 <Trans>
@@ -310,9 +330,9 @@ export function PublicGameProperties({
             onChange={(e, i, value: string) => setOrientation(value)}
             disabled={disabled}
           >
-            <SelectOption value="default" primaryText={t`Platform default`} />
-            <SelectOption value="landscape" primaryText={t`Landscape`} />
-            <SelectOption value="portrait" primaryText={t`Portrait`} />
+            <SelectOption value="default" label={t`Platform default`} />
+            <SelectOption value="landscape" label={t`Landscape`} />
+            <SelectOption value="portrait" label={t`Portrait`} />
           </SelectField>
           {setPlayableWithKeyboard &&
             setPlayableWithGamepad &&

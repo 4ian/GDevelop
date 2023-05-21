@@ -133,15 +133,15 @@ export const SetupExportHeader = ({
             <FormControlLabel
               value={'new'}
               control={<Radio color="primary" />}
-              label={<Trans>New upload key (recommended)</Trans>}
+              label={<Trans>Default upload key (recommended)</Trans>}
             />
             <FormControlLabel
               value={'old'}
               control={<Radio color="primary" />}
               label={
                 <Trans>
-                  Old upload key (only if you used to publish your game as an
-                  APK and already activated Play App Signing)
+                  Old, legacy upload key (only if you used to publish your game
+                  as an APK and already activated Play App Signing)
                 </Trans>
               }
             />

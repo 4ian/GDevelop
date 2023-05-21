@@ -62,7 +62,8 @@ const RaisedButton = React.forwardRef<Props, ButtonInterface>(
       >
         {icon}
         {!!icon && !!label && <Spacer />}
-        {label}
+        {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+        {label ? <span>{label}</span> : null}
       </Button>
     );
   }

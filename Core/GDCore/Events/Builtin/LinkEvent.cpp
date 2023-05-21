@@ -16,6 +16,7 @@
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Events/EventVisitor.h"
 
 using namespace std;
 
@@ -154,6 +155,16 @@ void LinkEvent::UnserializeFrom(gd::Project& project,
       SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
                             includeElement.GetIntAttribute("end"));
   }
+}
+
+bool LinkEvent::AcceptVisitor(gd::EventVisitor &eventVisitor) {
+  return BaseEvent::AcceptVisitor(eventVisitor) |
+         eventVisitor.VisitLinkEvent(*this);
+}
+
+void LinkEvent::AcceptVisitor(gd::ReadOnlyEventVisitor &eventVisitor) const {
+  BaseEvent::AcceptVisitor(eventVisitor);
+  eventVisitor.VisitLinkEvent(*this);
 }
 
 }  // namespace gd

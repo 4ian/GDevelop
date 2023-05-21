@@ -442,7 +442,14 @@ gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        const ObjectsContainer& layout,
                                        gd::String objectName,
                                        bool searchInGroups = true);
-
+/**
+ * \brief Check if an object or all object of a group has a behavior.
+ */
+bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
+                                            const gd::ObjectsContainer &layout,
+                                            const gd::String &objectOrGroupName,
+                                            const gd::String &behaviorName,
+                                            bool searchInGroups = true);
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.

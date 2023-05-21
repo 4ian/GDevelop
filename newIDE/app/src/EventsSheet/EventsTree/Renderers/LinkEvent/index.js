@@ -5,7 +5,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import IconButton from '../../../../UI/IconButton';
 import classNames from 'classnames';
 import {
@@ -20,6 +19,7 @@ import ExternalEventsAutoComplete from './ExternalEventsAutoComplete';
 import { showWarningBox } from '../../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from '../EventRenderer';
 import { shouldActivate } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
+import ShareExternal from '../../../../UI/CustomSvgIcons/ShareExternal';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -138,6 +138,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               [linkContainer]: true,
             })}
             style={styles.container}
+            id={`${this.props.idPrefix}-link`}
           >
             <span
               style={styles.title}
@@ -173,7 +174,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               onClick={() => this.openTarget(i18n)}
               disabled={!target}
             >
-              <OpenInNew style={styles.openInNewIcon} />
+              <ShareExternal style={styles.openInNewIcon} />
             </IconButton>
             <InlinePopover
               open={this.state.editing}

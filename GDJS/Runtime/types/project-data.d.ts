@@ -133,12 +133,16 @@ declare interface InstanceStringProperty {
 
 declare interface LayerData {
   name: string;
+  renderingType?: '' | '2d' | '3d' | '2d+3d';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
+  camera3DFieldOfView?: float;
+  camera3DFarPlaneDistance?: float;
+  camera3DNearPlaneDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
 }
@@ -181,6 +185,8 @@ declare interface ProjectPropertiesData {
   version: string;
   name: string;
   author: string;
+  authorIds: string[];
+  authorUsernames: string[];
   windowWidth: number;
   windowHeight: number;
   latestCompilationDirectory: string;
@@ -188,6 +194,7 @@ declare interface ProjectPropertiesData {
   minFPS: number;
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
+  watermark: WatermarkData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
@@ -198,6 +205,17 @@ declare interface ExtensionProperty {
   extension: string;
   property: string;
   value: string;
+}
+
+declare interface WatermarkData {
+  showWatermark: boolean;
+  placement:
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'bottom'
+    | 'top';
 }
 
 declare interface LoadingScreenData {
@@ -242,4 +260,5 @@ declare type ResourceKind =
   | 'json'
   | 'tilemap'
   | 'tileset'
-  | 'bitmapFont';
+  | 'bitmapFont'
+  | 'model3D';

@@ -55,6 +55,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition("DoesSceneExist",
+                    _("Does scene exist"),
+                    _("Check if scene exists."),
+                    _("Scene _PARAM1_ exists"),
+                    "",
+                    "res/actions/texte.png",
+                    "res/actions/texte.png")
+      .SetHelpPath("/interface/scene-editor/events")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("sceneName", _("Name of the scene to check"))
+      .MarkAsSimple();
+
+  extension
       .AddAction("Scene",
                  _("Change the scene"),
                  _("Stop this scene and start the specified one instead."),
@@ -136,6 +149,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno", _("Deactivate input when focus is lost"))
       .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "HasGameJustResumed",
+          _("Game has just resumed"),
+          _("Check if the game has just resumed from being hidden. It "
+            "happens when the game tab is selected, a minimized window is "
+            "restored or the application is put back on front."),
+          _("Game has just resumed"),
+          "",
+          "res/actions/window24.png",
+          "res/actions/window.png")
+      .SetHelpPath("/interface/scene-editor/events")
+      .AddCodeOnlyParameter("currentScene", "");
 }
 
 }  // namespace gd

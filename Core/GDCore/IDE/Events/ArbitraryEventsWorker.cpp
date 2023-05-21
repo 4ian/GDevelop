@@ -23,7 +23,7 @@ void ArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
   DoVisitEventList(events);
 
   for (std::size_t i = 0; i < events.size();) {
-    if (VisitEvent(events[i]))
+    if (events[i].AcceptVisitor(*this))
       events.RemoveEvent(i);
     else {
       if (events[i].CanHaveSubEvents())
@@ -48,6 +48,10 @@ bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
     VisitInstructionList(*actionsVectors[j], false);
 
   return false;
+}
+
+bool ArbitraryEventsWorker::VisitLinkEvent(gd::LinkEvent& linkEvent) {
+  return DoVisitLinkEvent(linkEvent);
 }
 
 void ArbitraryEventsWorker::VisitInstructionList(
@@ -80,7 +84,7 @@ void ReadOnlyArbitraryEventsWorker::VisitEventList(const gd::EventsList& events)
   DoVisitEventList(events);
 
   for (std::size_t i = 0; i < events.size(); ++i) {
-    VisitEvent(events[i]);
+    events[i].AcceptVisitor(*this);
 
     if (events[i].CanHaveSubEvents()) {
       VisitEventList(events[i].GetSubEvents());
@@ -101,6 +105,10 @@ void ReadOnlyArbitraryEventsWorker::VisitEvent(const gd::BaseEvent& event) {
   for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
     VisitInstructionList(*actionsVectors[j], false);
   }
+}
+
+void ReadOnlyArbitraryEventsWorker::VisitLinkEvent(const gd::LinkEvent& linkEvent) {
+  DoVisitLinkEvent(linkEvent);
 }
 
 void ReadOnlyArbitraryEventsWorker::VisitInstructionList(

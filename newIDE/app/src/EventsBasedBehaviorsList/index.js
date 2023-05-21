@@ -23,7 +23,11 @@ import {
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import Tooltip from '@material-ui/core/Tooltip';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import { Column, Line } from '../UI/Grid';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Text from '../UI/Text';
+import Add from '../UI/CustomSvgIcons/Add';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 
 const EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND = 'Events Based Behavior';
 
@@ -36,23 +40,27 @@ const styles = {
 
 const renderEventsBehaviorLabel = (
   eventsBasedBehavior: gdEventsBasedBehavior
-) =>
-  eventsBasedBehavior.isPrivate() ? (
+) => {
+  const label = (
+    <Text noMargin size="body-small">
+      {eventsBasedBehavior.getName()}
+    </Text>
+  );
+  return eventsBasedBehavior.isPrivate() ? (
     <>
       <Tooltip
         title={
           <Trans>This behavior won't be visible in the events editor.</Trans>
         }
       >
-        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
+        <VisibilityOff fontSize="small" style={styles.tooltip} />
       </Tooltip>
-      <span title={eventsBasedBehavior.getName()}>
-        {eventsBasedBehavior.getName()}
-      </span>
+      {label}
     </>
   ) : (
-    eventsBasedBehavior.getName()
+    label
   );
+};
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -65,6 +73,7 @@ const getEventsBasedBehaviorName = (
 
 type Props = {|
   project: gdProject,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
   onSelectEventsBasedBehavior: (
@@ -81,6 +90,10 @@ type Props = {|
   ) => void,
   onEventsBasedBehaviorRenamed: (
     eventsBasedBehavior: gdEventsBasedBehavior
+  ) => void,
+  onEventsBasedBehaviorPasted: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    sourceExtensionName: string
   ) => void,
   onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -205,6 +218,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
       eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),
       name: eventsBasedBehavior.getName(),
+      extensionName: this.props.eventsFunctionsExtension.getName(),
     });
   };
 
@@ -246,6 +260,17 @@ export default class EventsBasedBehaviorsList extends React.Component<
       project
     );
     newEventsBasedBehavior.setName(newName);
+
+    const sourceExtensionName = SafeExtractor.extractStringProperty(
+      clipboardContent,
+      'extensionName'
+    );
+    if (sourceExtensionName) {
+      this.props.onEventsBasedBehaviorPasted(
+        newEventsBasedBehavior,
+        sourceExtensionName
+      );
+    }
 
     this._onEventsBasedBehaviorModified();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
@@ -312,8 +337,23 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
     this._onEventsBasedBehaviorModified();
 
+    // Scroll to the new behavior.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(newEventsBasedBehavior);
+    }, 100); // A few ms is enough for a new render to be done.
+
+    // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
     this._editName(newEventsBasedBehavior);
+  };
+
+  scrollToItem = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(eventsBasedBehavior);
+    }
   };
 
   _onEventsBasedBehaviorModified() {
@@ -343,6 +383,20 @@ export default class EventsBasedBehaviorsList extends React.Component<
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search behaviors`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -354,8 +408,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsBasedBehavior}
-                    addNewItemLabel={<Trans>Add a new behavior</Trans>}
                     renderItemLabel={renderEventsBehaviorLabel}
                     getItemName={getEventsBasedBehaviorName}
                     selectedItems={
@@ -377,17 +429,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search behaviors`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new behavior</Trans>}
+              primary
+              onClick={this._addNewEventsBasedBehavior}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -17,14 +17,15 @@ import MiniToolbar from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
+import Visibility from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 
@@ -263,27 +264,64 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               }}
                               fullWidth
                             >
-                              <SelectOption
-                                value="Number"
-                                primaryText={t`Number`}
-                              />
-                              <SelectOption
-                                value="String"
-                                primaryText={t`String`}
-                              />
+                              <SelectOption value="Number" label={t`Number`} />
+                              <SelectOption value="String" label={t`String`} />
                               <SelectOption
                                 value="Boolean"
-                                primaryText={t`Boolean (checkbox)`}
+                                label={t`Boolean (checkbox)`}
                               />
                               <SelectOption
                                 value="Choice"
-                                primaryText={t`String from a list of options (text)`}
+                                label={t`String from a list of options (text)`}
                               />
                               <SelectOption
                                 value="Color"
-                                primaryText={t`Color (text)`}
+                                label={t`Color (text)`}
                               />
                             </SelectField>
+                            {property.getType() === 'Number' && (
+                              <SelectField
+                                floatingLabelText={
+                                  <Trans>Measurement unit</Trans>
+                                }
+                                value={property.getMeasurementUnit().getName()}
+                                onChange={(e, i, value: string) => {
+                                  property.setMeasurementUnit(
+                                    gd.MeasurementUnit.getDefaultMeasurementUnitByName(
+                                      value
+                                    )
+                                  );
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated &&
+                                    this.props.onPropertiesUpdated();
+                                }}
+                                fullWidth
+                              >
+                                {mapFor(
+                                  0,
+                                  gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
+                                  i => {
+                                    const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                      i
+                                    );
+                                    const unitShortLabel = getMeasurementUnitShortLabel(
+                                      measurementUnit
+                                    );
+                                    const label =
+                                      measurementUnit.getLabel() +
+                                      (unitShortLabel.length > 0
+                                        ? ' — ' + unitShortLabel
+                                        : '');
+                                    return (
+                                      <SelectOption
+                                        value={measurementUnit.getName()}
+                                        label={label}
+                                      />
+                                    );
+                                  }
+                                )}
+                              </SelectField>
+                            )}
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
                               <SemiControlledTextField
@@ -322,11 +360,11 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               >
                                 <SelectOption
                                   value="true"
-                                  primaryText={t`True (checked)`}
+                                  label={t`True (checked)`}
                                 />
                                 <SelectOption
                                   value="false"
-                                  primaryText={t`False (not checked)`}
+                                  label={t`False (not checked)`}
                                 />
                               </SelectField>
                             )}
@@ -347,7 +385,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                     <SelectOption
                                       key={index}
                                       value={choice}
-                                      primaryText={choice}
+                                      label={choice}
                                     />
                                   )
                                 )}

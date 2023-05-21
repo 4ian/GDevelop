@@ -81,6 +81,7 @@ export const renderInstructionOrExpressionTree = <
         // $FlowFixMe - see above
         const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
+          const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;
           return [
             <Subheader key={getSubheaderListItemKey(key)}>{key}</Subheader>,
           ].concat(
@@ -93,7 +94,7 @@ export const renderInstructionOrExpressionTree = <
               selectedItemRef,
               initiallyOpenedPath: restOfInitiallyOpenedPath,
               getGroupIconSrc,
-              parentGroupIconSrc,
+              parentGroupIconSrc: iconSrc,
             })
           );
         } else {

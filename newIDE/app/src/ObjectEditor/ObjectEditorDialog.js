@@ -22,6 +22,7 @@ import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -44,6 +45,7 @@ type Props = {|
 
   // Passed down to object editors:
   project: gdProject,
+  layout?: gdLayout,
   onComputeAllVariableNames: () => Array<string>,
   resourceManagementProps: ResourceManagementProps,
   unsavedChanges?: UnsavedChanges,
@@ -55,6 +57,7 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 |};
 
 type InnerDialogProps = {|
@@ -66,6 +69,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
@@ -74,6 +78,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   const {
     onCancelChanges,
     notifyOfChange,
+    hasUnsavedChanges,
   } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
@@ -111,6 +116,25 @@ const InnerDialog = (props: InnerDialogProps) => {
       }
     },
     [currentTab]
+  );
+
+  const { showConfirmation } = useAlertDialog();
+
+  const askConfirmationAndOpenBehaviorEvents = React.useCallback(
+    async (extensionName, behaviorName) => {
+      if (hasUnsavedChanges()) {
+        const answer = await showConfirmation({
+          title: t`Discard changes and open events`,
+          message: t`You've made some changes here. Are you sure you want to discard them and open the behavior events?`,
+          confirmButtonLabel: t`Yes, discard my changes`,
+          dismissButtonLabel: t`Stay there`,
+        });
+        if (!answer) return;
+      }
+      onCancelChanges();
+      openBehaviorEvents(extensionName, behaviorName);
+    },
+    [hasUnsavedChanges, onCancelChanges, openBehaviorEvents, showConfirmation]
   );
 
   return (
@@ -208,9 +232,11 @@ const InnerDialog = (props: InnerDialogProps) => {
           <EditorComponent
             objectConfiguration={props.object.getConfiguration()}
             project={props.project}
+            layout={props.layout}
+            object={props.object}
             resourceManagementProps={props.resourceManagementProps}
             onSizeUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positionned*/
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
             }
             objectName={props.objectName}
             onObjectUpdated={notifyOfChange}
@@ -224,10 +250,11 @@ const InnerDialog = (props: InnerDialogProps) => {
           eventsFunctionsExtension={props.eventsFunctionsExtension}
           resourceManagementProps={props.resourceManagementProps}
           onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positionned*/
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
+          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
         />
       )}
       {currentTab === 'variables' && (
@@ -260,11 +287,24 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'effects' && (
         <EffectsList
           target="object"
+          // TODO (3D): declare the renderer type in object metadata.
+          layerRenderingType="2d"
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}
+          onEffectsRenamed={(oldName, newName) =>
+            // TODO EBO Refactor event-based object events when an effect is renamed.
+            props.layout &&
+            gd.WholeProjectRefactorer.renameObjectEffect(
+              props.project,
+              props.layout,
+              props.object,
+              oldName,
+              newName
+            )
+          }
           onEffectsUpdated={() => {
-            forceUpdate(); /*Force update to ensure dialog is properly positionned*/
+            forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
           }}
         />

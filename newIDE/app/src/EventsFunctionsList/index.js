@@ -17,13 +17,18 @@ import {
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import AsyncIcon from '@material-ui/icons/SyncAlt';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { Column, Line } from '../UI/Grid';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Text from '../UI/Text';
+import Add from '../UI/CustomSvgIcons/Add';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 const gd: libGDevelop = global.gd;
 
@@ -39,21 +44,43 @@ export type EventsFunctionCreationParameters = {|
   name: ?string,
 |};
 
-const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.isPrivate() ? (
+const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) => {
+  const label = (
+    <Text noMargin size="body-small">
+      {eventsFunction.getName()}
+    </Text>
+  );
+
+  return eventsFunction.isPrivate() ? (
     <>
       <Tooltip
         title={
           <Trans>This function won't be visible in the events editor.</Trans>
         }
       >
-        <VisibilityOffIcon fontSize="small" style={styles.tooltip} />
+        <VisibilityOff fontSize="small" style={styles.tooltip} />
       </Tooltip>
-      <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
+      {label}
+    </>
+  ) : eventsFunction.isAsync() ? (
+    <>
+      <Tooltip
+        title={
+          <Trans>
+            This function is asynchronous - it will only allow subsequent events
+            to run after calling the action "End asynchronous task" within the
+            function.
+          </Trans>
+        }
+      >
+        <AsyncIcon fontSize="small" style={styles.tooltip} />
+      </Tooltip>
+      {label}
     </>
   ) : (
-    eventsFunction.getName()
+    label
   );
+};
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
   eventsFunction.getName();
@@ -82,7 +109,6 @@ type Props = {|
     (parameters: ?EventsFunctionCreationParameters) => void
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
-  renderHeader?: () => React.Node,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -108,6 +134,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _togglePrivate = (eventsFunction: gdEventsFunction) => {
     eventsFunction.setPrivate(!eventsFunction.isPrivate());
     this.forceUpdate();
+  };
+
+  _toggleAsync = (eventsFunction: gdEventsFunction) => {
+    eventsFunction.setAsync(!eventsFunction.isAsync());
+    this.forceUpdateList();
   };
 
   _deleteEventsFunction = (
@@ -319,8 +350,13 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
-        enabled: this.props.canRename(eventsFunction),
         click: () => this._togglePrivate(eventsFunction),
+      },
+      {
+        label: eventsFunction.isAsync()
+          ? i18n._(t`Make synchronous`)
+          : i18n._(t`Make asynchronous`),
+        click: () => this._toggleAsync(eventsFunction),
       },
       {
         label: i18n._(t`Delete`),
@@ -380,9 +416,18 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           );
         }
 
+        // Scroll to the new function.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          this.scrollToItem(eventsFunction);
+        }, 100); // A few ms is enough for a new render to be done.
+
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();
 
+        // We focus it so the user can edit the name directly.
         this.props.onSelectEventsFunction(eventsFunction);
         if (this.props.canRename(eventsFunction)) {
           this._editName(eventsFunction);
@@ -391,13 +436,18 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     );
   };
 
+  scrollToItem = (eventsFunction: gdEventsFunction) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(eventsFunction);
+    }
+  };
+
   render() {
     const {
       project,
       eventsFunctionsContainer,
       selectedEventsFunction,
       onSelectEventsFunction,
-      renderHeader,
     } = this.props;
     const { searchText } = this.state;
 
@@ -413,7 +463,20 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     return (
       <Background>
-        {renderHeader ? renderHeader() : null}
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search functions`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -425,8 +488,6 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsFunction}
-                    addNewItemLabel={<Trans>Add a new function</Trans>}
                     renderItemLabel={renderEventsFunctionLabel}
                     getItemName={getEventsFunctionName}
                     getItemThumbnail={this._getFunctionThumbnail}
@@ -447,17 +508,16 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search functions`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new function</Trans>}
+              primary
+              onClick={this._addNewEventsFunction}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

@@ -1,13 +1,12 @@
 // @flow
-import Keen from 'keen-tracking';
 import posthog from 'posthog-js';
 import { getUserUUID, resetUserUUID } from './UserUUID';
-import Authentication from '../GDevelopServices/Authentication';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { User as FirebaseUser } from 'firebase/auth';
 import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
 } from './LocalStats';
-import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
@@ -17,22 +16,26 @@ const electron = optionalRequire('electron');
 
 const isElectronApp = !!electron;
 const isDev = Window.isDev();
-let startupTimesSummary = null;
 
+// Flag helpful to know if posthog is ready to send events.
 let posthogLoaded = false;
-const posthogAliasMade = [];
+// Flag helpful to know if the user has been identified, to avoid sending initial events
+// to a random uuid (like program_opening), which may not be merged to the main user's account.
+let userIdentified = false;
 let posthogLastPropertiesSent = '';
 let currentlyRunningInAppTutorial = null;
-
-let keenClient = null;
 
 export const setCurrentlyRunningInAppTutorial = (tutorial: string | null) =>
   (currentlyRunningInAppTutorial = tutorial);
 
+/**
+ * Used to send an event to the analytics.
+ * This function will retry to send the event if the analytics service is not ready.
+ */
 const recordEvent = (name: string, metadata?: { [string]: any }) => {
-  if (isDev || !keenClient) return;
+  if (isDev) return;
 
-  if (!posthogLoaded) {
+  if (!posthogLoaded || !userIdentified) {
     console.info(`App analytics not ready for an event - retrying in 2s.`);
     setTimeout(() => {
       console.info(
@@ -44,7 +47,6 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
     return;
   }
 
-  keenClient.recordEvent(name, metadata);
   posthog.capture(name, {
     ...metadata,
     isInAppTutorialRunning: currentlyRunningInAppTutorial,
@@ -53,203 +55,129 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   });
 };
 
-export const installAnalyticsEvents = (authentication: Authentication) => {
+/**
+ * Used once at the beginning of the app to initialize the analytics.
+ */
+export const installAnalyticsEvents = () => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;
   }
 
-  const version = getIDEVersion();
-  const versionWithHash = getIDEVersionWithHash();
-
-  const updateUserInformation = () => {
-    if (!posthogLoaded) {
-      console.info(`App analytics not ready - retrying in 2s.`);
-      setTimeout(() => {
-        console.info(`Retrying to update the user for app analytics.`);
-        updateUserInformation();
-      }, 2000);
-
-      return;
-    }
-
-    const firebaseUser = authentication.getFirebaseUserSync();
-    const userPreferences = loadPreferencesFromLocalStorage();
-    const appLanguage = userPreferences ? userPreferences.language : undefined;
-    const browserLanguage = getBrowserLanguageOrLocale();
-
-    const userProperties = {
-      providerId: firebaseUser ? firebaseUser.providerId : undefined,
-      email: firebaseUser ? firebaseUser.email : undefined,
-      emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
-      // Only keep information useful to generate app usage statistics:
-      uuid: getUserUUID(),
-      version,
-      versionWithHash,
-      appLanguage,
-      browserLanguage,
-      programOpeningCount: getProgramOpeningCount(),
-      themeName: userPreferences ? userPreferences.themeName : 'Unknown',
-      ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
-    };
-
-    // If the user is logged in, alias the user with its firebase id.
-    if (firebaseUser) {
-      const aliasKey = firebaseUser.uid + '#' + getUserUUID();
-      if (!posthogAliasMade.includes(aliasKey)) {
-        // Try to Alias the random UUID to the Firebase ID.
-        // 2 cases:
-        // - Either it's the first time the user logs in and posthog does not know
-        //   about the Firebase ID, in which case we specify the firebaseId as 2nd parameter
-        //   of the alias method.
-        // - Or the user has already logged in and posthog knows about the Firebase ID,
-        //   in which case PostHog will reject the merging of the 2 users.
-        //   We then need to ensure we identify the user by its Firebase ID.
-        posthog.alias(getUserUUID(), firebaseUser.uid);
-        posthogAliasMade.push(aliasKey);
-      }
-    }
-
-    // Identify which user is using the app, after de-duplicating the call to
-    // avoid useless calls.
-    // This is so we can build stats on the used version, languages and usage
-    // of GDevelop features.
-    const stringifiedUserProperties = JSON.stringify(userProperties);
-    if (stringifiedUserProperties !== posthogLastPropertiesSent) {
-      // If the user is not logged in, identify the user by its random UUID.
-      // If the user is logged in, identify the user by its Firebase ID.
-      const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
-      posthog.identify(userId, userProperties);
-      posthogLastPropertiesSent = stringifiedUserProperties;
-    }
-  };
-
-  const onUserLogout = () => {
-    // Reset the UUID to generate a random new one and be sure
-    // we don't count different users as a single one in our stats.
-    resetUserUUID();
-    posthog.reset();
-
-    updateUserInformation();
-  };
-
-  authentication.addUserLogoutListener(onUserLogout);
-  authentication.addUserUpdateListener(updateUserInformation);
-
-  // Posthog
   posthog.init('phc_yjTVz4BMHUOhCLBhVImjk3Jn1AjMCg808bxENY228qu', {
     api_host: 'https://app.posthog.com',
     loaded: () => {
       posthogLoaded = true;
-      updateUserInformation();
     },
-    autocapture: false,
+    autocapture: false, // we disable autocapture because we want to control which events we send.
   });
+};
 
-  // Keen.io
-  const sessionCookie = Keen.utils.cookie('visitor-stats');
-  const sessionTimer = Keen.utils.timer();
-  sessionTimer.start();
+/**
+ * Must be called every time the user is fetched (and also even if the user turns out to be not connected).
+ * This allows updating the user properties (like the language used, the version of the app, etc...)
+ * and to identify the user if not already done.
+ * We can safely call it multiple times, as it will only send the user properties if they changed.
+ */
+export const identifyUserForAnalytics = (
+  authenticatedUser: AuthenticatedUser
+) => {
+  if (isDev) {
+    console.info('Development build - Analytics disabled');
+    return;
+  }
 
-  keenClient = new Keen({
-    projectId: '593d9f0595cfc907a1f8126a',
-    writeKey:
-      'B917F1DB50EE4C8949DBB374D2962845A22838B425AA43322A37138691A5270EB0358AEE45A4F61AFA7713B9765B4980517A1E276D4973A2E546EA851BF7757523706367ED430C041D2728A63BF61B5D1B2079C75E455DDDFAAC4324128AC2DB',
-  });
+  if (!posthogLoaded) {
+    console.info(`App analytics not ready - retrying in 2s.`);
+    setTimeout(() => {
+      console.info(`Retrying to update the user for app analytics.`);
+      identifyUserForAnalytics(authenticatedUser);
+    }, 2000);
 
-  keenClient.extendEvents(function() {
-    // Include the user public profile.
-    const firebaseUser = authentication.getFirebaseUserSync();
+    return;
+  }
 
-    // Compute the startup times (only once to avoid doing this for every event).
-    startupTimesSummary = startupTimesSummary || getStartupTimesSummary();
+  const firebaseUser = authenticatedUser.firebaseUser;
+  const profile = authenticatedUser.profile;
+  const userPreferences = loadPreferencesFromLocalStorage();
+  const appLanguage = userPreferences ? userPreferences.language : undefined;
+  const browserLanguage = getBrowserLanguageOrLocale();
 
-    const userPreferences = loadPreferencesFromLocalStorage();
-    const appLanguage = userPreferences ? userPreferences.language : undefined;
-    const browserLanguage = getBrowserLanguageOrLocale();
+  const userProperties = {
+    providerId: firebaseUser ? firebaseUser.providerId : undefined,
+    email: firebaseUser ? firebaseUser.email : undefined,
+    emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
+    // Only keep information useful to generate app usage statistics:
+    uuid: getUserUUID(),
+    version: getIDEVersion(),
+    versionWithHash: getIDEVersionWithHash(),
+    appLanguage,
+    browserLanguage,
+    programOpeningCount: getProgramOpeningCount(),
+    themeName: userPreferences ? userPreferences.themeName : 'Unknown',
+    ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
+    // Additional profile information:
+    gdevelopUsage: profile ? profile.gdevelopUsage : undefined,
+    teamOrCompanySize: profile ? profile.teamOrCompanySize : undefined,
+    companyName: profile ? profile.companyName : undefined,
+    creationExperience: profile ? profile.creationExperience : undefined,
+    creationGoal: profile ? profile.creationGoal : undefined,
+    hearFrom: profile ? profile.hearFrom : undefined,
+  };
 
-    return {
-      user: {
-        uuid: getUserUUID(),
-        uid: firebaseUser ? firebaseUser.uid : undefined,
-        providerId: firebaseUser ? firebaseUser.providerId : undefined,
-        email: firebaseUser ? firebaseUser.email : undefined,
-        emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
-      },
-      localStats: {
-        programOpeningCount: getProgramOpeningCount(),
-      },
-      tutorials: {
-        // Useful to differentiate if an event is part of a tutorial or not.
-        isInAppTutorialRunning: !!currentlyRunningInAppTutorial,
-        tutorial: currentlyRunningInAppTutorial,
-      },
-      language: {
-        appLanguage,
-        browserLanguage,
-      },
-      versionMetadata: {
-        version,
-        versionWithHash,
-      },
-      startupTimesSummary,
-      page: {
-        title: document.title,
-        url: document.location.href,
-        // info: {} (add-on)
-      },
-      referrer: {
-        url: document.referrer,
-        // info: {} (add-on)
-      },
-      tech: {
-        browser: Keen.helpers.getBrowserProfile(),
-        // info: {} (add-on)
-        ip: '${keen.ip}', // eslint-disable-line
-        ua: '${keen.user_agent}', // eslint-disable-line
-      },
-      time: Keen.helpers.getDatetimeIndex(),
-      visitor: {
-        id: sessionCookie.get('user_id'),
-        time_on_page: sessionTimer.value(),
-      },
-      // geo: {} (add-on)
-      keen: {
-        timestamp: new Date().toISOString(),
-        addons: [
-          {
-            name: 'keen:ip_to_geo',
-            input: {
-              ip: 'tech.ip',
-            },
-            output: 'geo',
-          },
-          {
-            name: 'keen:ua_parser',
-            input: {
-              ua_string: 'tech.ua',
-            },
-            output: 'tech.info',
-          },
-          {
-            name: 'keen:url_parser',
-            input: {
-              url: 'page.url',
-            },
-            output: 'page.info',
-          },
-          {
-            name: 'keen:referrer_parser',
-            input: {
-              page_url: 'page.url',
-              referrer_url: 'referrer.url',
-            },
-            output: 'referrer.info',
-          },
-        ],
-      },
-    };
-  });
+  // Identify which user is using the app, after de-duplicating the call to
+  // avoid useless calls.
+  // This is so we can build stats on the used version, languages and usage
+  // of GDevelop features.
+  const stringifiedUserProperties = JSON.stringify(userProperties);
+  if (stringifiedUserProperties !== posthogLastPropertiesSent) {
+    // If the user is not logged in, identify the user by its anonymous UUID.
+    // If the user is logged in, identify the user by its Firebase ID.
+    const userId = firebaseUser ? firebaseUser.uid : getUserUUID();
+    posthog.identify(userId, userProperties);
+    posthogLastPropertiesSent = stringifiedUserProperties;
+    userIdentified = true;
+  }
+};
+
+/**
+ * Must be called on signup, to link the current user Firebase ID to the anonymous UUID
+ * that was used before the signup (this allows linking the events sent before the signup)
+ * This is only done on signup as an ID can only be an alias of another ID once.
+ */
+export const aliasUserForAnalyticsAfterSignUp = (
+  firebaseUser: FirebaseUser
+) => {
+  if (isDev) {
+    console.info('Development build - Analytics disabled');
+    return;
+  }
+
+  if (!posthogLoaded) {
+    console.info(`App analytics not ready for aliasing - retrying in 2s.`);
+    setTimeout(() => {
+      console.info(`Retrying to alias the user for app analytics.`);
+      aliasUserForAnalyticsAfterSignUp(firebaseUser);
+    }, 2000);
+
+    return;
+  }
+
+  // This indicates to Posthog that the current user Firebase ID is now an alias
+  // of the anonymous UUID that was used before the signup.
+  posthog.alias(firebaseUser.uid, getUserUUID());
+};
+
+export const onUserLogoutForAnalytics = () => {
+  if (isDev) {
+    console.info('Development build - Analytics disabled');
+    return;
+  }
+
+  // Reset the UUID to generate a random new one and be sure
+  // we don't count different users as a single one in our stats.
+  resetUserUUID();
+  posthog.reset();
 };
 
 export const sendProgramOpening = () => {
@@ -300,7 +228,7 @@ export const sendAssetPackOpened = (options: {|
   assetPackTag: string | null,
   assetPackId: string | null,
   assetPackKind: 'public' | 'private' | 'unknown',
-  source: 'store-home' | 'author-profile',
+  source: 'store-home' | 'author-profile' | 'new-object',
 |}) => {
   recordEvent('asset_pack_opened', options);
 };
@@ -322,10 +250,6 @@ export const sendAssetPackInformationOpened = (options: {|
   recordEvent('asset_pack_information_opened', options);
 };
 
-export const sendHelpFinderOpened = () => {
-  recordEvent('help_finder_opened', {});
-};
-
 export const sendHelpSearch = (searchText: string) => {
   recordEvent('help_search', {
     searchText,
@@ -334,7 +258,12 @@ export const sendHelpSearch = (searchText: string) => {
 
 export const sendErrorMessage = (
   message: string,
-  type: 'error' | 'error-boundary',
+  type:
+    | 'error'
+    | 'error-boundary_mainframe'
+    | 'error-boundary_list-search-result'
+    | 'error-boundary_box-search-result'
+    | 'error-boundary_app',
   rawError: any,
   errorId: string
 ) => {
@@ -379,7 +308,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Cloud Project limit reached'
   | 'Consult profile'
   | 'Build limit reached'
-  | 'Leaderboard customization';
+  | 'Leaderboard customization'
+  | 'Extend redeemed subscription';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,
@@ -437,7 +367,12 @@ export const sendExternalEditorOpened = (editorName: string) => {
 export const sendBehaviorsEditorShown = (metadata: {|
   parentEditor: 'object-editor-dialog',
 |}) => {
-  recordEvent('behaviors-editor-shown', metadata);
+  // It would be costly to send an event for each opening of the behaviors editor.
+  // We would rather have this aggregated by the app and sent as a property for the user.
+  // TODO: investigate a more generic way of collecting some useful counters to understand
+  // which editors are used (and how much/how long),
+  // and send these as properties in the `identify` event (or in a debounced event?).
+  // recordEvent('behaviors-editor-shown', metadata);
 };
 
 export const sendBehaviorAdded = (metadata: {|
@@ -445,6 +380,13 @@ export const sendBehaviorAdded = (metadata: {|
   parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
 |}) => {
   recordEvent('behavior-added', metadata);
+};
+
+export const sendCloudProjectCouldNotBeOpened = (metadata: {|
+  userId: string,
+  cloudProjectId: string,
+|}) => {
+  recordEvent('cloud-project-opening-failed', metadata);
 };
 
 export const sendEventsExtractedAsFunction = (metadata: {|

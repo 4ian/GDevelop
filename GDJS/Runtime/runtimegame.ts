@@ -43,16 +43,96 @@ namespace gdjs {
     electronRemoteRequirePath?: string;
 
     /**
+     * the token to use by the game engine when requiring any resource stored on
+     * GDevelop Cloud buckets. Note that this is only useful during previews.
+     */
+    gdevelopResourceToken?: string;
+
+    /**
+     * Check if, in some exceptional cases, we allow authentication
+     * to be done through a iframe.
+     * This is usually discouraged as the user can't verify that the authentication
+     * window is a genuine one. It's only to be used in trusted contexts.
+     */
+    allowAuthenticationUsingIframeForPreview?: boolean;
+
+    /**
      * If set, the game should use the specified environment for making calls
      * to GDevelop APIs ("dev" = development APIs).
      */
     environment?: 'dev';
   };
 
+  const addSearchParameterToUrl = (
+    url: string,
+    urlEncodedParameterName: string,
+    urlEncodedValue: string
+  ) => {
+    if (url.startsWith('data:') || url.startsWith('blob:')) {
+      // blob/data protocol does not support search parameters, which are useless anyway.
+      return url;
+    }
+
+    const separator = url.indexOf('?') === -1 ? '?' : '&';
+    return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
+  };
+
+  const checkIfIsGDevelopCloudBucketUrl = (url: string): boolean => {
+    return (
+      url.startsWith('https://project-resources.gdevelop.io/') ||
+      url.startsWith('https://project-resources-dev.gdevelop.io/')
+    );
+  };
+
+  /**
+   * Gives helper methods used when resources are loaded from an URL.
+   */
+  export class RuntimeGameResourcesLoader {
+    _runtimeGame: RuntimeGame;
+
+    constructor(runtimeGame: RuntimeGame) {
+      this._runtimeGame = runtimeGame;
+    }
+
+    /**
+     * Complete the given URL with any specific parameter required to access
+     * the resource (this can be for example a token needed to access the resource).
+     */
+    getFullUrl(url: string) {
+      const { gdevelopResourceToken } = this._runtimeGame._options;
+      if (!gdevelopResourceToken) return url;
+
+      if (!checkIfIsGDevelopCloudBucketUrl(url)) return url;
+
+      return addSearchParameterToUrl(
+        url,
+        'gd_resource_token',
+        encodeURIComponent(gdevelopResourceToken)
+      );
+    }
+
+    /**
+     * Return true if the specified URL must be loaded with cookies ("credentials")
+     * sent to grant access to them.
+     */
+    checkIfCredentialsRequired(url: string) {
+      if (this._runtimeGame._options.gdevelopResourceToken) return false;
+
+      // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
+      // i.e: its gdevelop.io cookie, to be passed.
+      // Note that this is only useful during previews.
+      if (checkIfIsGDevelopCloudBucketUrl(url)) return true;
+
+      // For other resources, use the default way of loading resources ("anonymous" or "same-site").
+      return false;
+    }
+  }
+
   /**
    * Represents a game being played.
    */
   export class RuntimeGame {
+    _resourcesLoader: RuntimeGameResourcesLoader;
     _variables: VariablesContainer;
     _data: ProjectData;
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
@@ -60,6 +140,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
@@ -72,25 +153,43 @@ namespace gdjs {
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
+    /**
+     * Game loop management (see startGameLoop method)
+     */
     _renderer: RuntimeGameRenderer;
     _sessionId: string | null;
     _playerId: string | null;
+    _watermark: watermark.RuntimeWatermark;
 
-    //Game loop management (see startGameLoop method)
     _sceneStack: SceneStack;
+    /**
+     * When set to true, the scenes are notified that game resolution size changed.
+     */
     _notifyScenesForGameResolutionResize: boolean = false;
 
-    // When set to true, the scenes are notified that gamre resolution size changed.
+    /**
+     * When paused, the game won't step and will be freezed. Useful for debugging.
+     */
     _paused: boolean = false;
+
+    /**
+     * True during the first frame the game is back from being hidden.
+     * This has nothing to do with `_paused`.
+     */
+    _hasJustResumed: boolean = false;
 
     //Inputs :
     _inputManager: InputManager;
 
-    //Allow to specify an external layout to insert in the first scene:
+    /**
+     * Allow to specify an external layout to insert in the first scene.
+     */
     _injectExternalLayout: any;
     _options: RuntimeGameOptions;
 
-    //The mappings for embedded resources
+    /**
+     * The mappings for embedded resources
+     */
     _embeddedResourcesMappings: Map<string, Record<string, string>>;
 
     /**
@@ -109,21 +208,35 @@ namespace gdjs {
       this._options = options || {};
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
+      this._resourcesLoader = new gdjs.RuntimeGameResourcesLoader(this);
       this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources
+        this._data.resources.resources,
+        this._resourcesLoader
       );
       this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources
+        this._data.resources.resources,
+        this._resourcesLoader
       );
-      this._fontManager = new gdjs.FontManager(this._data.resources.resources);
-      this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
+      this._fontManager = new gdjs.FontManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      );
+      this._jsonManager = new gdjs.JsonManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      );
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         this._data.resources.resources,
+        this._resourcesLoader,
         this._imageManager
       );
+      this._model3DManager = new gdjs.Model3DManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      );
       this._effectsManager = new gdjs.EffectsManager();
-      this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
-      this._minFPS = this._data ? this._data.properties.minFPS : 15;
+      this._maxFPS = this._data.properties.maxFPS;
+      this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
@@ -135,6 +248,11 @@ namespace gdjs {
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
+      );
+      this._watermark = new gdjs.watermark.RuntimeWatermark(
+        this,
+        data.properties.authorUsernames,
+        this._data.properties.watermark
       );
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
@@ -159,7 +277,7 @@ namespace gdjs {
             }
           } catch {
             logger.error(
-              'Some metadata of resources can not be succesfully parsed.'
+              'Some metadata of resources can not be successfully parsed.'
             );
           }
         }
@@ -196,6 +314,7 @@ namespace gdjs {
       this._fontManager.setResources(this._data.resources.resources);
       this._jsonManager.setResources(this._data.resources.resources);
       this._bitmapFontManager.setResources(this._data.resources.resources);
+      this._model3DManager.setResources(this._data.resources.resources);
     }
 
     /**
@@ -267,6 +386,15 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    /**
+     * Get the 3D model manager of the game, used to load 3D model from game
+     * resources.
+     * @return The 3D model manager for the game
+     */
+    getModel3DManager(): gdjs.Model3DManager {
+      return this._model3DManager;
     }
 
     /**
@@ -525,6 +653,14 @@ namespace gdjs {
     }
 
     /**
+     * @returns true during the first frame the game is back from being hidden.
+     * This has nothing to do with `_paused`.
+     */
+    hasJustResumed() {
+      return this._hasJustResumed;
+    }
+
+    /**
      * Load all assets, displaying progress in renderer.
      */
     loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
@@ -588,9 +724,9 @@ namespace gdjs {
                       }
                     },
                     function (jsonTotalCount) {
-                      that._bitmapFontManager
-                        .loadBitmapFontData((count) => {
-                          var percent = Math.floor(
+                      that._model3DManager.loadModels(
+                        function (count, total) {
+                          const percent = Math.floor(
                             ((texturesTotalCount +
                               audioTotalCount +
                               fontTotalCount +
@@ -600,15 +736,35 @@ namespace gdjs {
                               100
                           );
                           loadingScreen.setPercent(percent);
-                          if (progressCallback) progressCallback(percent);
-                        })
-                        .then(() => loadingScreen.unload())
-                        .then(() =>
-                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                        )
-                        .then(() => {
-                          callback();
-                        });
+                          if (progressCallback) {
+                            progressCallback(percent);
+                          }
+                        },
+                        function (model3DTotalCount) {
+                          that._bitmapFontManager
+                            .loadBitmapFontData((count) => {
+                              var percent = Math.floor(
+                                ((texturesTotalCount +
+                                  audioTotalCount +
+                                  fontTotalCount +
+                                  jsonTotalCount +
+                                  model3DTotalCount +
+                                  count) /
+                                  allAssetsTotal) *
+                                  100
+                              );
+                              loadingScreen.setPercent(percent);
+                              if (progressCallback) progressCallback(percent);
+                            })
+                            .then(() => loadingScreen.unload())
+                            .then(() =>
+                              gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                            )
+                            .then(() => {
+                              callback();
+                            });
+                        }
+                      );
                     }
                   );
                 }
@@ -630,7 +786,7 @@ namespace gdjs {
         }
         this._forceGameResolutionUpdate();
 
-        //Load the first scene
+        // Load the first scene
         const firstSceneName = this._data.firstLayout;
         this._sceneStack.push(
           this.hasScene(firstSceneName)
@@ -639,6 +795,7 @@ namespace gdjs {
               this.getSceneData().name,
           this._injectExternalLayout
         );
+        this._watermark.displayAtStartup();
 
         //Uncomment to profile the first x frames of the game.
         // var x = 500;
@@ -652,9 +809,12 @@ namespace gdjs {
         // logger.log("Took", time, "ms");
         // return;
 
-        //The standard game loop
+        this._setupGameVisibilityEvents();
+
+        // The standard game loop
         const that = this;
         let accumulatedElapsedTime = 0;
+        this._hasJustResumed = false;
         this._renderer.startGameLoop(function (lastCallElapsedTime) {
           if (that._paused) {
             return true;
@@ -675,15 +835,16 @@ namespace gdjs {
           const elapsedTime = accumulatedElapsedTime;
           accumulatedElapsedTime = 0;
 
-          //Manage resize events.
+          // Manage resize events.
           if (that._notifyScenesForGameResolutionResize) {
             that._sceneStack.onGameResolutionResized();
             that._notifyScenesForGameResolutionResize = false;
           }
 
-          //Render and step the scene.
+          // Render and step the scene.
           if (that._sceneStack.step(elapsedTime)) {
             that.getInputManager().onFrameEnded();
+            that._hasJustResumed = false;
             return true;
           }
           return false;
@@ -704,6 +865,23 @@ namespace gdjs {
       this._disableMetrics = !enable;
       if (enable) {
         this._setupSessionMetrics();
+      }
+    }
+
+    _setupGameVisibilityEvents() {
+      if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            this._hasJustResumed = true;
+          }
+        });
+        window.addEventListener(
+          'resume',
+          () => {
+            this._hasJustResumed = true;
+          },
+          false
+        );
       }
     }
 
@@ -828,10 +1006,14 @@ namespace gdjs {
             sendSessionHit();
           }
         });
+        window.addEventListener('pagehide', sendSessionHit, false);
+        // Cordova events
+        window.addEventListener('pause', sendSessionHit, false);
         window.addEventListener(
-          'pagehide',
+          'resume',
           () => {
-            sendSessionHit();
+            // Skip the duration the game was hidden.
+            lastSessionResumeTime = Date.now();
           },
           false
         );

@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
@@ -11,6 +11,8 @@ import {
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -132,6 +134,25 @@ export default class PanelSpriteEditor extends React.Component<
               this.forceUpdate();
             }}
           />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout alignItems="center" noMargin>
+          <SelectField
+            floatingLabelText={<Trans>Anti-aliasing</Trans>}
+            value={shapePainterConfiguration.getAntialiasing()}
+            onChange={(e, i, valueString: string) => {
+              shapePainterConfiguration.setAntialiasing(valueString);
+              this.forceUpdate();
+            }}
+          >
+            <SelectOption key="none" value="none" label={t`None`} />
+            <SelectOption key="low" value="low" label={t`Low quality`} />
+            <SelectOption
+              key="medium"
+              value="medium"
+              label={t`Medium quality`}
+            />
+            <SelectOption key="high" value="high" label={t`High quality`} />
+          </SelectField>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     );

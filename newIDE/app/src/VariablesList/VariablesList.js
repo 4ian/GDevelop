@@ -7,22 +7,23 @@ import { ClickAwayListener } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { makeStyles, withStyles } from '@material-ui/styles';
 
-import Add from '@material-ui/icons/Add';
-import Edit from '@material-ui/icons/Edit';
-import Replay from '@material-ui/icons/Replay';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import SwapHorizontal from '@material-ui/icons/SwapHoriz';
+import Add from '../UI/CustomSvgIcons/Add';
+import Edit from '../UI/CustomSvgIcons/Edit';
+import Undo from '../UI/CustomSvgIcons/Undo';
+import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 
 import { Column, Line, Spacer } from '../UI/Grid';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../UI/SemiControlledTextField';
 import IconButton from '../UI/IconButton';
 import { DragHandleIcon } from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SemiControlledAutoComplete, {
@@ -73,6 +74,8 @@ import { CLIPBOARD_KIND } from './ClipboardKind';
 import VariablesListToolbar from './VariablesListToolbar';
 import { normalizeString } from '../Utils/Search';
 import { I18n } from '@lingui/react';
+import SwitchHorizontal from '../UI/CustomSvgIcons/SwitchHorizontal';
+import useRefocusField from './useRefocusField';
 const gd: libGDevelop = global.gd;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
@@ -118,7 +121,6 @@ const StyledTreeItem = withStyles(theme => ({
   iconContainer: {
     alignSelf: 'stretch',
     alignItems: 'center',
-    color: 'white',
   },
   root: {
     '&:focus:not(.Mui-selected)': {
@@ -178,12 +180,16 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
-  const topLevelVariableNameInputRefs = React.useRef<{
+  const topLevelVariableNameInputRefs = React.useRef<{|
     [number]: SemiControlledAutoCompleteInterface,
-  }>({});
-  const [variablePtrToFocus, setVariablePtrToFocus] = React.useState<?number>(
-    null
-  );
+  |}>({});
+  const topLevelVariableValueInputRefs = React.useRef<{|
+    [number]: SemiControlledTextFieldInterface,
+  |}>({});
+  // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+  const refocusNameField = useRefocusField(topLevelVariableNameInputRefs);
+  // $FlowFixMe - Hard to fix issue regarding strict checking with interface.
+  const refocusValueField = useRefocusField(topLevelVariableValueInputRefs);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -216,20 +222,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       }
     },
     [searchText, triggerSearch]
-  );
-
-  React.useEffect(
-    () => {
-      if (variablePtrToFocus) {
-        const inputRef =
-          topLevelVariableNameInputRefs.current[variablePtrToFocus];
-        if (inputRef) {
-          inputRef.focus();
-          setVariablePtrToFocus(null);
-        }
-      }
-    },
-    [variablePtrToFocus]
   );
 
   const shouldHideExpandIcons =
@@ -795,7 +787,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       );
       _onChange();
       setSelectedNodes([newName]);
-      setVariablePtrToFocus(variable.ptr);
+      refocusNameField({ identifier: variable.ptr });
       return;
     }
 
@@ -820,7 +812,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     _onChange();
     setSelectedNodes([newName]);
-    setVariablePtrToFocus(variable.ptr);
+    refocusNameField({ identifier: variable.ptr });
   };
 
   const renderVariableAndChildrenRows = (
@@ -830,12 +822,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       parentNodeId,
       parentVariable,
       isInherited,
+      index,
     }: {|
       name: string,
       variable: gdVariable,
       parentNodeId?: string,
       parentVariable?: gdVariable,
       isInherited: boolean,
+      index: number,
     |},
     i18n: I18nType
   ) => {
@@ -1010,6 +1004,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           }
                           forceUpdate();
                         }}
+                        id={`variable-${index}-name`}
                       />
                       <Spacer />
                     </Line>
@@ -1024,11 +1019,12 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             }}
                             isHighlighted={isSelected}
                             disabled={isInherited}
+                            id={`variable-${index}-type`}
                           />
                         </Column>
                         <Column expand>
                           {type === gd.Variable.Boolean ? (
-                            <Line noMargin>
+                            <Line noMargin alignItems="center">
                               <span
                                 style={
                                   isSelected
@@ -1064,7 +1060,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                         : t`Set to false`
                                     }
                                   >
-                                    <SwapHorizontal
+                                    <SwitchHorizontal
                                       htmlColor={
                                         isSelected
                                           ? gdevelopTheme.listItem
@@ -1079,6 +1075,13 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           ) : (
                             <SemiControlledTextField
                               margin="none"
+                              ref={element => {
+                                if (depth === 0 && element) {
+                                  topLevelVariableValueInputRefs.current[
+                                    variable.ptr
+                                  ] = element;
+                                }
+                              }}
                               type={
                                 type === gd.Variable.Number ? 'number' : 'text'
                               }
@@ -1096,13 +1099,18 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               value={
                                 isCollection
                                   ? i18n._(
-                                      t`${variable.getChildrenCount()} children`
+                                      variable.getChildrenCount() === 0
+                                        ? t`No children`
+                                        : variable.getChildrenCount() === 1
+                                        ? t`1 child`
+                                        : t`${variable.getChildrenCount()} children`
                                     )
                                   : type === gd.Variable.String
                                   ? variable.getString()
                                   : variable.getValue().toString()
                               }
                               commitOnBlur={props.commitChangesOnBlur}
+                              id={`variable-${index}-text-value`}
                             />
                           )}
                         </Column>
@@ -1154,7 +1162,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               deleteNode(nodeId);
                             }}
                           >
-                            <Replay
+                            <Undo
                               htmlColor={
                                 isSelected
                                   ? gdevelopTheme.listItem.selectedTextColor
@@ -1186,6 +1194,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         parentNodeId: nodeId,
                         parentVariable: variable,
                         isInherited,
+                        index,
                       },
                       i18n
                     );
@@ -1199,6 +1208,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       parentNodeId: nodeId,
                       parentVariable: variable,
                       isInherited,
+                      index,
                     },
                     i18n
                   );
@@ -1346,6 +1356,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       } else {
         setSelectedNodes([...newSelectedNodes, name]);
       }
+      const currentlyFocusedValueField =
+        topLevelVariableValueInputRefs.current[changedInheritedVariable.ptr];
+      refocusValueField({
+        identifier: variable.ptr,
+        caretPosition: currentlyFocusedValueField
+          ? currentlyFocusedValueField.getCaretPosition()
+          : null,
+      });
       newVariable.delete();
     } else {
       const { variable: changedVariable } = getVariableContextFromNodeId(
@@ -1401,6 +1419,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
             name,
             variable,
             isInherited,
+            index,
           },
           i18n
         );
@@ -1464,6 +1483,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           helpPagePath={props.helpPagePath || undefined}
                           tutorialId="intermediate-advanced-variables"
                           onAction={onAdd}
+                          actionButtonId="add-variable"
                         />
                       ) : null}
                     </Column>
@@ -1472,7 +1492,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       <TreeView
                         multiSelect
                         defaultExpandIcon={<ChevronRight />}
-                        defaultCollapseIcon={<ExpandMore />}
+                        defaultCollapseIcon={<ChevronBottom />}
                         onNodeSelect={(event, values) =>
                           setSelectedNodes(values)
                         }

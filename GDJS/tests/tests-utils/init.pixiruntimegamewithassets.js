@@ -6,7 +6,7 @@
  * @internal
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
-gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
+gdjs.getPixiRuntimeGameWithAssets = () => {
   if (gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise) {
     return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
   }
@@ -45,8 +45,11 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
         progressBarMaxWidth: 300,
         progressBarWidthPercent: 40,
         progressBarHeight: 20,
-        progressBarColor: 0xFFFFFF,
+        progressBarColor: 0xffffff,
       },
+      authorIds: [],
+      authorUsernames: [],
+      watermark: { showWatermark: true, placement: 'bottom' },
       currentPlatform: '',
       extensionProperties: [],
     },

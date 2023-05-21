@@ -1,9 +1,13 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { Component } from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
@@ -22,14 +26,17 @@ const mapTypeToOperators = {
   color: ['=', '+'],
 };
 
-export default class OperatorField extends Component<ParameterFieldProps> {
-  _field: ?SelectFieldInterface;
-  focus() {
-    if (this._field && this._field.focus) this._field.focus();
-  }
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function OperatorField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?SelectFieldInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  render() {
-    const { parameterMetadata } = this.props;
+    const { parameterMetadata } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -42,28 +49,33 @@ export default class OperatorField extends Component<ParameterFieldProps> {
 
     return (
       <SelectField
-        margin={this.props.isInline ? 'none' : 'dense'}
+        margin={props.isInline ? 'none' : 'dense'}
         fullWidth
         floatingLabelText={description}
         helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
-        value={this.props.value}
-        onChange={(e, i, value: string) => this.props.onChange(value)}
-        ref={field => (this._field = field)}
+        value={props.value}
+        onChange={(e, i, value: string) => props.onChange(value)}
+        ref={field}
         translatableHintText={t`Choose an operator`}
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-operator-field`
+            : undefined
+        }
       >
         {operators.map(operator => (
           <SelectOption
             key={operator}
             value={operator}
-            primaryText={operatorLabels[operator]}
+            label={operatorLabels[operator]}
           />
         ))}
       </SelectField>
     );
   }
-}
+);
 
 export const renderInlineOperator = ({
   value,

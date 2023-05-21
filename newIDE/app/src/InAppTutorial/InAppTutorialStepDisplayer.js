@@ -9,10 +9,14 @@ import {
   type InAppTutorialFlowFormattedStep,
   type InAppTutorialFormattedTooltip,
   type EditorIdentifier,
-} from './InAppTutorialContext';
+} from '../Utils/GDevelopServices/InAppTutorial';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
-import { isElementADialog } from '../UI/MaterialUISpecificUtil';
+import {
+  aboveMaterialUiMaxZIndex,
+  isElementADialog,
+  isElementAMuiInput,
+} from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 import InAppTutorialDialog from './InAppTutorialDialog';
 
@@ -21,7 +25,7 @@ const styles = {
     position: 'absolute',
     left: 20,
     bottom: 20,
-    zIndex: 5, // Scene editor mosaic z-index is 4
+    zIndex: aboveMaterialUiMaxZIndex, // Make sure the avatar is above the dialogs or drawers created by Material UI.
     display: 'flex',
     visibility: 'hidden',
     boxShadow:
@@ -94,6 +98,30 @@ const getWrongEditorTooltip = (
   };
 };
 
+export const queryElementOrItsMostVisuallySignificantParent = (
+  elementToHighlightId: string
+) => {
+  let foundElement = document.querySelector(elementToHighlightId);
+  if (foundElement instanceof HTMLTextAreaElement) {
+    // In this case, the element to highlight is a Material UI multiline text field
+    // and the textarea only occupies a fraction of the whole input. So we're going
+    // to highlight the parent div.
+    const parentDiv = foundElement.closest('div');
+    if (parentDiv instanceof HTMLElement && isElementAMuiInput(parentDiv)) {
+      foundElement = parentDiv;
+    }
+  } else if (
+    foundElement instanceof HTMLInputElement &&
+    'searchBar' in foundElement.dataset
+  ) {
+    const containerDiv = foundElement.closest('div[data-search-bar-container]');
+    if (containerDiv instanceof HTMLElement) {
+      foundElement = containerDiv;
+    }
+  }
+  return foundElement;
+};
+
 type Props = {|
   step: InAppTutorialFlowFormattedStep,
   expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
@@ -140,7 +168,10 @@ function InAppTutorialStepDisplayer({
   const queryElement = React.useCallback(
     () => {
       if (!elementToHighlightId) return;
-      setElementToHighlight(document.querySelector(elementToHighlightId));
+
+      setElementToHighlight(
+        queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
+      );
     },
     [elementToHighlightId]
   );
@@ -283,6 +314,7 @@ function InAppTutorialStepDisplayer({
                 visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
+              id="in-app-tutorial-avatar"
             >
               <img
                 alt="GDevelop mascot red hero"

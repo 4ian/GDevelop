@@ -12,6 +12,8 @@ import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
   canSeamlesslyChangeSubscription,
+  businessPlan,
+  hasValidSubscriptionPlan,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -59,9 +61,15 @@ const seamlesslyChangeConfirmationTexts = {
   dismissButtonLabel: t`Go back`,
 };
 const cancelAndChangeConfirmationTexts = {
-  title: t`Cancel then get a new subscription`,
-  message: t`To get a new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate but your payment will NOT be pro-rated (you will have to pay as for a new subscription).`,
+  title: t`Update your subscription`,
+  message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate but your payment will NOT be pro-rated (you will have to pay as for a new subscription).`,
   confirmButtonLabel: t`Cancel my subscription`,
+  dismissButtonLabel: t`Go back`,
+};
+const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
+  title: t`Update your subscription`,
+  message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
+  confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
 };
 
@@ -99,7 +107,7 @@ export default function SubscriptionDialog({
     [open, analyticsMetadata]
   );
 
-  const choosePlan = async (
+  const buyUpdateOrCancelPlan = async (
     i18n: I18nType,
     plan: { planId: null | string }
   ) => {
@@ -107,7 +115,7 @@ export default function SubscriptionDialog({
     if (!profile || !subscription) return;
     sendChoosePlanClicked(plan.planId);
 
-    // Subscribing from an account without a subscription.
+    // Subscribing from an account without a subscription
     if (!subscription.planId) {
       setSubscriptionPendingDialogOpen(true);
       Window.openExternalURL(
@@ -145,16 +153,33 @@ export default function SubscriptionDialog({
         setIsChangingSubscription(false);
       }
     } else {
+      const needToCancelSubscription = !canSeamlesslyChangeSubscription(
+        subscription
+      );
+      const hasValidRedeemedSubscription =
+        !!subscription.redemptionCodeValidUntil &&
+        subscription.redemptionCodeValidUntil > Date.now();
+      const hasExpiredRedeemedSubscription =
+        !!subscription.redemptionCodeValidUntil &&
+        subscription.redemptionCodeValidUntil < Date.now();
+      const shouldShowAlert =
+        (needToCancelSubscription && !hasExpiredRedeemedSubscription) || // we don't show an alert if the redeemed code is expired
+        hasValidRedeemedSubscription;
+
       // Changing the existing subscription.
-      const isSeamlessChange = canSeamlesslyChangeSubscription(subscription);
-      const confirmDialogTexts = isSeamlessChange
-        ? seamlesslyChangeConfirmationTexts
-        : cancelAndChangeConfirmationTexts;
+      const confirmDialogTexts =
+        !needToCancelSubscription || hasExpiredRedeemedSubscription
+          ? seamlesslyChangeConfirmationTexts
+          : hasValidRedeemedSubscription
+          ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
+          : cancelAndChangeConfirmationTexts;
 
-      const answer = await showConfirmation(confirmDialogTexts);
-      if (!answer) return;
+      if (shouldShowAlert) {
+        const answer = await showConfirmation(confirmDialogTexts);
+        if (!answer) return;
+      }
 
-      if (isSeamlessChange) {
+      if (!needToCancelSubscription) {
         // Changing the existing subscription without asking for payment details again.
         setIsChangingSubscription(true);
         try {
@@ -211,6 +236,8 @@ export default function SubscriptionDialog({
     !authenticatedUser.profile ||
     isChangingSubscription;
 
+  const isPlanValid = hasValidSubscriptionPlan(authenticatedUser.subscription);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -261,13 +288,16 @@ export default function SubscriptionDialog({
                 !!authenticatedUser.subscription &&
                 authenticatedUser.subscription.planId === plan.planId;
               // If no plan (free usage), do not display button.
-              const button = !plan.planId ? null : isCurrentPlan ? (
+              const button = !plan.planId ? null : isCurrentPlan &&
+                isPlanValid ? (
                 <React.Fragment key="cancel">
                   <LeftLoader isLoading={isLoading}>
                     <FlatButton
                       disabled={isLoading}
                       label={<Trans>Cancel your subscription</Trans>}
-                      onClick={() => choosePlan(i18n, { planId: null })}
+                      onClick={() =>
+                        buyUpdateOrCancelPlan(i18n, { planId: null })
+                      }
                     />
                   </LeftLoader>
                 </React.Fragment>
@@ -278,7 +308,7 @@ export default function SubscriptionDialog({
                       primary
                       disabled={isLoading}
                       label={<Trans>Choose this plan</Trans>}
-                      onClick={() => choosePlan(i18n, plan)}
+                      onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
                     />
                   </LeftLoader>
                 </React.Fragment>
@@ -289,10 +319,26 @@ export default function SubscriptionDialog({
                   plan={plan}
                   actions={[button]}
                   isPending={isLoading}
-                  isHighlighted={isCurrentPlan}
+                  isHighlighted={isCurrentPlan} // highlight the plan even if it's expired.
+                  background="medium"
                 />
               );
             })}
+            <PlanCard
+              plan={businessPlan}
+              actions={
+                <RaisedButton
+                  primary
+                  label={<Trans>Learn more</Trans>}
+                  onClick={() => {
+                    Window.openExternalURL('https://gdevelop.io/pricing');
+                  }}
+                />
+              }
+              isPending={false}
+              isHighlighted={false}
+              background="dark"
+            />
             <Column>
               <Line>
                 <EmptyMessage>
@@ -334,8 +380,11 @@ export default function SubscriptionDialog({
                   ]}
                 >
                   <Text>
-                    It's free and you'll get access to online services: cloud
-                    projects, leaderboards, player feedbacks, cloud builds...
+                    <Trans>
+                      It is free and you will get access to online services:
+                      cloud projects, leaderboards, player feedbacks, cloud
+                      builds...
+                    </Trans>
                   </Text>
                 </Dialog>
               )}

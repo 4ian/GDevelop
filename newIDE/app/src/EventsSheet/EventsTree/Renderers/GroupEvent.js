@@ -14,9 +14,11 @@ import { type EventRendererProps } from './EventRenderer';
 import {
   shouldActivate,
   shouldCloseOrCancel,
+  shouldSubmit,
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { Trans } from '@lingui/macro';
+import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -41,6 +43,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
   _textField: ?TextFieldInterface = null;
 
   edit = () => {
+    if (this.state.editing) return;
     const groupEvent = gd.asGroupEvent(this.props.event);
     if (!this.state.editingPreviousValue) {
       this.setState({ editingPreviousValue: groupEvent.getName() });
@@ -86,15 +89,19 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={this.edit}
-        onKeyPress={event => {
+        onKeyUp={event => {
           if (shouldActivate(event)) {
             this.edit();
           }
         }}
         tabIndex={0}
+        id={`${this.props.idPrefix}-group-${
+          groupEvent.isFolded() ? 'folded' : 'unfolded'
+        }`}
       >
         {this.state.editing ? (
           <TextField
+            margin="none"
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
             translatableHintText={t`<Enter group name>`}
@@ -108,21 +115,18 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               color: textColor,
               WebkitTextFillColor: textColor,
             }}
-            underlineFocusStyle={{
-              borderColor: textColor,
-            }}
             fullWidth
-            id="group-title"
             onKeyUp={event => {
               if (shouldCloseOrCancel(event)) {
                 this.endEditing();
               }
             }}
-            onKeyPress={event => {
-              if (shouldValidate(event)) {
+            onKeyDown={event => {
+              if (shouldValidate(event) || shouldSubmit(event)) {
                 this.endEditing();
               }
             }}
+            underlineShow={false}
           />
         ) : (
           <span
@@ -131,6 +135,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
               [disabledText]: this.props.disabled,
             })}
             style={{ ...styles.title, color: textColor }}
+            {...dataObjectToProps({ editableText: 'true' })}
           >
             {groupEvent.getName() ? (
               groupEvent.getName()

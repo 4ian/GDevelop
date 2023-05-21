@@ -38,6 +38,7 @@ import {
   getPrivateAssetPackListingData,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { t } from '@lingui/macro';
 
 const defaultSearchText = '';
 
@@ -60,7 +61,10 @@ type AssetStoreState = {|
   filters: ?Filters,
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPacks: ?Array<PrivateAssetPackListingData>,
-  assetPackRandomOrdering: ?Array<number>,
+  assetPackRandomOrdering: ?{|
+    starterPacks: Array<number>,
+    privateAssetPacks: Array<number>,
+  |},
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -112,11 +116,12 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   },
   navigationState: {
     getCurrentPage: () => assetStoreHomePageState,
-    backToPreviousPage: () => {},
-    openHome: () => {},
+    backToPreviousPage: () => assetStoreHomePageState,
+    openHome: () => assetStoreHomePageState,
     clearHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},
+    openAssetCategoryPage: category => {},
     openPackPage: assetPack => {},
     openDetailPage: assetShortHeader => {},
     openPrivateAssetPackInformationPage: privateAssetPackListingData => {},
@@ -168,7 +173,10 @@ export const AssetStoreStateProvider = ({
   const [
     assetPackRandomOrdering,
     setAssetPackRandomOrdering,
-  ] = React.useState<?Array<number>>(null);
+  ] = React.useState<?{|
+    starterPacks: Array<number>,
+    privateAssetPacks: Array<number>,
+  |}>(null);
   const [
     privateAssetPacks,
     setPrivateAssetPacks,
@@ -258,7 +266,7 @@ export const AssetStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              publicAssetShortHeaders.length
+              publicAssetShortHeaders ? publicAssetShortHeaders.length : 0
             } assets from the asset store.`
           );
           setPublicAssetPacks(publicAssetPacks);
@@ -344,8 +352,8 @@ export const AssetStoreStateProvider = ({
         }
 
         showAlert({
-          title: `Asset pack not found`,
-          message: `The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
+          title: t`Asset pack not found`,
+          message: t`The link to the asset pack you've followed seems outdated. Why not take a look at the other packs in the asset store?`,
         });
       }
     },
@@ -368,9 +376,10 @@ export const AssetStoreStateProvider = ({
   );
 
   // Randomize asset packs when number of asset packs and private asset packs change
-  const assetPackCount = publicAssetPacks
-    ? publicAssetPacks.starterPacks.length
-    : undefined;
+  const assetPackCount =
+    publicAssetPacks && publicAssetPacks.starterPacks
+      ? publicAssetPacks.starterPacks.length
+      : undefined;
   const privateAssetPackCount = privateAssetPacks
     ? privateAssetPacks.length
     : undefined;
@@ -379,9 +388,10 @@ export const AssetStoreStateProvider = ({
       if (assetPackCount === undefined || privateAssetPackCount === undefined) {
         return;
       }
-      setAssetPackRandomOrdering(
-        getAssetPackRandomOrdering(assetPackCount + privateAssetPackCount)
-      );
+      setAssetPackRandomOrdering({
+        starterPacks: getAssetPackRandomOrdering(assetPackCount),
+        privateAssetPacks: getAssetPackRandomOrdering(privateAssetPackCount),
+      });
     },
     [assetPackCount, privateAssetPackCount]
   );

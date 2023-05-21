@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { Line, Column } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
-import PublishIcon from '@material-ui/icons/Publish';
+import TranslateIcon from '@material-ui/icons/Translate';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import { type HomeTab } from '../HomePageMenu';
 import {
@@ -12,7 +13,6 @@ import {
   type Tutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
-import { isMobile } from '../../../../Utils/Platform';
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
@@ -25,8 +25,11 @@ import GridListTile from '@material-ui/core/GridListTile';
 import { makeStyles } from '@material-ui/core/styles';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
-import ArrowRight from '@material-ui/icons/ArrowRight';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
+import GuidedLessons from '../InAppTutorials/GuidedLessons';
+import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
+import Upload from '../../../../UI/CustomSvgIcons/Upload';
+import WikiSearchBar from '../../../../UI/WikiSearchBar';
 
 const useStyles = makeStyles({
   tile: {
@@ -34,10 +37,7 @@ const useStyles = makeStyles({
   },
 });
 
-const getHelpItemsColumnsFromWidth = (
-  width: WidthType,
-  showTourHelpItem: boolean
-) => {
+const getHelpItemsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
     case 'small':
       return 1;
@@ -45,7 +45,7 @@ const getHelpItemsColumnsFromWidth = (
       return 3;
     case 'large':
     default:
-      return showTourHelpItem ? 4 : 3;
+      return 4;
   }
 };
 
@@ -61,7 +61,7 @@ const getTutorialsColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large', true);
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large');
 const styles = {
   grid: {
     textAlign: 'center',
@@ -81,6 +81,7 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onSelectCategory: (?TutorialCategory) => void,
   tutorials: Array<Tutorial>,
+  selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const MainPage = ({
@@ -90,33 +91,31 @@ const MainPage = ({
   onOpenHelpFinder,
   onSelectCategory,
   tutorials,
+  selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
-  const shouldShowInAppTutorialButtons = !isMobile() && windowWidth !== 'small';
   const helpItems: {
     title: React.Node,
     description: React.Node,
     action: () => void,
     disabled?: boolean,
   }[] = [
-    shouldShowInAppTutorialButtons
-      ? {
-          title: <Trans>Guided Tour</Trans>,
-          description: (
-            <Trans>
-              Learn the fundamentals of the editor with our assisted tutorial.
-            </Trans>
-          ),
-          action: () => {
-            onStartTutorial();
-          },
-          disabled: !!currentlyRunningInAppTutorial,
-        }
-      : undefined,
+    {
+      title: <Trans>Guided Tour</Trans>,
+      description: (
+        <Trans>
+          Learn the fundamentals of the editor with our assisted tutorial.
+        </Trans>
+      ),
+      action: () => {
+        onStartTutorial();
+      },
+      disabled: !!currentlyRunningInAppTutorial,
+    },
     {
       title: <Trans>Documentation</Trans>,
       description: <Trans>Find the complete documentation on everything</Trans>,
@@ -135,28 +134,37 @@ const MainPage = ({
   ].filter(Boolean);
 
   const renderTutorialsRow = (category: TutorialCategory) => (
-    <ImageTileRow
-      title={TUTORIAL_CATEGORY_TEXTS[category].title}
-      description={TUTORIAL_CATEGORY_TEXTS[category].description}
-      items={tutorials
-        .filter(tutorial => tutorial.category === category)
-        .map(formatTutorialToImageTileComponent)}
-      onShowAll={() => onSelectCategory(category)}
-      showAllIcon={<ArrowRight fontSize="small" />}
-      getColumnsFromWidth={getTutorialsColumnsFromWidth}
-      getLimitFromWidth={getTutorialsColumnsFromWidth}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <ImageTileRow
+          title={TUTORIAL_CATEGORY_TEXTS[category].title}
+          description={TUTORIAL_CATEGORY_TEXTS[category].description}
+          items={tutorials
+            .filter(tutorial => tutorial.category === category)
+            .map(tutorial =>
+              formatTutorialToImageTileComponent(i18n, tutorial)
+            )}
+          onShowAll={() => onSelectCategory(category)}
+          showAllIcon={<ChevronArrowRight fontSize="small" />}
+          getColumnsFromWidth={getTutorialsColumnsFromWidth}
+          getLimitFromWidth={getTutorialsColumnsFromWidth}
+        />
+      )}
+    </I18n>
   );
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <SectionRow>
+        <Text>
+          <Trans>Quick search</Trans>
+        </Text>
+        <WikiSearchBar />
+      </SectionRow>
+      <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getHelpItemsColumnsFromWidth(
-              windowWidth,
-              shouldShowInAppTutorialButtons
-            )}
+            cols={getHelpItemsColumnsFromWidth(windowWidth)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
@@ -190,6 +198,12 @@ const MainPage = ({
           </GridList>
         </Line>
       </SectionRow>
+      <SectionRow>
+        <Text noMargin size="section-title">
+          <Trans>Guided lessons</Trans>
+        </Text>
+        <GuidedLessons selectInAppTutorial={selectInAppTutorial} />
+      </SectionRow>
       <>
         <SectionRow>
           <Line noMargin>
@@ -218,21 +232,34 @@ const MainPage = ({
                 <Trans>Guides and tutorials</Trans>
               </Text>
             </Column>
-            <Column noMargin>
+            <LineStackLayout noMargin>
               {windowWidth === 'large' && (
                 <FlatButton
-                  key="submit-example"
                   onClick={() => {
                     Window.openExternalURL(
                       'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
                     );
                   }}
                   primary
-                  leftIcon={<PublishIcon />}
+                  leftIcon={<Upload />}
                   label={<Trans>Submit your project as an example</Trans>}
                 />
               )}
-            </Column>
+              {windowWidth === 'large' && (
+                <FlatButton
+                  onClick={() => {
+                    Window.openExternalURL(
+                      'https://airtable.com/shrv295oHlsuS69el'
+                    );
+                  }}
+                  primary
+                  leftIcon={<TranslateIcon />}
+                  label={
+                    <Trans>Submit a tutorial translated in your language</Trans>
+                  }
+                />
+              )}
+            </LineStackLayout>
           </LineStackLayout>
           <Line noMargin>
             <Text noMargin>

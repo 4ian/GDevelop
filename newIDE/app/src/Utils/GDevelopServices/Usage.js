@@ -21,6 +21,11 @@ export type Subscription = {|
   stripeCustomerId?: string,
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
+
+  purchaselyPlan?: string,
+
+  redemptionCode?: string | null,
+  redemptionCodeValidUntil?: number | null,
 |};
 
 /**
@@ -75,7 +80,7 @@ export type Limits = {
 export type PlanDetails = {
   planId: string | null,
   name: string,
-  monthlyPriceInEuros: number,
+  monthlyPriceInEuros: number | null,
   smallDescription?: MessageDescriptor,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
@@ -115,6 +120,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       {
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
+      {
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
     ],
   },
   {
@@ -133,11 +141,59 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,
       },
       {
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+];
+
+export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
+  {
+    planId: 'gdevelop_indie',
+    name: 'GDevelop Indie (Legacy)',
+    monthlyPriceInEuros: 2.0,
+    smallDescription: t`Build more and faster.`,
+    descriptionBullets: [
+      {
+        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
+      },
+      {
+        message: t`10 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_pro',
+    name: 'GDevelop Pro (Legacy)',
+    monthlyPriceInEuros: 7.0,
+    smallDescription: t`Experimented creators, ambitious games.`,
+    descriptionBullets: [
+      {
+        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
+      },
+      {
+        message: t`70 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+      {
         message: t`Immerse your players by removing GDevelop logo when the game loads.`,
       },
     ],
   },
 ];
+
+export const businessPlan: PlanDetails = {
+  planId: null,
+  monthlyPriceInEuros: null,
+  name: 'GDevelop for businesses, game studios and professionals',
+  smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
+  descriptionBullets: [],
+};
 
 export const getUserUsages = (
   getAuthorizationHeader: () => Promise<string>,
@@ -220,6 +276,37 @@ export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
   // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
   // Otherwise (Paypal), it needs to be cancelled first.
   return !!subscription.stripeSubscriptionId;
+};
+
+export const hasMobileAppStoreSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
+  return !!subscription && !!subscription.purchaselyPlan;
+};
+
+export const hasSubscriptionBeenManuallyAdded = (
+  subscription: ?Subscription
+): boolean => {
+  return (
+    !!subscription &&
+    (subscription.stripeSubscriptionId === 'MANUALLY_ADDED' ||
+      subscription.stripeCustomerId === 'MANUALLY_ADDED')
+  );
+};
+
+export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+  const hasValidSubscription =
+    !!subscription &&
+    !!subscription.planId &&
+    (!subscription.redemptionCodeValidUntil || // No redemption code
+      subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
+
+  if (hasValidSubscription) {
+    // The user has a subscription registered in the backend (classic "Registered" user).
+    return true;
+  }
+
+  return false;
 };
 
 type UploadType = 'build' | 'preview';

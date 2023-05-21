@@ -5,8 +5,8 @@ import { type MenuItemTemplate } from './Menu/Menu.flow';
 import { type I18n as I18nType } from '@lingui/core';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Spacer } from './Grid';
+import ChevronArrowBottom from './CustomSvgIcons/ChevronArrowBottom';
 
 type Props = {|
   id?: string,
@@ -93,7 +93,7 @@ const FlatButtonWithSplitMenu = (props: Props) => {
             focusRipple={focusRipple}
             style={styles.arrowDropDownButton}
           >
-            <ArrowDropDownIcon />
+            <ChevronArrowBottom />
           </Button>
         }
         buildMenuTemplate={buildMenuTemplate}

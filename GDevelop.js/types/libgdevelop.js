@@ -64,6 +64,7 @@ declare class libGDevelop {
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
+  Watermark: Class<gdWatermark>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
   ExtensionProperties: Class<gdExtensionProperties>;
@@ -100,6 +101,7 @@ declare class libGDevelop {
   JsonResource: Class<gdJsonResource>;
   TilemapResource: Class<gdTilemapResource>;
   TilesetResource: Class<gdTilesetResource>;
+  Model3DResource: Class<gdModel3DResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;
@@ -150,10 +152,12 @@ declare class libGDevelop {
   EventsRefactorer: Class<gdEventsRefactorer>;
   UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
+  ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
+  InstructionsCountEvaluator: Class<gdInstructionsCountEvaluator>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;
   ExtensionAndObjectMetadata: Class<gdExtensionAndObjectMetadata>;
   ExtensionAndEffectMetadata: Class<gdExtensionAndEffectMetadata>;
@@ -224,6 +228,7 @@ declare class libGDevelop {
   ObjectCodeGenerator: Class<gdObjectCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;
+  ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
 };

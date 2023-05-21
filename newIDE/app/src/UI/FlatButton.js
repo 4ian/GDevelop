@@ -63,9 +63,10 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
         ref={ref}
       >
         {leftIcon}
-        {leftIcon && <Spacer />}
-        {label}
-        {rightIcon && <Spacer />}
+        {leftIcon && label && <Spacer />}
+        {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+        {label ? <span>{label}</span> : null}
+        {rightIcon && label && <Spacer />}
         {rightIcon}
       </Button>
     );

@@ -23,7 +23,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { Chip } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
 import Builds from '../Export/Builds';
 import AlertMessage from '../UI/AlertMessage';
 import RaisedButton from '../UI/RaisedButton';
@@ -431,6 +431,7 @@ export const GameDetailsDialog = ({
                                       undefined
                                     )
                                   }
+                                  className="notranslate"
                                   label={username}
                                   color={index === 0 ? 'primary' : 'default'}
                                 />
@@ -516,15 +517,9 @@ export const GameDetailsDialog = ({
                     }
                     value={publicGame.orientation}
                   >
-                    <SelectOption
-                      value="default"
-                      primaryText={t`Platform default`}
-                    />
-                    <SelectOption
-                      value="landscape"
-                      primaryText={t`Landscape`}
-                    />
-                    <SelectOption value="portrait" primaryText={t`Portrait`} />
+                    <SelectOption value="default" label={t`Platform default`} />
+                    <SelectOption value="landscape" label={t`Landscape`} />
+                    <SelectOption value="portrait" label={t`Portrait`} />
                   </SelectField>
                   <Line noMargin justifyContent="flex-end">
                     <FlatButton
@@ -552,14 +547,14 @@ export const GameDetailsDialog = ({
                         <RaisedButton
                           onClick={() => {
                             const answer = Window.showConfirmDialog(
-                              'Are you sure you want to unpublish this game? \n\nThis will make your Liluo.io unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
+                              'Are you sure you want to unpublish this game? \n\nThis will make your gd.games unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
                             );
 
                             if (!answer) return;
 
                             unpublishGame();
                           }}
-                          label={<Trans>Unpublish from Liluo.io</Trans>}
+                          label={<Trans>Unpublish from gd.games</Trans>}
                           disabled={isGameUpdating}
                         />
                         <Spacer />
@@ -621,6 +616,7 @@ export const GameDetailsDialog = ({
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
               isLoading={isGameUpdating}
+              i18n={i18n}
             />
           )}
         </Dialog>

@@ -22,10 +22,10 @@ import Toggle from '../../UI/Toggle';
 import TextButton from '../../UI/TextButton';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Copy from '../../UI/CustomSvgIcons/Copy';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -78,7 +78,7 @@ const downloadButtons = [
   {
     displayName: t`Open build link`,
     key: 's3Key',
-    icon: <OpenInNew />,
+    icon: <ShareExternal />,
   },
 ];
 
@@ -139,13 +139,13 @@ const BuildProgressAndActions = ({
               t`"${build.name ||
                 shortenUuidForDisplay(
                   build.id
-                )}" will be the new build of this game published on Liluo.io. Continue?`
+                )}" will be the new build of this game published on gd.games. Continue?`
             )
           : i18n._(
               t`"${build.name ||
                 shortenUuidForDisplay(
                   build.id
-                )}" will be unpublished on Liluo.io. Continue?`
+                )}" will be unpublished on gd.games. Continue?`
             )
       );
       if (!answer) return;
@@ -272,7 +272,7 @@ const BuildProgressAndActions = ({
                 {game && !!build.s3Key && (
                   <>
                     <Toggle
-                      label={<Trans>Publish this build on Liluo.io</Trans>}
+                      label={<Trans>Publish this build on gd.games</Trans>}
                       labelPosition="left"
                       toggled={isBuildPublished}
                       onToggle={() => {

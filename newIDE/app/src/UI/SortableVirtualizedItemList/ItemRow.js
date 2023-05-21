@@ -13,11 +13,13 @@ import {
   shouldValidate,
 } from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import Text from '../Text';
 
 const styles = {
   textField: {
     top: noMarginTextFieldInListItemTopOffset,
+    fontSize: 12,
   },
 };
 
@@ -40,7 +42,6 @@ type Props<Item> = {|
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
   scaleUpItemIconWhenSelected?: boolean,
-  connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 |};
 
 function ItemRow<Item>({
@@ -60,7 +61,6 @@ function ItemRow<Item>({
   onEdit,
   hideMenuButton,
   scaleUpItemIconWhenSelected,
-  connectIconDragSource,
 }: Props<Item>) {
   const textFieldRef = React.useRef<?TextFieldInterface>(null);
   const shouldDiscardChanges = React.useRef<boolean>(false);
@@ -117,12 +117,17 @@ function ItemRow<Item>({
         fontWeight: isBold ? 'bold' : 'normal',
       }}
     >
-      {renderItemLabel ? renderItemLabel() : itemName}
+      {renderItemLabel ? (
+        renderItemLabel()
+      ) : (
+        <Text noMargin size="body-small">
+          {itemName}
+        </Text>
+      )}
     </div>
   );
 
   const itemStyle = {
-    borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
     backgroundColor: selected
       ? errorStatus === ''
         ? gdevelopTheme.listItem.selectedBackgroundColor
@@ -154,11 +159,7 @@ function ItemRow<Item>({
     <ListItem
       style={{ ...itemStyle }}
       primaryText={label}
-      leftIcon={
-        connectIconDragSource && leftIcon
-          ? connectIconDragSource(<div>{leftIcon}</div>)
-          : leftIcon
-      }
+      leftIcon={leftIcon}
       displayMenuButton={!hideMenuButton}
       rightIconColor={
         selected

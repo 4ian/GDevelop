@@ -273,8 +273,6 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 
   if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
-    conditionCode += GenerateReferenceToUpperScopeBoolean(
-        "conditionTrue", returnBoolean, context);
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(
         condition, *this, context);
     maxCustomConditionsDepth =
@@ -291,7 +289,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     condition.SetParameters(parameters);
   }
 
-  // Verify that there are no mismatchs between object type in parameters.
+  // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter =
@@ -483,7 +481,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     action.SetParameters(parameters);
   }
 
-  // Verify that there are no mismatchs between object type in parameters.
+  // Verify that there are no mismatches between object type in parameters.
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
@@ -729,6 +727,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
              metadata.GetType() == "tilemapResource" ||
              metadata.GetType() == "tilesetResource" ||
              metadata.GetType() == "videoResource" ||
+             metadata.GetType() == "model3DResource" ||
              // Deprecated, old parameter names:
              metadata.GetType() == "password" || metadata.GetType() == "musicfile" ||
              metadata.GetType() == "soundfile" || metadata.GetType() == "police") {
@@ -1240,7 +1239,7 @@ size_t EventsCodeGenerator::GenerateSingleUsageUniqueIdFor(
               << std::endl;
   }
 
-  // Base the unique id on the adress in memory so that the same instruction
+  // Base the unique id on the address in memory so that the same instruction
   // in memory will get the same id across different code generations.
   size_t uniqueId = (size_t)instruction;
 

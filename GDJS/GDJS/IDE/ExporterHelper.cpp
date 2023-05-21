@@ -23,16 +23,17 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/EventsBasedObject.h"
-#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
@@ -41,7 +42,6 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
@@ -69,6 +69,29 @@ static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
     container.push_back(str);
 }
 
+static gd::String CleanProjectName(gd::String projectName) {
+  gd::String partiallyCleanedProjectName = projectName;
+
+  static const gd::String forbiddenFileNameCharacters =
+      "\\/:*?\"<>|";  // See
+                      // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+
+  for (size_t i = 0; i < partiallyCleanedProjectName.size();) {
+    // Delete all characters that are not allowed in a filename
+    if (forbiddenFileNameCharacters.find(partiallyCleanedProjectName[i]) !=
+        gd::String::npos) {
+      partiallyCleanedProjectName.erase(i, 1);
+    } else {
+      i++;
+    }
+  }
+
+  if (partiallyCleanedProjectName.empty())
+    partiallyCleanedProjectName = "Project";
+
+  return partiallyCleanedProjectName;
+}
+
 ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
                                gd::String gdjsRoot_,
                                gd::String codeOutputDir_)
@@ -87,11 +110,24 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   gd::Project exportedProject = options.project;
   const gd::Project &immutableProject = exportedProject;
 
-  if (!options.fullLoadingScreen) {
+  if (options.fullLoadingScreen) {
+    // Use project properties fallback to set empty properties
+    if (exportedProject.GetAuthorIds().empty() &&
+        !options.fallbackAuthorId.empty()) {
+      exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
+    }
+    if (exportedProject.GetAuthorUsernames().empty() &&
+        !options.fallbackAuthorUsername.empty()) {
+      exportedProject.GetAuthorUsernames().push_back(
+          options.fallbackAuthorUsername);
+    }
+  } else {
     // Most of the time, we skip the logo and minimum duration so that
     // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
-    exportedProject.GetLoadingScreen().SetMinDuration(0);
+    exportedProject.GetLoadingScreen()
+        .ShowGDevelopLogoDuringLoadingScreen(false)
+        .SetMinDuration(0);
+    exportedProject.GetWatermark().ShowGDevelopWatermark(false);
   }
 
   // Export resources (*before* generating events as some resources filenames
@@ -107,8 +143,16 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       fs, exportedProject.GetResourcesManager(), options.exportPath);
   // end of compatibility code
 
+  auto usedExtensionsResult =
+      gd::UsedExtensionsFinder::ScanProject(exportedProject);
+
+  bool isUsingScene3DExtension =
+      usedExtensionsResult.GetUsedExtensions().find("Scene3D") !=
+      usedExtensionsResult.GetUsedExtensions().end();
+
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
+                 /*pixiInThreeRenderers=*/isUsingScene3DExtension,
                  /*includeWebsocketDebuggerClient=*/
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
@@ -117,8 +161,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  includesFiles);
 
   // Export files for free function, object and behaviors
-  auto usedExtensionsResult =
-      gd::UsedExtensionsFinder::ScanProject(exportedProject);
   for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
     InsertUnique(includesFiles, includeFile);
   }
@@ -174,6 +216,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   if (options.isDevelopmentEnvironment) {
     runtimeGameOptions.AddChild("environment").SetStringValue("dev");
   }
+  if (!options.gdevelopResourceToken.empty()) {
+    runtimeGameOptions.AddChild("gdevelopResourceToken")
+        .SetStringValue(options.gdevelopResourceToken);
+  }
+  runtimeGameOptions.AddChild("allowAuthenticationUsingIframeForPreview")
+      .SetBoolValue(options.allowAuthenticationUsingIframeForPreview);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -290,16 +338,22 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     }
 
     // Splashscreen icon for Android 12+.
-    gd::String splashScreenIconFilename = getIconFilename("android", "windowSplashScreenAnimatedIcon");
+    gd::String splashScreenIconFilename =
+        getIconFilename("android", "windowSplashScreenAnimatedIcon");
     if (!splashScreenIconFilename.empty())
-      output += "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" value=\""
-        + splashScreenIconFilename + "\" />\n";
+      output +=
+          "<preference name=\"AndroidWindowSplashScreenAnimatedIcon\" "
+          "value=\"" +
+          splashScreenIconFilename + "\" />\n";
 
     // Splashscreen "branding" image for Android 12+.
-    gd::String splashScreenBrandingImageFilename = getIconFilename("android", "windowSplashScreenBrandingImage");
+    gd::String splashScreenBrandingImageFilename =
+        getIconFilename("android", "windowSplashScreenBrandingImage");
     if (!splashScreenBrandingImageFilename.empty())
-      output += "<preference name=\"AndroidWindowSplashScreenBrandingImage\" value=\""
-        + splashScreenBrandingImageFilename + "\" />\n";
+      output +=
+          "<preference name=\"AndroidWindowSplashScreenBrandingImage\" "
+          "value=\"" +
+          splashScreenBrandingImageFilename + "\" />\n";
 
     return output;
   };
@@ -440,11 +494,15 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                 ->GetMangledSceneName(project.GetName())
                                 .LowerCase()
                                 .FindAndReplace(" ", "-")));
+  // It's important to clean the project name from special characters,
+  // otherwise Windows executable may be corrupted when electron builds it.
+  gd::String jsonCleanedName = gd::Serializer::ToJSON(
+      gd::SerializerElement(CleanProjectName(project.GetName())));
 
   {
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
-            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonCleanedName)
             .FindAndReplace("\"GDJS_GAME_PACKAGE_NAME\"", jsonPackageName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
@@ -552,6 +610,7 @@ bool ExporterHelper::CompleteIndexFile(
 }
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
+                                    bool pixiInThreeRenderers,
                                     bool includeWebsocketDebuggerClient,
                                     bool includeWindowMessageDebuggerClient,
                                     gd::String gdevelopLogoStyle,
@@ -565,6 +624,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "AsyncTasksManager.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
+  InsertUnique(includesFiles, "Model3DManager.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "polygon.js");
   InsertUnique(includesFiles, "runtimeobject.js");
@@ -573,9 +633,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "runtimescene.js");
   InsertUnique(includesFiles, "scenestack.js");
   InsertUnique(includesFiles, "force.js");
+  InsertUnique(includesFiles, "RuntimeLayer.js");
   InsertUnique(includesFiles, "layer.js");
-  InsertUnique(includesFiles, "RuntimeSceneLayer.js");
+  InsertUnique(includesFiles, "RuntimeCustomObjectLayer.js");
   InsertUnique(includesFiles, "timer.js");
+  InsertUnique(includesFiles, "runtimewatermark.js");
   InsertUnique(includesFiles, "runtimegame.js");
   InsertUnique(includesFiles, "variable.js");
   InsertUnique(includesFiles, "variablescontainer.js");
@@ -621,6 +683,10 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "debugger-client/window-message-debugger-client.js");
   }
 
+  if (pixiInThreeRenderers) {
+    InsertUnique(includesFiles, "pixi-renderers/three.js");
+    InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
+  }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
@@ -631,10 +697,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/CustomObjectPixiRenderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/DebuggerPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/CustomObjectPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");

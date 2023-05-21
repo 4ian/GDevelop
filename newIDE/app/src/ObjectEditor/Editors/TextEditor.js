@@ -6,7 +6,8 @@ import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
-import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
+import { MiniToolbarText } from '../../UI/MiniToolbar';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
@@ -49,104 +50,110 @@ export default class TextEditor extends React.Component<EditorProps, void> {
 
     return (
       <Column noMargin>
-        <MiniToolbar>
-          <MiniToolbarText firstChild>
-            <Trans>Size:</Trans>
-          </MiniToolbarText>
-          <SemiControlledTextField
-            commitOnBlur
-            id="text-object-font-size"
-            type="number"
-            margin="none"
-            style={styles.sizeTextField}
-            value={textObjectConfiguration.getCharacterSize()}
-            onChange={value => {
-              textObjectConfiguration.setCharacterSize(
-                parseInt(value, 10) || 0
-              );
-              this.forceUpdate();
-            }}
-          />
-          <MiniToolbarText>
-            <Trans>Color:</Trans>
-          </MiniToolbarText>
-          <ColorPicker
-            style={styles.toolbarItem}
-            disableAlpha
-            color={{
-              r: textObjectConfiguration.getColorR(),
-              g: textObjectConfiguration.getColorG(),
-              b: textObjectConfiguration.getColorB(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              textObjectConfiguration.setColor(
-                color.rgb.r,
-                color.rgb.g,
-                color.rgb.b
-              );
-              this.forceUpdate();
-            }}
-          />
-          <Checkbox
-            label={<Trans>Bold</Trans>}
-            checked={textObjectConfiguration.isBold()}
-            onCheck={(e, checked) => {
-              textObjectConfiguration.setBold(checked);
-              this.forceUpdate();
-            }}
-            style={styles.checkbox}
-          />
-          <Checkbox
-            label={<Trans>Italic</Trans>}
-            checked={textObjectConfiguration.isItalic()}
-            onCheck={(e, checked) => {
-              textObjectConfiguration.setItalic(checked);
-              this.forceUpdate();
-            }}
-            style={styles.checkbox}
-          />
-          <ButtonGroup>
-            <Tooltip title={<Trans>Align text on the left</Trans>}>
-              <Button
-                variant={textAlignment === 'left' ? 'contained' : 'outlined'}
-                color={textAlignment === 'left' ? 'secondary' : 'default'}
-                onClick={() => {
-                  textObjectConfiguration.setTextAlignment('left');
-                  this.forceUpdate();
-                }}
-              >
-                <LeftTextAlignment />
-              </Button>
-            </Tooltip>
-            <Tooltip title={<Trans>Align text on the center</Trans>}>
-              <Button
-                variant={textAlignment === 'center' ? 'contained' : 'outlined'}
-                color={textAlignment === 'center' ? 'secondary' : 'default'}
-                onClick={() => {
-                  textObjectConfiguration.setTextAlignment('center');
-                  this.forceUpdate();
-                }}
-              >
-                <CenterTextAlignment />
-              </Button>
-            </Tooltip>
-            <Tooltip title={<Trans>Align text on the right</Trans>}>
-              <Button
-                variant={textAlignment === 'right' ? 'contained' : 'outlined'}
-                color={textAlignment === 'right' ? 'secondary' : 'default'}
-                onClick={() => {
-                  textObjectConfiguration.setTextAlignment('right');
-                  this.forceUpdate();
-                }}
-              >
-                <RightTextAlignment />
-              </Button>
-            </Tooltip>
-          </ButtonGroup>
-        </MiniToolbar>
+        <ResponsiveLineStackLayout noMargin alignItems="center">
+          <Line noMargin alignItems="center">
+            <MiniToolbarText firstChild>
+              <Trans>Size:</Trans>
+            </MiniToolbarText>
+            <SemiControlledTextField
+              commitOnBlur
+              id="text-object-font-size"
+              type="number"
+              margin="none"
+              style={styles.sizeTextField}
+              value={textObjectConfiguration.getCharacterSize()}
+              onChange={value => {
+                textObjectConfiguration.setCharacterSize(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+            />
+            <MiniToolbarText>
+              <Trans>Color:</Trans>
+            </MiniToolbarText>
+            <ColorPicker
+              style={styles.toolbarItem}
+              disableAlpha
+              color={{
+                r: textObjectConfiguration.getColorR(),
+                g: textObjectConfiguration.getColorG(),
+                b: textObjectConfiguration.getColorB(),
+                a: 255,
+              }}
+              onChangeComplete={color => {
+                textObjectConfiguration.setColor(
+                  color.rgb.r,
+                  color.rgb.g,
+                  color.rgb.b
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Line>
+          <Line noMargin alignItems="center">
+            <Checkbox
+              label={<Trans>Bold</Trans>}
+              checked={textObjectConfiguration.isBold()}
+              onCheck={(e, checked) => {
+                textObjectConfiguration.setBold(checked);
+                this.forceUpdate();
+              }}
+              style={styles.checkbox}
+            />
+            <Checkbox
+              label={<Trans>Italic</Trans>}
+              checked={textObjectConfiguration.isItalic()}
+              onCheck={(e, checked) => {
+                textObjectConfiguration.setItalic(checked);
+                this.forceUpdate();
+              }}
+              style={styles.checkbox}
+            />
+            <ButtonGroup size="small">
+              <Tooltip title={<Trans>Align text on the left</Trans>}>
+                <Button
+                  variant={textAlignment === 'left' ? 'contained' : 'outlined'}
+                  color={textAlignment === 'left' ? 'secondary' : 'default'}
+                  onClick={() => {
+                    textObjectConfiguration.setTextAlignment('left');
+                    this.forceUpdate();
+                  }}
+                >
+                  <LeftTextAlignment />
+                </Button>
+              </Tooltip>
+              <Tooltip title={<Trans>Align text on the center</Trans>}>
+                <Button
+                  variant={
+                    textAlignment === 'center' ? 'contained' : 'outlined'
+                  }
+                  color={textAlignment === 'center' ? 'secondary' : 'default'}
+                  onClick={() => {
+                    textObjectConfiguration.setTextAlignment('center');
+                    this.forceUpdate();
+                  }}
+                >
+                  <CenterTextAlignment />
+                </Button>
+              </Tooltip>
+              <Tooltip title={<Trans>Align text on the right</Trans>}>
+                <Button
+                  variant={textAlignment === 'right' ? 'contained' : 'outlined'}
+                  color={textAlignment === 'right' ? 'secondary' : 'default'}
+                  onClick={() => {
+                    textObjectConfiguration.setTextAlignment('right');
+                    this.forceUpdate();
+                  }}
+                >
+                  <RightTextAlignment />
+                </Button>
+              </Tooltip>
+            </ButtonGroup>
+          </Line>
+        </ResponsiveLineStackLayout>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
             <ResourceSelector
               project={project}
               resourceManagementProps={resourceManagementProps}
@@ -165,7 +172,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
           </Column>
         </Line>
         <Line noMargin>
-          <Column expand>
+          <Column expand noMargin>
             <Line>
               <SemiControlledTextField
                 floatingLabelText={<Trans>Initial text to display</Trans>}

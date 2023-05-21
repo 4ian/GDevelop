@@ -35,7 +35,7 @@ type State = {|
   androidIconResourceNames: Array<string>,
   androidWindowSplashScreenAnimatedIconResourceName: string,
   iosIconResourceNames: Array<string>,
-  displayLiluoThumbnailWarning: boolean,
+  displayGamesPlatformThumbnailWarning: boolean,
 |};
 
 const desktopSizes = [512];
@@ -80,7 +80,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   _loadFrom(project: gdProject): State {
     const platformSpecificAssets = project.getPlatformSpecificAssets();
     return {
-      thumbnailResourceName: platformSpecificAssets.get('liluo', `thumbnail`),
+      thumbnailResourceName: platformSpecificAssets.get('liluo', 'thumbnail'),
       desktopIconResourceNames: desktopSizes.map(size =>
         platformSpecificAssets.get('desktop', `icon-${size}`)
       ),
@@ -93,7 +93,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       iosIconResourceNames: iosSizes.map(size =>
         platformSpecificAssets.get('ios', `icon-${size}`)
       ),
-      displayLiluoThumbnailWarning: false,
+      displayGamesPlatformThumbnailWarning: false,
     };
   }
 
@@ -307,7 +307,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       androidIconResourceNames,
       androidWindowSplashScreenAnimatedIconResourceName,
       iosIconResourceNames,
-      displayLiluoThumbnailWarning,
+      displayGamesPlatformThumbnailWarning,
     } = this.state;
 
     return (
@@ -336,10 +336,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             )}
           </Line>
           <Text size="sub-title">
-            <Trans>Liluo.io thumbnail</Trans>
+            <Trans>gd.games thumbnail</Trans>
           </Text>
           <ResourceSelectorWithThumbnail
-            floatingLabelText={`Liluo.io thumbnail (1920x1080 px)`}
+            floatingLabelText={`gd.games thumbnail (1920x1080 px)`}
             project={project}
             resourceManagementProps={resourceManagementProps}
             resourceKind="image"
@@ -347,18 +347,18 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             onChange={resourceName => {
               this.setState({
                 thumbnailResourceName: resourceName,
-                displayLiluoThumbnailWarning:
+                displayGamesPlatformThumbnailWarning:
                   resourceName !== this.state.thumbnailResourceName,
               });
             }}
           />
-          {displayLiluoThumbnailWarning ? (
+          {displayGamesPlatformThumbnailWarning ? (
             <Line>
               <AlertMessage kind="warning">
                 <Trans>
-                  You're about to change the thumbnail displayed on Liluo.io for
+                  You're about to change the thumbnail displayed on gd.games for
                   your game. Once you have applied changes here, you will then
-                  need to publish a new version of your game on Liluo.io so that
+                  need to publish a new version of your game on gd.games so that
                   this new thumbnail is used.
                 </Trans>
               </AlertMessage>

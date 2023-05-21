@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
-import Delete from '@material-ui/icons/Delete';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import styles from './styles';
 import { roundTo } from '../../../../Utils/Mathematics';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import Trash from '../../../../UI/CustomSvgIcons/Trash';
 
 const VERTEX_COORDINATE_PRECISION = 4;
 
@@ -90,7 +90,7 @@ const VerticeRow = ({
             onClick={props.onRemove}
             disabled={!props.canRemove}
           >
-            <Delete />
+            <Trash />
           </IconButton>
         )}
       </TableRowColumn>

@@ -17,6 +17,10 @@ jobs:
   build-storybook:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -57,8 +61,8 @@ jobs:
 
       - name: Log urls to the Storybook
         run: |
-          echo "Find the latest Storybook for this branch on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
-          echo "Find the Storybook for this commit on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
+          echo "Find the latest Storybook for this branch on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
+          echo "Find the Storybook for this commit on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
 
       # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic

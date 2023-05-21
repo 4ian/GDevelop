@@ -45,7 +45,12 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
   }
 
   forceUpdateEditor() {
-    if (this.editor) this.editor.forceUpdateObjectsList();
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateObjectGroupsList();
+      editor.forceUpdateLayersList();
+    }
   }
 
   getLayout(): ?gdLayout {
@@ -102,6 +107,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onOpenEvents={this.props.onOpenEvents}
         isActive={isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+        openBehaviorEvents={this.props.openBehaviorEvents}
       />
     );
   }

@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -27,11 +28,9 @@ import AlertMessage from '../UI/AlertMessage';
 import { Tabs } from '../UI/Tabs';
 import { LoadingScreenEditor } from './LoadingScreenEditor';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import {
-  type HotReloadPreviewButtonProps,
-  NewPreviewIcon,
-} from '../HotReload/HotReloadPreviewButton';
+import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 
 type Props = {|
   project: gdProject,
@@ -41,6 +40,7 @@ type Props = {|
   onApply: (options: { newName?: string }) => Promise<boolean>,
   onPropertiesApplied: (options: { newName?: string }) => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
+  i18n: I18nType,
 
   // For resources:
   resourceManagementProps: ResourceManagementProps,
@@ -54,6 +54,7 @@ type ProjectProperties = {|
   description: string,
   author: string,
   authorIds: string[],
+  authorUsernames: string[],
   version: string,
   packageName: string,
   orientation: string,
@@ -66,7 +67,7 @@ type ProjectProperties = {|
   useDeprecatedZeroAsDefaultZOrder: boolean,
 |};
 
-function loadPropertiesFromProject(project: gdProject): ProjectProperties {
+const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
   return {
     gameResolutionWidth: project.getGameResolutionWidth(),
     gameResolutionHeight: project.getGameResolutionHeight(),
@@ -75,6 +76,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     description: project.getDescription(),
     author: project.getAuthor(),
     authorIds: project.getAuthorIds().toJSArray(),
+    authorUsernames: project.getAuthorUsernames().toJSArray(),
     version: project.getVersion(),
     packageName: project.getPackageName(),
     orientation: project.getOrientation(),
@@ -86,13 +88,13 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     isFolderProject: project.isFolderProject(),
     useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
-}
+};
 
 function applyPropertiesToProject(
   project: gdProject,
+  i18n: I18nType,
   newProperties: ProjectProperties
 ) {
-  const t = str => str; //TODO
   const {
     gameResolutionWidth,
     gameResolutionHeight,
@@ -100,6 +102,7 @@ function applyPropertiesToProject(
     name,
     description,
     authorIds,
+    authorUsernames,
     author,
     version,
     packageName,
@@ -119,6 +122,11 @@ function applyPropertiesToProject(
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  const projectAuthorUsernames = project.getAuthorUsernames();
+  projectAuthorUsernames.clear();
+  authorUsernames.forEach(authorUsername =>
+    projectAuthorUsernames.push_back(authorUsername)
+  );
   project.setAuthor(author);
   project.setVersion(version);
   project.setPackageName(packageName);
@@ -131,10 +139,13 @@ function applyPropertiesToProject(
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
-  return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
+  return displayProjectErrorsBox(
+    i18n,
+    getProjectPropertiesErrors(i18n, project)
+  );
 }
 
-function ProjectPropertiesDialog(props: Props) {
+const ProjectPropertiesDialog = (props: Props) => {
   const { project, hotReloadPreviewButtonProps } = props;
 
   const initialProperties = React.useMemo(
@@ -146,6 +157,9 @@ function ProjectPropertiesDialog(props: Props) {
     initialProperties.description
   );
   let [authorIds, setAuthorIds] = React.useState(initialProperties.authorIds);
+  let [authorUsernames, setAuthorUsernames] = React.useState(
+    initialProperties.authorUsernames
+  );
   let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
     initialProperties.gameResolutionWidth
   );
@@ -210,25 +224,30 @@ function ProjectPropertiesDialog(props: Props) {
     const proceed = await props.onApply(specialPropertiesChanged);
     if (!proceed) return;
 
-    const wasProjectPropertiesApplied = applyPropertiesToProject(project, {
-      gameResolutionWidth,
-      gameResolutionHeight,
-      adaptGameResolutionAtRuntime,
-      name,
-      description,
-      author,
-      authorIds,
-      version,
-      packageName,
-      orientation,
-      scaleMode,
-      pixelsRounding,
-      sizeOnStartupMode,
-      minFPS,
-      maxFPS,
-      isFolderProject,
-      useDeprecatedZeroAsDefaultZOrder,
-    });
+    const wasProjectPropertiesApplied = applyPropertiesToProject(
+      project,
+      props.i18n,
+      {
+        gameResolutionWidth,
+        gameResolutionHeight,
+        adaptGameResolutionAtRuntime,
+        name,
+        description,
+        author,
+        authorIds,
+        authorUsernames,
+        version,
+        packageName,
+        orientation,
+        scaleMode,
+        pixelsRounding,
+        sizeOnStartupMode,
+        minFPS,
+        maxFPS,
+        isFolderProject,
+        useDeprecatedZeroAsDefaultZOrder,
+      }
+    );
 
     if (wasProjectPropertiesApplied) {
       props.onPropertiesApplied(specialPropertiesChanged);
@@ -265,8 +284,8 @@ function ProjectPropertiesDialog(props: Props) {
               hotReloadPreviewButtonProps ? (
                 <FlatButton
                   key="hot-reload-preview-button"
-                  leftIcon={<NewPreviewIcon />}
-                  label={<Trans>Run a preview (with loading screen)</Trans>}
+                  leftIcon={<PreviewIcon />}
+                  label={<Trans>Run a preview (with loading & branding)</Trans>}
                   onClick={
                     hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
                   }
@@ -284,7 +303,7 @@ function ProjectPropertiesDialog(props: Props) {
                 options={[
                   { label: <Trans>Properties</Trans>, value: 'properties' },
                   {
-                    label: <Trans>Loading screen</Trans>,
+                    label: <Trans>Branding and Loading screen</Trans>,
                     value: 'loading-screen',
                   },
                 ]}
@@ -317,6 +336,10 @@ function ProjectPropertiesDialog(props: Props) {
                   authorIds={authorIds}
                   setAuthorIds={newAuthorIds => {
                     setAuthorIds(newAuthorIds);
+                    notifyOfChange();
+                  }}
+                  setAuthorUsernames={newAuthorUsernames => {
+                    setAuthorUsernames(newAuthorUsernames);
                     notifyOfChange();
                   }}
                   orientation={orientation}
@@ -411,7 +434,7 @@ function ProjectPropertiesDialog(props: Props) {
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
                           i18n._(
-                            t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommened)?`
+                            t`Make sure to verify all your events creating objects, and optionally add an action to set the Z order back to 0 if it's important for your game. Do you want to continue (recommended)?`
                           )
                         );
                         if (!answer) return;
@@ -488,15 +511,15 @@ function ProjectPropertiesDialog(props: Props) {
                 >
                   <SelectOption
                     value=""
-                    primaryText={t`No changes to the game size`}
+                    label={t`No changes to the game size`}
                   />
                   <SelectOption
                     value="adaptWidth"
-                    primaryText={t`Change width to fit the screen or window size`}
+                    label={t`Change width to fit the screen or window size`}
                   />
                   <SelectOption
                     value="adaptHeight"
-                    primaryText={t`Change height to fit the screen or window size`}
+                    label={t`Change height to fit the screen or window size`}
                   />
                 </SelectField>
                 <Checkbox
@@ -591,11 +614,11 @@ function ProjectPropertiesDialog(props: Props) {
                 >
                   <SelectOption
                     value="linear"
-                    primaryText={t`Linear (antialiased rendering, good for most games)`}
+                    label={t`Linear (antialiased rendering, good for most games)`}
                   />
                   <SelectOption
                     value="nearest"
-                    primaryText={t`Nearest (no antialiasing, good for pixel perfect games)`}
+                    label={t`Nearest (no antialiasing, good for pixel perfect games)`}
                   />
                 </SelectField>
                 <Checkbox
@@ -657,11 +680,11 @@ function ProjectPropertiesDialog(props: Props) {
                 >
                   <SelectOption
                     value={'single-file'}
-                    primaryText={t`Single file (default)`}
+                    label={t`Single file (default)`}
                   />
                   <SelectOption
                     value={'folder-project'}
-                    primaryText={t`Multiple files, saved in folder next to the main file`}
+                    label={t`Multiple files, saved in folder next to the main file`}
                   />
                 </SelectField>
                 <ExtensionsProperties project={project} />
@@ -670,6 +693,7 @@ function ProjectPropertiesDialog(props: Props) {
             {currentTab === 'loading-screen' && (
               <LoadingScreenEditor
                 loadingScreen={project.getLoadingScreen()}
+                watermark={project.getWatermark()}
                 onLoadingScreenUpdated={notifyOfLoadingScreenChange}
                 onChangeSubscription={onCancelChanges}
                 project={project}
@@ -681,6 +705,6 @@ function ProjectPropertiesDialog(props: Props) {
       )}
     </I18n>
   );
-}
+};
 
 export default ProjectPropertiesDialog;

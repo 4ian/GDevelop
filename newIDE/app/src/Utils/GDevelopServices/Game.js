@@ -6,6 +6,17 @@ import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
 
+export type CachedGameSlug = {
+  username: string,
+  gameSlug: string,
+};
+
+export type GameSlug = {
+  username: string,
+  gameSlug: string,
+  createdAt: number,
+};
+
 export type PublicGame = {
   id: string,
   gameName: string,
@@ -40,17 +51,12 @@ export type Game = {
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
+  cachedCurrentSlug?: CachedGameSlug,
 };
 
 export type GameCategory = {
   name: string,
   type: 'user-defined' | 'admin-only',
-};
-
-export type GameSlug = {
-  username: string,
-  gameSlug: string,
-  createdAt: number,
 };
 
 export type ShowcasedGameLink = {
@@ -135,8 +141,9 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-export const getGameUrl = (game: ?Game, slug: ?GameSlug) => {
+export const getGameUrl = (game: ?Game) => {
   if (!game) return null;
+  const slug = game.cachedCurrentSlug;
   return slug
     ? GDevelopGamesPlatform.getGameUrlWithSlug(slug.username, slug.gameSlug)
     : GDevelopGamesPlatform.getGameUrl(game.id);
@@ -392,26 +399,6 @@ export const getGames = (
 export const getPublicGame = (gameId: string): Promise<PublicGame> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
-    .then(response => response.data);
-};
-
-export const getGameSlugs = (
-  getAuthorizationHeader: () => Promise<string>,
-  userId: string,
-  gameId: string
-): Promise<Array<GameSlug>> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopGameApi.baseUrl}/game-slug`, {
-        params: {
-          userId,
-          gameId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
     .then(response => response.data);
 };
 

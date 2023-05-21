@@ -10,15 +10,14 @@ import {
 import ValueStateHolder from '../ValueStateHolder';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 import { Column } from '../../UI/Grid';
-import HomeIcon from '@material-ui/icons/Home';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import ObjectsList from '../../ObjectsList';
-import fakeResourceExternalEditors from '../FakeResourceExternalEditors';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
+import Home from '../../UI/CustomSvgIcons/Home';
+import fakeResourceManagementProps from '../FakeResourceManagement';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
@@ -39,7 +38,7 @@ export const ThreeTabs = () => (
               active={value === 0}
               onClick={() => onChange(0)}
               label={null}
-              icon={<HomeIcon />}
+              icon={<Home />}
               onClose={action('Close tab 1')}
               onCloseAll={action('Close all')}
               onCloseOthers={action('Close others')}
@@ -265,13 +264,7 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  resourceManagementProps={{
-                    getStorageProvider: () => emptyStorageProvider,
-                    onFetchNewlyAddedResources: async () => {},
-                    resourceSources: [],
-                    onChooseResource: () => Promise.reject('Unimplemented'),
-                    resourceExternalEditors: fakeResourceExternalEditors,
-                  }}
+                  resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
                   onExportObject={action('On export object')}
                   onAddObjectInstance={action('On add instance to the scene')}

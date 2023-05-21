@@ -7,7 +7,6 @@ import {
   sendProgramOpening,
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
-import { installRaven } from './Utils/Analytics/Raven';
 import { register } from './serviceWorker';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
@@ -15,7 +14,7 @@ import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
 import { loadPreferencesFromLocalStorage } from './MainFrame/Preferences/PreferencesProvider';
-import { getTheme } from './UI/Theme';
+import { getFullTheme } from './UI/Theme';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -30,9 +29,10 @@ let color = 'f0f0f0';
 try {
   const values = loadPreferencesFromLocalStorage();
   if (values && values.themeName) {
-    const theme = getTheme({
+    const theme = getFullTheme({
       themeName: values.themeName,
-      language: 'en', // language is not important here as we only look for a color
+      language: 'en', // language is not important here as we only look for a color.
+      windowWidth: 'small', // window size is not important as we only look for a color.
     });
     color = theme.muiTheme.palette.background.default;
   }
@@ -68,8 +68,7 @@ class Bootstrapper extends Component<{}, State> {
   authentication = new Authentication();
 
   componentDidMount() {
-    installAnalyticsEvents(this.authentication);
-    installRaven();
+    installAnalyticsEvents();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.

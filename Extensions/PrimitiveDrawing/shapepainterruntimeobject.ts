@@ -13,6 +13,8 @@ namespace gdjs {
     b: integer;
   };
 
+  export type Antialiasing = 'none' | 'low' | 'medium' | 'high';
+
   /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
   export type ShapePainterObjectDataType = {
     /** The color (in RGB format) of the inner part of the painted shape */
@@ -29,6 +31,8 @@ namespace gdjs {
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
+    /** The type of anti-aliasing to apply at rendering. */
+    antialiasing: Antialiasing;
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -52,6 +56,7 @@ namespace gdjs {
     _outlineSize: float;
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
+    _antialiasing: Antialiasing;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -86,6 +91,7 @@ namespace gdjs {
       this._outlineSize = shapePainterObjectData.outlineSize;
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
+      this._antialiasing = shapePainterObjectData.antialiasing;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -337,6 +343,19 @@ namespace gdjs {
       return this._clearBetweenFrames;
     }
 
+    setAntialiasing(value: Antialiasing): void {
+      this._antialiasing = value;
+      this._renderer.updateAntialiasing();
+    }
+
+    getAntialiasing(): Antialiasing {
+      return this._antialiasing;
+    }
+
+    checkAntialiasing(valueToCompare: Antialiasing): boolean {
+      return this._antialiasing === valueToCompare;
+    }
+
     setCoordinatesRelative(value: boolean): void {
       this._useAbsoluteCoordinates = !value;
     }
@@ -474,7 +493,7 @@ namespace gdjs {
     /**
      * The center of rotation is defined relatively
      * to the drawing origin (the object position).
-     * This avoid the center to move on the drawing
+     * This avoids the center to move on the drawing
      * when new shapes push the bounds.
      *
      * When no custom center is defined, it will move

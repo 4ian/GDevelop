@@ -124,7 +124,7 @@ export const ExtensionStoreStateProvider = ({
 
           console.info(
             `Loaded ${
-              extensionShortHeaders.length
+              extensionShortHeaders ? extensionShortHeaders.length : 0
             } extensions from the extension store.`
           );
           setExtensionShortHeadersByName(extensionShortHeadersByName);

@@ -43,18 +43,10 @@ std::map<gd::String, gd::PropertyDescriptor> CustomConfigurationHelper::GetPrope
     const auto &propertyName = property->GetName();
     const auto &propertyType = property->GetType();
 
-    // TODO Move this into a PropertyDescriptor copy method.
-    auto &newProperty = behaviorProperties[propertyName]
-                            .SetType(property->GetType())
-                            .SetDescription(property->GetDescription())
-                            .SetGroup(property->GetGroup())
-                            .SetLabel(property->GetLabel())
-                            .SetValue(property->GetValue())
-                            .SetHidden(property->IsHidden());
+    // Copy the property
+    behaviorProperties[propertyName] = *property;
 
-    for (auto &extraInfo : property->GetExtraInfo()) {
-      newProperty.AddExtraInfo(extraInfo);
-    }
+    auto &newProperty = behaviorProperties[propertyName];
 
     if (configurationContent.HasChild(propertyName)) {
       if (propertyType == "String" || propertyType == "Choice" ||

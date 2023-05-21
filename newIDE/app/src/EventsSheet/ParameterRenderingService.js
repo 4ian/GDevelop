@@ -60,9 +60,10 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import LeaderboardIdField, {
   renderInlineLeaderboardIdField,
 } from './ParameterFields/LeaderboardIdField';
-import { IdentifierField } from './ParameterFields/IdentifierField';
+import IdentifierField from './ParameterFields/IdentifierField';
 import TilemapResourceField from './ParameterFields/TilemapResourceField';
 import TilesetResourceField from './ParameterFields/TilesetResourceField';
+import Model3DResourceField from './ParameterFields/Model3DResourceField';
 
 const gd: libGDevelop = global.gd;
 
@@ -92,9 +93,9 @@ const components = {
   jsonResource: JsonResourceField,
   bitmapFontResource: BitmapFontResourceField,
   fontResource: FontResourceField,
+  model3DResource: Model3DResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
-  joyaxis: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
   layerEffectName: LayerEffectNameField,
@@ -150,6 +151,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   fontResource: t`Font resource`,
   jsonResource: t`JSON resource`,
   tilemapResource: t`Tile map resource`,
+  model3DResource: t`3D model resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,

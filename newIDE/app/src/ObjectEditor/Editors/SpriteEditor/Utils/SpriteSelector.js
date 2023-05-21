@@ -80,7 +80,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
                 <SelectOption
                   key={i}
                   value={i}
-                  primaryText={t`Animation #${i} ${animation.getName()}`}
+                  label={t`Animation #${i} ${animation.getName()}`}
                 />
               );
             })}
@@ -96,11 +96,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
             >
               {mapFor(0, animation.getDirectionsCount(), i => {
                 return (
-                  <SelectOption
-                    value={i}
-                    key={i}
-                    primaryText={t`Direction #${i}`}
-                  />
+                  <SelectOption value={i} key={i} label={t`Direction #${i}`} />
                 );
               })}
             </SelectField>
@@ -116,11 +112,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
             >
               {mapFor(0, direction.getSpritesCount(), i => {
                 return (
-                  <SelectOption
-                    value={i}
-                    key={i}
-                    primaryText={t`Frame #${i}`}
-                  />
+                  <SelectOption value={i} key={i} label={t`Frame #${i}`} />
                 );
               })}
             </SelectField>

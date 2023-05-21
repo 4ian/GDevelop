@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -24,6 +24,20 @@ import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
 import HelpButton from '../../UI/HelpButton';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+
+export const useOutOfDateAlertDialog = () => {
+  const { showConfirmation } = useAlertDialog();
+  return async (): Promise<boolean> => {
+    return await showConfirmation({
+      title: t`Outdated extension`,
+      message: t`The extension installed in this project is not up to date.
+      Consider upgrading it before reporting any issue.`,
+      confirmButtonLabel: t`Close`,
+      dismissButtonLabel: t`Report anyway`,
+    });
+  };
+};
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
@@ -57,9 +71,16 @@ const ExtensionInstallDialog = ({
   onEdit,
   project,
 }: Props) => {
-  const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
+  const alreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
+
+  const fromStore = alreadyInstalled
+    ? project
+        .getEventsFunctionsExtension(extensionShortHeader.name)
+        .getOriginName() === 'gdevelop-extension-store'
+    : false;
+
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
 
   const [error, setError] = React.useState<?Error>(null);
@@ -95,9 +116,13 @@ const ExtensionInstallDialog = ({
     () => {
       if (canInstallExtension) {
         if (alreadyInstalled) {
-          const answer = Window.showConfirmDialog(
-            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?'
-          );
+          let dialogText =
+            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
+          if (!fromStore)
+            dialogText =
+              'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
+
+          const answer = Window.showConfirmDialog(dialogText);
           if (!answer) return;
           onInstall();
         } else {
@@ -105,7 +130,26 @@ const ExtensionInstallDialog = ({
         }
       }
     },
-    [onInstall, canInstallExtension, alreadyInstalled]
+    [onInstall, canInstallExtension, alreadyInstalled, fromStore]
+  );
+
+  const showOutOfDateAlert = useOutOfDateAlertDialog();
+  const onUserReportIssue = React.useCallback(
+    async () => {
+      if (extensionUpdate) {
+        const shouldNotReportIssue = await showOutOfDateAlert();
+        if (shouldNotReportIssue) {
+          return;
+        }
+      }
+      Window.openExternalURL(
+        `https://github.com/GDevelopApp/GDevelop-extensions/issues/new` +
+          `?assignees=&labels=&template=bug-report.md&title=[${
+            extensionShortHeader.name
+          }] Issue short description`
+      );
+    },
+    [extensionShortHeader.name, extensionUpdate, showOutOfDateAlert]
   );
 
   return (
@@ -127,14 +171,18 @@ const ExtensionInstallDialog = ({
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
               ) : alreadyInstalled ? (
-                extensionUpdate ? (
-                  extensionShortHeader.tier === 'community' ? (
-                    <Trans>Update (could break the project)</Trans>
+                fromStore ? (
+                  extensionUpdate ? (
+                    extensionShortHeader.tier === 'community' ? (
+                      <Trans>Update (could break the project)</Trans>
+                    ) : (
+                      <Trans>Update</Trans>
+                    )
                   ) : (
-                    <Trans>Update</Trans>
+                    <Trans>Re-install</Trans>
                   )
                 ) : (
-                  <Trans>Re-install</Trans>
+                  <Trans>Replace existing extension</Trans>
                 )
               ) : (
                 <Trans>Install in project</Trans>
@@ -152,6 +200,15 @@ const ExtensionInstallDialog = ({
             key="edit-extension"
             label={<Trans>Open in editor</Trans>}
             onClick={onEdit}
+          />
+        ) : (
+          undefined
+        ),
+        alreadyInstalled ? (
+          <FlatButton
+            key="report-extension"
+            label={<Trans>Report an issue</Trans>}
+            onClick={() => onUserReportIssue()}
           />
         ) : (
           undefined
@@ -182,14 +239,16 @@ const ExtensionInstallDialog = ({
               <Trans>Version {' ' + extensionShortHeader.version}</Trans>
             </Text>
             <Line>
-              {extensionShortHeader.authors &&
-                extensionShortHeader.authors.map(author => (
-                  <UserPublicProfileChip
-                    user={author}
-                    key={author.id}
-                    isClickable
-                  />
-                ))}
+              <div style={{ flexWrap: 'wrap' }}>
+                {extensionShortHeader.authors &&
+                  extensionShortHeader.authors.map(author => (
+                    <UserPublicProfileChip
+                      user={author}
+                      key={author.id}
+                      isClickable
+                    />
+                  ))}
+              </div>
             </Line>
           </Column>
         </Line>

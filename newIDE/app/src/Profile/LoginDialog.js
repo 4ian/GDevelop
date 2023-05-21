@@ -19,10 +19,10 @@ import HelpButton from '../UI/HelpButton';
 import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   formContainer: {
-    width: '60%',
     marginTop: 20,
   },
 };
@@ -44,6 +44,7 @@ const LoginDialog = ({
   loginInProgress,
   error,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [
@@ -55,7 +56,7 @@ const LoginDialog = ({
     if (loginInProgress) return;
 
     onLogin({
-      email,
+      email: email.trim(),
       password,
     });
   };
@@ -97,6 +98,7 @@ const LoginDialog = ({
       }}
       maxWidth="sm"
       open
+      flexColumnBody
     >
       <ColumnStackLayout
         noMargin
@@ -105,7 +107,7 @@ const LoginDialog = ({
         alignItems="center"
       >
         <GDevelopGLogo fontSize="large" />
-        <Text size="title">
+        <Text size="title" align="center">
           <Trans>Log in to your account</Trans>
         </Text>
         <Column noMargin alignItems="center">
@@ -122,31 +124,54 @@ const LoginDialog = ({
             </Text>
           </Link>
         </Column>
-        <div style={styles.formContainer}>
-          <ColumnStackLayout noMargin>
-            <TextField
-              autoFocus="desktop"
-              value={email}
-              floatingLabelText={<Trans>Email</Trans>}
-              errorText={getEmailErrorText(error)}
-              onChange={(e, value) => {
-                setEmail(value);
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
-            <TextField
-              value={password}
-              floatingLabelText={<Trans>Password</Trans>}
-              errorText={getPasswordErrorText(error)}
-              type="password"
-              onChange={(e, value) => {
-                setPassword(value);
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
-          </ColumnStackLayout>
+        <div
+          style={{
+            ...styles.formContainer,
+            width: windowWidth === 'small' ? '100%' : '60%',
+          }}
+        >
+          <form
+            onSubmit={event => {
+              // Prevent browser to navigate on form submission.
+              event.preventDefault();
+              doLogin();
+            }}
+            autoComplete="on"
+            name="login"
+          >
+            <ColumnStackLayout noMargin>
+              <TextField
+                autoFocus="desktop"
+                value={email}
+                floatingLabelText={<Trans>Email</Trans>}
+                errorText={getEmailErrorText(error)}
+                onChange={(e, value) => {
+                  setEmail(value);
+                }}
+                onBlur={event => {
+                  setEmail(event.currentTarget.value.trim());
+                }}
+                fullWidth
+                disabled={loginInProgress}
+              />
+              <TextField
+                value={password}
+                floatingLabelText={<Trans>Password</Trans>}
+                errorText={getPasswordErrorText(error)}
+                type="password"
+                onChange={(e, value) => {
+                  setPassword(value);
+                }}
+                fullWidth
+                disabled={loginInProgress}
+              />
+              {/*
+                This input is needed so that the browser submits the form when
+                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
+              */}
+              <input type="submit" value="Submit" style={{ display: 'none' }} />
+            </ColumnStackLayout>
+          </form>
         </div>
         <Link
           href=""

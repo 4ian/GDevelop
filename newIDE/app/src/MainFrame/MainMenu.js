@@ -45,6 +45,10 @@ export type MainMenuCallbacks = {|
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 
+export type MainMenuExtraCallbacks = {|
+  onClosePreview?: ?(windowId: number) => void,
+|};
+
 export type MainMenuEvent =
   | 'main-menu-open'
   | 'main-menu-open-recent'
@@ -271,8 +275,8 @@ export const buildMainMenuDeclarativeTemplate = ({
       },
       { type: 'separator' },
       {
-        label: i18n._(t`GDevelop games on Liluo.io`),
-        onClickOpenLink: 'https://liluo.io',
+        label: i18n._(t`GDevelop games on gd.games`),
+        onClickOpenLink: 'https://gd.games',
       },
       {
         label: i18n._(t`Community Forums`),

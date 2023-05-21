@@ -10,12 +10,11 @@ import muiDecorator from '../../ThemeDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import EventsFunctionsExtensionEditor from '../../../EventsFunctionsExtensionEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 import PreferencesContext, {
   initialPreferences,
   type Preferences,
 } from '../../../MainFrame/Preferences/PreferencesContext';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/index',
@@ -30,13 +29,7 @@ export const Default = () => (
         project={testProject.project}
         eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
         setToolbar={() => {}}
-        resourceManagementProps={{
-          getStorageProvider: () => emptyStorageProvider,
-          onFetchNewlyAddedResources: async () => {},
-          resourceSources: [],
-          onChooseResource: () => Promise.reject('Unimplemented'),
-          resourceExternalEditors: fakeResourceExternalEditors,
-        }}
+        resourceManagementProps={fakeResourceManagementProps}
         openInstructionOrExpression={action('open instruction or expression')}
         initiallyFocusedFunctionName={null}
         initiallyFocusedBehaviorName={null}
@@ -60,13 +53,7 @@ export const WithObjectEditor = () => {
             project={testProject.project}
             eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
             setToolbar={() => {}}
-            resourceManagementProps={{
-              getStorageProvider: () => emptyStorageProvider,
-              onFetchNewlyAddedResources: async () => {},
-              resourceSources: [],
-              onChooseResource: () => Promise.reject('Unimplemented'),
-              resourceExternalEditors: fakeResourceExternalEditors,
-            }}
+            resourceManagementProps={fakeResourceManagementProps}
             openInstructionOrExpression={action(
               'open instruction or expression'
             )}

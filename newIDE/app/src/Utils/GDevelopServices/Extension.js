@@ -97,7 +97,7 @@ const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
   };
 };
 
-/** Check if the IDE version, passed as argument, satisfiy the version required by the extension. */
+/** Check if the IDE version, passed as argument, satisfy the version required by the extension. */
 export const isCompatibleWithExtension = (
   ideVersion: string,
   extensionShortHeader: ExtensionShortHeader
@@ -113,6 +113,9 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
     .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
     .then(response => response.data)
     .then(extensionsRegistry => {
+      if (!extensionsRegistry) {
+        throw new Error('Unexpected response from the extensions endpoint.');
+      }
       return {
         ...extensionsRegistry,
         // TODO: move this to backend endpoint

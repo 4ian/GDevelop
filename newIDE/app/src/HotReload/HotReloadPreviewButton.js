@@ -2,8 +2,8 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import UpdateIcon from '../UI/CustomSvgIcons/Update';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import IconButton from '../UI/IconButton';
 
@@ -13,19 +13,12 @@ export type HotReloadPreviewButtonProps = {|
   launchProjectWithLoadingScreenPreview: () => void,
 |};
 
-export const NewPreviewIcon = PlayCircleFilledIcon;
-export const HotReloadPreviewIcon = OfflineBoltIcon;
-
 export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
   const windowWidth = useResponsiveWindowWidth();
-  const icon = hasPreviewsRunning ? (
-    <HotReloadPreviewIcon />
-  ) : (
-    <NewPreviewIcon />
-  );
+  const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>
   ) : (

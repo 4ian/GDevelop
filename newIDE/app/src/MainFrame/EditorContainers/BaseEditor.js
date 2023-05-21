@@ -5,7 +5,10 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import type { StorageProvider } from '../../ProjectsStorage';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+import {
+  type FileMetadataAndStorageProviderName,
+  type FileMetadata,
+} from '../../ProjectsStorage';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 
 export type EditorContainerExtraProps = {|
@@ -16,6 +19,9 @@ export type EditorContainerExtraProps = {|
   // Homepage
   storageProviders?: Array<StorageProvider>,
   initialTab?: ?string,
+
+  // Resources editor
+  fileMetadata?: ?FileMetadata,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -51,6 +57,9 @@ export type RenderEditorContainerProps = {|
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onReloadEventsFunctionsExtensionMetadata: (
+    extension: gdEventsFunctionsExtension
+  ) => void,
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction,
@@ -87,6 +96,13 @@ export type RenderEditorContainerProps = {|
 
   // Project creation
   onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
+
+  // Project save
+  onSave: () => Promise<void>,
+  canSave: boolean,
+
+  // Object editing
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

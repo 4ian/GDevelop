@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   columnDropIndicator: {

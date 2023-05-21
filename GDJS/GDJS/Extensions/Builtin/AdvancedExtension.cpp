@@ -66,6 +66,44 @@ AdvancedExtension::AdvancedExtension() {
                booleanCode + "; }";
       });
 
+  GetAllActions()["CopyArgumentToVariable"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
+               parameter + "), " + variable +
+               ", false);\n"
+               "}\n";
+      });
+
+  GetAllActions()["CopyVariableToArgument"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(" +
+               variable + ", eventsFunctionContext.getArgument(" + parameter +
+               "), false);\n"
+               "}\n";
+      });
+
   GetAllConditions()["GetArgumentAsBoolean"]
       .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
@@ -83,8 +121,8 @@ AdvancedExtension::AdvancedExtension() {
             "!!eventsFunctionContext.getArgument(" +
             parameterNameCode + ") : false)";
         gd::String outputCode =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val = " + valueCode + ";\n";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context) +
+            " = " + valueCode + ";\n";
         return outputCode;
       });
 
@@ -141,8 +179,7 @@ AdvancedExtension::AdvancedExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
                "Number(eventsFunctionContext.getArgument(" +
@@ -169,8 +206,7 @@ AdvancedExtension::AdvancedExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
         return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
                "\"\" + eventsFunctionContext.getArgument(" +

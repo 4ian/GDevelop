@@ -9,8 +9,8 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
 } from '../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import withMock from 'storybook-addon-mock';
@@ -23,15 +23,13 @@ export default {
 };
 
 export const NoProjectLoaded = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration project={null} onGameRegistered={() => {}} />
   </AuthenticatedUserContext.Provider>
 );
 
 export const NotLoggedIn = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNotAuthenticatedAuthenticatedUser}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -40,7 +38,7 @@ export const NotLoggedIn = () => (
 );
 
 export const NotAuthorized = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -61,7 +59,7 @@ NotAuthorized.parameters = {
 };
 
 export const GameNotExisting = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -82,7 +80,7 @@ GameNotExisting.parameters = {
 };
 
 export const ErrorLoadingGame = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -103,7 +101,7 @@ ErrorLoadingGame.parameters = {
 };
 
 export const RegisteredWithGameStatsEmail = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -128,7 +126,7 @@ RegisteredWithGameStatsEmail.parameters = {
 };
 
 export const RegisteredWithLoader = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -152,7 +150,7 @@ RegisteredWithLoader.parameters = {
 };
 
 export const RegisteredWithoutLoader = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}

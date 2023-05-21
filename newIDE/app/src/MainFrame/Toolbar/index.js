@@ -6,6 +6,7 @@ import PreviewAndPublishButtons, {
   type PreviewAndPublishButtonsProps,
 } from './PreviewAndPublishButtons';
 import ProjectManagerIcon from '../../UI/CustomSvgIcons/ProjectManager';
+import FloppyIcon from '../../UI/CustomSvgIcons/Floppy';
 import IconButton from '../../UI/IconButton';
 import { Spacer } from '../../UI/Grid';
 
@@ -13,6 +14,8 @@ export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
   toggleProjectManager: () => void,
   exportProject: () => void,
+  onSave: () => Promise<void>,
+  canSave: boolean,
 
   ...PreviewAndPublishButtonsProps,
 |};
@@ -41,6 +44,16 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
                 color="default"
               >
                 <ProjectManagerIcon />
+              </IconButton>
+              <IconButton
+                size="small"
+                id="toolbar-save-button"
+                onClick={props.onSave}
+                tooltip={t`Save project`}
+                color="default"
+                disabled={!props.canSave}
+              >
+                <FloppyIcon />
               </IconButton>
             </ToolbarGroup>
             <ToolbarGroup>

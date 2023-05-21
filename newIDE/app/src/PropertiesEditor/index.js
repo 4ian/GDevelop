@@ -4,12 +4,10 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import ResourceSelector from '../ResourcesList/ResourceSelector';
-import ResourcesLoader from '../ResourcesLoader';
+import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import Subheader from '../UI/Subheader';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import Edit from '@material-ui/icons/Edit';
 import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
@@ -34,6 +32,7 @@ import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import Tooltip from '@material-ui/core/Tooltip';
+import Edit from '../UI/CustomSvgIcons/Edit';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -310,6 +309,7 @@ const PropertiesEditor = ({
               )
             }
             key={field.name}
+            id={field.name}
             checked={getFieldValue({ instances, field })}
             onCheck={(event, newValue) => {
               instances.forEach(i => setValue(i, !!newValue));
@@ -354,9 +354,8 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'color') {
         const { setValue } = field;
         return (
-          <Column expand noMargin>
+          <Column key={field.name} expand noMargin>
             <ColorField
-              key={field.name}
               id={field.name}
               floatingLabelText={getFieldLabel({ instances, field })}
               helperMarkdownText={getFieldDescription(field)}
@@ -457,8 +456,8 @@ const PropertiesEditor = ({
           <SelectOption
             key={value}
             value={value}
-            primaryText={label}
-            primaryTextIsUserDefined={labelIsUserDefined}
+            label={label}
+            shouldNotTranslate={labelIsUserDefined}
           />
         ));
 
@@ -468,6 +467,7 @@ const PropertiesEditor = ({
           <SelectField
             value={getFieldValue({ instances, field })}
             key={field.name}
+            id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
@@ -490,6 +490,7 @@ const PropertiesEditor = ({
               defaultValue: '(Multiple values)',
             })}
             key={field.name}
+            id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
@@ -546,15 +547,13 @@ const PropertiesEditor = ({
 
     const { setValue } = field;
     return (
-      <ResourceSelector
+      <ResourceSelectorWithThumbnail
         key={field.name}
         project={project}
         resourceManagementProps={resourceManagementProps}
-        resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fallbackResourceKind={field.fallbackResourceKind}
-        fullWidth
-        initialResourceName={getFieldValue({
+        resourceName={getFieldValue({
           instances,
           field,
           defaultValue: '(Multiple values)', //TODO

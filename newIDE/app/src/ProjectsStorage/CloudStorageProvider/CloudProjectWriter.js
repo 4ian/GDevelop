@@ -11,54 +11,69 @@ import {
 import type { $AxiosError } from 'axios';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { serializeToJSON } from '../../Utils/Serializer';
-import { initializeZipJs } from '../../Utils/Zip.js';
 import CloudSaveAsDialog from './CloudSaveAsDialog';
 import { t } from '@lingui/macro';
+import {
+  createZipWithSingleTextFile,
+  unzipFirstEntryOfBlob,
+} from '../../Utils/Zip.js/Utils';
 
-const zipProject = async (project: gdProject) => {
-  const zipJs: ZipJs = await initializeZipJs();
+const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
-  const textReader = new zipJs.TextReader(projectJson);
+  const zippedProject = await createZipWithSingleTextFile(
+    projectJson,
+    'game.json'
+  );
+  return [zippedProject, projectJson];
+};
 
-  return new Promise((resolve, reject) => {
-    zipJs.createWriter(
-      new zipJs.BlobWriter('application/zip'),
-      zipWriter => {
-        zipWriter.add('game.json', textReader, () => {
-          zipWriter.close(blob => {
-            resolve(blob);
-          });
-        });
-      },
-      error => {
-        console.error('An error occurred when zipping project', error);
-        reject(error);
-      }
+const checkZipContent = async (
+  zip: Blob,
+  projectJson: string
+): Promise<boolean> => {
+  try {
+    const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
+    return (
+      unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
     );
-  });
+  } catch (error) {
+    console.error('An error occurred when checking zipped project.', error);
+    return false;
+  }
 };
 
 const zipProjectAndCommitVersion = async ({
   authenticatedUser,
   project,
   cloudProjectId,
-}: {
+  options,
+}: {|
   authenticatedUser: AuthenticatedUser,
   project: gdProject,
   cloudProjectId: string,
-}): Promise<?string> => {
-  const archive = await zipProject(project);
-  const newVersion = await commitVersion(
+  options?: {| previousVersion: string |},
+|}): Promise<?string> => {
+  const [zippedProject, projectJson] = await zipProject(project);
+  const archiveIsSane = await checkZipContent(zippedProject, projectJson);
+  if (!archiveIsSane) {
+    throw new Error('Project compression failed before saving the project.');
+  }
+  const newVersion = await commitVersion({
     authenticatedUser,
     cloudProjectId,
-    archive
-  );
+    zippedProject,
+    previousVersion: options ? options.previousVersion : null,
+  });
   return newVersion;
 };
 
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
-) => async (project: gdProject, fileMetadata: FileMetadata) => {
+) => async (
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  options?: {| previousVersion: string |}
+) => {
   if (!fileMetadata.gameId) {
     console.info('Game id was never set, updating the cloud project.');
     try {
@@ -78,6 +93,7 @@ export const generateOnSaveProject = (
     authenticatedUser,
     project,
     cloudProjectId: newFileMetadata.fileIdentifier,
+    options,
   });
   if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
   return {

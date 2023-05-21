@@ -11,6 +11,8 @@
 #include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
+#include "GDCore/IDE/Events/ProjectElementRenamer.h"
+#include "GDCore/IDE/Events/LinkEventTargetRenamer.h"
 #include "GDCore/IDE/Events/CustomObjectTypeRenamer.h"
 #include "GDCore/IDE/Events/BehaviorTypeRenamer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
@@ -18,8 +20,20 @@
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsParameterMover.h"
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
+#include "GDCore/IDE/ProjectBrowser.h"
+#include "GDCore/IDE/ProjectBrowserHelper.h"
+#include "GDCore/IDE/WholeProjectBrowser.h"
+#include "GDCore/IDE/EventBasedBehaviorBrowser.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventsFunctionsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryEventBasedBehaviorsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryBehaviorSharedDataWorker.h"
+#include "GDCore/IDE/Project/RequiredBehaviorRenamer.h"
+#include "GDCore/IDE/Project/BehaviorObjectTypeRenamer.h"
+#include "GDCore/IDE/Project/BehaviorsSharedDataBehaviorTypeRenamer.h"
+#include "GDCore/IDE/Project/FunctionParameterBehaviorTypeRenamer.h"
+#include "GDCore/IDE/Project/FunctionParameterObjectTypeRenamer.h"
 #include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
@@ -43,174 +57,6 @@ const gd::String WholeProjectRefactorer::behaviorObjectParameterName = "Object";
 // By convention, the first parameter of an events based object method is
 // always called "Object".
 const gd::String WholeProjectRefactorer::parentObjectParameterName = "Object";
-
-void WholeProjectRefactorer::ExposeProjectEvents(
-    gd::Project& project, gd::ArbitraryEventsWorker& worker) {
-  // See also gd::Project::ExposeResources for a method that traverse the whole
-  // project (this time for resources).
-
-  // Add layouts events
-  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
-    worker.Launch(project.GetLayout(s).GetEvents());
-  }
-  // Add external events events
-  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
-    worker.Launch(project.GetExternalEvents(s).GetEvents());
-  }
-  // Add events based extensions
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    // Add (free) events functions
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      worker.Launch(eventsFunction->GetEvents());
-    }
-
-    // Add (behavior) events functions
-    for (auto&& eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        worker.Launch(eventsFunction->GetEvents());
-      }
-    }
-
-    // Add (object) events functions
-    for (auto&& eventsBasedObject :
-         eventsFunctionsExtension.GetEventsBasedObjects()
-             .GetInternalVector()) {
-      auto& objectEventsFunctions = eventsBasedObject->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           objectEventsFunctions.GetInternalVector()) {
-        worker.Launch(eventsFunction->GetEvents());
-      }
-    }
-  }
-}
-
-void WholeProjectRefactorer::ExposeProjectEvents(
-    gd::Project& project, gd::ArbitraryEventsWorkerWithContext& worker) {
-  // See also gd::Project::ExposeResources for a method that traverse the whole
-  // project (this time for resources) and ExposeProjectEffects (this time for
-  // effects).
-
-  // Add layouts events
-  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
-    auto& layout = project.GetLayout(s);
-    worker.Launch(layout.GetEvents(), project, layout);
-  }
-  // Add external events events
-  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
-    const auto& externalEvents = project.GetExternalEvents(s);
-    const gd::String& associatedLayout = externalEvents.GetAssociatedLayout();
-    if (project.HasLayoutNamed(associatedLayout)) {
-      worker.Launch(project.GetExternalEvents(s).GetEvents(),
-                    project,
-                    project.GetLayout(associatedLayout));
-    }
-  }
-  // Add events based extensions
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    // Add (free) events functions
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      gd::ObjectsContainer globalObjectsAndGroups;
-      gd::ObjectsContainer objectsAndGroups;
-      gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-          project,
-          eventsFunctionsExtension,
-          *eventsFunction,
-          globalObjectsAndGroups,
-          objectsAndGroups);
-
-      worker.Launch(eventsFunction->GetEvents(),
-                    globalObjectsAndGroups,
-                    objectsAndGroups);
-    }
-
-    // Add (behavior) events functions
-    for (auto&& eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      ExposeEventsBasedBehaviorEvents(project, *eventsBasedBehavior, worker);
-    }
-
-    // Add (object) events functions
-    for (auto&& eventsBasedObject :
-         eventsFunctionsExtension.GetEventsBasedObjects()
-             .GetInternalVector()) {
-      ExposeEventsBasedObjectEvents(project, *eventsBasedObject, worker);
-    }
-  }
-}
-
-void WholeProjectRefactorer::ExposeEventsBasedBehaviorEvents(
-    gd::Project& project,
-    const gd::EventsBasedBehavior& eventsBasedBehavior,
-    gd::ArbitraryEventsWorkerWithContext& worker) {
-  auto& behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
-  for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-    gd::ObjectsContainer globalObjectsAndGroups;
-    gd::ObjectsContainer objectsAndGroups;
-    gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
-        project,
-        eventsBasedBehavior,
-        *eventsFunction,
-        globalObjectsAndGroups,
-        objectsAndGroups);
-
-    worker.Launch(
-        eventsFunction->GetEvents(), globalObjectsAndGroups, objectsAndGroups);
-  }
-}
-
-void WholeProjectRefactorer::ExposeEventsBasedObjectEvents(
-    gd::Project& project,
-    const gd::EventsBasedObject& eventsBasedObject,
-    gd::ArbitraryEventsWorkerWithContext& worker) {
-  auto& objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
-  for (auto&& eventsFunction : objectEventsFunctions.GetInternalVector()) {
-    gd::ObjectsContainer globalObjectsAndGroups;
-    gd::ObjectsContainer objectsAndGroups;
-    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-        project,
-        eventsBasedObject,
-        *eventsFunction,
-        globalObjectsAndGroups,
-        objectsAndGroups);
-
-    worker.Launch(
-        eventsFunction->GetEvents(), globalObjectsAndGroups, objectsAndGroups);
-  }
-}
-
-void WholeProjectRefactorer::ExposeProjectObjects(
-    gd::Project& project, gd::ArbitraryObjectsWorker& worker) {
-
-  // Global objects
-  worker.Launch(project);
-
-  // Layers objects
-  for (size_t i = 0; i < project.GetLayoutsCount(); i++) {
-    worker.Launch(project.GetLayout(i));
-  }
-
-  // Event based objects children
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-      e++) {
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-
-    for (auto&& eventsBasedObjectUniquePtr :
-        eventsFunctionsExtension.GetEventsBasedObjects()
-            .GetInternalVector()) {
-      auto eventsBasedObject = eventsBasedObjectUniquePtr.get();
-      worker.Launch(*eventsBasedObject);
-    }
-  }
-};
 
 std::set<gd::String>
 WholeProjectRefactorer::GetAllObjectTypesUsingEventsBasedBehavior(
@@ -286,22 +132,48 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   }
 }
 
+void WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& sourceExtensionName) {
+  const EventBasedBehaviorBrowser eventBasedBehaviorExposer(eventsBasedBehavior);
+  WholeProjectRefactorer::RenameEventsFunctionsExtension(
+    project,
+    eventsFunctionsExtension,
+    sourceExtensionName,
+    eventsFunctionsExtension.GetName(),
+    eventBasedBehaviorExposer);
+}
+
+void WholeProjectRefactorer::RenameEventsFunctionsExtension(
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::String &oldName, const gd::String &newName) {
+  const WholeProjectBrowser wholeProjectExposer;
+  RenameEventsFunctionsExtension(project, eventsFunctionsExtension, oldName,
+                                 newName, wholeProjectExposer);
+}
+
 void WholeProjectRefactorer::RenameEventsFunctionsExtension(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::String& oldName,
-    const gd::String& newName) {
+    const gd::String& newName,
+    const gd::ProjectBrowser& projectBrowser
+    ) {
   auto renameEventsFunction =
-      [&project, &oldName, &newName](const gd::EventsFunction& eventsFunction) {
+      [&project, &oldName, &newName, &projectBrowser](const gd::EventsFunction& eventsFunction) {
         DoRenameEventsFunction(
             project,
             eventsFunction,
             gd::PlatformExtension::GetEventsFunctionFullType(oldName, eventsFunction.GetName()),
-            gd::PlatformExtension::GetEventsFunctionFullType(newName, eventsFunction.GetName()));
+            gd::PlatformExtension::GetEventsFunctionFullType(newName, eventsFunction.GetName()),
+            projectBrowser);
       };
 
   auto renameBehaviorEventsFunction =
-      [&project, &oldName, &newName](
+      [&project, &oldName, &newName, &projectBrowser](
           const gd::EventsBasedBehavior& eventsBasedBehavior,
           const gd::EventsFunction& eventsFunction) {
         if (eventsFunction.IsExpression()) {
@@ -316,12 +188,12 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
               gd::PlatformExtension::GetBehaviorEventsFunctionFullType(newName,
                                                 eventsBasedBehavior.GetName(),
                                                 eventsFunction.GetName()));
-          ExposeProjectEvents(project, renamer);
+          projectBrowser.ExposeEvents(project, renamer);
         }
       };
 
   auto renameBehaviorPropertyFunctions =
-      [&project, &oldName, &newName](
+      [&project, &oldName, &newName, &projectBrowser](
           const gd::EventsBasedBehavior& eventsBasedBehavior,
           const gd::NamedPropertyDescriptor& property) {
         gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
@@ -336,7 +208,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                 eventsBasedBehavior.GetName(),
                 gd::EventsBasedBehavior::GetPropertyActionName(
                     property.GetName())));
-        ExposeProjectEvents(project, actionRenamer);
+        projectBrowser.ExposeEvents(project, actionRenamer);
 
         gd::InstructionsTypeRenamer conditionRenamer =
             gd::InstructionsTypeRenamer(
@@ -351,14 +223,14 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                     eventsBasedBehavior.GetName(),
                     gd::EventsBasedBehavior::GetPropertyConditionName(
                         property.GetName())));
-        ExposeProjectEvents(project, conditionRenamer);
+        projectBrowser.ExposeEvents(project, conditionRenamer);
 
         // Nothing to do for expressions, expressions are not including the
         // extension name
       };
 
   auto renameBehaviorSharedPropertyFunctions =
-      [&project, &oldName, &newName](
+      [&project, &oldName, &newName, &projectBrowser](
           const gd::EventsBasedBehavior& eventsBasedBehavior,
           const gd::NamedPropertyDescriptor& property) {
         gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
@@ -373,7 +245,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                 eventsBasedBehavior.GetName(),
                 gd::EventsBasedBehavior::GetSharedPropertyActionName(
                     property.GetName())));
-        ExposeProjectEvents(project, actionRenamer);
+        projectBrowser.ExposeEvents(project, actionRenamer);
 
         gd::InstructionsTypeRenamer conditionRenamer =
             gd::InstructionsTypeRenamer(
@@ -388,14 +260,14 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                     eventsBasedBehavior.GetName(),
                     gd::EventsBasedBehavior::GetSharedPropertyConditionName(
                         property.GetName())));
-        ExposeProjectEvents(project, conditionRenamer);
+        projectBrowser.ExposeEvents(project, conditionRenamer);
 
         // Nothing to do for expressions, expressions are not including the
         // extension name
       };
 
   auto renameObjectEventsFunction =
-      [&project, &oldName, &newName](
+      [&project, &oldName, &newName, &projectBrowser](
           const gd::EventsBasedObject& eventsBasedObject,
           const gd::EventsFunction& eventsFunction) {
         if (eventsFunction.IsExpression()) {
@@ -410,12 +282,12 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
               gd::PlatformExtension::GetObjectEventsFunctionFullType(newName,
                                                 eventsBasedObject.GetName(),
                                                 eventsFunction.GetName()));
-          ExposeProjectEvents(project, renamer);
+          projectBrowser.ExposeEvents(project, renamer);
         }
       };
 
   auto renameObjectPropertyFunctions =
-      [&project, &oldName, &newName](
+      [&project, &oldName, &newName, &projectBrowser](
           const gd::EventsBasedObject& eventsBasedObject,
           const gd::NamedPropertyDescriptor& property) {
         gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
@@ -430,7 +302,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                 eventsBasedObject.GetName(),
                 gd::EventsBasedObject::GetPropertyActionName(
                     property.GetName())));
-        ExposeProjectEvents(project, actionRenamer);
+        projectBrowser.ExposeEvents(project, actionRenamer);
 
         gd::InstructionsTypeRenamer conditionRenamer =
             gd::InstructionsTypeRenamer(
@@ -445,7 +317,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                     eventsBasedObject.GetName(),
                     gd::EventsBasedObject::GetPropertyConditionName(
                         property.GetName())));
-        ExposeProjectEvents(project, conditionRenamer);
+        projectBrowser.ExposeEvents(project, conditionRenamer);
 
         // Nothing to do for expressions, expressions are not including the
         // extension name
@@ -533,7 +405,8 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
     DoRenameBehavior(
         project,
         gd::PlatformExtension::GetBehaviorFullType(oldName, eventsBasedBehavior->GetName()),
-        gd::PlatformExtension::GetBehaviorFullType(newName, eventsBasedBehavior->GetName()));
+        gd::PlatformExtension::GetBehaviorFullType(newName, eventsBasedBehavior->GetName()),
+        projectBrowser);
   }
 
   // Finally, rename custom objects type
@@ -542,7 +415,8 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
     DoRenameObject(
         project,
         gd::PlatformExtension::GetObjectFullType(oldName, eventsBasedObject->GetName()),
-        gd::PlatformExtension::GetObjectFullType(newName, eventsBasedObject->GetName()));
+        gd::PlatformExtension::GetObjectFullType(newName, eventsBasedObject->GetName()),
+        projectBrowser);
   }
 }
 
@@ -556,13 +430,15 @@ void WholeProjectRefactorer::RenameEventsFunction(
   const gd::EventsFunction& eventsFunction =
       eventsFunctionsExtension.GetEventsFunction(oldFunctionName);
 
+  const WholeProjectBrowser wholeProjectExposer;
   DoRenameEventsFunction(
       project,
       eventsFunction,
       gd::PlatformExtension::GetEventsFunctionFullType(eventsFunctionsExtension.GetName(),
                                 oldFunctionName),
       gd::PlatformExtension::GetEventsFunctionFullType(eventsFunctionsExtension.GetName(),
-                                newFunctionName));
+                                newFunctionName),
+      wholeProjectExposer);
   
   if (eventsFunction.GetFunctionType() == gd::EventsFunction::ExpressionAndCondition) {
     for (auto&& otherFunction : eventsFunctionsExtension.GetInternalVector())
@@ -598,7 +474,7 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
                             eventsBasedBehavior.GetName()),
         oldFunctionName,
         newFunctionName);
-    ExposeProjectEvents(project, renamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, renamer);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
@@ -609,7 +485,7 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
         gd::PlatformExtension::GetBehaviorEventsFunctionFullType(eventsFunctionsExtension.GetName(),
                                           eventsBasedBehavior.GetName(),
                                           newFunctionName));
-    ExposeProjectEvents(project, renamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, renamer);
   }
   if (eventsFunction.GetFunctionType() == gd::EventsFunction::ExpressionAndCondition) {
     for (auto&& otherFunction : eventsBasedBehavior.GetEventsFunctions().GetInternalVector())
@@ -642,7 +518,7 @@ void WholeProjectRefactorer::RenameObjectEventsFunction(
                             eventsBasedObject.GetName()),
         oldFunctionName,
         newFunctionName);
-    ExposeProjectEvents(project, renamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, renamer);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
@@ -653,7 +529,7 @@ void WholeProjectRefactorer::RenameObjectEventsFunction(
         gd::PlatformExtension::GetObjectEventsFunctionFullType(eventsFunctionsExtension.GetName(),
                                           eventsBasedObject.GetName(),
                                           newFunctionName));
-    ExposeProjectEvents(project, renamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, renamer);
   }
   if (eventsFunction.GetFunctionType() == gd::EventsFunction::ExpressionAndCondition) {
     for (auto&& otherFunction : eventsBasedObject.GetEventsFunctions().GetInternalVector())
@@ -685,7 +561,7 @@ void WholeProjectRefactorer::MoveEventsFunctionParameter(
         gd::ExpressionsParameterMover(project.GetCurrentPlatform());
     mover.SetFreeExpressionMovedParameter(
         eventsFunctionType, oldIndex, newIndex);
-    ExposeProjectEvents(project, mover);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     const int operatorIndexOffset = eventsFunction.IsExpression() ? 2 : 0;
@@ -694,7 +570,7 @@ void WholeProjectRefactorer::MoveEventsFunctionParameter(
         eventsFunctionType,
         oldIndex + operatorIndexOffset,
         newIndex + operatorIndexOffset);
-    ExposeProjectEvents(project, mover);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
 }
 
@@ -725,7 +601,7 @@ void WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
         functionName,
         oldIndex,
         newIndex);
-    ExposeProjectEvents(project, mover);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     const int operatorIndexOffset = eventsFunction.IsExpression() ? 2 : 0;
@@ -734,7 +610,7 @@ void WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
         eventsFunctionType,
         oldIndex + operatorIndexOffset,
         newIndex + operatorIndexOffset);
-    ExposeProjectEvents(project, mover);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
 }
 
@@ -765,7 +641,7 @@ void WholeProjectRefactorer::MoveObjectEventsFunctionParameter(
         functionName,
         oldIndex,
         newIndex);
-    ExposeProjectEvents(project, mover);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     const int operatorIndexOffset = eventsFunction.IsExpression() ? 2 : 0;
@@ -774,7 +650,7 @@ void WholeProjectRefactorer::MoveObjectEventsFunctionParameter(
         eventsFunctionType,
         oldIndex + operatorIndexOffset,
         newIndex + operatorIndexOffset);
-    ExposeProjectEvents(project, mover);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, mover);
   }
 }
 
@@ -800,7 +676,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
                                               oldPropertyName,
                                               newPropertyName);
 
-    ExposeEventsBasedBehaviorEvents(
+    gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
         project, eventsBasedBehavior, behaviorRenamer);
   } else {
     // Properties that represent primitive values will be used through
@@ -816,7 +692,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
                             eventsBasedBehavior.GetName()),
         EventsBasedBehavior::GetPropertyExpressionName(oldPropertyName),
         EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
-    ExposeProjectEvents(project, expressionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
 
     gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -828,7 +704,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
             eventsFunctionsExtension.GetName(),
             eventsBasedBehavior.GetName(),
             EventsBasedBehavior::GetPropertyActionName(newPropertyName)));
-    ExposeProjectEvents(project, actionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, actionRenamer);
 
     gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -840,7 +716,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
             eventsFunctionsExtension.GetName(),
             eventsBasedBehavior.GetName(),
             EventsBasedBehavior::GetPropertyConditionName(newPropertyName)));
-    ExposeProjectEvents(project, conditionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
   }
 }
 
@@ -866,7 +742,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
                                               oldPropertyName,
                                               newPropertyName);
 
-    ExposeEventsBasedBehaviorEvents(
+    gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
         project, eventsBasedBehavior, behaviorRenamer);
   } else {
     // Properties that represent primitive values will be used through
@@ -882,7 +758,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
                             eventsBasedBehavior.GetName()),
         EventsBasedBehavior::GetSharedPropertyExpressionName(oldPropertyName),
         EventsBasedBehavior::GetSharedPropertyExpressionName(newPropertyName));
-    ExposeProjectEvents(project, expressionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
 
     gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -894,7 +770,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
             eventsFunctionsExtension.GetName(),
             eventsBasedBehavior.GetName(),
             EventsBasedBehavior::GetSharedPropertyActionName(newPropertyName)));
-    ExposeProjectEvents(project, actionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, actionRenamer);
 
     gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -906,7 +782,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
             eventsFunctionsExtension.GetName(),
             eventsBasedBehavior.GetName(),
             EventsBasedBehavior::GetSharedPropertyConditionName(newPropertyName)));
-    ExposeProjectEvents(project, conditionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
   }
 }
 
@@ -932,7 +808,7 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
                           eventsBasedObject.GetName()),
       EventsBasedObject::GetPropertyExpressionName(oldPropertyName),
       EventsBasedObject::GetPropertyExpressionName(newPropertyName));
-  ExposeProjectEvents(project, expressionRenamer);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, expressionRenamer);
 
   gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
       project,
@@ -944,7 +820,7 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
           eventsFunctionsExtension.GetName(),
           eventsBasedObject.GetName(),
           EventsBasedObject::GetPropertyActionName(newPropertyName)));
-  ExposeProjectEvents(project, actionRenamer);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, actionRenamer);
 
   gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
       project,
@@ -956,7 +832,7 @@ void WholeProjectRefactorer::RenameEventsBasedObjectProperty(
           eventsFunctionsExtension.GetName(),
           eventsBasedObject.GetName(),
           EventsBasedObject::GetPropertyConditionName(newPropertyName)));
-  ExposeProjectEvents(project, conditionRenamer);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
 }
 
 void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -969,9 +845,21 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
     return;
   };
 
+  AddRequiredBehaviorsFor(project, object, behaviorName);
+}
+
+void WholeProjectRefactorer::AddRequiredBehaviorsFor(
+    gd::Project& project,
+    gd::Object& object,
+    const gd::String& behaviorName) {
+  if (!object.HasBehaviorNamed(behaviorName)) {
+    return;
+  };
+  gd::Behavior& behavior = object.GetBehavior(behaviorName);
+
   const gd::Platform& platform = project.GetCurrentPlatform();
   const gd::BehaviorMetadata& behaviorMetadata =
-      MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+      MetadataProvider::GetBehaviorMetadata(platform, behavior.GetTypeName());
   if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
     // Should not happen because the behavior was added successfully (so its
     // metadata are valid) - but double check anyway and bail out if the
@@ -979,7 +867,6 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
     return;
   }
 
-  gd::Behavior& behavior = object.GetBehavior(behaviorName);
   for (auto const& keyValue : behavior.GetProperties()) {
     const gd::String& propertyName = keyValue.first;
     const gd::PropertyDescriptor& property = keyValue.second;
@@ -1197,7 +1084,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
                   eventsFunctionsExtension.GetName(),
                   newBehaviorName,
                   eventsFunction.GetName()));
-          ExposeProjectEvents(project, renamer);
+          gd::ProjectBrowserHelper::ExposeProjectEvents(project, renamer);
         }
       };
 
@@ -1217,7 +1104,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
             eventsFunctionsExtension.GetName(),
             newBehaviorName,
             EventsBasedBehavior::GetPropertyActionName(property.GetName())));
-    ExposeProjectEvents(project, actionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, actionRenamer);
 
     gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -1229,7 +1116,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
             eventsFunctionsExtension.GetName(),
             newBehaviorName,
             EventsBasedBehavior::GetPropertyConditionName(property.GetName())));
-    ExposeProjectEvents(project, conditionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
 
     // Nothing to do for expression, expressions are not including the name of
     // the behavior
@@ -1251,7 +1138,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
             eventsFunctionsExtension.GetName(),
             newBehaviorName,
             EventsBasedBehavior::GetSharedPropertyActionName(property.GetName())));
-    ExposeProjectEvents(project, actionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, actionRenamer);
 
     gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -1263,7 +1150,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
             eventsFunctionsExtension.GetName(),
             newBehaviorName,
             EventsBasedBehavior::GetSharedPropertyConditionName(property.GetName())));
-    ExposeProjectEvents(project, conditionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
 
     // Nothing to do for expression, expressions are not including the name of
     // the behavior
@@ -1296,10 +1183,12 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
     renameBehaviorSharedProperty(*property);
   }
 
+  const WholeProjectBrowser wholeProjectExposer;
   DoRenameBehavior(
       project,
       gd::PlatformExtension::GetBehaviorFullType(eventsFunctionsExtension.GetName(), oldBehaviorName),
-      gd::PlatformExtension::GetBehaviorFullType(eventsFunctionsExtension.GetName(), newBehaviorName));
+      gd::PlatformExtension::GetBehaviorFullType(eventsFunctionsExtension.GetName(), newBehaviorName),
+      wholeProjectExposer);
 }
 
 void WholeProjectRefactorer::RenameEventsBasedObject(
@@ -1336,7 +1225,7 @@ void WholeProjectRefactorer::RenameEventsBasedObject(
                   eventsFunctionsExtension.GetName(),
                   newObjectName,
                   eventsFunction.GetName()));
-          ExposeProjectEvents(project, renamer);
+          gd::ProjectBrowserHelper::ExposeProjectEvents(project, renamer);
         }
       };
 
@@ -1356,7 +1245,7 @@ void WholeProjectRefactorer::RenameEventsBasedObject(
             eventsFunctionsExtension.GetName(),
             newObjectName,
             EventsBasedObject::GetPropertyActionName(property.GetName())));
-    ExposeProjectEvents(project, actionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, actionRenamer);
 
     gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
         project,
@@ -1368,7 +1257,7 @@ void WholeProjectRefactorer::RenameEventsBasedObject(
             eventsFunctionsExtension.GetName(),
             newObjectName,
             EventsBasedObject::GetPropertyConditionName(property.GetName())));
-    ExposeProjectEvents(project, conditionRenamer);
+    gd::ProjectBrowserHelper::ExposeProjectEvents(project, conditionRenamer);
 
     // Nothing to do for expression, expressions are not including the name of
     // the object
@@ -1399,17 +1288,20 @@ void WholeProjectRefactorer::RenameEventsBasedObject(
     renameObjectProperty(*property);
   }
 
+  const WholeProjectBrowser wholeProjectExposer;
   DoRenameObject(
       project,
       gd::PlatformExtension::GetObjectFullType(eventsFunctionsExtension.GetName(), oldObjectName),
-      gd::PlatformExtension::GetObjectFullType(eventsFunctionsExtension.GetName(), newObjectName));
+      gd::PlatformExtension::GetObjectFullType(eventsFunctionsExtension.GetName(), newObjectName),
+      wholeProjectExposer);
 }
 
 void WholeProjectRefactorer::DoRenameEventsFunction(
     gd::Project& project,
     const gd::EventsFunction& eventsFunction,
     const gd::String& oldFullType,
-    const gd::String& newFullType) {
+    const gd::String& newFullType,
+    const gd::ProjectBrowser& projectBrowser) {
   // Order is important: we first rename the expressions then the instructions,
   // to avoid being unable to fetch the metadata (the types of parameters) of
   // instructions after they are renamed.
@@ -1417,165 +1309,61 @@ void WholeProjectRefactorer::DoRenameEventsFunction(
     gd::ExpressionsRenamer renamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
     renamer.SetReplacedFreeExpression(oldFullType, newFullType);
-    ExposeProjectEvents(project, renamer);
+    projectBrowser.ExposeEvents(project, renamer);
   }
   if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsTypeRenamer renamer =
         gd::InstructionsTypeRenamer(project, oldFullType, newFullType);
-    ExposeProjectEvents(project, renamer);
+    projectBrowser.ExposeEvents(project, renamer);
   }
 }
 
 void WholeProjectRefactorer::DoRenameBehavior(
-    gd::Project& project,
-    const gd::String& oldBehaviorType,
-    const gd::String& newBehaviorType) {
-  auto renameBehaviorTypeInBehaviorContent =
-      [&oldBehaviorType,
-       &newBehaviorType](gd::BehaviorConfigurationContainer& behavior) {
-        if (behavior.GetTypeName() == oldBehaviorType) {
-          behavior.SetTypeName(newBehaviorType);
-        }
-      };
-  auto renameBehaviorTypeInParameters =
-      [&oldBehaviorType, &newBehaviorType](gd::EventsFunction& eventsFunction) {
-        for (auto& parameter : eventsFunction.GetParameters()) {
-          if (gd::ParameterMetadata::IsBehavior(parameter.GetType()) &&
-              parameter.GetExtraInfo() == oldBehaviorType) {
-            parameter.SetExtraInfo(newBehaviorType);
-          }
-        }
-      };
+    gd::Project &project, const gd::String &oldBehaviorType,
+    const gd::String &newBehaviorType,
+    const gd::ProjectBrowser &projectBrowser) {
 
   // Rename behavior in required behavior properties
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+  auto requiredBehaviorRenamer =
+      gd::RequiredBehaviorRenamer(oldBehaviorType, newBehaviorType);
+  projectBrowser.ExposeEventBasedBehaviors(project, requiredBehaviorRenamer);
 
-    for (auto&& eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      for (size_t i = 0;
-           i < eventsBasedBehavior->GetPropertyDescriptors().GetCount();
-           i++) {
-        NamedPropertyDescriptor& propertyDescriptor =
-            eventsBasedBehavior->GetPropertyDescriptors().Get(i);
-        std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
-        if (propertyDescriptor.GetType() == "Behavior" &&
-            extraInfo.size() > 0) {
-          const gd::String& requiredBehaviorType = extraInfo[0];
-          if (requiredBehaviorType == oldBehaviorType) {
-            extraInfo[0] = newBehaviorType;
-          }
-        }
-      }
-    }
-  }
-  
   // Rename behavior in objects lists.
-  auto behaviorTypeRenamer = gd::BehaviorTypeRenamer(
-          project,
-          oldBehaviorType,
-          newBehaviorType);
-  ExposeProjectObjects(project, behaviorTypeRenamer);
+  auto behaviorTypeRenamer =
+      gd::BehaviorTypeRenamer(oldBehaviorType, newBehaviorType);
+  projectBrowser.ExposeObjects(project, behaviorTypeRenamer);
 
   // Rename behavior in layout behavior shared data.
-  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    gd::Layout& layout = project.GetLayout(i);
-
-    for (auto& behaviorSharedDataContent : layout.GetAllBehaviorSharedData()) {
-      renameBehaviorTypeInBehaviorContent(*behaviorSharedDataContent.second);
-    }
-  }
+  auto sharedDataBehaviorTypeRenamer =
+      gd::BehaviorsSharedDataBehaviorTypeRenamer(oldBehaviorType, newBehaviorType);
+  projectBrowser.ExposeBehaviorSharedDatas(project, sharedDataBehaviorTypeRenamer);
 
   // Rename in parameters of (free/behavior) events function
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      renameBehaviorTypeInParameters(*eventsFunction);
-    }
-
-    for (auto&& eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        renameBehaviorTypeInParameters(*eventsFunction);
-      }
-    }
-
-    for (auto&& eventsBasedObject :
-         eventsFunctionsExtension.GetEventsBasedObjects()
-             .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedObject->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        renameBehaviorTypeInParameters(*eventsFunction);
-      }
-    }
-  }
+  auto behaviorParameterRenamer = gd::FunctionParameterBehaviorTypeRenamer(
+      oldBehaviorType, newBehaviorType);
+  projectBrowser.ExposeFunctions(project, behaviorParameterRenamer);
 }
 
 void WholeProjectRefactorer::DoRenameObject(
     gd::Project& project,
     const gd::String& oldObjectType,
-    const gd::String& newObjectType) {
+    const gd::String& newObjectType,
+    const gd::ProjectBrowser& projectBrowser) {
 
-  auto customObjectTypeRenamer = gd::CustomObjectTypeRenamer(
-          project,
-          oldObjectType,
-          newObjectType);
-  ExposeProjectObjects(project, customObjectTypeRenamer);
+  // Rename object type in objects lists.
+  auto customObjectTypeRenamer =
+      gd::CustomObjectTypeRenamer(oldObjectType, newObjectType);
+  projectBrowser.ExposeObjects(project, customObjectTypeRenamer);
 
-  auto renameObjectTypeInParameters =
-      [&oldObjectType, &newObjectType](gd::EventsFunction& eventsFunction) {
-        for (auto& parameter : eventsFunction.GetParameters()) {
-          if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
-              parameter.GetExtraInfo() == oldObjectType) {
-            parameter.SetExtraInfo(newObjectType);
-          }
-        }
-      };
+  // Rename in behaviors object type.
+  auto behaviorObjectTypeRenamer =
+      gd::BehaviorObjectTypeRenamer(oldObjectType, newObjectType);
+  projectBrowser.ExposeEventBasedBehaviors(project, behaviorObjectTypeRenamer);
 
   // Rename in parameters of (free/behavior) events function
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
-       e++) {
-    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-
-    // Behavior object types
-    for (auto&& eventsBasedBehavior :
-        eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
-      if (eventsBasedBehavior->GetObjectType() == oldObjectType) {
-        eventsBasedBehavior->SetObjectType(newObjectType);
-      }
-    }
-
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      renameObjectTypeInParameters(*eventsFunction);
-    }
-
-    for (auto&& eventsBasedBehavior :
-         eventsFunctionsExtension.GetEventsBasedBehaviors()
-             .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        renameObjectTypeInParameters(*eventsFunction);
-      }
-    }
-
-    for (auto&& eventsBasedObject :
-         eventsFunctionsExtension.GetEventsBasedObjects()
-             .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedObject->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        renameObjectTypeInParameters(*eventsFunction);
-      }
-    }
-  }
+  auto objectParameterRenamer =
+      gd::FunctionParameterObjectTypeRenamer(oldObjectType, newObjectType);
+  projectBrowser.ExposeFunctions(project, objectParameterRenamer);
 }
 
 void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
@@ -1605,25 +1393,12 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
 
   // Remove object in external events
   if (removeEventsAndGroups) {
-    DependenciesAnalyzer analyzer(project, layout);
-    if (analyzer.Analyze()) {
-      for (auto& externalEventsName :
-           analyzer.GetExternalEventsDependencies()) {
-        auto& externalEvents = project.GetExternalEvents(externalEventsName);
-        gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
-                                                   project,
-                                                   layout,
-                                                   externalEvents.GetEvents(),
-                                                   objectName);
-      }
-      for (auto& layoutName : analyzer.GetScenesDependencies()) {
-        auto& layout = project.GetLayout(layoutName);
-        gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
-                                                   project,
-                                                   layout,
-                                                   layout.GetEvents(),
-                                                   objectName);
-      }
+    for (auto &externalEventsName :
+         GetAssociatedExternalEvents(project, layout.GetName())) {
+      auto &externalEvents = project.GetExternalEvents(externalEventsName);
+      gd::EventsRefactorer::RemoveObjectInEvents(
+          project.GetCurrentPlatform(), project, layout,
+          externalEvents.GetEvents(), objectName);
     }
   }
 
@@ -1662,26 +1437,12 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
   }
 
   // Rename object in external events
-  DependenciesAnalyzer analyzer(project, layout);
-  if (analyzer.Analyze()) {
-    for (auto& externalEventsName : analyzer.GetExternalEventsDependencies()) {
-      auto& externalEvents = project.GetExternalEvents(externalEventsName);
-      gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(),
-                                                 project,
-                                                 layout,
-                                                 externalEvents.GetEvents(),
-                                                 oldName,
-                                                 newName);
-    }
-    for (auto& layoutName : analyzer.GetScenesDependencies()) {
-      auto& layout = project.GetLayout(layoutName);
-      gd::EventsRefactorer::RenameObjectInEvents(project.GetCurrentPlatform(),
-                                                 project,
-                                                 layout,
-                                                 layout.GetEvents(),
-                                                 oldName,
-                                                 newName);
-    }
+  for (auto &externalEventsName :
+       GetAssociatedExternalEvents(project, layout.GetName())) {
+    auto &externalEvents = project.GetExternalEvents(externalEventsName);
+    gd::EventsRefactorer::RenameObjectInEvents(
+        project.GetCurrentPlatform(), project, layout,
+        externalEvents.GetEvents(), oldName, newName);
   }
 
   // Rename object in external layouts
@@ -1694,6 +1455,102 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInLayout(
                                                                    newName);
     }
   }
+}
+
+void WholeProjectRefactorer::RenameLayout(gd::Project &project,
+                                          const gd::String &oldName,
+                                          const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "sceneName", oldName, newName);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, projectElementRenamer);
+
+  for (gd::String externalLayoutName :
+       GetAssociatedExternalLayouts(project, oldName)) {
+    auto &externalLayout = project.GetExternalLayout(externalLayoutName);
+    externalLayout.SetAssociatedLayout(newName);
+  }
+  for (gd::String externalEventsName :
+       GetAssociatedExternalEvents(project, oldName)) {
+    auto &externalEvents = project.GetExternalEvents(externalEventsName);
+    externalEvents.SetAssociatedLayout(newName);
+  }
+
+  gd::LinkEventTargetRenamer linkEventTargetRenamer(
+      project.GetCurrentPlatform(), oldName, newName);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, linkEventTargetRenamer);
+}
+
+void WholeProjectRefactorer::RenameExternalLayout(gd::Project &project,
+                                                  const gd::String &oldName,
+                                                  const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "externalLayoutName", oldName, newName);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameExternalEvents(gd::Project &project,
+                                                  const gd::String &oldName,
+                                                  const gd::String &newName) {
+  gd::LinkEventTargetRenamer linkEventTargetRenamer(
+      project.GetCurrentPlatform(), oldName, newName);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(project, linkEventTargetRenamer);
+}
+
+void WholeProjectRefactorer::RenameLayer(gd::Project &project,
+                                         gd::Layout &layout,
+                                         const gd::String &oldName,
+                                         const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "layer", oldName, newName);
+  gd::ProjectBrowserHelper::ExposeLayoutEvents(project, layout, projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameLayerEffect(gd::Project &project,
+                                               gd::Layout &layout,
+                                               gd::Layer &layer,
+                                               const gd::String &oldName,
+                                               const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "layerEffectName", oldName, newName);
+  projectElementRenamer.SetLayerConstraint(layer.GetName());
+  gd::ProjectBrowserHelper::ExposeLayoutEvents(project, layout,
+                                               projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectAnimation(gd::Project &project,
+                                                   gd::Layout &layout,
+                                                   gd::Object &object,
+                                                   const gd::String &oldName,
+                                                   const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "objectAnimationName", oldName, newName);
+  projectElementRenamer.SetObjectConstraint(object.GetName());
+  gd::ProjectBrowserHelper::ExposeLayoutEvents(project, layout,
+                                               projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectPoint(gd::Project &project,
+                                               gd::Layout &layout,
+                                               gd::Object &object,
+                                               const gd::String &oldName,
+                                               const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "objectPointName", oldName, newName);
+  projectElementRenamer.SetObjectConstraint(object.GetName());
+  gd::ProjectBrowserHelper::ExposeLayoutEvents(project, layout,
+                                               projectElementRenamer);
+}
+
+void WholeProjectRefactorer::RenameObjectEffect(gd::Project &project,
+                                                gd::Layout &layout,
+                                                gd::Object &object,
+                                                const gd::String &oldName,
+                                                const gd::String &newName) {
+  gd::ProjectElementRenamer projectElementRenamer(
+      project.GetCurrentPlatform(), "objectEffectName", oldName, newName);
+  projectElementRenamer.SetObjectConstraint(object.GetName());
+  gd::ProjectBrowserHelper::ExposeLayoutEvents(project, layout,
+                                               projectElementRenamer);
 }
 
 void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
@@ -1831,12 +1688,31 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
 
 std::vector<gd::String> WholeProjectRefactorer::GetAssociatedExternalLayouts(
     gd::Project& project, gd::Layout& layout) {
+  return GetAssociatedExternalLayouts(project, layout.GetName());
+}
+
+std::vector<gd::String> WholeProjectRefactorer::GetAssociatedExternalLayouts(
+    gd::Project& project, const gd::String& layoutName) {
   std::vector<gd::String> results;
   for (std::size_t i = 0; i < project.GetExternalLayoutsCount(); ++i) {
     auto& externalLayout = project.GetExternalLayout(i);
 
-    if (externalLayout.GetAssociatedLayout() == layout.GetName()) {
+    if (externalLayout.GetAssociatedLayout() == layoutName) {
       results.push_back(externalLayout.GetName());
+    }
+  }
+
+  return results;
+}
+
+std::vector<gd::String> WholeProjectRefactorer::GetAssociatedExternalEvents(
+    gd::Project &project, const gd::String &layoutName) {
+  std::vector<gd::String> results;
+  for (std::size_t i = 0; i < project.GetExternalEventsCount(); ++i) {
+    auto &externalEvents = project.GetExternalEvents(i);
+
+    if (externalEvents.GetAssociatedLayout() == layoutName) {
+      results.push_back(externalEvents.GetName());
     }
   }
 

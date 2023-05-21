@@ -3,14 +3,14 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
-import Delete from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
 import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import Text from '../../../../UI/Text';
 import { roundTo } from '../../../../Utils/Mathematics';
 import { Column } from '../../../../UI/Grid';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import styles from './styles';
+import Trash from '../../../../UI/CustomSvgIcons/Trash';
+import Edit from '../../../../UI/CustomSvgIcons/Edit';
 
 const POINT_COORDINATE_PRECISION = 4;
 
@@ -42,7 +42,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
       }}
       onClick={() => props.onClick(props.pointName)}
       onPointerEnter={() => props.onPointerEnter(props.pointName)}
-      onPointerLeave={props.onPointerEnter}
+      onPointerLeave={props.onPointerLeave}
     >
       <TableRowColumn style={styles.nameColumn}>
         <SemiControlledTextField
@@ -124,7 +124,7 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
       <TableRowColumn style={styles.toolColumn}>
         {!!props.onRemove && (
           <IconButton size="small" onClick={props.onRemove}>
-            <Delete />
+            <Trash />
           </IconButton>
         )}
         {!!props.onEdit && (

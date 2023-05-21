@@ -73,6 +73,12 @@ class FakeAsyncTask {
   }
 }
 
+class ManuallyResolvableTask extends FakeAsyncTask {
+  resolve() {
+    this._finished = true;
+  }
+}
+
 class TaskGroup {
   constructor() {
     /** @type {FakeAsyncTask[]} */
@@ -95,27 +101,129 @@ class TaskGroup {
   }
 }
 
-class VariablesContainer {
+class Variable {
   constructor() {
-    this._variables = {};
+    this._value = 0;
+    this._children = {};
   }
 
-  get(variableName) {
-    return {
-      add: (value) => {
-        this._variables[variableName] =
-          (this._variables[variableName] || 0) + value;
-      },
-      setNumber: (value) => {
-        this._variables[variableName] = value;
-      },
-      getAsNumber: () => {
-        return this._variables[variableName] || 0;
-      },
-    };
+  add(value) {
+    this._value = this.getAsNumber() + value;
   }
+
+  setNumber(value) {
+    this._value = value;
+  }
+
+  getAsNumber() {
+    return this._value || 0;
+  }
+
+  getValue() {
+    return this.getAsNumber();
+  }
+
+  setValue(value) {
+    this.setNumber(value);
+  }
+
+  /**
+   * @param {string} childName 
+   * @returns {Variable}
+   */
+  getChild(childName) {
+    if (
+      this._children[childName] === undefined ||
+      this._children[childName] === null
+    )
+      this._children[childName] = new Variable();
+    return this._children[childName];
+  }
+
+  getAllChildren() {
+    return this._children;
+  }
+
+  getAllChildrenArray() {
+    return Object.values(this._children);
+  }
+
+  castTo() {}
+
+  isPrimitive() {
+    return this.getAllChildrenArray().length === 0;
+  }
+
+  getType() {
+    return this.isPrimitive() ? 'number' : 'structure';
+  }
+
+  clearChildren() {
+    this._children = {};
+    this._childrenArray = [];
+  }
+
+  clone() {
+    return Variable.copy(this, new Variable());
+  }
+
+  addChild(childName, childVariable) {
+    // Make sure this is a structure
+    this.castTo('structure');
+    this._children[childName] = childVariable;
+    return this;
+  }
+
+  /**
+   * 
+   * @param {Variable} source 
+   * @param {Variable} target 
+   * @param {?boolean} merge 
+   * @returns {Variable}
+   */
+  static copy(
+    source,
+    target,
+    merge
+  ) {
+    if (!merge) target.clearChildren();
+    target.castTo(source.getType());
+    if (source.isPrimitive()) {
+      target.setValue(source.getValue());
+    } else if (source.getType() === 'structure') {
+      const children = source.getAllChildren();
+      for (const p in children) {
+        if (children.hasOwnProperty(p))
+          target.addChild(p, children[p].clone());
+      }
+    } else if (source.getType() === 'array') {
+      for (const p of source.getAllChildrenArray())
+        target.pushVariableCopy(p);
+    }
+    return target;
+  }
+}
+
+class VariablesContainer {
+  constructor() {
+    this._variables = new Hashtable();
+  }
+
+  /**
+   * @param {string} name 
+   * @returns {Variable}
+   */
+  get(name) {
+    let variable = this._variables.get(name);
+    if (!variable) {
+      variable = new Variable();
+      this._variables.put(name, variable);
+    }
+    return variable;
+  }
+
   has(variableName) {
-    return this._variables.hasOwnProperty(variableName);
+    return this._variables.containsKey(variableName);
   }
 }
 
@@ -139,6 +247,10 @@ class RuntimeObject {
 
   returnVariable(variable) {
     return variable;
+  }
+
+  static getVariableNumber(variable) {
+    return variable.getAsNumber();
   }
 
   getVariableNumber(variable) {
@@ -178,6 +290,14 @@ class RuntimeObject {
   markFakeAsyncActionAsFinished() {
     if (this._task) this._task.markAsFinished();
   }
+}
+
+class CustomRuntimeObject extends RuntimeObject {
+  constructor(parentInstanceContainer, objectData) {
+    super(parentInstanceContainer, objectData);
+    this._instanceContainer = parentInstanceContainer;
+  }
+  onCreated() {}
 }
 
 /**
@@ -336,7 +456,7 @@ const getSceneInstancesCount = (objectsContext, objectsLists) => {
     count += objectsContext.getInstancesCountOnScene(objectName);
   }
   return count;
-}
+};
 
 /**
  * @param {Hashtable<RuntimeObject[]>} objectsLists
@@ -349,7 +469,7 @@ const getPickedInstancesCount = (objectsLists) => {
     count += lists[i].length;
   }
   return count;
-}
+};
 
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
@@ -414,9 +534,13 @@ class RuntimeScene {
 
     return 0;
   }
-  
+
   getInitialSharedDataForBehavior(name) {
     return null;
+  }
+
+  getScene() {
+    return this;
   }
 }
 
@@ -494,6 +618,7 @@ class LongLivedObjectsList {
  */
 function makeMinimalGDJSMock() {
   const behaviorCtors = {};
+  const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
   const runtimeScene = new RuntimeScene();
 
@@ -501,14 +626,24 @@ function makeMinimalGDJSMock() {
     gdjs: {
       evtTools: {
         variable: { getVariableNumber: (variable) => variable.getAsNumber() },
-        object: { createObjectOnScene, getSceneInstancesCount, getPickedInstancesCount },
+        object: {
+          createObjectOnScene,
+          getSceneInstancesCount,
+          getPickedInstancesCount,
+        },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
           noop: () => {},
         },
+        common: {
+          resolveAsyncEventsFunction: ({ task }) => task.resolve(),
+        },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;
+      },
+      registerObject: (objectTypeName, Ctor) => {
+        customObjectsCtors[objectTypeName] = Ctor;
       },
       registerRuntimeScenePreEventsCallback: (cb) => {
         runtimeScenePreEventsCallbacks.push(cb);
@@ -521,10 +656,14 @@ function makeMinimalGDJSMock() {
       copyArray,
       objectsListsToArray,
       RuntimeBehavior,
+      RuntimeObject,
       OnceTriggers,
       Hashtable,
       LongLivedObjectsList,
       TaskGroup,
+      CustomRuntimeObject,
+      ManuallyResolvableTask,
+      Variable,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

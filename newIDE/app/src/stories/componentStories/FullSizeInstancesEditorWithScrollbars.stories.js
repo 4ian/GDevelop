@@ -39,9 +39,10 @@ export const Default = () => (
       <FullSizeInstancesEditorWithScrollbars
         project={testProject.project}
         layout={testProject.testLayout}
+        selectedLayer={''}
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}
-        onChangeInstancesEditorSettings={() => {}}
+        onInstancesEditorSettingsMutated={() => {}}
         instancesSelection={instancesSelection}
         onInstancesAdded={() => {}}
         onInstancesSelected={() => {}}
@@ -55,6 +56,7 @@ export const Default = () => (
           onCopy: () => {},
           onCut: () => {},
           onPaste: () => {},
+          onDuplicate: () => {},
           onDelete: () => {},
           onUndo: () => {},
           onRedo: () => {},

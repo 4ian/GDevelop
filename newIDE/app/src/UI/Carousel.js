@@ -3,8 +3,6 @@ import * as React from 'react';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
-import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ListOutlined from '@material-ui/icons/ListOutlined';
 import Skeleton from '@material-ui/lab/Skeleton';
 
@@ -15,6 +13,8 @@ import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import AlertMessage from './AlertMessage';
+import ArrowLeft from './CustomSvgIcons/ArrowLeft';
+import ArrowRight from './CustomSvgIcons/ArrowRight';
 
 type Thumbnail = {
   id: string,
@@ -116,10 +116,6 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
-const useStylesForLeftArrow = makeStyles({
-  arrow: { '& > path': { transform: 'translate(5px, 0px)' } }, // Translate path inside SVG since MUI icon is not centered
-});
-
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
@@ -136,7 +132,6 @@ const Carousel = <ThumbnailType: Thumbnail>({
   ] = React.useState<boolean>(false);
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
-  const classesForLeftArrow = useStylesForLeftArrow();
   const scrollView = React.useRef<?HTMLUListElement>(null);
   const [hoveredElement, setHoveredElement] = React.useState<?HTMLElement>(
     null
@@ -362,9 +357,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
         }}
         onClick={onClickArrow('left')}
       >
-        {areItemsSet && shouldDisplayLeftArrow && (
-          <ArrowBackIos className={classesForLeftArrow.arrow} />
-        )}
+        {areItemsSet && shouldDisplayLeftArrow && <ArrowLeft />}
       </div>
       <div
         style={{
@@ -443,7 +436,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
           }}
           onClick={onClickArrow('right')}
         >
-          <ArrowForwardIos />
+          <ArrowRight />
         </div>
       )}
     </Line>

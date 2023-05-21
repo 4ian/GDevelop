@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import CreateAccountDialog from '../../../Profile/CreateAccountDialog';
@@ -11,10 +12,10 @@ export default {
 };
 
 const defaultProps = {
-  onClose: () => {},
-  onGoToLogin: () => {},
+  onClose: () => action('onClose')(),
+  onGoToLogin: action('onGoToLogin'),
+  onCreateAccount: action('onCreateAccount'),
   createAccountInProgress: false,
-  onCreateAccount: async () => {},
   error: null,
 };
 export const Default = () => <CreateAccountDialog {...defaultProps} />;

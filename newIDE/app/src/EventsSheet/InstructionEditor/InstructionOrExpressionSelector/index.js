@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import Add from '@material-ui/icons/Add';
 import Fuse from 'fuse.js';
 
 import { List, type ListItemRefType } from '../../../UI/List';
@@ -27,7 +26,9 @@ import {
   tuneMatches,
   type SearchResult,
   sharedFuseConfiguration,
+  getFuseSearchQueryForMultipleKeys,
 } from '../../../UI/Search/UseSearchStructuredItem';
+import Add from '../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 const getGroupIconSrc = (key: string) => {
@@ -106,12 +107,20 @@ export default class InstructionOrExpressionSelector<
       id,
     } = this.props;
     const { searchText } = this.state;
+
     const displayedInstructionsList: Array<SearchResult<T>> =
       !!searchText && this.searchApi
-        ? this.searchApi.search(`'${searchText}`).map(result => ({
-            item: result.item,
-            matches: tuneMatches(result, searchText),
-          }))
+        ? this.searchApi
+            .search(
+              getFuseSearchQueryForMultipleKeys(searchText, [
+                'displayedName',
+                'fullGroupName',
+              ])
+            )
+            .map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
         : [];
     const hasResults = !searchText || !!displayedInstructionsList.length;
 

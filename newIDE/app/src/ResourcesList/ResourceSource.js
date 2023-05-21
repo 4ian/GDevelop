@@ -3,7 +3,11 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
-import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import {
+  type StorageProvider,
+  type FileMetadata,
+  type ResourcesActionsMenuBuilder,
+} from '../ProjectsStorage';
 import { type ResourceExternalEditor } from './ResourceExternalEditor';
 import { type OnFetchNewlyAddedResourcesFunction } from '../ProjectsStorage/ResourceFetcher';
 
@@ -19,7 +23,8 @@ export type ResourceKind =
   | 'json'
   | 'tilemap'
   | 'tileset'
-  | 'bitmapFont';
+  | 'bitmapFont'
+  | 'model3D';
 
 export const allResourceKindsAndMetadata = [
   {
@@ -70,6 +75,12 @@ export const allResourceKindsAndMetadata = [
     fileExtensions: ['fnt', 'xml'],
     createNewResource: () => new gd.BitmapFontResource(),
   },
+  {
+    kind: 'model3D',
+    displayName: t`3D model`,
+    fileExtensions: ['glb'],
+    createNewResource: () => new gd.Model3DResource(),
+  },
 ];
 
 const constructors = {};
@@ -99,6 +110,7 @@ export type ChooseResourceProps = {|
     path: string
   ) => void,
   options: ChooseResourceOptions,
+  automaticallyOpenIfPossible?: boolean,
 |};
 
 export type ResourceSourceComponentProps = {|
@@ -128,4 +140,5 @@ export type ResourceManagementProps = {|
   onChooseResource: ChooseResourceFunction,
   getStorageProvider: () => StorageProvider,
   onFetchNewlyAddedResources: OnFetchNewlyAddedResourcesFunction,
+  getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
 |};

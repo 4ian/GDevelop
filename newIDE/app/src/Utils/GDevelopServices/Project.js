@@ -7,23 +7,54 @@ import {
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import PromisePool from '@supercharge/promise-pool';
 import { getFileSha512TruncatedTo256 } from '../FileHasher';
+import { isNativeMobileApp } from '../Platform';
+import { unzipFirstEntryOfBlob } from '../Zip.js/Utils';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 export const PROJECT_RESOURCE_MAX_SIZE_IN_BYTES = 15 * 1000 * 1000;
 
-const projectResourcesClient = axios.create({
+export const projectResourcesClient = axios.create({
   baseURL: GDevelopProjectResourcesStorage.baseUrl,
-  withCredentials: true,
+  // On web/desktop, "credentials" are necessary to use the cookie previously
+  // returned by the server.
+  withCredentials: !isNativeMobileApp(),
 });
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
 });
 
 const projectResourcesCredentialsApiClient = axios.create({
   baseURL: GDevelopProjectApi.baseUrl,
-  withCredentials: true, // Necessary to save cookie returned by the server.
+  // On web/desktop, "credentials" are necessary to save cookie returned by the server.
+  withCredentials: !isNativeMobileApp(),
 });
+
+/**
+ * The token returned by the server to access the project resources and files, if not using a cookie.
+ */
+let gdResourceJwt: string | null = null;
+
+export const storeGDevelopResourceJwtToken = (token: string) => {
+  gdResourceJwt = token;
+};
+
+export const getGDevelopResourceJwtToken = (): string | null => {
+  return gdResourceJwt;
+};
+
+export const cleanGDevelopResourceJwtToken = () => {
+  gdResourceJwt = null;
+};
+
+export const addGDevelopResourceJwtTokenToUrl = (url: string) => {
+  if (!gdResourceJwt) return url;
+
+  const separator = url.indexOf('?') === -1 ? '?' : '&';
+  return (
+    url + separator + 'gd_resource_token=' + encodeURIComponent(gdResourceJwt)
+  );
+};
 
 type ResourceFileWithUploadPresignedUrl = {|
   resourceFile: File,
@@ -46,10 +77,43 @@ type CloudProject = {|
   deletedAt?: string,
 |};
 
+export type CloudProjectVersion = {|
+  projectId: string,
+  id: string,
+  createdAt: string,
+  /** previousVersion is null when the entity represents the initial version of a project. */
+  previousVersion: null | string,
+|};
+
 export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
   lastModifiedAt: string,
 |};
+
+export const isCloudProjectVersionSane = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  versionId: string
+): Promise<boolean> => {
+  const response = await refetchCredentialsForProjectAndRetryIfUnauthorized(
+    authenticatedUser,
+    cloudProjectId,
+    () =>
+      projectResourcesClient.get(
+        addGDevelopResourceJwtTokenToUrl(
+          `/${cloudProjectId}/versions/${versionId}.zip`
+        ),
+        { responseType: 'blob' }
+      )
+  );
+  try {
+    const projectFile = await unzipFirstEntryOfBlob(response.data);
+    JSON.parse(projectFile);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 const refetchCredentialsForProjectAndRetryIfUnauthorized = async <T>(
   authenticatedUser: AuthenticatedUser,
@@ -84,6 +148,24 @@ const getVersionIdFromPath = (path: string): string => {
   return path.substring(filenameStartIndex, filenameEndIndex);
 };
 
+export const getLastVersionsOfProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<?Array<CloudProjectVersion>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await apiClient.get(`/project/${cloudProjectId}/version`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId },
+  });
+  return response.data;
+};
+
 export const getCredentialsForCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
@@ -96,16 +178,30 @@ export const getCredentialsForCloudProject = async (
   const response = await projectResourcesCredentialsApiClient.get(
     `/project/${cloudProjectId}/action/authorize`,
     {
-      headers: { Authorization: authorizationHeader },
+      headers: {
+        Authorization: authorizationHeader,
+      },
       params: { userId },
       validateStatus: status => true,
     }
   );
+
+  if (isNativeMobileApp()) {
+    if (response.data && typeof response.data.gd_resource_jwt === 'string')
+      storeGDevelopResourceJwtToken(response.data.gd_resource_jwt);
+  }
+
   return response.status >= 200 && response.status < 400;
 };
 
 export const clearCloudProjectCredentials = async (): Promise<void> => {
-  await projectResourcesCredentialsApiClient.get('/action/clear-authorization');
+  if (isNativeMobileApp()) {
+    cleanGDevelopResourceJwtToken();
+  } else {
+    await projectResourcesCredentialsApiClient.get(
+      '/action/clear-authorization'
+    );
+  }
 };
 
 export const createCloudProject = async (
@@ -128,11 +224,24 @@ export const createCloudProject = async (
   return response.data;
 };
 
-export const commitVersion = async (
+/**
+ * This method takes the zipped project, uploads it to the cloud project storage
+ * and then informs the Project service that the cloud project has a new version.
+ * By default, a new version will have the project current version as parent.
+ * In some cases (project recovery from an old version), the new version will have
+ * a specific version as parent. In that case, specify a value in `previousVersion`.
+ */
+export const commitVersion = async ({
+  authenticatedUser,
+  cloudProjectId,
+  zippedProject,
+  previousVersion,
+}: {
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
-  zippedProject: any
-): Promise<?string> => {
+  zippedProject: Blob,
+  previousVersion?: ?string,
+}): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
@@ -150,14 +259,18 @@ export const commitVersion = async (
     authenticatedUser,
     cloudProjectId,
     () =>
-      projectResourcesClient.post(presignedUrl, zippedProject, {
-        headers: { 'content-type': 'application/zip' },
-      })
+      projectResourcesClient.post(
+        addGDevelopResourceJwtTokenToUrl(presignedUrl),
+        zippedProject,
+        {
+          headers: { 'content-type': 'application/zip' },
+        }
+      )
   );
   // Inform backend a new version has been uploaded.
   const response = await apiClient.post(
     `/project/${cloudProjectId}/action/commit`,
-    { newVersion },
+    { newVersion, ...(previousVersion ? { previousVersion } : undefined) },
     {
       headers: {
         Authorization: authorizationHeader,
@@ -192,9 +305,13 @@ export const uploadProjectResourceFiles = async (
           authenticatedUser,
           cloudProjectId,
           () =>
-            projectResourcesClient.post(presignedUrl, resourceFile, {
-              headers: { 'content-type': resourceFile.type },
-            })
+            projectResourcesClient.post(
+              addGDevelopResourceJwtTokenToUrl(presignedUrl),
+              resourceFile,
+              {
+                headers: { 'content-type': resourceFile.type },
+              }
+            )
         );
 
         const fullUrl = `${
@@ -366,13 +483,18 @@ const getPresignedUrlForResourcesUpload = async (
 };
 
 export const getProjectFileAsZipBlob = async (
-  cloudProject: CloudProject
+  cloudProject: CloudProject,
+  versionId?: ?string
 ): Promise<Blob> => {
   if (!cloudProject.currentVersion) {
     throw new Error('Opening of project without current version not handled');
   }
+
   const response = await projectResourcesClient.get(
-    `/${cloudProject.id}/versions/${cloudProject.currentVersion}.zip`,
+    addGDevelopResourceJwtTokenToUrl(
+      `/${cloudProject.id}/versions/${versionId ||
+        cloudProject.currentVersion}.zip`
+    ),
     { responseType: 'blob' }
   );
   return response.data;

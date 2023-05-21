@@ -280,11 +280,10 @@ namespace gdjs {
           );
         }
       }
+      // Make sure to delete already existing directions which are not used anymore.
       this.directions.length = i;
     }
   }
-
-  //Make sure to delete already existing directions which are not used anymore.
 
   /**
    * The SpriteRuntimeObject represents an object that can display images.
@@ -293,6 +292,7 @@ namespace gdjs {
     _currentAnimation: number = 0;
     _currentDirection: number = 0;
     _currentFrame: number = 0;
+    /** In seconds */
     _frameElapsedTime: float = 0;
     _animationSpeedScale: number = 1;
     _animationPaused: boolean = false;
@@ -308,15 +308,14 @@ namespace gdjs {
     _animations: gdjs.SpriteAnimation[] = [];
 
     /**
-     * Reference to the current SpriteAnimationFrame that is displayd.
+     * Reference to the current SpriteAnimationFrame that is displayed.
      * Verify is `this._animationFrameDirty === true` before using it, and if so
      * call `this._updateAnimationFrame()`.
      * Can be null, so ensure that this case is handled properly.
-     *
      */
     _animationFrame: gdjs.SpriteAnimationFrame | null = null;
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
-    _animationFrameDirty: any;
+    _animationFrameDirty: boolean = true;
 
     /**
      * @param instanceContainer The container the object belongs to
@@ -741,6 +740,7 @@ namespace gdjs {
         newFrame !== this._currentFrame
       ) {
         this._currentFrame = newFrame;
+        this._frameElapsedTime = 0;
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }
@@ -944,6 +944,9 @@ namespace gdjs {
      * @return the X position, on the scene, of the origin of the texture of the object.
      */
     getDrawableX(): float {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
       if (this._animationFrame === null) {
         return this.x;
       }
@@ -966,6 +969,9 @@ namespace gdjs {
      * @return the Y position, on the scene, of the origin of the texture of the object.
      */
     getDrawableY(): float {
+      if (this._animationFrameDirty) {
+        this._updateAnimationFrame();
+      }
       if (this._animationFrame === null) {
         return this.y;
       }

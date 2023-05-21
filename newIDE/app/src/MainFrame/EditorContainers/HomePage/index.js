@@ -54,6 +54,10 @@ type Props = {|
   // Project creation
   onOpenNewProjectSetupDialog: (?ExampleShortHeader) => void,
 
+  // Project save
+  onSave: () => Promise<void>,
+  canSave: boolean,
+
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
 |};
@@ -85,6 +89,8 @@ export const HomePage = React.memo<Props>(
         isActive,
         storageProviders,
         initialTab,
+        onSave,
+        canSave,
         resourceManagementProps,
         canInstallPrivateAsset,
       }: Props,
@@ -147,6 +153,8 @@ export const HomePage = React.memo<Props>(
                 onOpenLanguageDialog={onOpenLanguageDialog}
                 onOpenProfile={onOpenProfile}
                 onOpenProjectManager={onOpenProjectManager}
+                onSave={onSave}
+                canSave={canSave}
               />
             );
         },
@@ -156,6 +164,8 @@ export const HomePage = React.memo<Props>(
           onOpenProfile,
           onOpenProjectManager,
           project,
+          onSave,
+          canSave,
         ]
       );
 
@@ -246,6 +256,7 @@ export const HomePage = React.memo<Props>(
                         }
                         onTabChange={setActiveTab}
                         onOpenHelpFinder={onOpenHelpFinder}
+                        selectInAppTutorial={selectInAppTutorial}
                       />
                     )}
                     {activeTab === 'play' && <PlaySection />}
@@ -298,6 +309,8 @@ export const renderHomePageContainer = (
     initialTab={
       (props.extraEditorProps && props.extraEditorProps.initialTab) || null
     }
+    onSave={props.onSave}
+    canSave={props.canSave}
     resourceManagementProps={props.resourceManagementProps}
     canInstallPrivateAsset={props.canInstallPrivateAsset}
   />

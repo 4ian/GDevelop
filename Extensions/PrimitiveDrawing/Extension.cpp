@@ -28,9 +28,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           .AddObject<ShapePainterObject>(
               "Drawer",  //"Drawer" is kept for compatibility with GD<=3.6.76
               _("Shape painter"),
-              _("Allows you to draw simple shapes on the screen"),
+              _("Allows you to draw simple shapes on the screen using the "
+                "events."),
               "CppPlatform/Extensions/primitivedrawingicon.png")
-          .SetCategoryFullName(_("General"));
+          .SetCategoryFullName(_("Advanced"));
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction(
@@ -722,7 +723,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          _("Center of rotation"),
          _("Change the center of rotation of an object relatively to the "
            "object origin."),
-         _("Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_"),
+         _("Change the center of rotation of _PARAM0_ to _PARAM1_, _PARAM2_"),
          _("Angle"),
          "res/actions/position24_black.png",
          "res/actions/position_black.png")
@@ -783,5 +784,36 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("X drawing position"))
       .AddParameter("expression", _("Y drawing position"));
 
+  obj.AddAction("SetAntialiasing",
+                _("Anti-aliasing"),
+                _("Anti-aliasing"),
+                _("Set anti-aliasing of _PARAM0_ to _PARAM1_"),
+                _("Setup"),
+                "res/actions/antialiasing24.png",
+                "res/actions/antialiasing.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("stringWithSelector",
+                    _("Anti-aliasing quality level"),
+                    "[\"none\",\"low\",\"medium\",\"high\"]");
+
+  obj.AddCondition("CheckAntialiasing",
+                   _("Anti-aliasing type"),
+                   _("Checks the selected type of anti-aliasing"),
+                   _("The anti-aliasing of _PARAM0_ is set to _PARAM1_"),
+                   _("Setup"),
+                   "res/actions/antialiasing24.png",
+                   "res/actions/antialiasing.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("stringWithSelector",
+                    _("Type of anti-aliasing to check the object against"),
+                    "[\"none\",\"low\",\"medium\",\"high\"]");
+
+  obj.AddStrExpression("Antialiasing",
+                       _("Type of anti-aliasing used by a shape painter"),
+                       _("Returns the type of anti-aliasing in use: none, low, "
+                         "medium, or high."),
+                       _("Setup"),
+                       "res/actions/antialiasing.png")
+      .AddParameter("object", _("Object"), "Drawer");
 #endif
 }

@@ -5,8 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
-import Add from '@material-ui/icons/Add';
-import Delete from '@material-ui/icons/Delete';
 import IconButton from '../../../UI/IconButton';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -33,11 +31,15 @@ import { type EditorProps } from '../EditorProps.flow';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
-import ScrollView from '../../../UI/ScrollView';
+import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
+import Add from '../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
 
 const gd: libGDevelop = global.gd;
 
@@ -69,6 +71,7 @@ type AnimationProps = {|
   objectName: string,
   onChangeName: string => void,
   isAnimationListLocked: boolean,
+  onSpriteUpdated: () => void,
 |};
 
 class Animation extends React.Component<AnimationProps, void> {
@@ -87,6 +90,7 @@ class Animation extends React.Component<AnimationProps, void> {
       objectName,
       onChangeName,
       isAnimationListLocked,
+      onSpriteUpdated,
     } = this.props;
 
     const animationName = animation.getName();
@@ -115,7 +119,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 />
               </Column>
               <IconButton size="small" onClick={onRemove}>
-                <Delete />
+                <Trash />
               </IconButton>
             </MiniToolbar>
           )}
@@ -137,6 +141,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 objectName={objectName}
                 animationName={animationName}
                 onChangeName={onChangeName}
+                onSpriteUpdated={onSpriteUpdated}
               />
             );
           })}
@@ -164,12 +169,14 @@ const SortableAnimationsList = SortableContainer(
     onSelectSprite,
     onReplaceDirection,
     isAnimationListLocked,
+    onSpriteUpdated,
+    scrollViewRef,
   }) => {
     // Note that it's important to have <ScrollView> *inside* this
     // component, otherwise the sortable list won't work (because the
     // SortableContainer would not find a root div to use).
     return (
-      <ScrollView>
+      <ScrollView ref={scrollViewRef}>
         {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
           const animation = spriteConfiguration.getAnimation(i);
           return (
@@ -191,6 +198,7 @@ const SortableAnimationsList = SortableContainer(
                 onReplaceDirection(i, directionId, newDirection)
               }
               objectName={objectName}
+              onSpriteUpdated={onSpriteUpdated}
             />
           );
         })}
@@ -202,6 +210,8 @@ const SortableAnimationsList = SortableContainer(
 type AnimationsListContainerProps = {|
   spriteConfiguration: gdSpriteObject,
   project: gdProject,
+  layout?: gdLayout,
+  object?: gdObject,
   resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   extraBottomTools: React.Node,
@@ -225,6 +235,7 @@ class AnimationsListContainer extends React.Component<
     selectedSprites: {},
   };
   spriteContextMenu: ?ContextMenuInterface;
+  _scrollView = React.createRef<ScrollViewInterface>();
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.spriteConfiguration.moveAnimation(oldIndex, newIndex);
@@ -239,6 +250,16 @@ class AnimationsListContainer extends React.Component<
     this.forceUpdate();
     this.props.onSizeUpdated();
     if (this.props.onObjectUpdated) this.props.onObjectUpdated();
+
+    // Scroll to the bottom of the list.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      if (this._scrollView.current) {
+        this._scrollView.current.scrollToBottom();
+      }
+    }, 100); // A few ms is enough for a new render to be done.
   };
 
   removeAnimation = i => {
@@ -255,7 +276,10 @@ class AnimationsListContainer extends React.Component<
   };
 
   changeAnimationName = (i, newName) => {
-    const { spriteConfiguration } = this.props;
+    const { spriteConfiguration, project, layout, object } = this.props;
+
+    const currentName = spriteConfiguration.getAnimation(i).getName();
+    if (currentName === newName) return;
 
     const otherNames = mapFor(
       0,
@@ -263,7 +287,7 @@ class AnimationsListContainer extends React.Component<
       index => {
         return index === i
           ? undefined // Don't check the current animation name as we're changing it.
-          : spriteConfiguration.getAnimation(index).getName();
+          : currentName;
       }
     );
 
@@ -275,7 +299,19 @@ class AnimationsListContainer extends React.Component<
       return;
     }
 
-    spriteConfiguration.getAnimation(i).setName(newName);
+    const animation = spriteConfiguration.getAnimation(i);
+    const oldName = animation.getName();
+    animation.setName(newName);
+    // TODO EBO Refactor event-based object events when an animation is renamed.
+    if (layout && object) {
+      gd.WholeProjectRefactorer.renameObjectAnimation(
+        project,
+        layout,
+        object,
+        oldName,
+        newName
+      );
+    }
     this.forceUpdate();
     if (this.props.onObjectUpdated) this.props.onObjectUpdated();
   };
@@ -365,6 +401,8 @@ class AnimationsListContainer extends React.Component<
               useDragHandle
               lockAxis="y"
               axis="y"
+              onSpriteUpdated={this.props.onObjectUpdated}
+              scrollViewRef={this._scrollView}
             />
             <Column noMargin>
               <ResponsiveLineStackLayout
@@ -407,20 +445,24 @@ class AnimationsListContainer extends React.Component<
 export function LockedSpriteEditor({
   objectConfiguration,
   project,
+  layout,
+  object,
+  objectName,
   resourceManagementProps,
   onSizeUpdated,
   onObjectUpdated,
-  objectName,
 }: EditorProps) {
   return (
     <SpriteEditor
       isAnimationListLocked
       objectConfiguration={objectConfiguration}
       project={project}
+      layout={layout}
+      object={object}
+      objectName={objectName}
       resourceManagementProps={resourceManagementProps}
       onSizeUpdated={onSizeUpdated}
       onObjectUpdated={onObjectUpdated}
-      objectName={objectName}
     />
   );
 }
@@ -433,10 +475,12 @@ type SpriteEditorProps = {|
 export default function SpriteEditor({
   objectConfiguration,
   project,
+  layout,
+  object,
+  objectName,
   resourceManagementProps,
   onSizeUpdated,
   onObjectUpdated,
-  objectName,
   isAnimationListLocked = false,
 }: SpriteEditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
@@ -447,6 +491,8 @@ export default function SpriteEditor({
   ] = React.useState(false);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const windowWidth = useResponsiveWindowWidth();
+  const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
 
   return (
     <>
@@ -456,34 +502,53 @@ export default function SpriteEditor({
         resourcesLoader={ResourcesLoader}
         resourceManagementProps={resourceManagementProps}
         project={project}
+        layout={layout}
+        object={object}
         objectName={objectName}
         onSizeUpdated={onSizeUpdated}
         onObjectUpdated={onObjectUpdated}
         extraBottomTools={
-          <ResponsiveLineStackLayout noMargin noColumnMargin>
-            <RaisedButton
-              label={<Trans>Edit collision masks</Trans>}
-              primary={false}
-              onClick={() => setCollisionMasksEditorOpen(true)}
-              disabled={spriteConfiguration.getAnimationsCount() === 0}
-            />
-            {!isAnimationListLocked && (
-              <RaisedButton
-                label={<Trans>Edit points</Trans>}
-                primary={false}
-                onClick={() => setPointsEditorOpen(true)}
-                disabled={spriteConfiguration.getAnimationsCount() === 0}
-              />
-            )}
-            {!isAnimationListLocked && (
+          windowWidth !== 'small' ? (
+            <ResponsiveLineStackLayout noMargin noColumnMargin>
               <FlatButton
-                label={<Trans>Advanced options</Trans>}
-                primary={false}
-                onClick={() => setAdvancedOptionsOpen(true)}
-                disabled={spriteConfiguration.getAnimationsCount() === 0}
+                label={<Trans>Edit collision masks</Trans>}
+                onClick={() => setCollisionMasksEditorOpen(true)}
+                disabled={hasNoAnimations}
               />
-            )}
-          </ResponsiveLineStackLayout>
+              {!isAnimationListLocked && (
+                <FlatButton
+                  label={<Trans>Edit points</Trans>}
+                  onClick={() => setPointsEditorOpen(true)}
+                  disabled={hasNoAnimations}
+                />
+              )}
+              {!isAnimationListLocked && (
+                <FlatButton
+                  label={<Trans>Advanced options</Trans>}
+                  onClick={() => setAdvancedOptionsOpen(true)}
+                  disabled={hasNoAnimations}
+                />
+              )}
+            </ResponsiveLineStackLayout>
+          ) : (
+            <FlatButtonWithSplitMenu
+              label={<Trans>Edit collision masks</Trans>}
+              onClick={() => setCollisionMasksEditorOpen(true)}
+              disabled={hasNoAnimations}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Edit points`),
+                  disabled: hasNoAnimations,
+                  click: () => setPointsEditorOpen(true),
+                },
+                {
+                  label: i18n._(t`Advanced options`),
+                  disabled: hasNoAnimations,
+                  click: () => setAdvancedOptionsOpen(true),
+                },
+              ]}
+            />
+          )
         }
       />
       {advancedOptionsOpen && (
@@ -549,6 +614,18 @@ export default function SpriteEditor({
             resourcesLoader={ResourcesLoader}
             project={project}
             onPointsUpdated={onObjectUpdated}
+            onRenamedPoint={(oldName, newName) =>
+              // TODO EBO Refactor event-based object events when a point is renamed.
+              layout &&
+              object &&
+              gd.WholeProjectRefactorer.renameObjectPoint(
+                project,
+                layout,
+                object,
+                oldName,
+                newName
+              )
+            }
           />
         </Dialog>
       )}

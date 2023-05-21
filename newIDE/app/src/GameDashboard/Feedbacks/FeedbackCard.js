@@ -5,14 +5,11 @@ import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import CheckCircleIcon from '@material-ui/icons//CheckCircle';
-
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Card from '../../UI/Card';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -29,6 +26,8 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 import Link from '../../UI/Link';
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
+import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
+import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
@@ -130,9 +129,9 @@ const FeedbackCard = ({
                 onClick={() => setProcessed(!processed, i18n)}
               >
                 {processed ? (
-                  <CheckCircleIcon htmlColor={theme.message.valid} />
+                  <CheckCircleFilled htmlColor={theme.message.valid} />
                 ) : (
-                  <CheckCircleOutlineIcon />
+                  <CheckCircle />
                 )}
               </IconButton>
             }

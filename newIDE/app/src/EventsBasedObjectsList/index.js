@@ -22,6 +22,9 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { Column, Line } from '../UI/Grid';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const EVENTS_BASED_OBJECT_CLIPBOARD_KIND = 'Events Based Object';
 
@@ -266,8 +269,23 @@ export default class EventsBasedObjectsList extends React.Component<
     );
     this._onEventsBasedObjectModified();
 
+    // Scroll to the new function.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(newEventsBasedObject);
+    }, 100); // A few ms is enough for a new render to be done.
+
+    // We focus it so the user can edit the name directly.
     this.props.onSelectEventsBasedObject(newEventsBasedObject);
     this._editName(newEventsBasedObject);
+  };
+
+  scrollToItem = (eventsBasedObject: gdEventsBasedObject) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(eventsBasedObject);
+    }
   };
 
   _onEventsBasedObjectModified() {
@@ -297,6 +315,20 @@ export default class EventsBasedObjectsList extends React.Component<
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -308,8 +340,6 @@ export default class EventsBasedObjectsList extends React.Component<
                     fullList={list}
                     width={width}
                     height={height}
-                    onAddNewItem={this._addNewEventsBasedObject}
-                    addNewItemLabel={<Trans>Add a new object</Trans>}
                     getItemName={getEventsBasedObjectName}
                     selectedItems={
                       selectedEventsBasedObject
@@ -330,17 +360,16 @@ export default class EventsBasedObjectsList extends React.Component<
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search objects`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new object</Trans>}
+              primary
+              onClick={this._addNewEventsBasedObject}
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

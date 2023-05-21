@@ -141,6 +141,18 @@ namespace gdjs {
       }
 
       /**
+       * A hashmap associates each name of a mouse button with its respective code.
+       * @memberof gdjs.evtTools
+       */
+      export const mouseButtonsNameToCode = {
+        Left: gdjs.InputManager.MOUSE_LEFT_BUTTON,
+        Right: gdjs.InputManager.MOUSE_RIGHT_BUTTON,
+        Middle: gdjs.InputManager.MOUSE_MIDDLE_BUTTON,
+        Back: gdjs.InputManager.MOUSE_BACK_BUTTON,
+        Forward: gdjs.InputManager.MOUSE_FORWARD_BUTTON,
+      };
+
+      /**
        * Return true if the specified key is pressed
        *
        */
@@ -206,23 +218,13 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
-        if (button === 'Left') {
+        if (gdjs.evtTools.input.mouseButtonsNameToCode.hasOwnProperty(button)) {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(0);
-        }
-        if (button === 'Right') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(1);
-        }
-        if (button === 'Middle') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(2);
+            .isMouseButtonPressed(
+              gdjs.evtTools.input.mouseButtonsNameToCode[button]
+            );
         }
         return false;
       };
@@ -231,23 +233,13 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
-        if (button === 'Left') {
+        if (gdjs.evtTools.input.mouseButtonsNameToCode.hasOwnProperty(button)) {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(0);
-        }
-        if (button === 'Right') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(1);
-        }
-        if (button === 'Middle') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(2);
+            .isMouseButtonReleased(
+              gdjs.evtTools.input.mouseButtonsNameToCode[button]
+            );
         }
         return false;
       };
@@ -285,13 +277,71 @@ namespace gdjs {
         return instanceContainer.getGame().getInputManager().isScrollingDown();
       };
 
+      /**
+       * @deprecated Use getCursorX instead.
+       */
       export const getMouseX = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
+        return getCursorX(instanceContainer, layer, camera);
+      };
+
+      /**
+       * @deprecated Use getCursorY instead.
+       */
+      export const getMouseY = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        return getCursorY(instanceContainer, layer, camera);
+      };
+
+      export const getCursorX = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getMouseX
+          gdjs.evtTools.input.getCursorX
+        ) as FloatPoint;
+        return instanceContainer
+          .getLayer(layer)
+          .convertCoords(
+            instanceContainer.getGame().getInputManager().getCursorX(),
+            instanceContainer.getGame().getInputManager().getCursorY(),
+            0,
+            workingPoint
+          )[0];
+      };
+
+      export const getCursorY = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getCursorY
+        ) as FloatPoint;
+        return instanceContainer
+          .getLayer(layer)
+          .convertCoords(
+            instanceContainer.getGame().getInputManager().getCursorX(),
+            instanceContainer.getGame().getInputManager().getCursorY(),
+            0,
+            workingPoint
+          )[1];
+      };
+
+      export const getMouseOnlyCursorX = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        layer: string,
+        camera: integer
+      ) {
+        const workingPoint: FloatPoint = gdjs.staticArray(
+          gdjs.evtTools.input.getMouseOnlyCursorX
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
@@ -303,13 +353,13 @@ namespace gdjs {
           )[0];
       };
 
-      export const getMouseY = function (
+      export const getMouseOnlyCursorY = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         layer: string,
         camera: integer
       ) {
         const workingPoint: FloatPoint = gdjs.staticArray(
-          gdjs.evtTools.input.getMouseY
+          gdjs.evtTools.input.getMouseOnlyCursorY
         ) as FloatPoint;
         return instanceContainer
           .getLayer(layer)
@@ -389,7 +439,61 @@ namespace gdjs {
           )[1];
       };
 
+      /**
+       * @deprecated
+       */
       export const hasAnyTouchStarted = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): boolean => {
+        const startedTouchIdentifiers = instanceContainer
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers();
+        return (
+          startedTouchIdentifiers.length > 1 ||
+          (startedTouchIdentifiers.length > 0 &&
+            startedTouchIdentifiers[0] !== gdjs.InputManager.MOUSE_TOUCH_ID)
+        );
+      };
+
+      /**
+       * @deprecated
+       */
+      export const getStartedTouchCount = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): integer => {
+        const startedTouchIdentifiers = instanceContainer
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers();
+        return (
+          startedTouchIdentifiers.length +
+          (startedTouchIdentifiers.includes(gdjs.InputManager.MOUSE_TOUCH_ID)
+            ? -1
+            : 0)
+        );
+      };
+
+      /**
+       * @deprecated
+       */
+      export const getStartedTouchIdentifier = (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        index: integer
+      ): integer => {
+        const startedTouchIdentifiers = instanceContainer
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers();
+        const mouseIndex = startedTouchIdentifiers.indexOf(
+          gdjs.InputManager.MOUSE_TOUCH_ID
+        );
+        return mouseIndex < 0
+          ? startedTouchIdentifiers[index]
+          : startedTouchIdentifiers[index < mouseIndex ? index : index + 1];
+      };
+
+      export const hasAnyTouchOrMouseStarted = (
         instanceContainer: gdjs.RuntimeInstanceContainer
       ): boolean => {
         return (
@@ -400,7 +504,7 @@ namespace gdjs {
         );
       };
 
-      export const getStartedTouchCount = (
+      export const getStartedTouchOrMouseCount = (
         instanceContainer: gdjs.RuntimeInstanceContainer
       ): integer => {
         return instanceContainer
@@ -409,7 +513,7 @@ namespace gdjs {
           .getStartedTouchIdentifiers().length;
       };
 
-      export const getStartedTouchIdentifier = (
+      export const getStartedTouchOrMouseIdentifier = (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         index: integer
       ): integer => {

@@ -1,20 +1,24 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import React, { Component } from 'react';
+import React from 'react';
 import { I18n } from '@lingui/react';
 import Timer from '@material-ui/icons/Timer';
 import TextButton from '../../../UI/TextButton';
-import Checkbox from '../../../UI/Checkbox';
-import Brush from '@material-ui/icons/Brush';
-import PlayArrow from '@material-ui/icons/PlayArrow';
+import InlineCheckbox from '../../../UI/InlineCheckbox';
 import TextField from '../../../UI/TextField';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
-import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
+import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { Tooltip } from '@material-ui/core';
+import Text from '../../../UI/Text';
+import Edit from '../../../UI/CustomSvgIcons/Edit';
+import Play from '../../../UI/CustomSvgIcons/Play';
 
 const styles = {
   container: {
@@ -25,6 +29,7 @@ const styles = {
   },
   timeField: {
     width: 75,
+    fontSize: 14,
   },
   timeIcon: {
     paddingLeft: 6,
@@ -44,167 +49,169 @@ type Props = {|
   project: gdProject,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   onEditWith: (i18n: I18nType, ResourceExternalEditor) => Promise<void>,
+  onDirectionUpdated?: () => void,
 |};
 
-type State = {|
-  timeBetweenFrames: number,
-  timeError: boolean,
-  previewOpen: boolean,
-|};
+const DirectionTools = ({
+  animationName,
+  direction,
+  resourcesLoader,
+  project,
+  resourceExternalEditors,
+  onEditWith,
+  onDirectionUpdated,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+  const [timeBetweenFrames, setTimeBetweenFrames] = React.useState(
+    formatTime(direction.getTimeBetweenFrames())
+  );
+  const [previewOpen, setPreviewOpen] = React.useState(false);
 
-export default class DirectionTools extends Component<Props, State> {
-  state = {
-    timeBetweenFrames: formatTime(this.props.direction.getTimeBetweenFrames()),
-    timeError: false,
-    previewOpen: false,
-  };
+  React.useEffect(
+    () => {
+      setTimeBetweenFrames(formatTime(direction.getTimeBetweenFrames()));
+    },
+    [direction]
+  );
 
-  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
-  UNSAFE_componentWillReceiveProps(newProps: Props) {
-    this.setState({
-      timeBetweenFrames: formatTime(
-        this.props.direction.getTimeBetweenFrames()
-      ),
-      timeError: false,
-    });
-  }
+  const saveTimeBetweenFrames = () => {
+    const currentTimeBetweenFrames = direction.getTimeBetweenFrames();
+    const newTimeBetweenFrames = Math.max(
+      parseFloat(timeBetweenFrames),
+      0.00001
+    );
+    if (currentTimeBetweenFrames === newTimeBetweenFrames) return;
 
-  saveTimeBetweenFrames = () => {
-    const { direction } = this.props;
+    const newTimeIsValid = !isNaN(newTimeBetweenFrames);
 
-    const newTime = Math.max(parseFloat(this.state.timeBetweenFrames), 0.00001);
-    const newTimeIsValid = !isNaN(newTime);
-
-    if (newTimeIsValid) direction.setTimeBetweenFrames(newTime);
-    this.setState({
-      timeBetweenFrames: formatTime(
-        this.props.direction.getTimeBetweenFrames()
-      ),
-      timeError: newTimeIsValid,
-    });
-  };
-
-  setLooping = (check: boolean) => {
-    const { direction } = this.props;
-
-    direction.setLoop(!!check);
-    this.forceUpdate();
-  };
-
-  openPreview = (open: boolean) => {
-    this.setState({
-      previewOpen: open,
-    });
-    if (!open) {
-      this.saveTimeBetweenFrames();
+    if (newTimeIsValid) {
+      direction.setTimeBetweenFrames(newTimeBetweenFrames);
+      setTimeBetweenFrames(formatTime(newTimeBetweenFrames));
+      if (onDirectionUpdated) onDirectionUpdated();
     }
   };
 
-  render() {
-    const {
-      direction,
-      resourcesLoader,
-      project,
-      resourceExternalEditors,
-      onEditWith,
-    } = this.props;
+  const setLooping = (check: boolean) => {
+    direction.setLoop(!!check);
+    forceUpdate();
 
-    const imageResourceExternalEditors = resourceExternalEditors.filter(
-      ({ kind }) => kind === 'image'
-    );
+    if (onDirectionUpdated) onDirectionUpdated();
+  };
 
-    const hasSprites = direction.getSpritesCount();
+  const openPreview = (open: boolean) => {
+    setPreviewOpen(open);
+    if (!open) {
+      saveTimeBetweenFrames();
+    }
+  };
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <div style={styles.container}>
-            <ResponsiveWindowMeasurer>
-              {windowWidth =>
-                !!imageResourceExternalEditors.length && (
-                  <TextButton
-                    label={i18n._(
-                      windowWidth === 'small'
-                        ? hasSprites
-                          ? t`Edit`
-                          : t`Create`
-                        : hasSprites
-                        ? imageResourceExternalEditors[0].editDisplayName
-                        : imageResourceExternalEditors[0].createDisplayName
-                    )}
-                    icon={<Brush />}
-                    onClick={() =>
-                      onEditWith(i18n, imageResourceExternalEditors[0])
-                    }
-                  />
-                )
-              }
-            </ResponsiveWindowMeasurer>
-            <TextButton
-              label={<Trans>Preview</Trans>}
-              icon={<PlayArrow />}
-              onClick={() => this.openPreview(true)}
-            />
-            <Timer style={styles.timeIcon} />
-            <TextField
-              value={this.state.timeBetweenFrames}
-              onChange={(e, text) =>
-                this.setState({ timeBetweenFrames: parseFloat(text) || 0 })
-              }
-              onBlur={() => this.saveTimeBetweenFrames()}
-              id="direction-time-between-frames"
-              margin="none"
-              style={styles.timeField}
-              type="number"
-              step={0.005}
-              precision={2}
-              min={0.01}
-              max={5}
-            />
-            <span style={styles.spacer} />
-            <Checkbox
-              checked={direction.isLooping()}
-              label={<Trans>Loop</Trans>}
-              onCheck={(e, check) => this.setLooping(check)}
-            />
-            {this.state.previewOpen && (
-              <Dialog
-                title={<Trans>Preview {this.props.animationName}</Trans>}
-                actions={[
-                  <DialogPrimaryButton
-                    label={<Trans>Ok</Trans>}
-                    primary
-                    onClick={() => this.openPreview(false)}
-                    key="ok"
-                  />,
-                ]}
-                onRequestClose={() => this.openPreview(false)}
-                onApply={() => this.openPreview(false)}
-                open={this.state.previewOpen}
-                fullHeight
-                flexBody
-              >
-                <AnimationPreview
-                  animationName={this.props.animationName}
-                  resourceNames={direction.getSpriteNames().toJSArray()}
-                  getImageResourceSource={(name: string) =>
-                    resourcesLoader.getResourceFullUrl(project, name, {})
+  const imageResourceExternalEditors = resourceExternalEditors.filter(
+    ({ kind }) => kind === 'image'
+  );
+
+  const hasSprites = direction.getSpritesCount();
+  const windowWidth = useResponsiveWindowWidth();
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            justifyContent="flex-end"
+            noColumnMargin
+          >
+            <LineStackLayout noMargin>
+              {!!imageResourceExternalEditors.length && (
+                <TextButton
+                  label={i18n._(
+                    windowWidth === 'small'
+                      ? hasSprites
+                        ? t`Edit`
+                        : t`Create`
+                      : hasSprites
+                      ? imageResourceExternalEditors[0].editDisplayName
+                      : imageResourceExternalEditors[0].createDisplayName
+                  )}
+                  icon={<Edit />}
+                  onClick={() =>
+                    onEditWith(i18n, imageResourceExternalEditors[0])
                   }
-                  isImageResourceSmooth={(name: string) =>
-                    isProjectImageResourceSmooth(project, name)
-                  }
-                  timeBetweenFrames={this.state.timeBetweenFrames}
-                  onChangeTimeBetweenFrames={text =>
-                    this.setState({ timeBetweenFrames: text })
-                  }
-                  isLooping={direction.isLooping()}
-                  hideAnimationLoader // No need to show a loader in the Direction Tools.
                 />
-              </Dialog>
-            )}
-          </div>
-        )}
-      </I18n>
-    );
-  }
-}
+              )}
+              <TextButton
+                label={<Trans>Preview</Trans>}
+                icon={<Play />}
+                onClick={() => openPreview(true)}
+              />
+            </LineStackLayout>
+            <LineStackLayout noMargin alignItems="center">
+              <Tooltip title={<Trans>Time between frames</Trans>}>
+                <Timer style={styles.timeIcon} />
+              </Tooltip>
+              <TextField
+                value={timeBetweenFrames}
+                onChange={(e, text) =>
+                  setTimeBetweenFrames(parseFloat(text) || 0)
+                }
+                onBlur={() => saveTimeBetweenFrames()}
+                id="direction-time-between-frames"
+                margin="none"
+                style={styles.timeField}
+                type="number"
+                step={0.005}
+                precision={2}
+                min={0.01}
+                max={5}
+              />
+              <InlineCheckbox
+                checked={direction.isLooping()}
+                label={
+                  <Text size="body-small">
+                    <Trans>Loop</Trans>
+                  </Text>
+                }
+                onCheck={(e, check) => setLooping(check)}
+              />
+            </LineStackLayout>
+          </ResponsiveLineStackLayout>
+          {previewOpen && (
+            <Dialog
+              title={<Trans>Preview {animationName}</Trans>}
+              actions={[
+                <DialogPrimaryButton
+                  label={<Trans>Ok</Trans>}
+                  primary
+                  onClick={() => openPreview(false)}
+                  key="ok"
+                />,
+              ]}
+              onRequestClose={() => openPreview(false)}
+              onApply={() => openPreview(false)}
+              open={previewOpen}
+              fullHeight
+              flexBody
+            >
+              <AnimationPreview
+                animationName={animationName}
+                resourceNames={direction.getSpriteNames().toJSArray()}
+                getImageResourceSource={(name: string) =>
+                  resourcesLoader.getResourceFullUrl(project, name, {})
+                }
+                isImageResourceSmooth={(name: string) =>
+                  isProjectImageResourceSmooth(project, name)
+                }
+                timeBetweenFrames={timeBetweenFrames}
+                onChangeTimeBetweenFrames={text => setTimeBetweenFrames(text)}
+                isLooping={direction.isLooping()}
+                hideAnimationLoader // No need to show a loader in the Direction Tools.
+              />
+            </Dialog>
+          )}
+        </>
+      )}
+    </I18n>
+  );
+};
+
+export default DirectionTools;

@@ -15,6 +15,8 @@ export type ExampleShortHeader = {|
   authorIds?: Array<string>,
   previewImageUrls: Array<string>,
   gdevelopVersion: string,
+  codeSizeLevel: string,
+  difficultyLevel?: string,
 |};
 
 export type Example = {|
@@ -33,6 +35,9 @@ export const listAllExamples = async (): Promise<AllExamples> => {
   const response = await axios.get(
     `${GDevelopAssetApi.baseUrl}/example-short-header-and-filter`
   );
+
+  const examples = response.data;
+  if (!examples) throw new Error('Unexpected response from examples endpoint.');
 
   return response.data;
 };

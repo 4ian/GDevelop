@@ -6,7 +6,6 @@ import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
@@ -15,12 +14,18 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Add from '../UI/CustomSvgIcons/Add';
+
+const gd: libGDevelop = global.gd;
 
 const DropTarget = makeDropTarget('layers-list');
 
 type LayersListBodyProps = {|
+  project: gdProject,
   layersContainer: gdLayout,
+  selectedLayer: string,
+  onSelectLayer: string => void,
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onRenameLayer: (
@@ -42,6 +47,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
   const draggedLayerIndexRef = React.useRef<number | null>(null);
 
   const {
+    project,
     layersContainer,
     onEditEffects,
     onEdit,
@@ -80,6 +86,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
         key={`layer-${layer.ptr}`}
         id={`layer-${i}`}
         layer={layer}
+        isSelected={props.selectedLayer === layerName}
+        onSelect={() => props.onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
         effectsCount={layer.getEffects().getEffectsCount()}
         onEditEffects={() => onEditEffects(layer)}
@@ -106,6 +114,12 @@ const LayersListBody = (props: LayersListBodyProps) => {
             onRenameLayer(layerName, newName, doRename => {
               if (doRename)
                 layersContainer.getLayer(layerName).setName(newName);
+              gd.WholeProjectRefactorer.renameLayer(
+                project,
+                layersContainer,
+                layerName,
+                newName
+              );
             });
           }
         }}
@@ -120,6 +134,11 @@ const LayersListBody = (props: LayersListBodyProps) => {
         isVisible={layer.getVisibility()}
         onChangeVisibility={visible => {
           layer.setVisibility(visible);
+          onLayerModified();
+        }}
+        isLocked={layer.isLocked()}
+        onChangeLockState={isLocked => {
+          layer.setLocked(isLocked);
           onLayerModified();
         }}
         width={width}
@@ -161,6 +180,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
 
 type Props = {|
   project: gdProject,
+  selectedLayer: string,
+  onSelectLayer: string => void,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
@@ -242,6 +263,9 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
               // using SortableVirtualizedItemList.
               <LayersListBody
                 key={listKey}
+                selectedLayer={props.selectedLayer}
+                onSelectLayer={props.onSelectLayer}
+                project={props.project}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}

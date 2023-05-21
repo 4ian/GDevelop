@@ -372,4 +372,15 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
+
+  obj.AddAction("JumpEmitterForwardInTime",
+                _("Jump emitter forward in time"),
+                _("Simulate the passage of time for an emitter, "
+                  "including creating and moving particles"),
+                _("Jump _PARAM0_ forward in time by _PARAM1_ seconds"),
+                _("Advanced"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .AddParameter("number", _("Seconds of time"));
 }

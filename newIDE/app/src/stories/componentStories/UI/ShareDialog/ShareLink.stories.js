@@ -12,5 +12,5 @@ export default {
 };
 
 export const DefaultShareLink = () => (
-  <ShareLink url={'https://liluo.io/username/game-slug'} />
+  <ShareLink url={'https://gd.games/username/game-slug'} />
 );

@@ -3,13 +3,13 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 
 import Card from '../../UI/Card';
-import CheckCircle from '@material-ui/icons/CheckCircle';
 import { type PlanDetails } from '../../Utils/GDevelopServices/Usage';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { LineStackLayout } from '../../UI/Layout';
+import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
@@ -21,6 +21,8 @@ type Props = {|
   isHighlighted: boolean,
   actions?: React.Node,
   isPending?: boolean,
+  hidePrice?: boolean,
+  background: 'medium' | 'dark',
 |};
 
 const PlanCard = (props: Props) => {
@@ -29,7 +31,7 @@ const PlanCard = (props: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
-        <Card isHighlighted={props.isHighlighted}>
+        <Card isHighlighted={props.isHighlighted} background={props.background}>
           <Line noMargin justifyContent="space-between" alignItems="center">
             <Text size="block-title">
               <span>
@@ -37,10 +39,12 @@ const PlanCard = (props: Props) => {
               </span>
             </Text>
             <Text color="secondary">
-              {props.plan.monthlyPriceInEuros ? (
-                <Trans>{props.plan.monthlyPriceInEuros}€/month</Trans>
-              ) : (
+              {props.hidePrice ||
+              props.plan.monthlyPriceInEuros === null ? null : props.plan
+                  .monthlyPriceInEuros === 0 ? (
                 <Trans>Free</Trans>
+              ) : (
+                <Trans>{props.plan.monthlyPriceInEuros}€/month</Trans>
               )}
             </Text>
           </Line>

@@ -358,7 +358,22 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Angle to compare to (in degrees)")))
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("GetAngle");
+    
+    aut.AddScopedCondition(
+           "IsMovementAngleAround",
+           _("Angle of movement"),
+           _("Compare the angle of the top-down movement of the object."),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
+             ": _PARAM3_ degrees)"),
+         _("Movement"),
+         "CppPlatform/Extensions/topdownmovementicon24.png",
+         "CppPlatform/Extensions/topdownmovementicon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+        .AddParameter("expression", _("Angle (in degrees)"))
+        .AddParameter("expression", _("Tolerance (in degrees)"));
 
   aut.AddCondition("XVelocity",
                    _("Speed on X axis"),
@@ -426,7 +441,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
 
   aut.AddAction("AllowDiagonals",
                 _("Diagonal movement"),
-                _("Allow or restrict diagonal movemment"),
+                _("Allow or restrict diagonal movement"),
                 _("Allow diagonal moves for _PARAM0_: _PARAM2_"),
                 _("Movement"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",

@@ -17,10 +17,18 @@ declare class gdInstructionMetadata {
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
+  isRelevantForLayoutEvents(): boolean;
+  isRelevantForFunctionEvents(): boolean;
+  isRelevantForAsynchronousFunctionEvents(): boolean;
+  isRelevantForCustomObjectEvents(): boolean;
   setCanHaveSubInstructions(): gdInstructionMetadata;
   setHelpPath(helpPath: string): gdInstructionMetadata;
   setHidden(): gdInstructionMetadata;
   setPrivate(): gdInstructionMetadata;
+  setRelevantForLayoutEventsOnly(): gdInstructionMetadata;
+  setRelevantForFunctionEventsOnly(): gdInstructionMetadata;
+  setRelevantForAsynchronousFunctionEventsOnly(): gdInstructionMetadata;
+  setRelevantForCustomObjectEventsOnly(): gdInstructionMetadata;
   addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): gdInstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdInstructionMetadata;
   setDefaultValue(defaultValue: string): gdInstructionMetadata;
@@ -35,6 +43,7 @@ declare class gdInstructionMetadata {
   markAsComplex(): gdInstructionMetadata;
   getCodeExtraInformation(): gdExtraInformation;
   setFunctionName(functionName: string): gdExtraInformation;
+  setAsyncFunctionName(functionName: string): gdExtraInformation;
   setIncludeFile(includeFile: string): gdInstructionMetadata;
   addIncludeFile(includeFile: string): gdInstructionMetadata;
   getIncludeFiles(): gdVectorString;

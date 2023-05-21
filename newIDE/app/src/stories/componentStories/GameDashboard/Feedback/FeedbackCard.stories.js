@@ -11,7 +11,7 @@ import FeedbackCard from '../../../../GameDashboard/Feedbacks/FeedbackCard';
 import {
   commentProcessed,
   commentUnprocessed,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   indieUserProfile,
 } from '../../../../fixtures/GDevelopServicesTestData';
 
@@ -24,7 +24,7 @@ export default {
 export const Default = () => (
   <FeedbackCard
     comment={commentUnprocessed}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -32,7 +32,7 @@ export const Default = () => (
 export const Processed = () => (
   <FeedbackCard
     comment={commentProcessed}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -43,7 +43,7 @@ export const WithContact = () => (
       ...commentUnprocessed,
       contact: 'Clem#1234',
     }}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -53,10 +53,10 @@ export const WithNamedBuild = () => (
     comment={commentUnprocessed}
     buildProperties={{
       id: 'build-id',
-      name: 'My magnificient build',
+      name: 'My magnificent build',
       isDeleted: false,
     }}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -67,7 +67,7 @@ export const WithAuthenticatedPlayer = () => (
       ...commentUnprocessed,
       playerId: indieUserProfile.id,
     }}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -79,7 +79,7 @@ export const WithAuthenticatedPlayerAndContact = () => (
       playerId: indieUserProfile.id,
       contact: 'Clem#1234',
     }}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -88,7 +88,7 @@ export const FeedbackCardWithUnnamedBuild = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: false }}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
@@ -97,7 +97,7 @@ export const FeedbackCardWithDeletedBuild = () => (
   <FeedbackCard
     comment={commentUnprocessed}
     buildProperties={{ id: 'build-id', isDeleted: true }}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     onCommentUpdated={action('onCommentUpdated')}
   />
 );

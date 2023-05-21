@@ -405,6 +405,18 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
+   * \brief Generate the full name for accessing to a boolean variable used for
+   * conditions.
+   *
+   * Default implementation just returns the boolean name passed as argument.
+   */
+  virtual gd::String GenerateUpperScopeBooleanFullName(
+      const gd::String& boolName,
+      const gd::EventsCodeGenerationContext& context) {
+    return boolName;
+  }
+
+  /**
    * \brief Must create a boolean. Its value must be false.
    *
    * The default implementation generates C-style code.
@@ -493,9 +505,9 @@ class GD_CORE_API EventsCodeGenerator {
    * - object : Object name -> string
    * - expression : Mathematical expression -> number (double)
    * - string : %Text expression -> string
-   * - layer, color, file, joyaxis : Same as string
+   * - layer, color, file, stringWithSelector : Same as string
    * - relationalOperator : Used to make a comparison between the function
-  resturn value and value of the parameter preceding the relationOperator
+  return value and value of the parameter preceding the relationOperator
   parameter -> string
    * - operator : Used to update a value using a setter and a getter -> string
    * - key, mouse, objectvar, scenevar, globalvar, password, musicfile,
@@ -665,19 +677,6 @@ class GD_CORE_API EventsCodeGenerator {
     return "!(" + predicat + ")";
   };
 
-  /**
-   * \brief Must create a boolean which is a reference to a boolean declared in
-   * the parent scope.
-   *
-   * The default implementation generates C-style code.
-   */
-  virtual gd::String GenerateReferenceToUpperScopeBoolean(
-      const gd::String& referenceName,
-      const gd::String& referencedBoolean,
-      gd::EventsCodeGenerationContext& context) {
-    return "bool & " + referenceName + " = " + referencedBoolean + ";\n";
-  }
-
   virtual gd::String GenerateFreeCondition(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
@@ -786,7 +785,7 @@ class GD_CORE_API EventsCodeGenerator {
   const gd::Project* project;  ///< The project being used.
   const gd::Layout* scene;     ///< The scene being generated.
 
-  bool errorOccurred;          ///< Must be set to true if an error occured.
+  bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
 

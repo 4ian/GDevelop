@@ -212,6 +212,19 @@ class GD_CORE_API EventsFunction {
   }
 
   /**
+   * \brief Returns true if the function is async.
+   */
+  bool IsAsync() const { return isAsync; }
+
+  /**
+   * \brief Sets the asynchronicity of the function.
+   */
+  EventsFunction& SetAsync(bool _isAsync) {
+    isAsync = _isAsync;
+    return *this;
+  }
+
+  /**
    * \brief Return the events.
    */
   const gd::EventsList& GetEvents() const { return events; };
@@ -291,6 +304,7 @@ class GD_CORE_API EventsFunction {
   mutable std::vector<gd::ParameterMetadata> actionWithOperationParameters;
   gd::ObjectGroupsContainer objectGroups;
   bool isPrivate = false;
+  bool isAsync = false;
 };
 
 }  // namespace gd

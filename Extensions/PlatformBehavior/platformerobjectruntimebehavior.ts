@@ -274,6 +274,7 @@ namespace gdjs {
       this._updateOverlappedJumpThru();
 
       //1) X axis:
+      const beforeMovingXState = this._state;
       this._state.checkTransitionBeforeX();
       this._state.beforeMovingX();
 
@@ -285,8 +286,10 @@ namespace gdjs {
 
       const oldX = object.getX();
       this._moveX();
+      const mayCollideWall = object.getX() !== oldX + this._requestedDeltaX;
 
       //2) Y axis:
+      const beforeMovingYState = this._state;
       this._state.checkTransitionBeforeY(timeDelta);
       this._state.beforeMovingY(timeDelta, oldX);
 
@@ -294,9 +297,28 @@ namespace gdjs {
       this._moveY();
 
       //3) Update the current floor data for the next tick:
+      const beforeLastTransitionYState = this._state;
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
+      }
+
+      if (
+        // When the character is against a wall and the player hold left or
+        // right, the speed shouldn't stack because starting at full speed when
+        // jumping over the wall would look strange.
+        mayCollideWall &&
+        // Whereas, when the state has change, the collision is probably a
+        // landing or a collision from the floor when stating to jump. The
+        // speed must not be lost in these cases.
+        this._state === beforeMovingXState &&
+        this._state === beforeMovingYState &&
+        this._state === beforeLastTransitionYState &&
+        // When the character is on the floor, it will try to walk on the
+        // obstacles and already stop if necessary.
+        this._state !== this._onFloor
+      ) {
+        this._currentSpeed = 0;
       }
 
       this._wasLeftKeyPressed = this._leftKey;
@@ -411,15 +433,6 @@ namespace gdjs {
               Math.round(object.getX()) + (this._requestedDeltaX > 0 ? -1 : 1)
             );
           }
-        }
-
-        // When the character is on the floor it will try to walk on the obstacles.
-        // So, it should not be stopped.
-        if (
-          this._state !== this._onFloor &&
-          object.getX() !== oldX + this._requestedDeltaX
-        ) {
-          this._currentSpeed = 0;
         }
       }
     }
@@ -1362,7 +1375,7 @@ namespace gdjs {
 
       // Avoid a `_slopeClimbingFactor` set to exactly 0.
       // Otherwise, this can lead the floor finding functions to consider
-      // a floor to be "too high" to reach, even if the object is very slighlty
+      // a floor to be "too high" to reach, even if the object is very slightly
       // inside it, which can happen because of rounding errors.
       // See "Floating-point error mitigations" tests.
       if (this._slopeClimbingFactor < 1 / 1024) {

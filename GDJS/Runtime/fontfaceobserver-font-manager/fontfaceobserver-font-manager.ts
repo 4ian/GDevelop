@@ -6,40 +6,30 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Font manager');
 
-  const checkIfCredentialsRequired = (url: string) => {
-    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-    // i.e: its gdevelop.io cookie, to be passed.
-    // Note that this is only useful during previews.
-    if (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    )
-      return true;
-
-    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-    return false;
-  };
-
   /**
    * FontFaceObserverFontManager loads fonts (using `FontFace` or `fontfaceobserver` library)
    * from the game resources (see `loadFonts`), and allow to access to
    * the font families of the loaded fonts during the game (see `getFontFamily`).
    */
   export class FontFaceObserverFontManager {
-    _resources: any;
+    _resourcesLoader: RuntimeGameResourcesLoader;
+    _resources: ResourceData[];
+    // Associate font resource names to the loaded font family
     _loadedFontFamily: { [key: string]: string } = {};
+    // Associate font resource names to the resources, for faster access
     _loadedFonts: { [key: string]: ResourceData } = {};
     _filenameToFontFamily: { [key: string]: string } = {};
 
     /**
      * @param resources The resources data of the game.
+     * @param resourcesLoader The resources loader of the game.
      */
-    constructor(resources: ResourceData[]) {
+    constructor(
+      resources: ResourceData[],
+      resourcesLoader: RuntimeGameResourcesLoader
+    ) {
       this._resources = resources;
-
-      // Associate font resource names to the loaded font family
-
-      // Associate font resource names to the resources, for faster access
+      this._resourcesLoader = resourcesLoader;
     }
 
     // Cache the result of transforming a filename to a font family - useful to avoid duplicates.
@@ -102,7 +92,7 @@ namespace gdjs {
       }
 
       // Replaces all non-alphanumeric characters with dashes to ensure no issues when
-      // refering to this font family (see https://github.com/4ian/GDevelop/issues/1521).
+      // referring to this font family (see https://github.com/4ian/GDevelop/issues/1521).
       let baseSlugifiedName =
         'gdjs_font_' + filename.toLowerCase().replace(/[^\w]/gi, '-');
 
@@ -128,15 +118,15 @@ namespace gdjs {
      * @param fontFamily The font
      * @returns The font family to be used for this font resource.
      */
-    static _loadFont(fontFamily: string, src): Promise<void> {
+    private _loadFont(fontFamily: string, src): Promise<void> {
       const descriptors = {};
       const srcWithUrl = 'url(' + encodeURI(src) + ')';
 
       // @ts-ignore
       if (typeof FontFace !== 'undefined') {
         // Load the given font using CSS Font Loading API.
-        return fetch(src, {
-          credentials: checkIfCredentialsRequired(src)
+        return fetch(this._resourcesLoader.getFullUrl(src), {
+          credentials: this._resourcesLoader.checkIfCredentialsRequired(src)
             ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
               // i.e: its gdevelop.io cookie, to be passed.
               'include'
@@ -215,32 +205,34 @@ namespace gdjs {
       const totalCount = Object.keys(filesResources).length;
       if (totalCount === 0) {
         return onComplete(
-          //Nothing to load.
+          // Nothing to load.
           totalCount
         );
       }
       let loadingCount = 0;
-      const that = this;
 
-      function onFontLoaded(fontFamily: string, fontResources: ResourceData[]) {
-        fontResources.forEach(function (resource) {
-          that._loadedFontFamily[resource.name] = fontFamily;
-          that._loadedFonts[resource.name] = resource;
+      const onFontLoaded = (
+        fontFamily: string,
+        fontResources: ResourceData[]
+      ) => {
+        fontResources.forEach((resource) => {
+          this._loadedFontFamily[resource.name] = fontFamily;
+          this._loadedFonts[resource.name] = resource;
         });
         loadingCount++;
         onProgress(loadingCount, totalCount);
         if (loadingCount === totalCount) {
           onComplete(totalCount);
         }
-      }
-      Object.keys(filesResources).forEach(function (file) {
-        const fontFamily = that._getFontFamilyFromFilename(file);
+      };
+      Object.keys(filesResources).forEach((file) => {
+        const fontFamily = this._getFontFamilyFromFilename(file);
         const fontResources = filesResources[file];
-        FontFaceObserverFontManager._loadFont(fontFamily, file).then(
-          function () {
+        this._loadFont(fontFamily, file).then(
+          () => {
             onFontLoaded(fontFamily, fontResources);
           },
-          function (error) {
+          (error) => {
             logger.error(
               'Error loading font resource "' +
                 fontResources[0].name +

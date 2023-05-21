@@ -491,7 +491,9 @@ module.exports = {
       .addAction(
         'AddObjectPositionXTween',
         _('Tween object X position'),
-        _('Tweens an object X position from its current X position to a new one.'),
+        _(
+          'Tweens an object X position from its current X position to a new one.'
+        ),
         _(
           'Tween the X position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
@@ -515,6 +517,37 @@ module.exports = {
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectPositionXTween');
+
+    behavior
+      .addAction(
+        'AddObjectPositionZTween',
+        _('Tween object Z position'),
+        _(
+          'Tweens an object Z position (3D objects only) from its current Z position to a new one.'
+        ),
+        _(
+          'Tween the Z position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+        ),
+        _('Position'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('expression', _('To Z'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectPositionZTween');
 
     behavior
       .addAction(
@@ -576,9 +609,42 @@ module.exports = {
 
     behavior
       .addAction(
+        'AddObjectDepthTween',
+        _('Tween object depth'),
+        _(
+          'Tweens an object depth (suitable 3D objects only) from its current depth to a new one.'
+        ),
+        _(
+          'Tween the depth of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+        ),
+        _('Size'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+      .addParameter('expression', _('To depth'), '', false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectDepthTween');
+
+    behavior
+      .addAction(
         'AddObjectPositionYTween',
         _('Tween object Y position'),
-        _('Tweens an object Y position from its current Y position to a new one.'),
+        _(
+          'Tweens an object Y position from its current Y position to a new one.'
+        ),
         _(
           'Tween the Y position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
@@ -855,9 +921,19 @@ module.exports = {
       .addParameter('expression', _('To Hue'), '', false)
       .addParameter('yesorno', _('Animate Hue'), '', false)
       .setDefaultValue('yes')
-      .addParameter('expression', _('To Saturation (-1 to ignore)'), '', false)
+      .addParameter(
+        'expression',
+        _('To Saturation (0 to 100, -1 to ignore)'),
+        '',
+        false
+      )
       .setDefaultValue('-1')
-      .addParameter('expression', _('To Lightness (-1 to ignore)'), '', false)
+      .addParameter(
+        'expression',
+        _('To Lightness (0 to 100, -1 to ignore)'),
+        '',
+        false
+      )
       .setDefaultValue('-1')
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')

@@ -1,8 +1,9 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import { type Game, type GameSlug } from '../../../Utils/GDevelopServices/Game';
+import { type Game } from '../../../Utils/GDevelopServices/Game';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog from '../../../UI/Dialog';
 import {
@@ -22,10 +23,10 @@ type Props = {|
   onSaveProject: () => Promise<void>,
   buildId: string,
   game: Game,
-  slug: ?GameSlug,
   onClose: () => void,
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
+  i18n: I18nType,
 |};
 
 export const OnlineGamePropertiesDialog = ({
@@ -33,10 +34,10 @@ export const OnlineGamePropertiesDialog = ({
   onSaveProject,
   buildId,
   game,
-  slug,
   onClose,
   onApply,
   isLoading,
+  i18n,
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
@@ -50,6 +51,9 @@ export const OnlineGamePropertiesDialog = ({
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     project.getAuthorIds().toJSArray()
   );
+  const [authorUsernames, setAuthorUsernames] = React.useState<string[]>(
+    project.getAuthorUsernames().toJSArray()
+  );
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState<boolean>(
     project.isPlayableWithKeyboard()
   );
@@ -60,10 +64,13 @@ export const OnlineGamePropertiesDialog = ({
     project.isPlayableWithMobile()
   );
   const [userSlug, setUserSlug] = React.useState<string>(
-    (slug && slug.username) || (profile && profile.username) || ''
+    (game.cachedCurrentSlug && game.cachedCurrentSlug.username) ||
+      (profile && profile.username) ||
+      ''
   );
   const [gameSlug, setGameSlug] = React.useState<string>(
-    (slug && slug.gameSlug) || cleanUpGameSlug(project.getName())
+    (game.cachedCurrentSlug && game.cachedCurrentSlug.gameSlug) ||
+      cleanUpGameSlug(project.getName())
   );
   const [orientation, setOrientation] = React.useState<string>(
     project.getOrientation()
@@ -76,11 +83,12 @@ export const OnlineGamePropertiesDialog = ({
   const onPublish = async ({ saveProject }: { saveProject: boolean }) => {
     // First update the project with the new properties.
     if (
-      applyPublicPropertiesToProject(project, {
+      applyPublicPropertiesToProject(project, i18n, {
         name,
         categories: categories || [],
         description: description || '',
         authorIds,
+        authorUsernames,
         playWithKeyboard: !!playWithKeyboard,
         playWithGamepad: !!playWithGamepad,
         playWithMobile: !!playWithMobile,
@@ -140,6 +148,7 @@ export const OnlineGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        setAuthorUsernames={setAuthorUsernames}
         setPlayableWithKeyboard={setPlayableWithKeyboard}
         playWithKeyboard={playWithKeyboard}
         setPlayableWithGamepad={setPlayableWithGamepad}

@@ -38,7 +38,10 @@ struct PreviewExportOptions {
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
-        nonRuntimeScriptsCacheBurst(0){};
+        nonRuntimeScriptsCacheBurst(0),
+        fallbackAuthorId(""),
+        fallbackAuthorUsername(""),
+        allowAuthenticationUsingIframeForPreview(false){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -48,6 +51,17 @@ struct PreviewExportOptions {
       const gd::String &address, const gd::String &port) {
     websocketDebuggerServerAddress = address;
     websocketDebuggerServerPort = port;
+    return *this;
+  }
+
+  /**
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
+   */
+  PreviewExportOptions &SetFallbackAuthor(const gd::String &id,
+                                          const gd::String &username) {
+    fallbackAuthorId = id;
+    fallbackAuthorUsername = username;
     return *this;
   }
 
@@ -69,7 +83,7 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the (optional) external layout to be instanciated in the scene
+   * \brief Set the (optional) external layout to be instantiated in the scene
    * at the beginning of the previewed game.
    */
   PreviewExportOptions &SetExternalLayoutName(
@@ -137,6 +151,30 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * Set the token to use by the game engine when requiring any resource stored
+   * on GDevelop Cloud buckets. Note that this is only useful during previews.
+   */
+  PreviewExportOptions &SetGDevelopResourceToken(
+      const gd::String &gdevelopResourceToken_) {
+    gdevelopResourceToken = gdevelopResourceToken_;
+    return *this;
+  }
+
+  /**
+   * Set if, in some exceptional cases, we allow authentication
+   * to be done through a iframe.
+   * This is usually discouraged as the user can't verify that the
+   * authentication window is a genuine one. It's only to be used in trusted
+   * contexts.
+   */
+  PreviewExportOptions &SetAllowAuthenticationUsingIframeForPreview(
+      bool allowAuthenticationUsingIframeForPreview_) {
+    allowAuthenticationUsingIframeForPreview =
+        allowAuthenticationUsingIframeForPreview_;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String websocketDebuggerServerAddress;
@@ -144,12 +182,60 @@ struct PreviewExportOptions {
   bool useWindowMessageDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
+  gd::String fallbackAuthorUsername;
+  gd::String fallbackAuthorId;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
   bool fullLoadingScreen;
   bool isDevelopmentEnvironment;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
+  gd::String gdevelopResourceToken;
+  bool allowAuthenticationUsingIframeForPreview;
+};
+
+/**
+ * \brief The options used to export a project.
+ */
+struct ExportOptions {
+  /**
+   * \param project_ The project to export
+   * \param exportPath_ The path in the filesystem where to export the files
+   */
+  ExportOptions(gd::Project &project_, const gd::String &exportPath_)
+      : project(project_),
+        exportPath(exportPath_),
+        target(""),
+        fallbackAuthorId(""),
+        fallbackAuthorUsername(""){};
+
+  /**
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
+   */
+  ExportOptions &SetFallbackAuthor(const gd::String &id,
+                                   const gd::String &username) {
+    fallbackAuthorId = id;
+    fallbackAuthorUsername = username;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) target platform.
+   *
+   * \param target_ The target platform (`cordova`, `facebookInstantGames` or
+   * `electron`)
+   */
+  ExportOptions &SetTarget(const gd::String &target_) {
+    target = target_;
+    return *this;
+  }
+
+  gd::Project &project;
+  gd::String exportPath;
+  gd::String target;
+  gd::String fallbackAuthorUsername;
+  gd::String fallbackAuthorId;
 };
 
 /**
@@ -175,7 +261,7 @@ class ExporterHelper {
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
-   * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
+   * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
   static gd::String ExportProjectData(
@@ -202,6 +288,7 @@ class ExporterHelper {
    * \brief Add libraries files to the list of includes.
    */
   void AddLibsInclude(bool pixiRenderers,
+                      bool pixiInThreeRenderers,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       gd::String gdevelopLogoStyle,

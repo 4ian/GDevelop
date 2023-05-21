@@ -18,6 +18,8 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import { ExampleSizeChip } from '../../UI/ExampleSizeChip';
+import { ExampleDifficultyChip } from '../../UI/ExampleDifficultyChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -106,22 +108,45 @@ export const ExampleListItem = ({
     <div style={styles.container} ref={containerRef}>
       <ResponsiveLineStackLayout noMargin expand>
         <ButtonBase style={styles.button} onClick={onChoose} focusRipple>
-          {!!exampleShortHeader.previewImageUrls.length && (
-            <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
-          )}
-          <Column expand>
-            <Text noMargin>{renderExampleField('name')} </Text>
-            {exampleShortHeader.authors && (
-              <Line>
-                {exampleShortHeader.authors.map(author => (
-                  <UserPublicProfileChip user={author} key={author.id} />
-                ))}
-              </Line>
+          <ResponsiveLineStackLayout noMargin expand>
+            {!!exampleShortHeader.previewImageUrls.length && (
+              <Column noMargin>
+                <ExampleThumbnailOrIcon
+                  exampleShortHeader={exampleShortHeader}
+                />
+              </Column>
             )}
-            <Text noMargin size="body2">
-              {renderExampleField('shortDescription')}
-            </Text>
-          </Column>
+            <Column expand noMargin>
+              <Text noMargin>{renderExampleField('name')} </Text>
+              {
+                <Line>
+                  <div style={{ flexWrap: 'wrap' }}>
+                    {exampleShortHeader.difficultyLevel && (
+                      <ExampleDifficultyChip
+                        difficultyLevel={exampleShortHeader.difficultyLevel}
+                      />
+                    )}
+                    {exampleShortHeader.codeSizeLevel && (
+                      <ExampleSizeChip
+                        codeSizeLevel={exampleShortHeader.codeSizeLevel}
+                      />
+                    )}
+                    {exampleShortHeader.authors &&
+                      exampleShortHeader.authors.map(author => (
+                        <UserPublicProfileChip user={author} key={author.id} />
+                      ))}
+                  </div>
+                </Line>
+              }
+              <Text
+                noMargin
+                size="body2"
+                displayInlineAsSpan // Important to avoid the text to use a "p" which causes crashes with automatic translation tools with the highlighted text.
+              >
+                {renderExampleField('shortDescription')}
+              </Text>
+            </Column>
+          </ResponsiveLineStackLayout>
         </ButtonBase>
         <Column noMargin justifyContent="flex-end">
           <Line noMargin justifyContent="flex-end">

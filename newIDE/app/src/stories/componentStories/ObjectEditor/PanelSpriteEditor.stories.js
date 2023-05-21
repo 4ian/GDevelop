@@ -9,8 +9,7 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import PanelSpriteEditor from '../../../ObjectEditor/Editors/PanelSpriteEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
-import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'ObjectEditor/PanelSpriteEditor',
@@ -25,14 +24,10 @@ export const Default = () => (
     <PanelSpriteEditor
       objectConfiguration={testProject.panelSpriteObject.getConfiguration()}
       project={testProject.project}
-      resourceManagementProps={{
-        getStorageProvider: () => emptyStorageProvider,
-        onFetchNewlyAddedResources: async () => {},
-        resourceSources: [],
-        onChooseResource: () => Promise.reject('Unimplemented'),
-        resourceExternalEditors: fakeResourceExternalEditors,
-      }}
+      layout={testProject.testLayout}
+      resourceManagementProps={fakeResourceManagementProps}
       onSizeUpdated={() => {}}
+      object={testProject.panelSpriteObject}
       objectName="FakeObjectName"
     />
   </SerializedObjectDisplay>

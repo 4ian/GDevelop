@@ -1358,7 +1358,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       jumpthru.setPosition(12, -90);
       jumpthru.setCustomWidthAndHeight(60, 20);
 
-      // Add another jumpthu under with a 10 pixels interleave (less than object height).
+      // Add another jumpthru under with a 10 pixels interleave (less than object height).
       bottomJumpthru = addJumpThroughPlatformObject(runtimeScene);
       bottomJumpthru.setPosition(0, -70);
       bottomJumpthru.setCustomWidthAndHeight(60, 20);
@@ -1396,12 +1396,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       jumpthru.setPosition(10, -90);
       jumpthru.setCustomWidthAndHeight(60, 20);
 
-      // Add another jumpthu under with a 10 pixels interleave (less than object height).
+      // Add another jumpthru under with a 10 pixels interleave (less than object height).
       bottomJumpthru = addJumpThroughPlatformObject(runtimeScene);
       bottomJumpthru.setPosition(0, -70);
       bottomJumpthru.setCustomWidthAndHeight(60, 20);
 
-      // The character falls next to the jumthru.
+      // The character falls next to the jumpthru.
       for (let i = 0; i < 8; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
@@ -1783,6 +1783,168 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       behavior.simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
       expect(behavior.isOnFloor()).to.be(true);
+    });
+  });
+
+  describe('(jump from slopes)', function () {
+    /** @type {gdjs.RuntimeScene} */
+    let runtimeScene;
+    /** @type {gdjs.RuntimeObject} */
+    let object;
+    /** @type {gdjs.PlatformerObjectRuntimeBehavior} */
+    let behavior;
+
+    beforeEach(function () {
+      runtimeScene = makePlatformerTestRuntimeScene();
+
+      // Put a platformer object on a platform
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 900,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 500,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+            jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
+          },
+        ],
+        effects: [],
+      });
+      behavior = object.getBehavior('auto1');
+      object.setCustomWidthAndHeight(10, 20);
+      runtimeScene.addObject(object);
+      // The object is in the slope.
+      object.setPosition(0, 70);
+
+      const platform = addUpSlopePlatformObject(runtimeScene);
+      platform.setPosition(0, 0);
+    });
+
+    it('keep its speed on X when jumping while moving up on a slope', function () {
+      // The object stays on the platform.
+      for (let i = 0; i < 5; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getY()).to.within(70, 70 + 1);
+      expect(behavior.isFalling()).to.be(false);
+      expect(behavior.isFallingWithoutJumping()).to.be(false);
+      expect(behavior.isMoving()).to.be(false);
+
+      // Walk and gain speed.
+      for (let i = 0; i < 5; ++i) {
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      const walkingSpeed = behavior.getCurrentSpeed();
+
+      // Jump and keep the speed.
+      behavior.simulateJumpKey();
+      behavior.simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.isJumping()).to.be(true);
+      expect(behavior.getCurrentSpeed()).to.be.greaterThan(walkingSpeed);
+      for (let i = 0; i < 5; ++i) {
+        const oldY = object.getY();
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(behavior.isJumping()).to.be(true);
+        expect(behavior.isFalling()).to.be(false);
+        expect(behavior.getCurrentSpeed()).to.be.greaterThan(walkingSpeed);
+      }
+    });
+  });
+
+  describe('(jump to slopes)', function () {
+    /** @type {gdjs.RuntimeScene} */
+    let runtimeScene;
+    /** @type {gdjs.RuntimeObject} */
+    let object;
+    /** @type {gdjs.PlatformerObjectRuntimeBehavior} */
+    let behavior;
+
+    beforeEach(function () {
+      runtimeScene = makePlatformerTestRuntimeScene();
+
+      // Put a platformer object on a platform
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 900,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 200,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+            jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
+          },
+        ],
+        effects: [],
+      });
+      behavior = object.getBehavior('auto1');
+      object.setCustomWidthAndHeight(10, 20);
+      runtimeScene.addObject(object);
+      // The object is in the slope.
+      object.setPosition(10, -20);
+
+      addPlatformObject(runtimeScene);
+      const platform = addUpSlopePlatformObject(runtimeScene);
+      platform.setPosition(60, -100);
+    });
+
+    it('keep its speed on X when landing on a slope', function () {
+      // The object stays on the platform.
+      for (let i = 0; i < 5; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getY()).to.within(-20, -20 + 1);
+      expect(behavior.isFalling()).to.be(false);
+      expect(behavior.isFallingWithoutJumping()).to.be(false);
+      expect(behavior.isMoving()).to.be(false);
+
+      // Walk and gain speed.
+      for (let i = 0; i < 20; ++i) {
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      const walkingSpeed = behavior.getCurrentSpeed();
+
+      // Jump and keep the speed.
+      behavior.simulateJumpKey();
+      behavior.simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.isJumping()).to.be(true);
+      expect(behavior.getCurrentSpeed()).to.be.greaterThan(100);
+      for (let i = 0; i < 6; ++i) {
+        const oldY = object.getY();
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(behavior.isJumping()).to.be(true);
+        expect(behavior.getCurrentSpeed()).to.be.greaterThan(100);
+      }
+
+      // Land on the slope and keep the speed.
+      behavior.simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.isOnFloor()).to.be(true);
+      expect(behavior.getCurrentSpeed()).to.be.greaterThan(100);
     });
   });
 });

@@ -1,8 +1,10 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -11,6 +13,8 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 export type FileMetadata = {|
   /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
+  /** The version id if the provider supports versioning */
+  version?: string,
   lastModifiedDate?: number,
   name?: string,
   gameId?: string,
@@ -45,6 +49,24 @@ export type FileMetadataAndStorageProviderName = {
   storageProviderName: string,
 };
 
+export type ResourcesActionsProps = {|
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  resource: gdResource,
+  i18n: I18nType,
+  informUser: (
+    ?{|
+      message: React.Node,
+      actionLabel?: React.Node,
+      onActionClick?: () => void,
+    |}
+  ) => void,
+  updateInterface: () => void,
+  cleanUserSelectionOfResources: () => void,
+|};
+
+export type ResourcesActionsMenuBuilder = ResourcesActionsProps => Array<MenuItemTemplate>;
+
 /**
  * Interface returned by a storage provider to manipulate files.
  */
@@ -72,7 +94,8 @@ export type StorageProviderOperations = {|
   // Project saving:
   onSaveProject?: (
     project: gdProject,
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    options?: {| previousVersion: string |}
   ) => Promise<{|
     wasSaved: boolean,
     fileMetadata: FileMetadata,
@@ -135,11 +158,14 @@ export type StorageProvider = {|
     setSaveAsLocation: (?SaveAsLocation) => void,
     newProjectsDefaultFolder?: string,
   |}) => React.Node,
-  createOperations: ({
+  createOperations: ({|
     /** Open a dialog (a render function) */
     setDialog: (() => React.Node) => void,
     /** Close the dialog */
     closeDialog: () => void,
     authenticatedUser: AuthenticatedUser,
-  }) => StorageProviderOperations,
+  |}) => StorageProviderOperations,
+  createResourceOperations?: ({|
+    authenticatedUser: AuthenticatedUser,
+  |}) => ResourcesActionsMenuBuilder,
 |};

@@ -429,7 +429,7 @@ namespace gdjs {
             );
           else {
             // Arrays cannot be hot reloaded.
-            // As indices can change at runtime, and in the IDE, they can be desychronized.
+            // As indices can change at runtime, and in the IDE, they can be desynchronized.
             // It will in that case mess up the whole array,
             // and there is no way to know if that was the case.
             //
@@ -494,7 +494,7 @@ namespace gdjs {
               );
             else {
               // Arrays cannot be hot reloaded.
-              // As indices can change at runtime, and in the IDE, they can be desychronized.
+              // As indices can change at runtime, and in the IDE, they can be desynchronized.
               // It will in that case mess up the whole array,
               // and there is no way to know if that was the case.
               //
@@ -1037,7 +1037,7 @@ namespace gdjs {
     _hotReloadRuntimeLayer(
       oldLayer: LayerData,
       newLayer: LayerData,
-      runtimeLayer: gdjs.Layer
+      runtimeLayer: gdjs.RuntimeLayer
     ): void {
       // Properties
       if (oldLayer.visibility !== newLayer.visibility) {
@@ -1060,7 +1060,19 @@ namespace gdjs {
         }
       }
 
-      // TODO: cameras
+      // Rendering type can't be easily changed at runtime.
+      if (oldLayer.renderingType !== newLayer.renderingType) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not change the rendering type (2D, 3D...) layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
+      if (newLayer.isLightingLayer !== oldLayer.isLightingLayer) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not add/remove a lighting layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
 
       // Effects
       this._hotReloadRuntimeLayerEffects(
@@ -1073,7 +1085,7 @@ namespace gdjs {
     _hotReloadRuntimeLayerEffects(
       oldEffectsData: EffectData[],
       newEffectsData: EffectData[],
-      runtimeLayer: gdjs.Layer
+      runtimeLayer: gdjs.RuntimeLayer
     ): void {
       oldEffectsData.forEach((oldEffectData) => {
         const name = oldEffectData.name;
@@ -1115,7 +1127,7 @@ namespace gdjs {
     _hotReloadRuntimeLayerEffect(
       oldEffectData: EffectData,
       newEffectData: EffectData,
-      runtimeLayer: gdjs.Layer,
+      runtimeLayer: gdjs.RuntimeLayer,
       effectName: string
     ): void {
       // We consider oldEffectData.effectType and newEffectData.effectType

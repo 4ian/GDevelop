@@ -24,11 +24,6 @@ const buttonCommonStyles = {
 };
 
 const textFieldWithButtonLayoutStyles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'flex-start', // Align from the top to stay at the same position when error/multiline
-  },
   filledTextFieldWithLabelRightButtonMargins: {
     ...buttonCommonStyles,
     marginTop: 15, // Properly align with the text field (only dense "filled" text fields supported)
@@ -61,7 +56,11 @@ export const TextFieldWithButtonLayout = ({
   renderButton,
 }: TextFieldWithButtonLayoutProps) => {
   return (
-    <div style={textFieldWithButtonLayoutStyles.container}>
+    <ResponsiveLineStackLayout
+      alignItems="flex-start" // Align from the top to stay at the same position when error/multiline
+      expand
+      noMargin
+    >
       {renderTextField()}
       {renderButton(
         margin === 'none'
@@ -72,7 +71,7 @@ export const TextFieldWithButtonLayout = ({
           ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
           : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
       )}
-    </div>
+    </ResponsiveLineStackLayout>
   );
 };
 

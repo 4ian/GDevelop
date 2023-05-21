@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import {
   Table,
   TableRow,
@@ -9,11 +10,12 @@ import {
   TableHeaderColumn,
 } from '../../../UI/Table';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
-import AddCircle from '@material-ui/icons/AddCircle';
-import Delete from '@material-ui/icons/Delete';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import AddCircle from '../../../UI/CustomSvgIcons/AddCircle';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
+import Warning from '../../../UI/CustomSvgIcons/Warning';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export type Vertex = {|
   x: number,
@@ -107,7 +109,11 @@ const PolygonEditor = ({
               }}
             >
               <TableRowColumn>
-                {!isPolygonConvex(vertices) && <Warning />}
+                {!isPolygonConvex(vertices) && (
+                  <Tooltip title={<Trans>The polygon is not convex</Trans>}>
+                    <Warning />
+                  </Tooltip>
+                )}
               </TableRowColumn>
               <TableRowColumn>
                 <SemiControlledTextField
@@ -133,7 +139,7 @@ const PolygonEditor = ({
               </TableRowColumn>
               <TableRowColumn>
                 <IconButton size="small" onClick={() => onRemove(index)}>
-                  <Delete />
+                  <Trash />
                 </IconButton>
               </TableRowColumn>
             </TableRow>
@@ -144,7 +150,7 @@ const PolygonEditor = ({
           <TableRowColumn />
           <TableRowColumn />
           <TableRowColumn>
-            <IconButton onClick={onAdd}>
+            <IconButton onClick={onAdd} size="small">
               <AddCircle />
             </IconButton>
           </TableRowColumn>

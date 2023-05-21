@@ -5,9 +5,6 @@ import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { differenceInCalendarDays, format } from 'date-fns';
 
-import PhoneIphone from '@material-ui/icons/PhoneIphone';
-import LaptopMac from '@material-ui/icons/LaptopMac';
-
 import { Line, LargeSpacer, Spacer, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
@@ -15,12 +12,15 @@ import Text from '../../UI/Text';
 import InfoBar from '../../UI/Messages/InfoBar';
 import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import BackgroundText from '../../UI/BackgroundText';
-import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../../UI/KeyboardShortcuts/InteractionKeys';
 import { LineStackLayout } from '../../UI/Layout';
 import Card from '../../UI/Card';
 
@@ -37,6 +37,8 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
+import Mobile from '../../UI/CustomSvgIcons/Mobile';
+import Desktop from '../../UI/CustomSvgIcons/Desktop';
 
 const styles = {
   icon: {
@@ -71,9 +73,9 @@ const getIcon = (
 ) => {
   switch (buildType) {
     case 'cordova-build':
-      return <PhoneIphone style={styles.icon} />;
+      return <Mobile style={styles.icon} />;
     case 'electron-build':
-      return <LaptopMac style={styles.icon} />;
+      return <Desktop style={styles.icon} />;
     case 'web-build':
       return <Chrome style={styles.icon} />;
     default:
@@ -95,6 +97,9 @@ const BuildAndCreatedAt = ({ build }: { build: Build }) => (
     </BackgroundText>
   </Line>
 );
+
+const BUILD_NAME_MAX_LENGTH = 50;
+const BUILD_DEFAULT_NAME_TIME_FORMAT = 'yyyy-MM-dd-HH-mm-ss';
 
 type Props = {|
   build: Build,
@@ -120,7 +125,11 @@ export const BuildCard = ({
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const defaultBuildName = `${game.gameName
     .toLowerCase()
-    .replace(/ /g, '-')}-${format(build.updatedAt, 'yyyy-MM-dd-HH-mm-ss')}`;
+    .replace(/ /g, '-')
+    .slice(
+      0,
+      BUILD_NAME_MAX_LENGTH - BUILD_DEFAULT_NAME_TIME_FORMAT.length - 1
+    )}-${format(build.updatedAt, BUILD_DEFAULT_NAME_TIME_FORMAT)}`;
   const buildName = build.name ? build.name : defaultBuildName;
   const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
@@ -135,7 +144,7 @@ export const BuildCard = ({
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 
   const [isEditingName, setIsEditingName] = React.useState(false);
-  const [name, setName] = React.useState(build.name || '');
+  const [name, setName] = React.useState(buildName);
 
   const onCopyUuid = () => {
     navigator.clipboard.writeText(build.id);
@@ -284,7 +293,14 @@ export const BuildCard = ({
                         if (shouldValidate(event) && nameInput.current)
                           nameInput.current.blur();
                       }}
-                      maxLength={50}
+                      onKeyDown={event => {
+                        if (shouldCloseOrCancel(event)) {
+                          event.stopPropagation();
+                          setIsEditingName(false);
+                          setName(buildName);
+                        }
+                      }}
+                      maxLength={BUILD_NAME_MAX_LENGTH}
                     />
                     {gameUpdating && (
                       <>

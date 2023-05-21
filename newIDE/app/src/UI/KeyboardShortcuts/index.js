@@ -15,6 +15,7 @@ const SPACE_KEY = 32;
 const NUMPAD_ADD = 107;
 const NUMPAD_SUBTRACT = 109;
 const C_KEY = 67;
+const D_KEY = 68;
 const F_KEY = 70;
 const V_KEY = 86;
 const X_KEY = 88;
@@ -36,6 +37,7 @@ type ShortcutCallbacks = {|
   onCopy?: () => void,
   onCut?: () => void,
   onPaste?: () => void,
+  onDuplicate?: () => void,
   onUndo?: () => void,
   onRedo?: () => void,
   onSearch?: () => void,
@@ -45,6 +47,7 @@ type ShortcutCallbacks = {|
   onShift1?: () => void,
   onShift2?: () => void,
   onShift3?: () => void,
+  onToggleGrabbingTool?: (isEnabled: boolean) => void,
 |};
 
 type ConstructorArgs = {|
@@ -53,7 +56,7 @@ type ConstructorArgs = {|
 |};
 
 /**
- * Listen to keyboard shorcuts and call callbacks according to them.
+ * Listen to keyboard shortcuts and call callbacks according to them.
  * Also store the state of the modifier keys (shift, ctrl, alt, meta) to know
  * if some special operations (multi selection, selection duplication) must
  * be done.
@@ -106,7 +109,37 @@ export default class KeyboardShortcuts {
     return this._spacePressed || this._mouseMidButtonPressed;
   }
 
-  shouldZoom() {
+  _setSpacePressed(spacePressed: boolean) {
+    const previousShouldMoveView = this.shouldMoveView();
+
+    this._spacePressed = spacePressed;
+
+    this._callOnToggleGrabbingToolIfNeeded(previousShouldMoveView);
+  }
+
+  _setMouseMidButtonPressed(mouseMidButtonPressed: boolean) {
+    const previousShouldMoveView = this.shouldMoveView();
+
+    this._mouseMidButtonPressed = mouseMidButtonPressed;
+
+    this._callOnToggleGrabbingToolIfNeeded(previousShouldMoveView);
+  }
+
+  _callOnToggleGrabbingToolIfNeeded(previousShouldMoveView: boolean) {
+    const shouldMoveView = this.shouldMoveView();
+    if (shouldMoveView !== previousShouldMoveView) {
+      const onToggleGrabbingTool = this._shortcutCallbacks.onToggleGrabbingTool;
+      if (onToggleGrabbingTool) {
+        onToggleGrabbingTool(shouldMoveView);
+      }
+    }
+  }
+
+  shouldZoom(evt: WheelEvent) {
+    // Browsers trigger a wheel event with ctrlKey or metaKey to true when the user
+    // does a pinch gesture on a trackpad. If this is the case, we zoom.
+    // see https://dev.to/danburzo/pinch-me-i-m-zooming-gestures-in-the-dom-a0e
+    if (evt.ctrlKey || evt.metaKey) return true;
     if (isMacLike()) {
       return this._isControlOrCmdPressed();
     } else {
@@ -118,16 +151,48 @@ export default class KeyboardShortcuts {
     }
   }
 
+  shouldIgnoreDoubleClick() {
+    return (
+      this._metaPressed ||
+      this._altPressed ||
+      this._ctrlPressed ||
+      this._shiftPressed
+    );
+  }
+
+  resetModifiers = () => {
+    this._metaPressed = false;
+    this._altPressed = false;
+    this._ctrlPressed = false;
+    this._shiftPressed = false;
+    this._setMouseMidButtonPressed(false);
+    this._setSpacePressed(false);
+  };
+
   _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
+    const hasModifierChanged =
+      this._metaPressed !== evt.metaKey ||
+      this._altPressed !== evt.altKey ||
+      this._ctrlPressed !== evt.ctrlKey ||
+      this._shiftPressed !== evt.shiftKey;
+
     this._metaPressed = evt.metaKey;
     this._altPressed = evt.altKey;
     this._ctrlPressed = evt.ctrlKey;
     this._shiftPressed = evt.shiftKey;
+
+    return hasModifierChanged;
   };
 
   _updateSpecialKeysStatus = (evt: KeyboardEvent, isDown: boolean) => {
     if (evt.which === SPACE_KEY) {
-      this._spacePressed = isDown;
+      if (this._shortcutCallbacks.onToggleGrabbingTool) {
+        // Prevent scrolling in the rest of the UI when the grab tool is used.
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+
+      this._setSpacePressed(isDown);
     }
   };
 
@@ -138,15 +203,15 @@ export default class KeyboardShortcuts {
 
   onMouseDown = (evt: MouseEvent) => {
     if (evt.button === MID_MOUSE_BUTTON) {
-      this._mouseMidButtonPressed = true;
+      this._setMouseMidButtonPressed(true);
     } else {
-      this._mouseMidButtonPressed = false;
+      this._setMouseMidButtonPressed(false);
     }
   };
 
   onMouseUp = (evt: MouseEvent) => {
     if (evt.button === MID_MOUSE_BUTTON) {
-      this._mouseMidButtonPressed = false;
+      this._setMouseMidButtonPressed(false);
     }
   };
 
@@ -178,6 +243,7 @@ export default class KeyboardShortcuts {
       onCopy,
       onCut,
       onPaste,
+      onDuplicate,
       onUndo,
       onRedo,
       onSearch,
@@ -219,6 +285,10 @@ export default class KeyboardShortcuts {
     if (onPaste && this._isControlOrCmdPressed() && evt.which === V_KEY) {
       evt.preventDefault();
       onPaste();
+    }
+    if (onDuplicate && this._isControlOrCmdPressed() && evt.which === D_KEY) {
+      evt.preventDefault();
+      onDuplicate();
     }
     if (
       (onUndo || onRedo) &&

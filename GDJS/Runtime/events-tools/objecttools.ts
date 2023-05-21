@@ -488,7 +488,7 @@ namespace gdjs {
         x: float,
         y: float,
         layerName: string
-      ) {
+      ): gdjs.RuntimeObject | null {
         // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
         // eventsFunctionContext. We can't directly use runtimeScene because the object name could
         // be different than the real object name (this is the case in a function. The eventsFunctionContext
@@ -506,6 +506,7 @@ namespace gdjs {
             objectsLists.get(objectName).push(obj);
           }
         }
+        return obj;
       };
 
       /**
@@ -517,8 +518,8 @@ namespace gdjs {
         x: float,
         y: float,
         layerName: string
-      ) {
-        gdjs.evtTools.object.doCreateObjectOnScene(
+      ): gdjs.RuntimeObject | null {
+        return gdjs.evtTools.object.doCreateObjectOnScene(
           objectsContext,
           objectsLists.firstKey() as string,
           objectsLists,

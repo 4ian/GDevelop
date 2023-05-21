@@ -27,6 +27,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/create24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Movement using forces"))
       .SetIcon("res/actions/force24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
+      .SetIcon("res/conditions/var24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Position"))
+      .SetIcon("res/actions/position24_black.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -406,8 +410,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("ModVarObjet",
-                _("Value of an object variable"),
-                _("Change the value of an object variable."),
+                _("Change number variable"),
+                _("Modify the number value of an object variable."),
                 _("the variable _PARAM1_"),
                 _("Variables"),
                 "res/actions/var24.png",
@@ -419,8 +423,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                      ParameterOptions::MakeNewOptions());
 
   obj.AddAction("ModVarObjetTxt",
-                _("Text of an object variable"),
-                _("Change the text of an object variable."),
+                _("Change text variable"),
+                _("Modify the text of an object variable."),
                 _("the text of variable _PARAM1_"),
                 _("Variables"),
                 "res/actions/var24.png",
@@ -432,8 +436,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                                      ParameterOptions::MakeNewOptions());
 
   obj.AddAction("SetObjectVariableAsBoolean",
-                _("Boolean value of an object variable"),
-                _("Change the boolean value of an object variable."),
+                _("Change boolean variable"),
+                _("Modify the boolean value of an object variable."),
                 _("Set the boolean value of variable _PARAM1_ of "
                   "_PARAM0_ to _PARAM2_"),
                 _("Variables"),
@@ -446,7 +450,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "ToggleObjectVariableAsBoolean",
-         _("Toggle the boolean value of an object variable"),
+         _("Toggle boolean variable"),
          _("Toggles the boolean value of an object variable.") + "\n" +
              _("If it was true, it will become false, and if it was false "
                "it will become true."),
@@ -461,37 +465,39 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("ObjectVariableChildExists",
                    _("Child existence"),
-                   _("Check if the specified child of the variable exists."),
+                   _("Check if the specified child of the object "
+                     "structure variable exists."),
                    _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
-                   _("Variables/Collections/Structures"),
+                   _("Variables/Arrays and structures"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Structure variable"))
       .AddParameter("string", _("Name of the child"))
       .MarkAsAdvanced();
 
   obj.AddAction("ObjectVariableRemoveChild",
                 _("Remove a child"),
-                _("Remove a child from an object variable."),
+                _("Remove a child from an object structure variable."),
                 _("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Collections/Structures"),
+                _("Variables/Arrays and structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
       .MarkAsAdvanced();
 
   obj.AddAction("ObjectVariableClearChildren",
-                _("Clear variable"),
-                _("Remove all the children from the object variable."),
+                _("Clear children"),
+                _("Remove all the children from the object array or structure "
+                  "variable."),
                 _("Clear children from variable _PARAM1_ of _PARAM0_"),
-                _("Variables/Collections"),
+                _("Variables/Arrays and structures"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Array or structure variable"))
       .MarkAsAdvanced();
 
   obj.AddAction("Cache",
@@ -619,8 +625,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddCondition("VarObjet",
-                   _("Value of an object variable"),
-                   _("Compare the value of an object variable."),
+                   _("Number variable"),
+                   _("Compare the number value of an object variable."),
                    _("the variable _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
@@ -632,7 +638,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number", ParameterOptions::MakeNewOptions());
 
   obj.AddCondition("VarObjetTxt",
-                   _("Text of an object variable"),
+                   _("Text variable"),
                    _("Compare the text of an object variable."),
                    _("the text of variable _PARAM1_"),
                    _("Variables"),
@@ -645,7 +651,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "string", ParameterOptions::MakeNewOptions());
 
   obj.AddCondition("ObjectVariableAsBoolean",
-                   _("Boolean value of an object variable"),
+                   _("Boolean variable"),
                    _("Compare the boolean value of an object variable."),
                    _("The boolean value of variable _PARAM1_ of object "
                      "_PARAM0_ is _PARAM2_"),
@@ -659,7 +665,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("VarObjetDef",
                    "Variable defined",
-                   "Check if the variable is defined.",
+                   "Check if the object variable is defined.",
                    "Variable _PARAM1 of _PARAM0_ is defined",
                    _("Variables"),
                    "res/conditions/var24.png",
@@ -667,77 +673,130 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Variable"))
-      .SetHidden();
+      .SetHidden();  // Deprecated.
 
   obj.AddAction(
          "ObjectVariablePush",
-         _("Append variable to an object array"),
-         _("Appends a variable to the end of an object array variable."),
-         _("Append variable _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Collections/Arrays"),
+         _("Add existing variable"),
+         _("Adds an existing variable to the end of an object array variable."),
+         _("Add variable _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("scenevar", _("Scene variable with the content to append"))
-      .SetParameterLongDescription(
-          _("The content of the variable will *be copied* and appended at the "
-            "end of the array."))
+      .AddParameter("scenevar", _("Scene variable with the content to add"))
+      .SetParameterLongDescription(_("The content of the object variable will "
+                                     "*be copied* and added at the "
+                                     "end of the array."))
       .MarkAsAdvanced();
 
   obj.AddAction(
          "ObjectVariablePushString",
-         _("Append a string to an object array"),
-         _("Appends a string to the end of an object array variable."),
-         _("Append string _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Collections/Arrays"),
+         _("Add text variable"),
+         _("Adds a text (string) to the end of an object array variable."),
+         _("Add text _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("string", _("String to append"))
+      .AddParameter("string", _("Text to add"))
       .MarkAsAdvanced();
 
-  obj.AddAction(
-         "ObjectVariablePushNumber",
-         _("Append a number to an object array"),
-         _("Appends a number to the end of an object array variable."),
-         _("Append number _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Collections/Arrays"),
-         "res/actions/var24.png",
-         "res/actions/var.png")
+  obj.AddAction("ObjectVariablePushNumber",
+                _("Add number variable"),
+                _("Adds a number to the end of an object array variable."),
+                _("Add number _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+                _("Variables/Arrays and structures"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("expression", _("Number to append"))
+      .AddParameter("expression", _("Number to add"))
       .MarkAsAdvanced();
 
   obj.AddAction(
          "ObjectVariablePushBool",
-         _("Append a boolean to an object array"),
-         _("Appends a boolean to the end of an object array variable."),
-         _("Append boolean _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
-         _("Variables/Collections/Arrays"),
+         _("Add boolean variable"),
+         _("Adds a boolean to the end of an object array variable."),
+         _("Add boolean _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
-      .AddParameter("trueorfalse", _("Boolean to append"))
+      .AddParameter("trueorfalse", _("Boolean to add"))
       .MarkAsAdvanced();
 
   obj.AddAction(
          "ObjectVariableRemoveAt",
-         _("Remove variable from an object array (by index)"),
+         _("Remove variable by index"),
          _("Removes a variable at the specified index of an object array "
            "variable."),
          _("Remove variable at index _PARAM2_ from array variable _PARAM1_ of "
            "_PARAM0_"),
-         _("Variables/Collections/Arrays"),
+         _("Variables/Arrays and structures"),
          "res/actions/var24.png",
          "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("objectvar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
+
+  obj.AddCondition(
+         "ObjectVariableChildCount",
+         _("Number of children"),
+         _("Compare the number of children in an object array variable."),
+         _("The number of children in the array variable _PARAM1_"),
+         _("Variables/Arrays and structures"),
+         "res/conditions/var24.png",
+         "res/conditions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
+
+  obj.AddStrExpression(
+         "ArrayVariableFirstString",
+         _("First text child"),
+         _("Get the value of the first element of an object array variable, if "
+           "it is a text (string) variable."),
+         _("Variables/Arrays and structures"),
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"));
+
+  obj.AddExpression(
+         "ArrayVariableFirstNumber",
+         _("First number child"),
+         _("Get the value of the first element of an object array variable, if "
+           "it is a number variable."),
+         _("Variables/Arrays and structures"),
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"));
+
+  obj.AddStrExpression(
+         "ArrayVariableLastString",
+         _("Last text child"),
+         _("Get the value of the last element of an object array variable, if "
+           "it is a text (string) variable."),
+         _("Variables/Arrays and structures"),
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"));
+
+  obj.AddExpression(
+         "ArrayVariableLastNumber",
+         _("Last number child"),
+         _("Get the value of the last element of an object array variable, if "
+           "it is a number variable."),
+         _("Variables/Arrays and structures"),
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"));
 
   obj.AddCondition("BehaviorActivated",
                    _("Behavior activated"),
@@ -1115,23 +1174,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target Y position"));
 
   obj.AddExpression("Variable",
-                    _("Value of an object variable"),
-                    _("Value of an object variable"),
+                    _("Number variable"),
+                    _("Number value of an object variable"),
                     _("Variables"),
                     "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"));
 
-  obj.AddExpression("VariableChildCount",
-                    _("Number of children of an object variable"),
-                    _("Number of children of an object variable"),
-                    _("Variables"),
-                    "res/actions/var.png")
+  obj.AddExpression(
+         "VariableChildCount",
+         _("Number of children"),
+         _("Number of children in an object array or structure variable"),
+         _("Variables/Arrays and structures"),
+         "res/actions/var.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"));
+      .AddParameter("objectvar", _("Array or structure variable"));
 
   obj.AddStrExpression("VariableString",
-                       _("Text of an object variable"),
+                       _("Text variable"),
                        _("Text of an object variable"),
                        _("Variables"),
                        "res/actions/var.png")
@@ -1265,6 +1325,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple()
       .SetRequiresBaseObjectCapability("effect");
 
+  obj.AddAction("SetIncludedInParentCollisionMask",
+                _("Include in parent collision mask"),
+                _("Include or exclude a child from its parent collision mask."),
+                _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
+                _("Collision"),
+                "res/function32.png",
+                "res/function32.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("yesorno", "Include in parent collision mask")
+      .SetRelevantForCustomObjectEventsOnly();
+
   extension
       .AddAction("Create",
                  _("Create an object"),
@@ -1278,7 +1349,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectListOrEmptyIfJustDeclared", _("Object to create"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .MarkAsSimple();
 
@@ -1293,7 +1364,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  "res/actions/create24.png",
                  "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
-      .AddParameter("objectListOrEmptyIfJustDeclared", _("Group of potential objects"))
+      .AddParameter("objectListOrEmptyIfJustDeclared",
+                    _("Group of potential objects"))
       .SetParameterLongDescription(
           _("Group containing objects that can be created by the action."))
       .AddParameter("string", _("Name of the object to create"))
@@ -1302,7 +1374,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "with this name are found in the group, no object will be created."))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
@@ -1332,7 +1404,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Objects"),
           "res/actions/ajouthasard24.png",
           "res/actions/ajouthasard.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
 
@@ -1391,7 +1463,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Objects"),
           "res/conditions/add24.png",
           "res/conditions/add.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsAdvanced();
 
@@ -1406,7 +1478,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Objects"),
           "res/conditions/ajouthasard24.png",
           "res/conditions/ajouthasard.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
 
@@ -1516,7 +1588,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "Raycast",
           _("Raycast"),
           _("Sends a ray from the given source position and angle, "
-            "intersecting the closest object.\nThe instersected "
+            "intersecting the closest object.\nThe intersected "
             "object will become the only one taken into account.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),
@@ -1547,7 +1619,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "RaycastToPosition",
           _("Raycast to position"),
           _("Sends a ray from the given source position to the final point, "
-            "intersecting the closest object.\nThe instersected "
+            "intersecting the closest object.\nThe intersected "
             "object will become the only one taken into account.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),

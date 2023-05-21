@@ -9,6 +9,7 @@ export type PreviewOptions = {|
   hotReload: boolean,
   projectDataOnlyExport: boolean,
   fullLoadingScreen: boolean,
+  fallbackAuthor: ?{ id: string, username: string },
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
 |};
@@ -33,6 +34,10 @@ export type PreviewDebuggerServerCallbacks = {|
   onConnectionOpened: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
+  |}) => void,
+  onConnectionErrored: ({|
+    id: DebuggerId,
+    errorMessage: string,
   |}) => void,
   onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
 |};
@@ -67,6 +72,7 @@ export type PreviewLauncherInterface = {
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
   canDoHotReload: () => boolean,
+  +closePreview?: (windowId: number) => void,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 

@@ -9,7 +9,8 @@ type TextSize =
   | 'block-title'
   | 'sub-title'
   | 'body'
-  | 'body2';
+  | 'body2'
+  | 'body-small';
 
 type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
@@ -46,6 +47,9 @@ type Props = {|
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
 
+    // Allow user to select text
+    userSelect?: 'text',
+
     // Allow to expand the text
     flex?: 1,
 
@@ -70,6 +74,8 @@ const getVariantFromSize = (size: ?TextSize) => {
       return 'h5';
     case 'body2':
       return 'body2';
+    case 'body-small':
+      return 'caption';
     case 'body':
     default:
       return 'body1';
@@ -115,7 +121,7 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={getVariantFromSize(size)}
       ref={ref}
-      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+      translate={allowBrowserAutoTranslate ? undefined : 'no'}
       color={getTextColorFromColor(color)}
       component={
         displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined

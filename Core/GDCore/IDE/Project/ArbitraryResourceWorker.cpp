@@ -45,6 +45,11 @@ void ArbitraryResourceWorker::ExposeTileset(gd::String& tilesetName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeModel3D(gd::String& resourceName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -66,7 +71,7 @@ void ArbitraryResourceWorker::ExposeAudio(gd::String& audioName) {
     }
   }
 
-  // For compatibility with older projects (where events were refering to files
+  // For compatibility with older projects (where events were referring to files
   // directly), we consider that this resource name is a filename, and so expose
   // it as a file.
   ExposeFile(audioName);
@@ -83,7 +88,7 @@ void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
     }
   }
 
-  // For compatibility with older projects (where events were refering to files
+  // For compatibility with older projects (where events were referring to files
   // directly), we consider that this resource name is a filename, and so expose
   // it as a file.
   ExposeFile(fontName);
@@ -146,6 +151,8 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
             ExposeTileset(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "video") {
             ExposeVideo(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "model3D") {
+            ExposeModel3D(potentiallyUpdatedTargetResourceName);
           }
 
           if (potentiallyUpdatedTargetResourceName != targetResourceName) {
@@ -232,6 +239,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
           } else if (parameterMetadata.GetType() == "tilesetResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeTileset(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "model3DResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeModel3D(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });

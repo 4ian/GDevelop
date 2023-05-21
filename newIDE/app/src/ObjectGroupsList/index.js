@@ -25,6 +25,9 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { Column, Line } from '../UI/Grid';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -50,12 +53,13 @@ type Props = {|
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
-  canRenameGroup: (newName: string) => boolean,
+  canRenameGroup: (newName: string, global: boolean) => boolean,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
     newName: string,
     cb: Function
   ) => void,
+  beforeSetAsGlobalGroup?: (groupName: string) => boolean,
   onGroupAdded?: () => void,
   onGroupRemoved?: () => void,
   onGroupRenamed?: () => void,
@@ -125,8 +129,21 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       this.props.onGroupAdded();
     }
 
-    // A new group is not global by default. We focus it so the user can edit the name directly.
-    this._onEditName({ group: newObjectGroup, global: false });
+    const groupWithContext: GroupWithContext = {
+      group: newObjectGroup,
+      global: false, // A new group is not global by default.
+    };
+
+    // Scroll to the new group.
+    // Ideally, we'd wait for the list to be updated to scroll, but
+    // to simplify the code, we just wait a few ms for a new render
+    // to be done.
+    setTimeout(() => {
+      this.scrollToItem(groupWithContext);
+    }, 100); // A few ms is enough for a new render to be done.
+
+    // We focus it so the user can edit the name directly.
+    this._onEditName(groupWithContext);
   };
 
   _onDelete = (groupWithContext: GroupWithContext) => {
@@ -197,7 +214,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
-    const { group } = groupWithContext;
+    const { group, global } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
     this.setState({
@@ -213,7 +230,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return;
     }
 
-    if (this.props.canRenameGroup(newName)) {
+    if (this.props.canRenameGroup(newName, global)) {
       this.props.onRenameGroup(groupWithContext, newName, doRename => {
         if (!doRename) return;
 
@@ -227,22 +244,34 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     }
   };
 
-  _setAsGlobalGroup = (groupWithContext: GroupWithContext) => {
+  _setAsGlobalGroup = (i18n: I18nType, groupWithContext: GroupWithContext) => {
     const { group } = groupWithContext;
-    const { globalObjectGroups, objectGroups } = this.props;
+    const {
+      globalObjectGroups,
+      objectGroups,
+      beforeSetAsGlobalGroup,
+    } = this.props;
 
     const groupName = group.getName();
 
     if (globalObjectGroups.has(groupName)) {
       showWarningBox(
-        'A global object with this name already exists. Please change the object name before setting it as a global object',
+        i18n._(
+          t`A global object with this name already exists. Please change the object name before setting it as a global object`
+        ),
         { delayToNextTick: true }
       );
       return;
     }
 
+    if (beforeSetAsGlobalGroup && !beforeSetAsGlobalGroup(groupName)) {
+      return;
+    }
+
     const answer = Window.showConfirmDialog(
-      "This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?"
+      i18n._(
+        t`This group will be loaded and available in all the scenes. This is only recommended for groups that you reuse a lot and can't be undone. Make this group global?`
+      )
     );
     if (!answer) return;
 
@@ -277,6 +306,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     }
 
     return false;
+  };
+
+  _selectGroup = (groupWithContext: ?GroupWithContext) => {
+    this.setState({
+      selectedGroupWithContext: groupWithContext,
+    });
   };
 
   _moveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
@@ -349,7 +384,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     {
       label: i18n._(t`Set as global group`),
       enabled: !isGroupWithContextGlobal(groupWithContext),
-      click: () => this._setAsGlobalGroup(groupWithContext),
+      click: () => this._setAsGlobalGroup(i18n, groupWithContext),
       visible: this.props.canSetAsGlobalGroup !== false,
     },
     {
@@ -362,6 +397,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       click: this.addGroup,
     },
   ];
+
+  scrollToItem = (groupWithContext: GroupWithContext) => {
+    if (this.sortableList) {
+      this.sortableList.scrollToItem(groupWithContext);
+    }
+  };
 
   render() {
     const { globalObjectGroups, objectGroups } = this.props;
@@ -400,6 +441,20 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search object groups`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -419,15 +474,12 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                     onEditItem={groupWithContext =>
                       this.props.onEditGroup(groupWithContext.group)
                     }
-                    onAddNewItem={this.addGroup}
-                    addNewItemLabel={<Trans>Add a new group</Trans>}
-                    addNewItemId="add-new-group-button"
-                    selectedItems={[]}
-                    onItemSelected={groupWithContext => {
-                      this.setState({
-                        selectedGroupWithContext: groupWithContext,
-                      });
-                    }}
+                    selectedItems={
+                      this.state.selectedGroupWithContext
+                        ? [this.state.selectedGroupWithContext]
+                        : []
+                    }
+                    onItemSelected={this._selectGroup}
                     renamedItem={renamedGroupWithContext}
                     onRename={this._onRename}
                     buildMenuTemplate={this._renderGroupMenuTemplate(i18n)}
@@ -440,17 +492,17 @@ export default class GroupsListContainer extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          aspect="integrated-search-bar"
-          placeholder={t`Search object groups`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new group</Trans>}
+              primary
+              onClick={this.addGroup}
+              id="add-new-group-button"
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
       </Background>
     );
   }

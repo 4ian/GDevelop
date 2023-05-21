@@ -45,6 +45,9 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { Column, Line } from '../UI/Grid';
+import ResponsiveRaisedButton from '../UI/ResponsiveRaisedButton';
+import Add from '../UI/CustomSvgIcons/Add';
 
 const gd: libGDevelop = global.gd;
 
@@ -123,12 +126,15 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
+  beforeSetAsGlobalObject?: (groupName: string) => boolean,
+  canSetAsGlobalObject?: boolean,
+
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onExportObject: (object: gdObject) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
-  canRenameObject: (newName: string) => boolean,
+  canRenameObject: (newName: string, global: boolean) => boolean,
   onAddObjectInstance: (objectName: string) => void,
 
   getThumbnail: (
@@ -157,6 +163,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectTags,
       getAllObjectTags,
       onChangeSelectedObjectTags,
+
+      beforeSetAsGlobalObject,
+      canSetAsGlobalObject,
 
       onEditObject,
       onExportObject,
@@ -227,13 +236,25 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         object.setTags(getStringFromTags(selectedObjectTags));
 
+        const objectWithContext: ObjectWithContext = {
+          object,
+          global: false, // A new object is always added to the scene (layout) by default.
+        };
+
+        // Scroll to the new object.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          scrollToItem(objectWithContext);
+        }, 100); // A few ms is enough for a new render to be done.
+
         setNewObjectDialogOpen(false);
         // TODO Should it be called later?
         if (onEditObject) {
           onEditObject(object);
           onObjectCreated(object);
-          // For now, a new object is always added to the scene (layout)
-          onObjectSelected(/* objectWithContext= */ { object, global: false });
+          onObjectSelected(objectWithContext);
         }
       },
       [
@@ -284,7 +305,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         // It's important to call onDeleteObject, because the parent might
         // have to do some refactoring/clean up work before the object is deleted
-        // (typically, the SceneEditor will remove instances refering to the object,
+        // (typically, the SceneEditor will remove instances referring to the object,
         // leading to the removal of their renderer - which can keep a reference to
         // the object).
         onDeleteObject(objectWithContext, doRemove => {
@@ -439,12 +460,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
-        const { object } = objectWithContext;
+        const { object, global } = objectWithContext;
         onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
-        if (canRenameObject(newName)) {
+        if (canRenameObject(newName, global)) {
           onRenameObjectFinish(objectWithContext, newName, doRename => {
             if (!doRename) return;
 
@@ -460,6 +481,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFinish,
       ]
     );
+
+    const scrollToItem = (objectWithContext: ObjectWithContext) => {
+      if (sortableList.current) {
+        sortableList.current.scrollToItem(objectWithContext);
+      }
+    };
 
     const lists = enumerateObjects(project, objectsContainer);
     const displayedObjectWithContextsList = filterObjectsList(
@@ -586,7 +613,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     );
 
     const setAsGlobalObject = React.useCallback(
-      (objectWithContext: ObjectWithContext) => {
+      (i18n: I18nType, objectWithContext: ObjectWithContext) => {
         const { object } = objectWithContext;
 
         const objectName: string = object.getName();
@@ -594,14 +621,22 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
         if (project.hasObjectNamed(objectName)) {
           showWarningBox(
-            'A global object with this name already exists. Please change the object name before setting it as a global object',
+            i18n._(
+              t`A global object with this name already exists. Please change the object name before setting it as a global object`
+            ),
             { delayToNextTick: true }
           );
           return;
         }
 
+        if (beforeSetAsGlobalObject && !beforeSetAsGlobalObject(objectName)) {
+          return;
+        }
+
         const answer = Window.showConfirmDialog(
-          "This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?"
+          i18n._(
+            t`This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?`
+          )
         );
         if (!answer) return;
 
@@ -615,7 +650,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         );
         onObjectModified(true);
       },
-      [objectsContainer, onObjectModified, project]
+      [objectsContainer, onObjectModified, project, beforeSetAsGlobalObject]
     );
 
     const openEditTagDialog = React.useCallback(
@@ -725,18 +760,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Set as global object`),
             enabled: !isObjectWithContextGlobal(objectWithContext),
-            click: () => setAsGlobalObject(objectWithContext),
+            click: () => setAsGlobalObject(i18n, objectWithContext),
+            visible: canSetAsGlobalObject !== false,
           },
           {
             label: i18n._(t`Tags`),
             submenu: buildTagsMenuTemplate({
-              noTagLabel: 'No tags',
+              noTagLabel: i18n._(t`No tags`),
               getAllTags: getAllObjectTags,
               selectedTags: getTagsFromString(object.getTags()),
               onChange: objectTags => {
                 changeObjectTags(object, objectTags);
               },
-              editTagsLabel: 'Add/edit tags...',
+              editTagsLabel: i18n._(t`Add/edit tags...`),
               onEditTags: () => openEditTagDialog(object),
             }),
           },
@@ -787,6 +823,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         setAsGlobalObject,
         eventsFunctionsExtensionWriter,
         preferences.values.userShortcutMap,
+        canSetAsGlobalObject,
       ]
     );
 
@@ -799,6 +836,16 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     return (
       <Background maxWidth>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text => setSearchText(text)}
+              placeholder={t`Search objects`}
+            />
+          </Column>
+        </Line>
         <TagChips
           tags={selectedObjectTags}
           onChange={onChangeSelectedObjectTags}
@@ -827,9 +874,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     onEditItem={objectWithContext =>
                       onEditObject(objectWithContext.object)
                     }
-                    onAddNewItem={onAddNewObject}
-                    addNewItemLabel={<Trans>Add a new object</Trans>}
-                    addNewItemId="add-new-object-button"
                     selectedItems={selectedObjects}
                     onItemSelected={selectObject}
                     renamedItem={displayedRenamedObjectWithContext}
@@ -845,29 +889,28 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text => setSearchText(text)}
-          aspect="integrated-search-bar"
-          placeholder={t`Search objects`}
-        />
+        <Line>
+          <Column expand>
+            <ResponsiveRaisedButton
+              label={<Trans>Add a new object</Trans>}
+              primary
+              onClick={onAddNewObject}
+              id="add-new-object-button"
+              icon={<Add />}
+            />
+          </Column>
+        </Line>
         {newObjectDialogOpen && (
-          <I18n>
-            {({ i18n }) => (
-              <NewObjectDialog
-                onClose={() => setNewObjectDialogOpen(false)}
-                onCreateNewObject={addObject}
-                onObjectsAddedFromAssets={onObjectsAddedFromAssets}
-                project={project}
-                layout={layout}
-                objectsContainer={objectsContainer}
-                resourceManagementProps={resourceManagementProps}
-                canInstallPrivateAsset={canInstallPrivateAsset}
-                i18n={i18n}
-              />
-            )}
-          </I18n>
+          <NewObjectDialog
+            onClose={() => setNewObjectDialogOpen(false)}
+            onCreateNewObject={addObject}
+            onObjectsAddedFromAssets={onObjectsAddedFromAssets}
+            project={project}
+            layout={layout}
+            objectsContainer={objectsContainer}
+            resourceManagementProps={resourceManagementProps}
+            canInstallPrivateAsset={canInstallPrivateAsset}
+          />
         )}
         {tagEditedObject && (
           <EditTagsDialog

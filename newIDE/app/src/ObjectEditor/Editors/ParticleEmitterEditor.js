@@ -57,15 +57,12 @@ export default class ParticleEmitterEditor extends React.Component<
         >
           <SelectOption
             value={gd.ParticleEmitterObject.Point}
-            primaryText={t`Circle`}
+            label={t`Circle`}
           />
-          <SelectOption
-            value={gd.ParticleEmitterObject.Line}
-            primaryText={t`Line`}
-          />
+          <SelectOption value={gd.ParticleEmitterObject.Line} label={t`Line`} />
           <SelectOption
             value={gd.ParticleEmitterObject.Quad}
-            primaryText={t`Image`}
+            label={t`Image`}
           />
         </SelectField>
         {particleEmitterConfiguration.getRendererType() ===
@@ -458,6 +455,23 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getParticleAngle2()}
             onChange={value => {
               particleEmitterConfiguration.setParticleAngle2(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Jump forward in time on creation (in seconds)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterConfiguration.getJumpForwardInTimeOnCreation()}
+            onChange={value => {
+              particleEmitterConfiguration.setJumpForwardInTimeOnCreation(
+                parseFloat(value)
+              );
               this.forceUpdate();
             }}
           />

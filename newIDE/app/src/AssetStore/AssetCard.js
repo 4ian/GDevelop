@@ -36,6 +36,7 @@ const styles = {
   cardContainer: {
     overflow: 'hidden',
     position: 'relative',
+    borderRadius: 8,
   },
   titleContainer: {
     position: 'absolute',
@@ -57,12 +58,18 @@ const styles = {
 };
 
 type Props = {|
+  id?: string,
   size: number,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: () => void,
 |};
 
-export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
+export const AssetCard = ({
+  id,
+  assetShortHeader,
+  onOpenDetails,
+  size,
+}: Props) => {
   const previewImageUrl = assetShortHeader.previewImageUrls[0];
   const isPrivate = isPrivateAsset(assetShortHeader);
   const style = {
@@ -75,7 +82,10 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
   };
   return (
     <ButtonBase onClick={onOpenDetails} focusRipple>
-      <div style={{ ...styles.cardContainer, width: size, height: size }}>
+      <div
+        id={id}
+        style={{ ...styles.cardContainer, width: size, height: size }}
+      >
         <div style={{ ...styles.previewContainer, width: size, height: size }}>
           <CheckeredBackground />
           {isPrivate ? (

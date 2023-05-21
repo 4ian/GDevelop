@@ -19,6 +19,7 @@ export const UserPublicProfileChip = () => (
       username: 'username',
       description: 'something',
       donateLink: 'https://myurl.com',
+      communityLinks: {},
     }}
   />
 );

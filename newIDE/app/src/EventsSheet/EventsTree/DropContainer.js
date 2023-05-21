@@ -10,7 +10,7 @@ import {
 } from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
 const sharedStyles = {
   dropArea: { zIndex: 1, position: 'absolute' },

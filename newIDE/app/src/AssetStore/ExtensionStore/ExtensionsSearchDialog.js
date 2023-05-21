@@ -5,7 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import CloudDownload from '@material-ui/icons/CloudDownload';
 import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
@@ -17,7 +16,9 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
-import Add from '@material-ui/icons/Add';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Download from '../../UI/CustomSvgIcons/Download';
+import Add from '../../UI/CustomSvgIcons/Add';
 
 type Props = {|
   project: gdProject,
@@ -37,6 +38,7 @@ export default function ExtensionsSearchDialog({
   onExtensionInstalled,
   onCreateNew,
 }: Props) {
+  const windowWidth = useResponsiveWindowWidth();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -110,9 +112,15 @@ export default function ExtensionsSearchDialog({
             <HelpButton key="help" helpPagePath="/extensions/search" />,
             eventsFunctionsExtensionOpener ? (
               <FlatButton
-                leftIcon={<CloudDownload />}
+                leftIcon={<Download />}
                 key="import"
-                label={<Trans>Import extension</Trans>}
+                label={
+                  windowWidth === 'small' ? (
+                    <Trans>Import</Trans>
+                  ) : (
+                    <Trans>Import extension</Trans>
+                  )
+                }
                 onClick={() => {
                   installOrImportExtension(i18n);
                 }}
@@ -123,7 +131,13 @@ export default function ExtensionsSearchDialog({
               <FlatButton
                 key="create-new"
                 onClick={onCreateNew}
-                label={<Trans>Create a new extension</Trans>}
+                label={
+                  windowWidth === 'small' ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create a new extension</Trans>
+                  )
+                }
                 leftIcon={<Add />}
               />
             ) : null,

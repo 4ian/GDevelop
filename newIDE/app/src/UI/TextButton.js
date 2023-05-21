@@ -52,7 +52,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="text"
         size="small"
-        translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+        translate={allowBrowserAutoTranslate ? undefined : 'no'}
         color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
@@ -63,7 +63,8 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       >
         {icon}
         {icon && <Spacer />}
-        {label}
+        {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+        {label ? <span>{label}</span> : null}
       </Button>
     );
   }

@@ -2,13 +2,13 @@
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 import { Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
+import Cross from './CustomSvgIcons/Cross';
 
 const styles = {
   tabContentContainer: {
@@ -78,6 +78,7 @@ type ClosableTabsProps = {|
 |};
 
 export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const tabItemContainerStyle = {
     maxWidth: '100%', // Tabs should take all width
     display: hideLabels ? 'none' : 'flex',
@@ -87,8 +88,20 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => {
     marginTop: 6,
   };
 
+  const onScroll = React.useCallback((event: WheelEvent) => {
+    const divElement = containerRef.current;
+    if (divElement) {
+      divElement.scrollLeft += event.deltaY;
+    }
+  }, []);
+
   return (
-    <div className="almost-invisible-scrollbar" style={tabItemContainerStyle}>
+    <div
+      ref={containerRef}
+      className="almost-invisible-scrollbar"
+      style={tabItemContainerStyle}
+      onWheel={onScroll}
+    >
       {children}
     </div>
   );
@@ -167,6 +180,7 @@ export function ClosableTab({
   return (
     <React.Fragment>
       <span
+        id={id}
         style={{
           flexShrink: 0, // Tabs are never resized to fit in flex container
           position: 'relative',
@@ -220,7 +234,7 @@ export function ClosableTab({
             {...longTouchForContextMenuProps}
             focusRipple
           >
-            <Close
+            <Cross
               style={{
                 ...styles.closeButton,
                 width: gdevelopTheme.closableTabs.height / 2,

@@ -10,7 +10,7 @@ import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
 import { Line, Spacer } from '../UI/Grid';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 const gd = global.gd;
 
 type Props = {|
@@ -18,6 +18,7 @@ type Props = {|
   onChange: (newVariableType: string) => void,
   isHighlighted?: boolean,
   disabled?: boolean,
+  id?: string,
 |};
 
 let options;
@@ -29,27 +30,23 @@ const getOptions = () => {
     options = [
       <SelectOption
         key="string"
-        primaryText={t`String`}
+        label={t`String`}
         value={gd.Variable.String}
       />,
       <SelectOption
         key="number"
-        primaryText={t`Number`}
+        label={t`Number`}
         value={gd.Variable.Number}
       />,
       <SelectOption
         key="boolean"
-        primaryText={t`Boolean`}
+        label={t`Boolean`}
         value={gd.Variable.Boolean}
       />,
-      <SelectOption
-        key="array"
-        primaryText={t`Array`}
-        value={gd.Variable.Array}
-      />,
+      <SelectOption key="array" label={t`Array`} value={gd.Variable.Array} />,
       <SelectOption
         key="structure"
-        primaryText={t`Structure`}
+        label={t`Structure`}
         value={gd.Variable.Structure}
       />,
     ];
@@ -111,6 +108,7 @@ const VariableTypeSelector = (props: Props) => {
             : undefined
         }
         disabled={props.disabled}
+        id={props.id}
       >
         {getOptions()}
       </SelectField>

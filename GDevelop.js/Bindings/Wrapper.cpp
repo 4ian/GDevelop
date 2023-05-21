@@ -40,6 +40,7 @@
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
+#include <GDCore/IDE/Events/InstructionsCountEvaluator.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
@@ -50,6 +51,7 @@
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
+#include <GDCore/IDE/ProjectBrowserHelper.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/Project/Behavior.h>
@@ -594,6 +596,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   EnsureObjectEventsFunctionsProperParameters
 #define STATIC_AddBehaviorAndRequiredBehaviors \
   AddBehaviorAndRequiredBehaviors
+#define STATIC_AddRequiredBehaviorsFor AddRequiredBehaviorsFor
 #define STATIC_FindDependentBehaviorNames \
   FindDependentBehaviorNames
 #define STATIC_FindInvalidRequiredBehaviorProperties \
@@ -630,6 +633,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
+#define STATIC_UpdateExtensionNameInEventsBasedBehavior UpdateExtensionNameInEventsBasedBehavior
 #define STATIC_RenameEventsFunction RenameEventsFunction
 #define STATIC_RenameBehaviorEventsFunction RenameBehaviorEventsFunction
 #define STATIC_RenameObjectEventsFunction RenameObjectEventsFunction
@@ -643,19 +647,32 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RenameEventsBasedObjectProperty RenameEventsBasedObjectProperty
 #define STATIC_RenameEventsBasedBehavior RenameEventsBasedBehavior
 #define STATIC_RenameEventsBasedObject RenameEventsBasedObject
+#define STATIC_RenameLayout RenameLayout
+#define STATIC_RenameExternalLayout RenameExternalLayout
+#define STATIC_RenameExternalEvents RenameExternalEvents
+#define STATIC_RenameLayer RenameLayer
+#define STATIC_RenameLayerEffect RenameLayerEffect
+#define STATIC_RenameObjectAnimation RenameObjectAnimation
+#define STATIC_RenameObjectPoint RenameObjectPoint
+#define STATIC_RenameObjectEffect RenameObjectEffect
 
 #define STATIC_GetBehaviorPropertyGetterName GetBehaviorPropertyGetterName
 #define STATIC_GetBehaviorPropertySetterName GetBehaviorPropertySetterName
+#define STATIC_GetBehaviorPropertyToggleFunctionName GetBehaviorPropertyToggleFunctionName
 #define STATIC_GetBehaviorSharedPropertyGetterName GetBehaviorSharedPropertyGetterName
 #define STATIC_GetBehaviorSharedPropertySetterName GetBehaviorSharedPropertySetterName
+#define STATIC_GetBehaviorSharedPropertyToggleFunctionName GetBehaviorSharedPropertyToggleFunctionName
 #define STATIC_GetObjectPropertyGetterName GetObjectPropertyGetterName
 #define STATIC_GetObjectPropertySetterName GetObjectPropertySetterName
+#define STATIC_GetObjectPropertyToggleFunctionName GetObjectPropertyToggleFunctionName
 #define STATIC_GetPropertyActionName GetPropertyActionName
 #define STATIC_GetPropertyConditionName GetPropertyConditionName
 #define STATIC_GetPropertyExpressionName GetPropertyExpressionName
+#define STATIC_GetPropertyToggleActionName GetPropertyToggleActionName
 #define STATIC_GetSharedPropertyActionName GetSharedPropertyActionName
 #define STATIC_GetSharedPropertyConditionName GetSharedPropertyConditionName
 #define STATIC_GetSharedPropertyExpressionName GetSharedPropertyExpressionName
+#define STATIC_GetSharedPropertyToggleActionName GetSharedPropertyToggleActionName
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 
@@ -669,6 +686,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ScanProject ScanProject
 
 #define STATIC_ApplyTranslation ApplyTranslation
+#define STATIC_GetUndefined GetUndefined
 #define STATIC_GetDimensionless GetDimensionless
 #define STATIC_GetDegreeAngle GetDegreeAngle
 #define STATIC_GetSecond GetSecond
@@ -676,6 +694,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetPixelSpeed GetPixelSpeed
 #define STATIC_GetPixelAcceleration GetPixelAcceleration
 #define STATIC_GetNewton GetNewton
+#define STATIC_GetDefaultMeasurementUnitsCount GetDefaultMeasurementUnitsCount
+#define STATIC_GetDefaultMeasurementUnitAtIndex GetDefaultMeasurementUnitAtIndex
+#define STATIC_GetDefaultMeasurementUnitByName GetDefaultMeasurementUnitByName
+#define STATIC_HasDefaultMeasurementUnitNamed HasDefaultMeasurementUnitNamed
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

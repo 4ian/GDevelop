@@ -11,7 +11,7 @@ module.exports = function (config) {
   ];
 
   config.set({
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'sinon'],
     browserNoActivityTimeout: 400000,
     browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
     plugins: [
@@ -19,6 +19,7 @@ module.exports = function (config) {
       require('@chiragrupani/karma-chromium-edge-launcher'),
       require('karma-firefox-launcher'),
       require('karma-mocha'),
+      require('karma-sinon'),
     ],
     client: {
       mocha: {
@@ -40,12 +41,14 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/AsyncTasksManager.js',
       './newIDE/app/resources/GDJS/Runtime/libs/rbush.js',
       './newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi.js',
+      './newIDE/app/resources/GDJS/Runtime/pixi-renderers/three.js',
       './newIDE/app/resources/GDJS/Runtime/pixi-renderers/*.js',
       './newIDE/app/resources/GDJS/Runtime/howler-sound-manager/howler.min.js',
       './newIDE/app/resources/GDJS/Runtime/howler-sound-manager/howler-sound-manager.js',
       './newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
       './newIDE/app/resources/GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
       './newIDE/app/resources/GDJS/Runtime/jsonmanager.js',
+      './newIDE/app/resources/GDJS/Runtime/Model3DManager.js',
       './newIDE/app/resources/GDJS/Runtime/timemanager.js',
       './newIDE/app/resources/GDJS/Runtime/polygon.js',
       './newIDE/app/resources/GDJS/Runtime/runtimeobject.js',
@@ -54,11 +57,13 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/scenestack.js',
       './newIDE/app/resources/GDJS/Runtime/profiler.js',
       './newIDE/app/resources/GDJS/Runtime/force.js',
+      './newIDE/app/resources/GDJS/Runtime/RuntimeLayer.js',
       './newIDE/app/resources/GDJS/Runtime/layer.js',
-      './newIDE/app/resources/GDJS/Runtime/RuntimeSceneLayer.js',
+      './newIDE/app/resources/GDJS/Runtime/RuntimeCustomObjectLayer.js',
       './newIDE/app/resources/GDJS/Runtime/timer.js',
       './newIDE/app/resources/GDJS/Runtime/inputmanager.js',
       './newIDE/app/resources/GDJS/Runtime/runtimegame.js',
+      './newIDE/app/resources/GDJS/Runtime/runtimewatermark.js',
       './newIDE/app/resources/GDJS/Runtime/variable.js',
       './newIDE/app/resources/GDJS/Runtime/variablescontainer.js',
       './newIDE/app/resources/GDJS/Runtime/oncetriggers.js',
@@ -131,6 +136,7 @@ module.exports = function (config) {
       // Other test initialization files:
       './GDJS/tests/tests-utils/init.js',
       './GDJS/tests/tests-utils/init.pixiruntimegamewithassets.js',
+      './GDJS/tests/tests-utils/init.pixiruntimegame.js',
 
       // Test helpers
       './Extensions/PlatformBehavior/tests/PlatformerTestHelper.js',

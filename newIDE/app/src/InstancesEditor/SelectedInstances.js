@@ -190,6 +190,26 @@ export default class SelectedInstances {
     );
   }
 
+  getSelectionAABB(): Rectangle {
+    const selectionAABB = new Rectangle();
+    const selection = this.instancesSelection.getSelectedInstances();
+    let instanceRect = new Rectangle();
+    for (var i = 0; i < selection.length; i++) {
+      const instance = selection[i];
+
+      instanceRect = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        instanceRect
+      );
+      if (i === 0) {
+        selectionAABB.setRectangle(instanceRect);
+      } else {
+        selectionAABB.union(instanceRect);
+      }
+    }
+    return selectionAABB;
+  }
+
   render() {
     const {
       bigButtonSize,
@@ -275,11 +295,13 @@ export default class SelectedInstances {
       const buttonSize = useBigButton ? bigButtonSize : smallButtonSize;
       const padding = buttonPadding + buttonSize / 2;
       const resizeButtonPos = this.toCanvasCoordinates(
-        x1 - padding + relativePositions[0] * (x2 - x1 + 2 * padding),
-        y1 - padding + relativePositions[1] * (y2 - y1 + 2 * padding)
+        x1 + relativePositions[0] * (x2 - x1),
+        y1 + relativePositions[1] * (y2 - y1)
       );
-      resizeButtonPos[0] -= buttonSize / 2;
-      resizeButtonPos[1] -= buttonSize / 2;
+      resizeButtonPos[0] +=
+        -buttonSize / 2 + padding * Math.sign(relativePositions[0] - 0.5);
+      resizeButtonPos[1] +=
+        -buttonSize / 2 + padding * Math.sign(relativePositions[1] - 0.5);
 
       this._renderButton(
         show,

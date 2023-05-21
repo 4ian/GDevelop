@@ -25,6 +25,16 @@ namespace gdjs {
     }
   };
 
+  const applyThreeTextureSettings = (
+    threeTexture: THREE.Texture,
+    resourceData: ResourceData | null
+  ) => {
+    if (resourceData && !resourceData.smoothed) {
+      threeTexture.magFilter = THREE.NearestFilter;
+      threeTexture.minFilter = THREE.NearestFilter;
+    }
+  };
+
   const findResourceWithNameAndKind = (
     resources: ResourceData[],
     resourceName: string,
@@ -40,20 +50,6 @@ namespace gdjs {
     return null;
   };
 
-  const checkIfCredentialsRequired = (url: string) => {
-    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-    // i.e: its gdevelop.io cookie, to be passed.
-    // Note that this is only useful during previews.
-    if (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    )
-      return true;
-
-    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-    return false;
-  };
-
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
    */
@@ -64,22 +60,37 @@ namespace gdjs {
      * The invalid texture is a 8x8 PNG file filled with magenta (#ff00ff), to be
      * easily spotted if rendered on screen.
      */
-    _invalidTexture: PIXI.Texture;
+    private _invalidTexture: PIXI.Texture;
 
     /**
-     * Map associated resource name to the loaded PixiJS texture.
+     * Map associating a resource name to the loaded PixiJS texture.
      */
-    _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
+    private _loadedTextures: Hashtable<PIXI.Texture<PIXI.Resource>>;
+
+    /**
+     * Map associating a resource name to the loaded Three.js texture.
+     */
+    private _loadedThreeTextures: Hashtable<THREE.Texture>;
+    private _loadedThreeMaterials: Hashtable<THREE.Material>;
+
+    private _resourcesLoader: RuntimeGameResourcesLoader;
 
     /**
      * @param resources The resources data of the game.
+     * @param resourcesLoader The resources loader of the game.
      */
-    constructor(resources: ResourceData[]) {
+    constructor(
+      resources: ResourceData[],
+      resourcesLoader: RuntimeGameResourcesLoader
+    ) {
       this._resources = resources;
+      this._resourcesLoader = resourcesLoader;
       this._invalidTexture = PIXI.Texture.from(
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQoU2P8z/D/PwMewDgyFAAApMMX8Zi0uXAAAAAASUVORK5CYIIA'
       );
       this._loadedTextures = new Hashtable();
+      this._loadedThreeTextures = new Hashtable();
+      this._loadedThreeMaterials = new Hashtable();
     }
 
     /**
@@ -130,22 +141,107 @@ namespace gdjs {
 
       logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
-      const texture = PIXI.Texture.from(file, {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-        },
-      }).on('error', (error) => {
+      const texture = PIXI.Texture.from(
+        this._resourcesLoader.getFullUrl(file),
+        {
+          resourceOptions: {
+            // Note that using `false`
+            // to not having `crossorigin` at all would NOT work because the browser would taint the
+            // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+            crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+              ? 'use-credentials'
+              : 'anonymous',
+          },
+        }
+      ).on('error', (error) => {
         logFileLoadingError(file, error);
       });
       applyTextureSettings(texture, resource);
 
       this._loadedTextures.put(resourceName, texture);
       return texture;
+    }
+
+    /**
+     * Return the three.js texture associated to the specified resource name.
+     * Returns a placeholder texture if not found.
+     * @param resourceName The name of the resource
+     * @returns The requested texture, or a placeholder if not found.
+     */
+    getThreeTexture(resourceName: string): THREE.Texture {
+      const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
+      if (loadedThreeTexture) return loadedThreeTexture;
+
+      // Texture is not loaded, load it now from the PixiJS texture.
+      // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
+      // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
+      const pixiTexture = this.getPIXITexture(resourceName);
+      const pixiRenderer = this._resourcesLoader._runtimeGame
+        .getRenderer()
+        .getPIXIRenderer();
+      if (!pixiRenderer) throw new Error('No PIXI renderer was found.');
+
+      // @ts-ignore - source does exist on resource.
+      const image = pixiTexture.baseTexture.resource.source;
+      if (!(image instanceof HTMLImageElement)) {
+        throw new Error(
+          `Can't load texture for resource "${resourceName}" as it's not an image.`
+        );
+      }
+
+      const threeTexture = new THREE.Texture(image);
+      threeTexture.magFilter = THREE.LinearFilter;
+      threeTexture.minFilter = THREE.LinearFilter;
+      threeTexture.wrapS = THREE.RepeatWrapping;
+      threeTexture.wrapT = THREE.RepeatWrapping;
+      threeTexture.needsUpdate = true;
+
+      const resource = findResourceWithNameAndKind(
+        this._resources,
+        resourceName,
+        'image'
+      );
+
+      applyThreeTextureSettings(threeTexture, resource);
+      this._loadedThreeTextures.put(resourceName, threeTexture);
+
+      return threeTexture;
+    }
+
+    /**
+     * Return the three.js material associated to the specified resource name.
+     * @param resourceName The name of the resource
+     * @param options
+     * @returns The requested material.
+     */
+    getThreeMaterial(
+      resourceName: string,
+      {
+        useTransparentTexture,
+        forceBasicMaterial,
+      }: { useTransparentTexture: boolean; forceBasicMaterial: boolean }
+    ) {
+      const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
+        forceBasicMaterial ? 1 : 0
+      }`;
+
+      const loadedThreeMaterial = this._loadedThreeMaterials.get(cacheKey);
+      if (loadedThreeMaterial) return loadedThreeMaterial;
+
+      const material = forceBasicMaterial
+        ? new THREE.MeshBasicMaterial({
+            map: this.getThreeTexture(resourceName),
+            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+            transparent: useTransparentTexture,
+          })
+        : new THREE.MeshStandardMaterial({
+            map: this.getThreeTexture(resourceName),
+            side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+            transparent: useTransparentTexture,
+            metalness: 0,
+          });
+      this._loadedThreeMaterials.put(cacheKey, material);
+      return material;
     }
 
     /**
@@ -179,16 +275,19 @@ namespace gdjs {
       logger.log(
         'Loading video texture for resource "' + resourceName + '"...'
       );
-      const texture = PIXI.Texture.from(file, {
-        resourceOptions: {
-          // Note that using `false`
-          // to not having `crossorigin` at all would NOT work because the browser would taint the
-          // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
-          crossorigin: checkIfCredentialsRequired(file)
-            ? 'use-credentials'
-            : 'anonymous',
-        },
-      }).on('error', (error) => {
+      const texture = PIXI.Texture.from(
+        this._resourcesLoader.getFullUrl(file),
+        {
+          resourceOptions: {
+            // Note that using `false`
+            // to not having `crossorigin` at all would NOT work because the browser would taint the
+            // loaded resource so that it can't be read/used in a canvas (it's only working for display `<img>` on screen).
+            crossorigin: this._resourcesLoader.checkIfCredentialsRequired(file)
+              ? 'use-credentials'
+              : 'anonymous',
+          },
+        }
+      ).on('error', (error) => {
         logFileLoadingError(file, error);
       });
 
@@ -245,9 +344,9 @@ namespace gdjs {
         if (resourceFiles.hasOwnProperty(file)) {
           loader.add({
             name: file,
-            url: file,
+            url: this._resourcesLoader.getFullUrl(file),
             loadType: PIXI.LoaderResource.LOAD_TYPE.IMAGE,
-            crossOrigin: checkIfCredentialsRequired(file)
+            crossOrigin: this._resourcesLoader.checkIfCredentialsRequired(file)
               ? 'use-credentials'
               : 'anonymous',
           });

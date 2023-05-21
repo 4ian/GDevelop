@@ -23,6 +23,7 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 import ValueTypeEditor from './ValueTypeEditor';
+import AlertMessage from '../../UI/AlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -256,23 +257,23 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 >
                   <SelectOption
                     value={gd.EventsFunction.Action}
-                    primaryText={t`Action`}
+                    label={t`Action`}
                   />
                   <SelectOption
                     value={gd.EventsFunction.Condition}
-                    primaryText={t`Condition`}
+                    label={t`Condition`}
                   />
                   <SelectOption
                     value={gd.EventsFunction.Expression}
-                    primaryText={t`Expression`}
+                    label={t`Expression`}
                   />
                   <SelectOption
                     value={gd.EventsFunction.ExpressionAndCondition}
-                    primaryText={t`Expression and condition`}
+                    label={t`Expression and condition`}
                   />
                   <SelectOption
                     value={gd.EventsFunction.ActionWithOperator}
-                    primaryText={t`Action with operator`}
+                    label={t`Action with operator`}
                   />
                 </SelectField>
               </Line>
@@ -305,7 +306,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                                 <SelectOption
                                   key={eventsFunction.getName()}
                                   value={eventsFunction.getName()}
-                                  primaryText={
+                                  label={
                                     eventsFunction.getFullName() ||
                                     eventsFunction.getName()
                                   }
@@ -478,6 +479,16 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 }}
                 getLastObjectParameterObjectType={() => ''}
               />
+            )}
+            {eventsFunction.isAsync() && (
+              <AlertMessage kind="info">
+                <Trans>
+                  This is an asynchronous action, meaning that the actions and
+                  sub-events following it will wait for it to end. Don't forget
+                  to use the action "End asynchronous function" to mark the end
+                  of the action.
+                </Trans>
+              </AlertMessage>
             )}
             {helpPagePath ? (
               <Line noMargin>

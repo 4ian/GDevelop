@@ -15,11 +15,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
   extension
       .SetExtensionInformation(
           "BuiltinAsync",
-          _("Async functions"),
+          _("Asynchronous functions"),
           _("Functions that defer the execution of the events after it."),
           "Arthur Pacaud (arthuro555)",
           "Open source (MIT License)")
       .SetCategory("Advanced");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Asynchronous functions"))
+      .SetIcon("res/function32.png");
 
   extension.AddEvent("Async",
                      _("Async event"),
@@ -27,6 +29,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
                      "",
                      "res/eventaddicon.png",
                      std::make_shared<gd::AsyncEvent>());
+
+  extension
+      .AddAction(
+          "ResolveAsyncEventsFunction",
+          _("End asynchronous function"),
+          _("Mark an asynchronous function as finished. This will allow the "
+            "actions and subevents following it to be run."),
+          "Mark asynchronous function as ended",
+          "",
+          "res/actions/quit24.png",
+          "res/actions/quit.png")
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
+      .SetRelevantForAsynchronousFunctionEventsOnly();
 }
 
 }  // namespace gd

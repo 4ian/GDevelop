@@ -636,6 +636,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   platformSpecificAssets.UnserializeFrom(
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
+  watermark.UnserializeFrom(propElement.GetChild("watermark"));
 
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
@@ -645,6 +646,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   authorIdsElement.ConsiderAsArray();
   for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
+  }
+  authorUsernames.clear();
+  auto& authorUsernamesElement = propElement.GetChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < authorUsernamesElement.GetChildrenCount(); ++i) {
+    authorUsernames.push_back(
+        authorUsernamesElement.GetChild(i).GetStringValue());
   }
 
   categories.clear();
@@ -875,12 +883,18 @@ void Project::SerializeTo(SerializerElement& element) const {
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
+  watermark.SerializeTo(propElement.AddChild("watermark"));
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
   auto& authorIdsElement = propElement.AddChild("authorIds");
   authorIdsElement.ConsiderAsArray();
   for (const auto& authorId : authorIds) {
     authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
+  auto& authorUsernamesElement = propElement.AddChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (const auto& authorUsername : authorUsernames) {
+    authorUsernamesElement.AddChild("").SetStringValue(authorUsername);
   }
 
   auto& categoriesElement = propElement.AddChild("categories");
@@ -977,7 +991,7 @@ bool Project::ValidateName(const gd::String& name) {
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that
+  // See also gd::ProjectBrowserHelper::ExposeProjectEvents for a method that
   // traverse the whole project (this time for events) and ExposeProjectEffects
   // (this time for effects). Ideally, this method could be moved outside of
   // gd::Project.
@@ -1097,6 +1111,7 @@ void Project::Init(const gd::Project& game) {
 
   author = game.author;
   authorIds = game.authorIds;
+  authorUsernames = game.authorUsernames;
   isPlayableWithKeyboard = game.isPlayableWithKeyboard;
   isPlayableWithGamepad = game.isPlayableWithGamepad;
   isPlayableWithMobile = game.isPlayableWithMobile;
@@ -1107,6 +1122,7 @@ void Project::Init(const gd::Project& game) {
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;
   loadingScreen = game.loadingScreen;
+  watermark = game.watermark;
   objectGroups = game.objectGroups;
 
   extensionProperties = game.extensionProperties;

@@ -47,6 +47,11 @@ class GD_CORE_API Layer {
    */
   const gd::String& GetName() const { return name; }
 
+  const gd::String& GetRenderingType() const { return renderingType; }
+  void SetRenderingType(const gd::String& renderingType_) {
+    renderingType = renderingType_;
+  }
+
   /**
    * \brief Change if layer is displayed or not
    */
@@ -58,7 +63,17 @@ class GD_CORE_API Layer {
   bool GetVisibility() const { return isVisible; }
 
   /**
-   * \brief Set if the layer is a lightining layer or not.
+   * \brief Change if layer can be modified or not.
+   */
+  void SetLocked(bool isLocked_) { isLocked = isLocked_; }
+
+  /**
+   * \brief Return true if layer can't be modified.
+   */
+  bool IsLocked() const { return isLocked; }
+
+  /**
+   * \brief Set if the layer is a lighting layer or not.
    */
   void SetLightingLayer(bool isLightingLayer_) {
     isLightingLayer = isLightingLayer_;
@@ -80,6 +95,25 @@ class GD_CORE_API Layer {
    * \brief Return true if the layer follows the base layer.
    */
   bool IsFollowingBaseLayerCamera() const { return followBaseLayerCamera; }
+
+  /** \name 3D
+   */
+  ///@{
+  double GetCamera3DNearPlaneDistance() const {
+    return camera3DNearPlaneDistance;
+  }
+  void SetCamera3DNearPlaneDistance(double distance) {
+    camera3DNearPlaneDistance = distance;
+  }
+  double GetCamera3DFarPlaneDistance() const {
+    return camera3DFarPlaneDistance;
+  }
+  void SetCamera3DFarPlaneDistance(double distance) {
+    camera3DFarPlaneDistance = distance;
+  }
+  double GetCamera3DFieldOfView() const { return camera3DFieldOfView; }
+  void SetCamera3DFieldOfView(double angle) { camera3DFieldOfView = angle; }
+  ///@}
 
   /** \name Cameras
    */
@@ -164,12 +198,10 @@ class GD_CORE_API Layer {
   const EffectsContainer& GetEffects() const;
   ///@}
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize layer.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layer.
@@ -177,16 +209,22 @@ class GD_CORE_API Layer {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
-  gd::String name;       ///< The name of the layer
-  bool isVisible;        ///< True if the layer is visible
+  gd::String name;           ///< The name of the layer
+  gd::String renderingType;  ///< The rendering type: "" (empty), "2d", "3d" or
+                             ///< "2d+3d".
+  bool isVisible;            ///< True if the layer is visible
+  bool isLocked;             ///< True if the layer is locked
   bool isLightingLayer;  ///< True if the layer is used to display lights and
                          ///< renders an ambient light.
   bool followBaseLayerCamera;  ///< True if the layer automatically follows the
                                ///< base layer
-  unsigned int ambientLightColorR;  ///< Ambient light color Red component
-  unsigned int ambientLightColorG;  ///< Ambient light color Green component
-  unsigned int ambientLightColorB;  ///< Ambient light color Blue component
-  std::vector<gd::Camera> cameras;  ///< The camera displayed by the layer
+  double camera3DNearPlaneDistance;  ///< 3D camera frustum near plan distance
+  double camera3DFarPlaneDistance;   ///< 3D camera frustum far plan distance
+  double camera3DFieldOfView;        ///< 3D camera field of view (fov) in degrees
+  unsigned int ambientLightColorR;   ///< Ambient light color Red component
+  unsigned int ambientLightColorG;   ///< Ambient light color Green component
+  unsigned int ambientLightColorB;   ///< Ambient light color Blue component
+  std::vector<gd::Camera> cameras;   ///< The camera displayed by the layer
   gd::EffectsContainer effectsContainer;  ///< The effects applied to the layer.
 
   static gd::Camera badCamera;

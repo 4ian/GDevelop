@@ -120,9 +120,7 @@ namespace gdjs {
 
               currentUser
                 .reauthenticateWithCredential(credential)
-                .then(() =>
-                  (currentUser as firebase.User).updatePassword(newPassword)
-                )
+                .then(() => currentUser!.updatePassword(newPassword))
                 .then(() => {
                   if (typeof callbackStateVariable !== 'undefined')
                     callbackStateVariable.setString('ok');
@@ -154,7 +152,7 @@ namespace gdjs {
 
               currentUser
                 .reauthenticateWithCredential(credential)
-                .then(() => (currentUser as firebase.User).delete())
+                .then(() => currentUser!.delete())
                 .then(() => {
                   if (typeof callbackStateVariable !== 'undefined')
                     callbackStateVariable.setString('ok');
@@ -210,9 +208,7 @@ namespace gdjs {
               if (currentUser && _currentProvider)
                 currentUser
                   .reauthenticateWithPopup(_currentProvider)
-                  .then(() =>
-                    (currentUser as firebase.User).updatePassword(newPassword)
-                  )
+                  .then(() => currentUser!.updatePassword(newPassword))
                   .then(() => {
                     if (typeof callbackStateVariable !== 'undefined')
                       callbackStateVariable.setString('ok');
@@ -234,7 +230,7 @@ namespace gdjs {
               if (currentUser && _currentProvider)
                 currentUser
                   .reauthenticateWithPopup(_currentProvider)
-                  .then(() => (currentUser as firebase.User).delete())
+                  .then(() => currentUser!.delete())
                   .then(() => {
                     if (typeof callbackStateVariable !== 'undefined')
                       callbackStateVariable.setString('ok');
@@ -330,7 +326,7 @@ namespace gdjs {
           };
 
           /**
-           * Send an email to the users email adress to verify it.
+           * Send an email to the users email address to verify it.
            * @note Even though this function is redundant, we keep it for consistency.
            * @see currentUser.sendEmailVerification
            */

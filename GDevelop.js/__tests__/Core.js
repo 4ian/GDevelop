@@ -56,10 +56,10 @@ describe('libGD.js', function () {
     });
 
     it('can store loading screen setup', function () {
-      project.getLoadingScreen().showGDevelopSplash(true);
-      expect(project.getLoadingScreen().isGDevelopSplashShown()).toBe(true);
-      project.getLoadingScreen().showGDevelopSplash(false);
-      expect(project.getLoadingScreen().isGDevelopSplashShown()).toBe(false);
+      project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(true);
+      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(true);
+      project.getLoadingScreen().showGDevelopLogoDuringLoadingScreen(false);
+      expect(project.getLoadingScreen().isGDevelopLogoShownDuringLoadingScreen()).toBe(false);
     });
 
     it('handles layouts', function () {
@@ -3301,32 +3301,32 @@ describe('libGD.js', function () {
         type);
       expressionNode.visit(expressionValidator);
       if (expectedError2) {
-        expect(expressionValidator.getErrors().size()).toBe(2);
-        expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
+        expect(expressionValidator.getAllErrors().size()).toBe(2);
+        expect(expressionValidator.getAllErrors().at(0).getMessage()).toBe(
           expectedError
         );
         if (expectedErrorPosition)
-          expect(expressionValidator.getErrors().at(0).getStartPosition()).toBe(
+          expect(expressionValidator.getAllErrors().at(0).getStartPosition()).toBe(
             expectedErrorPosition
           );
-        expect(expressionValidator.getErrors().at(1).getMessage()).toBe(
+        expect(expressionValidator.getAllErrors().at(1).getMessage()).toBe(
           expectedError2
         );
         if (expectedErrorPosition2)
-          expect(expressionValidator.getErrors().at(1).getStartPosition()).toBe(
+          expect(expressionValidator.getAllErrors().at(1).getStartPosition()).toBe(
             expectedErrorPosition2
           );
       } else if (expectedError) {
-        expect(expressionValidator.getErrors().size()).toBe(1);
-        expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
+        expect(expressionValidator.getAllErrors().size()).toBe(1);
+        expect(expressionValidator.getAllErrors().at(0).getMessage()).toBe(
           expectedError
         );
         if (expectedErrorPosition)
-          expect(expressionValidator.getErrors().at(0).getStartPosition()).toBe(
+          expect(expressionValidator.getAllErrors().at(0).getStartPosition()).toBe(
             expectedErrorPosition
           );
       } else {
-        expect(expressionValidator.getErrors().size()).toBe(0);
+        expect(expressionValidator.getAllErrors().size()).toBe(0);
       }
 
       expressionValidator.delete();

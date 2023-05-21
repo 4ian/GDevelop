@@ -2,6 +2,8 @@
 import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
@@ -11,6 +13,10 @@ const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
+const loadedThreeTextures = {};
+const loadedThreeMaterials = {};
+const loaded3DModels = {};
+const invalidModel = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1));
 
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
@@ -23,6 +29,28 @@ const determineCrossOrigin = (url: string) => {
   return 'anonymous';
 };
 
+const applyPixiTextureSettings = (resource: gdResource, texture: any) => {
+  if (resource.getKind() !== 'image') return;
+
+  const imageResource = gd.asImageResource(resource);
+  if (!imageResource.isSmooth()) {
+    texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+  }
+};
+
+const applyThreeTextureSettings = (
+  resource: gdResource,
+  threeTexture: THREE.Texture
+) => {
+  if (resource.getKind() !== 'image') return;
+
+  const imageResource = gd.asImageResource(resource);
+  if (!imageResource.isSmooth()) {
+    threeTexture.magFilter = THREE.NearestFilter;
+    threeTexture.minFilter = THREE.NearestFilter;
+  }
+};
+
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
  * resources and a gd.Project.
@@ -30,15 +58,6 @@ const determineCrossOrigin = (url: string) => {
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
-  static _initializeTexture(resource: gdResource, texture: any) {
-    if (resource.getKind() !== 'image') return;
-
-    const imageResource = gd.asImageResource(resource);
-    if (!imageResource.isSmooth()) {
-      texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-    }
-  }
-
   /**
    * (Re)load the PIXI texture represented by the given resources.
    */
@@ -95,10 +114,7 @@ export default class PixiResourcesLoader {
           const texture = loadedResources[resourceName].texture;
           if (texture) {
             loadedTextures[resourceName] = texture;
-            PixiResourcesLoader._initializeTexture(
-              resource,
-              loadedTextures[resourceName]
-            );
+            applyPixiTextureSettings(resource, loadedTextures[resourceName]);
           }
         }
       }
@@ -138,11 +154,145 @@ export default class PixiResourcesLoader {
       },
     });
 
-    PixiResourcesLoader._initializeTexture(
-      resource,
-      loadedTextures[resourceName]
-    );
+    applyPixiTextureSettings(resource, loadedTextures[resourceName]);
     return loadedTextures[resourceName];
+  }
+
+  /**
+   * Return the three.js texture associated to the specified resource name.
+   * Returns a placeholder texture if not found.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @returns The requested texture, or a placeholder if not found.
+   */
+  static getThreeTexture(
+    project: gdProject,
+    resourceName: string
+  ): THREE.Texture {
+    const loadedThreeTexture = loadedThreeTextures[resourceName];
+    if (loadedThreeTexture) return loadedThreeTexture;
+
+    // Texture is not loaded, load it now from the PixiJS texture.
+    // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
+    // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
+    const pixiTexture = PixiResourcesLoader.getPIXITexture(
+      project,
+      resourceName
+    );
+
+    // @ts-ignore - source does exist on resource.
+    const image = pixiTexture.baseTexture.resource.source;
+    if (!(image instanceof HTMLImageElement)) {
+      throw new Error(
+        `Can't load texture for resource "${resourceName}" as it's not an image.`
+      );
+    }
+
+    const threeTexture = new THREE.Texture(image);
+    threeTexture.magFilter = THREE.LinearFilter;
+    threeTexture.minFilter = THREE.LinearFilter;
+    threeTexture.wrapS = THREE.RepeatWrapping;
+    threeTexture.wrapT = THREE.RepeatWrapping;
+    threeTexture.needsUpdate = true;
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    applyThreeTextureSettings(resource, threeTexture);
+
+    loadedThreeTextures[resourceName] = threeTexture;
+
+    return threeTexture;
+  }
+
+  /**
+   * Return the three.js material associated to the specified resource name.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @param options Set if the material should be transparent or not.
+   * @returns The requested material.
+   */
+  static getThreeMaterial(
+    project: gdProject,
+    resourceName: string,
+    { useTransparentTexture }: {| useTransparentTexture: boolean |}
+  ) {
+    const cacheKey = `${resourceName}|transparent:${useTransparentTexture.toString()}`;
+    const loadedThreeMaterial = loadedThreeMaterials[cacheKey];
+    if (loadedThreeMaterial) return loadedThreeMaterial;
+
+    const material = new THREE.MeshBasicMaterial({
+      map: this.getThreeTexture(project, resourceName),
+      side: useTransparentTexture ? THREE.DoubleSide : THREE.FrontSide,
+      transparent: useTransparentTexture,
+    });
+
+    loadedThreeMaterials[cacheKey] = material;
+    return material;
+  }
+
+  /**
+   * Return the three.js material associated to the specified resource name.
+   * @param project The project
+   * @param resourceName The name of the resource
+   * @param options
+   * @returns The requested material.
+   */
+  static get3DModel(
+    project: gdProject,
+    resourceName: string
+  ): Promise<THREE.Object3D> {
+    const loaded3DModel = loaded3DModels[resourceName];
+    if (loaded3DModel) return Promise.resolve(loaded3DModel);
+
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return Promise.resolve(invalidModel);
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'model3D') return Promise.resolve(invalidModel);
+
+    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+      isResourceForPixi: true,
+    });
+
+    const loader = new GLTFLoader();
+    // TODO Cache promises that are not yet resolved to void `load` being
+    // called more than once for the same resource.
+    return new Promise((resolve, reject) => {
+      loader.load(
+        url,
+        gltf => {
+          this._replaceMaterials(gltf.scene);
+          loaded3DModels[resourceName] = gltf.scene;
+          resolve(gltf.scene);
+        },
+        undefined,
+        error => {
+          reject(error);
+        }
+      );
+    });
+  }
+
+  /**
+   * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
+   */
+  static _replaceMaterials(object3D: THREE.Object3D) {
+    object3D.traverse(node => {
+      if (node.type === 'Mesh') {
+        const mesh: THREE.Mesh = node;
+        const basicMaterial = new THREE.MeshBasicMaterial();
+        //@ts-ignore
+        if (mesh.material.color) {
+          //@ts-ignore
+          basicMaterial.color = mesh.material.color;
+        }
+        //@ts-ignore
+        if (mesh.material.map) {
+          //@ts-ignore
+          basicMaterial.map = mesh.material.map;
+        }
+        mesh.material = basicMaterial;
+      }
+    });
   }
 
   /**

@@ -45,7 +45,7 @@ export const getEmailErrorText = (error: ?AuthError) => {
   if (error.code === 'auth/invalid-email')
     return <Trans>This email is invalid.</Trans>;
   if (error.code === 'auth/user-disabled')
-    return <Trans>The user was disabled.</Trans>;
+    return <Trans>This account has been deactivated or deleted.</Trans>;
   if (error.code === 'auth/user-not-found')
     return (
       <Trans>This user was not found: have you created your account?</Trans>
@@ -121,7 +121,7 @@ const CreateAccountDialog = ({
     if (!canCreateAccount) return;
     try {
       await onCreateAccount({
-        email,
+        email: email.trim(),
         password,
         username,
         getNewsletterEmail,
@@ -163,6 +163,7 @@ const CreateAccountDialog = ({
       }}
       maxWidth="sm"
       open
+      flexColumnBody
     >
       <ColumnStackLayout
         noMargin
@@ -194,50 +195,68 @@ const CreateAccountDialog = ({
           </LineStackLayout>
         </Column>
         <div style={styles.formContainer}>
-          <ColumnStackLayout noMargin>
-            <UsernameField
-              value={username}
-              onChange={(e, value) => {
-                setUsername(value);
-              }}
-              allowEmpty
-              onAvailabilityChecked={setUsernameAvailability}
-              onAvailabilityCheckLoading={setIsValidatingUsername}
-              isValidatingUsername={isValidatingUsername}
-              disabled={createAccountInProgress}
-            />
-            <TextField
-              value={email}
-              floatingLabelText={<Trans>Email</Trans>}
-              errorText={getEmailErrorText(error)}
-              fullWidth
-              required
-              onChange={(e, value) => {
-                setEmail(value);
-              }}
-              disabled={createAccountInProgress}
-            />
-            <TextField
-              value={password}
-              floatingLabelText={<Trans>Password</Trans>}
-              errorText={getPasswordErrorText(error)}
-              type="password"
-              fullWidth
-              required
-              onChange={(e, value) => {
-                setPassword(value);
-              }}
-              disabled={createAccountInProgress}
-            />
-            <Checkbox
-              label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
-              checked={getNewsletterEmail}
-              onCheck={(e, value) => {
-                setGetNewsletterEmail(value);
-              }}
-              disabled={createAccountInProgress}
-            />
-          </ColumnStackLayout>
+          <form
+            onSubmit={event => {
+              // Prevent browser to navigate on form submission.
+              event.preventDefault();
+              createAccount();
+            }}
+            autoComplete="on"
+            name="createAccount"
+          >
+            <ColumnStackLayout noMargin>
+              <UsernameField
+                value={username}
+                onChange={(e, value) => {
+                  setUsername(value);
+                }}
+                allowEmpty
+                onAvailabilityChecked={setUsernameAvailability}
+                onAvailabilityCheckLoading={setIsValidatingUsername}
+                isValidatingUsername={isValidatingUsername}
+                disabled={createAccountInProgress}
+              />
+              <TextField
+                value={email}
+                floatingLabelText={<Trans>Email</Trans>}
+                errorText={getEmailErrorText(error)}
+                fullWidth
+                required
+                onChange={(e, value) => {
+                  setEmail(value);
+                }}
+                onBlur={event => {
+                  setEmail(event.currentTarget.value.trim());
+                }}
+                disabled={createAccountInProgress}
+              />
+              <TextField
+                value={password}
+                floatingLabelText={<Trans>Password</Trans>}
+                errorText={getPasswordErrorText(error)}
+                type="password"
+                fullWidth
+                required
+                onChange={(e, value) => {
+                  setPassword(value);
+                }}
+                disabled={createAccountInProgress}
+              />
+              <Checkbox
+                label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
+                checked={getNewsletterEmail}
+                onCheck={(e, value) => {
+                  setGetNewsletterEmail(value);
+                }}
+                disabled={createAccountInProgress}
+              />
+              {/*
+                This input is needed so that the browser submits the form when
+                Enter key is pressed. See https://stackoverflow.com/questions/4196681/form-not-submitting-when-pressing-enter
+              */}
+              <input type="submit" value="Submit" style={{ display: 'none' }} />
+            </ColumnStackLayout>
+          </form>
         </div>
         <BackgroundText>
           <MarkdownText

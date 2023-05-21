@@ -18,7 +18,7 @@ class EventsBasedObject;
 
 namespace gd {
 /**
- * \brief Check if functions are only calling itself.
+ * \brief Check if functions are only calling themselves.
  *
  * It allows to detect mistakes when implementing functions for compatibility
  * after a function renaming.

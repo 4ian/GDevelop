@@ -414,8 +414,8 @@ const AdditionalUserInfoDialog = ({
             <SelectField
               floatingLabelText={formFields.creationExperience.title}
               value={creationExperience}
-              onChange={(e, i, newCreationExpersience: string) => {
-                setCreationExperience(newCreationExpersience);
+              onChange={(e, i, newCreationExperience: string) => {
+                setCreationExperience(newCreationExperience);
               }}
               {...selectFieldCommonProps}
             >

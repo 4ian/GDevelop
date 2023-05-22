@@ -4,17 +4,21 @@ cmake_policy(SET CMP0015 NEW)
 project(TextObject)
 gd_add_extension_includes()
 
-#Defines
-###
+# Defines
+#
 gd_add_extension_definitions(TextObject)
 
-#The targets
-###
+# The targets
+#
 include_directories(.)
-file(GLOB source_files *.cpp *.h)
+file(
+	GLOB
+	source_files
+	*.cpp
+	*.h)
 gd_add_clang_utils(TextObject "${source_files}")
 gd_add_extension_target(TextObject "${source_files}")
 
-#Linker files for the IDE extension
-###
+# Linker files for the IDE extension
+#
 gd_extension_link_libraries(TextObject)

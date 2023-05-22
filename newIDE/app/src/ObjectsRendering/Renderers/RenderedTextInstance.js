@@ -79,15 +79,14 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.getCharacterSize() !== this._characterSize ||
       textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
       this._instance.hasCustomSize() !== this._wrapping ||
-      (this._instance.getCustomWidth() !== this._wrappingWidth &&
-        this._wrapping)
+      (this.getCustomWidth() !== this._wrappingWidth && this._wrapping)
     ) {
       this._isItalic = textObjectConfiguration.isItalic();
       this._isBold = textObjectConfiguration.isBold();
       this._characterSize = textObjectConfiguration.getCharacterSize();
       this._textAlignment = textObjectConfiguration.getTextAlignment();
       this._wrapping = this._instance.hasCustomSize();
-      this._wrappingWidth = this._instance.getCustomWidth();
+      this._wrappingWidth = this.getCustomWidth();
       this._styleFontDirty = true;
     }
 
@@ -153,7 +152,7 @@ export default class RenderedTextInstance extends RenderedInstance {
           ? 0.5
           : 0;
 
-      const width = this._instance.getCustomWidth();
+      const width = this.getCustomWidth();
 
       // A vector from the custom size center to the renderer center.
       const centerToCenterX =

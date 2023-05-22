@@ -563,8 +563,8 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-      // Custom size can be read in instance.getCustomWidth() and
-      // instance.getCustomHeight()
+      // Custom size can be read in getCustomWidth() and
+      // getCustomHeight()
     };
 
     /**

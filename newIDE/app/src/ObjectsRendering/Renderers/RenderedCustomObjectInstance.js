@@ -235,18 +235,6 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     }
   }
 
-  getWidth() {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
-      : this.getDefaultWidth();
-  }
-
-  getHeight() {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
-      : this.getDefaultHeight();
-  }
-
   getDefaultWidth() {
     return this.childrenRenderedInstances.length > 0
       ? this.childrenRenderedInstances[0].getDefaultWidth()

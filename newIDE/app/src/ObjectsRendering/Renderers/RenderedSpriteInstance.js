@@ -89,10 +89,9 @@ export default class RenderedSpriteInstance extends RenderedInstance {
       : RenderedInstance.toRad(this._instance.getAngle());
     if (this._instance.hasCustomSize()) {
       this._pixiObject.scale.x =
-        this._instance.getCustomWidth() / this._pixiObject.texture.frame.width;
+        this.getCustomWidth() / this._pixiObject.texture.frame.width;
       this._pixiObject.scale.y =
-        this._instance.getCustomHeight() /
-        this._pixiObject.texture.frame.height;
+        this.getCustomHeight() / this._pixiObject.texture.frame.height;
     } else {
       this._pixiObject.scale.x = 1;
       this._pixiObject.scale.y = 1;

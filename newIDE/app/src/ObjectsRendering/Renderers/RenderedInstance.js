@@ -98,7 +98,7 @@ export default class RenderedInstance {
 
   getHeight(): number {
     return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
+      ? this.getCustomHeight()
       : this.getDefaultHeight();
   }
 

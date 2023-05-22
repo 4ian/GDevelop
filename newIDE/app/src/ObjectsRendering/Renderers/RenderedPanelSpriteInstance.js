@@ -66,8 +66,8 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
     const oldWidth = this._width;
     const oldHeight = this._height;
     if (this._instance.hasCustomSize()) {
-      this._width = this._instance.getCustomWidth();
-      this._height = this._instance.getCustomHeight();
+      this._width = this.getCustomWidth();
+      this._height = this.getCustomHeight();
     } else {
       var tiledSprite = gd.asPanelSpriteConfiguration(
         this._associatedObjectConfiguration

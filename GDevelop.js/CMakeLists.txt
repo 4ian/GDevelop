@@ -4,11 +4,11 @@ project(libGD.js)
 
 # Sanity checks
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-	message("CMAKE_BUILD_TYPE is empty, assuming build type is Release")
+	message(STATUS "CMAKE_BUILD_TYPE is empty, assuming build type is Release")
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 if(NOT EMSCRIPTEN)
-	error("You're trying to compile libGD.js without emscripten.")
+	message(FATAL_ERROR "You're trying to compile libGD.js without emscripten.")
 endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):

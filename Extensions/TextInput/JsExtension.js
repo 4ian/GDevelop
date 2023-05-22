@@ -714,8 +714,8 @@ module.exports = {
         let width = DEFAULT_WIDTH;
         let height = DEFAULT_HEIGHT;
         if (instance.hasCustomSize()) {
-          width = getCustomWidth();
-          height = getCustomHeight();
+          width = this.getCustomWidth();
+          height = this.getCustomHeight();
         }
 
         this._pixiObject.pivot.x = width / 2;

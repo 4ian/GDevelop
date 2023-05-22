@@ -7,79 +7,75 @@ macro(gd_add_extension_includes)
 	include_directories(${GDCORE_include_dir})
 endmacro()
 
-#Add common defines for a target that will be a GD extension
+# Add common defines for a target that will be a GD extension
 function(gd_add_extension_definitions target_name)
 
-	#Define used in GD to check the build type
-	IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-		add_definitions( -DDEBUG )
-	ELSE()
-		add_definitions( -DRELEASE )
-	ENDIF()
+	# Define used in GD to check the build type
+	if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+		add_definitions(-DDEBUG)
+	else()
+		add_definitions(-DRELEASE)
+	endif()
 
 	set(${target_name}_extra_definitions "${${target_name}_extra_definitions} GD_IDE_ONLY=1;" PARENT_SCOPE)
 
-	#Defne used in GD to identify the environment
-	IF (EMSCRIPTEN)
-		add_definitions( -DEMSCRIPTEN )
-	ELSEIF(WIN32)
-		add_definitions( -DWINDOWS )
-    ELSEIF(APPLE)
-    	add_definitions( -DMACOS )
-    ELSE()
-		add_definitions( -DLINUX )
-	ENDIF()
+	# Define used in GD to identify the environment
+	if(EMSCRIPTEN)
+		add_definitions(-DEMSCRIPTEN)
+	elseif(WIN32)
+		add_definitions(-DWINDOWS)
+	elseif(APPLE)
+		add_definitions(-DMACOS)
+	else()
+		add_definitions(-DLINUX)
+	endif()
 
-	IF(WIN32) #Windows specific defines
-		add_definitions( "-DGD_CORE_API=__declspec(dllimport)" )
-		add_definitions( "-DGD_API=__declspec(dllimport)" )
-		add_definitions( "-DGD_EXTENSION_API=__declspec(dllexport)" )
-		add_definitions( -D__GNUWIN32__ )
-	ELSE()
-
-		add_definitions( -DGD_API= )
-		add_definitions( -DGD_CORE_API= )
-		add_definitions( -DGD_EXTENSION_API= )
-	ENDIF(WIN32)
+	if(WIN32) # Windows specific defines
+		add_definitions("-DGD_API=__declspec(dllimport)")
+		add_definitions("-DGD_CORE_API=__declspec(dllimport)")
+		add_definitions("-DGD_EXTENSION_API=__declspec(dllexport)")
+		add_definitions(-D__GNUWIN32__)
+	else()
+		add_definitions(-DGD_API=)
+		add_definitions(-DGD_CORE_API=)
+		add_definitions(-DGD_EXTENSION_API=)
+	endif()
 endfunction()
 
-#Add a GD extension target, that will produce the final library file.
+# Add a GD extension target, that will produce the final library file.
 function(gd_add_extension_target target_name source_files)
-	IF(target_name STREQUAL "")
-		MESSAGE(ERROR "You called gd_add_extension_target without specifying a target name")
-	ENDIF()
+	if(target_name STREQUAL "")
+		message(ERROR "You called gd_add_extension_target without specifying a target name")
+	endif()
 
-	SET(platform_directory ${ARGV2})
-	IF(NOT platform_directory)
-		SET(platform_directory "CppPlatform")
-	ENDIF()
+	set(platform_directory ${ARGV2})
+	if(NOT platform_directory)
+		set(platform_directory "CppPlatform")
+	endif()
 
-	IF(EMSCRIPTEN)
+	if(EMSCRIPTEN)
 		# Emscripten treats all libraries as static libraries
 		add_library(${target_name} STATIC ${source_files})
-	ELSE()
+	else()
 		add_library(${target_name} SHARED ${source_files})
-	ENDIF()
+	endif()
 	set_target_properties(${target_name} PROPERTIES PREFIX "")
 	set_target_properties(${target_name} PROPERTIES COMPILE_DEFINITIONS "${${target_name}_extra_definitions}")
 	set_target_properties(${target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/${platform_directory}/Extensions")
 	set_target_properties(${target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/${platform_directory}/Extensions")
 	set_target_properties(${target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/${platform_directory}/Extensions")
-	IF(WIN32) #GD extensions have special suffix in their filenames.
+	if(WIN32) # GD extensions have special suffix in their filenames.
 		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgdwe")
-	ELSEIF(EMSCRIPTEN)
+	elseif(EMSCRIPTEN)
 		set_target_properties(${target_name} PROPERTIES SUFFIX ".bc")
-	ELSE()
+	else()
 		set_target_properties(${target_name} PROPERTIES SUFFIX ".xgde")
-	ENDIF()
+	endif()
 endfunction()
 
-#Link default libraries with a target that is a GD extension
+# Link default libraries with a target that is a GD extension
 function(gd_extension_link_libraries target_name)
-	IF(EMSCRIPTEN)
-		#Nothing.
-	ELSE()
+	if(NOT EMSCRIPTEN)
 		target_link_libraries(${target_name} GDCore)
-	ENDIF()
+	endif()
 endfunction()
-

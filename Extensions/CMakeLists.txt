@@ -6,22 +6,29 @@ cmake_minimum_required(VERSION 3.5)
 project(GD-Extensions)
 include(CMakeUtils.txt) # Functions to factor common tasks done in CMakeLists.txt of extensions
 
-# Add all the CMakeLists (for non pure JS extensions):
-add_subdirectory(3D)
-add_subdirectory(AnchorBehavior)
-add_subdirectory(DestroyOutsideBehavior)
-add_subdirectory(DraggableBehavior)
-add_subdirectory(Inventory)
-add_subdirectory(LinkedObjects)
-add_subdirectory(ParticleSystem)
-add_subdirectory(PanelSpriteObject)
-add_subdirectory(PathfindingBehavior)
-add_subdirectory(PhysicsBehavior)
-add_subdirectory(PlatformBehavior)
-add_subdirectory(PrimitiveDrawing)
-add_subdirectory(Shopify)
-add_subdirectory(SystemInfo)
-add_subdirectory(TextEntryObject)
-add_subdirectory(TextObject)
-add_subdirectory(TiledSpriteObject)
-add_subdirectory(TopDownMovementBehavior)
+# List of non pure JS extensions
+set(
+	GD_EXTENSIONS
+	3D
+	AnchorBehavior
+	DestroyOutsideBehavior
+	DraggableBehavior
+	Inventory
+	LinkedObjects
+	PanelSpriteObject
+	ParticleSystem
+	PathfindingBehavior
+	PhysicsBehavior
+	PlatformBehavior
+	PrimitiveDrawing
+	Shopify
+	SystemInfo
+	TextEntryObject
+	TextObject
+	TiledSpriteObject
+	TopDownMovementBehavior)
+
+# Automatically add all listed extensions
+foreach(extension ${GD_EXTENSIONS})
+	add_subdirectory(${extension})
+endforeach()

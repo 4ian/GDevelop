@@ -165,12 +165,8 @@ const InstancePropertiesEditor = ({
             name: 'Width',
             getLabel: () => i18n._(t`Width`),
             valueType: 'number',
-            getValue: (instance: gdInitialInstance) => {
-              console.log(onGetInstanceSize(instance)[0]);
-              return (
-                instance.getCustomWidth() || onGetInstanceSize(instance)[0]
-              );
-            },
+            getValue: (instance: gdInitialInstance) => 
+                instance.getCustomWidth() || onGetInstanceSize(instance)[0],
             setValue: (instance: gdInitialInstance, newValue: number) => {
               instance.setHasCustomSize(true);
               instance.setCustomWidth(Math.max(newValue, 0));

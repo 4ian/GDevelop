@@ -19,4 +19,9 @@ describe('cleanUpGameSlug', () => {
     );
     expect(cleanUpGameSlug('птфцчшщыэюя')).toEqual('ptftschshshchyeyuya');
   });
+  it('should complete the slug with dashes if the input is not long enough', () => {
+    expect(cleanUpGameSlug('TMNT')).toEqual(
+      'tmnt--'
+    );
+  })
 });

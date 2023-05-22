@@ -22,6 +22,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
 
 const GAME_SLUG_MAX_LENGTH = 30;
+const GAME_SLUG_MIN_LENGTH = 6;
 
 const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
@@ -38,12 +39,18 @@ export const cleanUpGameSlug = (gameSlug: string) => {
       })
       .join('');
   }
-  return latinGameSlug
+  let slug = latinGameSlug
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '-')
     .toLowerCase()
     .slice(0, GAME_SLUG_MAX_LENGTH);
+  if (slug.length < GAME_SLUG_MIN_LENGTH) {
+    slug = slug.concat(
+      new Array(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
+    );
+  }
+  return slug;
 };
 
 type Props = {|

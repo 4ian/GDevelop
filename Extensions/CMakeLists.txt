@@ -1,7 +1,7 @@
 #This is the CMake file used to build the C++ extensions.
 #For more information, see the README.md file.
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0011 NEW)
 
 project(GD-Extensions)

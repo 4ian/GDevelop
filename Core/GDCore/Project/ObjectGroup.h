@@ -8,7 +8,10 @@
 #define GDCORE_OBJECTGROUP_H
 #include <utility>
 #include <vector>
+
 #include "GDCore/String.h"
+#include "GDCore/Tools/MakeUnique.h"
+
 namespace gd {
 class SerializerElement;
 }
@@ -25,8 +28,37 @@ namespace gd {
  */
 class GD_CORE_API ObjectGroup {
  public:
-  ObjectGroup(){};
-  virtual ~ObjectGroup(){};
+  ObjectGroup();
+
+  /**
+   * Copy constructor. Calls Init().
+   */
+  ObjectGroup(const ObjectGroup& group) { Init(group); };
+
+  /**
+   * Assignment operator. Calls Init().
+   */
+  ObjectGroup& operator=(const gd::ObjectGroup& objectGroup) {
+    if ((this) != &objectGroup) Init(objectGroup);
+    return *this;
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~ObjectGroup();
+
+  /**
+   * Must return a pointer to a copy of the object. A such method is needed to
+   * do polymorphic copies. Just redefine this method in your derived object
+   * class like this:
+   * \code
+   * return gd::make_unique<MyObject>(*this);
+   * \endcode
+   */
+  virtual std::unique_ptr<gd::ObjectGroup> Clone() const {
+    return gd::make_unique<gd::ObjectGroup>(*this);
+  }
 
   /**
    * \brief Return true if an object is found inside the ObjectGroup.
@@ -60,6 +92,10 @@ class GD_CORE_API ObjectGroup {
    * \brief Get a vector with objects names.
    */
   inline const std::vector<gd::String>& GetAllObjectsNames() const {
+    std::cout << "memberobjectsize: " << memberObjects.size() << std::endl;
+    for (std::size_t i = 0; i < memberObjects.size(); ++i) {
+      std::cout << "Object " << i << " : " << memberObjects[i] << std::endl;
+    }
     return memberObjects;
   }
 
@@ -72,6 +108,12 @@ class GD_CORE_API ObjectGroup {
    * \brief Unserialize the group.
    */
   void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * Initialize from another object group. Used by copy-ctor and assign-op.
+   * Don't forget to update me if members were changed!
+   */
+  void Init(const gd::ObjectGroup& other);
 
  private:
   std::vector<gd::String> memberObjects;

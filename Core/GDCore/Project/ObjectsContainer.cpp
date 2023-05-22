@@ -4,7 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/ObjectsContainer.h"
+
 #include <algorithm>
+
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
@@ -16,14 +18,12 @@ ObjectsContainer::ObjectsContainer() {}
 
 ObjectsContainer::~ObjectsContainer() {}
 
-#if defined(GD_IDE_ONLY)
 void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("object");
   for (std::size_t j = 0; j < initialObjects.size(); j++) {
     initialObjects[j]->SerializeTo(element.AddChild("object"));
   }
 }
-#endif
 
 void ObjectsContainer::UnserializeObjectsFrom(
     gd::Project& project, const SerializerElement& element) {
@@ -75,7 +75,6 @@ std::size_t ObjectsContainer::GetObjectPosition(const gd::String& name) const {
 std::size_t ObjectsContainer::GetObjectsCount() const {
   return initialObjects.size();
 }
-#if defined(GD_IDE_ONLY)
 gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
                                               const gd::String& objectType,
                                               const gd::String& name,
@@ -87,7 +86,6 @@ gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
 
   return newlyCreatedObject;
 }
-#endif
 
 gd::Object& ObjectsContainer::InsertObject(const gd::Object& object,
                                            std::size_t position) {
@@ -119,7 +117,7 @@ void ObjectsContainer::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
 }
 
 void ObjectsContainer::RemoveObject(const gd::String& name) {
-  std::vector<std::unique_ptr<gd::Object> >::iterator objectIt =
+  std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
               bind2nd(ObjectHasName(), name));
@@ -132,7 +130,7 @@ void ObjectsContainer::MoveObjectToAnotherContainer(
     const gd::String& name,
     gd::ObjectsContainer& newContainer,
     std::size_t newPosition) {
-  std::vector<std::unique_ptr<gd::Object> >::iterator objectIt =
+  std::vector<std::unique_ptr<gd::Object>>::iterator objectIt =
       find_if(initialObjects.begin(),
               initialObjects.end(),
               bind2nd(ObjectHasName(), name));

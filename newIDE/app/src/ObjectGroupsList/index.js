@@ -210,8 +210,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     newGroup.setName(newName); // Unserialization has overwritten the name.
 
     this._onObjectGroupModified();
-
-    return { group: newGroup, global };
   };
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {

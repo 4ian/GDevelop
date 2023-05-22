@@ -6,8 +6,9 @@
 
 #ifndef GDCORE_OBJECTGROUPSCONTAINER_H
 #define GDCORE_OBJECTGROUPSCONTAINER_H
-#include <vector>
 #include <algorithm>
+#include <vector>
+
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -172,7 +173,7 @@ class GD_CORE_API ObjectGroupsContainer {
   ///@}
 
  private:
-  std::vector<ObjectGroup> objectGroups;
+  std::vector<std::unique_ptr<gd::ObjectGroup>> objectGroups;
   static ObjectGroup badGroup;
 };
 

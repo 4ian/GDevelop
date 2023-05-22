@@ -72,6 +72,8 @@ const objectTypeToDefaultName = {
   'MyDummyExtension::DummyObject': 'NewDummyObject',
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',
+  'Scene3D::Model3DObject': 'NewModel3D',
+  'Scene3D::Cube3DObject': 'NewBox3D',
   'Video::VideoObject': 'NewVideo',
 };
 

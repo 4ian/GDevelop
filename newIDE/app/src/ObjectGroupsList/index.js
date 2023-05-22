@@ -196,6 +196,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       ? globalObjectGroups
       : objectGroups;
 
+    const serializedDuplicatedGroup = serializeToJSObject(group);
     const newGroup = container.insertNew(
       newName,
       container.getPosition(group.getName()) + 1
@@ -203,7 +204,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     unserializeFromJSObject(
       newGroup,
-      serializeToJSObject(group),
+      serializedDuplicatedGroup,
       'unserializeFrom'
     );
     newGroup.setName(newName); // Unserialization has overwritten the name.

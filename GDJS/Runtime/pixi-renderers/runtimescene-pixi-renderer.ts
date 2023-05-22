@@ -134,6 +134,7 @@ namespace gdjs {
               (runtimeLayer.isLightingLayer() &&
                 runtimeLayerRenderer.getLightingSprite()) ||
               runtimeLayerRenderer.getRendererObject();
+
             pixiRenderer.render(pixiContainer, { clear: false });
             this._layerRenderingMetrics.rendered2DLayersCount++;
 
@@ -218,6 +219,11 @@ namespace gdjs {
 
         // Uncomment to display some debug metrics from Three.js.
         // console.log(threeRenderer.info);
+
+        const debugContainer = this._runtimeScene
+          .getDebuggerRenderer()
+          .getRendererObject();
+        if (debugContainer) pixiRenderer.render(debugContainer);
       } else {
         // 2D only rendering.
 

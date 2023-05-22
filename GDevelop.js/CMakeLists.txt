@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.5)
-cmake_policy(SET CMP0015 NEW)
 
 project(libGD.js)
 
@@ -13,9 +12,9 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2") # Optimizations during compilation
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g --profiling") # Uncomment for debugging + profiling support
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --profiling") # Uncomment for profiling support
+add_compile_options(-O2) # Optimizations during compilation
+# add_compile_options(-g --profiling) # Uncomment for debugging + profiling support
+# add_compile_options(--profiling) # Uncomment for profiling support
 
 # Common directories:
 #

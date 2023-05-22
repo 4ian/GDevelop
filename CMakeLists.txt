@@ -51,7 +51,7 @@ if(APPLE)
 endif()
 # Sanity checks
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-	message("CMAKE_BUILD_TYPE is empty, assuming build type is Release")
+	message(STATUS "CMAKE_BUILD_TYPE is empty, assuming build type is Release")
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 

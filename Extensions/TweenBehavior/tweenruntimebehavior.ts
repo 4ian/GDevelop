@@ -362,7 +362,7 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.Cube3DRuntimeObject)) return;
+      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
 
       this._addTween(
         identifier,

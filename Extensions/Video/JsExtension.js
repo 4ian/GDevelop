@@ -664,8 +664,8 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
+        this._pixiObject.width = this.getCustomWidth();
+        this._pixiObject.height = this.getCustomHeight();
       }
     };
 

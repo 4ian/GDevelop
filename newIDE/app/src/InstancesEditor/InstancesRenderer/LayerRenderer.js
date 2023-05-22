@@ -221,7 +221,16 @@ export default class LayerRenderer {
 
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
     if (instance.hasCustomSize())
-      return [instance.getCustomWidth(), instance.getCustomHeight()];
+      return [
+        instance.getCustomWidth() ||
+          (this.renderedInstances[instance.ptr]
+            ? this.renderedInstances[instance.ptr].getDefaultWidth()
+            : 0),
+        instance.getCustomHeight() ||
+          (this.renderedInstances[instance.ptr]
+            ? this.renderedInstances[instance.ptr].getDefaultHeight()
+            : 0),
+      ];
 
     return this.renderedInstances[instance.ptr]
       ? [

@@ -1896,12 +1896,8 @@ module.exports = {
       }
 
       updatePIXISprite() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this.getDefaultWidth();
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this.getDefaultHeight();
+        const width = this.getWidth();
+        const height = this.getHeight();
 
         this._pixiTexturedObject.anchor.x =
           this._centerX / this._pixiTexturedObject.texture.frame.width;
@@ -1923,12 +1919,8 @@ module.exports = {
       }
 
       updateFallbackObject() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this.getDefaultWidth();
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this.getDefaultHeight();
+        const width = this.getWidth();
+        const height = this.getHeight();
 
         this._pixiFallbackObject.clear();
         this._pixiFallbackObject.beginFill(0x0033ff);
@@ -1968,11 +1960,7 @@ module.exports = {
 
       getCenterX() {
         if (this._renderFallbackObject) {
-          if (this._instance.hasCustomSize()) {
-            return this._instance.getCustomWidth() / 2;
-          } else {
-            return this.getDefaultWidth() / 2;
-          }
+          return this.getWidth() / 2;
         } else {
           return this._centerX * this._pixiTexturedObject.scale.x;
         }
@@ -1980,11 +1968,7 @@ module.exports = {
 
       getCenterY() {
         if (this._renderFallbackObject) {
-          if (this._instance.hasCustomSize()) {
-            return this._instance.getCustomHeight() / 2;
-          } else {
-            return this.getDefaultHeight() / 2;
-          }
+          return this.getHeight() / 2;
         } else {
           return this._centerY * this._pixiTexturedObject.scale.y;
         }
@@ -2081,12 +2065,8 @@ module.exports = {
       }
 
       updateThreeObject() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this.getDefaultWidth();
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this.getDefaultHeight();
+        const width = this.getWidth();
+        const height = this.getHeight();
         let depth;
         if (this._instance.hasCustomSize()) {
           const instancePropertyDepth =
@@ -2334,12 +2314,8 @@ module.exports = {
       }
 
       updatePixiObject() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this.getDefaultWidth();
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this.getDefaultHeight();
+        const width = this.getWidth();
+        const height = this.getHeight();
 
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);
@@ -2366,22 +2342,6 @@ module.exports = {
 
       getDefaultHeight() {
         return this._defaultHeight;
-      }
-
-      getCenterX() {
-        if (this._instance.hasCustomSize()) {
-          return this._instance.getCustomWidth() / 2;
-        } else {
-          return this.getDefaultWidth() / 2;
-        }
-      }
-
-      getCenterY() {
-        if (this._instance.hasCustomSize()) {
-          return this._instance.getCustomHeight() / 2;
-        } else {
-          return this.getDefaultHeight() / 2;
-        }
       }
     }
 
@@ -2425,12 +2385,8 @@ module.exports = {
       }
 
       update() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this._defaultWidth;
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this._defaultHeight;
+        const width = this.getWidth();
+        const height = this.getHeight();
 
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x0033ff);
@@ -2598,12 +2554,8 @@ module.exports = {
       }
 
       updateThreeObject() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this.getDefaultWidth();
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this.getDefaultHeight();
+        const width = this.getWidth();
+        const height = this.getHeight();
         let depth;
         if (this._instance.hasCustomSize()) {
           const instancePropertyDepth =
@@ -2639,12 +2591,8 @@ module.exports = {
       }
 
       updatePixiObject() {
-        const width = this._instance.hasCustomSize()
-          ? this._instance.getCustomWidth()
-          : this.getDefaultWidth();
-        const height = this._instance.hasCustomSize()
-          ? this._instance.getCustomHeight()
-          : this.getDefaultHeight();
+        const width = this.getWidth();
+        const height = this.getHeight();
 
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);

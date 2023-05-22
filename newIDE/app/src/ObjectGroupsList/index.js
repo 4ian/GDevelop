@@ -186,15 +186,15 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const { group, global } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
+    const newName = newNameGenerator(
+      group.getName(),
+      name => objectGroups.has(name) || globalObjectGroups.has(name),
+      ''
+    );
+
     const container: gdObjectGroupsContainer = global
       ? globalObjectGroups
       : objectGroups;
-
-    const newName = newNameGenerator(
-      group.getName(),
-      name => container.has(name),
-      ''
-    );
 
     const newGroup = container.insertNew(
       newName,

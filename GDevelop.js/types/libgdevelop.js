@@ -52,6 +52,7 @@ declare class libGDevelop {
   ProjectHelper: Class<gdProjectHelper>;
   EventsVariablesFinder: Class<gdEventsVariablesFinder>;
   EventsIdentifiersFinder: Class<gdEventsIdentifiersFinder>;
+  EventsFunctionSelfCallChecker: Class<gdEventsFunctionSelfCallChecker>;
   InstructionOrExpressionGroupMetadata: Class<gdInstructionOrExpressionGroupMetadata>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;

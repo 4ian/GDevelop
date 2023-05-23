@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
@@ -100,6 +100,8 @@ import LeaderboardContext, {
 } from '../Leaderboard/LeaderboardContext';
 import { TutorialContext } from '../Tutorial/TutorialContext';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
+import AlertMessage from '../UI/AlertMessage';
+import { Column, Line } from '../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -1687,6 +1689,31 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const screenType = useScreenType();
 
+    const isFunctionOnlyCallingItself =
+      scope.eventsFunctionsExtension &&
+      scope.eventsFunction &&
+      ((!scope.eventsBasedBehavior &&
+        !scope.eventsBasedObject &&
+        gd.EventsFunctionSelfCallChecker.isFreeFunctionOnlyCallingItself(
+          project,
+          scope.eventsFunctionsExtension,
+          scope.eventsFunction
+        )) ||
+        (scope.eventsBasedBehavior &&
+          gd.EventsFunctionSelfCallChecker.isBehaviorFunctionOnlyCallingItself(
+            project,
+            scope.eventsFunctionsExtension,
+            scope.eventsBasedBehavior,
+            scope.eventsFunction
+          )) ||
+        (scope.eventsBasedObject &&
+          gd.EventsFunctionSelfCallChecker.isObjectFunctionOnlyCallingItself(
+            project,
+            scope.eventsFunctionsExtension,
+            scope.eventsBasedObject,
+            scope.eventsFunction
+          )));
+
     return (
       <ResponsiveWindowMeasurer>
         {windowWidth => (
@@ -1718,6 +1745,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 ref={this._containerDiv}
                 tabIndex={0}
               >
+                {isFunctionOnlyCallingItself && (
+                  <Line>
+                    <Column expand>
+                      <AlertMessage kind="warning">
+                        <Trans>
+                          This function calls itself (it is "recursive"). Ensure
+                          this is expected and there is a proper condition to
+                          stop it if necessary.
+                        </Trans>
+                      </AlertMessage>
+                    </Column>
+                  </Line>
+                )}
                 <EventsTree
                   ref={eventsTree => (this._eventsTree = eventsTree)}
                   key={events.ptr}

@@ -66,6 +66,11 @@ class GD_CORE_API ReadOnlyEventVisitor {
    * Note that VisitEvent is also called with this event.
    */
   virtual void VisitLinkEvent(const gd::LinkEvent& linkEvent) = 0;
+
+  /**
+   * @brief Abort the iteration on the events.
+   */
+  virtual void StopAnyEventIteration() = 0;
 };
 
 }

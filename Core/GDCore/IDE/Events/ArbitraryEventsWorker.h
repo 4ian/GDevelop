@@ -144,13 +144,16 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
  */
 class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
  public:
-  ReadOnlyArbitraryEventsWorker(){};
+  ReadOnlyArbitraryEventsWorker() : shouldStopIteration(false) {};
   virtual ~ReadOnlyArbitraryEventsWorker();
 
   /**
    * \brief Launch the worker on the specified events list.
    */
   void Launch(const gd::EventsList& events) { VisitEventList(events); };
+
+protected:
+  void StopAnyEventIteration() override;
 
  private:
   void VisitEventList(const gd::EventsList& events);
@@ -188,6 +191,8 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
    */
   virtual void DoVisitInstruction(const gd::Instruction& instruction,
                                   bool isCondition) {};
+
+  bool shouldStopIteration;
 };
 
 /**

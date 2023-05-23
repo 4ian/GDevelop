@@ -27,8 +27,10 @@ namespace gd {
  */
 class GD_CORE_API ObjectGroupsContainer {
  public:
-  ObjectGroupsContainer(){};
+  ObjectGroupsContainer();
+  ObjectGroupsContainer(const ObjectGroupsContainer&);
   virtual ~ObjectGroupsContainer(){};
+  ObjectGroupsContainer& operator=(const ObjectGroupsContainer& rhs);
 
   /**
    * \brief Return true if the specified group is in the container
@@ -171,6 +173,12 @@ class GD_CORE_API ObjectGroupsContainer {
    */
   const ObjectGroup& at(size_t index) const { return Get(index); };
   ///@}
+
+  /**
+   * Initialize from another object groups container. Used by copy-ctor and
+   * assign-op. Don't forget to update me if members were changed!
+   */
+  void Init(const gd::ObjectGroupsContainer& other);
 
  private:
   std::vector<std::unique_ptr<gd::ObjectGroup>> objectGroups;

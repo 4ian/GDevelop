@@ -4,19 +4,35 @@
  * reserved. This project is released under the MIT License.
  */
 
-#include "GDCore/Project/ObjectGroupsContainer.h"
+#include "ObjectGroupsContainer.h"
 
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 
 namespace gd {
+gd::ObjectGroup ObjectGroupsContainer::badGroup;
 
 ObjectGroupsContainer::ObjectGroupsContainer() {}
 
-ObjectGroupsContainer::~ObjectGroupsContainer() {}
+ObjectGroupsContainer::ObjectGroupsContainer(
+    const ObjectGroupsContainer& other) {
+  Init(other);
+}
 
-ObjectGroup ObjectGroupsContainer::badGroup;
+ObjectGroupsContainer& ObjectGroupsContainer::operator=(
+    const ObjectGroupsContainer& other) {
+  if (this != &other) Init(other);
+
+  return *this;
+}
+
+void ObjectGroupsContainer::Init(const ObjectGroupsContainer& other) {
+  objectGroups.clear();
+  for (auto& it : other.objectGroups) {
+    objectGroups.push_back(it->Clone());
+  }
+}
 
 void ObjectGroupsContainer::SerializeTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("group");
@@ -37,10 +53,11 @@ void ObjectGroupsContainer::UnserializeFrom(const SerializerElement& element) {
 }
 
 bool ObjectGroupsContainer::Has(const gd::String& name) const {
-  auto i = std::find_if(
-      objectGroups.begin(),
-      objectGroups.end(),
-      [&name](const ObjectGroup& group) { return group.GetName() == name; });
+  auto i = std::find_if(objectGroups.begin(),
+                        objectGroups.end(),
+                        [&name](const std::unique_ptr<gd::ObjectGroup>& group) {
+                          return group->GetName() == name;
+                        });
   return (i != objectGroups.end());
 }
 
@@ -57,32 +74,35 @@ const ObjectGroup& ObjectGroupsContainer::Get(std::size_t index) const {
 }
 
 ObjectGroup& ObjectGroupsContainer::Get(const gd::String& name) {
-  auto i = std::find_if(
-      objectGroups.begin(),
-      objectGroups.end(),
-      [&name](const ObjectGroup& group) { return group.GetName() == name; });
+  auto i = std::find_if(objectGroups.begin(),
+                        objectGroups.end(),
+                        [&name](const std::unique_ptr<gd::ObjectGroup>& group) {
+                          return group->GetName() == name;
+                        });
   if (i != objectGroups.end()) return **i;
 
   return badGroup;
 }
 
 const ObjectGroup& ObjectGroupsContainer::Get(const gd::String& name) const {
-  auto i = std::find_if(
-      objectGroups.begin(),
-      objectGroups.end(),
-      [&name](const ObjectGroup& group) { return group.GetName() == name; });
+  auto i = std::find_if(objectGroups.begin(),
+                        objectGroups.end(),
+                        [&name](const std::unique_ptr<gd::ObjectGroup>& group) {
+                          return group->GetName() == name;
+                        });
   if (i != objectGroups.end()) return **i;
 
   return badGroup;
 }
 
 void ObjectGroupsContainer::Remove(const gd::String& name) {
-  objectGroups.erase(std::remove_if(objectGroups.begin(),
-                                    objectGroups.end(),
-                                    [&name](const ObjectGroup& group) {
-                                      return group.GetName() == name;
-                                    }),
-                     objectGroups.end());
+  objectGroups.erase(
+      std::remove_if(objectGroups.begin(),
+                     objectGroups.end(),
+                     [&name](const std::unique_ptr<gd::ObjectGroup>& group) {
+                       return group->GetName() == name;
+                     }),
+      objectGroups.end());
 }
 
 std::size_t ObjectGroupsContainer::GetPosition(const gd::String& name) const {
@@ -98,7 +118,7 @@ ObjectGroup& ObjectGroupsContainer::InsertNew(const gd::String& name,
   gd::ObjectGroup& newlyInsertedGroup = *(*(objectGroups.insert(
       position < objectGroups.size() ? objectGroups.begin() + position
                                      : objectGroups.end(),
-      gd::make_unique<ObjectGroup>())));
+      gd::make_unique<gd::ObjectGroup>())));
   newlyInsertedGroup.SetName(name);
   return newlyInsertedGroup;
 }
@@ -116,11 +136,12 @@ bool ObjectGroupsContainer::Rename(const gd::String& oldName,
                                    const gd::String& newName) {
   if (Has(newName)) return false;
 
-  auto i = std::find_if(objectGroups.begin(),
-                        objectGroups.end(),
-                        [&oldName](const ObjectGroup& group) {
-                          return group.GetName() == oldName;
-                        });
+  auto i =
+      std::find_if(objectGroups.begin(),
+                   objectGroups.end(),
+                   [&oldName](const std::unique_ptr<gd::ObjectGroup>& group) {
+                     return group->GetName() == oldName;
+                   });
   if (i != objectGroups.end()) {
     (*i)->SetName(newName);
   }

@@ -711,7 +711,7 @@ module.exports = {
       const wordWrap = properties.get('wordWrap').getValue() === 'true';
       if (wordWrap && this._instance.hasCustomSize()) {
         this._pixiObject.maxWidth =
-          this._instance.getCustomWidth() / this._pixiObject.scale.x;
+          this.getCustomWidth() / this._pixiObject.scale.x;
         this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;

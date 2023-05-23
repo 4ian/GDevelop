@@ -606,7 +606,7 @@ module.exports = {
       );
 
       if (this._instance.hasCustomSize() && this._pixiObject) {
-        const customWidth = this._instance.getCustomWidth();
+        const customWidth = this.getCustomWidth();
         if (
           this._pixiObject &&
           this._pixiObject._style.wordWrapWidth !== customWidth

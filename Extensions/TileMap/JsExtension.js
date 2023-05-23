@@ -1347,9 +1347,9 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.x = this.getCustomWidth() / this.width;
         this._pixiObject.scale.y =
-          this._instance.getCustomHeight() / this.height;
+          this.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;
@@ -1599,9 +1599,9 @@ module.exports = {
      */
     RenderedCollisionMaskInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.x = this.getCustomWidth() / this.width;
         this._pixiObject.scale.y =
-          this._instance.getCustomHeight() / this.height;
+          this.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;

@@ -75,17 +75,31 @@ export default class RenderedInstance {
   }
 
   getCenterX() {
-    if (this._instance.hasCustomSize())
-      return this._instance.getCustomWidth() / 2;
-
-    return this.getDefaultWidth() / 2;
+    return this.getWidth() / 2;
   }
 
   getCenterY() {
-    if (this._instance.hasCustomSize())
-      return this._instance.getCustomHeight() / 2;
+    return this.getHeight() / 2;
+  }
 
-    return this.getDefaultHeight() / 2;
+  getCustomWidth(): number {
+    return this._instance.getCustomWidth() || this.getDefaultWidth();
+  }
+
+  getCustomHeight(): number {
+    return this._instance.getCustomHeight() || this.getDefaultHeight();
+  }
+
+  getWidth(): number {
+    return this._instance.hasCustomSize()
+      ? this.getCustomWidth()
+      : this.getDefaultWidth();
+  }
+
+  getHeight(): number {
+    return this._instance.hasCustomSize()
+      ? this.getCustomHeight()
+      : this.getDefaultHeight();
   }
 
   /**

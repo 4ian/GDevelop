@@ -39,12 +39,8 @@ export default class RenderedUnknownInstance extends RenderedInstance {
   }
 
   update() {
-    const width = this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
-      : 32;
-    const height = this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
-      : 32;
+    const width = this.getWidth();
+    const height = this.getHeight();
 
     this._pixiObject.clear();
     this._pixiObject.beginFill(0x0033ff);

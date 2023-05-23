@@ -154,11 +154,6 @@ const InstancePropertiesEditor = ({
         valueType: 'boolean',
         getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
         setValue: (instance: gdInitialInstance, newValue: boolean) => {
-          if (newValue) {
-            const [width, height] = onGetInstanceSize(instance);
-            instance.setCustomWidth(width);
-            instance.setCustomHeight(height);
-          }
           instance.setHasCustomSize(newValue);
         },
       },
@@ -171,7 +166,7 @@ const InstancePropertiesEditor = ({
             getLabel: () => i18n._(t`Width`),
             valueType: 'number',
             getValue: (instance: gdInitialInstance) =>
-              instance.getCustomWidth(),
+              instance.getCustomWidth() || onGetInstanceSize(instance)[0],
             setValue: (instance: gdInitialInstance, newValue: number) => {
               instance.setHasCustomSize(true);
               instance.setCustomWidth(Math.max(newValue, 0));
@@ -182,7 +177,7 @@ const InstancePropertiesEditor = ({
             getLabel: () => i18n._(t`Height`),
             valueType: 'number',
             getValue: (instance: gdInitialInstance) =>
-              instance.getCustomHeight(),
+              instance.getCustomHeight() || onGetInstanceSize(instance)[1],
             setValue: (instance: gdInitialInstance, newValue: number) => {
               instance.setHasCustomSize(true);
               instance.setCustomHeight(Math.max(newValue, 0));

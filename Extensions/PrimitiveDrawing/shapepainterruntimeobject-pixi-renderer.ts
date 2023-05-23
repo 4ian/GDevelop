@@ -239,6 +239,7 @@ namespace gdjs {
     }
 
     beginFillPath() {
+      this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255

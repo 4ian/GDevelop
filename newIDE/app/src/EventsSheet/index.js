@@ -1750,8 +1750,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     <Column expand>
                       <AlertMessage kind="warning">
                         <Trans>
-                          This function is calling itself. It may cause crashes
-                          at preview.
+                          This function calls itself (it is "recursive"). Ensure
+                          this is expected and there is a proper condition to
+                          stop it if necessary.
                         </Trans>
                       </AlertMessage>
                     </Column>

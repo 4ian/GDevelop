@@ -28,12 +28,12 @@ namespace gd {
  */
 class GD_CORE_API ObjectGroup {
  public:
-  ObjectGroup();
+  ObjectGroup(){};
 
   /**
    * Copy constructor. Calls Init().
    */
-  ObjectGroup(const ObjectGroup& group) { Init(group); };
+  ObjectGroup(const gd::ObjectGroup& group) { Init(group); };
 
   /**
    * Assignment operator. Calls Init().

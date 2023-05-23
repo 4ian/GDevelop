@@ -211,6 +211,17 @@ namespace gdjs {
           }
         }
 
+        const debugContainer = this._runtimeScene
+          .getDebuggerRenderer()
+          .getRendererObject();
+
+        if (debugContainer) {
+          threeRenderer.resetState();
+          pixiRenderer.reset();
+          pixiRenderer.render(debugContainer);
+          lastRenderWas3D = false;
+        }
+
         if (!lastRenderWas3D) {
           // Out of caution, reset the WebGL states from PixiJS to start again
           // with a 3D rendering on the next frame.
@@ -219,11 +230,6 @@ namespace gdjs {
 
         // Uncomment to display some debug metrics from Three.js.
         // console.log(threeRenderer.info);
-
-        const debugContainer = this._runtimeScene
-          .getDebuggerRenderer()
-          .getRendererObject();
-        if (debugContainer) pixiRenderer.render(debugContainer);
       } else {
         // 2D only rendering.
 

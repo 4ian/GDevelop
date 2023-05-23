@@ -220,22 +220,19 @@ export default class LayerRenderer {
   };
 
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
+    const renderedInstance = this.renderedInstances[instance.ptr];
     if (instance.hasCustomSize())
       return [
         instance.getCustomWidth() ||
-          (this.renderedInstances[instance.ptr]
-            ? this.renderedInstances[instance.ptr].getDefaultWidth()
-            : 0),
+          (renderedInstance ? renderedInstance.getDefaultWidth() : 0),
         instance.getCustomHeight() ||
-          (this.renderedInstances[instance.ptr]
-            ? this.renderedInstances[instance.ptr].getDefaultHeight()
-            : 0),
+          (renderedInstance ? renderedInstance.getDefaultHeight() : 0),
       ];
 
-    return this.renderedInstances[instance.ptr]
+    return renderedInstance
       ? [
-          this.renderedInstances[instance.ptr].getDefaultWidth(),
-          this.renderedInstances[instance.ptr].getDefaultHeight(),
+          renderedInstance.getDefaultWidth(),
+          renderedInstance.getDefaultHeight(),
         ]
       : [0, 0];
   };

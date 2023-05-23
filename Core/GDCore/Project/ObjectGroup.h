@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "GDCore/String.h"
-#include "GDCore/Tools/MakeUnique.h"
 
 namespace gd {
 class SerializerElement;
@@ -30,18 +29,6 @@ class GD_CORE_API ObjectGroup {
  public:
   ObjectGroup(){};
   virtual ~ObjectGroup(){};
-
-  /**
-   * Must return a pointer to a copy of the object. A such method is needed to
-   * do polymorphic copies. Just redefine this method in your derived object
-   * class like this:
-   * \code
-   * return gd::make_unique<MyObject>(*this);
-   * \endcode
-   */
-  virtual std::unique_ptr<gd::ObjectGroup> Clone() const {
-    return gd::make_unique<gd::ObjectGroup>(*this);
-  }
 
   /**
    * \brief Return true if an object is found inside the ObjectGroup.

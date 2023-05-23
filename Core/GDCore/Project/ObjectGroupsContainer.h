@@ -7,6 +7,7 @@
 #ifndef GDCORE_OBJECTGROUPSCONTAINER_H
 #define GDCORE_OBJECTGROUPSCONTAINER_H
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "GDCore/Project/ObjectGroup.h"

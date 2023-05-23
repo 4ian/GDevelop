@@ -6,6 +6,8 @@
 
 #include "ObjectGroupsContainer.h"
 
+#include <memory>
+
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"

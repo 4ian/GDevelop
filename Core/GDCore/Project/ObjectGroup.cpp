@@ -29,12 +29,10 @@ bool ObjectGroup::Find(const gd::String& name) const {
 }
 
 void ObjectGroup::AddObject(const gd::String& name) {
-  std::cout << "Add object " << name << std::endl;
   if (!Find(name)) memberObjects.push_back(name);
 }
 
 void ObjectGroup::RemoveObject(const gd::String& name) {
-  std::cout << "Remove object " << name << std::endl;
   memberObjects.erase(
       std::remove(memberObjects.begin(), memberObjects.end(), name),
       memberObjects.end());
@@ -48,13 +46,11 @@ void ObjectGroup::RenameObject(const gd::String& oldName,
 }
 
 void ObjectGroup::SerializeTo(SerializerElement& element) const {
-  std::cout << "Serialize ObjectGroup " << GetName() << std::endl;
   element.SetAttribute("name", GetName());
 
   SerializerElement& objectsElement = element.AddChild("objects");
   objectsElement.ConsiderAsArrayOf("object");
   for (auto& name : GetAllObjectsNames()) {
-    std::cout << "objectname" << name << std::endl;
     objectsElement.AddChild("object").SetAttribute("name", name);
   }
 }

@@ -92,10 +92,6 @@ class GD_CORE_API ObjectGroup {
    * \brief Get a vector with objects names.
    */
   inline const std::vector<gd::String>& GetAllObjectsNames() const {
-    std::cout << "memberobjectsize: " << memberObjects.size() << std::endl;
-    for (std::size_t i = 0; i < memberObjects.size(); ++i) {
-      std::cout << "Object " << i << " : " << memberObjects[i] << std::endl;
-    }
     return memberObjects;
   }
 

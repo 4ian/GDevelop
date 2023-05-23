@@ -23,7 +23,10 @@ const QrCode = ({ url, size = 128 }: Props) => {
         {
           text: url,
           radius: 0,
-          ecLevel: 'M', // L, M, Q, H
+          // See https://www.qrcode.com/en/about/error_correction.html.
+          // The lower the level, the smaller the image. We don't need high level
+          // because it won't be damaged.
+          ecLevel: 'L',
           fill: gdevelopTheme.palette.secondary,
           background: null, // color or null for transparent
           size, // in pixels

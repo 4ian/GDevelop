@@ -85,15 +85,17 @@ const LocalNetworkPreviewDialog = ({
             </Text>
           </Line>
           <ShareLink url={url} />
-          <Line>
-            <Text>
-              <Trans>Or flash this QR code:</Trans>
-            </Text>
-          </Line>
           {urlWithProtocol && (
-            <Line justifyContent="center">
-              <QrCode url={urlWithProtocol} size={100} />
-            </Line>
+            <>
+              <Line>
+                <Text>
+                  <Trans>Or flash this QR code:</Trans>
+                </Text>
+              </Line>
+              <Line justifyContent="center">
+                <QrCode url={urlWithProtocol} size={100} />
+              </Line>
+            </>
           )}
           <Line>
             <Text>

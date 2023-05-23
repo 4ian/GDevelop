@@ -145,21 +145,21 @@ interface EventsIdentifiersFinder {
 
 interface EventsFunctionSelfCallChecker {
   boolean STATIC_IsFreeFunctionOnlyCallingItself(
-      [ Const, Ref ] Project project,
-      [ Const, Ref ] EventsFunctionsExtension extension,
-      [ Const, Ref ] EventsFunction eventsFunction);
+      [Const, Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension extension,
+      [Const, Ref] EventsFunction eventsFunction);
 
   boolean STATIC_IsBehaviorFunctionOnlyCallingItself(
-      [ Const, Ref ] Project project,
-      [ Const, Ref ] EventsFunctionsExtension extension,
-      [ Const, Ref ] EventsBasedBehavior eventsBasedBehavior,
-      [ Const, Ref ] EventsFunction eventsFunction);
+      [Const, Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension extension,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const, Ref] EventsFunction eventsFunction);
 
   boolean STATIC_IsObjectFunctionOnlyCallingItself(
-      [ Const, Ref ] Project project,
-      [ Const, Ref ] EventsFunctionsExtension extension,
-      [ Const, Ref ] EventsBasedObject eventsBasedObject,
-      [ Const, Ref ] EventsFunction eventsFunction);
+      [Const, Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension extension,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const, Ref] EventsFunction eventsFunction);
 };
 
 interface InstructionOrExpressionGroupMetadata {

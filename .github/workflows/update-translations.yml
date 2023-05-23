@@ -14,20 +14,12 @@ jobs:
   update-translations:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - uses: actions/checkout@v2
-
-      # Cache npm dependencies to speed up the workflow
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-newIDE-app-node_modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('newIDE/app/package-lock.json') }}
+          cache: 'npm'
+          cache-dependency-path: 'newIDE/app/package-lock.json'
 
       - name: Install gettext
         run: sudo apt update && sudo apt install gettext -y
@@ -64,7 +56,7 @@ jobs:
         working-directory: newIDE/app
 
       - name: Create a Pull Request with the changes
-        uses: peter-evans/create-pull-request@v3.10.1
+        uses: peter-evans/create-pull-request@v5
         with:
           commit-message: Update translations [skip ci]
           branch: chore/update-translations

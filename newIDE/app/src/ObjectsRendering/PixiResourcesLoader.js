@@ -16,7 +16,10 @@ const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
 const loaded3DModels = {};
-const invalidModel = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1));
+const invalidModel = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 1, 1),
+  new THREE.MeshBasicMaterial({ color: '#ff00ff' })
+);
 
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,

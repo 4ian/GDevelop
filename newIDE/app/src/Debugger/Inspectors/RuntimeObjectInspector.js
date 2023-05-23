@@ -42,8 +42,8 @@ const transform = runtimeObject => {
     'Is hidden?': runtimeObject.hidden,
   };
   // TODO: Improve check to have more robust type checking
-  if (runtimeObject._z) {
-    // 3D Cube
+  if (typeof runtimeObject._z !== 'undefined') {
+    // 3D object
     runtimeObjectData['Z position'] = runtimeObject._z;
     runtimeObjectData['Rotation around X axis'] = runtimeObject._rotationX;
     runtimeObjectData['Rotation around Y axis'] = runtimeObject._rotationY;

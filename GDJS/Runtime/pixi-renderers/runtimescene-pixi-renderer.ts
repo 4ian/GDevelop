@@ -134,6 +134,7 @@ namespace gdjs {
               (runtimeLayer.isLightingLayer() &&
                 runtimeLayerRenderer.getLightingSprite()) ||
               runtimeLayerRenderer.getRendererObject();
+
             pixiRenderer.render(pixiContainer, { clear: false });
             this._layerRenderingMetrics.rendered2DLayersCount++;
 
@@ -208,6 +209,17 @@ namespace gdjs {
               lastRenderWas3D = true;
             }
           }
+        }
+
+        const debugContainer = this._runtimeScene
+          .getDebuggerRenderer()
+          .getRendererObject();
+
+        if (debugContainer) {
+          threeRenderer.resetState();
+          pixiRenderer.reset();
+          pixiRenderer.render(debugContainer);
+          lastRenderWas3D = false;
         }
 
         if (!lastRenderWas3D) {

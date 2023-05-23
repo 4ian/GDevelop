@@ -39,9 +39,14 @@ module.exports = {
       .setIcon('res/conditions/3d_box.svg');
 
     {
-      const Model3DObject = new gd.ObjectJsImplementation();
+      Model3DObject = class extends gd.ObjectJsImplementation {
+
+        constructor() {
+          super();
+          this.animations = [];
+        }
       // $FlowExpectedError - ignore Flow warning as we're creating an object
-      Model3DObject.updateProperty = function (
+      updateProperty(
         objectContent,
         propertyName,
         newValue
@@ -70,9 +75,10 @@ module.exports = {
         }
 
         return false;
-      };
+      }
+
       // $FlowExpectedError - ignore Flow warning as we're creating an object
-      Model3DObject.getProperties = function (objectContent) {
+      getProperties(objectContent) {
         const objectProperties = new gd.MapStringPropertyDescriptor();
 
         objectProperties
@@ -147,23 +153,10 @@ module.exports = {
           .setLabel(_('Material modifier'));
 
         return objectProperties;
-      };
-      Model3DObject.setRawJSONContent(
-        JSON.stringify({
-          width: 100,
-          height: 100,
-          depth: 100,
-          keepAspectRatio: true,
-          rotationX: 0,
-          rotationY: 0,
-          rotationZ: 0,
-          modelResourceName: '',
-          materialType: 'Basic',
-        })
-      );
+      }
 
       // $FlowExpectedError
-      Model3DObject.updateInitialInstanceProperty = function (
+      updateInitialInstanceProperty(
         objectContent,
         instance,
         propertyName,
@@ -172,10 +165,10 @@ module.exports = {
         layout
       ) {
         return false;
-      };
+      }
 
       // $FlowExpectedError
-      Model3DObject.getInitialInstanceProperties = function (
+      getInitialInstanceProperties(
         content,
         instance,
         project,
@@ -183,7 +176,47 @@ module.exports = {
       ) {
         const instanceProperties = new gd.MapStringPropertyDescriptor();
         return instanceProperties;
-      };
+      }
+
+      doSerializeTo(serializerElement) {
+        super.doSerializeTo(serializerElement);
+        const content = serializerElement.getChild("content");
+        const animationsElement = content.addChild("animations");
+        animationsElement.considerAsArrayOf("animation");
+        for (const animation of this.animations) {
+          const animationElement = animationsElement.addChild("animation");
+          animationElement.setAttribute("name", animation.name);
+          animationElement.setAttribute("source", animation.source);
+        }
+      }
+
+      doUnserializeFrom(serializerElement) {
+        super.doSerializeTo(serializerElement);
+        animation.length = 0;
+        const content = serializerElement.getChild("content");
+        const animationsElement = content.getChild("animations");
+        animationsElement.considerAsArrayOf("animation");
+        for (let i = 0; i < animationsElement.GetChildrenCount(); ++i) {
+          const animationElement = animationsElement.GetChild(i);
+          animation.name = animationElement.getStringAttribute("name", "");
+          animation.source = animationElement.getAttribute("source", "");
+        }
+      }
+    }
+    const model3DObject = new Model3DObject();
+    model3DObject.setRawJSONContent(
+      JSON.stringify({
+        width: 100,
+        height: 100,
+        depth: 100,
+        keepAspectRatio: true,
+        rotationX: 0,
+        rotationY: 0,
+        rotationZ: 0,
+        modelResourceName: '',
+        materialType: 'Basic',
+      })
+    );
 
       const object = extension
         .addObject(
@@ -191,7 +224,7 @@ module.exports = {
           _('3D Model'),
           _('A 3D model.'),
           'JsPlatform/Extensions/3d_box.svg',
-          Model3DObject
+          model3DObject
         )
         .setCategoryFullName(_('3D'))
         .addUnsupportedBaseObjectCapability('effect')

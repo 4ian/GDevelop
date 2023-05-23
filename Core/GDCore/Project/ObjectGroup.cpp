@@ -16,13 +16,6 @@ using namespace std;
 
 namespace gd {
 
-ObjectGroup::~ObjectGroup() {}
-
-void ObjectGroup::Init(const ObjectGroup& other) {
-  name = other.name;
-  memberObjects = other.memberObjects;
-}
-
 bool ObjectGroup::Find(const gd::String& name) const {
   return std::find(memberObjects.begin(), memberObjects.end(), name) !=
          memberObjects.end();

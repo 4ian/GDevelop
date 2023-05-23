@@ -29,24 +29,7 @@ namespace gd {
 class GD_CORE_API ObjectGroup {
  public:
   ObjectGroup(){};
-
-  /**
-   * Copy constructor. Calls Init().
-   */
-  ObjectGroup(const gd::ObjectGroup& group) { Init(group); };
-
-  /**
-   * Assignment operator. Calls Init().
-   */
-  ObjectGroup& operator=(const gd::ObjectGroup& objectGroup) {
-    if ((this) != &objectGroup) Init(objectGroup);
-    return *this;
-  }
-
-  /**
-   * Destructor.
-   */
-  virtual ~ObjectGroup();
+  virtual ~ObjectGroup(){};
 
   /**
    * Must return a pointer to a copy of the object. A such method is needed to
@@ -104,12 +87,6 @@ class GD_CORE_API ObjectGroup {
    * \brief Unserialize the group.
    */
   void UnserializeFrom(const SerializerElement& element);
-
-  /**
-   * Initialize from another object group. Used by copy-ctor and assign-op.
-   * Don't forget to update me if members were changed!
-   */
-  void Init(const gd::ObjectGroup& other);
 
  private:
   std::vector<gd::String> memberObjects;

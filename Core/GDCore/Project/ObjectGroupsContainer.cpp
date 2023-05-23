@@ -30,7 +30,7 @@ ObjectGroupsContainer& ObjectGroupsContainer::operator=(
 void ObjectGroupsContainer::Init(const ObjectGroupsContainer& other) {
   objectGroups.clear();
   for (auto& it : other.objectGroups) {
-    objectGroups.push_back(it->Clone());
+    objectGroups.push_back(gd::make_unique<gd::ObjectGroup>(*it));
   }
 }
 
@@ -128,7 +128,7 @@ ObjectGroup& ObjectGroupsContainer::Insert(const gd::ObjectGroup& group,
   gd::ObjectGroup& newlyInsertedGroup = *(*(objectGroups.insert(
       position < objectGroups.size() ? objectGroups.begin() + position
                                      : objectGroups.end(),
-      group.Clone())));
+      gd::make_unique<gd::ObjectGroup>(group))));
   return newlyInsertedGroup;
 }
 

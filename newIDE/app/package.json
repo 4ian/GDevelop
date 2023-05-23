@@ -58,6 +58,7 @@
     "pixi.js-legacy": "6.1.2",
     "posthog-js": "^1.57.2",
     "prop-types": "^15.5.10",
+    "qr-creator": "^1.0.0",
     "react": "16.14.0",
     "react-color": "2.13.8",
     "react-dnd": "7.7.0",

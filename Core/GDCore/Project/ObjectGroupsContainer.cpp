@@ -9,6 +9,7 @@
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/MakeUnique.h"
 
 namespace gd {
 gd::ObjectGroup ObjectGroupsContainer::badGroup;

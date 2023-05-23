@@ -144,7 +144,7 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
  */
 class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
  public:
-  ReadOnlyArbitraryEventsWorker(){};
+  ReadOnlyArbitraryEventsWorker() : shouldStopIteration(false) {};
   virtual ~ReadOnlyArbitraryEventsWorker();
 
   /**

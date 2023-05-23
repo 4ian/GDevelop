@@ -19,7 +19,6 @@ import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
-import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import ExternalEventsAutoComplete from '../EventsSheet/EventsTree/Renderers/LinkEvent/ExternalEventsAutoComplete';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
 import MouseField from '../EventsSheet/ParameterFields/MouseField';
@@ -2646,40 +2645,6 @@ storiesOf('Profile/ContributionsDetails', module)
       <ExtensionsAccordion extensions={[]} extensionError={new Error()} />
       <ExamplesAccordion examples={[]} exampleError={new Error()} />
     </>
-  ));
-
-storiesOf('LocalNetworkPreviewDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <LocalNetworkPreviewDialog
-      open
-      url="192.168.0.1:2929"
-      error={null}
-      onRunPreviewLocally={action('on run preview locally')}
-      onExport={action('on export')}
-      onClose={action('on close')}
-    />
-  ))
-  .add('waiting for url', () => (
-    <LocalNetworkPreviewDialog
-      open
-      url=""
-      error={null}
-      onRunPreviewLocally={action('on run preview locally')}
-      onExport={action('on export')}
-      onClose={action('on close')}
-    />
-  ))
-  .add('error', () => (
-    <LocalNetworkPreviewDialog
-      open
-      url="192.168.0.1:2929"
-      error={{ message: 'Oops' }}
-      onRunPreviewLocally={action('on run preview locally')}
-      onExport={action('on export')}
-      onClose={action('on close')}
-    />
   ));
 
 storiesOf('BrowserPreviewErrorDialog', module)

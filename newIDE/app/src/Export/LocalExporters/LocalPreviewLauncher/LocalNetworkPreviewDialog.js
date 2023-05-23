@@ -8,9 +8,13 @@ import Text from '../../../UI/Text';
 import { Line } from '../../../UI/Grid';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
+import QrCode from '../../../UI/QrCode';
 
 type Props = {|
   open: boolean,
+  /**
+   * url without protocol, for example '192.168.1.16:2929'
+   */
   url: ?string,
   onClose: () => void,
   onExport: ?() => void,
@@ -27,6 +31,7 @@ const LocalNetworkPreviewDialog = ({
   onRunPreviewLocally,
 }: Props) => {
   if (!open) return null;
+  const urlWithProtocol = url ? `http://${url}` : '';
 
   return (
     <Dialog
@@ -80,6 +85,16 @@ const LocalNetworkPreviewDialog = ({
             </Text>
           </Line>
           <ShareLink url={url} />
+          <Line>
+            <Text>
+              <Trans>Or flash this QR code:</Trans>
+            </Text>
+          </Line>
+          {urlWithProtocol && (
+            <Line justifyContent="center">
+              <QrCode url={urlWithProtocol} size={100} />
+            </Line>
+          )}
           <Line>
             <Text>
               <Trans>

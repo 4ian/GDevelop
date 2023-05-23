@@ -275,8 +275,24 @@ export default class ProjectManager extends React.Component<Props, State> {
   };
 
   _duplicateLayout = (layout: gdLayout, index: number) => {
-    this._copyLayout(layout);
-    this._pasteLayout(index);
+    const { project } = this.props;
+
+    const newName = newNameGenerator(layout.getName(), name =>
+      project.hasLayoutNamed(name)
+    );
+
+    const newLayout = project.insertNewLayout(newName, index);
+
+    unserializeFromJSObject(
+      newLayout,
+      serializeToJSObject(layout),
+      'unserializeFrom',
+      project
+    );
+    newLayout.setName(newName); // Unserialization has overwritten the name.
+    newLayout.updateBehaviorsSharedData(project);
+
+    this._onProjectItemModified();
   };
 
   _addLayout = (index: number, i18n: I18nType) => {

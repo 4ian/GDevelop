@@ -5,17 +5,17 @@
  */
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
-#include "GDCore/Vector2.h"
 #include <map>
 #include <memory>
 #include <vector>
 
 #include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/EffectsContainer.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GDCore/Vector2.h"
 
 namespace gd {
 class PropertyDescriptor;
@@ -45,7 +45,7 @@ class GD_CORE_API Object {
 
   /**
    * Create a new object with the name passed as argument.
-   * 
+   *
    * Object takes the ownership of the configuration.
    */
   Object(const gd::String& name,
@@ -104,7 +104,9 @@ class GD_CORE_API Object {
 
   /** \brief Change the asset store id of the object.
    */
-  void SetAssetStoreId(const gd::String& assetStoreId_) { assetStoreId = assetStoreId_; };
+  void SetAssetStoreId(const gd::String& assetStoreId_) {
+    assetStoreId = assetStoreId_;
+  };
 
   /** \brief Return the asset store id of the object.
    */
@@ -112,15 +114,11 @@ class GD_CORE_API Object {
 
   /** \brief Change the type of the object.
    */
-  void SetType(const gd::String& type_) {
-    configuration->SetType(type_);
-  }
+  void SetType(const gd::String& type_) { configuration->SetType(type_); }
 
   /** \brief Return the type of the object.
    */
-  const gd::String& GetType() const {
-    return configuration->GetType();
-  }
+  const gd::String& GetType() const { return configuration->GetType(); }
 
   /** \brief Change the tags of the object.
    */
@@ -224,12 +222,12 @@ class GD_CORE_API Object {
    * effects.
    */
   gd::EffectsContainer& GetEffects() { return effectsContainer; }
-///@}
+  ///@}
 
-/** \name Serialization
- * Members functions related to serialization of the object
- */
-///@{
+  /** \name Serialization
+   * Members functions related to serialization of the object
+   */
+  ///@{
   /**
    * \brief Serialize the object.
    * \see DoSerializeTo
@@ -244,8 +242,9 @@ class GD_CORE_API Object {
   ///@}
 
  protected:
-  gd::String name;  ///< The full name of the object
-  gd::String assetStoreId;  ///< The ID of the asset if the object comes from the store.
+  gd::String name;          ///< The full name of the object
+  gd::String assetStoreId;  ///< The ID of the asset if the object comes from
+                            ///< the store.
   std::unique_ptr<gd::ObjectConfiguration> configuration;
   std::map<gd::String, std::unique_ptr<gd::Behavior>>
       behaviors;  ///< Contains all behaviors and their properties for the
@@ -260,7 +259,7 @@ class GD_CORE_API Object {
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.
    * Don't forget to update me if members were changed!
-   * 
+   *
    * It's needed because there is no default copy for a map of unique_ptr like
    * behaviors and it must be a deep copy.
    */
@@ -282,15 +281,5 @@ struct ObjectHasName : public std::binary_function<std::unique_ptr<gd::Object>,
 };
 
 }  // namespace gd
-
-/**
- * An object list is a vector containing (smart) pointers to objects.
- */
-using ObjList = std::vector<std::unique_ptr<gd::Object>>;
-
-/**
- * Objects are usually managed thanks to (smart) pointers.
- */
-using ObjSPtr = std::unique_ptr<gd::Object>;
 
 #endif  // GDCORE_OBJECT_H

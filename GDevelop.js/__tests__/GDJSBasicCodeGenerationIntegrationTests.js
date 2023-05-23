@@ -552,7 +552,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     eventsFunction
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
-    const group = eventsFunction.getObjectGroups().insert('MyObjectGroup', 0);
+    const group = eventsFunction
+      .getObjectGroups()
+      .insertNew('MyObjectGroup', 0);
     group.setName('MyObjectGroup');
     group.addObject('ObjectParam1');
     group.addObject('ObjectParam2');

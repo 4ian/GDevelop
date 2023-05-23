@@ -81,24 +81,23 @@ Project::~Project() {}
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
-  const gd::String& type,
-  const gd::String& name) const {
-    return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
+    const gd::String& type, const gd::String& name) const {
+  return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
 }
 
 std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(
-  const gd::String& type) const {
+    const gd::String& type) const {
   if (Project::HasEventsBasedObject(type)) {
     return gd::make_unique<CustomObjectConfiguration>(*this, type);
-  }
-  else {
+  } else {
     // Create a base object if the type can't be found in the platform.
     return currentPlatform->CreateObjectConfiguration(type);
   }
 }
 
 bool Project::HasEventsBasedObject(const gd::String& type) const {
-  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
   if (separatorIndex == std::string::npos) {
     return false;
   }
@@ -106,59 +105,67 @@ bool Project::HasEventsBasedObject(const gd::String& type) const {
   if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
     return false;
   }
-  auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
   gd::String objectTypeName = type.substr(separatorIndex + 2);
   return extension.GetEventsBasedObjects().Has(objectTypeName);
 }
 
 gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) {
-  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
   gd::String extensionName = type.substr(0, separatorIndex);
   gd::String objectTypeName = type.substr(separatorIndex + 2);
 
-  auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
   return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 
-const gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) const {
-  const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
+const gd::EventsBasedObject& Project::GetEventsBasedObject(
+    const gd::String& type) const {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
   gd::String extensionName = type.substr(0, separatorIndex);
   gd::String objectTypeName = type.substr(separatorIndex + 2);
 
-  const auto &extension = Project::GetEventsFunctionsExtension(extensionName);
+  const auto& extension = Project::GetEventsFunctionsExtension(extensionName);
   return extension.GetEventsBasedObjects().Get(objectTypeName);
 }
 
 bool Project::HasEventsBasedBehavior(const gd::String& type) const {
-    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
-    if (separatorIndex == std::string::npos) {
-      return false;
-    }
-    gd::String extensionName = type.substr(0, separatorIndex);
-    if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
-      return false;
-    }
-    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
-    return extension.GetEventsBasedBehaviors().Has(behaviorTypeName);
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return false;
+  }
+  gd::String extensionName = type.substr(0, separatorIndex);
+  if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+    return false;
+  }
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+  return extension.GetEventsBasedBehaviors().Has(behaviorTypeName);
 }
 
-gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(const gd::String& type) {
-    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
-    gd::String extensionName = type.substr(0, separatorIndex);
-    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(
+    const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String behaviorTypeName = type.substr(separatorIndex + 2);
 
-    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-    return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
 }
 
-const gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(const gd::String& type) const {
-    const auto separatorIndex = type.find(PlatformExtension::GetNamespaceSeparator());
-    gd::String extensionName = type.substr(0, separatorIndex);
-    gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+const gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(
+    const gd::String& type) const {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String behaviorTypeName = type.substr(separatorIndex + 2);
 
-    auto &extension = Project::GetEventsFunctionsExtension(extensionName);
-    return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
 }
 
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
@@ -378,7 +385,7 @@ void Project::MoveExternalLayout(std::size_t oldIndex, std::size_t newIndex) {
 };
 
 void Project::MoveEventsFunctionsExtension(std::size_t oldIndex,
-                                          std::size_t newIndex) {
+                                           std::size_t newIndex) {
   if (oldIndex >= eventsFunctionsExtensions.size() ||
       newIndex >= eventsFunctionsExtensions.size())
     return;
@@ -1005,7 +1012,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add layouts resources
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
     for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j) { // Add objects resources
+         ++j) {  // Add objects resources
       GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
     }
 

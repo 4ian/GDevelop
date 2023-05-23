@@ -568,6 +568,106 @@ module.exports = {
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'string',
+          'AnimationName',
+          _('Current animation'),
+          _(
+            'the animation played by the object'
+          ),
+          _('the animation'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .useStandardParameters(
+          'objectAnimationName',
+          gd.ParameterOptions.makeNewOptions().setDescription(_('Animation name'))
+        )
+        .markAsAdvanced()
+        .setFunctionName('setAnimationName')
+        .setGetter('getAnimationName');
+
+      object
+        .addAction(
+          'PauseAnimation',
+          _('Pause the animation'),
+          _('Pause the animation of the object'),
+          _('Pause the animation of _PARAM0_'),
+          _('Animations and images'),
+          'res/actions/animation24.png',
+          'res/actions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('pauseAnimation');
+
+      object
+        .addAction(
+          'ResumeAnimation',
+          _('Resume the animation'),
+          _('Resume the animation of the object'),
+          _('Resume the animation of _PARAM0_'),
+          _('Animations and images'),
+          'res/actions/animation24.png',
+          'res/actions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('resumeAnimation');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AnimationSpeedScale',
+          _('Animation speed scale'),
+          _(
+            'the animation speed scale (1 = the default speed, >1 = faster and <1 = slower).'
+          ),
+          _('the animation speed scale'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(_('Speed scale'))
+        )
+        .markAsSimple()
+        .setFunctionName('setAnimationSpeedScale')
+        .setGetter('getAnimationSpeedScale');
+
+      object
+        .addCondition(
+          'IsAnimationPaused',
+          _('Animation paused'),
+          _('Check if the animation of an object is paused.'),
+          _('The animation of _PARAM0_ is paused'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('isAnimationPaused');
+
+      object
+        .addCondition(
+          'HasAnimationEnded',
+          _('Animation finished'),
+          _(
+            'Check if the animation being played by the Sprite object is finished.'
+          ),
+          _('The animation of _PARAM0_ is finished'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('hasAnimationEnded');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();

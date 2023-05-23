@@ -69,7 +69,7 @@ namespace gdjs {
     private _threeObject: THREE.Object3D;
     private _originalModel: THREE_ADDONS.GLTF;
     private _animationMixer: THREE.AnimationMixer;
-    private _action: THREE.AnimationAction;
+    private _action: THREE.AnimationAction | null;
 
     constructor(
       runtimeObject: gdjs.Model3DRuntimeObject,
@@ -97,12 +97,7 @@ namespace gdjs {
       this.updateRotation();
 
       this._animationMixer = new THREE.AnimationMixer(model);
-      const clip = THREE.AnimationClip.findByName(
-        this._originalModel.animations,
-        'Anim_0'
-      );
-      this._action = this._animationMixer.clipAction(clip);
-      this._action.play();
+      this._action = null;
     }
 
     updateAnimation(timeDelta: float) {
@@ -198,12 +193,13 @@ namespace gdjs {
       
       this._threeObject = modelObject3D;
       this._animationMixer = new THREE.AnimationMixer(modelObject3D);
-      const clip = THREE.AnimationClip.findByName(
-        this._originalModel.animations,
-        'Anim_0'
-      );
-      this._action = this._animationMixer.clipAction(clip);
-      this._action.play();
+      const animationName = this._model3DRuntimeObject.getAnimationName();
+      if (animationName) {
+        this.playAnimation(animationName);
+        if (this._model3DRuntimeObject.isAnimationPaused()) {
+          this.pauseAnimation();
+        }
+      }
 
       this._replaceMaterials();
     }
@@ -223,6 +219,59 @@ namespace gdjs {
       ) {
         traverseToSetBasicMaterialFromMeshes(this._threeObject);
       }
+    }
+
+    getAnimationCount() {
+      return this._originalModel.animations.length;
+    }
+
+    getAnimationName(animationIndex: integer) {
+      return this._originalModel.animations[animationIndex].name;
+    }
+
+    /**
+     * Return true if animation has ended.
+     * The animation had ended if:
+     * - it's not configured as a loop;
+     * - the current frame is the last frame;
+     * - the last frame has been displayed long enough.
+     */
+    hasAnimationEnded(): boolean {
+      if (!this._action) {
+        return true;
+      }
+      return !this._action.isRunning();
+    }
+
+    animationPaused() {
+      if (!this._action) {
+        return;
+      }
+      return this._action.paused;
+    }
+
+    pauseAnimation() {
+      if (!this._action) {
+        return;
+      }
+      this._action.paused = true;
+    }
+
+    resumeAnimation() {
+      if (!this._action) {
+        return;
+      }
+      this._action.paused = false;
+    }
+    
+    playAnimation(animationName: string) {
+      this._animationMixer.stopAllAction();
+      const clip = THREE.AnimationClip.findByName(
+        this._originalModel.animations,
+        animationName
+      );
+      this._action = this._animationMixer.clipAction(clip);
+      this._action.play();
     }
   }
 

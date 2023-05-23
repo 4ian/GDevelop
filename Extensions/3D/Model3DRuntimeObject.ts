@@ -22,6 +22,10 @@ namespace gdjs {
     _materialType: gdjs.Model3DRuntimeObject.MaterialType =
       gdjs.Model3DRuntimeObject.MaterialType.Basic;
 
+    _currentAnimationName: string | null = null;
+    _animationSpeedScale: number = 1;
+    _animationPaused: boolean = false;
+
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: Model3DObjectData
@@ -106,7 +110,65 @@ namespace gdjs {
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       const elapsedTime = this.getElapsedTime() / 1000;
-      this._renderer.updateAnimation(elapsedTime);
+      this._renderer.updateAnimation(elapsedTime * this._animationSpeedScale);
+    }
+
+    /**
+     * Change the animation being played.
+     * @param newAnimationName The name of the new animation to be played
+     */
+    setAnimationName(newAnimationName: string): void {
+      if (!newAnimationName) {
+        return;
+      }
+      this._currentAnimationName = newAnimationName;
+      // TODO Allow to remap animation names.
+      this._renderer.playAnimation(newAnimationName);
+    }
+
+    /**
+     * Get the name of the animation being played.
+     * @return The name of the new animation being played
+     */
+    getAnimationName(): string {
+      return this._currentAnimationName || "";
+    }
+
+    isCurrentAnimationName(name: string): boolean {
+      return this.getAnimationName() === name;
+    }
+    
+    /**
+     * Return true if animation has ended.
+     * The animation had ended if:
+     * - it's not configured as a loop;
+     * - the current frame is the last frame;
+     * - the last frame has been displayed long enough.
+     */
+    hasAnimationEnded(): boolean {
+      return this._renderer.hasAnimationEnded();
+    }
+
+    isAnimationPaused() {
+      return this._animationPaused;
+    }
+
+    pauseAnimation() {
+      this._animationPaused = true;
+      return this._renderer.pauseAnimation();
+    }
+
+    resumeAnimation() {
+      this._animationPaused = false;
+      return this._renderer.resumeAnimation();
+    }
+
+    getAnimationSpeedScale() {
+      return this._animationSpeedScale;
+    }
+
+    setAnimationSpeedScale(ratio: float): void {
+      this._animationSpeedScale = ratio;
     }
   }
 

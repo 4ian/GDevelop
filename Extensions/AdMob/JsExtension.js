@@ -147,7 +147,7 @@ module.exports = {
       .addCondition(
         'AppOpenErrored',
         _('App open errored'),
-        _('Check if there was a error while loading the app open.'),
+        _('Check if there was an error while loading the app open.'),
         _('App open had an error'),
         '',
         'JsPlatform/Extensions/admobicon24.png',

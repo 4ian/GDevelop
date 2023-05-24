@@ -14,7 +14,7 @@ endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O2") # Optimizations during compilation
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g --profiling") # Uncomment for debugging + profiling support
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g --profiling") # Uncomment for debugging + profiling support
 # SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --profiling") # Uncomment for profiling support
 
 #Common directories:
@@ -102,3 +102,4 @@ target_link_libraries(GD Shopify)
 target_link_libraries(GD PathfindingBehavior)
 target_link_libraries(GD PhysicsBehavior)
 target_link_libraries(GD ParticleSystem)
+target_link_libraries(GD Scene3D)

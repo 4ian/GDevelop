@@ -32,6 +32,7 @@ declare class libGDevelop {
   asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;
   asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
   asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;
+  asModel3DConfiguration(gdObjectConfiguration): gdModel3DObjectConfiguration;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -215,6 +216,8 @@ declare class libGDevelop {
   Direction: Class<gdDirection>;
   Animation: Class<gdAnimation>;
   SpriteObject: Class<gdSpriteObject>;
+  Model3DAnimation: Class<gdModel3DAnimation>;
+  Model3DObjectConfiguration: Class<gdModel3DObjectConfiguration>;
   Vector2f: Class<gdVector2f>;
   VectorVector2f: Class<gdVectorVector2f>;
   TextObject: Class<gdTextObject>;

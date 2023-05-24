@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 import { type EditorProps } from './EditorProps.flow';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -26,22 +25,14 @@ import ResourcesLoader from '../../ResourcesLoader';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import IconButton from '../../UI/IconButton';
-import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import { mapFor } from '../../Utils/MapFor';
-import Dialog from '../../UI/Dialog';
-import HelpButton from '../../UI/HelpButton';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import DragHandle from '../../UI/DragHandle';
-import ContextMenu, {
-  type ContextMenuInterface,
-} from '../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import Window from '../../Utils/Window';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 
@@ -240,6 +231,8 @@ const Animation = ({
   onChangeName,
   onSpriteUpdated,
 }: AnimationProps) => {
+  const forceUpdate = useForceUpdate();
+
   return (
     <div style={styles.animationLine}>
       <Column expand noMargin>
@@ -264,6 +257,19 @@ const Animation = ({
             <Trash />
           </IconButton>
         </MiniToolbar>
+        <Column noMargin expand key="animation-source">
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelFixed
+            floatingLabelText={<Trans>BLG animation name</Trans>}
+            onChange={value => {
+              console.log(value);
+              animation.setSource(value);
+              forceUpdate();
+            }}
+            value={animation.getSource()}
+          />
+        </Column>
       </Column>
     </div>
   );
@@ -273,7 +279,7 @@ const SortableAnimation = SortableElement(Animation);
 
 const SortableAnimationsList = SortableContainer(
   ({
-    spriteConfiguration,
+    objectConfiguration,
     onAddAnimation,
     onRemoveAnimation,
     onChangeAnimationName,
@@ -285,42 +291,37 @@ const SortableAnimationsList = SortableContainer(
     selectedSprites,
     onSelectSprite,
     onSpriteUpdated,
-    scrollViewRef,
   }) => {
+    // TODO Fix drag and drop
+
     // Note that it's important to have <ScrollView> *inside* this
     // component, otherwise the sortable list won't work (because the
     // SortableContainer would not find a root div to use).
-    return (
-      <ScrollView ref={scrollViewRef}>
-        {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-          const animation = spriteConfiguration.getAnimation(i);
-          return (
-            <SortableAnimation
-              key={i}
-              index={i}
-              id={i}
-              animation={animation}
-              project={project}
-              resourcesLoader={resourcesLoader}
-              resourceManagementProps={resourceManagementProps}
-              onRemove={() => onRemoveAnimation(i)}
-              onChangeName={newName => onChangeAnimationName(i, newName)}
-              onSpriteContextMenu={onSpriteContextMenu}
-              selectedSprites={selectedSprites}
-              onSelectSprite={onSelectSprite}
-              onSpriteUpdated={onSpriteUpdated}
-            />
-          );
-        })}
-      </ScrollView>
-    );
+    return mapFor(0, objectConfiguration.getAnimationsCount(), i => {
+      const animation = objectConfiguration.getAnimation(i);
+      return (
+        <SortableAnimation
+          key={i}
+          index={i}
+          id={i}
+          animation={animation}
+          project={project}
+          resourcesLoader={resourcesLoader}
+          resourceManagementProps={resourceManagementProps}
+          onRemove={() => onRemoveAnimation(i)}
+          onChangeName={newName => onChangeAnimationName(i, newName)}
+          onSpriteContextMenu={onSpriteContextMenu}
+          selectedSprites={selectedSprites}
+          onSelectSprite={onSelectSprite}
+          onSpriteUpdated={onSpriteUpdated}
+        />
+      );
+    });
   }
 );
 
 type AnimationsListContainerProps = {|
-  objectConfiguration: gdObjectConfiguration & {
-    animations: Array<{ name: string, source: string }>,
-  },
+  objectConfiguration: gdModel3DObjectConfiguration,
   project: gdProject,
   layout?: gdLayout,
   object?: gdObject,
@@ -328,6 +329,7 @@ type AnimationsListContainerProps = {|
   resourcesLoader: typeof ResourcesLoader,
   onSizeUpdated: () => void,
   onObjectUpdated?: () => void,
+  addAnimation: () => void,
 |};
 
 const AnimationsListContainer = ({
@@ -339,13 +341,13 @@ const AnimationsListContainer = ({
   resourcesLoader,
   onSizeUpdated,
   onObjectUpdated,
+  addAnimation,
 }: AnimationsListContainerProps) => {
   const [selectedSprites, setSelectedSprites] = React.useState<{
     [number]: boolean,
   }>({});
 
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
-  const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const forceUpdate = useForceUpdate();
 
@@ -355,29 +357,6 @@ const AnimationsListContainer = ({
       forceUpdate();
     },
     [forceUpdate, objectConfiguration]
-  );
-
-  const addAnimation = React.useCallback(
-    () => {
-      const emptyAnimation = new gd.Animation();
-      emptyAnimation.setDirectionsCount(1);
-      objectConfiguration.addAnimation(emptyAnimation);
-      emptyAnimation.delete();
-      forceUpdate();
-      onSizeUpdated();
-      if (onObjectUpdated) onObjectUpdated();
-
-      // Scroll to the bottom of the list.
-      // Ideally, we'd wait for the list to be updated to scroll, but
-      // to simplify the code, we just wait a few ms for a new render
-      // to be done.
-      setTimeout(() => {
-        if (scrollView.current) {
-          scrollView.current.scrollToBottom();
-        }
-      }, 100); // A few ms is enough for a new render to be done.
-    },
-    [forceUpdate, onObjectUpdated, onSizeUpdated, objectConfiguration]
   );
 
   const removeAnimation = React.useCallback(
@@ -463,7 +442,7 @@ const AnimationsListContainer = ({
 
   return (
     <Column noMargin expand useFullHeight>
-      {objectConfiguration.animations.length === 0 ? (
+      {objectConfiguration.getAnimationsCount() === 0 ? (
         <Column noMargin expand justifyContent="center">
           <EmptyPlaceholder
             title={<Trans>Add your first animation</Trans>}
@@ -477,7 +456,7 @@ const AnimationsListContainer = ({
       ) : (
         <React.Fragment>
           <SortableAnimationsList
-            spriteConfiguration={objectConfiguration}
+            objectConfiguration={objectConfiguration}
             helperClass="sortable-helper"
             project={project}
             onSortEnd={onSortEnd}
@@ -492,21 +471,7 @@ const AnimationsListContainer = ({
             lockAxis="y"
             axis="y"
             onSpriteUpdated={onObjectUpdated}
-            scrollViewRef={scrollView}
           />
-          <Column noMargin>
-            <ResponsiveLineStackLayout
-              justifyContent="space-between"
-              noColumnMargin
-            >
-              <RaisedButton
-                label={<Trans>Add an animation</Trans>}
-                primary
-                onClick={addAnimation}
-                icon={<Add />}
-              />
-            </ResponsiveLineStackLayout>
-          </Column>
         </React.Fragment>
       )}
     </Column>
@@ -523,7 +488,12 @@ const Model3DEditor = ({
   resourceManagementProps,
 }: EditorProps) => {
   const forceUpdate = useForceUpdate();
+  const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
+  console.log(objectConfiguration);
+  console.log(model3DConfiguration);
   const properties = objectConfiguration.getProperties();
+
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const onChangeProperty = React.useCallback(
     (property: string, value: string) => {
@@ -533,98 +503,141 @@ const Model3DEditor = ({
     [objectConfiguration, forceUpdate]
   );
 
+  const addAnimation = React.useCallback(
+    () => {
+      const emptyAnimation = new gd.Model3DAnimation();
+      model3DConfiguration.addAnimation(emptyAnimation);
+      emptyAnimation.delete();
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
+
+      // Scroll to the bottom of the list.
+      // Ideally, we'd wait for the list to be updated to scroll, but
+      // to simplify the code, we just wait a few ms for a new render
+      // to be done.
+      setTimeout(() => {
+        if (scrollView.current) {
+          scrollView.current.scrollToBottom();
+        }
+      }, 100); // A few ms is enough for a new render to be done.
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, model3DConfiguration]
+  );
+
   return (
-    <ColumnStackLayout noMargin>
-      <PropertyResourceSelector
-        objectConfiguration={objectConfiguration}
-        propertyName="modelResourceName"
-        project={project}
-        resourceManagementProps={resourceManagementProps}
-      />
-      <Text size="block-title" noMargin>
-        <Trans>Default orientation</Trans>
-      </Text>
-      <ResponsiveLineStackLayout expand noColumnMargin>
-        <PropertyField
-          objectConfiguration={objectConfiguration}
-          propertyName="rotationX"
-        />
-        <PropertyField
-          objectConfiguration={objectConfiguration}
-          propertyName="rotationY"
-        />
-        <PropertyField
-          objectConfiguration={objectConfiguration}
-          propertyName="rotationZ"
-        />
-      </ResponsiveLineStackLayout>
-      <Text size="block-title" noMargin>
-        <Trans>Default size</Trans>
-      </Text>
-      <ResponsiveLineStackLayout expand noColumnMargin>
-        <PropertyField
-          objectConfiguration={objectConfiguration}
-          propertyName="width"
-        />
-        <PropertyField
-          objectConfiguration={objectConfiguration}
-          propertyName="height"
-        />
-        <PropertyField
-          objectConfiguration={objectConfiguration}
-          propertyName="depth"
-        />
-      </ResponsiveLineStackLayout>
-      <ColumnStackLayout noMargin expand>
-        <PropertyCheckbox
-          objectConfiguration={objectConfiguration}
-          propertyName="keepAspectRatio"
-        />
-        <SelectField
-          value={properties.get('materialType').getValue()}
-          floatingLabelText={properties.get('materialType').getLabel()}
-          helperMarkdownText={properties.get('materialType').getDescription()}
-          onChange={(event, index, newValue) => {
-            onChangeProperty('materialType', newValue);
-          }}
+    <>
+      <ScrollView ref={scrollView}>
+        <ColumnStackLayout noMargin>
+          <PropertyResourceSelector
+            objectConfiguration={objectConfiguration}
+            propertyName="modelResourceName"
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+          />
+          <Text size="block-title" noMargin>
+            <Trans>Default orientation</Trans>
+          </Text>
+          <ResponsiveLineStackLayout expand noColumnMargin>
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="rotationX"
+            />
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="rotationY"
+            />
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="rotationZ"
+            />
+          </ResponsiveLineStackLayout>
+          <Text size="block-title" noMargin>
+            <Trans>Default size</Trans>
+          </Text>
+          <ResponsiveLineStackLayout expand noColumnMargin>
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="width"
+            />
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="height"
+            />
+            <PropertyField
+              objectConfiguration={objectConfiguration}
+              propertyName="depth"
+            />
+          </ResponsiveLineStackLayout>
+          <ColumnStackLayout noMargin expand>
+            <PropertyCheckbox
+              objectConfiguration={objectConfiguration}
+              propertyName="keepAspectRatio"
+            />
+            <SelectField
+              value={properties.get('materialType').getValue()}
+              floatingLabelText={properties.get('materialType').getLabel()}
+              helperMarkdownText={properties
+                .get('materialType')
+                .getDescription()}
+              onChange={(event, index, newValue) => {
+                onChangeProperty('materialType', newValue);
+              }}
+            >
+              <SelectOption
+                label={t`No lighting effect`}
+                value="Basic"
+                key="Basic"
+              />
+              <SelectOption
+                label={t`Emit all ambient light`}
+                value="StandardWithoutMetalness"
+                key="StandardWithoutMetalness"
+              />
+              <SelectOption
+                label={t`Keep model material`}
+                value="KeepOriginal"
+                key="KeepOriginal"
+              />
+            </SelectField>
+            {properties.get('materialType').getValue() !== 'Basic' &&
+              !hasLight(layout) && (
+                <AlertMessage kind="error">
+                  <Trans>
+                    Make sure to set up a light in the effects of the layer or
+                    chose "No lighting effect" - otherwise the object will
+                    appear black.
+                  </Trans>
+                </AlertMessage>
+              )}
+          </ColumnStackLayout>
+          <AnimationsListContainer
+            objectConfiguration={model3DConfiguration}
+            resourcesLoader={ResourcesLoader}
+            resourceManagementProps={resourceManagementProps}
+            project={project}
+            layout={layout}
+            object={object}
+            onSizeUpdated={onSizeUpdated}
+            onObjectUpdated={onObjectUpdated}
+            addAnimation={addAnimation}
+          />
+        </ColumnStackLayout>
+      </ScrollView>
+      <Column noMargin>
+        <ResponsiveLineStackLayout
+          justifyContent="space-between"
+          noColumnMargin
         >
-          <SelectOption
-            label={t`No lighting effect`}
-            value="Basic"
-            key="Basic"
+          <RaisedButton
+            label={<Trans>Add an animation</Trans>}
+            primary
+            onClick={addAnimation}
+            icon={<Add />}
           />
-          <SelectOption
-            label={t`Emit all ambient light`}
-            value="StandardWithoutMetalness"
-            key="StandardWithoutMetalness"
-          />
-          <SelectOption
-            label={t`Keep model material`}
-            value="KeepOriginal"
-            key="KeepOriginal"
-          />
-        </SelectField>
-        {properties.get('materialType').getValue() !== 'Basic' &&
-          !hasLight(layout) && (
-            <AlertMessage kind="error">
-              <Trans>
-                Make sure to set up a light in the effects of the layer or chose
-                "No lighting effect" - otherwise the object will appear black.
-              </Trans>
-            </AlertMessage>
-          )}
-      </ColumnStackLayout>
-      <AnimationsListContainer
-        objectConfiguration={objectConfiguration}
-        resourcesLoader={ResourcesLoader}
-        resourceManagementProps={resourceManagementProps}
-        project={project}
-        layout={layout}
-        object={object}
-        onSizeUpdated={onSizeUpdated}
-        onObjectUpdated={onObjectUpdated}
-      />
-    </ColumnStackLayout>
+        </ResponsiveLineStackLayout>
+      </Column>
+    </>
   );
 };
 

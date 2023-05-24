@@ -3019,6 +3019,30 @@ interface SpriteObject {
 };
 SpriteObject implements ObjectConfiguration;
 
+interface Model3DAnimation {
+    void Model3DAnimation();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+
+    void SetSource([Const] DOMString name);
+    [Const, Ref] DOMString GetSource();
+};
+
+interface Model3DObjectConfiguration {
+    void Model3DObjectConfiguration();
+
+    void AddAnimation([Const, Ref] Model3DAnimation animation);
+    [Ref] Model3DAnimation GetAnimation(unsigned long index);
+    unsigned long GetAnimationsCount();
+    void RemoveAnimation(unsigned long index);
+    void RemoveAllAnimations();
+    boolean HasNoAnimations();
+    void SwapAnimations(unsigned long first, unsigned long second);
+    void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+};
+Model3DObjectConfiguration implements ObjectConfiguration;
+
 interface Vector2f {
     void Vector2f();
 

@@ -425,12 +425,29 @@ module.exports = {
 
       object
         .addExpressionAndConditionAndAction(
+          'number',
+          'Animation',
+          _('Change the animation'),
+          _('the number of the animation played by the object (the number from the animations list).'),
+          _('the number of the animation'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions()
+        )
+        .markAsSimple()
+        .setFunctionName('setAnimationIndex')
+        .setGetter('getAnimationIndex');
+
+      object
+        .addExpressionAndConditionAndAction(
           'string',
           'AnimationName',
-          _('Current animation'),
-          _(
-            'the animation played by the object'
-          ),
+          _('Current animation name'),
+          _('the animation played by the object'),
           _('the animation'),
           _('Animations and images'),
           'res/actions/animation24.png'
@@ -438,7 +455,9 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject')
         .useStandardParameters(
           'objectAnimationName',
-          gd.ParameterOptions.makeNewOptions().setDescription(_('Animation name'))
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Animation name')
+          )
         )
         .markAsAdvanced()
         .setFunctionName('setAnimationName')

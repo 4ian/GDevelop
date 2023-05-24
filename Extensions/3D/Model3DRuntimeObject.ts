@@ -1,4 +1,6 @@
 namespace gdjs {
+  type Model3DAnimation = { name: string; source: string };
+
   /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
   export interface Model3DObjectData extends Object3DData {
     /** The base parameters of the Model3D object */
@@ -9,6 +11,7 @@ namespace gdjs {
       rotationZ: number;
       keepAspectRatio: boolean;
       materialType: 'Basic' | 'StandardWithoutMetalness' | 'KeepOriginal';
+      animations: Model3DAnimation[];
     };
   }
 
@@ -22,9 +25,11 @@ namespace gdjs {
     _materialType: gdjs.Model3DRuntimeObject.MaterialType =
       gdjs.Model3DRuntimeObject.MaterialType.Basic;
 
-    _currentAnimationName: string | null = null;
-    _animationSpeedScale: number = 1;
+    _currentAnimationIndex: integer = 0;
+    _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
+
+    _animations: Model3DAnimation[];
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -32,11 +37,13 @@ namespace gdjs {
     ) {
       super(instanceContainer, objectData);
       this._modelResourceName = objectData.content.modelResourceName;
+      this._animations = objectData.content.animations;
       this._renderer = new gdjs.Model3DRuntimeObjectRenderer(
         this,
         instanceContainer
       );
       this._updateMaterialType(objectData);
+      this._renderer.playAnimation(this._animations[0].source);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -114,16 +121,28 @@ namespace gdjs {
     }
 
     /**
-     * Change the animation being played.
-     * @param newAnimationName The name of the new animation to be played
+     * Get the index of the animation being played.
+     * @return The index of the new animation being played
      */
-    setAnimationName(newAnimationName: string): void {
-      if (!newAnimationName) {
-        return;
+    getAnimationIndex(): number {
+      return this._currentAnimationIndex;
+    }
+
+    /**
+     * Change the animation being played.
+     * @param animationIndex The index of the new animation to be played
+     */
+    setAnimationIndex(animationIndex: number): void {
+      animationIndex = animationIndex | 0;
+      if (
+        animationIndex < this._animations.length &&
+        this._currentAnimationIndex !== animationIndex &&
+        animationIndex >= 0
+      ) {
+        const animation = this._animations[animationIndex];
+        this._currentAnimationIndex = animationIndex;
+        this._renderer.playAnimation(animation.source);
       }
-      this._currentAnimationName = newAnimationName;
-      // TODO Allow to remap animation names.
-      this._renderer.playAnimation(newAnimationName);
     }
 
     /**
@@ -131,13 +150,32 @@ namespace gdjs {
      * @return The name of the new animation being played
      */
     getAnimationName(): string {
-      return this._currentAnimationName || "";
+      if (this._currentAnimationIndex >= this._animations.length) {
+        return '';
+      }
+      return this._animations[this._currentAnimationIndex].name;
+    }
+
+    /**
+     * Change the animation being played.
+     * @param newAnimationName The name of the new animation to be played
+     */
+    setAnimationName(newAnimationName: string): void {
+      if (!newAnimationName) {
+        return;
+      }
+      const animationIndex = this._animations.findIndex(
+        (animation) => animation.name === newAnimationName
+      );
+      if (animationIndex >= 0) {
+        this.setAnimationIndex(animationIndex);
+      }
     }
 
     isCurrentAnimationName(name: string): boolean {
       return this.getAnimationName() === name;
     }
-    
+
     /**
      * Return true if animation has ended.
      * The animation had ended if:

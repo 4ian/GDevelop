@@ -1,6 +1,7 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import SemiControlledAutoComplete, {
@@ -14,7 +15,6 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { Divider } from '@material-ui/core';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -225,34 +225,38 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
         {...otherProps}
       />
     ) : (
-      <SelectField
-        margin={margin}
-        value={value}
-        onChange={(e, i, newValue) => {
-          onChange(newValue);
-          if (onChoose) onChoose(newValue);
-          if (onApply) onApply();
-        }}
-        translatableHintText={hintText || t`Choose an object`}
-        style={{ flex: otherProps.fullWidth ? 1 : undefined }}
-        errorText={errorText}
-        helperMarkdownText={otherProps.helperMarkdownText}
-        floatingLabelText={otherProps.floatingLabelText}
-        id={id}
-      >
-        {objectAndGroups.map((option, index) =>
-          option.type === 'separator' ? (
-            <Divider key={`divider${index}`} />
-          ) : (
-            <SelectOption
-              key={option.value}
-              label={option.value}
-              value={option.value}
-              shouldNotTranslate
-            />
-          )
+      <I18n>
+        {({ i18n }) => (
+          <SelectField
+            margin={margin}
+            value={value}
+            onChange={(e, i, newValue) => {
+              onChange(newValue);
+              if (onChoose) onChoose(newValue);
+              if (onApply) onApply();
+            }}
+            translatableHintText={hintText || t`Choose an object`}
+            style={{ flex: otherProps.fullWidth ? 1 : undefined }}
+            errorText={errorText}
+            helperMarkdownText={otherProps.helperMarkdownText}
+            floatingLabelText={otherProps.floatingLabelText}
+            id={id}
+          >
+            {objectAndGroups.map((option, index) =>
+              option.type === 'separator' ? (
+                <optgroup key={`group-divider`} label={i18n._(t`Groups`)} />
+              ) : (
+                <SelectOption
+                  key={option.value}
+                  label={option.value}
+                  value={option.value}
+                  shouldNotTranslate
+                />
+              )
+            )}
+          </SelectField>
         )}
-      </SelectField>
+      </I18n>
     );
   }
 );

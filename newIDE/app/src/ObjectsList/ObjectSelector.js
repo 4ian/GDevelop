@@ -100,7 +100,11 @@ const getObjectsAndGroupsDataSource = ({
         };
       });
 
-  const fullList = [...objects, { type: 'separator' }, ...groups];
+  const fullList =
+    groups.length === 0
+      ? objects
+      : [...objects, { type: 'separator' }, ...groups];
+
   return excludedObjectOrGroupNames
     ? fullList.filter(
         //$FlowFixMe

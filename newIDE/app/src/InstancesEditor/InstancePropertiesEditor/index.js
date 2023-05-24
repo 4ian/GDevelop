@@ -52,6 +52,24 @@ const InstancePropertiesEditor = ({
   editInstanceVariables,
   onInstancesModified,
 }: Props) => {
+  const forceUpdate = useForceUpdate();
+
+  const getInstanceWidth = React.useCallback(
+    (instance: gdInitialInstance) =>
+      instance.hasCustomSize()
+        ? instance.getCustomWidth() || onGetInstanceSize(instance)[0]
+        : onGetInstanceSize(instance)[0],
+    [onGetInstanceSize]
+  );
+
+  const getInstanceHeight = React.useCallback(
+    (instance: gdInitialInstance) =>
+      instance.hasCustomSize()
+        ? instance.getCustomHeight() || onGetInstanceSize(instance)[1]
+        : onGetInstanceSize(instance)[1],
+    [onGetInstanceSize]
+  );
+
   const schema: Schema = React.useMemo(
     () => [
       {
@@ -155,6 +173,7 @@ const InstancePropertiesEditor = ({
         getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
         setValue: (instance: gdInitialInstance, newValue: boolean) => {
           instance.setHasCustomSize(newValue);
+          forceUpdate();
         },
       },
       {
@@ -165,28 +184,39 @@ const InstancePropertiesEditor = ({
             name: 'Width',
             getLabel: () => i18n._(t`Width`),
             valueType: 'number',
-            getValue: (instance: gdInitialInstance) =>
-              instance.getCustomWidth() || onGetInstanceSize(instance)[0],
+            getValue: getInstanceWidth,
             setValue: (instance: gdInitialInstance, newValue: number) => {
-              instance.setHasCustomSize(true);
               instance.setCustomWidth(Math.max(newValue, 0));
+              instance.setCustomHeight(getInstanceHeight(instance));
+              // This must be done after getInstanceHeight.
+              instance.setHasCustomSize(true);
+              forceUpdate();
             },
           },
           {
             name: 'Height',
             getLabel: () => i18n._(t`Height`),
             valueType: 'number',
-            getValue: (instance: gdInitialInstance) =>
-              instance.getCustomHeight() || onGetInstanceSize(instance)[1],
+            getValue: getInstanceHeight,
             setValue: (instance: gdInitialInstance, newValue: number) => {
-              instance.setHasCustomSize(true);
+              instance.setCustomWidth(getInstanceWidth(instance));
               instance.setCustomHeight(Math.max(newValue, 0));
+              // This must be done after getInstanceWidth.
+              instance.setHasCustomSize(true);
+              forceUpdate();
             },
           },
         ],
       },
     ],
-    [i18n, layout, onEditObjectByName, onGetInstanceSize]
+    [
+      i18n,
+      getInstanceWidth,
+      getInstanceHeight,
+      onEditObjectByName,
+      layout,
+      forceUpdate,
+    ]
   );
 
   const instance = instances[0];

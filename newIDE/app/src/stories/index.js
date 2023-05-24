@@ -107,8 +107,6 @@ import {
   TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
 } from '../UI/Layout';
-import SelectField from '../UI/SelectField';
-import SelectOption from '../UI/SelectOption';
 import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
 import {
   getFakePopperJsAnchorElement,
@@ -151,64 +149,6 @@ storiesOf('Welcome', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('to Storybook', () => <Welcome />);
-
-storiesOf('UI Building Blocks/SelectField', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ValueStateHolder
-      initialValue={'1'}
-      render={(value, onChange) => (
-        <SelectField
-          value={value}
-          onChange={(e, i, newValue: string) => onChange(newValue)}
-          fullWidth
-        >
-          <SelectOption value="1" label="Choice 1" />
-          <SelectOption value="2" label="Choice 2" />
-          <SelectOption value="3" label="Choice 3" />
-          <SelectOption value="4" label="Choice 4" />
-        </SelectField>
-      )}
-    />
-  ))
-  .add('default, with (markdown) helper text and floating label', () => (
-    <ValueStateHolder
-      initialValue={'1'}
-      render={(value, onChange) => (
-        <SelectField
-          value={value}
-          onChange={(e, i, newValue: string) => onChange(newValue)}
-          fullWidth
-          helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-          floatingLabelText="This is a floating label"
-        >
-          <SelectOption value="1" label="Choice 1" />
-          <SelectOption value="2" label="Choice 2" />
-          <SelectOption value="3" label="Choice 3" />
-          <SelectOption value="4" label="Choice 4" />
-        </SelectField>
-      )}
-    />
-  ))
-  .add('margin=none', () => (
-    <ValueStateHolder
-      initialValue={'1'}
-      render={(value, onChange) => (
-        <SelectField
-          margin="none"
-          value={value}
-          onChange={(e, i, newValue: string) => onChange(newValue)}
-          fullWidth
-        >
-          <SelectOption value="1" label="Choice 1" />
-          <SelectOption value="2" label="Choice 2" />
-          <SelectOption value="3" label="Choice 3" />
-          <SelectOption value="4" label="Choice 4" />
-        </SelectField>
-      )}
-    />
-  ));
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(paperDecorator)

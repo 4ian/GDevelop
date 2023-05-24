@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -269,13 +270,13 @@ const AnimationsListContainer = ({
   );
 
   const removeAnimation = React.useCallback(
-    i => {
+    (index: number, i18n: I18nType) => {
       const answer = Window.showConfirmDialog(
-        'Are you sure you want to remove this animation?'
+        i18n._(t`Are you sure you want to remove this animation?`)
       );
 
       if (answer) {
-        spriteConfiguration.removeAnimation(i);
+        spriteConfiguration.removeAnimation(index);
         forceUpdate();
         onSizeUpdated();
         if (onObjectUpdated) onObjectUpdated();
@@ -285,15 +286,17 @@ const AnimationsListContainer = ({
   );
 
   const changeAnimationName = React.useCallback(
-    (i, newName) => {
-      const currentName = spriteConfiguration.getAnimation(i).getName();
+    (changedAnimationIndex: number, newName: string, i18n: I18nType) => {
+      const currentName = spriteConfiguration
+        .getAnimation(changedAnimationIndex)
+        .getName();
       if (currentName === newName) return;
 
       const otherNames = mapFor(
         0,
         spriteConfiguration.getAnimationsCount(),
         index => {
-          return index === i
+          return index === changedAnimationIndex
             ? undefined // Don't check the current animation name as we're changing it.
             : currentName;
         }
@@ -304,13 +307,15 @@ const AnimationsListContainer = ({
         otherNames.filter(name => name === newName).length
       ) {
         showWarningBox(
-          'Another animation with this name already exists. Please use another name.',
+          i18n._(
+            t`Another animation with this name already exists. Please use another name.`
+          ),
           { delayToNextTick: true }
         );
         return;
       }
 
-      const animation = spriteConfiguration.getAnimation(i);
+      const animation = spriteConfiguration.getAnimation(changedAnimationIndex);
       const oldName = animation.getName();
       animation.setName(newName);
       // TODO EBO Refactor event-based object events when an animation is renamed.
@@ -387,74 +392,82 @@ const AnimationsListContainer = ({
   );
 
   return (
-    <Column noMargin expand useFullHeight>
-      {spriteConfiguration.getAnimationsCount() === 0 ? (
-        <Column noMargin expand justifyContent="center">
-          <EmptyPlaceholder
-            title={<Trans>Add your first animation</Trans>}
-            description={<Trans>Animations are a sequence of images.</Trans>}
-            actionLabel={<Trans>Add an animation</Trans>}
-            helpPagePath="/objects/sprite"
-            tutorialId="intermediate-changing-animations"
-            onAction={addAnimation}
-          />
+    <I18n>
+      {({ i18n }) => (
+        <Column noMargin expand useFullHeight>
+          {spriteConfiguration.getAnimationsCount() === 0 ? (
+            <Column noMargin expand justifyContent="center">
+              <EmptyPlaceholder
+                title={<Trans>Add your first animation</Trans>}
+                description={
+                  <Trans>Animations are a sequence of images.</Trans>
+                }
+                actionLabel={<Trans>Add an animation</Trans>}
+                helpPagePath="/objects/sprite"
+                tutorialId="intermediate-changing-animations"
+                onAction={addAnimation}
+              />
+            </Column>
+          ) : (
+            <React.Fragment>
+              <SpacedDismissableTutorialMessage />
+              <SortableAnimationsList
+                isAnimationListLocked={isAnimationListLocked}
+                spriteConfiguration={spriteConfiguration}
+                objectName={objectName}
+                helperClass="sortable-helper"
+                project={project}
+                onSortEnd={onSortEnd}
+                onChangeAnimationName={(index, newName) =>
+                  changeAnimationName(index, newName, i18n)
+                }
+                onRemoveAnimation={index => removeAnimation(index, i18n)}
+                onReplaceDirection={replaceDirection}
+                onSpriteContextMenu={openSpriteContextMenu}
+                selectedSprites={selectedSprites}
+                onSelectSprite={selectSprite}
+                resourcesLoader={resourcesLoader}
+                resourceManagementProps={resourceManagementProps}
+                useDragHandle
+                lockAxis="y"
+                axis="y"
+                onSpriteUpdated={onObjectUpdated}
+                scrollViewRef={scrollView}
+              />
+              <Column noMargin>
+                <ResponsiveLineStackLayout
+                  justifyContent="space-between"
+                  noColumnMargin
+                >
+                  {extraBottomTools}
+                  {!isAnimationListLocked && (
+                    <RaisedButton
+                      label={<Trans>Add an animation</Trans>}
+                      primary
+                      onClick={addAnimation}
+                      icon={<Add />}
+                    />
+                  )}
+                </ResponsiveLineStackLayout>
+              </Column>
+              <ContextMenu
+                ref={spriteContextMenu}
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Delete selection`),
+                    click: deleteSelection,
+                  },
+                  {
+                    label: i18n._(t`Duplicate selection`),
+                    click: duplicateSelection,
+                  },
+                ]}
+              />
+            </React.Fragment>
+          )}
         </Column>
-      ) : (
-        <React.Fragment>
-          <SpacedDismissableTutorialMessage />
-          <SortableAnimationsList
-            isAnimationListLocked={isAnimationListLocked}
-            spriteConfiguration={spriteConfiguration}
-            objectName={objectName}
-            helperClass="sortable-helper"
-            project={project}
-            onSortEnd={onSortEnd}
-            onChangeAnimationName={changeAnimationName}
-            onRemoveAnimation={removeAnimation}
-            onReplaceDirection={replaceDirection}
-            onSpriteContextMenu={openSpriteContextMenu}
-            selectedSprites={selectedSprites}
-            onSelectSprite={selectSprite}
-            resourcesLoader={resourcesLoader}
-            resourceManagementProps={resourceManagementProps}
-            useDragHandle
-            lockAxis="y"
-            axis="y"
-            onSpriteUpdated={onObjectUpdated}
-            scrollViewRef={scrollView}
-          />
-          <Column noMargin>
-            <ResponsiveLineStackLayout
-              justifyContent="space-between"
-              noColumnMargin
-            >
-              {extraBottomTools}
-              {!isAnimationListLocked && (
-                <RaisedButton
-                  label={<Trans>Add an animation</Trans>}
-                  primary
-                  onClick={addAnimation}
-                  icon={<Add />}
-                />
-              )}
-            </ResponsiveLineStackLayout>
-          </Column>
-          <ContextMenu
-            ref={spriteContextMenu}
-            buildMenuTemplate={(i18n: I18nType) => [
-              {
-                label: i18n._(t`Delete selection`),
-                click: deleteSelection,
-              },
-              {
-                label: i18n._(t`Duplicate selection`),
-                click: duplicateSelection,
-              },
-            ]}
-          />
-        </React.Fragment>
       )}
-    </Column>
+    </I18n>
   );
 };
 

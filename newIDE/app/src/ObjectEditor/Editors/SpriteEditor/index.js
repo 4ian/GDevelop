@@ -103,7 +103,9 @@ const Animation = ({
         {!isAnimationListLocked && (
           <MiniToolbar noPadding>
             <DragHandle />
-            <MiniToolbarText>{<Trans>Animation #{id}</Trans>}</MiniToolbarText>
+            <MiniToolbarText>
+              <Trans>Animation #{id}</Trans>
+            </MiniToolbarText>
             <Column expand>
               <SemiControlledTextField
                 commitOnBlur

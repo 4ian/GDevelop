@@ -1,6 +1,7 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import SemiControlledAutoComplete, {
@@ -11,6 +12,9 @@ import ListIcon from '../UI/ListIcon';
 import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -96,7 +100,11 @@ const getObjectsAndGroupsDataSource = ({
         };
       });
 
-  const fullList = [...objects, { type: 'separator' }, ...groups];
+  const fullList =
+    groups.length === 0
+      ? objects
+      : [...objects, { type: 'separator' }, ...groups];
+
   return excludedObjectOrGroupNames
     ? fullList.filter(
         //$FlowFixMe
@@ -142,17 +150,19 @@ const checkHasRequiredCapability = ({
   );
 };
 
-export default class ObjectSelector extends React.Component<Props, {||}> {
-  _field: ?SemiControlledAutoCompleteInterface;
+export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-  // Don't add a componentWillUnmount that would call onChange. This can lead to
-  // calling callbacks that would then update a deleted instruction parameters.
+const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
+  (props, ref) => {
+    const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
-  focus: FieldFocusFunction = options => {
-    if (this._field) this._field.focus(options);
-  };
+    const focus: FieldFocusFunction = options => {
+      if (fieldRef.current) fieldRef.current.focus(options);
+    };
+    const shouldAutofocusInput = useShouldAutofocusInput();
 
-  render() {
+    React.useImperativeHandle(ref, () => ({ focus }));
+
     const {
       value,
       onChange,
@@ -169,8 +179,9 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       onApply,
       id,
       excludedObjectOrGroupNames,
-      ...rest
-    } = this.props;
+      hintText,
+      ...otherProps
+    } = props;
 
     const objectAndGroups = getObjectsAndGroupsDataSource({
       project,
@@ -180,10 +191,12 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       allowedObjectType,
       excludedObjectOrGroupNames,
     });
+
     const hasValidChoice =
       objectAndGroups.filter(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
+
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
       project,
       requiredObjectCapability,
@@ -200,10 +213,10 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       undefined
     );
 
-    return (
+    return shouldAutofocusInput ? (
       <SemiControlledAutoComplete
         margin={margin}
-        hintText={t`Choose an object`}
+        hintText={hintText || t`Choose an object`}
         value={value}
         onChange={onChange}
         onChoose={onChoose}
@@ -211,10 +224,45 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         onApply={onApply}
         dataSource={objectAndGroups}
         errorText={errorText}
-        ref={field => (this._field = field)}
+        ref={fieldRef}
         id={id}
-        {...rest}
+        {...otherProps}
       />
+    ) : (
+      <I18n>
+        {({ i18n }) => (
+          <SelectField
+            margin={margin}
+            value={value}
+            onChange={(e, i, newValue) => {
+              onChange(newValue);
+              if (onChoose) onChoose(newValue);
+              if (onApply) onApply();
+            }}
+            translatableHintText={hintText || t`Choose an object`}
+            style={{ flex: otherProps.fullWidth ? 1 : undefined }}
+            errorText={errorText}
+            helperMarkdownText={otherProps.helperMarkdownText}
+            floatingLabelText={otherProps.floatingLabelText}
+            id={id}
+          >
+            {objectAndGroups.map((option, index) =>
+              option.type === 'separator' ? (
+                <optgroup key={`group-divider`} label={i18n._(t`Groups`)} />
+              ) : (
+                <SelectOption
+                  key={option.value}
+                  label={option.value}
+                  value={option.value}
+                  shouldNotTranslate
+                />
+              )
+            )}
+          </SelectField>
+        )}
+      </I18n>
     );
   }
-}
+);
+
+export default ObjectSelector;

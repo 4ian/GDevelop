@@ -257,6 +257,7 @@ export default class PixiResourcesLoader {
     });
 
     const loader = new GLTFLoader();
+    loader.withCredentials = checkIfCredentialsRequired(url);
     // TODO Cache promises that are not yet resolved to void `load` being
     // called more than once for the same resource.
     return new Promise((resolve, reject) => {

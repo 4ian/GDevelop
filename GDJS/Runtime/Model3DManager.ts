@@ -82,9 +82,13 @@ namespace gdjs {
       let loaded = 0;
       for (let i = 0; i < model3DResources.length; ++i) {
         const resource = model3DResources[i];
+        const url = this._resourcesLoader.getFullUrl(resource.file);
 
+        this._loader.withCredentials = this._resourcesLoader.checkIfCredentialsRequired(
+          url
+        );
         this._loader.load(
-          resource.file,
+          url,
           (gltf) => {
             gltf.scene.rotation.order = 'ZYX';
             this._loadedThreeModels.set(resource.name, gltf.scene);

@@ -1658,7 +1658,7 @@ module.exports = {
         .setType('number');
       properties
         .getOrCreate('top')
-        .setValue('Y+')
+        .setValue('Y-')
         .setLabel(_('3D world top'))
         .setType('choice')
         .addExtraInfo('Y-')

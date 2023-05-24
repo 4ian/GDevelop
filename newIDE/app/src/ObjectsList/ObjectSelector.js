@@ -142,17 +142,18 @@ const checkHasRequiredCapability = ({
   );
 };
 
-export default class ObjectSelector extends React.Component<Props, {||}> {
-  _field: ?SemiControlledAutoCompleteInterface;
+export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-  // Don't add a componentWillUnmount that would call onChange. This can lead to
-  // calling callbacks that would then update a deleted instruction parameters.
+const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
+  (props, ref) => {
+    const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
-  focus: FieldFocusFunction = options => {
-    if (this._field) this._field.focus(options);
-  };
+    const focus: FieldFocusFunction = options => {
+      if (fieldRef.current) fieldRef.current.focus(options);
+    };
 
-  render() {
+    React.useImperativeHandle(ref, () => ({ focus }));
+
     const {
       value,
       onChange,
@@ -169,8 +170,8 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       onApply,
       id,
       excludedObjectOrGroupNames,
-      ...rest
-    } = this.props;
+      ...otherProps
+    } = props;
 
     const objectAndGroups = getObjectsAndGroupsDataSource({
       project,
@@ -180,10 +181,12 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       allowedObjectType,
       excludedObjectOrGroupNames,
     });
+
     const hasValidChoice =
       objectAndGroups.filter(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
+
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
       project,
       requiredObjectCapability,
@@ -211,10 +214,12 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         onApply={onApply}
         dataSource={objectAndGroups}
         errorText={errorText}
-        ref={field => (this._field = field)}
+        ref={fieldRef}
         id={id}
-        {...rest}
+        {...otherProps}
       />
     );
   }
-}
+);
+
+export default ObjectSelector;

@@ -2,7 +2,9 @@
 import * as React from 'react';
 import classNames from 'classnames';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import ObjectSelector from '../../ObjectsList/ObjectSelector';
+import ObjectSelector, {
+  type ObjectSelectorInterface,
+} from '../../ObjectsList/ObjectSelector';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -17,7 +19,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const { currentlyRunningInAppTutorial } = React.useContext(
       InAppTutorialContext
     );
-    const field = React.useRef<?ObjectSelector>(null);
+    const field = React.useRef<?ObjectSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {
       // Prevent focus of field if an in-app tutorial is running because
       // the popper of the tooltip and the popper of the semi controlled

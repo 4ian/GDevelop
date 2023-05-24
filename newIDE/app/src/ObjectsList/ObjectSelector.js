@@ -11,6 +11,10 @@ import ListIcon from '../UI/ListIcon';
 import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import { Divider } from '@material-ui/core';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -151,6 +155,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
     const focus: FieldFocusFunction = options => {
       if (fieldRef.current) fieldRef.current.focus(options);
     };
+    const shouldAutofocusInput = useShouldAutofocusInput();
 
     React.useImperativeHandle(ref, () => ({ focus }));
 
@@ -170,6 +175,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       onApply,
       id,
       excludedObjectOrGroupNames,
+      hintText,
       ...otherProps
     } = props;
 
@@ -203,10 +209,10 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       undefined
     );
 
-    return (
+    return shouldAutofocusInput ? (
       <SemiControlledAutoComplete
         margin={margin}
-        hintText={t`Choose an object`}
+        hintText={hintText || t`Choose an object`}
         value={value}
         onChange={onChange}
         onChoose={onChoose}
@@ -218,6 +224,35 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
         id={id}
         {...otherProps}
       />
+    ) : (
+      <SelectField
+        margin={margin}
+        value={value}
+        onChange={(e, i, newValue) => {
+          onChange(newValue);
+          if (onChoose) onChoose(newValue);
+          if (onApply) onApply();
+        }}
+        translatableHintText={hintText || t`Choose an object`}
+        style={{ flex: otherProps.fullWidth ? 1 : undefined }}
+        errorText={errorText}
+        helperMarkdownText={otherProps.helperMarkdownText}
+        floatingLabelText={otherProps.floatingLabelText}
+        id={id}
+      >
+        {objectAndGroups.map((option, index) =>
+          option.type === 'separator' ? (
+            <Divider key={`divider${index}`} />
+          ) : (
+            <SelectOption
+              key={option.value}
+              label={option.value}
+              value={option.value}
+              shouldNotTranslate
+            />
+          )
+        )}
+      </SelectField>
     );
   }
 );

@@ -192,14 +192,17 @@ module.exports = {
 
       doUnserializeFrom(serializerElement) {
         super.doSerializeTo(serializerElement);
-        animation.length = 0;
+        animations.length = 0;
         const content = serializerElement.getChild("content");
         const animationsElement = content.getChild("animations");
         animationsElement.considerAsArrayOf("animation");
         for (let i = 0; i < animationsElement.GetChildrenCount(); ++i) {
           const animationElement = animationsElement.GetChild(i);
-          animation.name = animationElement.getStringAttribute("name", "");
-          animation.source = animationElement.getAttribute("source", "");
+          const animation = {
+            name: animationElement.getStringAttribute("name", ""),
+            source: animationElement.getAttribute("source", ""),
+          }
+          this.animations.push(animation);
         }
       }
     }

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { type EditorProps } from './EditorProps.flow';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
@@ -22,6 +23,27 @@ import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesM
 import AlertMessage from '../../UI/AlertMessage';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import ResourcesLoader from '../../ResourcesLoader';
+
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import IconButton from '../../UI/IconButton';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
+import { mapFor } from '../../Utils/MapFor';
+import Dialog from '../../UI/Dialog';
+import HelpButton from '../../UI/HelpButton';
+import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
+import DragHandle from '../../UI/DragHandle';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../UI/Menu/ContextMenu';
+import { showWarningBox } from '../../UI/Messages/MessageBox';
+import Window from '../../Utils/Window';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
+import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
+import Add from '../../UI/CustomSvgIcons/Add';
+import Trash from '../../UI/CustomSvgIcons/Trash';
 
 const gd: libGDevelop = global.gd;
 
@@ -180,10 +202,324 @@ const PropertyResourceSelector = ({
   );
 };
 
+const styles = {
+  animationLine: {
+    // Use a non standard spacing because:
+    // - The SortableAnimationsList won't work with <Spacer /> or <LargeSpacer /> between elements.
+    // - We need to visually show a difference between animations.
+    marginBottom: 16,
+  },
+};
+
+type AnimationProps = {|
+  animation: gdAnimation,
+  id: number,
+  project: gdProject,
+  resourceManagementProps: ResourceManagementProps,
+  onRemove: () => void,
+  resourcesLoader: typeof ResourcesLoader,
+  onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
+  selectedSprites: {
+    [number]: boolean,
+  },
+  onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
+  onChangeName: string => void,
+  onSpriteUpdated: () => void,
+|};
+
+const Animation = ({
+  animation,
+  id,
+  project,
+  onRemove,
+  resourceManagementProps,
+  resourcesLoader,
+  onSpriteContextMenu,
+  selectedSprites,
+  onSelectSprite,
+  onChangeName,
+  onSpriteUpdated,
+}: AnimationProps) => {
+  return (
+    <div style={styles.animationLine}>
+      <Column expand noMargin>
+        <Column expand noMargin>
+          <Text size="block-title">{animation.getName()}</Text>
+        </Column>
+
+        <MiniToolbar noPadding>
+          <DragHandle />
+          <MiniToolbarText>{<Trans>Animation #{id}</Trans>}</MiniToolbarText>
+          <Column expand>
+            <SemiControlledTextField
+              commitOnBlur
+              margin="none"
+              value={animation.getName()}
+              translatableHintText={t`Optional animation name`}
+              onChange={text => onChangeName(text)}
+              fullWidth
+            />
+          </Column>
+          <IconButton size="small" onClick={onRemove}>
+            <Trash />
+          </IconButton>
+        </MiniToolbar>
+      </Column>
+    </div>
+  );
+};
+
+const SortableAnimation = SortableElement(Animation);
+
+const SortableAnimationsList = SortableContainer(
+  ({
+    spriteConfiguration,
+    onAddAnimation,
+    onRemoveAnimation,
+    onChangeAnimationName,
+    project,
+    resourcesLoader,
+    resourceManagementProps,
+    extraBottomTools,
+    onSpriteContextMenu,
+    selectedSprites,
+    onSelectSprite,
+    onSpriteUpdated,
+    scrollViewRef,
+  }) => {
+    // Note that it's important to have <ScrollView> *inside* this
+    // component, otherwise the sortable list won't work (because the
+    // SortableContainer would not find a root div to use).
+    return (
+      <ScrollView ref={scrollViewRef}>
+        {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
+          const animation = spriteConfiguration.getAnimation(i);
+          return (
+            <SortableAnimation
+              key={i}
+              index={i}
+              id={i}
+              animation={animation}
+              project={project}
+              resourcesLoader={resourcesLoader}
+              resourceManagementProps={resourceManagementProps}
+              onRemove={() => onRemoveAnimation(i)}
+              onChangeName={newName => onChangeAnimationName(i, newName)}
+              onSpriteContextMenu={onSpriteContextMenu}
+              selectedSprites={selectedSprites}
+              onSelectSprite={onSelectSprite}
+              onSpriteUpdated={onSpriteUpdated}
+            />
+          );
+        })}
+      </ScrollView>
+    );
+  }
+);
+
+type AnimationsListContainerProps = {|
+  objectConfiguration: gdObjectConfiguration & {
+    animations: Array<{ name: string, source: string }>,
+  },
+  project: gdProject,
+  layout?: gdLayout,
+  object?: gdObject,
+  resourceManagementProps: ResourceManagementProps,
+  resourcesLoader: typeof ResourcesLoader,
+  onSizeUpdated: () => void,
+  onObjectUpdated?: () => void,
+|};
+
+const AnimationsListContainer = ({
+  objectConfiguration,
+  project,
+  layout,
+  object,
+  resourceManagementProps,
+  resourcesLoader,
+  onSizeUpdated,
+  onObjectUpdated,
+}: AnimationsListContainerProps) => {
+  const [selectedSprites, setSelectedSprites] = React.useState<{
+    [number]: boolean,
+  }>({});
+
+  const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
+
+  const forceUpdate = useForceUpdate();
+
+  const onSortEnd = React.useCallback(
+    ({ oldIndex, newIndex }) => {
+      objectConfiguration.moveAnimation(oldIndex, newIndex);
+      forceUpdate();
+    },
+    [forceUpdate, objectConfiguration]
+  );
+
+  const addAnimation = React.useCallback(
+    () => {
+      const emptyAnimation = new gd.Animation();
+      emptyAnimation.setDirectionsCount(1);
+      objectConfiguration.addAnimation(emptyAnimation);
+      emptyAnimation.delete();
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
+
+      // Scroll to the bottom of the list.
+      // Ideally, we'd wait for the list to be updated to scroll, but
+      // to simplify the code, we just wait a few ms for a new render
+      // to be done.
+      setTimeout(() => {
+        if (scrollView.current) {
+          scrollView.current.scrollToBottom();
+        }
+      }, 100); // A few ms is enough for a new render to be done.
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, objectConfiguration]
+  );
+
+  const removeAnimation = React.useCallback(
+    i => {
+      const answer = Window.showConfirmDialog(
+        'Are you sure you want to remove this animation?'
+      );
+
+      if (answer) {
+        objectConfiguration.removeAnimation(i);
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
+      }
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, objectConfiguration]
+  );
+
+  const changeAnimationName = React.useCallback(
+    (i, newName) => {
+      const currentName = objectConfiguration.getAnimation(i).getName();
+      if (currentName === newName) return;
+
+      const otherNames = mapFor(
+        0,
+        objectConfiguration.getAnimationsCount(),
+        index => {
+          return index === i
+            ? undefined // Don't check the current animation name as we're changing it.
+            : currentName;
+        }
+      );
+
+      if (
+        newName !== '' &&
+        otherNames.filter(name => name === newName).length
+      ) {
+        showWarningBox(
+          'Another animation with this name already exists. Please use another name.',
+          { delayToNextTick: true }
+        );
+        return;
+      }
+
+      const animation = objectConfiguration.getAnimation(i);
+      const oldName = animation.getName();
+      animation.setName(newName);
+      // TODO EBO Refactor event-based object events when an animation is renamed.
+      if (layout && object) {
+        gd.WholeProjectRefactorer.renameObjectAnimation(
+          project,
+          layout,
+          object,
+          oldName,
+          newName
+        );
+      }
+      forceUpdate();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [forceUpdate, layout, object, onObjectUpdated, project, objectConfiguration]
+  );
+
+  const selectSprite = React.useCallback(
+    (sprite, selected) => {
+      setSelectedSprites({
+        ...selectedSprites,
+        [sprite.ptr]: selected,
+      });
+    },
+    [selectedSprites]
+  );
+
+  const openSpriteContextMenu = React.useCallback(
+    (x, y, sprite, index) => {
+      selectSprite(sprite, true);
+      if (spriteContextMenu.current) {
+        spriteContextMenu.current.open(x, y);
+      }
+    },
+    [selectSprite]
+  );
+
+  return (
+    <Column noMargin expand useFullHeight>
+      {objectConfiguration.animations.length === 0 ? (
+        <Column noMargin expand justifyContent="center">
+          <EmptyPlaceholder
+            title={<Trans>Add your first animation</Trans>}
+            description={<Trans>Animations are a sequence of images.</Trans>}
+            actionLabel={<Trans>Add an animation</Trans>}
+            helpPagePath="/objects/sprite"
+            tutorialId="intermediate-changing-animations"
+            onAction={addAnimation}
+          />
+        </Column>
+      ) : (
+        <React.Fragment>
+          <SortableAnimationsList
+            spriteConfiguration={objectConfiguration}
+            helperClass="sortable-helper"
+            project={project}
+            onSortEnd={onSortEnd}
+            onChangeAnimationName={changeAnimationName}
+            onRemoveAnimation={removeAnimation}
+            onSpriteContextMenu={openSpriteContextMenu}
+            selectedSprites={selectedSprites}
+            onSelectSprite={selectSprite}
+            resourcesLoader={resourcesLoader}
+            resourceManagementProps={resourceManagementProps}
+            useDragHandle
+            lockAxis="y"
+            axis="y"
+            onSpriteUpdated={onObjectUpdated}
+            scrollViewRef={scrollView}
+          />
+          <Column noMargin>
+            <ResponsiveLineStackLayout
+              justifyContent="space-between"
+              noColumnMargin
+            >
+              <RaisedButton
+                label={<Trans>Add an animation</Trans>}
+                primary
+                onClick={addAnimation}
+                icon={<Add />}
+              />
+            </ResponsiveLineStackLayout>
+          </Column>
+        </React.Fragment>
+      )}
+    </Column>
+  );
+};
+
 const Model3DEditor = ({
   objectConfiguration,
   project,
   layout,
+  object,
+  onSizeUpdated,
+  onObjectUpdated,
   resourceManagementProps,
 }: EditorProps) => {
   const forceUpdate = useForceUpdate();
@@ -278,6 +614,16 @@ const Model3DEditor = ({
             </AlertMessage>
           )}
       </ColumnStackLayout>
+      <AnimationsListContainer
+        objectConfiguration={objectConfiguration}
+        resourcesLoader={ResourcesLoader}
+        resourceManagementProps={resourceManagementProps}
+        project={project}
+        layout={layout}
+        object={object}
+        onSizeUpdated={onSizeUpdated}
+        onObjectUpdated={onObjectUpdated}
+      />
     </ColumnStackLayout>
   );
 };

@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -74,82 +75,78 @@ type AnimationProps = {|
   onSpriteUpdated: () => void,
 |};
 
-class Animation extends React.Component<AnimationProps, void> {
-  render() {
-    const {
-      animation,
-      id,
-      project,
-      onRemove,
-      resourceManagementProps,
-      resourcesLoader,
-      onSpriteContextMenu,
-      selectedSprites,
-      onSelectSprite,
-      onReplaceDirection,
-      objectName,
-      onChangeName,
-      isAnimationListLocked,
-      onSpriteUpdated,
-    } = this.props;
-
-    const animationName = animation.getName();
-    return (
-      <div style={styles.animationLine}>
-        <Column expand noMargin>
-          {isAnimationListLocked && (
-            <Column expand noMargin>
-              <Text size="block-title">{animation.getName()}</Text>
-            </Column>
-          )}
-          {!isAnimationListLocked && (
-            <MiniToolbar noPadding>
-              <DragHandle />
-              <MiniToolbarText>
-                {<Trans>Animation #{id}</Trans>}
-              </MiniToolbarText>
-              <Column expand>
-                <SemiControlledTextField
-                  commitOnBlur
-                  margin="none"
-                  value={animation.getName()}
-                  translatableHintText={t`Optional animation name`}
-                  onChange={text => onChangeName(text)}
-                  fullWidth
-                />
-              </Column>
-              <IconButton size="small" onClick={onRemove}>
-                <Trash />
-              </IconButton>
-            </MiniToolbar>
-          )}
-          {mapFor(0, animation.getDirectionsCount(), i => {
-            const direction = animation.getDirection(i);
-            return (
-              <SpritesList
-                direction={direction}
-                key={i}
-                project={project}
-                resourcesLoader={resourcesLoader}
-                resourceManagementProps={resourceManagementProps}
-                onSpriteContextMenu={onSpriteContextMenu}
-                selectedSprites={selectedSprites}
-                onSelectSprite={onSelectSprite}
-                onReplaceByDirection={newDirection =>
-                  onReplaceDirection(i, newDirection)
-                }
-                objectName={objectName}
-                animationName={animationName}
-                onChangeName={onChangeName}
-                onSpriteUpdated={onSpriteUpdated}
+const Animation = ({
+  animation,
+  id,
+  project,
+  onRemove,
+  resourceManagementProps,
+  resourcesLoader,
+  onSpriteContextMenu,
+  selectedSprites,
+  onSelectSprite,
+  onReplaceDirection,
+  objectName,
+  onChangeName,
+  isAnimationListLocked,
+  onSpriteUpdated,
+}: AnimationProps) => {
+  const animationName = animation.getName();
+  return (
+    <div style={styles.animationLine}>
+      <Column expand noMargin>
+        {isAnimationListLocked && (
+          <Column expand noMargin>
+            <Text size="block-title">{animation.getName()}</Text>
+          </Column>
+        )}
+        {!isAnimationListLocked && (
+          <MiniToolbar noPadding>
+            <DragHandle />
+            <MiniToolbarText>
+              <Trans>Animation #{id}</Trans>
+            </MiniToolbarText>
+            <Column expand>
+              <SemiControlledTextField
+                commitOnBlur
+                margin="none"
+                value={animation.getName()}
+                translatableHintText={t`Optional animation name`}
+                onChange={text => onChangeName(text)}
+                fullWidth
               />
-            );
-          })}
-        </Column>
-      </div>
-    );
-  }
-}
+            </Column>
+            <IconButton size="small" onClick={onRemove}>
+              <Trash />
+            </IconButton>
+          </MiniToolbar>
+        )}
+        {mapFor(0, animation.getDirectionsCount(), i => {
+          const direction = animation.getDirection(i);
+          return (
+            <SpritesList
+              direction={direction}
+              key={i}
+              project={project}
+              resourcesLoader={resourcesLoader}
+              resourceManagementProps={resourceManagementProps}
+              onSpriteContextMenu={onSpriteContextMenu}
+              selectedSprites={selectedSprites}
+              onSelectSprite={onSelectSprite}
+              onReplaceByDirection={newDirection =>
+                onReplaceDirection(i, newDirection)
+              }
+              objectName={objectName}
+              animationName={animationName}
+              onChangeName={onChangeName}
+              onSpriteUpdated={onSpriteUpdated}
+            />
+          );
+        })}
+      </Column>
+    </div>
+  );
+};
 
 const SortableAnimation = SortableElement(Animation);
 
@@ -221,226 +218,260 @@ type AnimationsListContainerProps = {|
   isAnimationListLocked: boolean,
 |};
 
-type AnimationsListContainerState = {|
-  selectedSprites: {
+const AnimationsListContainer = ({
+  spriteConfiguration,
+  project,
+  layout,
+  object,
+  resourceManagementProps,
+  resourcesLoader,
+  extraBottomTools,
+  onSizeUpdated,
+  objectName,
+  onObjectUpdated,
+  isAnimationListLocked,
+}: AnimationsListContainerProps) => {
+  const [selectedSprites, setSelectedSprites] = React.useState<{
     [number]: boolean,
-  },
-|};
+  }>({});
 
-class AnimationsListContainer extends React.Component<
-  AnimationsListContainerProps,
-  AnimationsListContainerState
-> {
-  state = {
-    selectedSprites: {},
-  };
-  spriteContextMenu: ?ContextMenuInterface;
-  _scrollView = React.createRef<ScrollViewInterface>();
+  const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-  onSortEnd = ({ oldIndex, newIndex }) => {
-    this.props.spriteConfiguration.moveAnimation(oldIndex, newIndex);
-    this.forceUpdate();
-  };
+  const forceUpdate = useForceUpdate();
 
-  addAnimation = () => {
-    const emptyAnimation = new gd.Animation();
-    emptyAnimation.setDirectionsCount(1);
-    this.props.spriteConfiguration.addAnimation(emptyAnimation);
-    emptyAnimation.delete();
-    this.forceUpdate();
-    this.props.onSizeUpdated();
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
+  const onSortEnd = React.useCallback(
+    ({ oldIndex, newIndex }) => {
+      spriteConfiguration.moveAnimation(oldIndex, newIndex);
+      forceUpdate();
+    },
+    [forceUpdate, spriteConfiguration]
+  );
 
-    // Scroll to the bottom of the list.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      if (this._scrollView.current) {
-        this._scrollView.current.scrollToBottom();
-      }
-    }, 100); // A few ms is enough for a new render to be done.
-  };
+  const addAnimation = React.useCallback(
+    () => {
+      const emptyAnimation = new gd.Animation();
+      emptyAnimation.setDirectionsCount(1);
+      spriteConfiguration.addAnimation(emptyAnimation);
+      emptyAnimation.delete();
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
 
-  removeAnimation = i => {
-    const answer = Window.showConfirmDialog(
-      'Are you sure you want to remove this animation?'
-    );
+      // Scroll to the bottom of the list.
+      // Ideally, we'd wait for the list to be updated to scroll, but
+      // to simplify the code, we just wait a few ms for a new render
+      // to be done.
+      setTimeout(() => {
+        if (scrollView.current) {
+          scrollView.current.scrollToBottom();
+        }
+      }, 100); // A few ms is enough for a new render to be done.
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, spriteConfiguration]
+  );
 
-    if (answer) {
-      this.props.spriteConfiguration.removeAnimation(i);
-      this.forceUpdate();
-      this.props.onSizeUpdated();
-      if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-    }
-  };
-
-  changeAnimationName = (i, newName) => {
-    const { spriteConfiguration, project, layout, object } = this.props;
-
-    const currentName = spriteConfiguration.getAnimation(i).getName();
-    if (currentName === newName) return;
-
-    const otherNames = mapFor(
-      0,
-      spriteConfiguration.getAnimationsCount(),
-      index => {
-        return index === i
-          ? undefined // Don't check the current animation name as we're changing it.
-          : currentName;
-      }
-    );
-
-    if (newName !== '' && otherNames.filter(name => name === newName).length) {
-      showWarningBox(
-        'Another animation with this name already exists. Please use another name.',
-        { delayToNextTick: true }
+  const removeAnimation = React.useCallback(
+    (index: number, i18n: I18nType) => {
+      const answer = Window.showConfirmDialog(
+        i18n._(t`Are you sure you want to remove this animation?`)
       );
-      return;
-    }
 
-    const animation = spriteConfiguration.getAnimation(i);
-    const oldName = animation.getName();
-    animation.setName(newName);
-    // TODO EBO Refactor event-based object events when an animation is renamed.
-    if (layout && object) {
-      gd.WholeProjectRefactorer.renameObjectAnimation(
-        project,
-        layout,
-        object,
-        oldName,
-        newName
+      if (answer) {
+        spriteConfiguration.removeAnimation(index);
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
+      }
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, spriteConfiguration]
+  );
+
+  const changeAnimationName = React.useCallback(
+    (changedAnimationIndex: number, newName: string, i18n: I18nType) => {
+      const currentName = spriteConfiguration
+        .getAnimation(changedAnimationIndex)
+        .getName();
+      if (currentName === newName) return;
+
+      const otherNames = mapFor(
+        0,
+        spriteConfiguration.getAnimationsCount(),
+        index => {
+          return index === changedAnimationIndex
+            ? undefined // Don't check the current animation name as we're changing it.
+            : currentName;
+        }
       );
-    }
-    this.forceUpdate();
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
 
-  deleteSelection = () => {
-    const { spriteConfiguration } = this.props;
+      if (
+        newName !== '' &&
+        otherNames.filter(name => name === newName).length
+      ) {
+        showWarningBox(
+          i18n._(
+            t`Another animation with this name already exists. Please use another name.`
+          ),
+          { delayToNextTick: true }
+        );
+        return;
+      }
 
-    mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-      const animation = spriteConfiguration.getAnimation(index);
-      deleteSpritesFromAnimation(animation, this.state.selectedSprites);
-    });
+      const animation = spriteConfiguration.getAnimation(changedAnimationIndex);
+      const oldName = animation.getName();
+      animation.setName(newName);
+      // TODO EBO Refactor event-based object events when an animation is renamed.
+      if (layout && object) {
+        gd.WholeProjectRefactorer.renameObjectAnimation(
+          project,
+          layout,
+          object,
+          oldName,
+          newName
+        );
+      }
+      forceUpdate();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [forceUpdate, layout, object, onObjectUpdated, project, spriteConfiguration]
+  );
 
-    this.setState({
-      selectedSprites: {},
-    });
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
+  const deleteSelection = React.useCallback(
+    () => {
+      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+        const animation = spriteConfiguration.getAnimation(index);
+        deleteSpritesFromAnimation(animation, selectedSprites);
+      });
 
-  duplicateSelection = () => {
-    const { spriteConfiguration } = this.props;
+      setSelectedSprites({});
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [onObjectUpdated, selectedSprites, spriteConfiguration]
+  );
 
-    mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-      const animation = spriteConfiguration.getAnimation(index);
-      duplicateSpritesInAnimation(animation, this.state.selectedSprites);
-    });
+  const duplicateSelection = React.useCallback(
+    () => {
+      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+        const animation = spriteConfiguration.getAnimation(index);
+        duplicateSpritesInAnimation(animation, selectedSprites);
+      });
 
-    this.setState({
-      selectedSprites: {},
-    });
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
+      setSelectedSprites({});
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [onObjectUpdated, selectedSprites, spriteConfiguration]
+  );
 
-  openSpriteContextMenu = (x, y, sprite, index) => {
-    this.selectSprite(sprite, true);
-    if (this.spriteContextMenu) this.spriteContextMenu.open(x, y);
-  };
-
-  selectSprite = (sprite, selected) => {
-    this.setState({
-      selectedSprites: {
-        ...this.state.selectedSprites,
+  const selectSprite = React.useCallback(
+    (sprite, selected) => {
+      setSelectedSprites({
+        ...selectedSprites,
         [sprite.ptr]: selected,
-      },
-    });
-  };
+      });
+    },
+    [selectedSprites]
+  );
 
-  replaceDirection = (animationId, directionId, newDirection) => {
-    this.props.spriteConfiguration
-      .getAnimation(animationId)
-      .setDirection(newDirection, directionId);
-    this.forceUpdate();
-    if (this.props.onObjectUpdated) this.props.onObjectUpdated();
-  };
+  const openSpriteContextMenu = React.useCallback(
+    (x, y, sprite, index) => {
+      selectSprite(sprite, true);
+      if (spriteContextMenu.current) {
+        spriteContextMenu.current.open(x, y);
+      }
+    },
+    [selectSprite]
+  );
 
-  render() {
-    return (
-      <Column noMargin expand useFullHeight>
-        {this.props.spriteConfiguration.getAnimationsCount() === 0 ? (
-          <Column noMargin expand justifyContent="center">
-            <EmptyPlaceholder
-              title={<Trans>Add your first animation</Trans>}
-              description={<Trans>Animations are a sequence of images.</Trans>}
-              actionLabel={<Trans>Add an animation</Trans>}
-              helpPagePath="/objects/sprite"
-              tutorialId="intermediate-changing-animations"
-              onAction={this.addAnimation}
-            />
-          </Column>
-        ) : (
-          <React.Fragment>
-            <SpacedDismissableTutorialMessage />
-            <SortableAnimationsList
-              isAnimationListLocked={this.props.isAnimationListLocked}
-              spriteConfiguration={this.props.spriteConfiguration}
-              objectName={this.props.objectName}
-              helperClass="sortable-helper"
-              project={this.props.project}
-              onSortEnd={this.onSortEnd}
-              onChangeAnimationName={this.changeAnimationName}
-              onRemoveAnimation={this.removeAnimation}
-              onReplaceDirection={this.replaceDirection}
-              onSpriteContextMenu={this.openSpriteContextMenu}
-              selectedSprites={this.state.selectedSprites}
-              onSelectSprite={this.selectSprite}
-              resourcesLoader={this.props.resourcesLoader}
-              resourceManagementProps={this.props.resourceManagementProps}
-              useDragHandle
-              lockAxis="y"
-              axis="y"
-              onSpriteUpdated={this.props.onObjectUpdated}
-              scrollViewRef={this._scrollView}
-            />
-            <Column noMargin>
-              <ResponsiveLineStackLayout
-                justifyContent="space-between"
-                noColumnMargin
-              >
-                {this.props.extraBottomTools}
-                {!this.props.isAnimationListLocked && (
-                  <RaisedButton
-                    label={<Trans>Add an animation</Trans>}
-                    primary
-                    onClick={this.addAnimation}
-                    icon={<Add />}
-                  />
-                )}
-              </ResponsiveLineStackLayout>
+  const replaceDirection = React.useCallback(
+    (animationId, directionId, newDirection) => {
+      spriteConfiguration
+        .getAnimation(animationId)
+        .setDirection(newDirection, directionId);
+      forceUpdate();
+      if (onObjectUpdated) onObjectUpdated();
+    },
+    [forceUpdate, onObjectUpdated, spriteConfiguration]
+  );
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Column noMargin expand useFullHeight>
+          {spriteConfiguration.getAnimationsCount() === 0 ? (
+            <Column noMargin expand justifyContent="center">
+              <EmptyPlaceholder
+                title={<Trans>Add your first animation</Trans>}
+                description={
+                  <Trans>Animations are a sequence of images.</Trans>
+                }
+                actionLabel={<Trans>Add an animation</Trans>}
+                helpPagePath="/objects/sprite"
+                tutorialId="intermediate-changing-animations"
+                onAction={addAnimation}
+              />
             </Column>
-            <ContextMenu
-              ref={spriteContextMenu =>
-                (this.spriteContextMenu = spriteContextMenu)
-              }
-              buildMenuTemplate={(i18n: I18nType) => [
-                {
-                  label: i18n._(t`Delete selection`),
-                  click: () => this.deleteSelection(),
-                },
-                {
-                  label: i18n._(t`Duplicate selection`),
-                  click: () => this.duplicateSelection(),
-                },
-              ]}
-            />
-          </React.Fragment>
-        )}
-      </Column>
-    );
-  }
-}
+          ) : (
+            <React.Fragment>
+              <SpacedDismissableTutorialMessage />
+              <SortableAnimationsList
+                isAnimationListLocked={isAnimationListLocked}
+                spriteConfiguration={spriteConfiguration}
+                objectName={objectName}
+                helperClass="sortable-helper"
+                project={project}
+                onSortEnd={onSortEnd}
+                onChangeAnimationName={(index, newName) =>
+                  changeAnimationName(index, newName, i18n)
+                }
+                onRemoveAnimation={index => removeAnimation(index, i18n)}
+                onReplaceDirection={replaceDirection}
+                onSpriteContextMenu={openSpriteContextMenu}
+                selectedSprites={selectedSprites}
+                onSelectSprite={selectSprite}
+                resourcesLoader={resourcesLoader}
+                resourceManagementProps={resourceManagementProps}
+                useDragHandle
+                lockAxis="y"
+                axis="y"
+                onSpriteUpdated={onObjectUpdated}
+                scrollViewRef={scrollView}
+              />
+              <Column noMargin>
+                <ResponsiveLineStackLayout
+                  justifyContent="space-between"
+                  noColumnMargin
+                >
+                  {extraBottomTools}
+                  {!isAnimationListLocked && (
+                    <RaisedButton
+                      label={<Trans>Add an animation</Trans>}
+                      primary
+                      onClick={addAnimation}
+                      icon={<Add />}
+                    />
+                  )}
+                </ResponsiveLineStackLayout>
+              </Column>
+              <ContextMenu
+                ref={spriteContextMenu}
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Delete selection`),
+                    click: deleteSelection,
+                  },
+                  {
+                    label: i18n._(t`Duplicate selection`),
+                    click: duplicateSelection,
+                  },
+                ]}
+              />
+            </React.Fragment>
+          )}
+        </Column>
+      )}
+    </I18n>
+  );
+};
 
 export function LockedSpriteEditor({
   objectConfiguration,

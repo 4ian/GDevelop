@@ -4,9 +4,12 @@
 name: Update translations
 on:
   # Execute only on master
+  # Skip if only files in the locales directory are changed.
   push:
     branches:
       - master
+    paths-ignore:
+      - 'newIDE/app/src/locales/**'
   # Allows to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
@@ -58,7 +61,7 @@ jobs:
       - name: Create a Pull Request with the changes
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Update translations [skip ci]
+          commit-message: Update translations [skip travis]
           branch: chore/update-translations
           delete-branch: true
           title: "[Auto PR] Update translations"

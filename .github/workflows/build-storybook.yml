@@ -8,7 +8,10 @@ name: Build Storybook
 
 on:
   # Launch on all commits.
+  # Skip if only files in the locales directory are changed
   push:
+    paths-ignore:
+      - 'newIDE/app/src/locales/**'
   # Allows to run this workflow manually from the Actions tab,
   # to publish on Chromatic (not done by default).
   workflow_dispatch:

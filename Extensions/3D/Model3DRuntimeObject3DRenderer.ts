@@ -15,7 +15,7 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(runtimeObject._modelResourceName);
-      const modelObject3D = originalModelMesh.clone();
+      const modelObject3D = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
 
       // Create a group to transform the object according to
       // position, angle and dimensions.
@@ -125,7 +125,7 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(this._model3DRuntimeObject._modelResourceName);
-      const modelObject3D = originalModelMesh.clone();
+      const modelObject3D = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
 
       this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(modelObject3D);
@@ -144,14 +144,24 @@ namespace gdjs {
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness
       ) {
         this._threeObject.traverse((node) => {
-          if (node.type === 'Mesh') {
-            const mesh = node as THREE.Mesh;
-            const material = mesh.material as THREE.MeshStandardMaterial;
-            //@ts-ignore
-            if (material.metalness) {
+          const mesh = node as THREE.Mesh;
+          if (!mesh.material) {
+            return;
+          }
+          const material = mesh.material;
+          if (Array.isArray(material)) {
+            for (const materialElement of material) {
               //@ts-ignore
-              material.metalness = 0;
+              if (materialElement.metalness) {
+                //@ts-ignore
+                materialElement.metalness = 0;
+              }
             }
+          }
+          //@ts-ignore
+          else if (material.metalness) {
+            //@ts-ignore
+            material.metalness = 0;
           }
         });
       } else if (
@@ -159,21 +169,26 @@ namespace gdjs {
         gdjs.Model3DRuntimeObject.MaterialType.Basic
       ) {
         this._threeObject.traverse((node) => {
-          if (node.type === 'Mesh') {
-            const mesh = node as THREE.Mesh;
-            const basicMaterial = new THREE.MeshBasicMaterial();
-            //@ts-ignore
-            if (mesh.material.color) {
-              //@ts-ignore
-              basicMaterial.color = mesh.material.color;
-            }
-            //@ts-ignore
-            if (mesh.material.map) {
-              //@ts-ignore
-              basicMaterial.map = mesh.material.map;
-            }
-            mesh.material = basicMaterial;
+          const mesh = node as THREE.Mesh;
+          if (!mesh.material) {
+            return;
           }
+          let material = mesh.material;
+          if (Array.isArray(material)) {
+            material = material[0];
+          }
+          const basicMaterial = new THREE.MeshBasicMaterial();
+          //@ts-ignore
+          if (material.color) {
+            //@ts-ignore
+            basicMaterial.color = material.color;
+          }
+          //@ts-ignore
+          if (material.map) {
+            //@ts-ignore
+            basicMaterial.map = material.map;
+          }
+          mesh.material = basicMaterial;
         });
       }
     }

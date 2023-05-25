@@ -18,6 +18,7 @@ export type ObjectsRenderingService = {
   gd: libGDevelop,
   PIXI: any,
   THREE: any,
+  THREE_ADDONS: {SkeletonUtils: any},
   RenderedInstance: any,
   Rendered3DInstance: any,
   registerInstanceRenderer: (objectType: string, renderer: any) => void,

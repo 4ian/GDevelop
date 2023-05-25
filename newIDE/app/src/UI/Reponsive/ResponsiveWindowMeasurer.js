@@ -27,7 +27,7 @@ export const useResponsiveWindowWidth = (): WidthType => {
     return 'medium';
   }
 
-  return window.innerWidth < 750 || window.innerHeight < 350
+  return window.innerWidth < 950 || window.innerHeight < 350
     ? 'small'
     : window.innerWidth < 1150
     ? 'medium'

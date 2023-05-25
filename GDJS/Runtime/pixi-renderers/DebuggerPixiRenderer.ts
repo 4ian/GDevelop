@@ -112,39 +112,19 @@ namespace gdjs {
         const polygon: float[] = [];
         polygon.push.apply(
           polygon,
-          layer.convertInverseCoords(
-            aabb.min[0],
-            aabb.min[1],
-            0,
-            workingPoint
-          )
+          layer.convertInverseCoords(aabb.min[0], aabb.min[1], 0, workingPoint)
         );
         polygon.push.apply(
           polygon,
-          layer.convertInverseCoords(
-            aabb.max[0],
-            aabb.min[1],
-            0,
-            workingPoint
-          )
+          layer.convertInverseCoords(aabb.max[0], aabb.min[1], 0, workingPoint)
         );
         polygon.push.apply(
           polygon,
-          layer.convertInverseCoords(
-            aabb.max[0],
-            aabb.max[1],
-            0,
-            workingPoint
-          )
+          layer.convertInverseCoords(aabb.max[0], aabb.max[1], 0, workingPoint)
         );
         polygon.push.apply(
           polygon,
-          layer.convertInverseCoords(
-            aabb.min[0],
-            aabb.max[1],
-            0,
-            workingPoint
-          )
+          layer.convertInverseCoords(aabb.min[0], aabb.max[1], 0, workingPoint)
         );
 
         debugDraw.drawPolygon(polygon);

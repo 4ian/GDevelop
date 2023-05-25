@@ -27,12 +27,12 @@ jobs:
           echo "| Language | Change |" >> sumup.md
           echo "| --- | --- |" >> sumup.md
           for index in ${!ADDS[@]}; do
-            LANGUAGE=${LANS[index]//_/ }
             DELTA=$(echo "scale=3; (${ADDS[index]} - ${SUBS[index]})*100/1" | bc)
-            if (( $(echo "$DELTA != 0" | bc -l) )); then
-              DELTA=$(printf "%1.3f" $DELTA)
+            if (( $(echo "$DELTA == 0" | bc -l) )); then
+              continue
             fi
-            echo "| $LANGUAGE | $DELTA % |" >> sumup.md
+            LANGUAGE=${LANS[index]//_/ }
+            echo "| $LANGUAGE | $(printf "%1.3f" $DELTA) % |" >> sumup.md
           done
       - name: Find Comment
         uses: peter-evans/find-comment@v2

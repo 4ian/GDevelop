@@ -77,6 +77,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           .filter(Boolean)
           .sort();
       }
+      else if (object.getType() === 'Scene3D::Model3DObject') {
+        const model3DConfiguration = gd.asModel3DConfiguration(
+          object.getConfiguration()
+        );
+
+        return mapFor(0, model3DConfiguration.getAnimationsCount(), index => {
+          const animationName = model3DConfiguration
+            .getAnimation(index)
+            .getName();
+          return animationName.length > 0 ? animationName : null;
+        })
+          .filter(Boolean)
+          .sort();
+      }
 
       return [];
     };

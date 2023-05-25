@@ -269,6 +269,12 @@ namespace gdjs {
         this._originalModel.animations,
         animationName
       );
+      if (!clip) {
+        console.error(
+          `The GLB file: ${this._model3DRuntimeObject._modelResourceName} doesn't have any animation named: ${animationName}`
+        );
+        return;
+      }
       this._action = this._animationMixer.clipAction(clip);
       this._action.play();
     }

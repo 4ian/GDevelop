@@ -7,7 +7,7 @@ on:
       - synchronize
 jobs:
   read-locales-metadata:
-    if: contains(github.event.pull_request.title, '[Auto PR]') && contains(github.event.pull_request.title, 'Update') && contains(github.event.pull_request.title, 'translations')
+    if: github.event.pull_request.title == '[Auto PR] Update translations'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

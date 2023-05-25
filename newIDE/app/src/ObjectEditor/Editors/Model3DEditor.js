@@ -226,10 +226,6 @@ const Animation = ({
   return (
     <div style={styles.animationLine}>
       <Column expand noMargin>
-        <Column expand noMargin>
-          <Text size="block-title">{animation.getName()}</Text>
-        </Column>
-
         <MiniToolbar noPadding>
           <DragHandle />
           <MiniToolbarText>{<Trans>Animation #{id}</Trans>}</MiniToolbarText>
@@ -251,7 +247,7 @@ const Animation = ({
           <SemiControlledTextField
             commitOnBlur
             floatingLabelFixed
-            floatingLabelText={<Trans>BLG animation name</Trans>}
+            floatingLabelText={<Trans>LGB animation name</Trans>}
             onChange={value => {
               animation.setSource(value);
               forceUpdate();
@@ -561,6 +557,7 @@ const Model3DEditor = ({
                 </AlertMessage>
               )}
           </ColumnStackLayout>
+          <Text size="block-title">Animations</Text>
           <AnimationsListContainer
             objectConfiguration={model3DConfiguration}
             resourcesLoader={ResourcesLoader}

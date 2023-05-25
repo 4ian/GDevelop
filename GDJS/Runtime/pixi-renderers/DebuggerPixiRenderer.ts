@@ -112,7 +112,7 @@ namespace gdjs {
         const polygon: float[] = [];
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          layer.convertInverseCoords(
             aabb.min[0],
             aabb.min[1],
             0,
@@ -121,7 +121,7 @@ namespace gdjs {
         );
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          layer.convertInverseCoords(
             aabb.max[0],
             aabb.min[1],
             0,
@@ -130,7 +130,7 @@ namespace gdjs {
         );
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          layer.convertInverseCoords(
             aabb.max[0],
             aabb.max[1],
             0,
@@ -139,7 +139,7 @@ namespace gdjs {
         );
         polygon.push.apply(
           polygon,
-          layer.applyLayerTransformation(
+          layer.convertInverseCoords(
             aabb.min[0],
             aabb.max[1],
             0,
@@ -185,7 +185,7 @@ namespace gdjs {
           // as this is for debug draw.
           const polygon: float[] = [];
           hitboxes[j].vertices.forEach((point) => {
-            point = layer.applyLayerTransformation(
+            point = layer.convertInverseCoords(
               point[0],
               point[1],
               0,
@@ -205,7 +205,7 @@ namespace gdjs {
         debugDraw.fill.alpha = 0.3;
 
         // Draw Center point
-        const centerPoint = layer.applyLayerTransformation(
+        const centerPoint = layer.convertInverseCoords(
           object.getCenterXInScene(),
           object.getCenterYInScene(),
           0,
@@ -221,7 +221,7 @@ namespace gdjs {
         );
 
         // Draw position point
-        const positionPoint = layer.applyLayerTransformation(
+        const positionPoint = layer.convertInverseCoords(
           object.getX(),
           object.getY(),
           0,
@@ -245,7 +245,7 @@ namespace gdjs {
             Math.abs(originPoint[0] - positionPoint[0]) >= 1 ||
             Math.abs(originPoint[1] - positionPoint[1]) >= 1
           ) {
-            originPoint = layer.applyLayerTransformation(
+            originPoint = layer.convertInverseCoords(
               originPoint[0],
               originPoint[1],
               0,
@@ -269,7 +269,7 @@ namespace gdjs {
           for (const customPointName in object._animationFrame.points.items) {
             let customPoint = object.getPointPosition(customPointName);
 
-            customPoint = layer.applyLayerTransformation(
+            customPoint = layer.convertInverseCoords(
               customPoint[0],
               customPoint[1],
               0,

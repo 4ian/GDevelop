@@ -23,6 +23,8 @@ export const splitNameAndNumberSuffix = (
   for (let i = 0; i < text.length; i++) {
     const suffix = text.slice(i, text.length);
     if (suffix.startsWith('0')) continue;
+
+    // parseInt cannot be used since parseInt('3D4') returns 3.
     const numberSuffix = Number(suffix);
     if (numberSuffix === Math.floor(numberSuffix)) {
       return [text.slice(0, i), numberSuffix];

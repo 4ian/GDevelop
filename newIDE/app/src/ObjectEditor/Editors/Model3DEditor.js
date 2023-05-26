@@ -24,6 +24,7 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 import ResourcesLoader from '../../ResourcesLoader';
 import IconButton from '../../UI/IconButton';
 import RaisedButton from '../../UI/RaisedButton';
+import FlatButton from '../../UI/FlatButton';
 import { mapFor } from '../../Utils/MapFor';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
@@ -246,6 +247,10 @@ const Model3DEditor = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const forceUpdate = useForceUpdate();
 
+  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
+    {}
+  );
+
   const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
   const properties = objectConfiguration.getProperties();
 
@@ -256,6 +261,10 @@ const Model3DEditor = ({
     },
     [objectConfiguration, forceUpdate]
   );
+
+  const scanNewAnimation = React.useCallback(() => {
+    // TODO
+  }, []);
 
   const addAnimation = React.useCallback(
     () => {
@@ -309,30 +318,23 @@ const Model3DEditor = ({
         .getAnimation(animationIndex)
         .getName();
       if (currentName === newName) return;
+      const animation = model3DConfiguration.getAnimation(animationIndex);
+      if (nameErrors[animation.ptr]) {
+        const newNameErrors = { ...nameErrors };
+        delete newNameErrors[animation.ptr];
+        setNameErrors(newNameErrors);
+      }
 
-      const otherNames = mapFor(
-        0,
-        model3DConfiguration.getAnimationsCount(),
-        index => {
-          return index === animationIndex
-            ? undefined // Don't check the current animation name as we're changing it.
-            : currentName;
-        }
-      );
-
-      if (
-        newName !== '' &&
-        otherNames.filter(name => name === newName).length
-      ) {
-        showWarningBox(
-          'Another animation with this name already exists. Please use another name.',
-          { delayToNextTick: true }
-        );
+      if (newName !== '' && model3DConfiguration.hasAnimationNamed(newName)) {
+        setNameErrors({
+          ...nameErrors,
+          [animation.ptr]: (
+            <Trans>The animation name {newName} is already taken</Trans>
+          ),
+        });
         return;
       }
 
-      const animation = model3DConfiguration.getAnimation(animationIndex);
-      const oldName = animation.getName();
       animation.setName(newName);
       // TODO EBO Refactor event-based object events when an animation is renamed.
       if (layout && object) {
@@ -340,7 +342,7 @@ const Model3DEditor = ({
           project,
           layout,
           object,
-          oldName,
+          currentName,
           newName
         );
       }
@@ -348,12 +350,13 @@ const Model3DEditor = ({
       if (onObjectUpdated) onObjectUpdated();
     },
     [
-      forceUpdate,
+      model3DConfiguration,
       layout,
       object,
+      forceUpdate,
       onObjectUpdated,
+      nameErrors,
       project,
-      model3DConfiguration,
     ]
   );
 
@@ -521,6 +524,7 @@ const Model3DEditor = ({
                                   <SemiControlledTextField
                                     margin="none"
                                     commitOnBlur
+                                    errorText={nameErrors[animation.ptr]}
                                     translatableHintText={t`Optional animation name`}
                                     value={animation.getName()}
                                     onChange={text =>
@@ -570,6 +574,11 @@ const Model3DEditor = ({
           justifyContent="space-between"
           noColumnMargin
         >
+          <FlatButton
+            label={<Trans>Scan missing animations</Trans>}
+            onClick={scanNewAnimation}
+            icon={<Add />}
+          />
           <RaisedButton
             label={<Trans>Add an animation</Trans>}
             primary

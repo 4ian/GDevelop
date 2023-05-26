@@ -4,7 +4,11 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { type EditorProps } from './EditorProps.flow';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import Text from '../../UI/Text';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import useForceUpdate from '../../Utils/UseForceUpdate';
@@ -641,26 +645,33 @@ const Model3DEditor = ({
                                 </Line>
                                 <Spacer />
                               </div>
-                              <Line expand>
-                                <Column expand>
-                                  <SelectField
-                                    id="animation-source-field"
-                                    value={animation.getSource()}
-                                    onChange={(event, value) => {
-                                      animation.setSource(event.target.value);
-                                      forceUpdate();
-                                    }}
-                                    margin="dense"
-                                    fullWidth
-                                    floatingLabelText={
-                                      <Trans>GLB animation name</Trans>
-                                    }
-                                    translatableHintText={t`Choose an animation`}
-                                  >
-                                    {sourceSelectOptions}
-                                  </SelectField>
-                                </Column>
-                              </Line>
+                              <Spacer />
+                              <ColumnStackLayout expand>
+                                <SelectField
+                                  id="animation-source-field"
+                                  value={animation.getSource()}
+                                  onChange={(event, value) => {
+                                    animation.setSource(event.target.value);
+                                    forceUpdate();
+                                  }}
+                                  margin="dense"
+                                  fullWidth
+                                  floatingLabelText={
+                                    <Trans>GLB animation name</Trans>
+                                  }
+                                  translatableHintText={t`Choose an animation`}
+                                >
+                                  {sourceSelectOptions}
+                                </SelectField>
+                                <Checkbox
+                                  label={<Trans>loop</Trans>}
+                                  checked={animation.shouldLoop()}
+                                  onCheck={(e, checked) => {
+                                    animation.setShouldLoop(checked);
+                                    forceUpdate();
+                                  }}
+                                />
+                              </ColumnStackLayout>
                             </div>
                           )
                         }

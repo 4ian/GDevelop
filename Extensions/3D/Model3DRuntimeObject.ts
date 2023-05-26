@@ -1,5 +1,5 @@
 namespace gdjs {
-  type Model3DAnimation = { name: string; source: string };
+  type Model3DAnimation = { name: string; source: string, loop: boolean };
 
   /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
   export interface Model3DObjectData extends Object3DData {
@@ -43,7 +43,7 @@ namespace gdjs {
         instanceContainer
       );
       this._updateMaterialType(objectData);
-      this._renderer.playAnimation(this._animations[0].source);
+      this._renderer.playAnimation(this._animations[0].source, this._animations[0].loop);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -141,7 +141,7 @@ namespace gdjs {
       ) {
         const animation = this._animations[animationIndex];
         this._currentAnimationIndex = animationIndex;
-        this._renderer.playAnimation(animation.source);
+        this._renderer.playAnimation(animation.source, animation.loop);
       }
     }
 

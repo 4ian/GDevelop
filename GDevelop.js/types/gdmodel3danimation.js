@@ -5,6 +5,8 @@ declare class gdModel3DAnimation {
   getName(): string;
   setSource(name: string): void;
   getSource(): string;
+  setShouldLoop(shouldLoop: boolean): void;
+  shouldLoop(): boolean;
   delete(): void;
   ptr: number;
 };

@@ -263,7 +263,7 @@ namespace gdjs {
       this._action.paused = false;
     }
 
-    playAnimation(animationName: string) {
+    playAnimation(animationName: string, shouldLoop: boolean) {
       this._animationMixer.stopAllAction();
       const clip = THREE.AnimationClip.findByName(
         this._originalModel.animations,
@@ -276,6 +276,8 @@ namespace gdjs {
         return;
       }
       this._action = this._animationMixer.clipAction(clip);
+      this._action.setLoop(shouldLoop ? THREE.LoopRepeat : THREE.LoopOnce, Number.POSITIVE_INFINITY);
+      this._action.clampWhenFinished = true;
       this._action.play();
     }
   }

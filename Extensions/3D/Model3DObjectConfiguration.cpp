@@ -206,6 +206,7 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
     Model3DAnimation animation;
     animation.SetName(animationElement.GetStringAttribute("name", ""));
     animation.SetSource(animationElement.GetStringAttribute("source", ""));
+    animation.SetShouldLoop(animationElement.GetBoolAttribute("loop", false));
     AddAnimation(animation);
   }
 }
@@ -229,6 +230,7 @@ void Model3DObjectConfiguration::DoSerializeTo(
     auto &animationElement = animationsElement.AddChild("animation");
     animationElement.SetAttribute("name", animation.GetName());
     animationElement.SetAttribute("source", animation.GetSource());
+    animationElement.SetAttribute("loop", animation.ShouldLoop());
   }
 }
 

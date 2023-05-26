@@ -15,7 +15,7 @@ class Project;
 
 class GD_EXTENSION_API Model3DAnimation {
 public:
-  Model3DAnimation(){};
+  Model3DAnimation() : shouldLoop(false) {};
   virtual ~Model3DAnimation(){};
 
   /**
@@ -38,9 +38,20 @@ public:
    */
   void SetSource(const gd::String &source_) { source = source_; }
 
+  /**
+   * \brief Return true if the animation should loop.
+   */
+  const bool ShouldLoop() const { return shouldLoop; }
+
+  /**
+   * \brief Change whether the animation should loop or not.
+   */
+  void SetShouldLoop(bool shouldLoop_) { shouldLoop = shouldLoop_; }
+
 private:
   gd::String name;
   gd::String source;
+  bool shouldLoop;
 };
 
 /**

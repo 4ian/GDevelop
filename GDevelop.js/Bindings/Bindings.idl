@@ -3027,6 +3027,9 @@ interface Model3DAnimation {
 
     void SetSource([Const] DOMString name);
     [Const, Ref] DOMString GetSource();
+
+    void SetShouldLoop(boolean shouldLoop);
+    boolean ShouldLoop();
 };
 
 interface Model3DObjectConfiguration {

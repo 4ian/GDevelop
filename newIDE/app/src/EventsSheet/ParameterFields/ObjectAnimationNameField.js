@@ -76,8 +76,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         })
           .filter(Boolean)
           .sort();
-      }
-      else if (object.getType() === 'Scene3D::Model3DObject') {
+      } else if (object.getType() === 'Scene3D::Model3DObject') {
         const model3DConfiguration = gd.asModel3DConfiguration(
           object.getConfiguration()
         );

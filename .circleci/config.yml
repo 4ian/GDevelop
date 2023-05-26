@@ -19,6 +19,15 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: Stop job if commit message contains 'Update translations' and 'skip' keywords
+          command: |
+            COMMIT_MSG=$(git log --format=oneline -n 1 $CIRCLE_SHA1)
+            if [[ "$COMMIT_MSG" =~ Update\ translations.* && "$COMMIT_MSG" =~ skip ]]; then
+              echo "Commit message contains 'Update translations' and 'skip', stopping job."
+              circleci-agent step halt
+            fi
+
       # System dependencies (for Emscripten and upload)
       - run:
           name: Install dependencies for Emscripten
@@ -93,6 +102,16 @@ jobs:
 
     steps:
       - checkout
+
+      - run:
+          name: Stop job if commit message contains 'Update translations' and 'skip' keywords
+          command: |
+            COMMIT_MSG=$(git log --format=oneline -n 1 $CIRCLE_SHA1)
+            if [[ "$COMMIT_MSG" =~ Update\ translations.* && "$COMMIT_MSG" =~ skip ]]; then
+              echo "Commit message contains 'Update translations' and 'skip', stopping job."
+              circleci-agent step halt
+            fi
+
       - aws-cli/setup
 
       # System dependencies (for Electron Builder and Emscripten)
@@ -170,6 +189,16 @@ jobs:
 
     steps:
       - checkout
+
+      - run:
+          name: Stop job if commit message contains 'Update translations' and 'skip' keywords
+          command: |
+            COMMIT_MSG=$(git log --format=oneline -n 1 $CIRCLE_SHA1)
+            if [[ "$COMMIT_MSG" =~ Update\ translations.* && "$COMMIT_MSG" =~ skip ]]; then
+              echo "Commit message contains 'Update translations' and 'skip', stopping job."
+              circleci-agent step halt
+            fi
+
       - aws-cli/setup
 
       # System dependencies (for Emscripten)

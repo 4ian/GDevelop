@@ -8,8 +8,10 @@ name: Build Storybook
 
 on:
   # Launch on all commits.
-  # Skip if only files in the locales directory are changed
+  # Skip if the `chore/` prefix is used for branch.
   push:
+    branches-ignore:
+      - 'chore/**'
     paths-ignore:
       - 'newIDE/app/src/locales/**'
   # Allows to run this workflow manually from the Actions tab,

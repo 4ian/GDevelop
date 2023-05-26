@@ -459,7 +459,7 @@ const Model3DEditor = ({
           />
         );
       })
-    : null;
+    : [];
 
   return (
     <>

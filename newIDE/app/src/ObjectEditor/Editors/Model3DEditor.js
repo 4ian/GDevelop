@@ -444,6 +444,19 @@ const Model3DEditor = ({
     ]
   );
 
+  const sourceSelectOptions = model3D
+    ? model3D.animations.map(animation => {
+        return (
+          <SelectOption
+            key={animation.name}
+            value={animation.name}
+            label={animation.name}
+            shouldNotTranslate
+          />
+        );
+      })
+    : null;
+
   return (
     <>
       <ScrollView ref={scrollView}>
@@ -630,18 +643,22 @@ const Model3DEditor = ({
                               </div>
                               <Line expand>
                                 <Column expand>
-                                  <SemiControlledTextField
-                                    commitOnBlur
-                                    floatingLabelFixed
+                                  <SelectField
+                                    id="animation-source-field"
+                                    value={animation.getSource()}
+                                    onChange={(event, value) => {
+                                      animation.setSource(event.target.value);
+                                      forceUpdate();
+                                    }}
+                                    margin="dense"
+                                    fullWidth
                                     floatingLabelText={
                                       <Trans>GLB animation name</Trans>
                                     }
-                                    onChange={value => {
-                                      animation.setSource(value);
-                                      forceUpdate();
-                                    }}
-                                    value={animation.getSource()}
-                                  />
+                                    translatableHintText={t`Choose an animation`}
+                                  >
+                                    {sourceSelectOptions}
+                                  </SelectField>
                                 </Column>
                               </Line>
                             </div>

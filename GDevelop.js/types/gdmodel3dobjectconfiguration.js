@@ -3,6 +3,7 @@ declare class gdModel3DObjectConfiguration extends gdObjectConfiguration {
   constructor(): void;
   addAnimation(animation: gdModel3DAnimation): void;
   getAnimation(index: number): gdModel3DAnimation;
+  hasAnimationNamed(name: string): boolean;
   getAnimationsCount(): number;
   removeAnimation(index: number): void;
   removeAllAnimations(): void;

@@ -96,6 +96,11 @@ public:
   std::size_t GetAnimationsCount() const { return animations.size(); };
 
   /**
+   * \brief Return true if the animation called "name" exists.
+   */
+  bool HasAnimationNamed(const gd::String& name) const;
+
+  /**
    * \brief Add an animation at the end of the existing ones.
    */
   void AddAnimation(const Model3DAnimation &animation);

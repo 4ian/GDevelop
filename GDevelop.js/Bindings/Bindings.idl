@@ -3034,6 +3034,7 @@ interface Model3DObjectConfiguration {
 
     void AddAnimation([Const, Ref] Model3DAnimation animation);
     [Ref] Model3DAnimation GetAnimation(unsigned long index);
+    boolean HasAnimationNamed([Const] DOMString name);
     unsigned long GetAnimationsCount();
     void RemoveAnimation(unsigned long index);
     void RemoveAllAnimations();

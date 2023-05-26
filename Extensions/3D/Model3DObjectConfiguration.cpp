@@ -254,6 +254,14 @@ Model3DAnimation &Model3DObjectConfiguration::GetAnimation(std::size_t nb) {
   return animations[nb];
 }
 
+bool Model3DObjectConfiguration::HasAnimationNamed(
+    const gd::String &name) const {
+  return !name.empty() && (find_if(animations.begin(), animations.end(),
+                                   [&name](const Model3DAnimation &animation) {
+                                     return animation.GetName() == name;
+                                   }) != animations.end());
+}
+
 void Model3DObjectConfiguration::AddAnimation(
     const Model3DAnimation &animation) {
   animations.push_back(animation);

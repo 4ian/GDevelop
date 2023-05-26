@@ -26,7 +26,6 @@ import IconButton from '../../UI/IconButton';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
 import { mapFor } from '../../Utils/MapFor';
-import { showWarningBox } from '../../UI/Messages/MessageBox';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import Add from '../../UI/CustomSvgIcons/Add';
@@ -35,6 +34,9 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -173,6 +175,7 @@ type PropertyResourceSelectorProps = {|
   propertyName: string,
   project: gd.Project,
   resourceManagementProps: ResourceManagementProps,
+  onChange: (value: string) => void,
 |};
 
 const PropertyResourceSelector = ({
@@ -180,6 +183,7 @@ const PropertyResourceSelector = ({
   propertyName,
   project,
   resourceManagementProps,
+  onChange,
 }: PropertyResourceSelectorProps) => {
   const forceUpdate = useForceUpdate();
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
@@ -188,9 +192,10 @@ const PropertyResourceSelector = ({
   const onChangeProperty = React.useCallback(
     (property: string, value: string) => {
       objectConfiguration.updateProperty(property, value);
+      onChange(value);
       forceUpdate();
     },
-    [objectConfiguration, forceUpdate]
+    [objectConfiguration, onChange, forceUpdate]
   );
 
   const property = properties.get(propertyName);
@@ -241,18 +246,32 @@ const Model3DEditor = ({
     },
     [justAddedAnimationName]
   );
+  const { showAlert } = useAlertDialog();
 
   const draggedAnimationIndex = React.useRef<?number>(null);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const forceUpdate = useForceUpdate();
 
+  const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
+  const properties = objectConfiguration.getProperties();
+
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
 
-  const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
-  const properties = objectConfiguration.getProperties();
+  const [model3D, setModel3D] = React.useState<?GLTF>(null);
+  const getModel3D = React.useCallback(
+    (modelResourceName: string) => {
+      PixiResourcesLoader.get3DModel(project, modelResourceName).then(
+        newModel3d => {
+          setModel3D(newModel3d);
+        }
+      );
+    },
+    [project]
+  );
+  getModel3D(properties.get('modelResourceName').getValue());
 
   const onChangeProperty = React.useCallback(
     (property: string, value: string) => {
@@ -262,9 +281,74 @@ const Model3DEditor = ({
     [objectConfiguration, forceUpdate]
   );
 
-  const scanNewAnimation = React.useCallback(() => {
-    // TODO
-  }, []);
+  const onChangeModelResourceName = React.useCallback(
+    (modelResourceName: string) => {
+      getModel3D(modelResourceName);
+    },
+    [getModel3D]
+  );
+
+  const scanNewAnimations = React.useCallback(
+    () => {
+      if (!model3D) {
+        return;
+      }
+
+      const animationSources = mapFor(
+        0,
+        model3DConfiguration.getAnimationsCount(),
+        animationIndex =>
+          model3DConfiguration.getAnimation(animationIndex).getSource()
+      );
+
+      let hasAddedAnimation = false;
+      for (const resourceAnimation of model3D.animations) {
+        if (animationSources.includes(resourceAnimation.name)) {
+          continue;
+        }
+        const newAnimationName = model3DConfiguration.hasAnimationNamed(
+          resourceAnimation.name
+        )
+          ? ''
+          : resourceAnimation.name;
+
+        const newAnimation = new gd.Model3DAnimation();
+        newAnimation.setName(newAnimationName);
+        newAnimation.setSource(resourceAnimation.name);
+        model3DConfiguration.addAnimation(newAnimation);
+        newAnimation.delete();
+        hasAddedAnimation = true;
+      }
+      if (hasAddedAnimation) {
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
+
+        // Scroll to the bottom of the list.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          if (scrollView.current) {
+            scrollView.current.scrollToBottom();
+          }
+        }, 100); // A few ms is enough for a new render to be done.
+      } else {
+        showAlert({
+          title: t`No new animation`,
+          message: t`Every animation from the GLB file is already in the list.`,
+        });
+      }
+    },
+    [
+      forceUpdate,
+      model3D,
+      model3DConfiguration,
+      onObjectUpdated,
+      onSizeUpdated,
+      showAlert,
+    ]
+  );
 
   const addAnimation = React.useCallback(
     () => {
@@ -369,6 +453,7 @@ const Model3DEditor = ({
             propertyName="modelResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
+            onChange={onChangeModelResourceName}
           />
           <Text size="block-title" noMargin>
             <Trans>Default orientation</Trans>
@@ -534,7 +619,9 @@ const Model3DEditor = ({
                                   />
                                   <IconButton
                                     size="small"
-                                    onClick={removeAnimation}
+                                    onClick={() =>
+                                      removeAnimation(animationIndex)
+                                    }
                                   >
                                     <Trash />
                                   </IconButton>
@@ -576,8 +663,7 @@ const Model3DEditor = ({
         >
           <FlatButton
             label={<Trans>Scan missing animations</Trans>}
-            onClick={scanNewAnimation}
-            icon={<Add />}
+            onClick={scanNewAnimations}
           />
           <RaisedButton
             label={<Trans>Add an animation</Trans>}

@@ -17,7 +17,6 @@ import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
-import BackgroundColor from './BackgroundColor';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import FpsLimiter from './FpsLimiter';
@@ -127,7 +126,6 @@ export default class InstancesEditor extends Component<Props> {
   statusBar: StatusBar;
   pixiContainer: PIXI.Container;
   backgroundArea: PIXI.Container;
-  backgroundColor: BackgroundColor;
   instancesRenderer: InstancesRenderer;
   viewPosition: ViewPosition;
   longTouchHandler: LongTouchHandler;
@@ -270,7 +268,7 @@ export default class InstancesEditor extends Component<Props> {
       }
     });
 
-    this.pixiContainer = new PIXI.Container();
+    this.pixiContainer = new PIXI.Container(); //TODO: rename
 
     this.backgroundArea = new PIXI.Container();
     this.backgroundArea.hitArea = new PIXI.Rectangle(
@@ -399,9 +397,6 @@ export default class InstancesEditor extends Component<Props> {
       this.pixiContainer.removeChild(this.statusBar.getPixiObject());
     }
 
-    this.backgroundColor = new BackgroundColor({
-      layout: props.layout,
-    });
     this.instancesRenderer = new InstancesRenderer({
       project: props.project,
       layout: props.layout,
@@ -1038,7 +1033,6 @@ export default class InstancesEditor extends Component<Props> {
         this.pixiRenderer,
         this.threeRenderer,
         this.viewPosition,
-        this.backgroundColor,
         this.pixiContainer
       );
     }

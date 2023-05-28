@@ -1,9 +1,9 @@
 // @flow
 import LayerRenderer from './LayerRenderer';
 import ViewPosition from '../ViewPosition';
-import BackgroundColor from '../BackgroundColor';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
+import { rgbToHexNumber } from '../../Utils/ColorTransformer';
 import Rectangle from '../../Utils/Rectangle';
 
 export type InstanceMeasurer = {|
@@ -158,7 +158,6 @@ export default class InstancesRenderer {
     pixiRenderer: PIXI.Renderer,
     threeRenderer: THREE.WebGLRenderer | null,
     viewPosition: ViewPosition,
-    backgroundColor: BackgroundColor,
     uiPixiContainer: PIXI.Container
   ) {
     /** Useful to render the background color. */
@@ -168,6 +167,12 @@ export default class InstancesRenderer {
     // might have changed some WebGL states already. Reset the state for the very first frame.
     // And, out of caution, keep doing it for every frame.
     if (threeRenderer) threeRenderer.resetState();
+
+    const backgroundColor = rgbToHexNumber(
+      this.layout.getBackgroundColorRed(),
+      this.layout.getBackgroundColorGreen(),
+      this.layout.getBackgroundColorBlue()
+    );
 
     for (let i = 0; i < this.layout.getLayersCount(); i++) {
       const layer = this.layout.getLayerAt(i);
@@ -220,7 +225,7 @@ export default class InstancesRenderer {
           pixiRenderer.reset();
 
           // Render the background color.
-          backgroundColor.setBackgroundColorForPixi(pixiRenderer);
+          pixiRenderer.backgroundColor = backgroundColor;
           pixiRenderer.backgroundAlpha = 1;
           pixiRenderer.clear();
 
@@ -250,17 +255,23 @@ export default class InstancesRenderer {
             pixiRenderer
           );
 
-          threeRenderer.resetState();
+          // It's important to reset the internal WebGL state of PixiJS, then Three.js
+          // to ensure the 3D rendering is made properly by Three.js
           pixiRenderer.reset();
+          threeRenderer.resetState();
 
           if (isFirstRender) {
-            backgroundColor.setBackgroundColorForThree(
-              threeRenderer,
-              threeScene
-            );
+            // Render the background color.
+            threeRenderer.setClearColor(backgroundColor);
+            threeRenderer.resetState();
             threeRenderer.clear();
+            threeScene.background = new THREE.Color(backgroundColor);
 
             isFirstRender = false;
+          } else {
+            // It's important to set the background to null, as maybe the first rendered
+            // layer hsa changed and so the Three.js scene background must be reset.
+            threeScene.background = null;
           }
 
           // Clear the depth as each layer is independent and display on top of the previous one,
@@ -280,6 +291,13 @@ export default class InstancesRenderer {
     }
 
     pixiRenderer.render(uiPixiContainer);
+
+    if (threeRenderer) {
+      // It's important to reset the internal WebGL state of PixiJS, then Three.js
+      // to ensure the 3D rendering is made properly by Three.js
+      pixiRenderer.reset();
+      threeRenderer.resetState();
+    }
   }
 
   _updatePixiObjectsZOrder() {

@@ -2437,8 +2437,8 @@ module.exports = {
         // Center the model.
         model3D.position.set(
           -(boundingBox.min.x + boundingBox.max.x) / 2,
-          (model3D.position.y = -(boundingBox.min.y + boundingBox.max.y) / 2),
-          (model3D.position.z = -(boundingBox.min.z + boundingBox.max.z) / 2)
+          -(boundingBox.min.y + boundingBox.max.y) / 2,
+          -(boundingBox.min.z + boundingBox.max.z) / 2
         );
 
         // Rotate the model.

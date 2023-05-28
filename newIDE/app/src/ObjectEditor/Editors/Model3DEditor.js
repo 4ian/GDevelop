@@ -472,6 +472,40 @@ const Model3DEditor = ({
             resourceManagementProps={resourceManagementProps}
             onChange={onChangeModelResourceName}
           />
+          <SelectField
+            value={properties.get('materialType').getValue()}
+            floatingLabelText={properties.get('materialType').getLabel()}
+            helperMarkdownText={properties.get('materialType').getDescription()}
+            onChange={(event, index, newValue) => {
+              onChangeProperty('materialType', newValue);
+            }}
+          >
+            <SelectOption
+              label={t`No lighting effect`}
+              value="Basic"
+              key="Basic"
+            />
+            <SelectOption
+              label={t`Emit all ambient light`}
+              value="StandardWithoutMetalness"
+              key="StandardWithoutMetalness"
+            />
+            <SelectOption
+              label={t`Keep model material`}
+              value="KeepOriginal"
+              key="KeepOriginal"
+            />
+          </SelectField>
+          {properties.get('materialType').getValue() !== 'Basic' &&
+            !hasLight(layout) && (
+              <AlertMessage kind="error">
+                <Trans>
+                  Make sure to set up a light in the effects of the layer or
+                  chose "No lighting effect" - otherwise the object will appear
+                  black.
+                </Trans>
+              </AlertMessage>
+            )}
           <Text size="block-title" noMargin>
             <Trans>Default orientation</Trans>
           </Text>
@@ -506,48 +540,84 @@ const Model3DEditor = ({
               propertyName="depth"
             />
           </ResponsiveLineStackLayout>
-          <ColumnStackLayout noMargin expand>
-            <PropertyCheckbox
-              objectConfiguration={objectConfiguration}
-              propertyName="keepAspectRatio"
-            />
+          <PropertyCheckbox
+            objectConfiguration={objectConfiguration}
+            propertyName="keepAspectRatio"
+          />
+          <Text size="block-title" noMargin>
+            <Trans>Points</Trans>
+          </Text>
+          <ResponsiveLineStackLayout expand noColumnMargin>
             <SelectField
-              value={properties.get('materialType').getValue()}
-              floatingLabelText={properties.get('materialType').getLabel()}
+              value={properties.get('originLocation').getValue()}
+              floatingLabelText={properties.get('originLocation').getLabel()}
               helperMarkdownText={properties
-                .get('materialType')
+                .get('originLocation')
                 .getDescription()}
               onChange={(event, index, newValue) => {
-                onChangeProperty('materialType', newValue);
+                onChangeProperty('originLocation', newValue);
               }}
+              fullWidth
             >
               <SelectOption
-                label={t`No lighting effect`}
-                value="Basic"
-                key="Basic"
+                label={t`Model origin`}
+                value="ModelOrigin"
+                key="ModelOrigin"
               />
               <SelectOption
-                label={t`Emit all ambient light`}
-                value="StandardWithoutMetalness"
-                key="StandardWithoutMetalness"
+                label={t`Top-left corner`}
+                value="TopLeft"
+                key="TopLeftCorner"
               />
               <SelectOption
-                label={t`Keep model material`}
-                value="KeepOriginal"
-                key="KeepOriginal"
+                label={t`Object center`}
+                value="ObjectCenter"
+                key="ObjectCenter"
+              />
+              <SelectOption
+                label={t`Bottom center (on Z axis)`}
+                value="BottomCenterZ"
+                key="BottomCenterZ"
+              />
+              <SelectOption
+                label={t`Bottom center (on Y axis)`}
+                value="BottomCenterY"
+                key="BottomCenterY"
               />
             </SelectField>
-            {properties.get('materialType').getValue() !== 'Basic' &&
-              !hasLight(layout) && (
-                <AlertMessage kind="error">
-                  <Trans>
-                    Make sure to set up a light in the effects of the layer or
-                    chose "No lighting effect" - otherwise the object will
-                    appear black.
-                  </Trans>
-                </AlertMessage>
-              )}
-          </ColumnStackLayout>
+            <SelectField
+              value={properties.get('centerLocation').getValue()}
+              floatingLabelText={properties.get('centerLocation').getLabel()}
+              helperMarkdownText={properties
+                .get('centerLocation')
+                .getDescription()}
+              onChange={(event, index, newValue) => {
+                onChangeProperty('centerLocation', newValue);
+              }}
+              fullWidth
+            >
+              <SelectOption
+                label={t`Model origin`}
+                value="ModelOrigin"
+                key="ModelOrigin"
+              />
+              <SelectOption
+                label={t`Object center`}
+                value="ObjectCenter"
+                key="ObjectCenter"
+              />
+              <SelectOption
+                label={t`Bottom center (on Z axis)`}
+                value="BottomCenterZ"
+                key="BottomCenterZ"
+              />
+              <SelectOption
+                label={t`Bottom center (on Y axis)`}
+                value="BottomCenterY"
+                key="BottomCenterY"
+              />
+            </SelectField>
+          </ResponsiveLineStackLayout>
           <Text size="block-title">Animations</Text>
           <Column noMargin expand useFullHeight>
             {model3DConfiguration.getAnimationsCount() === 0 ? (

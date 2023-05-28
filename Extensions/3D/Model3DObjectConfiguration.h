@@ -166,6 +166,8 @@ private:
 
   gd::String modelResourceName;
   gd::String materialType;
+  gd::String originLocation;
+  gd::String centerLocation;
 
   bool keepAspectRatio;
 

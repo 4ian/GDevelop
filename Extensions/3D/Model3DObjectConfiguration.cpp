@@ -22,6 +22,7 @@ using namespace std;
 Model3DObjectConfiguration::Model3DObjectConfiguration()
     : width(100), height(100), depth(100), rotationX(0), rotationY(0),
       rotationZ(0), modelResourceName(""), materialType("Basic"),
+      originLocation("ModelOrigin"), centerLocation("ModelOrigin"),
       keepAspectRatio(true) {}
 
 bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
@@ -56,6 +57,14 @@ bool Model3DObjectConfiguration::UpdateProperty(const gd::String &propertyName,
   }
   if (propertyName == "materialType") {
     materialType = newValue;
+    return true;
+  }
+  if (propertyName == "originLocation") {
+    originLocation = newValue;
+    return true;
+  }
+  if (propertyName == "centerLocation") {
+    centerLocation = newValue;
     return true;
   }
   if (propertyName == "keepAspectRatio") {
@@ -132,6 +141,25 @@ Model3DObjectConfiguration::GetProperties() const {
       .AddExtraInfo("KeepOriginal")
       .SetLabel(_("Material modifier"));
 
+  objectProperties["originLocation"]
+      .SetValue(originLocation.empty() ? "TopLeft" : originLocation)
+      .SetType("choice")
+      .AddExtraInfo("ModelOrigin")
+      .AddExtraInfo("TopLeft")
+      .AddExtraInfo("ObjectCenter")
+      .AddExtraInfo("BottomCenterZ")
+      .AddExtraInfo("BottomCenterY")
+      .SetLabel(_("Origin point"));
+
+  objectProperties["centerLocation"]
+      .SetValue(centerLocation.empty() ? "ObjectCenter" : centerLocation)
+      .SetType("choice")
+      .AddExtraInfo("ModelOrigin")
+      .AddExtraInfo("ObjectCenter")
+      .AddExtraInfo("BottomCenterZ")
+      .AddExtraInfo("BottomCenterY")
+      .SetLabel(_("Center point"));
+
   return objectProperties;
 }
 
@@ -196,6 +224,8 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
   rotationZ = content.GetDoubleAttribute("rotationZ");
   modelResourceName = content.GetStringAttribute("modelResourceName");
   materialType = content.GetStringAttribute("materialType");
+  originLocation = content.GetStringAttribute("originLocation");
+  centerLocation = content.GetStringAttribute("centerLocation");
   keepAspectRatio = content.GetBoolAttribute("keepAspectRatio");
 
   RemoveAllAnimations();
@@ -222,6 +252,8 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("rotationZ", rotationZ);
   content.SetAttribute("modelResourceName", modelResourceName);
   content.SetAttribute("materialType", materialType);
+  content.SetAttribute("originLocation", originLocation);
+  content.SetAttribute("centerLocation", centerLocation);
   content.SetAttribute("keepAspectRatio", keepAspectRatio);
 
   auto &animationsElement = content.AddChild("animations");

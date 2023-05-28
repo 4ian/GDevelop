@@ -1,5 +1,5 @@
 namespace gdjs {
-  type Model3DAnimation = { name: string; source: string, loop: boolean };
+  type Model3DAnimation = { name: string; source: string; loop: boolean };
 
   /** Base parameters for {@link gdjs.Cube3DRuntimeObject} */
   export interface Model3DObjectData extends Object3DData {
@@ -11,9 +11,39 @@ namespace gdjs {
       rotationZ: number;
       keepAspectRatio: boolean;
       materialType: 'Basic' | 'StandardWithoutMetalness' | 'KeepOriginal';
+      originLocation:
+        | 'ModelOrigin'
+        | 'ObjectCenter'
+        | 'BottomCenterZ'
+        | 'BottomCenterY'
+        | 'TopLeft';
+      centerLocation:
+        | 'ModelOrigin'
+        | 'ObjectCenter'
+        | 'BottomCenterZ'
+        | 'BottomCenterY';
       animations: Model3DAnimation[];
     };
   }
+
+  type FloatPoint3D = [float, float, float];
+
+  const getPointForLocation = (location: string): FloatPoint3D | null => {
+    switch (location) {
+      case 'ModelOrigin':
+        return null;
+      case 'ObjectCenter':
+        return [0.5, 0.5, 0.5];
+      case 'BottomCenterZ':
+        return [0.5, 0.5, 0];
+      case 'BottomCenterY':
+        return [0.5, 1, 0.5];
+      case 'TopLeft':
+        return [0, 0, 0];
+      default:
+        return null;
+    }
+  };
 
   /**
    * A 3D object which displays a 3D model.
@@ -25,11 +55,13 @@ namespace gdjs {
     _materialType: gdjs.Model3DRuntimeObject.MaterialType =
       gdjs.Model3DRuntimeObject.MaterialType.Basic;
 
+    _originPoint: FloatPoint3D | null;
+    _centerPoint: FloatPoint3D | null;
+
+    _animations: Model3DAnimation[];
     _currentAnimationIndex: integer = 0;
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
-
-    _animations: Model3DAnimation[];
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -38,12 +70,26 @@ namespace gdjs {
       super(instanceContainer, objectData);
       this._modelResourceName = objectData.content.modelResourceName;
       this._animations = objectData.content.animations;
+      this._originPoint = getPointForLocation(
+        objectData.content.originLocation
+      );
+      this._centerPoint = getPointForLocation(
+        objectData.content.centerLocation
+      );
       this._renderer = new gdjs.Model3DRuntimeObjectRenderer(
         this,
         instanceContainer
       );
-      this._updateMaterialType(objectData);
-      this._renderer.playAnimation(this._animations[0].source, this._animations[0].loop);
+      this._materialType = this._convertMaterialType(
+        objectData.content.materialType
+      );
+      this._updateModel(objectData);
+      if (this._animations.length > 0) {
+        this._renderer.playAnimation(
+          this._animations[0].source,
+          this._animations[0].loop
+        );
+      }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -64,23 +110,42 @@ namespace gdjs {
         oldObjectData.content.keepAspectRatio !==
           newObjectData.content.keepAspectRatio
       ) {
-        this._updateDefaultTransformation(newObjectData);
+        this._updateModel(newObjectData);
       }
       if (
         oldObjectData.content.materialType !==
         newObjectData.content.materialType
       ) {
-        this._updateMaterialType(newObjectData);
+        this._materialType = this._convertMaterialType(
+          newObjectData.content.materialType
+        );
+        this._updateModel(newObjectData);
+      }
+      if (
+        oldObjectData.content.originLocation !==
+        newObjectData.content.originLocation
+      ) {
+        this._originPoint = getPointForLocation(
+          newObjectData.content.originLocation
+        );
+      }
+      if (
+        oldObjectData.content.centerLocation !==
+        newObjectData.content.centerLocation
+      ) {
+        this._centerPoint = getPointForLocation(
+          newObjectData.content.centerLocation
+        );
       }
       return true;
     }
 
-    _updateDefaultTransformation(objectData: Model3DObjectData) {
+    _updateModel(objectData: Model3DObjectData) {
       const rotationX = objectData.content.rotationX || 0;
       const rotationY = objectData.content.rotationY || 0;
       const rotationZ = objectData.content.rotationZ || 0;
       const keepAspectRatio = objectData.content.keepAspectRatio;
-      this._renderer._updateDefaultTransformation(
+      this._renderer._updateModel(
         rotationX,
         rotationY,
         rotationZ,
@@ -105,14 +170,6 @@ namespace gdjs {
       } else {
         return gdjs.Model3DRuntimeObject.MaterialType.Basic;
       }
-    }
-
-    _updateMaterialType(objectData: Model3DObjectData) {
-      this._materialType = this._convertMaterialType(
-        objectData.content.materialType
-      );
-      this._renderer._updateMaterials();
-      this._updateDefaultTransformation(objectData);
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
@@ -207,6 +264,26 @@ namespace gdjs {
 
     setAnimationSpeedScale(ratio: float): void {
       this._animationSpeedScale = ratio;
+    }
+
+    getCenterX(): float {
+      const centerPoint = this._renderer.getCenterPoint();
+      return this.getWidth() * centerPoint[0];
+    }
+
+    getCenterY(): float {
+      const centerPoint = this._renderer.getCenterPoint();
+      return this.getHeight() * centerPoint[1];
+    }
+
+    getDrawableX(): float {
+      const originPoint = this._renderer.getOriginPoint();
+      return this.getX() - this.getWidth() * originPoint[0];
+    }
+
+    getDrawableY(): float {
+      const originPoint = this._renderer.getOriginPoint();
+      return this.getY() - this.getHeight() * originPoint[1];
     }
   }
 

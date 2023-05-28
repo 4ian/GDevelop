@@ -268,7 +268,7 @@ export default class InstancesEditor extends Component<Props> {
       }
     });
 
-    this.pixiContainer = new PIXI.Container(); //TODO: rename
+    this.pixiContainer = new PIXI.Container(); // TODO (3D): rename this container.
 
     this.backgroundArea = new PIXI.Container();
     this.backgroundArea.hitArea = new PIXI.Rectangle(

@@ -216,6 +216,7 @@ export default class InstancesRenderer {
       if (threeCamera && threePlaneMesh) {
         viewPosition.applyTransformationToThree(threeCamera, threePlaneMesh);
       }
+      threeCamera.fov = layer.getCamera3DFieldOfView();
 
       if (!threeRenderer) {
         // Render a layer with 2D rendering (PixiJS) only.

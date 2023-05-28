@@ -67,7 +67,6 @@ export default class LayerRenderer {
   _threeGroup: THREE.Group | null = null;
   _threeScene: THREE.Scene | null = null;
   _threeCamera: THREE.PerspectiveCamera | null = null;
-  _threeCameraDirty: boolean = false;
 
   // For a 2D+3D layer, the 2D rendering is done on the render texture
   // and then must be displayed on a plane in the 3D world:
@@ -479,7 +478,7 @@ export default class LayerRenderer {
     threeScene.add(this._threeGroup);
 
     const threeCamera = new THREE.PerspectiveCamera(
-      this.layer.getCamera3DFieldOfView(),
+      45,
       1,
       0.1,
       2000

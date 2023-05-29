@@ -182,7 +182,9 @@ namespace gdjs {
       const scaleZ = 1 / modelDepth;
 
       const scaleMatrix = new THREE.Matrix4();
-      scaleMatrix.makeScale(scaleX, scaleY, scaleZ);
+      // Flip on Y because the Y axis is on the opposite side of direct basis.
+      // It avoids models to be like a mirror refection.
+      scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
       threeObject.updateMatrix();
       threeObject.applyMatrix4(scaleMatrix);
 

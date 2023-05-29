@@ -2459,7 +2459,9 @@ module.exports = {
         const scaleZ = 1 / modelDepth;
 
         const scaleMatrix = new THREE.Matrix4();
-        scaleMatrix.makeScale(scaleX, scaleY, scaleZ);
+        // Flip on Y because the Y axis is on the opposite side of direct basis.
+        // It avoids models to be like a mirror refection.
+        scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
         model3D.updateMatrix();
         model3D.applyMatrix4(scaleMatrix);
 

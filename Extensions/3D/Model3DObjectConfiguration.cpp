@@ -128,7 +128,7 @@ Model3DObjectConfiguration::GetProperties() const {
       .SetGroup(_("Default orientation"));
 
   objectProperties["modelResourceName"]
-      .SetValue(modelResourceName.empty() ? "Basic" : modelResourceName)
+      .SetValue(modelResourceName)
       .SetType("resource")
       .AddExtraInfo("model3D")
       .SetLabel(_("3D model"));

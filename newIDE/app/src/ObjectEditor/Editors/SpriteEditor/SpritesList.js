@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -11,6 +11,8 @@ import {
   copySpritePolygons,
   allDirectionSpritesHaveSamePointsAs,
   allDirectionSpritesHaveSameCollisionMasksAs,
+  deleteSpritesFromAnimation,
+  duplicateSpritesInAnimation,
 } from './Utils/SpriteObjectHelper';
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
@@ -32,6 +34,9 @@ import {
 } from '../../../UI/Layout';
 import { Column } from '../../../UI/Grid';
 import Add from '../../../UI/CustomSvgIcons/Add';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../../UI/Menu/ContextMenu';
 const gd: libGDevelop = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -83,7 +88,7 @@ const SortableList = SortableContainer(
     resourceManagementProps,
     selectedSprites,
     onSelectSprite,
-    onSpriteContextMenu,
+    onOpenSpriteContextMenu,
   }) => {
     const spritesCount = direction.getSpritesCount();
     const hasMoreThanOneSprite = spritesCount > 1;
@@ -99,7 +104,7 @@ const SortableList = SortableContainer(
                 index={i}
                 isFirst={i === 0}
                 selected={!!selectedSprites[sprite.ptr]}
-                onContextMenu={(x, y) => onSpriteContextMenu(x, y, sprite)}
+                onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 resourcesLoader={resourcesLoader}
                 project={project}
@@ -110,7 +115,7 @@ const SortableList = SortableContainer(
                 selectable
                 selected={!!selectedSprites[sprite.ptr]}
                 onSelect={selected => onSelectSprite(sprite, selected)}
-                onContextMenu={(x, y) => onSpriteContextMenu(x, y, sprite)}
+                onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 resourceName={sprite.getImageName()}
                 resourcesLoader={resourcesLoader}
                 project={project}
@@ -160,15 +165,11 @@ const removeExtensionFromFileName = (fileName: string) => {
 };
 
 type Props = {|
+  spriteConfiguration: gdSpriteObject,
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
-  onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
-  selectedSprites: {
-    [number]: boolean,
-  },
-  onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
   onReplaceByDirection: (newDirection: gdDirection) => void,
   onSpriteUpdated?: () => void,
   onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
@@ -177,13 +178,11 @@ type Props = {|
 |};
 
 const SpritesList = ({
+  spriteConfiguration,
   direction,
   project,
   resourcesLoader,
   resourceManagementProps,
-  onSpriteContextMenu,
-  selectedSprites,
-  onSelectSprite,
   onReplaceByDirection,
   onSpriteUpdated,
   onChangeName,
@@ -191,16 +190,85 @@ const SpritesList = ({
   animationName,
 }: Props) => {
   const [externalEditorOpened, setExternalEditorOpened] = React.useState(false);
+  // It's important to save the selected sprites in a ref, so that
+  // we can update the selection when a context menu is opened without relying on the state.
+  // Otherwise, the selection would be updated after the context menu is opened.
+  // Then, we need to ensure we trigger a force-update every time the selection changes.
+  const selectedSprites = React.useRef<{
+    [number]: boolean,
+  }>({});
+  const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
+
+  const updateIndexesAfterMoveUp = React.useCallback(
+    (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
+      for (let i = oldIndex; i <= newIndex; ++i) {
+        const spriteAtIndex = direction.getSprite(i);
+        if (i === newIndex) {
+          // If this is the new index of the moved sprite, we keep its selection status.
+          selectedSprites.current[spriteAtIndex.ptr] = wasMovedItemSelected;
+        } else {
+          // If moving up, the other sprites are going down, so their previous index was i+1.
+          const previousSpriteIndex = i + 1;
+          const previousSelectionStatus = !!selectedSprites.current[
+            direction.getSprite(previousSpriteIndex).ptr
+          ];
+          console.log('previousSelectionStatus', previousSelectionStatus);
+          selectedSprites.current[spriteAtIndex.ptr] = previousSelectionStatus;
+        }
+      }
+    },
+    [direction]
+  );
+
+  const updateIndexesAfterMoveDown = React.useCallback(
+    (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
+      for (let i = oldIndex; i >= newIndex; --i) {
+        const spriteAtIndex = direction.getSprite(i);
+        if (i === newIndex) {
+          // If this is the new index of the moved sprite, we keep its selection status.
+          selectedSprites.current[spriteAtIndex.ptr] = wasMovedItemSelected;
+        } else {
+          // If moving down, the other sprites are going up, so their previous index was i-1.
+          const previousSpriteIndex = i - 1;
+          const previousSelectionStatus = !!selectedSprites.current[
+            direction.getSprite(previousSpriteIndex).ptr
+          ];
+          selectedSprites.current[spriteAtIndex.ptr] = previousSelectionStatus;
+        }
+      }
+    },
+    [direction]
+  );
 
   const onSortEnd = React.useCallback(
     ({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) => {
       if (oldIndex === newIndex) return;
+      // We store the selection value of the moved sprite, as its pointer will
+      // be changed by the move.
+      const wasMovedItemSelected = !!selectedSprites.current[
+        direction.getSprite(oldIndex).ptr
+      ];
       direction.moveSprite(oldIndex, newIndex);
+
+      // When moving a sprite, the pointers are all shifted, so we need to
+      // update the selectedSprites map for the user not to lose their selection.
+      if (oldIndex < newIndex) {
+        updateIndexesAfterMoveUp(oldIndex, newIndex, wasMovedItemSelected);
+      } else {
+        updateIndexesAfterMoveDown(oldIndex, newIndex, wasMovedItemSelected);
+      }
+
       forceUpdate();
       onSpriteUpdated && onSpriteUpdated();
     },
-    [direction, forceUpdate, onSpriteUpdated]
+    [
+      direction,
+      forceUpdate,
+      onSpriteUpdated,
+      updateIndexesAfterMoveDown,
+      updateIndexesAfterMoveUp,
+    ]
   );
 
   const onAddSprite = React.useCallback(
@@ -355,6 +423,73 @@ const SpritesList = ({
     ]
   );
 
+  const deleteSprites = React.useCallback(
+    () => {
+      const sprites = selectedSprites.current;
+      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+        const animation = spriteConfiguration.getAnimation(index);
+        deleteSpritesFromAnimation(animation, sprites);
+      });
+
+      // Clear selection after deletion.
+      selectedSprites.current = {};
+      forceUpdate();
+      if (onSpriteUpdated) onSpriteUpdated();
+    },
+    [onSpriteUpdated, spriteConfiguration, forceUpdate]
+  );
+
+  const duplicateSprites = React.useCallback(
+    () => {
+      const sprites = selectedSprites.current;
+      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
+        const animation = spriteConfiguration.getAnimation(index);
+        duplicateSpritesInAnimation(animation, sprites);
+      });
+
+      // Clear selection after duplication.
+      selectedSprites.current = {};
+      forceUpdate();
+      if (onSpriteUpdated) onSpriteUpdated();
+    },
+    [onSpriteUpdated, spriteConfiguration, forceUpdate]
+  );
+
+  const selectSprite = React.useCallback(
+    (sprite, selected) => {
+      selectedSprites.current = {
+        ...selectedSprites.current,
+        [sprite.ptr]: selected,
+      };
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
+
+  const selectUniqueSprite = React.useCallback(
+    (sprite: gdSprite) => {
+      selectedSprites.current = {
+        [sprite.ptr]: true,
+      };
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
+
+  const openSpriteContextMenu = React.useCallback(
+    (x, y, sprite) => {
+      // If the sprite is not selected, select only it.
+      if (!selectedSprites.current[sprite.ptr]) {
+        selectUniqueSprite(sprite);
+      }
+      // Otherwise, keep the selection as is.
+      if (spriteContextMenu.current) {
+        spriteContextMenu.current.open(x, y);
+      }
+    },
+    [selectUniqueSprite]
+  );
+
   const storageProvider = resourceManagementProps.getStorageProvider();
   const resourceSources = resourceManagementProps.resourceSources
     .filter(source => source.kind === 'image')
@@ -385,12 +520,25 @@ const SpritesList = ({
           onSortEnd={onSortEnd}
           onAddSprite={onAddSprite}
           resourceManagementProps={resourceManagementProps}
-          selectedSprites={selectedSprites}
-          onSelectSprite={onSelectSprite}
-          onSpriteContextMenu={onSpriteContextMenu}
+          selectedSprites={selectedSprites.current}
+          onSelectSprite={selectSprite}
+          onOpenSpriteContextMenu={openSpriteContextMenu}
           helperClass="sortable-helper"
           lockAxis="x"
           axis="x"
+        />
+        <ContextMenu
+          ref={spriteContextMenu}
+          buildMenuTemplate={(i18n: I18nType) => [
+            {
+              label: i18n._(t`Delete selection`),
+              click: deleteSprites,
+            },
+            {
+              label: i18n._(t`Duplicate selection`),
+              click: duplicateSprites,
+            },
+          ]}
         />
         <Column noMargin>
           <RaisedButtonWithSplitMenu

@@ -1252,6 +1252,29 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
+      if (
+        gdjs.RuntimeObject3D &&
+        runtimeObject instanceof gdjs.RuntimeObject3D
+      ) {
+        if (oldInstance.z !== newInstance.z && newInstance.z !== undefined) {
+          runtimeObject.setZ(newInstance.z);
+          somethingChanged = true;
+        }
+        if (
+          oldInstance.rotationX !== newInstance.rotationX &&
+          newInstance.rotationX !== undefined
+        ) {
+          runtimeObject.setRotationX(newInstance.rotationX);
+          somethingChanged = true;
+        }
+        if (
+          oldInstance.rotationY !== newInstance.rotationY &&
+          newInstance.rotationY !== undefined
+        ) {
+          runtimeObject.setRotationY(newInstance.rotationY);
+          somethingChanged = true;
+        }
+      }
 
       // Check if size changed
       let sizeChanged = false;
@@ -1278,6 +1301,28 @@ namespace gdjs {
       } else {
         if (!newInstance.customSize && oldInstance.customSize) {
           // The custom size was removed. Just flag the size as changed
+          // and hope the object will handle this in
+          // `extraInitializationFromInitialInstance`.
+          sizeChanged = true;
+        }
+      }
+      if (
+        gdjs.RuntimeObject3D &&
+        runtimeObject instanceof gdjs.RuntimeObject3D
+      ) {
+        // A custom depth was set or changed
+        if (
+          oldInstance.depth !== newInstance.depth &&
+          newInstance.depth !== undefined
+        ) {
+          runtimeObject.setDepth(newInstance.depth);
+          somethingChanged = true;
+          sizeChanged = true;
+        } else if (
+          newInstance.depth === undefined &&
+          oldInstance.depth !== undefined
+        ) {
+          // The custom depth was removed. Just flag the depth as changed
           // and hope the object will handle this in
           // `extraInitializationFromInitialInstance`.
           sizeChanged = true;

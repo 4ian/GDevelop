@@ -597,6 +597,8 @@ describe('libGD.js', function () {
       expect(initialInstance.getCustomWidth()).toBe(34);
       initialInstance.setCustomHeight(30);
       expect(initialInstance.getCustomHeight()).toBe(30);
+
+      expect(initialInstance.hasCustomDepth()).toBe(false);
     });
     it('Sprite object custom properties', function () {
       initialInstance.updateCustomProperty('animation', '2', project, layout);
@@ -622,13 +624,154 @@ describe('libGD.js', function () {
       expect(initialInstance2.getObjectName()).toBe('MySpriteObject');
       expect(initialInstance2.getX()).toBe(150);
       expect(initialInstance2.getY()).toBe(140);
+      expect(initialInstance2.getZ()).toBe(0);
       expect(initialInstance2.getAngle()).toBe(45);
+      expect(initialInstance2.getRotationX()).toBe(0);
+      expect(initialInstance2.getRotationY()).toBe(0);
       expect(initialInstance2.getZOrder()).toBe(12);
       expect(initialInstance2.getLayer()).toBe('MyLayer');
       expect(initialInstance2.isLocked()).toBe(true);
       expect(initialInstance2.hasCustomSize()).toBe(true);
+      expect(initialInstance2.hasCustomDepth()).toBe(false);
       expect(initialInstance2.getCustomWidth()).toBe(34);
       expect(initialInstance2.getCustomHeight()).toBe(30);
+      expect(initialInstance2.getCustomDepth()).toBe(0);
+    });
+    it('can have 3D properties migrated from number properties', function () {
+      const element = gd.Serializer.fromJSObject({
+        "angle": 2,
+        "customSize": true,
+        "height": 100,
+        "layer": "",
+        "name": "Walls",
+        "persistentUuid": "1075df65-af84-472d-a431-47d6f7a5cb63",
+        "width": 950,
+        "x": -100,
+        "y": -75,
+        "zOrder": 1,
+        "numberProperties": [
+          {
+            "name": "depth", // This indicates there is a custom depth.
+            "value": 300
+          },
+          {
+            "name": "z",
+            "value": 12
+          },
+          {
+            "name": "rotationX",
+            "value": 1
+          },
+          {
+            "name": "rotationY",
+            "value": 3
+          }
+        ],
+        "stringProperties": [],
+        "initialVariables": []
+      });
+
+      const migratedInstance = layout
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      migratedInstance.unserializeFrom(element);
+
+      element.delete();
+      expect(migratedInstance.getX()).toBe(-100);
+      expect(migratedInstance.getY()).toBe(-75);
+      expect(migratedInstance.getZ()).toBe(12);
+      expect(migratedInstance.getAngle()).toBe(2);
+      expect(migratedInstance.getRotationX()).toBe(1);
+      expect(migratedInstance.getRotationY()).toBe(3);
+      expect(migratedInstance.hasCustomSize()).toBe(true);
+      expect(migratedInstance.hasCustomDepth()).toBe(true);
+      expect(migratedInstance.getCustomWidth()).toBe(950);
+      expect(migratedInstance.getCustomHeight()).toBe(100);
+      expect(migratedInstance.getCustomDepth()).toBe(300);
+    });
+    it('can have depth without a custom size', function () {
+      const element = gd.Serializer.fromJSObject({
+        "angle": 2,
+        "customSize": false,
+        "height": 100,
+        "layer": "",
+        "name": "Walls",
+        "persistentUuid": "1075df65-af84-472d-a431-47d6f7a5cb63",
+        "width": 950,
+        "x": -100,
+        "y": -75,
+        "zOrder": 1,
+        "z": 12,
+        "depth": 300, // This indicates there is a custom depth.
+        "rotationX": 1,
+        "rotationY": 3,
+        "numberProperties": [
+        ],
+        "stringProperties": [],
+        "initialVariables": []
+      });
+
+      const instanceWithJustDepth = layout
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instanceWithJustDepth.unserializeFrom(element);
+
+      element.delete();
+      expect(instanceWithJustDepth.getX()).toBe(-100);
+      expect(instanceWithJustDepth.getY()).toBe(-75);
+      expect(instanceWithJustDepth.getZ()).toBe(12);
+      expect(instanceWithJustDepth.getAngle()).toBe(2);
+      expect(instanceWithJustDepth.getRotationX()).toBe(1);
+      expect(instanceWithJustDepth.getRotationY()).toBe(3);
+      expect(instanceWithJustDepth.hasCustomSize()).toBe(false);
+      expect(instanceWithJustDepth.hasCustomDepth()).toBe(true);
+      expect(instanceWithJustDepth.getCustomDepth()).toBe(300);
+      expect(instanceWithJustDepth.getCustomWidth()).toBe(950);
+      expect(instanceWithJustDepth.getCustomHeight()).toBe(100);
+    });
+    it('can have 3D properties', function () {
+      const initialInstanceIn3D = layout.getInitialInstances().insertNewInitialInstance();
+      initialInstanceIn3D.setX(40);
+      initialInstanceIn3D.setY(41);
+      initialInstanceIn3D.setZ(42);
+      initialInstanceIn3D.setAngle(43);
+      initialInstanceIn3D.setRotationX(44);
+      initialInstanceIn3D.setRotationY(45);
+      initialInstanceIn3D.setHasCustomSize(true);
+      initialInstanceIn3D.setHasCustomDepth(true);
+      initialInstanceIn3D.setCustomWidth(46);
+      initialInstanceIn3D.setCustomHeight(47);
+      initialInstanceIn3D.setCustomDepth(48);
+      expect(initialInstanceIn3D.getX()).toBe(40);
+      expect(initialInstanceIn3D.getY()).toBe(41);
+      expect(initialInstanceIn3D.getZ()).toBe(42);
+      expect(initialInstanceIn3D.getAngle()).toBe(43);
+      expect(initialInstanceIn3D.getRotationX()).toBe(44);
+      expect(initialInstanceIn3D.getRotationY()).toBe(45);
+      expect(initialInstanceIn3D.hasCustomSize()).toBe(true);
+      expect(initialInstanceIn3D.hasCustomDepth()).toBe(true);
+      expect(initialInstanceIn3D.getCustomWidth()).toBe(46);
+      expect(initialInstanceIn3D.getCustomHeight()).toBe(47);
+      expect(initialInstanceIn3D.getCustomDepth()).toBe(48);
+
+      const element = new gd.SerializerElement();
+      initialInstanceIn3D.serializeTo(element);
+
+      const initialInstance2 = layout
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      initialInstance2.unserializeFrom(element);
+      expect(initialInstance2.getX()).toBe(40);
+      expect(initialInstance2.getY()).toBe(41);
+      expect(initialInstance2.getZ()).toBe(42);
+      expect(initialInstance2.getAngle()).toBe(43);
+      expect(initialInstance2.getRotationX()).toBe(44);
+      expect(initialInstance2.getRotationY()).toBe(45);
+      expect(initialInstance2.hasCustomSize()).toBe(true);
+      expect(initialInstance2.hasCustomDepth()).toBe(true);
+      expect(initialInstance2.getCustomWidth()).toBe(46);
+      expect(initialInstance2.getCustomHeight()).toBe(47);
+      expect(initialInstance2.getCustomDepth()).toBe(48);
     });
     it('can be serialized with a persistent UUID called persistentUuid', function () {
       const initialInstance = new gd.InitialInstance();

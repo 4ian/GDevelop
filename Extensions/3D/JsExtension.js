@@ -171,20 +171,6 @@ module.exports = {
         project,
         layout
       ) {
-        if (propertyName === 'z') {
-          instance.setRawDoubleProperty('z', parseFloat(newValue));
-          return true;
-        } else if (propertyName === 'rotationX') {
-          instance.setRawDoubleProperty('rotationX', parseFloat(newValue));
-          return true;
-        } else if (propertyName === 'rotationY') {
-          instance.setRawDoubleProperty('rotationY', parseFloat(newValue));
-          return true;
-        } else if (propertyName === 'depth') {
-          instance.setRawDoubleProperty('depth', parseFloat(newValue));
-          return true;
-        }
-
         return false;
       };
 
@@ -196,31 +182,6 @@ module.exports = {
         layout
       ) {
         const instanceProperties = new gd.MapStringPropertyDescriptor();
-
-        instanceProperties
-          .getOrCreate('z')
-          .setValue(instance.getRawDoubleProperty('z').toString())
-          .setType('number')
-          .setLabel(_('Z (elevation)'));
-
-        instanceProperties
-          .getOrCreate('rotationX')
-          .setValue(instance.getRawDoubleProperty('rotationX').toString())
-          .setType('number')
-          .setLabel(_('Rotation X'));
-
-        instanceProperties
-          .getOrCreate('rotationY')
-          .setValue(instance.getRawDoubleProperty('rotationY').toString())
-          .setType('number')
-          .setLabel(_('Rotation Y'));
-
-        instanceProperties
-          .getOrCreate('depth')
-          .setValue(instance.getRawDoubleProperty('depth').toString())
-          .setType('number')
-          .setLabel(_('Depth'));
-
         return instanceProperties;
       };
 
@@ -907,20 +868,6 @@ module.exports = {
       project,
       layout
     ) {
-      if (propertyName === 'z') {
-        instance.setRawDoubleProperty('z', parseFloat(newValue));
-        return true;
-      } else if (propertyName === 'rotationX') {
-        instance.setRawDoubleProperty('rotationX', parseFloat(newValue));
-        return true;
-      } else if (propertyName === 'rotationY') {
-        instance.setRawDoubleProperty('rotationY', parseFloat(newValue));
-        return true;
-      } else if (propertyName === 'depth') {
-        instance.setRawDoubleProperty('depth', parseFloat(newValue));
-        return true;
-      }
-
       return false;
     };
 
@@ -932,31 +879,6 @@ module.exports = {
       layout
     ) {
       const instanceProperties = new gd.MapStringPropertyDescriptor();
-
-      instanceProperties
-        .getOrCreate('z')
-        .setValue(instance.getRawDoubleProperty('z').toString())
-        .setType('number')
-        .setLabel(_('Z (elevation)'));
-
-      instanceProperties
-        .getOrCreate('rotationX')
-        .setValue(instance.getRawDoubleProperty('rotationX').toString())
-        .setType('number')
-        .setLabel(_('Rotation X'));
-
-      instanceProperties
-        .getOrCreate('rotationY')
-        .setValue(instance.getRawDoubleProperty('rotationY').toString())
-        .setType('number')
-        .setLabel(_('Rotation Y'));
-
-      instanceProperties
-        .getOrCreate('depth')
-        .setValue(instance.getRawDoubleProperty('depth').toString())
-        .setType('number')
-        .setLabel(_('Depth'));
-
       return instanceProperties;
     };
 
@@ -1998,6 +1920,7 @@ module.exports = {
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
         this._defaultHeight = parseFloat(properties.get('height').getValue());
+        this._defaultDepth = parseFloat(properties.get('depth').getValue());
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
@@ -2032,7 +1955,7 @@ module.exports = {
           .getValue();
         this._shouldUseTransparentTexture =
           properties.get('enableTextureTransparency').getValue() === 'true';
-        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const materials = [
           this._getFaceMaterial(project, materialIndexToFaceIndex[0]),
@@ -2067,28 +1990,17 @@ module.exports = {
       updateThreeObject() {
         const width = this.getWidth();
         const height = this.getHeight();
-        let depth;
-        if (this._instance.hasCustomSize()) {
-          const instancePropertyDepth =
-            this._instance.getRawDoubleProperty('depth');
-          depth =
-            typeof instancePropertyDepth === 'number'
-              ? instancePropertyDepth
-              : this._defaultDepth;
-        } else {
-          depth = this._defaultDepth;
-        }
-        const z = this._instance.getRawDoubleProperty('z');
+        const depth = this.getDepth();
 
         this._threeObject.position.set(
           this._instance.getX() + width / 2,
           this._instance.getY() + height / 2,
-          z + depth / 2
+          this._instance.getZ() + depth / 2
         );
 
         this._threeObject.rotation.set(
-          0,
-          0,
+          RenderedInstance.toRad(this._instance.getRotationX()),
+          RenderedInstance.toRad(this._instance.getRotationY()),
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
@@ -2343,6 +2255,10 @@ module.exports = {
       getDefaultHeight() {
         return this._defaultHeight;
       }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
+      }
     }
 
     objectsRenderingService.registerInstanceRenderer(
@@ -2556,28 +2472,17 @@ module.exports = {
       updateThreeObject() {
         const width = this.getWidth();
         const height = this.getHeight();
-        let depth;
-        if (this._instance.hasCustomSize()) {
-          const instancePropertyDepth =
-            this._instance.getRawDoubleProperty('depth');
-          depth =
-            typeof instancePropertyDepth === 'number'
-              ? instancePropertyDepth
-              : this._defaultDepth;
-        } else {
-          depth = this._defaultDepth;
-        }
-        const z = this._instance.getRawDoubleProperty('z');
+        const depth = this.getDepth();
 
         this._threeObject.position.set(
           this._instance.getX() + width / 2,
           this._instance.getY() + height / 2,
-          z + depth / 2
+          this._instance.getZ() + depth / 2
         );
 
         this._threeObject.rotation.set(
-          0,
-          0,
+          RenderedInstance.toRad(this._instance.getRotationX()),
+          RenderedInstance.toRad(this._instance.getRotationY()),
           RenderedInstance.toRad(this._instance.getAngle())
         );
 
@@ -2619,6 +2524,10 @@ module.exports = {
 
       getDefaultHeight() {
         return this._defaultHeight;
+      }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
       }
     }
 

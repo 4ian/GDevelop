@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
-import Rectangle from '../../Utils/Rectangle';
+import Rectangle from '../../Utils/Rectangle'; // TODO (3D): add support for zMin/zMax/depth.
 import { rotatePolygon, type Polygon } from '../../Utils/PolygonHelper';
 import Rendered3DInstance from '../../ObjectsRendering/Renderers/Rendered3DInstance';
 const gd: libGDevelop = global.gd;
@@ -220,20 +220,25 @@ export default class LayerRenderer {
 
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
     const renderedInstance = this.renderedInstances[instance.ptr];
-    if (instance.hasCustomSize())
-      return [
-        instance.getCustomWidth() ||
-          (renderedInstance ? renderedInstance.getDefaultWidth() : 0),
-        instance.getCustomHeight() ||
-          (renderedInstance ? renderedInstance.getDefaultHeight() : 0),
-      ];
+    const hasCustomSize = instance.hasCustomSize();
+    const hasCustomDepth = instance.hasCustomDepth();
+    const width = hasCustomSize
+      ? instance.getCustomWidth()
+      : renderedInstance
+      ? renderedInstance.getDefaultWidth()
+      : 0;
+    const height = hasCustomSize
+      ? instance.getCustomHeight()
+      : renderedInstance
+      ? renderedInstance.getDefaultHeight()
+      : 0;
+    const depth = hasCustomDepth
+      ? instance.getCustomDepth()
+      : renderedInstance
+      ? renderedInstance.getDefaultDepth()
+      : 0;
 
-    return renderedInstance
-      ? [
-          renderedInstance.getDefaultWidth(),
-          renderedInstance.getDefaultHeight(),
-        ]
-      : [0, 0];
+    return [width, height, depth];
   };
 
   getUnrotatedInstanceAABB(
@@ -245,6 +250,7 @@ export default class LayerRenderer {
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + size[0];
     const bottom = top + size[1];
+    // TODO (3D): add support for zMin/zMax/depth.
     bounds.set({ left, top, right, bottom });
     return bounds;
   }
@@ -306,6 +312,7 @@ export default class LayerRenderer {
       top = Math.min(top, rotatedRectangle[i][1]);
       bottom = Math.max(bottom, rotatedRectangle[i][1]);
     }
+    // TODO (3D): add support for zMin/zMax/depth.
     bounds.set({ left, top, right, bottom });
     return bounds;
   }

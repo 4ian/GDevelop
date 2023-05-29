@@ -379,7 +379,19 @@ export class ChildInstance {
     return this.y;
   }
 
+  getZ() {
+    return 0;
+  }
+
   getAngle() {
+    return 0;
+  }
+
+  getRotationX() {
+    return 0;
+  }
+
+  getRotationY() {
     return 0;
   }
 
@@ -393,7 +405,13 @@ export class ChildInstance {
 
   setY(y: number) {}
 
+  setZ(z: number) {}
+
   setAngle(angle: number) {}
+
+  setRotationX(angle: number) {}
+
+  setRotationY(angle: number) {}
 
   isLocked() {
     return false;
@@ -427,6 +445,9 @@ export class ChildInstance {
     return this._hasCustomSize;
   }
 
+  hasCustomDepth() {
+    return false;
+  }
   setCustomWidth(width: number) {
     this._customWidth = width;
     this._hasCustomSize = true;
@@ -443,6 +464,14 @@ export class ChildInstance {
 
   getCustomHeight() {
     return this._customHeight;
+  }
+
+  setCustomDepth(depth: number) {
+    // Not implemented.
+  }
+
+  getCustomDepth() {
+    return 0;
   }
 
   resetPersistentUuid() {

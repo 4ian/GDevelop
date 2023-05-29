@@ -630,6 +630,7 @@ interface gdObject {
     [Const, Ref] DOMString GetType();
     void SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
+    boolean Is3DObject();
 
     [Ref] ObjectConfiguration GetConfiguration();
 
@@ -1055,8 +1056,14 @@ interface InitialInstance {
     void SetX(double x);
     double GetY();
     void SetY(double y);
+    double GetZ();
+    void SetZ(double z);
     double GetAngle();
     void SetAngle(double angle);
+    double GetRotationX();
+    void SetRotationX(double rotationX);
+    double GetRotationY();
+    void SetRotationY(double rotationY);
     boolean IsLocked();
     void SetLocked(boolean lock);
     boolean IsSealed();
@@ -1068,11 +1075,15 @@ interface InitialInstance {
 
     void SetHasCustomSize(boolean enable);
     boolean HasCustomSize();
+    void SetHasCustomDepth(boolean enable);
+    boolean HasCustomDepth();
 
     void SetCustomWidth(double width);
     double GetCustomWidth();
     void SetCustomHeight(double height);
     double GetCustomHeight();
+    void SetCustomDepth(double depth);
+    double GetCustomDepth();
 
     [Ref] InitialInstance ResetPersistentUuid();
 

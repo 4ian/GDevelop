@@ -108,19 +108,8 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      initialInstanceData.numberProperties.forEach((property) => {
-        if (property.name === 'z') {
-          this.setZ(property.value);
-        } else if (property.name === 'depth') {
-          if (initialInstanceData.customSize) {
-            this.setDepth(property.value);
-          }
-        } else if (property.name === 'rotationX') {
-          this.setRotationX(property.value);
-        } else if (property.name === 'rotationY') {
-          this.setRotationY(property.value);
-        }
-      });
+      if (initialInstanceData.depth != undefined)
+        this.setDepth(initialInstanceData.depth);
     }
 
     setX(x: float): void {

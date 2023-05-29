@@ -8,9 +8,7 @@ import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema, {
-  reorganizeSchemaFor3DInstance,
-} from '../../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
@@ -31,7 +29,7 @@ type Props = {|
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
-  onGetInstanceSize: gdInitialInstance => [number, number],
+  onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
@@ -39,6 +37,229 @@ type Props = {|
 |};
 
 export type InstancePropertiesEditorInterface = {| forceUpdate: () => void |};
+
+const makeSchema = ({
+  is3DInstance,
+  i18n,
+  forceUpdate,
+  onEditObjectByName,
+  onGetInstanceSize,
+  layout,
+}) => {
+  const getInstanceWidth = (instance: gdInitialInstance) =>
+    instance.hasCustomSize()
+      ? instance.getCustomWidth()
+      : onGetInstanceSize(instance)[0];
+
+  const getInstanceHeight = (instance: gdInitialInstance) =>
+    instance.hasCustomSize()
+      ? instance.getCustomHeight()
+      : onGetInstanceSize(instance)[1];
+
+  const getInstanceDepth = (instance: gdInitialInstance) =>
+    instance.hasCustomDepth()
+      ? instance.getCustomDepth()
+      : onGetInstanceSize(instance)[2];
+
+  return [
+    {
+      name: i18n._(t`Object`),
+      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+      nonFieldType: 'sectionTitle',
+      defaultValue: i18n._(t`Different objects`),
+    },
+    {
+      label: i18n._(t`Edit object`),
+      disabled: 'onValuesDifferent',
+      nonFieldType: 'button',
+      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+      onClick: (instance: gdInitialInstance) =>
+        onEditObjectByName(instance.getObjectName()),
+    },
+    {
+      name: i18n._(t`Instance`),
+      nonFieldType: 'sectionTitle',
+    },
+    {
+      name: 'Position',
+      type: 'row',
+      children: [
+        {
+          name: 'X',
+          getLabel: () => i18n._(t`X`),
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getX(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setX(newValue),
+        },
+        {
+          name: 'Y',
+          getLabel: () => i18n._(t`Y`),
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getY(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setY(newValue),
+        },
+        is3DInstance
+          ? {
+              name: 'Z',
+              getLabel: () => i18n._(t`Z`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) => instance.getZ(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setZ(newValue),
+            }
+          : null,
+      ].filter(Boolean),
+    },
+    {
+      name: 'Angles',
+      type: 'row',
+      children: [
+        is3DInstance
+          ? {
+              name: 'RotationX',
+              getLabel: () => i18n._(t`Rotation (X)`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) =>
+                instance.getRotationX(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setRotationX(newValue),
+            }
+          : null,
+        is3DInstance
+          ? {
+              name: 'RotationY',
+              getLabel: () => i18n._(t`Rotation (Y)`),
+              valueType: 'number',
+              getValue: (instance: gdInitialInstance) =>
+                instance.getRotationY(),
+              setValue: (instance: gdInitialInstance, newValue: number) =>
+                instance.setRotationY(newValue),
+            }
+          : null,
+        {
+          name: 'Angle',
+          getLabel: () =>
+            is3DInstance ? i18n._(t`Rotation (Z)`) : i18n._(t`Angle`),
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getAngle(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setAngle(newValue),
+        },
+      ].filter(Boolean),
+    },
+    {
+      name: 'Lock instance position angle',
+      getLabel: () => i18n._(t`Lock position/angle in the editor`),
+      valueType: 'boolean',
+      getValue: (instance: gdInitialInstance) => instance.isLocked(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        instance.setLocked(newValue);
+        if (!newValue) {
+          instance.setSealed(newValue);
+        }
+      },
+    },
+    {
+      name: 'Prevent instance selection',
+      getLabel: () => i18n._(t`Prevent selection in the editor`),
+      valueType: 'boolean',
+      disabled: (instances: gdInitialInstance[]) => {
+        return instances.some(instance => !instance.isLocked());
+      },
+      getValue: (instance: gdInitialInstance) => instance.isSealed(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setSealed(newValue),
+    },
+    !is3DInstance
+      ? {
+          name: 'Z Order',
+          getLabel: () => i18n._(t`Z Order`),
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getZOrder(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setZOrder(newValue),
+        }
+      : null,
+    {
+      name: 'Layer',
+      getLabel: () => i18n._(t`Layer`),
+      valueType: 'string',
+      getChoices: () => enumerateLayers(layout),
+      getValue: (instance: gdInitialInstance) => instance.getLayer(),
+      setValue: (instance: gdInitialInstance, newValue: string) =>
+        instance.setLayer(newValue),
+    },
+    {
+      name: 'Custom size',
+      getLabel: () => i18n._(t`Custom size`),
+      valueType: 'boolean',
+      getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        instance.setHasCustomSize(newValue);
+        instance.setHasCustomDepth(newValue);
+        forceUpdate();
+      },
+    },
+    {
+      name: 'custom-size-row',
+      type: 'row',
+      children: [
+        {
+          name: 'Width',
+          getLabel: () => i18n._(t`Width`),
+          valueType: 'number',
+          getValue: getInstanceWidth,
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            instance.setCustomWidth(Math.max(newValue, 0));
+            instance.setCustomHeight(getInstanceHeight(instance));
+            instance.setCustomDepth(getInstanceDepth(instance));
+
+            // This must be done after reading the size.
+            instance.setHasCustomSize(true);
+            instance.setHasCustomDepth(true);
+            forceUpdate();
+          },
+        },
+        {
+          name: 'Height',
+          getLabel: () => i18n._(t`Height`),
+          valueType: 'number',
+          getValue: getInstanceHeight,
+          setValue: (instance: gdInitialInstance, newValue: number) => {
+            instance.setCustomWidth(getInstanceWidth(instance));
+            instance.setCustomHeight(Math.max(newValue, 0));
+            instance.setCustomDepth(getInstanceDepth(instance));
+
+            // This must be done after reading the size.
+            instance.setHasCustomSize(true);
+            instance.setHasCustomDepth(true);
+            forceUpdate();
+          },
+        },
+        is3DInstance
+          ? {
+              name: 'Depth',
+              getLabel: () => i18n._(t`Depth`),
+              valueType: 'number',
+              getValue: getInstanceDepth,
+              setValue: (instance: gdInitialInstance, newValue: number) => {
+                instance.setCustomWidth(getInstanceWidth(instance));
+                instance.setCustomHeight(getInstanceHeight(instance));
+                instance.setCustomDepth(Math.max(newValue, 0));
+
+                // This must be done after reading the size.
+                instance.setHasCustomSize(true);
+                instance.setHasCustomDepth(true);
+                forceUpdate();
+              },
+            }
+          : null,
+      ].filter(Boolean),
+    },
+  ].filter(Boolean);
+};
 
 const InstancePropertiesEditor = ({
   instances,
@@ -54,182 +275,46 @@ const InstancePropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  const getInstanceWidth = React.useCallback(
-    (instance: gdInitialInstance) =>
-      instance.hasCustomSize()
-        ? instance.getCustomWidth() || onGetInstanceSize(instance)[0]
-        : onGetInstanceSize(instance)[0],
-    [onGetInstanceSize]
+  const schemaFor2D: Schema = React.useMemo(
+    () =>
+      makeSchema({
+        i18n,
+        is3DInstance: false,
+        onGetInstanceSize,
+        onEditObjectByName,
+        layout,
+        forceUpdate,
+      }),
+    [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
   );
 
-  const getInstanceHeight = React.useCallback(
-    (instance: gdInitialInstance) =>
-      instance.hasCustomSize()
-        ? instance.getCustomHeight() || onGetInstanceSize(instance)[1]
-        : onGetInstanceSize(instance)[1],
-    [onGetInstanceSize]
+  const schemaFor3D: Schema = React.useMemo(
+    () =>
+      makeSchema({
+        i18n,
+        is3DInstance: true,
+        onGetInstanceSize,
+        onEditObjectByName,
+        layout,
+        forceUpdate,
+      }),
+    [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
   );
 
-  const schema: Schema = React.useMemo(
-    () => [
-      {
-        name: i18n._(t`Object`),
-        getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-        nonFieldType: 'sectionTitle',
-        defaultValue: i18n._(t`Different objects`),
-      },
-      {
-        label: i18n._(t`Edit object`),
-        disabled: 'onValuesDifferent',
-        nonFieldType: 'button',
-        getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-        onClick: (instance: gdInitialInstance) =>
-          onEditObjectByName(instance.getObjectName()),
-      },
-      {
-        name: i18n._(t`Instance`),
-        nonFieldType: 'sectionTitle',
-      },
-      {
-        name: 'Position',
-        type: 'row',
-        children: [
-          {
-            name: 'X',
-            getLabel: () => i18n._(t`X`),
-            valueType: 'number',
-            getValue: (instance: gdInitialInstance) => instance.getX(),
-            setValue: (instance: gdInitialInstance, newValue: number) =>
-              instance.setX(newValue),
-          },
-          {
-            name: 'Y',
-            getLabel: () => i18n._(t`Y`),
-            valueType: 'number',
-            getValue: (instance: gdInitialInstance) => instance.getY(),
-            setValue: (instance: gdInitialInstance, newValue: number) =>
-              instance.setY(newValue),
-          },
-        ],
-      },
-      {
-        name: 'Angles',
-        type: 'row',
-        children: [
-          {
-            name: 'Angle',
-            getLabel: () => i18n._(t`Angle`),
-            valueType: 'number',
-            getValue: (instance: gdInitialInstance) => instance.getAngle(),
-            setValue: (instance: gdInitialInstance, newValue: number) =>
-              instance.setAngle(newValue),
-          },
-        ],
-      },
-      {
-        name: 'Lock instance position angle',
-        getLabel: () => i18n._(t`Lock position/angle in the editor`),
-        valueType: 'boolean',
-        getValue: (instance: gdInitialInstance) => instance.isLocked(),
-        setValue: (instance: gdInitialInstance, newValue: boolean) => {
-          instance.setLocked(newValue);
-          if (!newValue) {
-            instance.setSealed(newValue);
-          }
-        },
-      },
-      {
-        name: 'Prevent instance selection',
-        getLabel: () => i18n._(t`Prevent selection in the editor`),
-        valueType: 'boolean',
-        disabled: (instances: gdInitialInstance[]) => {
-          return instances.some(instance => !instance.isLocked());
-        },
-        getValue: (instance: gdInitialInstance) => instance.isSealed(),
-        setValue: (instance: gdInitialInstance, newValue: boolean) =>
-          instance.setSealed(newValue),
-      },
-      {
-        name: 'Z Order',
-        getLabel: () => i18n._(t`Z Order`),
-        valueType: 'number',
-        getValue: (instance: gdInitialInstance) => instance.getZOrder(),
-        setValue: (instance: gdInitialInstance, newValue: number) =>
-          instance.setZOrder(newValue),
-      },
-      {
-        name: 'Layer',
-        getLabel: () => i18n._(t`Layer`),
-        valueType: 'string',
-        getChoices: () => enumerateLayers(layout),
-        getValue: (instance: gdInitialInstance) => instance.getLayer(),
-        setValue: (instance: gdInitialInstance, newValue: string) =>
-          instance.setLayer(newValue),
-      },
-      {
-        name: 'Custom size',
-        getLabel: () => i18n._(t`Custom size`),
-        valueType: 'boolean',
-        getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-        setValue: (instance: gdInitialInstance, newValue: boolean) => {
-          instance.setHasCustomSize(newValue);
-          forceUpdate();
-        },
-      },
-      {
-        name: 'custom-size-row',
-        type: 'row',
-        children: [
-          {
-            name: 'Width',
-            getLabel: () => i18n._(t`Width`),
-            valueType: 'number',
-            getValue: getInstanceWidth,
-            setValue: (instance: gdInitialInstance, newValue: number) => {
-              instance.setCustomWidth(Math.max(newValue, 0));
-              instance.setCustomHeight(getInstanceHeight(instance));
-              // This must be done after getInstanceHeight.
-              instance.setHasCustomSize(true);
-              forceUpdate();
-            },
-          },
-          {
-            name: 'Height',
-            getLabel: () => i18n._(t`Height`),
-            valueType: 'number',
-            getValue: getInstanceHeight,
-            setValue: (instance: gdInitialInstance, newValue: number) => {
-              instance.setCustomWidth(getInstanceWidth(instance));
-              instance.setCustomHeight(Math.max(newValue, 0));
-              // This must be done after getInstanceWidth.
-              instance.setHasCustomSize(true);
-              forceUpdate();
-            },
-          },
-        ],
-      },
-    ],
-    [
-      i18n,
-      getInstanceWidth,
-      getInstanceHeight,
-      onEditObjectByName,
-      layout,
-      forceUpdate,
-    ]
-  );
-
+  // TODO: multiple instances support.
   const instance = instances[0];
 
   const { object, instanceSchema } = React.useMemo(
     () => {
       if (!instance) return {};
+
       const associatedObjectName = instance.getObjectName();
       const object = getObjectByName(project, layout, associatedObjectName);
-      // TODO: multiple instances support
       const properties = instance.getCustomProperties(project, layout);
-      // TODO: Reorganize fields if any of the selected instances is 3D.
-      const is3DInstance = properties.has('z');
+      if (!object) return {};
+
+      // TODO (3D): Use 3D fields if any of the selected instances is 3D.
+      const is3DInstance = object.is3DObject();
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>
@@ -240,14 +325,11 @@ const InstancePropertiesEditor = ({
       return {
         object,
         instanceSchema: is3DInstance
-          ? reorganizeSchemaFor3DInstance(
-              schema,
-              instanceSchemaForCustomProperties
-            )
-          : schema.concat(instanceSchemaForCustomProperties),
+          ? schemaFor3D.concat(instanceSchemaForCustomProperties)
+          : schemaFor2D.concat(instanceSchemaForCustomProperties),
       };
     },
-    [project, layout, instance, schema]
+    [project, layout, instance, schemaFor2D, schemaFor3D]
   );
 
   if (!object || !instance || !instanceSchema) return null;

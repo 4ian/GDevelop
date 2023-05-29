@@ -9,7 +9,7 @@ import Rectangle from '../../Utils/Rectangle';
 export type InstanceMeasurer = {|
   getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
   getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
-  getUnrotatedInstanceSize: gdInitialInstance => [number, number],
+  getUnrotatedInstanceSize: gdInitialInstance => [number, number, number],
 |};
 
 export default class InstancesRenderer {
@@ -129,6 +129,8 @@ export default class InstancesRenderer {
           bounds.top = instance.getY();
           bounds.right = instance.getX();
           bounds.bottom = instance.getY();
+
+          // TODO (3D): add support for zMin/zMax/depth.
           return bounds;
         }
 
@@ -138,7 +140,7 @@ export default class InstancesRenderer {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) {
-          return [0, 0];
+          return [0, 0, 0];
         }
 
         return layerRenderer.getUnrotatedInstanceSize(instance);

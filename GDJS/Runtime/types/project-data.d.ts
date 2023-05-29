@@ -107,16 +107,26 @@ declare interface ExternalLayoutData {
 
 declare interface InstanceData {
   persistentUuid: string;
-  angle: number;
-  customSize: boolean;
-  height: number;
+
   layer: string;
   locked: boolean;
   name: string;
-  width: number;
+
   x: number;
   y: number;
+  z?: number;
+
+  angle: number;
+  rotationX?: number;
+  rotationY?: number;
+
   zOrder: number;
+
+  customSize: boolean;
+  width: number;
+  height: number;
+  depth?: number;
+
   numberProperties: InstanceNumberProperty[];
   stringProperties: InstanceStringProperty[];
   initialVariables: RootVariableData[];

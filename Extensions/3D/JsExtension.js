@@ -2428,7 +2428,7 @@ module.exports = {
         this._pixiResourcesLoader
           .get3DModel(project, modelResourceName)
           .then((model3d) => {
-            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(model3d);
+            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(model3d.scene);
             clonedModel3D.rotation.order = 'ZYX';
             this._updateDefaultTransformation(
               clonedModel3D,

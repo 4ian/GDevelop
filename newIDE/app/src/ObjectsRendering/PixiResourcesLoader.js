@@ -17,10 +17,30 @@ const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
 const loaded3DModels = {};
-const invalidModel = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: '#ff00ff' })
-);
+
+const createInvalidModel = (): GLTF => {
+  /**
+   * The invalid model is a box with magenta (#ff00ff) faces, to be
+   * easily spotted if rendered on screen.
+   */
+  const group = new THREE.Group();
+  group.add(
+    new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ color: '#ff00ff' })
+    )
+  );
+  return {
+    scene: group,
+    animations: [],
+    cameras: [],
+    scenes: [],
+    asset: {},
+    userData: {},
+    parser: null,
+  };
+};
+const invalidModel: GLTF = createInvalidModel();
 
 let gltfLoader = null;
 const getOrCreateGltfLoader = () => {
@@ -287,7 +307,7 @@ export default class PixiResourcesLoader {
   static get3DModel(
     project: gdProject,
     resourceName: string
-  ): Promise<THREE.Object3D> {
+  ): Promise<THREE.THREE_ADDONS.GLTF> {
     const loaded3DModel = loaded3DModels[resourceName];
     if (loaded3DModel) return Promise.resolve(loaded3DModel);
 
@@ -310,8 +330,8 @@ export default class PixiResourcesLoader {
         url,
         gltf => {
           traverseToSetBasicMaterialFromMeshes(gltf.scene);
-          loaded3DModels[resourceName] = gltf.scene;
-          resolve(gltf.scene);
+          loaded3DModels[resourceName] = gltf;
+          resolve(gltf);
         },
         undefined,
         error => {

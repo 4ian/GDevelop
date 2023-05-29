@@ -200,7 +200,7 @@ namespace gdjs {
                 isFirstRender = false;
               } else {
                 // It's important to set the background to null, as maybe the first rendered
-                // layer hsa changed and so the Three.js scene background must be reset.
+                // layer has changed and so the Three.js scene background must be reset.
                 threeScene.background = null;
               }
 

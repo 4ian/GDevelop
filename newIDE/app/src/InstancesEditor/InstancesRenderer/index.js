@@ -264,14 +264,14 @@ export default class InstancesRenderer {
           if (isFirstRender) {
             // Render the background color.
             threeRenderer.setClearColor(backgroundColor);
-            threeRenderer.resetState();
+            threeRenderer.resetState(); // Probably not needed, but keep it out of caution.
             threeRenderer.clear();
             threeScene.background = new THREE.Color(backgroundColor);
 
             isFirstRender = false;
           } else {
             // It's important to set the background to null, as maybe the first rendered
-            // layer hsa changed and so the Three.js scene background must be reset.
+            // layer has changed and so the Three.js scene background must be reset.
             threeScene.background = null;
           }
 

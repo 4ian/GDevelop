@@ -477,12 +477,7 @@ export default class LayerRenderer {
     this._threeGroup = new THREE.Group();
     threeScene.add(this._threeGroup);
 
-    const threeCamera = new THREE.PerspectiveCamera(
-      45,
-      1,
-      0.1,
-      2000
-    );
+    const threeCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
     threeCamera.rotation.order = 'ZYX';
     this._threeCamera = threeCamera;
 

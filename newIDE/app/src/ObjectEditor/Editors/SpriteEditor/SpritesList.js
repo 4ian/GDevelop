@@ -48,7 +48,7 @@ const styles = {
     flex: 1,
   },
   thumbnailExtraStyle: {
-    marginLeft: 10,
+    marginLeft: 5,
   },
   spriteThumbnailImage: {
     maxWidth: SPRITE_SIZE,

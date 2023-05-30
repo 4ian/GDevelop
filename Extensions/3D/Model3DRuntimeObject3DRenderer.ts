@@ -149,9 +149,8 @@ namespace gdjs {
       this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
       this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
 
-      // Flip the model origin on Y axis.
-      const center = this.getCenterPoint();
-      this._modelOriginPoint[1] = center[1] - (this._modelOriginPoint[1] - center[1]);
+      // The model is flipped on Y axis.
+      this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
 
       // Center the model.
       const centerPoint = this._model3DRuntimeObject._centerPoint;
@@ -161,9 +160,10 @@ namespace gdjs {
             boundingBox.min.x +
             (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
           ),
+          // The model is flipped on Y axis.
           -(
             boundingBox.min.y +
-            (boundingBox.max.y - boundingBox.min.y) * centerPoint[1]
+            (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
           ),
           -(
             boundingBox.min.z +

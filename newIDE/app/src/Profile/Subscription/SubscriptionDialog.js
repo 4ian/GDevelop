@@ -14,6 +14,8 @@ import {
   canSeamlesslyChangeSubscription,
   businessPlan,
   hasValidSubscriptionPlan,
+  EDUCATION_PLAN_MAX_SEATS,
+  EDUCATION_PLAN_MIN_SEATS,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -25,13 +27,20 @@ import {
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from '../RedeemCodeDialog';
 import PlanCard from './PlanCard';
 import LeftLoader from '../../UI/LeftLoader';
 import RaisedButton from '../../UI/RaisedButton';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
 const styles = {
   descriptionText: {
@@ -90,6 +99,14 @@ export default function SubscriptionDialog({
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
+  const [
+    educationPlanPeriodicity,
+    setEducationPlanPeriodicity,
+  ] = React.useState<'year' | 'month'>('year');
+  const [
+    educationPlanSeatsCount,
+    setEducationPlanSeatsCount,
+  ] = React.useState<number>(5);
   const [
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
@@ -284,44 +301,116 @@ export default function SubscriptionDialog({
               />
             </LineStackLayout>
             {getSubscriptionPlans().map(plan => {
-              const userPlanId =
-                authenticatedUser.subscription &&
-                authenticatedUser.subscription.planId;
+              const userPlanId = authenticatedUser.subscription
+                ? authenticatedUser.subscription.planId
+                : null;
               const isFreePlan = !plan.planId;
               const isUserCurrentOrLegacyPlan =
                 userPlanId === plan.planId ||
-                (!!userPlanId && userPlanId === plan.legacyPlanId);
-              // If no plan (free usage), do not display button.
-              const button = isFreePlan ? null : isUserCurrentOrLegacyPlan &&
-                isPlanValid ? (
-                <React.Fragment key="cancel">
-                  <LeftLoader isLoading={isLoading}>
-                    <FlatButton
-                      disabled={isLoading}
-                      label={<Trans>Cancel your subscription</Trans>}
-                      onClick={() =>
-                        buyUpdateOrCancelPlan(i18n, { planId: null })
-                      }
-                    />
-                  </LeftLoader>
-                </React.Fragment>
-              ) : (
-                <React.Fragment key="upgrade">
-                  <LeftLoader isLoading={isLoading}>
+                (!!userPlanId && userPlanId === plan.legacyPlanId) ||
+                // Education plans (yearly and monthly) are merged into a single plan in the UI
+                // with a selector.
+                (!!userPlanId &&
+                  !!plan.planId &&
+                  userPlanId.startsWith(plan.planId));
+              let actions: React.Node = null;
+              if (isFreePlan) {
+                // If no plan (free usage), do not display button.
+              } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
+                actions = [
+                  <FlatButton
+                    key="cancel"
+                    disabled={isLoading}
+                    label={
+                      <LeftLoader isLoading={isLoading}>
+                        <Trans>Cancel your subscription</Trans>
+                      </LeftLoader>
+                    }
+                    onClick={() =>
+                      buyUpdateOrCancelPlan(i18n, { planId: null })
+                    }
+                  />,
+                ];
+              } else if (plan.planId === 'gdevelop_education') {
+                if (!isUserCurrentOrLegacyPlan) {
+                  actions = [
+                    <ResponsiveLineStackLayout key="options" expand>
+                      <SemiControlledTextField
+                        value={educationPlanSeatsCount.toString()}
+                        floatingLabelFixed
+                        fullWidth
+                        floatingLabelText={<Trans>Number of seats</Trans>}
+                        commitOnBlur
+                        type="number"
+                        style={{}}
+                        onChange={value =>
+                          setEducationPlanSeatsCount(
+                            Math.min(
+                              EDUCATION_PLAN_MAX_SEATS,
+                              Math.max(
+                                parseInt(value),
+                                EDUCATION_PLAN_MIN_SEATS
+                              )
+                            )
+                          )
+                        }
+                        min={EDUCATION_PLAN_MIN_SEATS}
+                        max={EDUCATION_PLAN_MAX_SEATS}
+                        step={1}
+                      />
+                      <SelectField
+                        value={educationPlanPeriodicity}
+                        floatingLabelText={<Trans>Engagement</Trans>}
+                        fullWidth
+                        onChange={(e, i, newValue) => {
+                          // $FlowExpectedError - Flow does not infer the type given the select options.
+                          setEducationPlanPeriodicity(newValue);
+                        }}
+                      >
+                        <SelectOption value="year" label={t`Per year`} />
+                        <SelectOption value="month" label={t`Per month`} />
+                      </SelectField>
+                    </ResponsiveLineStackLayout>,
                     <RaisedButton
                       primary
+                      key="upgrade"
                       disabled={isLoading}
-                      label={<Trans>Choose this plan</Trans>}
+                      label={
+                        <LeftLoader isLoading={isLoading}>
+                          <Trans>Choose this plan</Trans>
+                        </LeftLoader>
+                      }
                       onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
-                    />
-                  </LeftLoader>
-                </React.Fragment>
-              );
+                    />,
+                  ];
+                } else {
+                  actions = [
+                    <Text key="contact">
+                      <Trans>Contact us for more information.</Trans>
+                    </Text>,
+                  ];
+                }
+              } else {
+                actions = [
+                  <RaisedButton
+                    primary
+                    key="upgrade"
+                    disabled={isLoading}
+                    label={
+                      <LeftLoader isLoading={isLoading}>
+                        <Trans>Choose this plan</Trans>
+                      </LeftLoader>
+                    }
+                    onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
+                  />,
+                ];
+              }
+
               return (
                 <PlanCard
                   key={plan.planId || 'free'}
                   plan={plan}
-                  actions={[button]}
+                  actions={actions}
                   isPending={isLoading}
                   isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
                   background="medium"

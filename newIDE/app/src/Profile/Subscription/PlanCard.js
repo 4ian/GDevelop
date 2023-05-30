@@ -25,6 +25,43 @@ type Props = {|
   background: 'medium' | 'dark',
 |};
 
+const getPlanPrice = ({
+  plan,
+  hidePrice,
+}: {
+  plan: PlanDetails,
+  hidePrice?: boolean,
+}): React.Node => {
+  if (hidePrice || plan.monthlyPriceInEuros === null) return null;
+  if (plan.monthlyPriceInEuros === 0) return <Trans>Free</Trans>;
+  const prices = [];
+  prices.push(
+    plan.isPerUser ? (
+      <Text noMargin color="secondary">
+        <Trans key="month">{plan.monthlyPriceInEuros}€/seat/month</Trans>
+      </Text>
+    ) : (
+      <Text noMargin color="secondary">
+        <Trans key="month">{plan.monthlyPriceInEuros}€/month</Trans>
+      </Text>
+    )
+  );
+  if (plan.yearlyPriceInEuros) {
+    prices.push(
+      plan.isPerUser ? (
+        <Text noMargin color="secondary">
+          <Trans key="year">or {plan.yearlyPriceInEuros}€/seat/year</Trans>
+        </Text>
+      ) : (
+        <Text noMargin color="secondary">
+          <Trans key="year">or {plan.yearlyPriceInEuros}€/year</Trans>
+        </Text>
+      )
+    );
+  }
+  return prices;
+};
+
 const PlanCard = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -38,15 +75,9 @@ const PlanCard = (props: Props) => {
                 <b>{props.plan.name}</b>
               </span>
             </Text>
-            <Text color="secondary">
-              {props.hidePrice ||
-              props.plan.monthlyPriceInEuros === null ? null : props.plan
-                  .monthlyPriceInEuros === 0 ? (
-                <Trans>Free</Trans>
-              ) : (
-                <Trans>{props.plan.monthlyPriceInEuros}€/month</Trans>
-              )}
-            </Text>
+            <Column noMargin alignItems="flex-end">
+              {getPlanPrice({ plan: props.plan, hidePrice: props.hidePrice })}
+            </Column>
           </Line>
           <Text color="secondary" noMargin>
             {props.plan.smallDescription

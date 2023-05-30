@@ -546,9 +546,6 @@ export function createGdevelopTheme({
         selectedBorderColor: styles['ThemeClosableTabsSelectedBorderColor'],
         ...closeableTabSizeOverrides,
       },
-      imageThumbnail: {
-        selectedBorderColor: styles['ThemeSelectionBackgroundColor'],
-      },
       imagePreview: {
         backgroundFilter: styles['ThemeImagePreviewBackgroundFilter'],
         borderColor: styles['ThemeImagePreviewBorderColor'],

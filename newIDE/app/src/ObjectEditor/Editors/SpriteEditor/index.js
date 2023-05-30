@@ -16,18 +16,11 @@ import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
-import ContextMenu, {
-  type ContextMenuInterface,
-} from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
 import Window from '../../../Utils/Window';
-import {
-  deleteSpritesFromAnimation,
-  duplicateSpritesInAnimation,
-} from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { Column } from '../../../UI/Grid';
@@ -54,17 +47,13 @@ const styles = {
 };
 
 type AnimationProps = {|
+  spriteConfiguration: gdSpriteObject,
   animation: gdAnimation,
   id: number,
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   onRemove: () => void,
   resourcesLoader: typeof ResourcesLoader,
-  onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
-  selectedSprites: {
-    [number]: boolean,
-  },
-  onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
   onReplaceDirection: (
     directionIndex: number,
     newDirection: gdDirection
@@ -76,15 +65,13 @@ type AnimationProps = {|
 |};
 
 const Animation = ({
+  spriteConfiguration,
   animation,
   id,
   project,
   onRemove,
   resourceManagementProps,
   resourcesLoader,
-  onSpriteContextMenu,
-  selectedSprites,
-  onSelectSprite,
   onReplaceDirection,
   objectName,
   onChangeName,
@@ -125,14 +112,12 @@ const Animation = ({
           const direction = animation.getDirection(i);
           return (
             <SpritesList
+              spriteConfiguration={spriteConfiguration}
               direction={direction}
               key={i}
               project={project}
               resourcesLoader={resourcesLoader}
               resourceManagementProps={resourceManagementProps}
-              onSpriteContextMenu={onSpriteContextMenu}
-              selectedSprites={selectedSprites}
-              onSelectSprite={onSelectSprite}
               onReplaceByDirection={newDirection =>
                 onReplaceDirection(i, newDirection)
               }
@@ -161,9 +146,6 @@ const SortableAnimationsList = SortableContainer(
     resourcesLoader,
     resourceManagementProps,
     extraBottomTools,
-    onSpriteContextMenu,
-    selectedSprites,
-    onSelectSprite,
     onReplaceDirection,
     isAnimationListLocked,
     onSpriteUpdated,
@@ -178,6 +160,7 @@ const SortableAnimationsList = SortableContainer(
           const animation = spriteConfiguration.getAnimation(i);
           return (
             <SortableAnimation
+              spriteConfiguration={spriteConfiguration}
               isAnimationListLocked={isAnimationListLocked}
               key={i}
               index={i}
@@ -188,9 +171,6 @@ const SortableAnimationsList = SortableContainer(
               resourceManagementProps={resourceManagementProps}
               onRemove={() => onRemoveAnimation(i)}
               onChangeName={newName => onChangeAnimationName(i, newName)}
-              onSpriteContextMenu={onSpriteContextMenu}
-              selectedSprites={selectedSprites}
-              onSelectSprite={onSelectSprite}
               onReplaceDirection={(directionId, newDirection) =>
                 onReplaceDirection(i, directionId, newDirection)
               }
@@ -231,11 +211,6 @@ const AnimationsListContainer = ({
   onObjectUpdated,
   isAnimationListLocked,
 }: AnimationsListContainerProps) => {
-  const [selectedSprites, setSelectedSprites] = React.useState<{
-    [number]: boolean,
-  }>({});
-
-  const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const forceUpdate = useForceUpdate();
@@ -336,52 +311,6 @@ const AnimationsListContainer = ({
     [forceUpdate, layout, object, onObjectUpdated, project, spriteConfiguration]
   );
 
-  const deleteSelection = React.useCallback(
-    () => {
-      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-        const animation = spriteConfiguration.getAnimation(index);
-        deleteSpritesFromAnimation(animation, selectedSprites);
-      });
-
-      setSelectedSprites({});
-      if (onObjectUpdated) onObjectUpdated();
-    },
-    [onObjectUpdated, selectedSprites, spriteConfiguration]
-  );
-
-  const duplicateSelection = React.useCallback(
-    () => {
-      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-        const animation = spriteConfiguration.getAnimation(index);
-        duplicateSpritesInAnimation(animation, selectedSprites);
-      });
-
-      setSelectedSprites({});
-      if (onObjectUpdated) onObjectUpdated();
-    },
-    [onObjectUpdated, selectedSprites, spriteConfiguration]
-  );
-
-  const selectSprite = React.useCallback(
-    (sprite, selected) => {
-      setSelectedSprites({
-        ...selectedSprites,
-        [sprite.ptr]: selected,
-      });
-    },
-    [selectedSprites]
-  );
-
-  const openSpriteContextMenu = React.useCallback(
-    (x, y, sprite, index) => {
-      selectSprite(sprite, true);
-      if (spriteContextMenu.current) {
-        spriteContextMenu.current.open(x, y);
-      }
-    },
-    [selectSprite]
-  );
-
   const replaceDirection = React.useCallback(
     (animationId, directionId, newDirection) => {
       spriteConfiguration
@@ -425,9 +354,6 @@ const AnimationsListContainer = ({
                 }
                 onRemoveAnimation={index => removeAnimation(index, i18n)}
                 onReplaceDirection={replaceDirection}
-                onSpriteContextMenu={openSpriteContextMenu}
-                selectedSprites={selectedSprites}
-                onSelectSprite={selectSprite}
                 resourcesLoader={resourcesLoader}
                 resourceManagementProps={resourceManagementProps}
                 useDragHandle
@@ -452,19 +378,6 @@ const AnimationsListContainer = ({
                   )}
                 </ResponsiveLineStackLayout>
               </Column>
-              <ContextMenu
-                ref={spriteContextMenu}
-                buildMenuTemplate={(i18n: I18nType) => [
-                  {
-                    label: i18n._(t`Delete selection`),
-                    click: deleteSelection,
-                  },
-                  {
-                    label: i18n._(t`Duplicate selection`),
-                    click: duplicateSelection,
-                  },
-                ]}
-              />
             </React.Fragment>
           )}
         </Column>

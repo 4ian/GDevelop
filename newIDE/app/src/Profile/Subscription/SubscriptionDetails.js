@@ -126,17 +126,17 @@ const SubscriptionDetails = ({
                 !redemptionCodeExpirationDate &&
                 !hasMobileAppStoreSubscriptionPlan(subscription) &&
                 !hasSubscriptionBeenManuallyAdded(subscription) ? (
-                  <LeftLoader
+                  <FlatButton
                     key="manage-online"
-                    isLoading={isManageSubscriptionLoading}
-                  >
-                    <FlatButton
-                      label={<Trans>Manage online</Trans>}
-                      primary
-                      onClick={onManageSubscription}
-                      disabled={isManageSubscriptionLoading}
-                    />
-                  </LeftLoader>
+                    label={
+                      <LeftLoader isLoading={isManageSubscriptionLoading}>
+                        <Trans>Manage online</Trans>
+                      </LeftLoader>
+                    }
+                    primary
+                    onClick={onManageSubscription}
+                    disabled={isManageSubscriptionLoading}
+                  />
                 ) : (
                   undefined
                 ),

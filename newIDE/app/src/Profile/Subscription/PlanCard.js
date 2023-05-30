@@ -8,7 +8,7 @@ import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { LineStackLayout } from '../../UI/Layout';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
@@ -77,9 +77,14 @@ const PlanCard = (props: Props) => {
             </Column>
           </Line>
           {props.actions && (
-            <LineStackLayout expand justifyContent="flex-end" noMargin>
+            <ResponsiveLineStackLayout
+              expand
+              noMargin
+              alignItems="center"
+              justifyContent="flex-end"
+            >
               {props.actions}
-            </LineStackLayout>
+            </ResponsiveLineStackLayout>
           )}
         </Card>
       )}

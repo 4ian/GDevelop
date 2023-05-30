@@ -74,7 +74,7 @@ namespace gdjs {
     private _animationMixer: THREE.AnimationMixer;
     private _action: THREE.AnimationAction | null;
 
-    private _modelOriginPoint: FloatPoint3D = [0, 0, 0];
+    private _modelOriginPoint: FloatPoint3D;
 
     constructor(
       runtimeObject: gdjs.Model3DRuntimeObject,
@@ -96,6 +96,7 @@ namespace gdjs {
       this._model3DRuntimeObject = runtimeObject;
       this._threeObject = model;
       this._originalModel = originalModel;
+      this._modelOriginPoint = [0, 0, 0];
 
       this.updateSize();
       this.updatePosition();

@@ -428,16 +428,15 @@ module.exports = {
           'number',
           'Animation',
           _('Change the animation'),
-          _('the number of the animation played by the object (the number from the animations list).'),
+          _(
+            'the number of the animation played by the object (the number from the animations list).'
+          ),
           _('the number of the animation'),
           _('Animations and images'),
           'res/actions/animation24.png'
         )
         .addParameter('object', _('3D model'), 'Model3DObject')
-        .useStandardParameters(
-          'number',
-          gd.ParameterOptions.makeNewOptions()
-        )
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .markAsSimple()
         .setFunctionName('setAnimationIndex')
         .setGetter('getAnimationIndex');
@@ -2359,7 +2358,26 @@ module.exports = {
       }
     }
 
+    const getPointForLocation = (location) => {
+      switch (location) {
+        case 'ModelOrigin':
+          return null;
+        case 'ObjectCenter':
+          return [0.5, 0.5, 0.5];
+        case 'BottomCenterZ':
+          return [0.5, 0.5, 0];
+        case 'BottomCenterY':
+          return [0.5, 1, 0.5];
+        case 'TopLeft':
+          return [0, 0, 0];
+        default:
+          return null;
+      }
+    };
+
     class Model3DRendered3DInstance extends Rendered3DInstance {
+      _modelOriginPoint = [0, 0, 0];
+
       constructor(
         project,
         layout,
@@ -2390,6 +2408,12 @@ module.exports = {
         const modelResourceName = properties
           .get('modelResourceName')
           .getValue();
+        this._originPoint = getPointForLocation(
+          properties.get('originLocation').getValue()
+        );
+        this._centerPoint = getPointForLocation(
+          properties.get('centerLocation').getValue()
+        );
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
@@ -2401,7 +2425,9 @@ module.exports = {
         this._pixiResourcesLoader
           .get3DModel(project, modelResourceName)
           .then((model3d) => {
-            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(model3d.scene);
+            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
+              model3d.scene
+            );
             clonedModel3D.rotation.order = 'ZYX';
             this._updateDefaultTransformation(
               clonedModel3D,
@@ -2415,6 +2441,34 @@ module.exports = {
             );
             this._threeObject.add(clonedModel3D);
           });
+      }
+
+      getOriginX() {
+        const originPoint = this.getOriginPoint();
+        return this.getWidth() * originPoint[0];
+      }
+
+      getOriginY() {
+        const originPoint = this.getOriginPoint();
+        return this.getHeight() * originPoint[1];
+      }
+
+      getCenterX() {
+        const centerPoint = this.getCenterPoint();
+        return this.getWidth() * centerPoint[0];
+      }
+
+      getCenterY() {
+        const centerPoint = this.getCenterPoint();
+        return this.getHeight() * centerPoint[1];
+      }
+
+      getOriginPoint() {
+        return this._originPoint || this._modelOriginPoint;
+      }
+
+      getCenterPoint() {
+        return this._centerPoint || this._modelOriginPoint;
       }
 
       _updateDefaultTransformation(
@@ -2434,12 +2488,35 @@ module.exports = {
           rotationZ
         );
 
+        const modelWidth = boundingBox.max.x - boundingBox.min.x;
+        const modelHeight = boundingBox.max.y - boundingBox.min.y;
+        const modelDepth = boundingBox.max.z - boundingBox.min.z;
+        this._modelOriginPoint[0] = -boundingBox.min.x / modelWidth;
+        this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
+        this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
+
+        // The model is flipped on Y axis.
+        this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
+
         // Center the model.
-        model3D.position.set(
-          -(boundingBox.min.x + boundingBox.max.x) / 2,
-          -(boundingBox.min.y + boundingBox.max.y) / 2,
-          -(boundingBox.min.z + boundingBox.max.z) / 2
-        );
+        const centerPoint = this._centerPoint;
+        if (centerPoint) {
+          model3D.position.set(
+            -(
+              boundingBox.min.x +
+              (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
+            ),
+            // The model is flipped on Y axis.
+            -(
+              boundingBox.min.y +
+              (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
+            ),
+            -(
+              boundingBox.min.z +
+              (boundingBox.max.z - boundingBox.min.z) * centerPoint[2]
+            )
+          );
+        }
 
         // Rotate the model.
         model3D.scale.set(1, 1, 1);
@@ -2450,10 +2527,6 @@ module.exports = {
         );
 
         // Stretch the model in a 1x1x1 cube.
-        const modelWidth = boundingBox.max.x - boundingBox.min.x;
-        const modelHeight = boundingBox.max.y - boundingBox.min.y;
-        const modelDepth = boundingBox.max.z - boundingBox.min.z;
-
         const scaleX = 1 / modelWidth;
         const scaleY = 1 / modelHeight;
         const scaleZ = 1 / modelDepth;
@@ -2503,10 +2576,12 @@ module.exports = {
         const height = this.getHeight();
         const depth = this.getDepth();
 
+        const originPoint = this.getOriginPoint();
+        const centerPoint = this.getCenterPoint();
         this._threeObject.position.set(
-          this._instance.getX() + width / 2,
-          this._instance.getY() + height / 2,
-          this._instance.getZ() + depth / 2
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0]),
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]),
+          this._instance.getZ() - depth * (originPoint[2] - centerPoint[2])
         );
 
         this._threeObject.rotation.set(
@@ -2527,19 +2602,26 @@ module.exports = {
       updatePixiObject() {
         const width = this.getWidth();
         const height = this.getHeight();
+        const centerPoint = this.getCenterPoint();
+        const centerX = width * centerPoint[0];
+        const centerY = height * centerPoint[1];
+        //console.log("center: " + centerX + " "  + centerY);
 
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);
         this._pixiObject.lineStyle(1, 0xffd900, 0);
-        this._pixiObject.moveTo(-width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, height / 2);
-        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.moveTo(0 - centerX, 0 - centerY);
+        this._pixiObject.lineTo(width - centerX, 0 - centerY);
+        this._pixiObject.lineTo(width - centerX, height - centerY);
+        this._pixiObject.lineTo(0 - centerX, height - centerY);
         this._pixiObject.endFill();
 
-        this._pixiObject.position.x = this._instance.getX() + width / 2;
-        this._pixiObject.position.y = this._instance.getY() + height / 2;
-        this._pixiObject.angle = this._instance.getAngle();
+        const originPoint = this.getOriginPoint();
+        (this._pixiObject.position.x =
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0])),
+          (this._pixiObject.position.y =
+            this._instance.getY() - height * (originPoint[1] - centerPoint[1])),
+          (this._pixiObject.angle = this._instance.getAngle());
       }
 
       update() {

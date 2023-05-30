@@ -82,11 +82,16 @@ export type PlanDetails = {
   legacyPlanId?: string,
   name: string,
   monthlyPriceInEuros: number | null,
+  yearlyPriceInEuros?: number | null,
+  isPerUser?: true,
   smallDescription?: MessageDescriptor,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
 };
+
+export const EDUCATION_PLAN_MIN_SEATS = 5;
+export const EDUCATION_PLAN_MAX_SEATS = 300;
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
   {
@@ -145,6 +150,25 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_education',
+    name: 'GDevelop Education',
+    monthlyPriceInEuros: 3,
+    yearlyPriceInEuros: 2.5,
+    isPerUser: true,
+    smallDescription: t`Schools and universities.`,
+    descriptionBullets: [
+      {
+        message: t`Students anonymity.`,
+      },
+      {
+        message: t`Organize students per classroom.`,
+      },
+      {
+        message: t`Each of your student gets a Gold subscription (and you as well).`,
       },
     ],
   },

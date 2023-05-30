@@ -200,7 +200,7 @@ const SpritesList = ({
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
 
-  const updateIndexesAfterMoveUp = React.useCallback(
+  const updateSelectionIndexesAfterMoveUp = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
       for (let i = oldIndex; i <= newIndex; ++i) {
         const spriteAtIndex = direction.getSprite(i);
@@ -213,7 +213,6 @@ const SpritesList = ({
           const previousSelectionStatus = !!selectedSprites.current[
             direction.getSprite(previousSpriteIndex).ptr
           ];
-          console.log('previousSelectionStatus', previousSelectionStatus);
           selectedSprites.current[spriteAtIndex.ptr] = previousSelectionStatus;
         }
       }
@@ -221,7 +220,7 @@ const SpritesList = ({
     [direction]
   );
 
-  const updateIndexesAfterMoveDown = React.useCallback(
+  const updateSelectionIndexesAfterMoveDown = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
       for (let i = oldIndex; i >= newIndex; --i) {
         const spriteAtIndex = direction.getSprite(i);
@@ -254,9 +253,17 @@ const SpritesList = ({
       // When moving a sprite, the pointers are all shifted, so we need to
       // update the selectedSprites map for the user not to lose their selection.
       if (oldIndex < newIndex) {
-        updateIndexesAfterMoveUp(oldIndex, newIndex, wasMovedItemSelected);
+        updateSelectionIndexesAfterMoveUp(
+          oldIndex,
+          newIndex,
+          wasMovedItemSelected
+        );
       } else {
-        updateIndexesAfterMoveDown(oldIndex, newIndex, wasMovedItemSelected);
+        updateSelectionIndexesAfterMoveDown(
+          oldIndex,
+          newIndex,
+          wasMovedItemSelected
+        );
       }
 
       forceUpdate();
@@ -266,8 +273,8 @@ const SpritesList = ({
       direction,
       forceUpdate,
       onSpriteUpdated,
-      updateIndexesAfterMoveDown,
-      updateIndexesAfterMoveUp,
+      updateSelectionIndexesAfterMoveDown,
+      updateSelectionIndexesAfterMoveUp,
     ]
   );
 

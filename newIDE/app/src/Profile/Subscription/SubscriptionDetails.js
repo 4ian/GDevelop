@@ -74,7 +74,12 @@ const SubscriptionDetails = ({
       const possiblePlans: Array<PlanDetails> = getSubscriptionPlans().concat(
         getFormerSubscriptionPlans()
       );
-      return possiblePlans.find(plan => plan.planId === subscription.planId);
+      return possiblePlans.find(
+        plan =>
+          subscription.planId &&
+          plan.planId &&
+          subscription.planId.startsWith(plan.planId)
+      );
     },
     [subscription]
   );

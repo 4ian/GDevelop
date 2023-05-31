@@ -135,8 +135,20 @@ export default function SubscriptionDialog({
     // Subscribing from an account without a subscription
     if (!subscription.planId) {
       setSubscriptionPendingDialogOpen(true);
+      const isEducationPlan = plan.planId === 'gdevelop_education';
+      const planId = isEducationPlan
+        ? `gdevelop_education_${
+            educationPlanPeriodicity === 'year' ? 'yearly' : 'monthly'
+          }`
+        : plan.planId || '';
+      const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
       Window.openExternalURL(
-        getRedirectToCheckoutUrl(plan.planId || '', profile.id, profile.email)
+        getRedirectToCheckoutUrl({
+          planId,
+          userId: profile.id,
+          userEmail: profile.email,
+          quantity,
+        })
       );
       return;
     }
@@ -242,7 +254,11 @@ export default function SubscriptionDialog({
         // Then redirect as if a new subscription is being chosen.
         setSubscriptionPendingDialogOpen(true);
         Window.openExternalURL(
-          getRedirectToCheckoutUrl(planId, profile.id, profile.email)
+          getRedirectToCheckoutUrl({
+            planId,
+            userId: profile.id,
+            userEmail: profile.email,
+          })
         );
       }
     }

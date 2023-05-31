@@ -299,10 +299,18 @@ export const changeUserSubscription = (
     .then(response => response.data);
 };
 
-export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
+export const canSeamlesslyChangeSubscription = (
+  subscription: Subscription,
+  planId: string
+) => {
   // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
   // Otherwise (Paypal), it needs to be cancelled first.
-  return !!subscription.stripeSubscriptionId;
+  // If the user changes for an education plan and already has a subscription made with
+  // Stripe, the Stripe subscription has to be cancelled first.
+  return (
+    !!subscription.stripeSubscriptionId &&
+    !planId.startsWith('gdevelop_education')
+  );
 };
 
 export const hasMobileAppStoreSubscriptionPlan = (

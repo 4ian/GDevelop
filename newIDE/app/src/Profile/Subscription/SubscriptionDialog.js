@@ -183,7 +183,8 @@ export default function SubscriptionDialog({
       }
     } else {
       const needToCancelSubscription = !canSeamlesslyChangeSubscription(
-        subscription
+        subscription,
+        planId,
       );
       const hasValidRedeemedSubscription =
         !!subscription.redemptionCodeValidUntil &&

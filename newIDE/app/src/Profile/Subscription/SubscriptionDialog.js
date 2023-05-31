@@ -350,7 +350,12 @@ export default function SubscriptionDialog({
               } else if (plan.planId === 'gdevelop_education') {
                 if (!isUserCurrentOrLegacyPlan) {
                   actions = [
-                    <ResponsiveLineStackLayout key="options" expand>
+                    <ResponsiveLineStackLayout
+                      key="options"
+                      expand
+                      noColumnMargin
+                      noMargin
+                    >
                       <SemiControlledTextField
                         value={educationPlanSeatsCount.toString()}
                         floatingLabelFixed

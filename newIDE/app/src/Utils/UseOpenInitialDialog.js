@@ -3,6 +3,7 @@ import * as React from 'react';
 import RouterContext from '../MainFrame/RouterContext';
 import { SubscriptionSuggestionContext } from '../Profile/Subscription/SubscriptionSuggestionContext';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from './GDevelopServices/InAppTutorial';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   openInAppTutorialDialog: (tutorialId: string) => void,
@@ -23,6 +24,9 @@ export const useOpenInitialDialog = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+  const { onCreateAccount, authenticated } = React.useContext(
+    AuthenticatedUserContext
+  );
 
   React.useEffect(
     () => {
@@ -31,6 +35,16 @@ export const useOpenInitialDialog = ({
           openSubscriptionDialog({ reason: 'Landing dialog at opening' });
           removeRouteArguments(['initial-dialog']);
           break;
+        case 'signup':
+          const timeoutId = setTimeout(() => {
+            if (authenticated) {
+              openProfileDialog(true);
+            } else {
+              onCreateAccount();
+            }
+            removeRouteArguments(['initial-dialog']);
+          }, 2000);
+          return () => clearTimeout(timeoutId);
         case 'onboarding':
         case 'guided-lesson':
           const tutorialId = routeArguments['tutorial-id'];
@@ -57,6 +71,8 @@ export const useOpenInitialDialog = ({
       openProfileDialog,
       removeRouteArguments,
       openSubscriptionDialog,
+      authenticated,
+      onCreateAccount,
     ]
   );
 };

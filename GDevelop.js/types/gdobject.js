@@ -10,6 +10,7 @@ declare class gdObject {
   getType(): string;
   setTags(tags: string): void;
   getTags(): string;
+  is3DObject(): boolean;
   getConfiguration(): gdObjectConfiguration;
   getVariables(): gdVariablesContainer;
   getEffects(): gdEffectsContainer;

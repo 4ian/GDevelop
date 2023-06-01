@@ -1453,8 +1453,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
-  _getInstanceSize = (initialInstance: gdInitialInstance) => {
-    if (!this.editor) return [0, 0];
+  _getInstanceSize = (
+    initialInstance: gdInitialInstance
+  ): [number, number, number] => {
+    if (!this.editor) return [0, 0, 0];
 
     return this.editor.getInstanceSize(initialInstance);
   };

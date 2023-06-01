@@ -102,6 +102,10 @@ export default class RenderedInstance {
       : this.getDefaultHeight();
   }
 
+  getDepth(): number {
+    return 0;
+  }
+
   /**
    * Return the width of the instance when the instance doesn't have a custom size.
    */
@@ -114,5 +118,9 @@ export default class RenderedInstance {
    */
   getDefaultHeight() {
     return 32;
+  }
+
+  getDefaultDepth() {
+    return 0;
   }
 }

@@ -290,74 +290,31 @@ module.exports = {
           .getValue()
       );
       if (this._radius <= 0) this._radius = 1;
-      const colorHex = objectsRenderingService.rgbOrHexToHexNumber(
+      const color = objectsRenderingService.rgbOrHexToHexNumber(
         this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('color')
           .getValue()
       );
-      this._color = [
-        ((colorHex >> 16) & 0xff) / 255,
-        ((colorHex >> 8) & 0xff) / 255,
-        (colorHex & 0xff) / 255,
-      ];
 
-      const geometry = new PIXI.Geometry();
-      const shader = PIXI.Shader.from(
-        `
-    precision mediump float;
-    attribute vec2 aVertexPosition;
+      // The icon in the middle.
+      const lightIconSprite = new PIXI.Sprite(PIXI.Texture.from('CppPlatform/Extensions/lightIcon32.png'));
+      lightIconSprite.anchor.x = 0.5;
+      lightIconSprite.anchor.y = 0.5;
 
-    uniform mat3 translationMatrix;
-    uniform mat3 projectionMatrix;
-    varying vec2 vPos;
-
-    void main() {
-        vPos = aVertexPosition;
-        gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-    }`,
-        `
-    precision mediump float;
-    uniform vec2 center;
-    uniform float radius;
-    uniform vec3 color;
-    uniform mat3 translationMatrix;
-    uniform mat3 projectionMatrix;
-
-    varying vec2 vPos;
-
-    void main() {
-        float l = length(vPos - center);
-        float intensity = 0.0;
-        if(l < radius)
-          intensity = clamp((radius - l)*(radius - l)/(radius*radius), 0.0, 1.0);
-        gl_FragColor = vec4(color*intensity, 1.0);
-    }
-    `,
-        {
-          center: [this._instance.getX(), this._instance.getY()],
-          radius: this._radius,
-          color: this._color,
-        }
+      // The circle to show the radius of the light.
+      const radiusBorderWidth = 2;
+      const radiusGraphics = new PIXI.Graphics();
+      radiusGraphics.lineStyle(
+        radiusBorderWidth,
+        color,
+        0.8
       );
+      radiusGraphics.drawCircle(0, 0, Math.max(1, this._radius - radiusBorderWidth));
 
-      this._vertexBuffer = new Float32Array([
-        this._instance.getX() - this._radius,
-        this._instance.getY() + this._radius,
-        this._instance.getX() + this._radius,
-        this._instance.getY() + this._radius,
-        this._instance.getX() + this._radius,
-        this._instance.getY() - this._radius,
-        this._instance.getX() - this._radius,
-        this._instance.getY() - this._radius,
-      ]);
-
-      geometry
-        .addAttribute('aVertexPosition', this._vertexBuffer, 2)
-        .addIndex([0, 1, 2, 2, 3, 0]);
-
-      this._pixiObject = new PIXI.Mesh(geometry, shader);
-      this._pixiObject.blendMode = PIXI.BLEND_MODES.ADD;
+      this._pixiObject = new PIXI.Container();
+      this._pixiObject.addChild(lightIconSprite);
+      this._pixiObject.addChild(radiusGraphics);
       this._pixiContainer.addChild(this._pixiObject);
       this.update();
     }
@@ -380,37 +337,22 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedLightObjectInstance.prototype.update = function () {
-      this._pixiObject.shader.uniforms.center = new Float32Array([
-        this._instance.getX(),
-        this._instance.getY(),
-      ]);
-
-      this._vertexBuffer[0] = this._instance.getX() - this._radius;
-      this._vertexBuffer[1] = this._instance.getY() + this._radius;
-      this._vertexBuffer[2] = this._instance.getX() + this._radius;
-      this._vertexBuffer[3] = this._instance.getY() + this._radius;
-      this._vertexBuffer[4] = this._instance.getX() + this._radius;
-      this._vertexBuffer[5] = this._instance.getY() - this._radius;
-      this._vertexBuffer[6] = this._instance.getX() - this._radius;
-      this._vertexBuffer[7] = this._instance.getY() - this._radius;
-
-      this._pixiObject.geometry
-        .getBuffer('aVertexPosition')
-        .update(this._vertexBuffer);
+      this._pixiObject.position.x = this._instance.getX();
+      this._pixiObject.position.y = this._instance.getY();
     };
 
     /**
      * Return the width of the instance, when it's not resized.
      */
     RenderedLightObjectInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
+      return this._radius * 2;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedLightObjectInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
+      return this._radius * 2;
     };
 
     RenderedLightObjectInstance.prototype.getOriginX = function () {

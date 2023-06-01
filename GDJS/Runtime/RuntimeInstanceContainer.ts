@@ -257,8 +257,19 @@ namespace gdjs {
             newObject.persistentUuid = instanceData.persistentUuid || null;
           }
           newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
-          newObject.setZOrder(instanceData.zOrder);
           newObject.setAngle(instanceData.angle);
+          if (
+            gdjs.RuntimeObject3D &&
+            newObject instanceof gdjs.RuntimeObject3D
+          ) {
+            if (instanceData.z !== undefined) newObject.setZ(instanceData.z);
+            if (instanceData.rotationX !== undefined)
+              newObject.setRotationX(instanceData.rotationX);
+            if (instanceData.rotationY !== undefined)
+              newObject.setRotationY(instanceData.rotationY);
+          }
+
+          newObject.setZOrder(instanceData.zOrder);
           newObject.setLayer(instanceData.layer);
           newObject
             .getVariables()

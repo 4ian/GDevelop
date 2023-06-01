@@ -345,9 +345,18 @@ export default class InstancesResizer {
       // prevent the user from modifying them manually in the inline fields.
       selectedInstance.setX(Math.round(newX));
       selectedInstance.setY(Math.round(newY));
+
+      // Also round the size, and set the default depth if necessary.
+      if (!selectedInstance.hasCustomDepth()) {
+        const defaultSize = this.instanceMeasurer.getUnrotatedInstanceSize(
+          selectedInstance
+        );
+        selectedInstance.setHasCustomDepth(true);
+        selectedInstance.setCustomDepth(defaultSize[2]);
+      }
+      selectedInstance.setHasCustomSize(true);
       selectedInstance.setCustomWidth(Math.round(newWidth));
       selectedInstance.setCustomHeight(Math.round(newHeight));
-      selectedInstance.setHasCustomSize(true);
     }
   }
 

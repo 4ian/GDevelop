@@ -71,6 +71,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
+  isInstanceOf3DObject: gdInitialInstance => boolean,
   onInstancesEditorSettingsMutated: (
     instancesEditorSettings: InstancesEditorSettings
   ) => void,
@@ -430,6 +431,7 @@ export default class InstancesEditor extends Component<Props> {
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
+      isInstanceOf3DObject: this.props.isInstanceOf3DObject,
     });
     this.instancesResizer = new InstancesResizer({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),

@@ -197,6 +197,18 @@ const makeSchema = ({
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
       setValue: (instance: gdInitialInstance, newValue: boolean) => {
+        if (
+          instance.getCustomHeight() === 0 &&
+          instance.getCustomWidth() === 0 &&
+          instance.getCustomDepth() === 0
+        ) {
+          // The instance custom dimensions have never been set before.
+          // To avoid setting setting all the dimensions to 0 when enabling
+          // the instance custom size flag, the current instance dimensions are used.
+          instance.setCustomWidth(getInstanceWidth(instance));
+          instance.setCustomHeight(getInstanceHeight(instance));
+          instance.setCustomDepth(getInstanceDepth(instance));
+        }
         instance.setHasCustomSize(newValue);
         instance.setHasCustomDepth(newValue);
         forceUpdate();

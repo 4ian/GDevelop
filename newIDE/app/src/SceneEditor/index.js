@@ -1153,6 +1153,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
   };
 
+  isInstanceOf3DObject = (instance: gdInitialInstance) => {
+    const { project, layout } = this.props;
+
+    const object = getObjectByName(project, layout, instance.getObjectName());
+    return !!object && object.is3DObject();
+  };
+
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {
     let contextMenuItems = [];
     if (
@@ -1590,6 +1597,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onInstancesRotated={this._onInstancesRotated}
             selectedObjectNames={selectedObjectNames}
             onContextMenu={this._onContextMenu}
+            isInstanceOf3DObject={this.isInstanceOf3DObject}
             instancesEditorShortcutsCallbacks={{
               onCopy: () => this.copySelection({ useLastCursorPosition: true }),
               onCut: () => this.cutSelection({ useLastCursorPosition: true }),

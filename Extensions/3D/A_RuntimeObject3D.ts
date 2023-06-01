@@ -108,7 +108,7 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
-      if (initialInstanceData.depth != undefined)
+      if (initialInstanceData.depth !== undefined)
         this.setDepth(initialInstanceData.depth);
     }
 

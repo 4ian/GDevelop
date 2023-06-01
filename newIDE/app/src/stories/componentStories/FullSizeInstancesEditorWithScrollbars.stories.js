@@ -43,6 +43,7 @@ export const Default = () => (
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}
         onInstancesEditorSettingsMutated={() => {}}
+        isInstanceOf3DObject={() => false}
         instancesSelection={instancesSelection}
         onInstancesAdded={() => {}}
         onInstancesSelected={() => {}}

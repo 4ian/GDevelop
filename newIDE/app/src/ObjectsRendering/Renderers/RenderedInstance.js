@@ -83,11 +83,11 @@ export default class RenderedInstance {
   }
 
   getCustomWidth(): number {
-    return this._instance.getCustomWidth() || this.getDefaultWidth();
+    return this._instance.getCustomWidth();
   }
 
   getCustomHeight(): number {
-    return this._instance.getCustomHeight() || this.getDefaultHeight();
+    return this._instance.getCustomHeight();
   }
 
   getWidth(): number {

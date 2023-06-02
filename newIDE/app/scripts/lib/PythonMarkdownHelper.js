@@ -1,3 +1,5 @@
+const requireSpaceLength = 4; // The number of spaces required for a line to be considered a Markdown list item. (python-markdown requires 4 spaces)
+
 // Check if a line starts with a Markdown list item.
 const isListItem = line => (/^[ \t]*([*-]|\d+\.)[ \t]+/).test(line);
 
@@ -37,13 +39,11 @@ const convertCommonMarkdownToPythonMarkdown = content => {
       }
 
       if (sublistLevel > 0) {
-        // Adjust indentation level for sublist items. (python-markdown requires 4 spaces for each level of sublist items.)
+        // Adjust indentation level for sublist items.
         const spaceIndentationLevel = getSpaceIndentationLevel(line);
-        if (spaceIndentationLevel < 4) {
-          line = line.replace(/^ */, '    '); // Replace leading whitespaces with 4 spaces
-        } else if (spaceIndentationLevel % 4 !== 0) {
-          const tabLength = spaceIndentationLevel - (spaceIndentationLevel % 4);
-          line = line.replace(/^ */, ' '.repeat(tabLength)); // Replace leading whitespaces with spaces based on tab length
+        if (spaceIndentationLevel % requireSpaceLength !== 0) {
+          const spaceLength = spaceIndentationLevel - (spaceIndentationLevel % requireSpaceLength);
+          line = line.replace(/^ */, ' '.repeat(spaceLength + requireSpaceLength)); // Replace leading spaces with spaces of the correct indentation level.
         }
       }
     }

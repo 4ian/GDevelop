@@ -1,7 +1,7 @@
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
 declare global {
   namespace THREE_ADDONS {
-    export { GLTFLoader };
+    export { GLTFLoader, GLTF };
   }
 }

@@ -4,6 +4,9 @@ const isListItem = line => (/^[ \t]*([*-]|\d+\.)[ \t]+/).test(line);
 // Calculate indentation level based on leading whitespaces (spaces or tabs).
 const getIndentationLevel = line => line.match(/^( |\t)*/)[0].length;
 
+// Calculate indentation level based on leading spaces only.
+const getSpaceIndentationLevel = line => line.match(/^ */)[0].length;
+
 // Check if a line is empty or contains only whitespaces.
 const isEmptyLine = line => line.trim() === '';
 
@@ -11,6 +14,7 @@ const convertCommonMarkdownToPythonMarkdown = content => {
   const lines = content.split('\n');
   const result = [];
   let isInList = false;
+  let sublistLevel = 0;
 
   lines.forEach((line, index) => {
     const currentIndentation = getIndentationLevel(line);
@@ -25,8 +29,22 @@ const convertCommonMarkdownToPythonMarkdown = content => {
           result.push(''); // Add a blank line before starting a list, unless the previous line is already a blank line.
         }
         isInList = true;
-      } else if (previousIndentation < currentIndentation && !isEmptyLine(previousLine)) {
-        result.push(''); // Add a blank line before starting a sublist, unless the previous line is already a blank line.
+      } else if (previousIndentation < currentIndentation) {
+        if (!isEmptyLine(previousLine)) {
+          result.push(''); // Add a blank line before starting a sublist, unless the previous line is already a blank line.
+        }
+        sublistLevel += 1;
+      }
+
+      if (sublistLevel > 0) {
+        // Adjust indentation level for sublist items. (python-markdown requires 4 spaces for each level of sublist items.)
+        const spaceIndentationLevel = getSpaceIndentationLevel(line);
+        if (spaceIndentationLevel < 4) {
+          line = line.replace(/^ */, '    '); // Replace leading whitespaces with 4 spaces
+        } else if (spaceIndentationLevel % 4 !== 0) {
+          const tabLength = spaceIndentationLevel - (spaceIndentationLevel % 4);
+          line = line.replace(/^ */, ' '.repeat(tabLength)); // Replace leading whitespaces with spaces based on tab length
+        }
       }
     }
 
@@ -43,11 +61,15 @@ const convertCommonMarkdownToPythonMarkdown = content => {
         } else if (currentIndentation >= nextIndentation) {
           result.push(''); // Add a blank line after ending a list or a sublist, unless the next line is already a blank line.
           isInList = false;
+          if (sublistLevel > 0) {
+            sublistLevel -= 1;
+          }
         }
       } else if (currentIndentation > nextIndentation) {
         if (!isEmptyLine(nextLine)) {
           result.push(''); // Add a blank line after ending a sublist, unless the next line is already a blank line.
         }
+        sublistLevel -= 1;
       }
     }
   });

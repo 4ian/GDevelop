@@ -293,6 +293,8 @@ export default class PixiResourcesLoader {
         if (mesh.material.map) {
           //@ts-ignore
           basicMaterial.map = mesh.material.map;
+          //@ts-ignore - Fix for https://forum.gdevelop.io/t/dark-textures-on-3d-models/47575.
+          basicMaterial.map.encoding = THREE.LinearEncoding;
         }
         mesh.material = basicMaterial;
       }

@@ -4,11 +4,7 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { type EditorProps } from './EditorProps.flow';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import useForceUpdate from '../../Utils/UseForceUpdate';

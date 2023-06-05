@@ -521,6 +521,7 @@ export default class LayerRenderer {
     const size = width * height;
     const data = new Uint8Array(4 * size);
     const threePlaneTexture = new THREE.DataTexture(data, width, height);
+    threePlaneTexture.colorSpace = THREE.SRGBColorSpace;
     threePlaneTexture.needsUpdate = true;
     this._threePlaneTexture = threePlaneTexture;
 

@@ -196,6 +196,7 @@ export default class PixiResourcesLoader {
     threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
+    threeTexture.colorSpace = THREE.SRGBColorSpace;
     threeTexture.needsUpdate = true;
 
     const resource = project.getResourcesManager().getResource(resourceName);
@@ -295,8 +296,6 @@ export default class PixiResourcesLoader {
       }
       if (mesh.material.map) {
         basicMaterial.map = material.map;
-        // Fix for https://forum.gdevelop.io/t/dark-textures-on-3d-models/47575.
-        basicMaterial.map.encoding = THREE.LinearEncoding;
       }
       mesh.material = basicMaterial;
     });

@@ -221,6 +221,7 @@ namespace gdjs {
             this._threePlaneTexture.magFilter = filter;
             this._threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
             this._threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
+            this._threePlaneTexture.colorSpace = THREE.SRGBColorSpace;
             this._threePlaneMaterial.map = this._threePlaneTexture;
 
             // Finally, create the mesh shown in the scene.

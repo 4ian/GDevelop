@@ -194,6 +194,7 @@ namespace gdjs {
       threeTexture.minFilter = THREE.LinearFilter;
       threeTexture.wrapS = THREE.RepeatWrapping;
       threeTexture.wrapT = THREE.RepeatWrapping;
+      threeTexture.colorSpace = THREE.SRGBColorSpace;
       threeTexture.needsUpdate = true;
 
       const resource = findResourceWithNameAndKind(

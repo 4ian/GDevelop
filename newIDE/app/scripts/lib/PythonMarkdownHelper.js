@@ -1,22 +1,36 @@
-const requireSpaceLength = 4; // The number of spaces required for a line to be considered a Markdown list item. (python-markdown requires 4 spaces)
-
 // Check if a line starts with a Markdown list item.
-const isListItem = line => (/^[ \t]*([*-]|\d+\.)[ \t]+/).test(line);
+const isListItem = line => (/^[ \t]*([*+-]|\d+\.)[ \t]+/).test(line);
 
 // Calculate indentation level based on leading whitespaces (spaces or tabs).
 const getIndentationLevel = line => line.match(/^( |\t)*/)[0].length;
 
-// Calculate indentation level based on leading spaces only.
-const getSpaceIndentationLevel = line => line.match(/^ */)[0].length;
-
 // Check if a line is empty or contains only whitespaces.
 const isEmptyLine = line => line.trim() === '';
+
+// Add a blank line to result if the next or previous Line line is not an empty line.
+const addBlankLine = (line, nextOrPreviousLine, result) => {
+  if (!isEmptyLine(nextOrPreviousLine)) {
+    result.push('');
+  }
+}
+
+// Function to handle non-list item lines after a list.
+const handleNonListItem = (lines, index, line, nextLine, result, currentIndentation, nextIndentation) => {
+  if (isEmptyLine(nextLine)) {
+    // If the next line is empty, we need to check the line after to see if it's a list item. (Could be an nested lists)
+    return isListItem(lines[index + 2] || '');
+  } else if (currentIndentation >= nextIndentation) {
+    // Add a blank line after a list if the next line is not a list item and at the same or less indentation level.
+    addBlankLine(line, nextLine, result);
+    return isListItem(lines[index + 2] || '');
+  }
+  return false;
+};
 
 const convertCommonMarkdownToPythonMarkdown = content => {
   const lines = content.split('\n');
   const result = [];
-  let isInList = false;
-  let sublistLevel = 0;
+  let startList = false;
 
   lines.forEach((line, index) => {
     const currentIndentation = getIndentationLevel(line);
@@ -24,57 +38,35 @@ const convertCommonMarkdownToPythonMarkdown = content => {
 
     if (isCurrentListItem) {
       const previousLine = lines[index - 1] || '';
-      const previousIndentation = getIndentationLevel(previousLine);
 
-      if (!isInList) {
-        if (!isEmptyLine(previousLine)) {
-          result.push(''); // Add a blank line before starting a list, unless the previous line is already a blank line.
-        }
-        isInList = true;
-      } else if (previousIndentation < currentIndentation) {
-        if (!isEmptyLine(previousLine)) {
-          result.push(''); // Add a blank line before starting a sublist, unless the previous line is already a blank line.
-        }
-        sublistLevel += 1;
-      }
-
-      if (sublistLevel > 0) {
-        // Adjust indentation level for sublist items.
-        const spaceIndentationLevel = getSpaceIndentationLevel(line);
-        if (spaceIndentationLevel % requireSpaceLength !== 0) {
-          const spaceLength = spaceIndentationLevel - (spaceIndentationLevel % requireSpaceLength);
-          line = line.replace(/^ */, ' '.repeat(spaceLength + requireSpaceLength)); // Replace leading spaces with spaces of the correct indentation level.
-        }
+      // Add blank line before the list starts.
+      if (!startList) {
+        addBlankLine(line, previousLine, result);
+        startList = true;
+      } else if (getIndentationLevel(previousLine) < currentIndentation) {
+        // Add blank line before a nested list starts.
+        addBlankLine(line, previousLine, result);
       }
     }
 
-    result.push(line); // Push the current line into result before checking if the list ends
+    result.push(line);
 
-    if (isInList) {
+    if (startList) {
       const nextLine = lines[index + 1] || '';
       const nextIndentation = getIndentationLevel(nextLine);
       const isNextListItem = isListItem(nextLine);
 
+      // Handling non-list item lines after a list.
       if (!isNextListItem) {
-        if (isEmptyLine(nextLine)) {
-          isInList = false;
-        } else if (currentIndentation >= nextIndentation) {
-          result.push(''); // Add a blank line after ending a list or a sublist, unless the next line is already a blank line.
-          isInList = false;
-          if (sublistLevel > 0) {
-            sublistLevel -= 1;
-          }
-        }
+        startList = handleNonListItem(lines, index, line, nextLine, result, currentIndentation, nextIndentation);
       } else if (currentIndentation > nextIndentation) {
-        if (!isEmptyLine(nextLine)) {
-          result.push(''); // Add a blank line after ending a sublist, unless the next line is already a blank line.
-        }
-        sublistLevel -= 1;
+        // Add blank line after a nested list ends.
+        addBlankLine(line, nextLine, result);
       }
     }
   });
 
-  // If the last line of the result is a blank line, remove it.
+  // Remove last line if it is blank.
   if (isEmptyLine(result[result.length - 1])) {
     result.pop();
   }

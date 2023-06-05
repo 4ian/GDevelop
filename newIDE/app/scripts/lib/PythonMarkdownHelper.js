@@ -71,7 +71,16 @@ const convertCommonMarkdownToPythonMarkdown = content => {
     result.pop();
   }
 
-  return result.join('\n');
+  // Join lines into a single string to form the converted content.
+  return result.map(line => {
+    // If a line is not a header, list item, or empty, and does not end with two spaces, add spaces until it does.
+    if (!line.startsWith('#') && !isListItem(line) && !isEmptyLine(line)) {
+      while (!line.endsWith('  ')) {
+        line += ' ';
+      }
+    }
+    return line;
+  }).join('\n');
 };
 
 module.exports = { convertCommonMarkdownToPythonMarkdown };

@@ -166,20 +166,6 @@ Model3DObjectConfiguration::GetProperties() const {
 bool Model3DObjectConfiguration::UpdateInitialInstanceProperty(
     gd::InitialInstance &instance, const gd::String &propertyName,
     const gd::String &newValue, gd::Project &project, gd::Layout &layout) {
-  if (propertyName == "z") {
-    instance.SetRawDoubleProperty("z", newValue.To<double>());
-    return true;
-  } else if (propertyName == "rotationX") {
-    instance.SetRawDoubleProperty("rotationX", newValue.To<double>());
-    return true;
-  } else if (propertyName == "rotationY") {
-    instance.SetRawDoubleProperty("rotationY", newValue.To<double>());
-    return true;
-  } else if (propertyName == "depth") {
-    instance.SetRawDoubleProperty("depth", newValue.To<double>());
-    return true;
-  }
-
   return false;
 }
 
@@ -188,27 +174,6 @@ Model3DObjectConfiguration::GetInitialInstanceProperties(
     const gd::InitialInstance &instance, gd::Project &project,
     gd::Layout &layout) {
   std::map<gd::String, gd::PropertyDescriptor> instanceProperties;
-
-  instanceProperties["z"]
-      .SetValue(gd::String::From(instance.GetRawDoubleProperty("z")))
-      .SetType("number")
-      .SetLabel(_("Z (elevation)"));
-
-  instanceProperties["rotationX"]
-      .SetValue(gd::String::From(instance.GetRawDoubleProperty("rotationX")))
-      .SetType("number")
-      .SetLabel(_("Rotation X"));
-
-  instanceProperties["rotationY"]
-      .SetValue(gd::String::From(instance.GetRawDoubleProperty("rotationY")))
-      .SetType("number")
-      .SetLabel(_("Rotation Y"));
-
-  instanceProperties["depth"]
-      .SetValue(gd::String::From(instance.GetRawDoubleProperty("depth")))
-      .SetType("number")
-      .SetLabel(_("Depth"));
-
   return instanceProperties;
 }
 

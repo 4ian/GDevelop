@@ -39,9 +39,9 @@ const CommunityLinksLines = ({
   communityLinks: Array<{ url: ?string, icon: React.Node }>,
 |}) => (
   <ColumnStackLayout expand noMargin>
-    {communityLinks.map(({ url, icon }) =>
+    {communityLinks.map(({ url, icon }, index) =>
       url ? (
-        <LineStackLayout noMargin alignItems="center">
+        <LineStackLayout noMargin alignItems="center" key={index}>
           {icon}
           {isAuthenticatedUserProfile ? (
             <Text noMargin>{url}</Text>

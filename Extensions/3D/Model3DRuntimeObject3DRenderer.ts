@@ -143,57 +143,86 @@ namespace gdjs {
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness
       ) {
-        this._threeObject.traverse((node) => {
-          const mesh = node as THREE.Mesh;
-          if (!mesh.material) {
-            return;
-          }
-          const material = mesh.material;
-          if (Array.isArray(material)) {
-            for (const materialElement of material) {
-              //@ts-ignore
-              if (materialElement.metalness) {
-                //@ts-ignore
-                materialElement.metalness = 0;
-              }
-            }
-          }
-          //@ts-ignore
-          else if (material.metalness) {
-            //@ts-ignore
-            material.metalness = 0;
-          }
-        });
+        gdjs.scene3d.Model3DRuntimeObject3DRenderer.traverseToRemoveMetalnessFromMeshes(
+          this._threeObject
+        );
       } else if (
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.Basic
       ) {
-        this._threeObject.traverse((node) => {
-          const mesh = node as THREE.Mesh;
-          if (!mesh.material) {
-            return;
-          }
-          let material = mesh.material;
-          if (Array.isArray(material)) {
-            material = material[0];
-          }
-          const basicMaterial = new THREE.MeshBasicMaterial();
-          //@ts-ignore
-          if (material.color) {
-            //@ts-ignore
-            basicMaterial.color = material.color;
-          }
-          //@ts-ignore
-          if (material.map) {
-            //@ts-ignore
-            basicMaterial.map = material.map;
-          }
-          mesh.material = basicMaterial;
-        });
+        gdjs.scene3d.Model3DRuntimeObject3DRenderer.traverseToSetBasicMaterialFromMeshes(
+          this._threeObject
+        );
       }
     }
   }
 
   export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
   export type Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
+
+  export namespace scene3d {
+    export namespace Model3DRuntimeObject3DRenderer {
+      const removeMetalness = (material: THREE.Material): void => {
+        //@ts-ignore
+        if (material.metalness) {
+          //@ts-ignore
+          material.metalness = 0;
+        }
+      };
+
+      const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>) => {
+        const mesh = node as THREE.Mesh;
+        if (!mesh.material) {
+          return;
+        }
+        if (Array.isArray(mesh.material)) {
+          for (let index = 0; index < mesh.material.length; index++) {
+            removeMetalness(mesh.material[index]);
+          }
+        } else {
+          removeMetalness(mesh.material);
+        }
+      };
+
+      export const traverseToRemoveMetalnessFromMeshes = (
+        node: THREE.Object3D<THREE.Event>
+      ) => node.traverse(removeMetalnessFromMesh);
+
+      const convertToBasicMaterial = (
+        material: THREE.Material
+      ): THREE.MeshBasicMaterial => {
+        const basicMaterial = new THREE.MeshBasicMaterial();
+        //@ts-ignore
+        if (material.color) {
+          //@ts-ignore
+          basicMaterial.color = material.color;
+        }
+        //@ts-ignore
+        if (material.map) {
+          //@ts-ignore
+          basicMaterial.map = material.map;
+        }
+        return basicMaterial;
+      };
+
+      const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+        const mesh = node as THREE.Mesh;
+        if (!mesh.material) {
+          return;
+        }
+
+        if (Array.isArray(mesh.material)) {
+          for (let index = 0; index < mesh.material.length; index++) {
+            mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
+          }
+        } else {
+          mesh.material = convertToBasicMaterial(mesh.material);
+        }
+      };
+
+      export const traverseToSetBasicMaterialFromMeshes = (
+        node: THREE.Object3D<THREE.Event>
+      ) => node.traverse(setBasicMaterialTo);
+    }
+  }
 }

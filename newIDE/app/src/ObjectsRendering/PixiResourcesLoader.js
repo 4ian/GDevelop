@@ -54,6 +54,38 @@ const applyThreeTextureSettings = (
   }
 };
 
+const convertToBasicMaterial = (
+  material: THREE.Material
+): THREE.MeshBasicMaterial => {
+  const basicMaterial = new THREE.MeshBasicMaterial();
+  if (material.color) {
+    basicMaterial.color = material.color;
+  }
+  if (material.map) {
+    basicMaterial.map = material.map;
+  }
+  return basicMaterial;
+};
+
+const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+  const mesh = (node: THREE.Mesh);
+  if (!mesh.material) {
+    return;
+  }
+
+  if (Array.isArray(mesh.material)) {
+    for (let index = 0; index < mesh.material.length; index++) {
+      mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
+    }
+  } else {
+    mesh.material = convertToBasicMaterial(mesh.material);
+  }
+};
+
+const traverseToSetBasicMaterialFromMeshes = (
+  node: THREE.Object3D<THREE.Event>
+) => node.traverse(setBasicMaterialTo);
+
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
  * resources and a gd.Project.
@@ -265,7 +297,7 @@ export default class PixiResourcesLoader {
       loader.load(
         url,
         gltf => {
-          this._replaceMaterials(gltf.scene);
+          traverseToSetBasicMaterialFromMeshes(gltf.scene);
           loaded3DModels[resourceName] = gltf.scene;
           resolve(gltf.scene);
         },
@@ -274,30 +306,6 @@ export default class PixiResourcesLoader {
           reject(error);
         }
       );
-    });
-  }
-
-  /**
-   * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
-   */
-  static _replaceMaterials(object3D: THREE.Object3D) {
-    object3D.traverse(node => {
-      if (!node.material) {
-        return;
-      }
-      const mesh: THREE.Mesh = node;
-      let material = mesh.material;
-      if (Array.isArray(material)) {
-        material = material[0];
-      }
-      const basicMaterial = new THREE.MeshBasicMaterial();
-      if (mesh.material.color) {
-        basicMaterial.color = material.color;
-      }
-      if (mesh.material.map) {
-        basicMaterial.map = material.map;
-      }
-      mesh.material = basicMaterial;
     });
   }
 

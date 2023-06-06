@@ -54,6 +54,38 @@ const applyThreeTextureSettings = (
   }
 };
 
+const convertToBasicMaterial = (
+  material: THREE.Material
+): THREE.MeshBasicMaterial => {
+  const basicMaterial = new THREE.MeshBasicMaterial();
+  if (material.color) {
+    basicMaterial.color = material.color;
+  }
+  if (material.map) {
+    basicMaterial.map = material.map;
+  }
+  return basicMaterial;
+};
+
+const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+  const mesh = (node: THREE.Mesh);
+  if (!mesh.material) {
+    return;
+  }
+
+  if (Array.isArray(mesh.material)) {
+    for (let index = 0; index < mesh.material.length; index++) {
+      mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
+    }
+  } else {
+    mesh.material = convertToBasicMaterial(mesh.material);
+  }
+};
+
+const traverseToSetBasicMaterialFromMeshes = (
+  node: THREE.Object3D<THREE.Event>
+) => node.traverse(setBasicMaterialTo);
+
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
  * resources and a gd.Project.
@@ -196,6 +228,7 @@ export default class PixiResourcesLoader {
     threeTexture.minFilter = THREE.LinearFilter;
     threeTexture.wrapS = THREE.RepeatWrapping;
     threeTexture.wrapT = THREE.RepeatWrapping;
+    threeTexture.colorSpace = THREE.SRGBColorSpace;
     threeTexture.needsUpdate = true;
 
     const resource = project.getResourcesManager().getResource(resourceName);
@@ -264,7 +297,7 @@ export default class PixiResourcesLoader {
       loader.load(
         url,
         gltf => {
-          this._replaceMaterials(gltf.scene);
+          traverseToSetBasicMaterialFromMeshes(gltf.scene);
           loaded3DModels[resourceName] = gltf.scene;
           resolve(gltf.scene);
         },
@@ -273,31 +306,6 @@ export default class PixiResourcesLoader {
           reject(error);
         }
       );
-    });
-  }
-
-  /**
-   * Replace materials with `MeshBasicMaterial` as lights are not yet supported.
-   */
-  static _replaceMaterials(object3D: THREE.Object3D) {
-    object3D.traverse(node => {
-      if (node.type === 'Mesh') {
-        const mesh: THREE.Mesh = node;
-        const basicMaterial = new THREE.MeshBasicMaterial();
-        //@ts-ignore
-        if (mesh.material.color) {
-          //@ts-ignore
-          basicMaterial.color = mesh.material.color;
-        }
-        //@ts-ignore
-        if (mesh.material.map) {
-          //@ts-ignore
-          basicMaterial.map = mesh.material.map;
-          //@ts-ignore - Fix for https://forum.gdevelop.io/t/dark-textures-on-3d-models/47575.
-          basicMaterial.map.encoding = THREE.LinearEncoding;
-        }
-        mesh.material = basicMaterial;
-      }
     });
   }
 

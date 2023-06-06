@@ -504,15 +504,6 @@ export default class LayerRenderer {
     // to render, and that will be projected on a plane by Three.js
     this._createPixiRenderTexture(pixiRenderer);
 
-    // Create the plane that will show this texture.
-    const threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
-    this._threePlaneGeometry = threePlaneGeometry;
-    const threePlaneMaterial = new THREE.MeshBasicMaterial({
-      side: THREE.FrontSide,
-      transparent: true,
-    });
-    this._threePlaneMaterial = threePlaneMaterial;
-
     // Create the texture to project on the plane.
     // Use a buffer to create a "fake" DataTexture, just so the texture
     // is considered initialized by Three.js.
@@ -533,7 +524,37 @@ export default class LayerRenderer {
     threePlaneTexture.magFilter = filter;
     threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
     threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
-    threePlaneMaterial.map = threePlaneTexture;
+
+    // Create the plane that will show this texture.
+    const threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
+    this._threePlaneGeometry = threePlaneGeometry;
+    // This disable the gamma correction done by THREE as PIXI is already doing it.
+    const noGammaCorrectionShader: THREE.ShaderMaterialParameters = {
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D map;
+        varying vec2 vUv;
+        void main() {
+          vec4 texel = texture2D(map, vUv);
+          gl_FragColor = texel;
+        }
+      `,
+      uniforms: {
+        map: { value: this._threePlaneTexture },
+      },
+      side: THREE.FrontSide,
+      transparent: true,
+    };
+    const threePlaneMaterial = new THREE.ShaderMaterial(
+      noGammaCorrectionShader
+    );
+    this._threePlaneMaterial = threePlaneMaterial;
 
     // Finally, create the mesh shown in the scene.
     const threePlaneMesh = new THREE.Mesh(

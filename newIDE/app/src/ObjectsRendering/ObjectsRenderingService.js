@@ -14,6 +14,7 @@ import RenderedInstance from './Renderers/RenderedInstance';
 import Rendered3DInstance from './Renderers/Rendered3DInstance';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import { rgbOrHexToHexNumber } from '../Utils/ColorTransformer';
 const path = optionalRequire('path');
@@ -253,6 +254,9 @@ const ObjectsRenderingService = {
   gd, // Expose gd so that it can be used by renderers
   PIXI, // Expose PIXI so that it can be used by renderers
   THREE, // Expose THREE so that it can be used by renderers
+  THREE_ADDONS: {
+    SkeletonUtils,
+  }, // Expose THREE so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
   Rendered3DInstance, // Expose the base class for 3D renderers so that it can be used by renderers
 };

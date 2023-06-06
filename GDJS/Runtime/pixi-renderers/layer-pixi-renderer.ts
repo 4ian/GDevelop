@@ -43,7 +43,7 @@ namespace gdjs {
     // and then must be displayed on a plane in the 3D world:
     private _threePlaneTexture: THREE.Texture | null = null;
     private _threePlaneGeometry: THREE.PlaneGeometry | null = null;
-    private _threePlaneMaterial: THREE.MeshBasicMaterial | null = null;
+    private _threePlaneMaterial: THREE.ShaderMaterial | null = null;
     private _threePlaneMesh: THREE.Mesh | null = null;
 
     /**
@@ -195,10 +195,6 @@ namespace gdjs {
 
             // Create the plane that will show this texture.
             this._threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
-            this._threePlaneMaterial = new THREE.MeshBasicMaterial({
-              side: THREE.FrontSide,
-              transparent: true,
-            });
 
             // Create the texture to project on the plane.
             // Use a buffer to create a "fake" DataTexture, just so the texture
@@ -221,7 +217,33 @@ namespace gdjs {
             this._threePlaneTexture.magFilter = filter;
             this._threePlaneTexture.wrapS = THREE.ClampToEdgeWrapping;
             this._threePlaneTexture.wrapT = THREE.ClampToEdgeWrapping;
-            this._threePlaneMaterial.map = this._threePlaneTexture;
+            // This disable the gamma correction done by THREE as PIXI is already doing it.
+            const noGammaCorrectionShader: THREE.ShaderMaterialParameters = {
+              vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                  vUv = uv;
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+              `,
+              fragmentShader: `
+                uniform sampler2D map;
+                varying vec2 vUv;
+                void main() {
+                  vec4 texel = texture2D(map, vUv);
+                  gl_FragColor = texel;
+                }
+              `,
+              uniforms: {
+                map: { value: this._threePlaneTexture },
+              },
+              side: THREE.FrontSide,
+              transparent: true,
+            };
+            this._threePlaneMaterial = new THREE.ShaderMaterial(
+              noGammaCorrectionShader
+            );
+            this._threePlaneMaterial;
 
             // Finally, create the mesh shown in the scene.
             this._threePlaneMesh = new THREE.Mesh(

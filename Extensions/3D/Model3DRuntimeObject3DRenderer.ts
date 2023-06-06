@@ -1,4 +1,66 @@
 namespace gdjs {
+  const removeMetalness = (material: THREE.Material): void => {
+    //@ts-ignore
+    if (material.metalness) {
+      //@ts-ignore
+      material.metalness = 0;
+    }
+  };
+
+  const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>) => {
+    const mesh = node as THREE.Mesh;
+    if (!mesh.material) {
+      return;
+    }
+    if (Array.isArray(mesh.material)) {
+      for (let index = 0; index < mesh.material.length; index++) {
+        removeMetalness(mesh.material[index]);
+      }
+    } else {
+      removeMetalness(mesh.material);
+    }
+  };
+
+  const traverseToRemoveMetalnessFromMeshes = (
+    node: THREE.Object3D<THREE.Event>
+  ) => node.traverse(removeMetalnessFromMesh);
+
+  const convertToBasicMaterial = (
+    material: THREE.Material
+  ): THREE.MeshBasicMaterial => {
+    const basicMaterial = new THREE.MeshBasicMaterial();
+    //@ts-ignore
+    if (material.color) {
+      //@ts-ignore
+      basicMaterial.color = material.color;
+    }
+    //@ts-ignore
+    if (material.map) {
+      //@ts-ignore
+      basicMaterial.map = material.map;
+    }
+    return basicMaterial;
+  };
+
+  const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+    const mesh = node as THREE.Mesh;
+    if (!mesh.material) {
+      return;
+    }
+
+    if (Array.isArray(mesh.material)) {
+      for (let index = 0; index < mesh.material.length; index++) {
+        mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
+      }
+    } else {
+      mesh.material = convertToBasicMaterial(mesh.material);
+    }
+  };
+
+  const traverseToSetBasicMaterialFromMeshes = (
+    node: THREE.Object3D<THREE.Event>
+  ) => node.traverse(setBasicMaterialTo);
+
   class Model3DRuntimeObject3DRenderer extends gdjs.RuntimeObject3DRenderer {
     private _model3DRuntimeObject: gdjs.Model3DRuntimeObject;
     /**
@@ -15,7 +77,7 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(runtimeObject._modelResourceName);
-      const modelObject3D = originalModelMesh.clone();
+      const modelObject3D = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
 
       // Create a group to transform the object according to
       // position, angle and dimensions.
@@ -125,7 +187,7 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(this._model3DRuntimeObject._modelResourceName);
-      const modelObject3D = originalModelMesh.clone();
+      const modelObject3D = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
 
       this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(modelObject3D);
@@ -143,38 +205,12 @@ namespace gdjs {
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness
       ) {
-        this._threeObject.traverse((node) => {
-          if (node.type === 'Mesh') {
-            const mesh = node as THREE.Mesh;
-            const material = mesh.material as THREE.MeshStandardMaterial;
-            //@ts-ignore
-            if (material.metalness) {
-              //@ts-ignore
-              material.metalness = 0;
-            }
-          }
-        });
+        traverseToRemoveMetalnessFromMeshes(this._threeObject);
       } else if (
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.Basic
       ) {
-        this._threeObject.traverse((node) => {
-          if (node.type === 'Mesh') {
-            const mesh = node as THREE.Mesh;
-            const basicMaterial = new THREE.MeshBasicMaterial();
-            //@ts-ignore
-            if (mesh.material.color) {
-              //@ts-ignore
-              basicMaterial.color = mesh.material.color;
-            }
-            //@ts-ignore
-            if (mesh.material.map) {
-              //@ts-ignore
-              basicMaterial.map = mesh.material.map;
-            }
-            mesh.material = basicMaterial;
-          }
-        });
+        traverseToSetBasicMaterialFromMeshes(this._threeObject);
       }
     }
   }

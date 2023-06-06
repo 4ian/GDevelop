@@ -1639,6 +1639,7 @@ module.exports = {
     const Rendered3DInstance = objectsRenderingService.Rendered3DInstance;
     const PIXI = objectsRenderingService.PIXI;
     const THREE = objectsRenderingService.THREE;
+    const THREE_ADDONS = objectsRenderingService.THREE_ADDONS;
 
     const materialIndexToFaceIndex = {
       // $FlowFixMe
@@ -2374,7 +2375,7 @@ module.exports = {
         this._pixiResourcesLoader
           .get3DModel(project, modelResourceName)
           .then((model3d) => {
-            const clonedModel3D = model3d.clone();
+            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(model3d);
             clonedModel3D.rotation.order = 'ZYX';
             this._updateDefaultTransformation(
               clonedModel3D,

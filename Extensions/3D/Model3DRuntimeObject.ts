@@ -84,12 +84,12 @@ namespace gdjs {
         objectData.content.materialType
       );
       this._updateModel(objectData);
-      if (this._animations.length > 0) {
-        this._renderer.playAnimation(
-          this._animations[0].source,
-          this._animations[0].loop
-        );
-      }
+      // if (this._animations.length > 0) {
+      //   this._renderer.playAnimation(
+      //     this._animations[0].source,
+      //     this._animations[0].loop
+      //   );
+      // }
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();

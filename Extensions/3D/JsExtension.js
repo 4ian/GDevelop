@@ -2428,9 +2428,11 @@ module.exports = {
             const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
               model3d.scene
             );
-            clonedModel3D.rotation.order = 'ZYX';
+            const threeObject = new THREE.Group();
+            threeObject.add(clonedModel3D);
+            threeObject.rotation.order = 'ZYX';
             this._updateDefaultTransformation(
-              clonedModel3D,
+              threeObject,
               rotationX,
               rotationY,
               rotationZ,
@@ -2439,7 +2441,7 @@ module.exports = {
               this._defaultDepth,
               keepAspectRatio
             );
-            this._threeObject.add(clonedModel3D);
+            this._threeObject.add(threeObject);
           });
       }
 
@@ -2472,7 +2474,7 @@ module.exports = {
       }
 
       _updateDefaultTransformation(
-        model3D,
+        threeObject,
         rotationX,
         rotationY,
         rotationZ,
@@ -2481,12 +2483,19 @@ module.exports = {
         originalDepth,
         keepAspectRatio
       ) {
-        const boundingBox = this._getModelAABB(
-          model3D,
-          rotationX,
-          rotationY,
-          rotationZ
+        threeObject.rotation.set(
+          (rotationX * Math.PI) / 180,
+          (rotationY * Math.PI) / 180,
+          (rotationZ * Math.PI) / 180
         );
+        threeObject.traverse((node) => {
+          const mesh = node;
+          if (mesh.type === 'SkinnedMesh') {
+            mesh.pose();
+            return;
+          }
+        });
+        const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
         const modelWidth = boundingBox.max.x - boundingBox.min.x;
         const modelHeight = boundingBox.max.y - boundingBox.min.y;
@@ -2501,7 +2510,7 @@ module.exports = {
         // Center the model.
         const centerPoint = this._centerPoint;
         if (centerPoint) {
-          model3D.position.set(
+          threeObject.position.set(
             -(
               boundingBox.min.x +
               (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
@@ -2519,8 +2528,8 @@ module.exports = {
         }
 
         // Rotate the model.
-        model3D.scale.set(1, 1, 1);
-        model3D.rotation.set(
+        threeObject.scale.set(1, 1, 1);
+        threeObject.rotation.set(
           (rotationX * Math.PI) / 180,
           (rotationY * Math.PI) / 180,
           (rotationZ * Math.PI) / 180
@@ -2535,8 +2544,8 @@ module.exports = {
         // Flip on Y because the Y axis is on the opposite side of direct basis.
         // It avoids models to be like a mirror refection.
         scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
-        model3D.updateMatrix();
-        model3D.applyMatrix4(scaleMatrix);
+        threeObject.updateMatrix();
+        threeObject.applyMatrix4(scaleMatrix);
 
         if (keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
@@ -2550,25 +2559,7 @@ module.exports = {
           this._defaultDepth = scaleRatio * modelDepth;
         }
 
-        model3D.updateMatrix();
-      }
-
-      _getModelAABB(model3D, rotationX, rotationY, rotationZ) {
-        // The original model is used because `setFromObject` is working in
-        // world transformation.
-
-        model3D.rotation.set(
-          (rotationX * Math.PI) / 180,
-          (rotationY * Math.PI) / 180,
-          (rotationZ * Math.PI) / 180
-        );
-
-        const aabb = new THREE.Box3().setFromObject(model3D);
-
-        // Revert changes.
-        model3D.rotation.set(0, 0, 0);
-
-        return aabb;
+        threeObject.updateMatrix();
       }
 
       updateThreeObject() {

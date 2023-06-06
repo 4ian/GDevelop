@@ -140,7 +140,20 @@ namespace gdjs {
       originalDepth: float,
       keepAspectRatio: boolean
     ) {
-      const boundingBox = this._getModelAABB(rotationX, rotationY, rotationZ);
+      threeObject.rotation.set(
+        gdjs.toRad(rotationX),
+        gdjs.toRad(rotationY),
+        gdjs.toRad(rotationZ)
+      );
+      threeObject.traverse((node) => {
+        node.frustumCulled = false;
+        const mesh = node as THREE.SkinnedMesh;
+        if (mesh.type === 'SkinnedMesh') {
+          mesh.pose();
+          return;
+        }
+      });
+      const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
       const modelWidth = boundingBox.max.x - boundingBox.min.x;
       const modelHeight = boundingBox.max.y - boundingBox.min.y;
@@ -207,29 +220,6 @@ namespace gdjs {
       threeObject.updateMatrix();
     }
 
-    private _getModelAABB(
-      rotationX: float,
-      rotationY: float,
-      rotationZ: float
-    ) {
-      // The original model is used because `setFromObject` is working in
-      // world transformation.
-      const originalModelMesh = this._originalModel.scene;
-
-      originalModelMesh.rotation.set(
-        gdjs.toRad(rotationX),
-        gdjs.toRad(rotationY),
-        gdjs.toRad(rotationZ)
-      );
-
-      const aabb = new THREE.Box3().setFromObject(originalModelMesh);
-
-      // Revert changes.
-      originalModelMesh.rotation.set(0, 0, 0);
-
-      return aabb;
-    }
-
     _updateModel(
       rotationX: float,
       rotationY: float,
@@ -242,8 +232,10 @@ namespace gdjs {
       // Start from the original model because:
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space
-      const originalModelMesh = this._originalModel.scene;
-      const threeObject = THREE_ADDONS.SkeletonUtils.clone(originalModelMesh);
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
+      threeObject.add(root);
 
       this._replaceMaterials(threeObject);
 
@@ -264,7 +256,7 @@ namespace gdjs {
       this._threeObject = threeObject;
 
       // Start the current animation on the new 3D object.
-      this._animationMixer = new THREE.AnimationMixer(threeObject);
+      this._animationMixer = new THREE.AnimationMixer(root);
       const isAnimationPaused = this._model3DRuntimeObject.isAnimationPaused();
       this._model3DRuntimeObject.setAnimationIndex(
         this._model3DRuntimeObject.getAnimationIndex()
@@ -352,7 +344,8 @@ namespace gdjs {
         Number.POSITIVE_INFINITY
       );
       this._action.clampWhenFinished = true;
-      this._action.play();
+      // TODO Fix animations making the object disappear.
+      //this._action.play();
     }
   }
 

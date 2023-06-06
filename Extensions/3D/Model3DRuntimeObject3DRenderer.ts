@@ -1,5 +1,4 @@
 namespace gdjs {
-
   type FloatPoint3D = [float, float, float];
 
   const removeMetalness = (material: THREE.Material): void => {

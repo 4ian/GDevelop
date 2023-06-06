@@ -146,7 +146,6 @@ namespace gdjs {
         gdjs.toRad(rotationZ)
       );
       threeObject.traverse((node) => {
-        node.frustumCulled = false;
         const mesh = node as THREE.SkinnedMesh;
         if (mesh.type === 'SkinnedMesh') {
           mesh.pose();

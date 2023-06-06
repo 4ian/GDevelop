@@ -284,11 +284,15 @@ export default function SubscriptionDialog({
               />
             </LineStackLayout>
             {getSubscriptionPlans().map(plan => {
-              const isCurrentPlan =
-                !!authenticatedUser.subscription &&
-                authenticatedUser.subscription.planId === plan.planId;
+              const userPlanId =
+                authenticatedUser.subscription &&
+                authenticatedUser.subscription.planId;
+              const isFreePlan = !plan.planId;
+              const isUserCurrentOrLegacyPlan =
+                userPlanId === plan.planId ||
+                (!!userPlanId && userPlanId === plan.legacyPlanId);
               // If no plan (free usage), do not display button.
-              const button = !plan.planId ? null : isCurrentPlan &&
+              const button = isFreePlan ? null : isUserCurrentOrLegacyPlan &&
                 isPlanValid ? (
                 <React.Fragment key="cancel">
                   <LeftLoader isLoading={isLoading}>
@@ -319,7 +323,7 @@ export default function SubscriptionDialog({
                   plan={plan}
                   actions={[button]}
                   isPending={isLoading}
-                  isHighlighted={isCurrentPlan} // highlight the plan even if it's expired.
+                  isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
                   background="medium"
                 />
               );

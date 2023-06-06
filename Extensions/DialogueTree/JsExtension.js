@@ -46,7 +46,7 @@ module.exports = {
         _(
           'Load a dialogue data object - Yarn json format, stored in a scene variable. Use this command to load all the Dialogue data at the beginning of the game.'
         ),
-        _('Load dialogue data from Scene variable _PARAM1_'),
+        _('Load dialogue data from Scene variable _PARAM0_'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'

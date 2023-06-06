@@ -512,7 +512,6 @@ export default class LayerRenderer {
     const size = width * height;
     const data = new Uint8Array(4 * size);
     const threePlaneTexture = new THREE.DataTexture(data, width, height);
-    threePlaneTexture.colorSpace = THREE.SRGBColorSpace;
     threePlaneTexture.needsUpdate = true;
     this._threePlaneTexture = threePlaneTexture;
 
@@ -529,6 +528,7 @@ export default class LayerRenderer {
     // Create the plane that will show this texture.
     const threePlaneGeometry = new THREE.PlaneGeometry(1, 1);
     this._threePlaneGeometry = threePlaneGeometry;
+    // This disable the gamma correction done by THREE as PIXI is already doing it.
     const noGammaCorrectionShader: THREE.ShaderMaterialParameters = {
       vertexShader: `
         varying vec2 vUv;

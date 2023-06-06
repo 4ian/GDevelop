@@ -1,4 +1,66 @@
 namespace gdjs {
+  const removeMetalness = (material: THREE.Material): void => {
+    //@ts-ignore
+    if (material.metalness) {
+      //@ts-ignore
+      material.metalness = 0;
+    }
+  };
+
+  const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>) => {
+    const mesh = node as THREE.Mesh;
+    if (!mesh.material) {
+      return;
+    }
+    if (Array.isArray(mesh.material)) {
+      for (let index = 0; index < mesh.material.length; index++) {
+        removeMetalness(mesh.material[index]);
+      }
+    } else {
+      removeMetalness(mesh.material);
+    }
+  };
+
+  const traverseToRemoveMetalnessFromMeshes = (
+    node: THREE.Object3D<THREE.Event>
+  ) => node.traverse(removeMetalnessFromMesh);
+
+  const convertToBasicMaterial = (
+    material: THREE.Material
+  ): THREE.MeshBasicMaterial => {
+    const basicMaterial = new THREE.MeshBasicMaterial();
+    //@ts-ignore
+    if (material.color) {
+      //@ts-ignore
+      basicMaterial.color = material.color;
+    }
+    //@ts-ignore
+    if (material.map) {
+      //@ts-ignore
+      basicMaterial.map = material.map;
+    }
+    return basicMaterial;
+  };
+
+  const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+    const mesh = node as THREE.Mesh;
+    if (!mesh.material) {
+      return;
+    }
+
+    if (Array.isArray(mesh.material)) {
+      for (let index = 0; index < mesh.material.length; index++) {
+        mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
+      }
+    } else {
+      mesh.material = convertToBasicMaterial(mesh.material);
+    }
+  };
+
+  const traverseToSetBasicMaterialFromMeshes = (
+    node: THREE.Object3D<THREE.Event>
+  ) => node.traverse(setBasicMaterialTo);
+
   class Model3DRuntimeObject3DRenderer extends gdjs.RuntimeObject3DRenderer {
     private _model3DRuntimeObject: gdjs.Model3DRuntimeObject;
     /**
@@ -143,86 +205,16 @@ namespace gdjs {
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.StandardWithoutMetalness
       ) {
-        gdjs.scene3d.Model3DRuntimeObject3DRenderer.traverseToRemoveMetalnessFromMeshes(
-          this._threeObject
-        );
+        traverseToRemoveMetalnessFromMeshes(this._threeObject);
       } else if (
         this._model3DRuntimeObject._materialType ===
         gdjs.Model3DRuntimeObject.MaterialType.Basic
       ) {
-        gdjs.scene3d.Model3DRuntimeObject3DRenderer.traverseToSetBasicMaterialFromMeshes(
-          this._threeObject
-        );
+        traverseToSetBasicMaterialFromMeshes(this._threeObject);
       }
     }
   }
 
   export const Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
   export type Model3DRuntimeObjectRenderer = Model3DRuntimeObject3DRenderer;
-
-  export namespace scene3d {
-    export namespace Model3DRuntimeObject3DRenderer {
-      const removeMetalness = (material: THREE.Material): void => {
-        //@ts-ignore
-        if (material.metalness) {
-          //@ts-ignore
-          material.metalness = 0;
-        }
-      };
-
-      const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>) => {
-        const mesh = node as THREE.Mesh;
-        if (!mesh.material) {
-          return;
-        }
-        if (Array.isArray(mesh.material)) {
-          for (let index = 0; index < mesh.material.length; index++) {
-            removeMetalness(mesh.material[index]);
-          }
-        } else {
-          removeMetalness(mesh.material);
-        }
-      };
-
-      export const traverseToRemoveMetalnessFromMeshes = (
-        node: THREE.Object3D<THREE.Event>
-      ) => node.traverse(removeMetalnessFromMesh);
-
-      const convertToBasicMaterial = (
-        material: THREE.Material
-      ): THREE.MeshBasicMaterial => {
-        const basicMaterial = new THREE.MeshBasicMaterial();
-        //@ts-ignore
-        if (material.color) {
-          //@ts-ignore
-          basicMaterial.color = material.color;
-        }
-        //@ts-ignore
-        if (material.map) {
-          //@ts-ignore
-          basicMaterial.map = material.map;
-        }
-        return basicMaterial;
-      };
-
-      const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
-        const mesh = node as THREE.Mesh;
-        if (!mesh.material) {
-          return;
-        }
-
-        if (Array.isArray(mesh.material)) {
-          for (let index = 0; index < mesh.material.length; index++) {
-            mesh.material[index] = convertToBasicMaterial(mesh.material[index]);
-          }
-        } else {
-          mesh.material = convertToBasicMaterial(mesh.material);
-        }
-      };
-
-      export const traverseToSetBasicMaterialFromMeshes = (
-        node: THREE.Object3D<THREE.Event>
-      ) => node.traverse(setBasicMaterialTo);
-    }
-  }
 }

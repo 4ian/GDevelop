@@ -33,16 +33,15 @@ type Props = {|
 const loadingMessages = [
   <Trans>Talking to the AI... beep boop beep boop...</Trans>,
   <Trans>
-    The AI has accepted your request. It's now writing down some ideas...
+    The AI has accepted your request. It is now thinking about the best way to
+    create your game...
   </Trans>,
-  <Trans>It is now thinking about the best way to create your game...</Trans>,
-  <Trans>The AI is now choosing objects from the asset store...</Trans>,
-  <Trans>The AI is now choosing behaviors for the objects...</Trans>,
+  <Trans>It is now choosing objects from the asset store...</Trans>,
   <Trans>It is now placing everything in the scene...</Trans>,
   <Trans>Almost done...</Trans>,
 ];
-const loadingMessagesInterval = 8;
-const timeBeforeShowingError = 80;
+const loadingMessagesInterval = 5;
+const timeBeforeShowingError = 35;
 
 const ProjectGeneratingDialog = ({
   generatingProjectId,

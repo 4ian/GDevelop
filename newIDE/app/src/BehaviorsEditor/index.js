@@ -486,6 +486,7 @@ const BehaviorsEditor = (props: Props) => {
                         helpPagePath={behaviorMetadata.getHelpPath()}
                       />,
                       <ElementWithMenu
+                        key="menu"
                         element={
                           <IconButton size="small">
                             <ThreeDotsMenu />

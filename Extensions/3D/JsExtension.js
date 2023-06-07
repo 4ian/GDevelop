@@ -2428,6 +2428,7 @@ module.exports = {
             const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
               model3d.scene
             );
+            // This group hold the rotation defined by properties.
             const threeObject = new THREE.Group();
             threeObject.rotation.order = 'ZYX';
             threeObject.add(clonedModel3D);

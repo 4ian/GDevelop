@@ -163,6 +163,14 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
+      console.info('No authenticated user found at startup.');
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
+          receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
+        },
+      }));
       // If the user is not logged, we still need to identify the user for analytics.
       // But don't do anything else, the user is already logged or being logged.
       identifyUserForAnalytics(this.state.authenticatedUser);
@@ -269,6 +277,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       firebaseUser = await this._reloadFirebaseProfile();
       if (!firebaseUser) {
+        console.info('User is not authenticated.');
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,

@@ -692,12 +692,12 @@ const ProjectPropertiesDialog = (props: Props) => {
                     setAntialiasingMode(
                       newScaleMode === 'never' ? 'none' : 'MSAA'
                     );
-                    setAntialisingEnabledOnMobile(newScaleMode === 'alway');
+                    setAntialisingEnabledOnMobile(newScaleMode === 'always');
                     notifyOfChange();
                   }}
                 >
                   <SelectOption value="notOnMobile" label={t`Not on mobile`} />
-                  <SelectOption value="alway" label={t`Always`} />
+                  <SelectOption value="always" label={t`Always`} />
                   <SelectOption value="never" label={t`Never`} />
                 </SelectField>
 

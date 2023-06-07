@@ -232,6 +232,8 @@ namespace gdjs {
       // Start from the original model because:
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space
+
+      // This group hold the rotation defined by properties.
       const threeObject = new THREE.Group();
       threeObject.rotation.order = 'ZYX';
       const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);

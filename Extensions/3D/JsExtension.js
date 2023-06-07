@@ -2492,7 +2492,6 @@ module.exports = {
           const mesh = node;
           if (mesh.type === 'SkinnedMesh') {
             mesh.pose();
-            return;
           }
         });
         const boundingBox = new THREE.Box3().setFromObject(threeObject);

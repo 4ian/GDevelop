@@ -151,7 +151,6 @@ namespace gdjs {
         const mesh = node as THREE.SkinnedMesh;
         if (mesh.type === 'SkinnedMesh') {
           mesh.pose();
-          return;
         }
       });
       const boundingBox = new THREE.Box3().setFromObject(threeObject);

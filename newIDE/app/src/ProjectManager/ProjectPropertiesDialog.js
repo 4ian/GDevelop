@@ -682,7 +682,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     antialiasingMode === 'none'
                       ? 'never'
                       : isAntialisingEnabledOnMobile
-                      ? 'alway'
+                      ? 'always'
                       : 'notOnMobile'
                   }
                   onChange={(e, i, newScaleMode: string) => {

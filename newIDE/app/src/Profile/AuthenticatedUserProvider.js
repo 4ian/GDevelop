@@ -27,6 +27,7 @@ import {
 import AuthenticatedUserContext, {
   initialAuthenticatedUser,
   type AuthenticatedUser,
+  authenticatedUserLoggedOutAttributes,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
@@ -118,7 +119,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   >(listUserCloudProjects);
 
   async componentDidMount() {
-    this._resetAuthenticatedUser();
+    this._initializeAuthenticatedUser();
 
     // Those callbacks are added a bit too late (after the authentication `hasAuthChanged` has already been triggered)
     // So this is not called at the startup, but only when the user logs in or log out.
@@ -163,13 +164,16 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
+      console.info('No authenticated user found at startup.');
+      this._markAuthenticatedUserAsLoggedOut();
       // If the user is not logged, we still need to identify the user for analytics.
       // But don't do anything else, the user is already logged or being logged.
       identifyUserForAnalytics(this.state.authenticatedUser);
     }
   }
 
-  _resetAuthenticatedUser() {
+  // This should be called only on the first mount of the provider.
+  _initializeAuthenticatedUser() {
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...initialAuthenticatedUser,
@@ -202,6 +206,21 @@ export default class AuthenticatedUserProvider extends React.Component<
         onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
+      },
+    }));
+    this._hasNotifiedUserAboutAdditionalInfo = false;
+    this._hasNotifiedUserAboutEmailVerification = false;
+  }
+
+  // This should be called every time the user is detected as logged out.
+  // - At startup, if the user is not logged in.
+  // - When the user logs out.
+  // - When the user deletes their account.
+  _markAuthenticatedUserAsLoggedOut() {
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        ...authenticatedUserLoggedOutAttributes,
       },
     }));
     this._hasNotifiedUserAboutAdditionalInfo = false;
@@ -269,21 +288,13 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       firebaseUser = await this._reloadFirebaseProfile();
       if (!firebaseUser) {
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            loginState: 'done',
-          },
-        }));
+        console.info('User is not authenticated.');
+        this._markAuthenticatedUserAsLoggedOut();
         return;
       }
     } catch (error) {
-      this.setState(({ authenticatedUser }) => ({
-        authenticatedUser: {
-          ...authenticatedUser,
-          loginState: 'done',
-        },
-      }));
+      console.error('Unable to fetch the authenticated Firebase user:', error);
+      this._markAuthenticatedUserAsLoggedOut();
       throw error;
     }
 
@@ -623,7 +634,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (this.props.authentication) {
       await this.props.authentication.logout();
     }
-    this._resetAuthenticatedUser();
+    this._markAuthenticatedUserAsLoggedOut();
     clearCloudProjectCookies();
     this.showUserSnackbar({
       message: <Trans>You're now logged out</Trans>,
@@ -755,7 +766,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.deleteAccount(authentication.getAuthorizationHeader);
-      this._resetAuthenticatedUser();
+      this._markAuthenticatedUserAsLoggedOut();
       clearCloudProjectCookies();
       this.openEditProfileDialog(false);
       this.showUserSnackbar({

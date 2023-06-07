@@ -79,6 +79,23 @@ export const initialAuthenticatedUser = {
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 
+export const authenticatedUserLoggedOutAttributes = {
+  authenticated: false,
+  firebaseUser: null,
+  profile: null,
+  // A logged out user is not the same a user being loaded (which can be the case at startup).
+  // Use this loginState to make sure this is understood by the app as a user logged out, and not loading.
+  loginState: 'done',
+  badges: null,
+  cloudProjects: [], // Initialize to empty array to indicate that the loading is done.
+  cloudProjectsFetchingErrorLabel: null,
+  receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
+  receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
+  subscription: null,
+  usages: null,
+  limits: null,
+};
+
 const AuthenticatedUserContext = React.createContext<AuthenticatedUser>(
   initialAuthenticatedUser
 );

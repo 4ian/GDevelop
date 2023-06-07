@@ -79,6 +79,7 @@ export type Limits = {
 
 export type PlanDetails = {
   planId: string | null,
+  legacyPlanId?: string,
   name: string,
   monthlyPriceInEuros: number | null,
   smallDescription?: MessageDescriptor,
@@ -107,6 +108,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
   },
   {
     planId: 'gdevelop_silver',
+    legacyPlanId: 'gdevelop_indie',
     name: 'GDevelop Silver',
     monthlyPriceInEuros: 4.99,
     smallDescription: t`Build more and faster.`,
@@ -127,6 +129,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
   },
   {
     planId: 'gdevelop_gold',
+    legacyPlanId: 'gdevelop_pro',
     name: 'GDevelop Gold',
     monthlyPriceInEuros: 9.99,
     smallDescription: t`Experimented creators, ambitious games.`,

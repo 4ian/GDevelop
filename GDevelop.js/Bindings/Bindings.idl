@@ -445,6 +445,10 @@ interface Project {
     boolean GetPixelsRounding();
     void SetSizeOnStartupMode([Const] DOMString orientation);
     [Const, Ref] DOMString GetSizeOnStartupMode();
+    void SetAntialiasingMode([Const] DOMString antialiasingMode);
+    [Const, Ref] DOMString GetAntialiasingMode();
+    void SetAntialisingEnabledOnMobile(boolean pixelsRounding);
+    boolean IsAntialisingEnabledOnMobile();
     long GetMaximumFPS();
     void SetMaximumFPS(long fps);
     long GetMinimumFPS();

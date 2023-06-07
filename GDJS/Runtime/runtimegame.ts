@@ -153,6 +153,8 @@ namespace gdjs {
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
+    _antialiasingMode: 'none' | 'MSAA';
+    _isAntialisingEnabledOnMobile: boolean;
     /**
      * Game loop management (see startGameLoop method)
      */
@@ -245,6 +247,8 @@ namespace gdjs {
       this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
       this._pixelsRounding = this._data.properties.pixelsRounding;
+      this._antialiasingMode = this._data.properties.antialiasingMode;
+      this._isAntialisingEnabledOnMobile = this._data.properties.antialisingEnabledOnMobile;
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -635,6 +639,20 @@ namespace gdjs {
      */
     getPixelsRounding(): boolean {
       return this._pixelsRounding;
+    }
+
+    /**
+     * Return the antialiasing mode used by the game ("none" or "MSAA").
+     */
+    getAntialiasingMode(): 'none' | 'MSAA' {
+      return this._antialiasingMode;
+    }
+
+    /**
+     * Return true if antialising is enabled on mobiles.
+     */
+    isAntialisingEnabledOnMobile(): boolean {
+      return this._isAntialisingEnabledOnMobile;
     }
 
     /**

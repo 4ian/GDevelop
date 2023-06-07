@@ -61,6 +61,8 @@ type ProjectProperties = {|
   scaleMode: string,
   pixelsRounding: boolean,
   sizeOnStartupMode: string,
+  antialiasingMode: string,
+  isAntialisingEnabledOnMobile: boolean,
   minFPS: number,
   maxFPS: number,
   isFolderProject: boolean,
@@ -83,6 +85,8 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     scaleMode: project.getScaleMode(),
     pixelsRounding: project.getPixelsRounding(),
     sizeOnStartupMode: project.getSizeOnStartupMode(),
+    antialiasingMode: project.getAntialiasingMode(),
+    isAntialisingEnabledOnMobile: project.isAntialisingEnabledOnMobile(),
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
@@ -110,6 +114,8 @@ function applyPropertiesToProject(
     scaleMode,
     pixelsRounding,
     sizeOnStartupMode,
+    antialiasingMode,
+    isAntialisingEnabledOnMobile,
     minFPS,
     maxFPS,
     isFolderProject,
@@ -134,6 +140,8 @@ function applyPropertiesToProject(
   project.setScaleMode(scaleMode);
   project.setPixelsRounding(pixelsRounding);
   project.setSizeOnStartupMode(sizeOnStartupMode);
+  project.setAntialiasingMode(antialiasingMode);
+  project.setAntialisingEnabledOnMobile(isAntialisingEnabledOnMobile);
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
@@ -185,6 +193,13 @@ const ProjectPropertiesDialog = (props: Props) => {
   let [sizeOnStartupMode, setSizeOnStartupMode] = React.useState(
     initialProperties.sizeOnStartupMode
   );
+  let [antialiasingMode, setAntialiasingMode] = React.useState(
+    initialProperties.antialiasingMode
+  );
+  let [
+    isAntialisingEnabledOnMobile,
+    setAntialisingEnabledOnMobile,
+  ] = React.useState(initialProperties.isAntialisingEnabledOnMobile);
   let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
   let [isFolderProject, setIsFolderProject] = React.useState(
@@ -241,6 +256,8 @@ const ProjectPropertiesDialog = (props: Props) => {
         orientation,
         scaleMode,
         pixelsRounding,
+        antialiasingMode,
+        isAntialisingEnabledOnMobile,
         sizeOnStartupMode,
         minFPS,
         maxFPS,
@@ -658,6 +675,31 @@ const ProjectPropertiesDialog = (props: Props) => {
                     </Trans>
                   </DismissableAlertMessage>
                 )}
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>Antialising for 3D</Trans>}
+                  value={
+                    antialiasingMode === 'none'
+                      ? 'never'
+                      : isAntialisingEnabledOnMobile
+                      ? 'alway'
+                      : 'notOnMobile'
+                  }
+                  onChange={(e, i, newScaleMode: string) => {
+                    if (newScaleMode === scaleMode) {
+                      return;
+                    }
+                    setAntialiasingMode(
+                      newScaleMode === 'never' ? 'none' : 'MSAA'
+                    );
+                    setAntialisingEnabledOnMobile(newScaleMode === 'alway');
+                    notifyOfChange();
+                  }}
+                >
+                  <SelectOption value="notOnMobile" label={t`Not on mobile`} />
+                  <SelectOption value="alway" label={t`Always`} />
+                  <SelectOption value="never" label={t`Never`} />
+                </SelectField>
 
                 <Text size="block-title">
                   <Trans>Project files</Trans>

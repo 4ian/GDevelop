@@ -232,7 +232,10 @@ namespace gdjs {
       // Start from the original model because:
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space
-      const threeObject = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
+      threeObject.add(root);
 
       this._replaceMaterials(threeObject);
 
@@ -253,7 +256,7 @@ namespace gdjs {
       this._threeObject = threeObject;
 
       // Start the current animation on the new 3D object.
-      this._animationMixer = new THREE.AnimationMixer(threeObject);
+      this._animationMixer = new THREE.AnimationMixer(root);
       const isAnimationPaused = this._model3DRuntimeObject.isAnimationPaused();
       this._model3DRuntimeObject.setAnimationIndex(
         this._model3DRuntimeObject.getAnimationIndex()

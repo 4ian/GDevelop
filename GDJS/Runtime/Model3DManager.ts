@@ -110,7 +110,6 @@ namespace gdjs {
         this._loader.load(
           url,
           (gltf: THREE_ADDONS.GLTF) => {
-            gltf.scene.rotation.order = 'ZYX';
             this._loadedThreeModels.set(resource.name, gltf);
 
             loaded++;

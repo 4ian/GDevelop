@@ -79,6 +79,7 @@ namespace gdjs {
       runtimeObject: gdjs.Model3DRuntimeObject,
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
+      // GLB files with skeleton must not have any transformation to work properly.
       const originalModel = instanceContainer
         .getGame()
         .getModel3DManager()
@@ -231,10 +232,7 @@ namespace gdjs {
       // Start from the original model because:
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space
-      const threeObject = new THREE.Group();
-      threeObject.rotation.order = 'ZYX';
-      const root = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
-      threeObject.add(root);
+      const threeObject = THREE_ADDONS.SkeletonUtils.clone(this._originalModel.scene);
 
       this._replaceMaterials(threeObject);
 
@@ -255,7 +253,7 @@ namespace gdjs {
       this._threeObject = threeObject;
 
       // Start the current animation on the new 3D object.
-      this._animationMixer = new THREE.AnimationMixer(root);
+      this._animationMixer = new THREE.AnimationMixer(threeObject);
       const isAnimationPaused = this._model3DRuntimeObject.isAnimationPaused();
       this._model3DRuntimeObject.setAnimationIndex(
         this._model3DRuntimeObject.getAnimationIndex()
@@ -343,8 +341,7 @@ namespace gdjs {
         Number.POSITIVE_INFINITY
       );
       this._action.clampWhenFinished = true;
-      // TODO Fix animations making the object disappear.
-      //this._action.play();
+      this._action.play();
     }
   }
 

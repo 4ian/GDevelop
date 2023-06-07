@@ -110,18 +110,6 @@ namespace gdjs {
         this._loader.load(
           url,
           (gltf: THREE_ADDONS.GLTF) => {
-            // Iterate over loaded texture as a fix for https://forum.gdevelop.io/t/dark-textures-on-3d-models/47575.
-            // TODO (3D): Investigate if it's a legitimate thing to do or if the loaded glb file should be
-            // adapted so that loader uses the "correct" encoding.
-            gltf.scene.traverse((object) => {
-              if ((object as THREE.Mesh).isMesh) {
-                // @ts-ignore - The typing is not accurate here.
-                const texture = (object as THREE.Mesh).material.map;
-                if (texture && texture.isTexture) {
-                  texture.encoding = THREE.LinearEncoding;
-                }
-              }
-            });
             gltf.scene.rotation.order = 'ZYX';
             this._loadedThreeModels.set(resource.name, gltf);
 

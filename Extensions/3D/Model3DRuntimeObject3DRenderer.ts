@@ -84,7 +84,8 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(runtimeObject._modelResourceName);
-      const model = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
+      // _updateModel will actually add a clone of the model.
+      const model = new THREE.Group()
 
       // Create a group to transform the object according to
       // position, angle and dimensions.

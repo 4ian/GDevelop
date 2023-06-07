@@ -2428,7 +2428,6 @@ module.exports = {
             const threeObject = THREE_ADDONS.SkeletonUtils.clone(
               model3d.scene
             );
-            threeObject.rotation.order = 'ZYX';
             this._updateDefaultTransformation(
               threeObject,
               rotationX,

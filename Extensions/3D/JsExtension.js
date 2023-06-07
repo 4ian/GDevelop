@@ -1600,6 +1600,52 @@ module.exports = {
         .setType('number')
         .setGroup(_('Orientation'));
     }
+    {
+      const effect = extension
+        .addEffect('HemisphereLight')
+        .setFullName(_('Hemisphere light'))
+        .setDescription(_('A light that illuminates objects from every direction with a gradient.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/HemisphereLight.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('skyColor')
+        .setValue('255;255;255')
+        .setLabel(_('Sky color'))
+        .setType('color');
+      properties
+        .getOrCreate('groundColor')
+        .setValue('127;127;127')
+        .setLabel(_('Ground color'))
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.5')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('top')
+        .setValue('Y-')
+        .setLabel(_('3D world top'))
+        .setType('choice')
+        .addExtraInfo('Y-')
+        .addExtraInfo('Z+')
+        .setGroup(_('Orientation'));
+      properties
+        .getOrCreate('elevation')
+        .setValue('90')
+        .setLabel(_('Elevation (in degrees)'))
+        .setType('number')
+        .setGroup(_('Orientation'))
+        .setDescription(_('Maximal elevation is reached at 90°.'));
+      properties
+        .getOrCreate('rotation')
+        .setValue('0')
+        .setLabel(_('Rotation (in degrees)'))
+        .setType('number')
+        .setGroup(_('Orientation'));
+    }
 
     return extension;
   },

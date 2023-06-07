@@ -1744,6 +1744,7 @@ module.exports = {
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
         this._defaultHeight = parseFloat(properties.get('height').getValue());
+        this._defaultDepth = parseFloat(properties.get('depth').getValue());
 
         this._pixiObject = new PIXI.Container();
         this._pixiFallbackObject = new PIXI.Graphics();
@@ -1879,6 +1880,10 @@ module.exports = {
 
       getDefaultHeight() {
         return this._defaultHeight;
+      }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
       }
 
       getCenterX() {

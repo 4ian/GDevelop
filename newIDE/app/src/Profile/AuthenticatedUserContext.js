@@ -79,6 +79,21 @@ export const initialAuthenticatedUser = {
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 
+export const authenticatedUserLoggedOutAttributes = {
+  authenticated: false,
+  firebaseUser: null,
+  profile: null,
+  loginState: 'done', // Particularly useful on first mount.
+  badges: null,
+  cloudProjects: [], // Initialize to empty array to indicate that the loading is done.
+  cloudProjectsFetchingErrorLabel: null,
+  receivedAssetPacks: [], // Initialize to empty array to indicate that the loading is done.
+  receivedAssetShortHeaders: [], // Initialize to empty array to indicate that the loading is done.
+  subscription: null,
+  usages: null,
+  limits: null,
+};
+
 const AuthenticatedUserContext = React.createContext<AuthenticatedUser>(
   initialAuthenticatedUser
 );

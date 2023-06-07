@@ -83,7 +83,9 @@ export const authenticatedUserLoggedOutAttributes = {
   authenticated: false,
   firebaseUser: null,
   profile: null,
-  loginState: 'done', // Particularly useful on first mount.
+  // A logged out user is not the same a user being loaded (which can be the case at startup).
+  // Use this loginState to make sure this is understood by the app as a user logged out, and not loading.
+  loginState: 'done',
   badges: null,
   cloudProjects: [], // Initialize to empty array to indicate that the loading is done.
   cloudProjectsFetchingErrorLabel: null,

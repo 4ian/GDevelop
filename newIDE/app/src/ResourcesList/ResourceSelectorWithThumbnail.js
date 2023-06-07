@@ -24,6 +24,7 @@ type Props = {|
   hintText?: MessageDescriptor,
   helperMarkdownText?: ?string,
   fallbackResourceKind?: ResourceKind,
+  id?: string,
 |};
 
 const ResourceSelectorWithThumbnail = ({
@@ -36,6 +37,7 @@ const ResourceSelectorWithThumbnail = ({
   hintText,
   helperMarkdownText,
   fallbackResourceKind,
+  id,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const itemsAlignment = windowWidth === 'small' ? 'center' : 'flex-end';
@@ -54,6 +56,7 @@ const ResourceSelectorWithThumbnail = ({
       hintText={hintText}
       helperMarkdownText={helperMarkdownText}
       fallbackResourceKind={fallbackResourceKind}
+      id={id}
     />
   );
   if (displayThumbnail) {

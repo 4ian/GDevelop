@@ -2,7 +2,7 @@
   {
     "id": "cameraParallax",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/cameraParallax.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th"],
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/cameraParallax/game.json",
     "initialProjectData": {
       "cameraScene": "CameraScene",
@@ -14,19 +14,19 @@
   {
     "id": "flingGame",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/flingGame.json",
-    "availableLocales": ["en", "fr-FR", "th-TH"]
+    "availableLocales": ["en", "fr", "es", "pt", "th"]
   },
   {
     "id": "healthBar",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/healthBar.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th"],
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/healthBar/game.json",
     "initialProjectData": { "level": "Level", "player": "Player" }
   },
   {
     "id": "joystick",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/joystick.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th"],
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/joystick/game.json",
     "initialProjectData": {
       "gameScene": "GameScene",
@@ -34,9 +34,16 @@
     }
   },
   {
+    "id": "object3d",
+    "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/object3d.json",
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
+    "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/object3d/game.json",
+    "initialProjectData": { "gameScene": "GameScene" }
+  },
+  {
     "id": "plinkoMultiplier",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/plinkoMultiplier.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th"],
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/plinkoMultiplier/game.json",
     "initialProjectData": {
       "gameScene": "GameScene",
@@ -49,10 +56,8 @@
   {
     "id": "timer",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/timer.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th"],
+    "availableLocales": ["en", "fr", "es", "pt", "th", "ar"],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/timer/game.json",
-    "initialProjectData": {
-      "gameScene": "GameScene"
-    }
+    "initialProjectData": { "gameScene": "GameScene" }
   }
 ]

@@ -16,6 +16,7 @@ import {
   CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
   HEALTH_BAR_IN_APP_TUTORIAL_ID,
   JOYSTICK_IN_APP_TUTORIAL_ID,
+  OBJECT_3D_IN_APP_TUTORIAL_ID,
   isMiniTutorial,
 } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
@@ -128,6 +129,16 @@ const titleAndContentByKey = {
         <Trans>Add a new layer</Trans>,
         <Trans>Add a joystick prefab</Trans>,
         <Trans>Add a behavior</Trans>,
+      ],
+    }),
+  },
+  [OBJECT_3D_IN_APP_TUTORIAL_ID]: {
+    title: <Trans>Let's add a 3D object to our game</Trans>,
+    content: getGuidedLessonContent({
+      learningKeys: [
+        <Trans>Add a 3D Box</Trans>,
+        <Trans>Add a behavior</Trans>,
+        <Trans>Update the elevation of a 3D box</Trans>,
       ],
     }),
   },

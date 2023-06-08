@@ -196,6 +196,13 @@ export const subscriptionForGoldUser: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
 };
+export const subscriptionForGoldUserFromEducationPlan: Subscription = {
+  planId: 'gdevelop_gold',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+  benefitsFromEducationPlan: true,
+};
 
 export const purchaselyGoldSubscription: Subscription = {
   planId: 'gdevelop_gold',

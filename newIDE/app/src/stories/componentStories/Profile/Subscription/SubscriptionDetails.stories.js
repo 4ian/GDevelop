@@ -13,6 +13,7 @@ import {
   subscriptionForProUser,
   subscriptionForSilverUser,
   purchaselyGoldSubscription,
+  subscriptionForGoldUserFromEducationPlan,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDecorator';
 import SubscriptionDetails from '../../../../Profile/Subscription/SubscriptionDetails';
@@ -68,6 +69,16 @@ export const WithGoldSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
       subscription={subscriptionForGoldUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithGoldSubscriptionFromEducationPlan = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForGoldUserFromEducationPlan}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />

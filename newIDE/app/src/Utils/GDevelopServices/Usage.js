@@ -26,6 +26,8 @@ export type Subscription = {|
 
   redemptionCode?: string | null,
   redemptionCodeValidUntil?: number | null,
+
+  benefitsFromEducationPlan?: boolean,
 |};
 
 /**

@@ -100,8 +100,8 @@ const convertCommonMarkdownToPythonMarkdown = content => {
       isInCodeBlock = !isInCodeBlock;
     }
 
-    // Add two spaces at the end of a paragraph line if the next line is also a paragraph line.
     if (!isInCodeBlock && isParagraph(line) && isParagraph(nextLine)) {
+      // In Markdown, to create a line break between paragraphs, two spaces are required instead of '\n'.
       while (!line.endsWith('  ')) {
         line += ' ';
       }

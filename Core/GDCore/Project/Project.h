@@ -384,6 +384,26 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetPixelsRounding(bool enable) { pixelsRounding = enable; }
 
   /**
+   * Return the antialiasing mode used by the game ("none" or "MSAA").
+   */
+  const gd::String& GetAntialiasingMode() const { return antialiasingMode; }
+
+  /**
+   * Set the antialiasing mode used by the game ("none" or "MSAA").
+   */
+  void SetAntialiasingMode(const gd::String& antialiasingMode_) { antialiasingMode = antialiasingMode_; }
+
+  /**
+   * Return true if antialising is enabled on mobiles.
+   */
+  bool IsAntialisingEnabledOnMobile() const { return isAntialisingEnabledOnMobile; }
+
+  /**
+   * Set whether antialising is enabled on mobiles or not.
+   */
+  void SetAntialisingEnabledOnMobile(bool enable) { isAntialisingEnabledOnMobile = enable; }
+
+  /**
    * \brief Return if the project should set 0 as Z-order for objects created
    * from events (which is deprecated) - instead of the highest Z order that was
    * found on each layer when the scene started.
@@ -1040,6 +1060,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String
       sizeOnStartupMode;   ///< How to adapt the game size to the screen. Can be
                            ///< "adaptWidth", "adaptHeight" or empty
+  gd::String antialiasingMode;
+  bool isAntialisingEnabledOnMobile;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
                            ///< services or database that would require it.
   bool useDeprecatedZeroAsDefaultZOrder;  ///< If true, objects created from

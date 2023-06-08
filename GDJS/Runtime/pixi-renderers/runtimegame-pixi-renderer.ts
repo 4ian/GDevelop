@@ -69,6 +69,10 @@ namespace gdjs {
         gameCanvas = document.createElement('canvas');
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
+          antialias:
+            this._game.getAntialiasingMode() !== 'none' &&
+            (this._game.isAntialisingEnabledOnMobile() ||
+              !gdjs.evtTools.common.isMobile()),
         });
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(

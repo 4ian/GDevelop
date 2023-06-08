@@ -65,6 +65,8 @@ Project::Project()
       pixelsRounding(false),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      antialiasingMode("MSAA"),
+      isAntialisingEnabledOnMobile(false),
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       useExternalSourceFiles(false),
@@ -628,6 +630,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
+  SetAntialiasingMode(propElement.GetStringAttribute("antialiasingMode", "MSAA"));
+  SetAntialisingEnabledOnMobile(propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
@@ -882,6 +886,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
+  propElement.SetAttribute("antialiasingMode", antialiasingMode);
+  propElement.SetAttribute("antialisingEnabledOnMobile", isAntialisingEnabledOnMobile);
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
@@ -1113,6 +1119,8 @@ void Project::Init(const gd::Project& game) {
   pixelsRounding = game.pixelsRounding;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  antialiasingMode = game.antialiasingMode;
+  isAntialisingEnabledOnMobile = game.isAntialisingEnabledOnMobile;
   projectUuid = game.projectUuid;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 

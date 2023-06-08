@@ -190,6 +190,8 @@ declare interface ProjectPropertiesData {
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
   pixelsRounding: boolean;
+  antialiasingMode: 'none' | 'MSAA';
+  antialisingEnabledOnMobile: boolean;
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;

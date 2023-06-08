@@ -40,6 +40,10 @@ declare class gdProject extends gdObjectsContainer {
   getPixelsRounding(): boolean;
   setSizeOnStartupMode(orientation: string): void;
   getSizeOnStartupMode(): string;
+  setAntialiasingMode(antialiasingMode: string): void;
+  getAntialiasingMode(): string;
+  setAntialisingEnabledOnMobile(pixelsRounding: boolean): void;
+  isAntialisingEnabledOnMobile(): boolean;
   getMaximumFPS(): number;
   setMaximumFPS(fps: number): void;
   getMinimumFPS(): number;

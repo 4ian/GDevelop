@@ -333,21 +333,6 @@ export default function SubscriptionDialog({
               let actions: React.Node = null;
               if (isFreePlan) {
                 // If no plan (free usage), do not display button.
-              } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
-                actions = [
-                  <FlatButton
-                    key="cancel"
-                    disabled={isLoading}
-                    label={
-                      <LeftLoader isLoading={isLoading}>
-                        <Trans>Cancel your subscription</Trans>
-                      </LeftLoader>
-                    }
-                    onClick={() =>
-                      buyUpdateOrCancelPlan(i18n, { planId: null })
-                    }
-                  />,
-                ];
               } else if (plan.planId === 'gdevelop_education') {
                 if (!isUserCurrentOrLegacyPlan) {
                   actions = [
@@ -412,6 +397,21 @@ export default function SubscriptionDialog({
                     </Text>,
                   ];
                 }
+              } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
+                actions = [
+                  <FlatButton
+                    key="cancel"
+                    disabled={isLoading}
+                    label={
+                      <LeftLoader isLoading={isLoading}>
+                        <Trans>Cancel your subscription</Trans>
+                      </LeftLoader>
+                    }
+                    onClick={() =>
+                      buyUpdateOrCancelPlan(i18n, { planId: null })
+                    }
+                  />,
+                ];
               } else {
                 actions = [
                   <RaisedButton

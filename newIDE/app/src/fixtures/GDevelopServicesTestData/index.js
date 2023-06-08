@@ -199,6 +199,14 @@ export const subscriptionForGoldUser: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
 };
+
+export const subscriptionForEducationPlan: Subscription = {
+  planId: 'gdevelop_education_1year',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'teacher-user',
+};
+
 export const subscriptionForGoldUserFromEducationPlan: Subscription = {
   planId: 'gdevelop_gold',
   createdAt: 1515084011000,
@@ -425,6 +433,11 @@ export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
+  limits: limitsForGoldUser,
+};
+export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForEducationPlan,
   limits: limitsForGoldUser,
 };
 

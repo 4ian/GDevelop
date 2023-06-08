@@ -14,7 +14,7 @@ const isTable = line => (/^ {0,3}\|/ && /\|[ \t]*$/).test(line);
 
 // Checks if a line is a code block.
 // A code block starts with three '`' characters at the beginning of the line.
-const isCodeBlock = line => (/^ {0,3}(```[a-z]*)?/).test(line);
+const isCodeBlock = line => (/^ {0,3}```[a-z]*/).test(line);
 
 // Checks if a line is a list item.
 // A list item starts with '*', '+', '-' or number followed by '.' at the beginning of the line.
@@ -27,9 +27,6 @@ const isBlockquoteItem = line => (/^ {0,3}>/).test(line);
 // Checks if a line is a paragraph.
 // A paragraph is not empty, not indented, not a header, not a table, not a code block, not a list item and not a blockquote item.
 const isParagraph = line => !isEmptyLine(line) && !isIndented(line) && !isHeader(line) && !isTable(line) && !isCodeBlock(line) && !isListItem(line) && !isBlockquoteItem(line);
-
-// Defines the types of markdown elements that do not require an extra line break between them.
-const typesNoNeedExtraLineBreak = [ 'paragraph', 'list', 'blockquote' ];
 
 // Determines the type of a markdown element.
 const getElementType = (line) => {
@@ -59,6 +56,9 @@ const getElementType = (line) => {
 
   return 'paragraph';
 };
+
+// Defines the types of markdown elements that do not require an extra line break between them.
+const typesNoNeedExtraLineBreak = [ 'paragraph', 'list', 'blockquote' ];
 
 // Checks if an additional line break is needed between two markdown elements.
 // An additional line break is not needed if the two elements are of the same type and do not require an extra line break.

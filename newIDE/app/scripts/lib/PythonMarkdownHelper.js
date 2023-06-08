@@ -78,8 +78,6 @@ const convertCommonMarkdownToPythonMarkdown = content => {
   let previousLineWasEmpty = false;
   lines.forEach((line, index) => {
     const previousLine = lines[index - 1] || '';
-    const nextLine = lines[index + 1] || '';
-
     if (!isInCodeBlock && !previousLineWasEmpty && needAdditionalLineBreakBetweenElements(previousLine, line)) {
       result.push('');
     }
@@ -91,6 +89,7 @@ const convertCommonMarkdownToPythonMarkdown = content => {
 
     result.push(line);
 
+    const nextLine = lines[index + 1] || '';
     if (!isInCodeBlock && !previousLineWasEmpty && needAdditionalLineBreakBetweenElements(line, nextLine)) {
       result.push('');
       previousLineWasEmpty = true;

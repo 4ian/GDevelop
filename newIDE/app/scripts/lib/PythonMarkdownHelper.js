@@ -1,5 +1,6 @@
 // Checks if a line is empty.
 const isEmptyLine = line => line.trim() === '';
+
 // Checks if a line is a header.
 // A header starts with 1-6 '#' characters at the beginning of the line.
 const isHeader = line => (/^ {0,3}#{1,6}/).test(line);

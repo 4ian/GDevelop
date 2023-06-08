@@ -73,6 +73,7 @@ type Props = {|
   error?: ?Error,
   onRetry?: () => void,
   onChangeEmail?: () => void,
+  disableChangeEmailButton?: boolean,
   onEditProfile?: () => void,
   assetPacksListingData?: ?Array<PrivateAssetPackListingData>,
   onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
@@ -84,6 +85,7 @@ const ProfileDetails = ({
   error,
   onRetry,
   onChangeEmail,
+  disableChangeEmailButton,
   onEditProfile,
   assetPacksListingData,
   onAssetPackOpen,
@@ -252,6 +254,7 @@ const ProfileDetails = ({
                 <FlatButton
                   label={<Trans>Change my email</Trans>}
                   onClick={onChangeEmail}
+                  disabled={disableChangeEmailButton}
                 />
                 <FlatButton
                   label={<Trans>Access public profile</Trans>}

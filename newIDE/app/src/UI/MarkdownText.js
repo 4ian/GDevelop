@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
@@ -64,7 +65,10 @@ export const MarkdownText = (props: Props) => {
   const markdownElement = (
     <I18n>
       {({ i18n }) => (
-        <ReactMarkdown components={markdownCustomComponents}>
+        <ReactMarkdown
+          components={markdownCustomComponents}
+          remarkPlugins={[remarkGfm]}
+        >
           {props.translatableSource
             ? i18n._(props.translatableSource)
             : props.source}

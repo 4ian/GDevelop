@@ -10,7 +10,7 @@ const isHeader = line => (/^ {0,3}#{1,6}/).test(line);
 
 // Checks if a line is a table.
 // A table starts and ends with '|'
-const isTable = line => (/^ {0,3}\|/.test(line) && /\|[ \t]*$/.test(line));
+const isTable = line => (/^ {0,3}\|/ && /\|[ \t]*$/).test(line);
 
 // Checks if a line is a code block.
 // A code block starts with three '`' characters at the beginning of the line.
@@ -58,7 +58,7 @@ const getElementType = (line) => {
 };
 
 // Defines the types of markdown elements that do not require an extra line break between them.
-const typesNoNeedExtraLineBreak = [ 'paragraph', 'list', 'blockquote' ];
+const typesNoNeedExtraLineBreak = [ 'paragraph', 'list', 'blockquote', 'table' ];
 
 // Checks if an additional line break is needed between two markdown elements.
 // An additional line break is not needed if the two elements are of the same type and do not require an extra line break.

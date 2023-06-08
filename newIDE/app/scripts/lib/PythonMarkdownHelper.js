@@ -1,9 +1,5 @@
 // Checks if a line is empty.
 const isEmptyLine = line => line.trim() === '';
-
-// Checks if a line is indented.
-const isIndented = line => (/^ {4,}|\t+/).test(line);
-
 // Checks if a line is a header.
 // A header starts with 1-6 '#' characters at the beginning of the line.
 const isHeader = line => (/^ {0,3}#{1,6}/).test(line);
@@ -23,10 +19,6 @@ const isListItem = line => (/^[ \t]*([*+-]|\d+\.)[ \t]+/).test(line);
 // Checks if a line is a blockquote.
 // A blockquote starts with '>' at the beginning of the line.
 const isBlockquoteItem = line => (/^ {0,3}>/).test(line);
-
-// Checks if a line is a paragraph.
-// A paragraph is not empty, not indented, not a header, not a table, not a code block, not a list item and not a blockquote item.
-const isParagraph = line => !isEmptyLine(line) && !isIndented(line) && !isHeader(line) && !isTable(line) && !isCodeBlock(line) && !isListItem(line) && !isBlockquoteItem(line);
 
 // Determines the type of a markdown element.
 const getElementType = (line) => {
@@ -94,13 +86,6 @@ const convertCommonMarkdownToPythonMarkdown = content => {
     // Check if the current line starts or ends a code block.
     if (isCodeBlock(line)) {
       isInCodeBlock = !isInCodeBlock;
-    }
-
-    if (!isInCodeBlock && isParagraph(line) && isParagraph(nextLine)) {
-      // In Markdown, to create a line break between paragraphs, two spaces are required instead of '\n'.
-      while (!line.endsWith('  ')) {
-        line += ' ';
-      }
     }
 
     result.push(line);

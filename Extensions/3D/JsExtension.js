@@ -2489,12 +2489,7 @@ module.exports = {
           (rotationY * Math.PI) / 180,
           (rotationZ * Math.PI) / 180
         );
-        threeObject.traverse((node) => {
-          const mesh = node;
-          if (mesh.type === 'SkinnedMesh') {
-            mesh.pose();
-          }
-        });
+        threeObject.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
         const modelWidth = boundingBox.max.x - boundingBox.min.x;

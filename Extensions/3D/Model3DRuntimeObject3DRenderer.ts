@@ -147,12 +147,7 @@ namespace gdjs {
         gdjs.toRad(rotationY),
         gdjs.toRad(rotationZ)
       );
-      threeObject.traverse((node) => {
-        const mesh = node as THREE.SkinnedMesh;
-        if (mesh.type === 'SkinnedMesh') {
-          mesh.pose();
-        }
-      });
+      threeObject.updateMatrixWorld(true);
       const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
       const modelWidth = boundingBox.max.x - boundingBox.min.x;

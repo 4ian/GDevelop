@@ -73,12 +73,8 @@ const needAdditionalLineBreakBetweenElements = (line, otherLine) => {
   if (elementType2 === 'empty') {
     return false;
   }
-  
-  if (elementType1 === elementType2 && typesNoNeedExtraLineBreak.includes(elementType1)) {
-    return false;
-  }
 
-  return elementType1 !== elementType2;
+  return elementType1 !== elementType2 || !typesNoNeedExtraLineBreak.includes(elementType1);
 };
 
 const convertCommonMarkdownToPythonMarkdown = content => {

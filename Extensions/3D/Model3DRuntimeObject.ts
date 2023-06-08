@@ -55,7 +55,27 @@ namespace gdjs {
     _materialType: gdjs.Model3DRuntimeObject.MaterialType =
       gdjs.Model3DRuntimeObject.MaterialType.Basic;
 
+    /**
+     * The local point of the model that will be at the object position.
+     *
+     * Coordinates are between 0 and 1.
+     *
+     * Its value is `null` when the point is configured to `"ModelOrigin"`
+     * because the model origin needs to be evaluated according to the object
+     * configuration.
+     * @see gdjs.Model3DRuntimeObject3DRenderer.getOriginPoint
+     */
     _originPoint: FloatPoint3D | null;
+    /**
+     * The local point of the model that is used as rotation center.
+     *
+     * Coordinates are between 0 and 1.
+     *
+     * Its value is `null` when the point is configured to `"ModelOrigin"`
+     * because the model origin needs to be evaluated according to the object
+     * configuration.
+     * @see gdjs.Model3DRuntimeObject3DRenderer.getCenterPoint
+     */
     _centerPoint: FloatPoint3D | null;
 
     _animations: Model3DAnimation[];

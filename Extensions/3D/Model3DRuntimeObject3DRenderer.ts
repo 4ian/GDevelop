@@ -73,6 +73,11 @@ namespace gdjs {
     private _animationMixer: THREE.AnimationMixer;
     private _action: THREE.AnimationAction | null;
 
+    /**
+     * The model origin evaluated according to the object configuration.
+     *
+     * Coordinates are between 0 and 1.
+     */
     private _modelOriginPoint: FloatPoint3D;
 
     constructor(
@@ -211,8 +216,6 @@ namespace gdjs {
         this._object._setOriginalHeight(scaleRatio * modelHeight);
         this._object._setOriginalDepth(scaleRatio * modelDepth);
       }
-
-      threeObject.updateMatrix();
     }
 
     _updateModel(

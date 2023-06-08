@@ -2553,8 +2553,6 @@ module.exports = {
           this._defaultHeight = scaleRatio * modelHeight;
           this._defaultDepth = scaleRatio * modelDepth;
         }
-
-        threeObject.updateMatrix();
       }
 
       updateThreeObject() {
@@ -2591,7 +2589,6 @@ module.exports = {
         const centerPoint = this.getCenterPoint();
         const centerX = width * centerPoint[0];
         const centerY = height * centerPoint[1];
-        //console.log("center: " + centerX + " "  + centerY);
 
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);

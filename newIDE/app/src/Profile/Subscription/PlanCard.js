@@ -33,7 +33,12 @@ const getPlanPrice = ({
   hidePrice?: boolean,
 }): React.Node => {
   if (hidePrice || plan.monthlyPriceInEuros === null) return null;
-  if (plan.monthlyPriceInEuros === 0) return <Trans>Free</Trans>;
+  if (plan.monthlyPriceInEuros === 0)
+    return (
+      <Text noMargin color="secondary">
+        <Trans>Free</Trans>
+      </Text>
+    );
   const prices = [];
   prices.push(
     plan.isPerUser ? (

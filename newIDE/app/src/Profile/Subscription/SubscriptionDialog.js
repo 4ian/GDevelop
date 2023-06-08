@@ -367,6 +367,9 @@ export default function SubscriptionDialog({
                         min={EDUCATION_PLAN_MIN_SEATS}
                         max={EDUCATION_PLAN_MAX_SEATS}
                         step={1}
+                        helperMarkdownText={i18n._(
+                          t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
+                        )}
                       />
                       <SelectField
                         value={educationPlanPeriodicity}

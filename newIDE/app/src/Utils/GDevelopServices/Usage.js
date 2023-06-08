@@ -158,8 +158,8 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
   {
     planId: 'gdevelop_education',
     name: 'GDevelop Education',
-    monthlyPriceInEuros: 3,
-    yearlyPriceInEuros: 2.5,
+    monthlyPriceInEuros: 2.99,
+    yearlyPriceInEuros: 29.99,
     isPerUser: true,
     smallDescription: t`Schools and universities.`,
     descriptionBullets: [
@@ -170,7 +170,7 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`Organize students per classroom.`,
       },
       {
-        message: t`Each of your student gets a Gold subscription (and you as well).`,
+        message: t`You and your students receive a Gold subscription.`,
       },
     ],
   },

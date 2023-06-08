@@ -10,7 +10,7 @@ const isHeader = line => (/^ {0,3}#{1,6}/).test(line);
 
 // Checks if a line is a table.
 // A table starts and ends with '|'
-const isTable = line => (/^ {0,3}\|/ && /\|[ \t]*$/).test(line);
+const isTable = line => (/^ {0,3}\|/.test(line) && /\|[ \t]*$/.test(line));
 
 // Checks if a line is a code block.
 // A code block starts with three '`' characters at the beginning of the line.

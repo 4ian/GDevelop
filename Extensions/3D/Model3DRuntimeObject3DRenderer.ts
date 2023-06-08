@@ -85,7 +85,7 @@ namespace gdjs {
         .getModel3DManager()
         .getModel(runtimeObject._modelResourceName);
       // _updateModel will actually add a clone of the model.
-      const model = new THREE.Group()
+      const model = new THREE.Group();
 
       // Create a group to transform the object according to
       // position, angle and dimensions.

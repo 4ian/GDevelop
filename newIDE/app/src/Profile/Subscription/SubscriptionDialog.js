@@ -106,7 +106,7 @@ export default function SubscriptionDialog({
   const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
-  ] = React.useState<number>(5);
+  ] = React.useState<number>(20);
   const [
     subscriptionPendingDialogOpen,
     setSubscriptionPendingDialogOpen,
@@ -350,17 +350,20 @@ export default function SubscriptionDialog({
                         commitOnBlur
                         type="number"
                         style={{}}
-                        onChange={value =>
+                        onChange={value => {
+                          const newValue = parseInt(value);
                           setEducationPlanSeatsCount(
                             Math.min(
                               EDUCATION_PLAN_MAX_SEATS,
                               Math.max(
-                                parseInt(value),
+                                Number.isNaN(newValue)
+                                  ? EDUCATION_PLAN_MIN_SEATS
+                                  : newValue,
                                 EDUCATION_PLAN_MIN_SEATS
                               )
                             )
-                          )
-                        }
+                          );
+                        }}
                         min={EDUCATION_PLAN_MIN_SEATS}
                         max={EDUCATION_PLAN_MAX_SEATS}
                         step={1}

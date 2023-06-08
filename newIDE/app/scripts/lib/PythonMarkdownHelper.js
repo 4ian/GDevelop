@@ -1,86 +1,127 @@
-// Check if a line starts with a Markdown list item.
-const isListItem = line => (/^[ \t]*([*+-]|\d+\.)[ \t]+/).test(line);
-
-// Calculate indentation level based on leading whitespaces (spaces or tabs).
-const getIndentationLevel = line => line.match(/^( |\t)*/)[0].length;
-
-// Check if a line is empty or contains only whitespaces.
+// Checks if a line is empty.
 const isEmptyLine = line => line.trim() === '';
 
-// Add a blank line to result if the next or previous Line line is not an empty line.
-const addBlankLine = (line, nextOrPreviousLine, result) => {
-  if (!isEmptyLine(nextOrPreviousLine)) {
-    result.push('');
-  }
-}
+// Checks if a line is indented.
+const isIndented = line => (/^ {4,}|\t+/).test(line);
 
-// Function to handle non-list item lines after a list.
-const handleNonListItem = (lines, index, line, nextLine, result, currentIndentation, nextIndentation) => {
-  if (isEmptyLine(nextLine)) {
-    // If the next line is empty, we need to check the line after to see if it's a list item. (Could be an nested lists)
-    return isListItem(lines[index + 2] || '');
-  } else if (currentIndentation >= nextIndentation) {
-    // Add a blank line after a list if the next line is not a list item and at the same or less indentation level.
-    addBlankLine(line, nextLine, result);
-    return isListItem(lines[index + 2] || '');
+// Checks if a line is a header.
+// A header starts with 1-6 '#' characters at the beginning of the line.
+const isHeader = line => (/^ {0,3}#{1,6}/).test(line);
+
+// Checks if a line is a table.
+// A table starts and ends with '|'
+const isTable = line => (/^ {0,3}\|/ && /\|[ \t]*$/).test(line);
+
+// Checks if a line is a code block.
+// A code block starts with three '`' characters at the beginning of the line.
+const isCodeBlock = line => (/^ {0,3}(```[a-z]*)?/).test(line);
+
+// Checks if a line is a list item.
+// A list item starts with '*', '+', '-' or number followed by '.' at the beginning of the line.
+const isListItem = line => (/^[ \t]*([*+-]|\d+\.)[ \t]+/).test(line);
+
+// Checks if a line is a blockquote.
+// A blockquote starts with '>' at the beginning of the line.
+const isBlockquoteItem = line => (/^ {0,3}>/).test(line);
+
+// Checks if a line is a paragraph.
+// A paragraph is not empty, not indented, not a header, not a table, not a code block, not a list item and not a blockquote item.
+const isParagraph = line => !isEmptyLine(line) && !isIndented(line) && !isHeader(line) && !isTable(line) && !isCodeBlock(line) && !isListItem(line) && !isBlockquoteItem(line);
+
+// Defines the types of markdown elements that do not require an extra line break between them.
+const typesNoNeedExtraLineBreak = [ 'paragraph', 'list', 'blockquote' ];
+
+// Determines the type of a markdown element.
+const getElementType = (line) => {
+  if (isEmptyLine(line)) {
+    return 'empty';
   }
-  return false;
+
+  if (isHeader(line)) {
+    return 'header';
+  }
+
+  if (isTable(line)) {
+    return 'table';
+  }
+
+  if (isCodeBlock(line)) {
+    return 'codeBlock';
+  }
+
+  if (isListItem(line)) {
+    return 'list';
+  }
+  
+  if (isBlockquoteItem(line)) {
+    return 'blockquote';
+  }
+
+  return 'paragraph';
+};
+
+// Checks if an additional line break is needed between two markdown elements.
+// An additional line break is not needed if the two elements are of the same type and do not require an extra line break.
+// Also, an additional line break is not needed if either of the elements is empty.
+const needAdditionalLineBreakBetweenElements = (line, otherLine) => {
+  const elementType1 = getElementType(line);
+  if (elementType1 === 'empty') {
+    return false;
+  }
+
+  const elementType2 = getElementType(otherLine);
+  if (elementType2 === 'empty') {
+    return false;
+  }
+  
+  if (elementType1 === elementType2 && typesNoNeedExtraLineBreak.includes(elementType1)) {
+    return false;
+  }
+
+  return elementType1 !== elementType2;
 };
 
 const convertCommonMarkdownToPythonMarkdown = content => {
   const lines = content.split('\n');
   const result = [];
-  let startList = false;
 
+  let isInCodeBlock = false;
+  let previousLineWasEmpty = false;
   lines.forEach((line, index) => {
-    const currentIndentation = getIndentationLevel(line);
-    const isCurrentListItem = isListItem(line);
+    const previousLine = lines[index - 1] || '';
+    const nextLine = lines[index + 1] || '';
 
-    if (isCurrentListItem) {
-      const previousLine = lines[index - 1] || '';
+    if (!isInCodeBlock && !previousLineWasEmpty && needAdditionalLineBreakBetweenElements(previousLine, line)) {
+      result.push('');
+    }
 
-      // Add blank line before the list starts.
-      if (!startList) {
-        addBlankLine(line, previousLine, result);
-        startList = true;
-      } else if (getIndentationLevel(previousLine) < currentIndentation) {
-        // Add blank line before a nested list starts.
-        addBlankLine(line, previousLine, result);
+    // Check if the current line starts or ends a code block.
+    if (isCodeBlock(line)) {
+      isInCodeBlock = !isInCodeBlock;
+    }
+
+    // Add two spaces at the end of a paragraph line if the next line is also a paragraph line.
+    if (!isInCodeBlock && isParagraph(line) && isParagraph(nextLine)) {
+      while (!line.endsWith('  ')) {
+        line += ' ';
       }
     }
 
     result.push(line);
 
-    if (startList) {
-      const nextLine = lines[index + 1] || '';
-      const nextIndentation = getIndentationLevel(nextLine);
-      const isNextListItem = isListItem(nextLine);
-
-      // Handling non-list item lines after a list.
-      if (!isNextListItem) {
-        startList = handleNonListItem(lines, index, line, nextLine, result, currentIndentation, nextIndentation);
-      } else if (currentIndentation > nextIndentation) {
-        // Add blank line after a nested list ends.
-        addBlankLine(line, nextLine, result);
-      }
+    if (!isInCodeBlock && !previousLineWasEmpty && needAdditionalLineBreakBetweenElements(line, nextLine)) {
+      result.push('');
+      previousLineWasEmpty = true;
+    } else {
+      previousLineWasEmpty = false;
     }
   });
 
-  // Remove last line if it is blank.
   if (isEmptyLine(result[result.length - 1])) {
     result.pop();
   }
 
-  // Join lines into a single string to form the converted content.
-  return result.map(line => {
-    // If a line is not a header, list item, or empty, and does not end with two spaces, add spaces until it does.
-    if (!line.startsWith('#') && !isListItem(line) && !isEmptyLine(line)) {
-      while (!line.endsWith('  ')) {
-        line += ' ';
-      }
-    }
-    return line;
-  }).join('\n');
+  return result.join('\n');
 };
 
 module.exports = { convertCommonMarkdownToPythonMarkdown };

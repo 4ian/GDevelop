@@ -129,6 +129,7 @@ const Cube3DEditor = ({
                     </InputAdornment>
                   </Tooltip>
                 }
+                id={`cube3d-object-${propertyName}`}
               />
             </Column>
           );
@@ -248,6 +249,7 @@ const Cube3DEditor = ({
                     value ? '1' : '0'
                   );
                 }}
+                id={`cube3d-object-${faceProperty.visibilityProperty}`}
               />
               <Checkbox
                 checked={
@@ -264,6 +266,7 @@ const Cube3DEditor = ({
                     value ? '1' : '0'
                   );
                 }}
+                id={`cube3d-object-${faceProperty.resourceRepeatProperty}`}
               />
             </ColumnStackLayout>
             <ResourceSelectorWithThumbnail
@@ -279,6 +282,7 @@ const Cube3DEditor = ({
               onChange={value =>
                 onChangeProperty(faceProperty.resourceNameProperty, value)
               }
+              id={`cube3d-object-${faceProperty.resourceNameProperty}`}
             />
           </ColumnStackLayout>
         </React.Fragment>

@@ -39,6 +39,7 @@ type Props = {|
     marginRight?: number,
     margin?: number,
   |},
+  id?: string,
 |};
 
 /**
@@ -59,6 +60,7 @@ const Checkbox = (props: Props) => {
       icon={props.uncheckedIcon}
       checkedIcon={props.checkedIcon}
       style={props.label ? undefined : props.style}
+      id={props.id}
     />
   );
   return props.label ? (

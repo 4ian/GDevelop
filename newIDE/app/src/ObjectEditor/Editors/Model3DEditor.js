@@ -44,7 +44,8 @@ export const hasLight = (layout: ?gd.Layout) => {
       const type = effect.getEffectType();
       if (
         type === 'Scene3D::AmbientLight' ||
-        type === 'Scene3D::DirectionalLight'
+        type === 'Scene3D::DirectionalLight' ||
+        type === 'Scene3D::HemisphereLight'
       ) {
         return true;
       }

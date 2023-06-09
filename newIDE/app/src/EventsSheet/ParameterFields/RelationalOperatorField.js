@@ -30,7 +30,7 @@ const mapTypeToOperators: { [string]: Array<string> } = {
 
 const defaultOperators: { [string]: string } = {
   number: '=',
-  time: '>',
+  time: '>=',
   string: '=',
   color: '=',
 };

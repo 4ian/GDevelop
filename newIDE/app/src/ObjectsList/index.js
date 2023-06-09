@@ -941,4 +941,4 @@ const areEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
-export default React.memo<Props>(ObjectsList, areEqual);
+export default React.memo<Props, ObjectsListInterface>(ObjectsList, areEqual);

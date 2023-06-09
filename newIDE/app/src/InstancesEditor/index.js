@@ -368,7 +368,7 @@ export default class InstancesEditor extends Component<Props> {
    * this when the initial instances were recreated to ensure that there
    * is not mismatch between renderers and the instances that were updated.
    */
-  forceRemount() {
+  forceRemount = () => {
     this._mountEditorComponents(this.props);
   }
 
@@ -558,14 +558,14 @@ export default class InstancesEditor extends Component<Props> {
    * See also ResourcesLoader and PixiResourcesLoader.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetInstanceRenderersFor(objectName: string) {
+  resetInstanceRenderersFor = (objectName: string) => {
     if (this.instancesRenderer)
       this.instancesRenderer.resetInstanceRenderersFor(objectName);
   }
 
-  zoomBy(value: number) {
+  zoomBy = (value: number) => {
     this.setZoomFactor(this.getZoomFactor() * value);
-  }
+  };
 
   /**
    * Zoom and scroll so that the cursor stays on the same position scene-wise.
@@ -925,7 +925,7 @@ export default class InstancesEditor extends Component<Props> {
     return this.canvasArea.getBoundingClientRect();
   }
 
-  zoomToFitContent() {
+  zoomToFitContent = () => {
     const { initialInstances } = this.props;
     if (initialInstances.getInstancesCount() === 0) return;
 
@@ -954,9 +954,9 @@ export default class InstancesEditor extends Component<Props> {
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
     if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
-  }
+  };
 
-  zoomToInitialPosition() {
+  zoomToInitialPosition = () => {
     const width = this.props.project.getGameResolutionWidth();
     const height = this.props.project.getGameResolutionHeight();
     const x = width / 2;
@@ -965,9 +965,9 @@ export default class InstancesEditor extends Component<Props> {
       getRecommendedInitialZoomFactor(Math.max(height, width))
     );
     this.scrollTo(x, y);
-  }
+  };
 
-  zoomToFitSelection(instances: Array<gdInitialInstance>) {
+  zoomToFitSelection = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) return;
     const [firstInstance, ...otherInstances] = instances;
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
@@ -981,9 +981,9 @@ export default class InstancesEditor extends Component<Props> {
       );
     });
     this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
-  }
+  };
 
-  centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
+  centerViewOnLastInstance = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) return;
 
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
@@ -992,7 +992,7 @@ export default class InstancesEditor extends Component<Props> {
       new Rectangle()
     );
     this.fitViewToRectangle(lastInstanceRectangle, { adaptZoom: false });
-  }
+  };
 
   getLastContextMenuSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
@@ -1008,7 +1008,7 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  getViewPosition = () /*: ?ViewPosition */ => {
+  getViewPosition = (): ?ViewPosition => {
     return this.viewPosition;
   };
 

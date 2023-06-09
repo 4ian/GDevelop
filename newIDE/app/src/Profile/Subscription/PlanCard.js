@@ -42,24 +42,24 @@ const getPlanPrice = ({
   const prices = [];
   prices.push(
     plan.isPerUser ? (
-      <Text noMargin color="secondary">
-        <Trans key="month">{plan.monthlyPriceInEuros}€/seat/month</Trans>
+      <Text key="month" noMargin color="secondary">
+        <Trans>{plan.monthlyPriceInEuros}€/seat/month</Trans>
       </Text>
     ) : (
-      <Text noMargin color="secondary">
-        <Trans key="month">{plan.monthlyPriceInEuros}€/month</Trans>
+      <Text key="month" noMargin color="secondary">
+        <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
       </Text>
     )
   );
   if (plan.yearlyPriceInEuros) {
     prices.push(
       plan.isPerUser ? (
-        <Text noMargin color="secondary">
-          <Trans key="year">or {plan.yearlyPriceInEuros}€/seat/year</Trans>
+        <Text key="year" noMargin color="secondary">
+          <Trans>or {plan.yearlyPriceInEuros}€/seat/year</Trans>
         </Text>
       ) : (
-        <Text noMargin color="secondary">
-          <Trans key="year">or {plan.yearlyPriceInEuros}€/year</Trans>
+        <Text key="year" noMargin color="secondary">
+          <Trans>or {plan.yearlyPriceInEuros}€/year</Trans>
         </Text>
       )
     );

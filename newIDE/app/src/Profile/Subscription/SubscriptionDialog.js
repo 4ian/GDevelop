@@ -102,7 +102,7 @@ export default function SubscriptionDialog({
   const [
     educationPlanPeriodicity,
     setEducationPlanPeriodicity,
-  ] = React.useState<'year' | 'month'>('year');
+  ] = React.useState<'yearly' | 'monthly'>('yearly');
   const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
@@ -137,9 +137,7 @@ export default function SubscriptionDialog({
       setSubscriptionPendingDialogOpen(true);
       const isEducationPlan = plan.planId === 'gdevelop_education';
       const planId = isEducationPlan
-        ? `gdevelop_education_${
-            educationPlanPeriodicity === 'year' ? 'yearly' : 'monthly'
-          }`
+        ? `gdevelop_education_${educationPlanPeriodicity}`
         : plan.planId || '';
       const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
       Window.openExternalURL(
@@ -349,7 +347,6 @@ export default function SubscriptionDialog({
                         floatingLabelText={<Trans>Number of seats</Trans>}
                         commitOnBlur
                         type="number"
-                        style={{}}
                         onChange={value => {
                           const newValue = parseInt(value);
                           setEducationPlanSeatsCount(
@@ -380,8 +377,8 @@ export default function SubscriptionDialog({
                           setEducationPlanPeriodicity(newValue);
                         }}
                       >
-                        <SelectOption value="year" label={t`Per year`} />
-                        <SelectOption value="month" label={t`Per month`} />
+                        <SelectOption value="yearly" label={t`Per year`} />
+                        <SelectOption value="monthly" label={t`Per month`} />
                       </SelectField>
                     </ResponsiveLineStackLayout>,
                     <RaisedButton

@@ -36,6 +36,8 @@ export const useOpenInitialDialog = ({
           removeRouteArguments(['initial-dialog']);
           break;
         case 'signup':
+          // Add timeout to give time to the app to sign in with Firebase
+          // to make sure the most relevant dialog is opened.
           const timeoutId = setTimeout(() => {
             if (authenticated) {
               openProfileDialog(true);

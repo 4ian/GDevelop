@@ -11,6 +11,7 @@ import {
   subscriptionForGoldUser,
   subscriptionForIndieUser,
   subscriptionForProUser,
+  subscriptionForEducationPlan,
   subscriptionForSilverUser,
   purchaselyGoldSubscription,
   subscriptionForGoldUserFromEducationPlan,
@@ -79,6 +80,16 @@ export const WithGoldSubscriptionFromEducationPlan = () => (
   <AlertProvider>
     <SubscriptionDetails
       subscription={subscriptionForGoldUserFromEducationPlan}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithEducationSubscription = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForEducationPlan}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />

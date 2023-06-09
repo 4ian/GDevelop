@@ -201,7 +201,7 @@ export const subscriptionForGoldUser: Subscription = {
 };
 
 export const subscriptionForEducationPlan: Subscription = {
-  planId: 'gdevelop_education_1year',
+  planId: 'gdevelop_education',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'teacher-user',

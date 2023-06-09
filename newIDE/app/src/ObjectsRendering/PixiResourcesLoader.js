@@ -27,7 +27,7 @@ const getOrCreateGltfLoader = () => {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('/examples/jsm/libs/draco/');
+    dracoLoader.setDecoderPath('./external/draco/gltf/');
     gltfLoader.setDRACOLoader(dracoLoader);
   }
   return gltfLoader;

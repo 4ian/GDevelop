@@ -56,7 +56,6 @@ type Props = {
  *  - If the code is expired, show a message to invite the user to re-subscribe.
  *    We will need to cancel the current expired subscription, but don't show a warning.
  */
-
 const SubscriptionDetails = ({
   subscription,
   isManageSubscriptionLoading,
@@ -74,12 +73,7 @@ const SubscriptionDetails = ({
       const possiblePlans: Array<PlanDetails> = getSubscriptionPlans().concat(
         getFormerSubscriptionPlans()
       );
-      return possiblePlans.find(
-        plan =>
-          subscription.planId &&
-          plan.planId &&
-          subscription.planId.startsWith(plan.planId)
-      );
+      return possiblePlans.find(plan => subscription.planId === plan.planId);
     },
     [subscription]
   );

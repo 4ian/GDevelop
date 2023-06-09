@@ -322,12 +322,7 @@ export default function SubscriptionDialog({
               const isFreePlan = !plan.planId;
               const isUserCurrentOrLegacyPlan =
                 userPlanId === plan.planId ||
-                (!!userPlanId && userPlanId === plan.legacyPlanId) ||
-                // Education plans (yearly and monthly) are merged into a single plan in the UI
-                // with a selector.
-                (!!userPlanId &&
-                  !!plan.planId &&
-                  userPlanId.startsWith(plan.planId));
+                (!!userPlanId && userPlanId === plan.legacyPlanId);
               let actions: React.Node = null;
               if (isFreePlan) {
                 // If no plan (free usage), do not display button.

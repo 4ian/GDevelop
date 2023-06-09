@@ -1646,7 +1646,8 @@ module.exports = {
         .setType('number')
         .setGroup(_('Orientation'));
     }
-    // Update the alert condition in Model3DEditor.js when adding a new light.
+    // Don't forget to update the alert condition in Model3DEditor.js when
+    // adding a new light.
 
     return extension;
   },

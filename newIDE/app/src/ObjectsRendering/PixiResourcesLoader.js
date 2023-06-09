@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
@@ -20,6 +21,17 @@ const invalidModel = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1),
   new THREE.MeshBasicMaterial({ color: '#ff00ff' })
 );
+
+let gltfLoader = null;
+const getOrCreateGltfLoader = () => {
+  if (!gltfLoader) {
+    gltfLoader = new GLTFLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/examples/jsm/libs/draco/');
+    gltfLoader.setDRACOLoader(dracoLoader);
+  }
+  return gltfLoader;
+};
 
 const determineCrossOrigin = (url: string) => {
   // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
@@ -289,12 +301,12 @@ export default class PixiResourcesLoader {
       isResourceForPixi: true,
     });
 
-    const loader = new GLTFLoader();
-    loader.withCredentials = checkIfCredentialsRequired(url);
+    const gltfLoader = getOrCreateGltfLoader();
+    gltfLoader.withCredentials = checkIfCredentialsRequired(url);
     // TODO Cache promises that are not yet resolved to void `load` being
     // called more than once for the same resource.
     return new Promise((resolve, reject) => {
-      loader.load(
+      gltfLoader.load(
         url,
         gltf => {
           traverseToSetBasicMaterialFromMeshes(gltf.scene);

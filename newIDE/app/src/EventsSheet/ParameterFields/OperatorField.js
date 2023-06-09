@@ -19,7 +19,7 @@ const operatorLabels = {
   '/': t`/ (divide by)`,
 };
 
-const mapTypeToOperators = {
+const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '+', '-', '*', '/'],
   string: ['=', '+'],
@@ -46,6 +46,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       : 'unknown';
     const operators =
       mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
+
+    if (!props.value && comparedValueType !== 'unknown') {
+      props.onChange('=');
+    }
 
     return (
       <SelectField

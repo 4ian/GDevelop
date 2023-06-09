@@ -90,14 +90,10 @@ const ProjectGeneratingDialog = ({
             throw new Error('Generated project has no fileUrl');
           }
           await onCreate(generatedProject, {
+            // We only update the project name, the rest is handled by the template.
             projectName: generatedProject.projectName,
             storageProvider,
             saveAsLocation,
-            height: generatedProject.height,
-            width: generatedProject.width,
-            orientation: 'landscape',
-            optimizeForPixelArt: false,
-            allowPlayersToLogIn: false,
           });
         } else if (generatedProject.status === 'error') {
           throw new Error('Generated project has an error');

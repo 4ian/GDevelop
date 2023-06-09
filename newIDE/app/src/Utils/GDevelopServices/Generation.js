@@ -16,7 +16,6 @@ export type GeneratedProject = {
   projectName: string,
   fileUrl?: string,
   synopsis?: string,
-  layoutExplanation?: string,
   error?: string,
 };
 

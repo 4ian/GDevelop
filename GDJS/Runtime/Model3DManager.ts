@@ -22,6 +22,7 @@ namespace gdjs {
     _resources: ResourceData[];
 
     _loader: THREE_ADDONS.GLTFLoader | null = null;
+    _dracoLoader: THREE_ADDONS.DRACOLoader | null = null;
 
     _invalidModel: THREE.Object3D | null = null;
 
@@ -38,6 +39,10 @@ namespace gdjs {
 
       if (typeof THREE !== 'undefined') {
         this._loader = new THREE_ADDONS.GLTFLoader();
+
+        this._dracoLoader = new THREE_ADDONS.DRACOLoader();
+        this._dracoLoader.setDecoderPath('./pixi-renderers/draco/gltf/');
+        this._loader.setDRACOLoader(this._dracoLoader);
 
         /**
          * The invalid model is a box with magenta (#ff00ff) faces, to be

@@ -686,6 +686,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (pixiInThreeRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/three.js");
     InsertUnique(includesFiles, "pixi-renderers/ThreeAddons.js");
+    InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_decoder.wasm");
+    InsertUnique(includesFiles, "pixi-renderers/draco/gltf/draco_wasm_wrapper.js");
   }
   if (pixiRenderers) {
     InsertUnique(includesFiles, "pixi-renderers/pixi.js");

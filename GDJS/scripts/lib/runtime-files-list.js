@@ -24,13 +24,14 @@ const untransformedPaths = [
   // GDJS prebuilt files:
   'GDJS/Runtime/pixi-renderers/pixi.js',
   'GDJS/Runtime/pixi-renderers/three.js',
+  'GDJS/Runtime/pixi-renderers/ThreeAddons.js',
+  'GDJS/Runtime/pixi-renderers/draco/gltf/draco_wasm_wrapper.js',
   'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
   'GDJS/Runtime/Cordova',
   'GDJS/Runtime/Electron',
   'GDJS/Runtime/FacebookInstantGames',
   'GDJS/Runtime/libs/CocoonJS',
   'GDJS/Runtime/libs/rbush.js',
-  'GDJS/Runtime/libs/ThreeAddons.js',
 
   // Extensions pre-built files:
   'Extensions/Leaderboards/sha256.js',

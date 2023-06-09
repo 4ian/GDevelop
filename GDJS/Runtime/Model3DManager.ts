@@ -41,7 +41,7 @@ namespace gdjs {
         this._loader = new THREE_ADDONS.GLTFLoader();
 
         this._dracoLoader = new THREE_ADDONS.DRACOLoader();
-        this._dracoLoader.setDecoderPath('/pixi-renderers/draco/gltf/');
+        this._dracoLoader.setDecoderPath('./pixi-renderers/draco/gltf/');
         this._loader.setDRACOLoader(this._dracoLoader);
 
         /**

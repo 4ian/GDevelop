@@ -427,7 +427,7 @@ module.exports = {
         .addExpressionAndConditionAndAction(
           'number',
           'Animation',
-          _('Change the animation'),
+          _('Animation (by number)'),
           _(
             'the number of the animation played by the object (the number from the animations list).'
           ),
@@ -445,7 +445,7 @@ module.exports = {
         .addExpressionAndConditionAndAction(
           'string',
           'AnimationName',
-          _('Current animation name'),
+          _('Animation (by name)'),
           _('the animation played by the object'),
           _('the animation'),
           _('Animations and images'),

@@ -680,9 +680,9 @@ const Model3DEditor = ({
                                 <Line noMargin expand alignItems="center">
                                   {connectDragSource(
                                     <span>
-                                      <Spacer />
-                                      <DragHandleIcon />
-                                      <Spacer />
+                                      <Column>
+                                        <DragHandleIcon />
+                                      </Column>
                                     </span>
                                   )}
                                   <Text noMargin noShrink>
@@ -730,7 +730,7 @@ const Model3DEditor = ({
                                   {sourceSelectOptions}
                                 </SelectField>
                                 <Checkbox
-                                  label={<Trans>loop</Trans>}
+                                  label={<Trans>Loop</Trans>}
                                   checked={animation.shouldLoop()}
                                   onCheck={(e, checked) => {
                                     animation.setShouldLoop(checked);

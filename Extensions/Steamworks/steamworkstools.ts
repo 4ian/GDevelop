@@ -1,6 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Steamworks');
-  let steamAPI: import('steamworks.js').Client | null = null;
+  export let steamAPI: import('steamworks.js').Client | null = null;
 
   gdjs.registerFirstRuntimeSceneLoadedCallback((runtimeScene) => {
     const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
@@ -64,7 +64,9 @@ namespace gdjs {
     // ---
 
     export function getSteamId(): string {
-      return steamAPI ? steamAPI.localplayer.getSteamId().steamId64.toString(10) : '';
+      return steamAPI
+        ? steamAPI.localplayer.getSteamId().steamId64.toString(10)
+        : '';
     }
 
     export function getName(): string {
@@ -88,5 +90,21 @@ namespace gdjs {
     }
 
     // ---
+
+    export function isSteamworksProperlyLoaded() {
+      return !!steamAPI;
+    }
+
+    export function getAppID(): number {
+      return steamAPI ? steamAPI.utils.getAppId() : 0;
+    }
+
+    export function getServerRealTime(): number {
+      return steamAPI ? steamAPI.utils.getServerRealTime() : Date.now();
+    }
+
+    export function isOnSteamDeck(): boolean {
+      return steamAPI ? steamAPI.utils.isSteamRunningOnSteamDeck() : false;
+    }
   }
 }

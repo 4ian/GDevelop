@@ -210,6 +210,66 @@ module.exports = {
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.setRichPresence');
 
+    extension
+      .addCondition(
+        'IsSteamworksLoaded',
+        _('Is Steamworks Loaded'),
+        _(
+          'Checks whether the Steamworks SDK could be properly loaded. If steam is not installed, the game is not running on PC, or for any other reason Steamworks features will not be able to function, this function will trigger allowing you to disable functionality that relies on Steamworks.'
+        ),
+        _('Steamworks is properly loaded'),
+        _('Utilities'),
+        'JsPlatform/Extensions/icon.png',
+        'JsPlatform/Extensions/icon.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isSteamworksProperlyLoaded');
+
+    extension
+      .addExpression(
+        'AppID',
+        _('Steam AppID'),
+        _(
+          "Obtains the game's Steam app ID, as declared in the games properties."
+        ),
+        _('Utilities'),
+        'JsPlatform/Extensions/icon.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getAppID');
+
+    extension
+      .addExpression(
+        'ServerTime',
+        _('Current time (from the Steam servers)'),
+        _(
+          'Obtains the real current time from the Steam servers, which cannot be faked by changing the system time.'
+        ),
+        _('Utilities'),
+        'JsPlatform/Extensions/icon.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getServerRealTime');
+
+    extension
+      .addCondition(
+        'IsOnSteamDeck',
+        _('Is on Steam Deck'),
+        _(
+          'Checks whether the game is currently running on a Steam Deck or not.'
+        ),
+        _('Game is running on a Steam Deck'),
+        _('Utilities'),
+        'JsPlatform/Extensions/icon.png',
+        'JsPlatform/Extensions/icon.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isOnSteamDeck');
+
     return extension;
   },
   runExtensionSanityTests: function (

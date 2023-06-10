@@ -37,7 +37,7 @@ module.exports = {
 
     extension
       .addInstructionOrExpressionGroupMetadata(_('Steamworks (Steam)'))
-      .setIcon('res/actions/son24.png');
+      .setIcon('JsPlatform/Extensions/steam.svg');
 
     extension
       .registerProperty('AppID')
@@ -70,8 +70,8 @@ module.exports = {
         ),
         _('Claim steam achievement _PARAM0_'),
         _('Achievements'),
-        'res/actions/son24.png',
-        'res/actions/son.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(
         'identifier',
@@ -90,8 +90,8 @@ module.exports = {
         _("Removes a player's Steam achievement."),
         _('Unclaim Steam achievement _PARAM0_'),
         _('Achievements'),
-        'res/actions/son24.png',
-        'res/actions/son.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(
         'identifier',
@@ -110,8 +110,8 @@ module.exports = {
         _("Checks if a player owns one of this game's Steam achievement."),
         _('Player has previously claimed the Steam achievement _PARAM0_'),
         _('Achievements'),
-        'res/actions/son24.png',
-        'res/actions/son.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(
         'identifier',
@@ -131,7 +131,7 @@ module.exports = {
           "The player's unique Steam ID number. Note that it is too big a number to load correctly as a float, and must be used as a string."
         ),
         _('Player'),
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -143,7 +143,7 @@ module.exports = {
         _('Name'),
         _("The player's registered name on Steam."),
         _('Player'),
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -155,7 +155,7 @@ module.exports = {
         _('Country code'),
         _("The player's country represented as its two-letter code."),
         _('Player'),
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -167,7 +167,7 @@ module.exports = {
         _('Steam Level'),
         _("Obtains the player's Steam level"),
         _('Player'),
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -182,8 +182,8 @@ module.exports = {
         ),
         _('Set steam rich presence attribute _PARAM0_ to _PARAM1_'),
         _('Rich presence'),
-        'JsPlatform/Extensions/icon.png',
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .addParameter(
         'stringWithSelector',
@@ -219,8 +219,8 @@ module.exports = {
         ),
         _('Steamworks is properly loaded'),
         _('Utilities'),
-        'JsPlatform/Extensions/icon.png',
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -234,7 +234,7 @@ module.exports = {
           "Obtains the game's Steam app ID, as declared in the games properties."
         ),
         _('Utilities'),
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -248,7 +248,7 @@ module.exports = {
           'Obtains the real current time from the Steam servers, which cannot be faked by changing the system time.'
         ),
         _('Utilities'),
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
@@ -263,8 +263,8 @@ module.exports = {
         ),
         _('Game is running on a Steam Deck'),
         _('Utilities'),
-        'JsPlatform/Extensions/icon.png',
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')

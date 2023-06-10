@@ -37,6 +37,7 @@ import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
+  onlyAppStorePrivateAssetPacks?: boolean,
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
@@ -56,6 +57,7 @@ const Providers = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
+  onlyAppStorePrivateAssetPacks,
 }: Props) => {
   return (
     <DragAndDropContextProvider>
@@ -92,7 +94,11 @@ const Providers = ({
                                   >
                                     <SubscriptionSuggestionProvider>
                                       <CommandsContextProvider>
-                                        <AssetStoreStateProvider>
+                                        <AssetStoreStateProvider
+                                          onlyAppStorePrivateAssetPacks={
+                                            onlyAppStorePrivateAssetPacks
+                                          }
+                                        >
                                           <ResourceStoreStateProvider>
                                             <ExampleStoreStateProvider>
                                               <ExtensionStoreStateProvider>

@@ -6,7 +6,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridList from '@material-ui/core/GridList';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
-import PriceTag from '../UI/PriceTag';
+import { PrivateAssetPackPriceTag } from './PrivateAssets/PrivateAssetPackPriceTag';
 import type {
   PublicAssetPacks,
   PublicAssetPack,
@@ -204,8 +204,8 @@ export const PrivateAssetPackTile = ({
           alt={`Preview image of asset pack ${assetPackListingData.name}`}
         />
         <div style={styles.priceTagContainer}>
-          <PriceTag
-            value={assetPackListingData.prices[0].value}
+          <PrivateAssetPackPriceTag
+            privateAssetPackListingData={assetPackListingData}
             withOverlay
             owned={owned}
           />

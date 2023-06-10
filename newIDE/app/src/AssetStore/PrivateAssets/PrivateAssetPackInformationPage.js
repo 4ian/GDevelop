@@ -10,7 +10,6 @@ import Text from '../../UI/Text';
 import { t, Trans } from '@lingui/macro';
 import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
-import { formatPrice } from '../../UI/PriceTag';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { ResponsiveLineStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -32,6 +31,11 @@ import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
 import { PrivateAssetPackTile } from '../AssetsHome';
+import {
+  purchaseAppStoreProduct,
+  shouldUseAppStoreProduct,
+} from '../../Utils/AppStorePurchases';
+import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
 
 const sameCreatorPackCountForSmallWindow = 2;
 const sameCreatorPackCountForMediumWindow = 3;
@@ -78,7 +82,7 @@ const PrivateAssetPackInformationPage = ({
   isPurchaseDialogOpen,
   onAssetPackOpen,
 }: Props) => {
-  const { id, name, sellerId, prices } = privateAssetPackListingData;
+  const { id, name, sellerId } = privateAssetPackListingData;
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
@@ -89,6 +93,10 @@ const PrivateAssetPackInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
+  const [
+    appStoreProductBeingBought,
+    setAppStoreProductBeingBought,
+  ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
 
@@ -97,8 +105,11 @@ const PrivateAssetPackInformationPage = ({
       (async () => {
         setIsFetching(true);
         try {
-          const assetPack = await getPrivateAssetPack(id);
-          const profile = await getUserPublicProfile(sellerId);
+          const [assetPack, profile] = await Promise.all([
+            getPrivateAssetPack(id),
+            getUserPublicProfile(sellerId),
+          ]);
+
           setAssetPack(assetPack);
           setSellerPublicProfile(profile);
         } catch (error) {
@@ -119,43 +130,64 @@ const PrivateAssetPackInformationPage = ({
         }
       })();
     },
-    [id, sellerId]
+    [id, sellerId, privateAssetPackListingData.appStoreProductId]
   );
 
-  const onClickBuy = () => {
+  const onClickBuy = async () => {
     if (!assetPack) return;
     try {
-      onOpenPurchaseDialog();
       sendAssetPackBuyClicked({
         assetPackId: assetPack.id,
         assetPackName: assetPack.name,
         assetPackTag: assetPack.tag,
         assetPackKind: 'private',
       });
+
+      if (shouldUseAppStoreProduct()) {
+        try {
+          setAppStoreProductBeingBought(true);
+          await purchaseAppStoreProduct(
+            privateAssetPackListingData.appStoreProductId
+          );
+        } finally {
+          setAppStoreProductBeingBought(false);
+        }
+      } else {
+        onOpenPurchaseDialog();
+      }
     } catch (e) {
       console.warn('Unable to send event', e);
     }
   };
 
-  const getBuyButton = i18n =>
-    !errorText ? (
+  const getBuyButton = i18n => {
+    if (errorText) return null;
+
+    const label = !assetPack ? (
+      <Trans>Loading...</Trans>
+    ) : isPurchaseDialogOpen || appStoreProductBeingBought ? (
+      <Trans>Processing...</Trans>
+    ) : (
+      <Trans>
+        Buy for{' '}
+        {formatPrivateAssetPackPrice({ i18n, privateAssetPackListingData })}
+      </Trans>
+    );
+
+    const disabled =
+      !assetPack || isPurchaseDialogOpen || appStoreProductBeingBought;
+
+    return (
       <RaisedButton
         key="buy-asset-pack"
         primary
-        label={
-          !assetPack ? (
-            <Trans>Loading...</Trans>
-          ) : isPurchaseDialogOpen ? (
-            <Trans>Processing...</Trans>
-          ) : (
-            <Trans>Buy for {formatPrice(i18n, prices[0].value)}</Trans>
-          )
-        }
+        label={label}
         onClick={onClickBuy}
-        disabled={!assetPack || isPurchaseDialogOpen}
+        disabled={disabled}
         id="buy-asset-pack"
       />
-    ) : null;
+    );
+  };
 
   const mediaItems = assetPack
     ? assetPack.previewImageUrls
@@ -221,7 +253,10 @@ const PrivateAssetPackInformationPage = ({
                           alignItems="center"
                         >
                           <Text noMargin size="block-title">
-                            {formatPrice(i18n, prices[0].value)}
+                            {formatPrivateAssetPackPrice({
+                              i18n,
+                              privateAssetPackListingData,
+                            })}
                           </Text>
                           {getBuyButton(i18n)}
                         </Line>

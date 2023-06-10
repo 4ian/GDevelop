@@ -56,5 +56,37 @@ namespace gdjs {
           `Could not unclaim achievement ${achievement}, steamworks was not properly loaded!`
         );
     }
+
+    export function hasAchievement(achievement: string) {
+      return steamAPI && steamAPI.achievement.isActivated(achievement);
+    }
+
+    // ---
+
+    export function getSteamId(): string {
+      return steamAPI ? steamAPI.localplayer.getSteamId().steamId64.toString(10) : '';
+    }
+
+    export function getName(): string {
+      return steamAPI ? steamAPI.localplayer.getName() : 'Unknown';
+    }
+
+    export function getCountry(): string {
+      return steamAPI ? steamAPI.localplayer.getIpCountry() : '??';
+    }
+
+    export function getLevel(): number {
+      return steamAPI ? steamAPI.localplayer.getLevel() : 0;
+    }
+
+    export function setRichPresence(key: string, value: string) {
+      if (steamAPI) steamAPI.localplayer.setRichPresence(key, value);
+      else
+        logger.warn(
+          `Could not set the rich presence, steamworks was not properly loaded!`
+        );
+    }
+
+    // ---
   }
 }

@@ -12,6 +12,7 @@ import {
   GDevelopUserApi,
 } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import { client as assetApiAxiosClient } from '../../../../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServices/Shop';
 
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
@@ -19,7 +20,7 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-const privateAssetPackListingData = {
+const privateAssetPackListingData: PrivateAssetPackListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
   productType: 'ASSET_PACK',
@@ -33,6 +34,7 @@ const privateAssetPackListingData = {
   name: 'French Food',
   categories: ['props'],
   prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
+  appStoreProductId: null,
 };
 
 const sellerPublicProfile = {
@@ -118,6 +120,7 @@ export const Default = () => {
           prices: [
             { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
           ],
+          appStoreProductId: null,
         },
         {
           id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
@@ -135,6 +138,7 @@ export const Default = () => {
           prices: [
             { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
           ],
+          appStoreProductId: 'fake.product.id',
         },
       ]}
     />

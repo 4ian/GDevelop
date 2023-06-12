@@ -237,15 +237,13 @@ export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
 const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/gi;
 const consecutiveSpacesRegex = /\s+/gi;
 const cleanUpProjectFileName = (projectFileName: string) => {
-  let cleanedProjectFileName = projectFileName;
-  if (cleanedProjectFileName.length > 200) {
-    cleanedProjectFileName = cleanedProjectFileName.substring(0, 200);
-  }
-  cleanedProjectFileName = cleanedProjectFileName
+  return (projectFileName.length > 200
+    ? projectFileName.substring(0, 200)
+    : projectFileName
+  )
     .replaceAll(forbiddenCharacterRegex, ' ')
     .replaceAll(consecutiveSpacesRegex, ' ')
     .trim();
-  return cleanedProjectFileName;
 };
 
 export const onRenderNewProjectSaveAsLocationChooser = ({

@@ -121,6 +121,8 @@ const NewProjectSetupDialog = ({
     resolutionOption,
     setResolutionOption,
   ] = React.useState<ResolutionOption>('desktopMobileLandscape');
+  const [customWidth, setCustomWidth] = React.useState<?number>(800);
+  const [customHeight, setCustomHeight] = React.useState<?number>(600);
   const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
     false
   );
@@ -183,6 +185,12 @@ const NewProjectSetupDialog = ({
     storageProvider.internalName === 'Cloud' &&
     checkIfHasTooManyCloudProjects(authenticatedUser);
 
+  const selectedWidth =
+    resolutionOptions[resolutionOption].width || customWidth || 800;
+  const selectedHeight =
+    resolutionOptions[resolutionOption].height || customHeight || 600;
+  const selectedOrientation = resolutionOptions[resolutionOption].orientation;
+
   const generateProject = React.useCallback(
     async () => {
       if (isOpeningProject) return;
@@ -195,8 +203,8 @@ const NewProjectSetupDialog = ({
           {
             userId: profile.id,
             prompt: generationPrompt,
-            width: resolutionOptions[resolutionOption].width,
-            height: resolutionOptions[resolutionOption].height,
+            width: selectedWidth,
+            height: selectedHeight,
             projectName,
           }
         );
@@ -225,10 +233,11 @@ const NewProjectSetupDialog = ({
       getAuthorizationHeader,
       generationPrompt,
       profile,
-      resolutionOption,
       projectName,
       showAlert,
       authenticatedUser,
+      selectedHeight,
+      selectedWidth,
     ]
   );
 
@@ -249,16 +258,13 @@ const NewProjectSetupDialog = ({
         );
         return;
       }
-      const { height, width, orientation } = resolutionOptions[
-        resolutionOption
-      ];
       const projectSetup = {
         projectName,
         storageProvider,
         saveAsLocation,
-        height,
-        width,
-        orientation,
+        height: selectedHeight,
+        width: selectedWidth,
+        orientation: selectedOrientation,
         optimizeForPixelArt,
         allowPlayersToLogIn,
       };
@@ -282,7 +288,9 @@ const NewProjectSetupDialog = ({
       projectName,
       storageProvider,
       saveAsLocation,
-      resolutionOption,
+      selectedHeight,
+      selectedWidth,
+      selectedOrientation,
       optimizeForPixelArt,
       allowPlayersToLogIn,
       generateProject,
@@ -343,6 +351,10 @@ const NewProjectSetupDialog = ({
                 onClick={key => setResolutionOption(key)}
                 selectedOption={resolutionOption}
                 disabled={isLoading}
+                customHeight={customHeight}
+                customWidth={customWidth}
+                onCustomHeightChange={setCustomHeight}
+                onCustomWidthChange={setCustomWidth}
               />
             )}
             <TextField

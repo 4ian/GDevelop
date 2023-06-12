@@ -4,17 +4,19 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../UI/Text';
-import { Column, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import { Trans } from '@lingui/macro';
 import DesktopHD from './Icons/DesktopHD';
 import DesktopMobileLandscape from './Icons/DesktopMobileLandscape';
 import MobilePortrait from './Icons/MobilePortrait';
+import CustomSize from './Icons/CustomSize';
+import TextField from '../UI/TextField';
 
 const styles = {
   optionsContainer: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))',
-    gridGap: '1rem',
+    gridGap: '0.5rem',
     margin: 2,
   },
   optionContainer: {
@@ -38,18 +40,26 @@ const styles = {
     width: '100%',
     display: 'flex',
   },
+  largeIcon: {
+    transform: 'scale(1.5)',
+  },
+  customSizeField: {
+    fontSize: 12,
+    padding: 2,
+  },
 };
 
 export type ResolutionOption =
   | 'mobilePortrait'
   | 'desktopMobileLandscape'
-  | 'desktopHD';
+  | 'desktopHD'
+  | 'custom';
 
 export const resolutionOptions: {
   [key: ResolutionOption]: {|
     label: React.Node,
-    height: number,
-    width: number,
+    height?: number,
+    width?: number,
     orientation: 'landscape' | 'portrait' | 'default',
     icon: React.Node,
   |},
@@ -66,14 +76,19 @@ export const resolutionOptions: {
     width: 1280,
     height: 720,
     orientation: 'landscape',
-    icon: <DesktopMobileLandscape />,
+    icon: <DesktopMobileLandscape fontSize="large" />,
   },
   desktopHD: {
     label: <Trans>Desktop Full HD</Trans>,
     width: 1920,
     height: 1080,
     orientation: 'default',
-    icon: <DesktopHD fontSize="large" />,
+    icon: <DesktopHD fontSize="large" style={styles.largeIcon} />,
+  },
+  custom: {
+    label: <Trans>Custom size</Trans>,
+    orientation: 'default',
+    icon: <CustomSize fontSize="large" style={styles.largeIcon} />,
   },
 };
 
@@ -113,7 +128,6 @@ const ResolutionOptionButton = ({
   return (
     <ButtonBase
       onClick={onClick}
-      focusRipple
       elevation={2}
       style={{
         ...styles.buttonBase,
@@ -121,10 +135,11 @@ const ResolutionOptionButton = ({
       classes={classes}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
+        if (shouldValidate(event) && !selected) {
           onClick();
         }
       }}
+      disableTouchRipple={selected} // Avoid ripple effect even if already selected.
       disabled={disabled}
     >
       <div style={styles.contentWrapper}>{children}</div>
@@ -136,10 +151,18 @@ const ResolutionOptions = ({
   selectedOption,
   onClick,
   disabled,
+  customWidth,
+  customHeight,
+  onCustomWidthChange,
+  onCustomHeightChange,
 }: {|
   selectedOption: string,
   onClick: ResolutionOption => void,
   disabled?: boolean,
+  customWidth: ?number,
+  customHeight: ?number,
+  onCustomWidthChange: (?number) => void,
+  onCustomHeightChange: (?number) => void,
 |}) => {
   return (
     <div style={styles.optionsContainer}>
@@ -164,9 +187,76 @@ const ResolutionOptions = ({
                   <Text size="body2" noMargin>
                     {label}
                   </Text>
-                  <Text size="body-small" noMargin color="secondary">
-                    {width}x{height}
-                  </Text>
+                  {width && height ? (
+                    <Text size="body-small" noMargin color="secondary">
+                      {width}x{height}
+                    </Text>
+                  ) : (
+                    <Line noMargin alignItems="center" justifyContent="center">
+                      <Text size="body-small" noMargin color="secondary">
+                        W
+                      </Text>
+                      <TextField
+                        margin="none"
+                        style={styles.customSizeField}
+                        inputStyle={{ padding: 0 }}
+                        type="number"
+                        value={customWidth || ''}
+                        onChange={(e, newValue: string) => {
+                          // Allow any value, we will clean the value on blur.
+                          const newWidth = parseInt(newValue, 10);
+                          onCustomWidthChange(
+                            isNaN(newWidth) ? null : newWidth
+                          );
+                        }}
+                        onBlur={() => {
+                          const newWidth = parseInt(
+                            customWidth || 800, // Default to 600 if empty.
+                            10
+                          );
+                          const newWidthWithinLimits = Math.min(
+                            Math.max(newWidth, 1),
+                            10000
+                          );
+                          onCustomWidthChange(newWidthWithinLimits);
+                        }}
+                        min={1}
+                        max={10000}
+                        step={1}
+                      />
+                      <Text size="body-small" noMargin color="secondary">
+                        H
+                      </Text>
+                      <TextField
+                        margin="none"
+                        style={styles.customSizeField}
+                        inputStyle={{ padding: 0 }}
+                        type="number"
+                        value={customHeight || ''}
+                        onChange={(e, newValue: string) => {
+                          // Allow any value, we will clean the value on blur.
+                          const newHeight = parseInt(newValue, 10);
+                          onCustomHeightChange(
+                            isNaN(newHeight) ? null : newHeight
+                          );
+                        }}
+                        onBlur={() => {
+                          const newHeight = parseInt(
+                            customHeight || 600, // Default to 600 if empty.
+                            10
+                          );
+                          const newHeightWithinLimits = Math.min(
+                            Math.max(newHeight, 1),
+                            10000
+                          );
+                          onCustomHeightChange(newHeightWithinLimits);
+                        }}
+                        min={1}
+                        max={10000}
+                        step={1}
+                      />
+                    </Line>
+                  )}
                 </Column>
               </Column>
             </ResolutionOptionButton>

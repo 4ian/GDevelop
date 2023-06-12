@@ -370,7 +370,7 @@ export default class InstancesEditor extends Component<Props> {
    */
   forceRemount = () => {
     this._mountEditorComponents(this.props);
-  }
+  };
 
   _mountEditorComponents(props: Props) {
     //Remove and delete any existing editor component
@@ -561,7 +561,7 @@ export default class InstancesEditor extends Component<Props> {
   resetInstanceRenderersFor = (objectName: string) => {
     if (this.instancesRenderer)
       this.instancesRenderer.resetInstanceRenderersFor(objectName);
-  }
+  };
 
   zoomBy = (value: number) => {
     this.setZoomFactor(this.getZoomFactor() * value);

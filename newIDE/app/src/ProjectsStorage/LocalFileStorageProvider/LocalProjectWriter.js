@@ -236,15 +236,14 @@ export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
 // See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/gi;
 const consecutiveSpacesRegex = /\s+/gi;
-const cleanUpProjectFileName = (projectFileName: string) => {
-  return (projectFileName.length > 200
+const cleanUpProjectFileName = (projectFileName: string) =>
+  (projectFileName.length > 200
     ? projectFileName.substring(0, 200)
     : projectFileName
   )
     .replaceAll(forbiddenCharacterRegex, ' ')
     .replaceAll(consecutiveSpacesRegex, ' ')
     .trim();
-};
 
 export const onRenderNewProjectSaveAsLocationChooser = ({
   projectName,

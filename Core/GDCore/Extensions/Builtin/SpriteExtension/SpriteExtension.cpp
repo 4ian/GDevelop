@@ -161,6 +161,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .SetHidden();  // Deprecated
 
+  // Deprecated
   obj.AddAction("ChangeScale",
                 _("Scale"),
                 _("Modify the scale of the specified object."),
@@ -174,8 +175,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeScaleWidth",
                 _("Scale on X axis"),
                 _("Modify the scale of the width of an object."),
@@ -189,8 +192,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeScaleHeight",
                 _("Scale on Y axis"),
                 _("Modify the scale of the height of an object."),
@@ -204,8 +209,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeWidth",
                 _("Width"),
                 _("Change the width of a Sprite object."),
@@ -217,8 +224,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("Width",
                    _("Width"),
                    _("Compare the width of a Sprite object."),
@@ -230,8 +239,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeHeight",
                 _("Height"),
                 _("Change the height of a Sprite object."),
@@ -243,8 +254,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("Height",
                    _("Height"),
                    _("Compare the height of a Sprite object."),
@@ -256,8 +269,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetSize",
                 _("Size"),
                 _("Change the size of an object."),
@@ -269,7 +284,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
   obj.AddCondition(
          "Animation",
@@ -602,19 +618,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/animation.png")
       .AddParameter("object", _("Object"), "Sprite");
 
+  // Deprecated
   obj.AddExpression("ScaleX",
                     _("Scale of the width of an object"),
                     _("Scale of the width of an object"),
                     _("Size"),
                     "res/actions/scaleWidth_black.png")
-      .AddParameter("object", _("Object"), "Sprite");
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
+  // Deprecated
   obj.AddExpression("ScaleY",
                     _("Scale of the height of an object"),
                     _("Scale of the height of an object"),
                     _("Size"),
                     "res/actions/scaleHeight_black.png")
-      .AddParameter("object", _("Object"), "Sprite");
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
   obj.AddExpression("Opacity",
                     _("Opacity"),

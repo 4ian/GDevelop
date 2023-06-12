@@ -612,6 +612,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("AreCoordinatesRelative");
 
+  // Deprecated
   obj.AddAction("Scale",
                 _("Scale"),
                 _("Modify the scale of the specified object."),
@@ -624,8 +625,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddExpressionAndConditionAndAction("number",
                                          "ScaleX",
                                          _("Scale on X axis"),
@@ -638,8 +641,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddExpressionAndConditionAndAction("number",
                                          "ScaleY",
                                          _("Scale on Y axis"),
@@ -652,6 +657,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetHidden()
       .MarkAsAdvanced();
 
   obj.AddAction("FlipX",
@@ -694,6 +700,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    "res/actions/flipY.png")
       .AddParameter("object", _("Object"), "Drawer");
 
+  // Deprecated
   obj.AddAction("Width",
                 _("Width"),
                 _("Change the width of an object."),
@@ -704,8 +711,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddAction("Height",
                 _("Height"),
                 _("Change the height of an object."),
@@ -716,6 +725,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .MarkAsAdvanced();
 
   obj.AddAction(

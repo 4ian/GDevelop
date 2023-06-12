@@ -90,6 +90,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("color", _("Tint"));
 
+  // Deprecated
   obj.AddAction("Width",
                 _("Width"),
                 _("Modify the width of a Panel Sprite."),
@@ -101,9 +102,11 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetWidth")
       .SetGetter("GetWidth");
 
+  // Deprecated
   obj.AddCondition("Width",
                    _("Width"),
                    _("Check the width of a Panel Sprite."),
@@ -115,8 +118,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("GetWidth");
 
+  // Deprecated
   obj.AddAction("Height",
                 _("Height"),
                 _("Modify the height of a Panel Sprite."),
@@ -128,9 +133,11 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
+  // Deprecated
   obj.AddCondition("Height",
                    _("Height"),
                    _("Check the height of a Panel Sprite."),
@@ -142,6 +149,7 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 

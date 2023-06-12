@@ -1094,13 +1094,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .SetHidden();
 
-  obj.AddExpression("Width",
-                    _("Width"),
-                    _("Width of the object"),
-                    _("Size"),
-                    "res/actions/scaleWidth_black.png")
-      .AddParameter("object", _("Object"));
-
+  // Deprecated
   obj.AddExpression("Largeur",
                     _("Width"),
                     _("Width of the object"),
@@ -1109,13 +1103,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .SetHidden();
 
-  obj.AddExpression("Height",
-                    _("Height"),
-                    _("Height of the object"),
-                    _("Size"),
-                    "res/actions/scaleHeight_black.png")
-      .AddParameter("object", _("Object"));
-
+  // Deprecated
   obj.AddExpression("Hauteur",
                     _("Height"),
                     _("Height of the object"),
@@ -1668,6 +1656,98 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        "",
                        "res/actions/layer.png")
       .AddParameter("object", _("Object"));
+
+// Instruction for Resizable capability.
+{
+  // The expression is standard.
+  obj.AddExpressionAndConditionAndAction(
+                "number",
+                "Width",
+                _("Width"),
+                _("the width of the object"),
+                _("the width"),
+                _("Size"),
+                "res/actions/scaleWidth24_black.png")
+
+      .AddParameter("object", _("Object"), "Object")
+      .UseStandardParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
+
+  // The expression is standard.
+  obj.AddExpressionAndConditionAndAction(
+                "number",
+                "Height",
+                _("Height"),
+                _("the height of the object"),
+                _("the height"),
+                _("Size"),
+                "res/actions/scaleHeight24_black.png")
+
+      .AddParameter("object", _("Object"), "Object")
+      .UseStandardParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
+
+  obj.AddAction("SetSize",
+                _("Size"),
+                _("Change the size of an object."),
+                _("Change the size of _PARAM0_: set to _PARAM1_ x _PARAM2_"),
+                _("Size"),
+                "res/actions/scale24_black.png",
+                "res/actions/scale_black.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Width"))
+      .AddParameter("expression", _("Height"))
+      .MarkAsAdvanced();
+}
+// Instruction for Scalable capability.
+{
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "Scale",
+         _("Scale"),
+         _("the scale of the object (default scale is 1)"),
+         _("the scale"),
+         _("Scale"),
+         "res/actions/scale24_black.png")
+      .AddParameter("object", _("Object"), "Object")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
+      .MarkAsAdvanced();
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "ScaleX",
+         _("Scale on X axis"),
+         _("the scale on X axis of the object (default scale is 1)"),
+         _("the scale on X axis"),
+         _("Scale"),
+         "res/actions/scale24_black.png")
+      .AddParameter("object", _("Object"), "Object")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
+      .MarkAsAdvanced();
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "ScaleY",
+         _("Scale on Y axis"),
+         _("the scale on Y axis of the object (default scale is 1)"),
+         _("the scale on Y axis"),
+         _("Scale"),
+         "res/actions/scale24_black.png")
+      .AddParameter("object", _("Object"), "Object")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
+      .MarkAsAdvanced();
+}
 }
 
 }  // namespace gd

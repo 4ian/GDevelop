@@ -352,6 +352,36 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("getVariableChildCount")
       .SetIncludeFile("runtimeobject.js");
 
+  // Instructions for the Resizable capability
+  objectActions["SetSize"]
+      .SetFunctionName("setSize")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["Width"].SetFunctionName("getWidth");
+  objectActions["SetWidth"]
+      .SetFunctionName("setWidth")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["Height"].SetFunctionName("getHeight");
+  objectActions["SetHeight"]
+      .SetFunctionName("setHeight")
+      .SetIncludeFile("runtimeobject.js");
+
+  // Instructions for the Scalable capability
+  objectExpressions["Scale"].SetFunctionName("getScale");
+  objectConditions["Scale"].SetFunctionName("getScale");
+  objectActions["SetScale"]
+      .SetFunctionName("setScale")
+      .SetIncludeFile("runtimeobject.js");
+  objectExpressions["ScaleX"].SetFunctionName("getScaleX");
+  objectConditions["ScaleX"].SetFunctionName("getScaleX");
+  objectActions["SetScaleX"]
+      .SetFunctionName("setScaleX")
+      .SetIncludeFile("runtimeobject.js");
+  objectExpressions["ScaleY"].SetFunctionName("getScaleY");
+  objectConditions["ScaleY"].SetFunctionName("getScaleY");
+  objectActions["SetScaleY"]
+      .SetFunctionName("setScaleY")
+      .SetIncludeFile("runtimeobject.js");
+
   GetAllActions()["MoveObjects"].SetCustomCodeGenerator(
       [](gd::Instruction &,
          gd::EventsCodeGenerator &,

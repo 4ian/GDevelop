@@ -153,7 +153,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget {
+  export class RuntimeObject implements EffectsTarget, gdjs.Resizable, gdjs.Scalable {
     name: string;
     type: string;
     x: float = 0;
@@ -1200,18 +1200,6 @@ namespace gdjs {
     isHidden(): boolean {
       return this.hidden;
     }
-
-    /**
-     * Set the width of the object, if applicable.
-     * @param width The new width in pixels.
-     */
-    setWidth(width: float): void {}
-
-    /**
-     * Set the height of the object, if applicable.
-     * @param height The new height in pixels.
-     */
-    setHeight(height: float): void {}
 
     /**
      * Return the width of the object.
@@ -2546,6 +2534,27 @@ namespace gdjs {
         }
       }
       return false;
+    }
+
+    // Implementation of the Resizable interface.
+    setWidth(width: float): void {}
+    setHeight(height: float): void {}
+    setSize(newWidth: number, newHeight: number): void {}
+
+    // Implementation of the Scalable interface.
+    setScale(newScale: number): void {}
+    setScaleX(newScale: number): void {}
+    setScaleY(newScale: number): void {}
+    getScale(): number {
+      const scaleX = Math.abs(this.getScaleX());
+      const scaleY = Math.abs(this.getScaleY());
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
+    }
+    getScaleY(): number {
+      return 1;
+    }
+    getScaleX(): number {
+      return 1;
     }
 
     /**

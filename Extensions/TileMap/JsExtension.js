@@ -495,6 +495,7 @@ const defineTileMap = function (
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
 
+  // Deprecated
   object
     .addAction(
       'Scale',
@@ -513,10 +514,12 @@ const defineTileMap = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setScale')
     .setGetter('getScale');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -535,9 +538,11 @@ const defineTileMap = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -556,9 +561,11 @@ const defineTileMap = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
 
+  // Deprecated
   object
     .addAction(
       'Width',
@@ -575,9 +582,11 @@ const defineTileMap = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setWidth');
 
+  // Deprecated
   object
     .addAction(
       'Height',
@@ -594,6 +603,7 @@ const defineTileMap = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setHeight');
 };
@@ -909,6 +919,7 @@ const defineCollisionMask = function (
     .setFunctionName('setScale')
     .setGetter('getScale');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -932,9 +943,11 @@ const defineCollisionMask = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleX')
     .setGetter('getScaleX');
 
+  // Deprecated
   object
     .addExpressionAndConditionAndAction(
       'number',
@@ -958,9 +971,11 @@ const defineCollisionMask = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .setFunctionName('setScaleY')
     .setGetter('getScaleY');
 
+  // Deprecated
   object
     .addScopedAction(
       'Width',
@@ -982,9 +997,11 @@ const defineCollisionMask = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setWidth');
 
+  // Deprecated
   object
     .addScopedAction(
       'Height',
@@ -1006,6 +1023,7 @@ const defineCollisionMask = function (
       gd.ParameterOptions.makeNewOptions()
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setHeight');
 };

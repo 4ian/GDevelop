@@ -234,15 +234,15 @@ export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
   t`An error occurred when saving the project. Please try again by choosing another location.`;
 
 // See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
-const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/gi;
-const consecutiveSpacesRegex = /\s+/gi;
+const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/g;
+const consecutiveSpacesRegex = /\s+/g;
 const cleanUpProjectFileName = (projectFileName: string) =>
   (projectFileName.length > 200
     ? projectFileName.substring(0, 200)
     : projectFileName
   )
-    .replaceAll(forbiddenCharacterRegex, ' ')
-    .replaceAll(consecutiveSpacesRegex, ' ')
+    .replace(forbiddenCharacterRegex, ' ')
+    .replace(consecutiveSpacesRegex, ' ')
     .trim();
 
 export const onRenderNewProjectSaveAsLocationChooser = ({

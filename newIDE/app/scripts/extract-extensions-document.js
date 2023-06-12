@@ -3,6 +3,7 @@
  * Launch this script to generate a list (in markdown format) of all custom extensions.
  */
 
+const initializeGDevelopJs = require('../public/libGD.js');
 const fs = require('fs').promises;
 const { default: axios } = require('axios');
 const path = require('path');
@@ -16,6 +17,13 @@ const {
   convertCommonMarkdownToPythonMarkdown,
 } = require('./lib/PythonMarkdownHelper');
 const shell = require('shelljs');
+const {
+  generateExtensionReference,
+  generateExtensionRawText,
+  rawTextsToString,
+} = require('./lib/ExtensionReferenceGenerator');
+const { mapVector, mapFor } = require('./lib/MapFor');
+
 
 /** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
 
@@ -63,33 +71,91 @@ const generateAuthorNamesWithLinks = authors => {
 };
 
 /**
- * Return the list of all extensions and their associated short headers
+ * Add a serialized (JS object) events function extension to the project.
+ * 
  * (useful as containing author public profiles information).
- * @returns {Promise<Array<ExtensionHeader>>} A promise to all extension headers
+ * 
+ * @param {any} gd
+ * @param {gdProject} project
+ * 
+ * @returns {Promise<gdEventsFunctionsExtension>} A promise to all extensions
  */
-const getAllExtensionHeaders = async () => {
+const addAllExtensionsToProject = async (gd, project) => {
   const response = await axios.get(extensionShortHeadersUrl);
   const extensionShortHeaders = response.data;
   if (!extensionShortHeaders.length) {
     throw new Error('Unexpected response from the extension endpoint.');
   }
 
-  const extensionHeaders = await Promise.all(
+  return await Promise.all(
     extensionShortHeaders.map(async extensionShortHeader => {
-      const response = await axios.get(extensionShortHeader.headerUrl);
-      const extensionHeader = response.data;
-      if (!extensionHeader) {
+      const response = await axios.get(extensionShortHeader.url);
+      const serializedExtension = response.data;
+      if (!serializedExtension) {
         throw new Error(
-          `Unexpected response when fetching an extension header (${
-            extensionShortHeader.headerUrl
+          `Unexpected response when fetching an extension (${
+            extensionShortHeader.url
           }).`
         );
       }
-      return { ...extensionHeader, ...extensionShortHeader };
+      
+      const { name } = serializedExtension;
+      if (!name)
+        return Promise.reject(new Error('Malformed extension (missing name).'));
+
+      const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(name, 0);
+      unserializeFromJSObject(
+        gd,
+        newEventsFunctionsExtension,
+        serializedExtension,
+        'unserializeFrom',
+        project
+      );
+
+      return newEventsFunctionsExtension;
     })
   );
+};
 
-  return extensionHeaders;
+/**
+ * Tool function to restore a serializable object from a JS object.
+ * Most gd.* objects are "serializable", meaning they have a serializeTo
+ * and unserializeFrom method.
+ * @param {gdSerializable} serializable A gd.* object to restore
+ * @param {Object} object The JS object to be used to restore the serializable.
+ * @param {string} methodName The name of the unserialization method. "unserializeFrom" by default
+ * @param {?gdProject} optionalProject The project to pass as argument for unserialization
+ */
+function unserializeFromJSObject(
+  gd,
+  serializable,
+  object,
+  methodName = 'unserializeFrom',
+  optionalProject = undefined
+) {
+  const serializedElement = gd.Serializer.fromJSObject(object);
+  if (!optionalProject) {
+    serializable[methodName](serializedElement);
+  } else {
+    // It's not uncommon for unserializeFrom methods of gd.* classes
+    // to require the project to be passed as first argument.
+    serializable[methodName](optionalProject, serializedElement);
+  }
+  serializedElement.delete();
+}
+
+/**
+ * Return the list of all extensions and their associated short headers
+ * (useful as containing author public profiles information).
+ * @returns {Promise<Array<ExtensionHeader>>} A promise to all extension headers
+ */
+const getAllExtensionShortHeaders = async () => {
+  const response = await axios.get(extensionShortHeadersUrl);
+  const extensionShortHeaders = response.data;
+  if (!extensionShortHeaders.length) {
+    throw new Error('Unexpected response from the extension endpoint.');
+  }
+  return extensionShortHeaders;
 };
 
 const groupBy = (array, getKey) => {
@@ -116,23 +182,26 @@ const sortKeys = table => {
 
 /**
  * Create a page for an extension.
- * @param {ExtensionHeader} extensionHeader The extension header
+ * @param {any} gd
+ * @param {gdProject} project
+ * @param {gdEventsFunctionsExtension} extension The extension
+ * @param {ExtensionHeader} extensionShortHeader
  * @param {boolean} isCommunity The tier
  */
-const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
-  const folderName = getExtensionFolderName(extensionHeader.name);
+const createExtensionReferencePage = async (gd, project, extension, extensionShortHeader, isCommunity) => {
+  const folderName = getExtensionFolderName(extension.getName());
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
-  const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
   const authorNamesWithLinks = generateAuthorNamesWithLinks(
-    extensionHeader.authors || []
+    extensionShortHeader.authors || []
   );
 
   const referencePageContent =
-    `# ${extensionHeader.fullName}` +
+    `# ${extension.getFullName()}` +
     '\n\n' +
-    generateSvgImageIcon(extensionHeader.previewIconUrl) +
+    generateSvgImageIcon(extension.getPreviewIconUrl()) +
     '\n' +
-    `${extensionHeader.shortDescription}\n` +
+    `${extension.getShortDescription()}\n` +
     '\n' +
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
@@ -147,10 +216,13 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
       : '') +
     '---\n' +
     '\n' +
-    convertCommonMarkdownToPythonMarkdown(extensionHeader.description) +
+    convertCommonMarkdownToPythonMarkdown(extension.getDescription()) +
     '\n' +
-    (extensionHeader.helpPath ? `\n[Read more...](${helpPageUrl})\n` : ``) +
-    generateExtensionFooterText(extensionHeader.fullName);
+    (extension.getHelpPath() ? `\n[Read more...](${helpPageUrl})\n` : ``) +
+    '\n' +
+    generateReferenceContent(gd, project, extension) +
+    '\n' +
+    generateExtensionFooterText(extension.getFullName());
 
   const extensionReferenceFilePath = path.join(
     extensionsRootPath,
@@ -162,6 +234,79 @@ const createExtensionReferencePage = async (extensionHeader, isCommunity) => {
   });
   await fs.writeFile(extensionReferenceFilePath, referencePageContent);
   console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
+};
+
+/**
+ * Create a page for an extension.
+ * @param {any} gd
+ * @param {gdProject} project
+ * @param {gdEventsFunctionsExtension} extension The extension
+ * @returns {string}
+ */
+const generateReferenceContent = async (gd, project, extension) => {
+  const extensionMetadata = generateEventsFunctionExtensionMetadata(project, extension);
+  const extensionReference = generateExtensionReference(extensionMetadata);
+  return rawTextsToString(generateExtensionRawText(extensionReference));
+}
+
+/**
+ * Generate the metadata for the events based extension
+ * @param {gdProject} project A project containing of the extensions
+ * @param {eventsFunctionsExtension} eventsFunctionsExtension An extension
+ * @returns {gdPlatformExtension} the extension metadata
+ */
+const generateEventsFunctionExtensionMetadata = (
+  gd, project, eventsFunctionsExtension) => {
+  const extension = new gd.PlatformExtension();
+  gd.MetadataDeclarationHelper.declareExtension(
+    extension,
+    eventsFunctionsExtension
+  );
+
+  // Generate all behaviors and their functions
+  mapVector(
+    eventsFunctionsExtension.getEventsBasedBehaviors(),
+    eventsBasedBehavior => {
+      const behaviorMethodMangledNames = new gd.MapStringString();
+      gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+        project,
+        extension,
+        eventsFunctionsExtension,
+        eventsBasedBehavior,
+        behaviorMethodMangledNames
+      );
+      behaviorMethodMangledNames.delete();
+    }
+  );
+  // Generate all objects and their functions
+  mapVector(
+    eventsFunctionsExtension.getEventsBasedObjects(),
+    eventsBasedObject => {
+      const objectMethodMangledNames = new gd.MapStringString();
+      gd.MetadataDeclarationHelper.generateObjectMetadata(
+        project,
+        extension,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        objectMethodMangledNames
+      );
+      objectMethodMangledNames.delete();
+    }
+  );
+  // Generate all free functions
+  const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+  mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
+    const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventsFunctionsExtension,
+      eventsFunction
+    );
+  });
+  metadataDeclarationHelper.delete();
+
+  return extension;
 };
 
 /**
@@ -201,7 +346,7 @@ const generateAllExtensionsSections = extensionShortHeaders => {
   return extensionSectionsContent;
 };
 
-const generateExtensionsList = async extensionShortHeaders => {
+const generateExtensionsList = async (gd) => {
   let content = `## Extensions list
 
 Here are listed all the extensions available in GDevelop. The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
@@ -210,19 +355,23 @@ Here are listed all the extensions available in GDevelop. The list is divided in
 - [Community extensions](#community-extensions)
 
 `;
-  const extensionHeaders = await getAllExtensionHeaders();
-  const reviewedExtensionHeaders = extensionHeaders.filter(
+  const project = new gd.ProjectHelper.createNewGDJSProject();
+  const extensions = await addAllExtensionsToProject(gd, project);
+  const extensionShortHeaders = await getAllExtensionShortHeaders();
+
+  const reviewedExtensions = extensions.filter(
     pair => pair.tier !== 'community'
   );
-  const communityExtensionHeaders = extensionHeaders.filter(
+  const communityExtensions = extensions.filter(
     pair => pair.tier === 'community'
   );
 
   content += '## Reviewed extensions\n\n';
-  for (const extensionHeader of reviewedExtensionHeaders) {
-    await createExtensionReferencePage(extensionHeader, false);
+  for (const extension of reviewedExtensions) {
+    const extensionShortHeader = extensionShortHeaders.find(header => header.name === extension.getName());
+    await createExtensionReferencePage(gd, project, extension, extensionShortHeader, false);
   }
-  content += generateAllExtensionsSections(reviewedExtensionHeaders);
+  content += generateAllExtensionsSections(reviewedExtensions);
 
   content += `## Community extensions
 
@@ -233,14 +382,16 @@ doubt, contact the author to know more about what the extension
 does or inspect its content before using it.
 
 `;
-  for (const extensionHeader of communityExtensionHeaders) {
-    await createExtensionReferencePage(extensionHeader, true);
+  for (const extension of communityExtensions) {
+    const extensionShortHeader = extensionShortHeaders.find(header => header.name === extension.getName());
+    await createExtensionReferencePage(gd, project, extension, extensionShortHeader, true);
   }
-  content += generateAllExtensionsSections(communityExtensionHeaders);
+  content += generateAllExtensionsSections(communityExtensions);
+  project.delete();
   return content;
 };
 
-(async () => {
+initializeGDevelopJs().then(async gd => {
   try {
     console.info(`ℹ️ Loading all community extensions...`);
 
@@ -259,7 +410,7 @@ Read more about this:
 
 `;
 
-    indexPageContent += await generateExtensionsList();
+    indexPageContent += await generateExtensionsList(gd);
 
     try {
       await fs.mkdir(path.dirname(extensionsMainFilePath), { recursive: true });
@@ -282,4 +433,4 @@ Read more about this:
     console.error('❌ Error while fetching data', err);
     shell.exit(1);
   }
-})();
+});

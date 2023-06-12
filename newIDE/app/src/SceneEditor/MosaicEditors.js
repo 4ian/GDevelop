@@ -468,7 +468,7 @@ const MosaicEditors = React.forwardRef<Props, MosaicEditorsInterface>(
             wrappedEditorRef={editor => {
               editorRef.current = editor;
             }}
-            pauseRendering={props.isActive}
+            pauseRendering={!props.isActive}
           />
         ),
       },

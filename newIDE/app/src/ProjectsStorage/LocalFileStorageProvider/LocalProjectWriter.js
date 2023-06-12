@@ -11,7 +11,6 @@ import {
 } from '../../Utils/ObjectSplitter';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
-import { cleanUpIdentifier } from '../../GameDashboard/PublicGameProperties';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -234,6 +233,21 @@ export const onAutoSaveProject = (
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
   t`An error occurred when saving the project. Please try again by choosing another location.`;
 
+// See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/gi;
+const consecutiveSpacesRegex = /\s+/gi;
+const cleanUpProjectFileName = (projectFileName: string) => {
+  let cleanedProjectFileName = projectFileName;
+  if (cleanedProjectFileName.length > 200) {
+    cleanedProjectFileName = cleanedProjectFileName.substring(0, 200);
+  }
+  cleanedProjectFileName = cleanedProjectFileName
+    .replaceAll(forbiddenCharacterRegex, ' ')
+    .replaceAll(consecutiveSpacesRegex, ' ')
+    .trim();
+  return cleanedProjectFileName;
+};
+
 export const onRenderNewProjectSaveAsLocationChooser = ({
   projectName,
   saveAsLocation,
@@ -251,7 +265,7 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
     ? newProjectsDefaultFolder
     : '';
   const projectFileName = projectName
-    ? cleanUpIdentifier(projectName, 1, 60) + '.json'
+    ? cleanUpProjectFileName(projectName) + '.json'
     : 'game.json';
   if (!saveAsLocation) {
     setSaveAsLocation({

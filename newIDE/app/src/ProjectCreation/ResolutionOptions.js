@@ -12,9 +12,10 @@ import MobilePortrait from './Icons/MobilePortrait';
 
 const styles = {
   optionsContainer: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))',
+    gridGap: '1rem',
     margin: 2,
-    flex: 1,
   },
   optionContainer: {
     display: 'flex',
@@ -145,17 +146,21 @@ const ResolutionOptions = ({
       {Object.keys(resolutionOptions).map((key, index) => {
         const { width, height, label, icon } = resolutionOptions[key];
         return (
-          <React.Fragment key={key}>
-            {index !== 0 && <Spacer />}
-            <Column expand noMargin>
-              <ResolutionOptionButton
-                onClick={() => onClick(key)}
-                selected={selectedOption === key}
-                disabled={disabled}
+          <Column expand noMargin key={key}>
+            <ResolutionOptionButton
+              onClick={() => onClick(key)}
+              selected={selectedOption === key}
+              disabled={disabled}
+            >
+              <Column
+                expand
+                alignItems="center"
+                justifyContent="center"
+                noMargin
               >
-                <Column expand alignItems="center" justifyContent="center">
-                  {icon}
-                  <Spacer />
+                {icon}
+                <Spacer />
+                <Column noMargin>
                   <Text size="body2" noMargin>
                     {label}
                   </Text>
@@ -163,9 +168,9 @@ const ResolutionOptions = ({
                     {width}x{height}
                   </Text>
                 </Column>
-              </ResolutionOptionButton>
-            </Column>
-          </React.Fragment>
+              </Column>
+            </ResolutionOptionButton>
+          </Column>
         );
       })}
     </div>

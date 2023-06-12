@@ -115,7 +115,7 @@ const ProjectGeneratingDialog = ({
 
   const shouldUpdateProject = !isReady && !isErrored && generatingProjectId;
 
-  // Check every 5 seconds if the email has been verified.
+  // Takes in average 20 seconds, so we check every 3 seconds.
   useInterval(
     () => {
       updateGeneratingProject();

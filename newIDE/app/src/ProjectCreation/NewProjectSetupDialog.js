@@ -363,6 +363,7 @@ const NewProjectSetupDialog = ({
                 </IconButton>
               }
               autoFocus="desktop"
+              maxLength={100}
             />
             <SelectField
               fullWidth

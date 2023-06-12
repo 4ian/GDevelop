@@ -27,7 +27,7 @@ const useClasses = rotating =>
         transform: 'translate(-50%, -50%)',
         borderRadius: '100%',
         zIndex: 0,
-        animation: rotating ? 'spin 3s linear infinite' : 'none',
+        animation: rotating ? 'spin-background 3s linear infinite' : 'none',
       },
       '&::after': {
         content: "''",

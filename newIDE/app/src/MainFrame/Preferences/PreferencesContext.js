@@ -166,7 +166,7 @@ export const allAlertMessages: Array<{
   },
   {
     key: 'new-generate-project-from-prompt',
-    label: <Trans>Message about generating a project from a prompt</Trans>,
+    label: <Trans>New project generation from prompt warning</Trans>,
   },
 ];
 

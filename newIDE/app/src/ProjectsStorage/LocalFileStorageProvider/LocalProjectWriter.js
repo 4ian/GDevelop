@@ -250,10 +250,12 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
     : newProjectsDefaultFolder
     ? newProjectsDefaultFolder
     : '';
-  const fileName = cleanUpIdentifier(projectName, 1, 60) + '.json';
+  const projectFileName = projectName
+    ? cleanUpIdentifier(projectName, 1, 60) + '.json'
+    : 'game.json';
   if (!saveAsLocation) {
     setSaveAsLocation({
-      fileIdentifier: path.join(outputPath, fileName),
+      fileIdentifier: path.join(outputPath, projectFileName),
     });
   }
 
@@ -263,7 +265,7 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
       value={outputPath}
       onChange={newOutputPath =>
         setSaveAsLocation({
-          fileIdentifier: path.join(newOutputPath, fileName),
+          fileIdentifier: path.join(newOutputPath, projectFileName),
         })
       }
       type="create-game"

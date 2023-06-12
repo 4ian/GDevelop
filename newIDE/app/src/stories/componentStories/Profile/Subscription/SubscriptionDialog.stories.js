@@ -17,6 +17,7 @@ import {
   fakeAuthenticatedUserWithLegacyIndieSubscription,
   fakeGoldAuthenticatedUser,
   fakeAuthenticatedUserWithLegacyProSubscription,
+  fakeAuthenticatedUserWithEducationPlan,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
@@ -65,6 +66,12 @@ export const WithSilverSubscription = () => (
 
 export const WithGoldSubscription = () => (
   <SubscriptionDialogWrapper authenticatedUser={fakeGoldAuthenticatedUser} />
+);
+
+export const WithEducationPlan = () => (
+  <SubscriptionDialogWrapper
+    authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
+  />
 );
 
 export const WithValidSilverRedemptionCodeSubscription = () => (

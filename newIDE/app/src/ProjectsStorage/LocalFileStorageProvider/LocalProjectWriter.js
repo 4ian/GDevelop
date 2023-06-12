@@ -11,6 +11,7 @@ import {
 } from '../../Utils/ObjectSplitter';
 import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
+import { cleanUpIdentifier } from '../../GameDashboard/PublicGameProperties';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -234,10 +235,12 @@ export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
   t`An error occurred when saving the project. Please try again by choosing another location.`;
 
 export const onRenderNewProjectSaveAsLocationChooser = ({
+  projectName,
   saveAsLocation,
   setSaveAsLocation,
   newProjectsDefaultFolder,
 }: {
+  projectName: string,
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
@@ -247,9 +250,10 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
     : newProjectsDefaultFolder
     ? newProjectsDefaultFolder
     : '';
+  const fileName = cleanUpIdentifier(projectName, 1, 60) + '.json';
   if (!saveAsLocation) {
     setSaveAsLocation({
-      fileIdentifier: path.join(outputPath, 'game.json'),
+      fileIdentifier: path.join(outputPath, fileName),
     });
   }
 
@@ -259,7 +263,7 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
       value={outputPath}
       onChange={newOutputPath =>
         setSaveAsLocation({
-          fileIdentifier: path.join(newOutputPath, 'game.json'),
+          fileIdentifier: path.join(newOutputPath, fileName),
         })
       }
       type="create-game"

@@ -28,7 +28,11 @@ const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
 const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
 
-export const cleanUpGameSlug = (gameSlug: string) => {
+export const cleanUpIdentifier = (
+  gameSlug: string,
+  minLength: number,
+  maxLength: number
+) => {
   let latinGameSlug = gameSlug;
   if (isCyrillic(gameSlug)) {
     latinGameSlug = gameSlug
@@ -44,14 +48,15 @@ export const cleanUpGameSlug = (gameSlug: string) => {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '-')
     .toLowerCase()
-    .slice(0, GAME_SLUG_MAX_LENGTH);
-  if (slug.length < GAME_SLUG_MIN_LENGTH) {
-    slug = slug.concat(
-      new Array(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
-    );
+    .slice(0, maxLength);
+  if (slug.length < minLength) {
+    slug = slug.concat(new Array(minLength - slug.length).fill('-').join(''));
   }
   return slug;
 };
+
+export const cleanUpGameSlug = (gameSlug: string) =>
+  cleanUpIdentifier(gameSlug, GAME_SLUG_MIN_LENGTH, GAME_SLUG_MAX_LENGTH);
 
 type Props = {|
   project: gdProject,

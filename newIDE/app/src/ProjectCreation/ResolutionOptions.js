@@ -58,14 +58,14 @@ export const resolutionOptions: {
     width: 720,
     height: 1280,
     orientation: 'portrait',
-    icon: <MobilePortrait fontSize="medium" />,
+    icon: <MobilePortrait fontSize="large" />,
   },
   desktopMobileLandscape: {
     label: <Trans>Desktop & Mobile landscape</Trans>,
     width: 1280,
     height: 720,
     orientation: 'landscape',
-    icon: <DesktopMobileLandscape fontSize="medium" />,
+    icon: <DesktopMobileLandscape />,
   },
   desktopHD: {
     label: <Trans>Desktop Full HD</Trans>,
@@ -145,7 +145,7 @@ const ResolutionOptions = ({
       {Object.keys(resolutionOptions).map((key, index) => {
         const { width, height, label, icon } = resolutionOptions[key];
         return (
-          <>
+          <React.Fragment key={key}>
             {index !== 0 && <Spacer />}
             <Column expand noMargin>
               <ResolutionOptionButton
@@ -165,7 +165,7 @@ const ResolutionOptions = ({
                 </Column>
               </ResolutionOptionButton>
             </Column>
-          </>
+          </React.Fragment>
         );
       })}
     </div>

@@ -225,29 +225,41 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
 
   /**
    * \brief The "capabilities" that are offered by the base object that are
-   * *not* supported by this object, and should be hidden in the editor
+   * supported by this object, and should *not* be hidden in the editor
    * interface.
    */
-  const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
-    return unsupportedBaseObjectCapabilities;
+  const std::set<gd::String>& GetSupportedBaseObjectCapabilities() const {
+    return supportedBaseObjectCapabilities;
   }
 
   /**
-   * \brief Add a "capability" that is offered by the base object that is *not*
-   * supported by this object, and should be hidden in the editor interface.
+   * \brief Add a "capability" that is offered by the base object that is
+   * supported by this object, and should *not* be hidden in the editor interface.
    */
-  ObjectMetadata& AddUnsupportedBaseObjectCapability(
+  ObjectMetadata& MarkBaseObjectCapabilityAsSupported(
       const gd::String& capability) {
-    unsupportedBaseObjectCapabilities.insert(capability);
+    supportedBaseObjectCapabilities.insert(capability);
     return *this;
   }
 
   /**
-   * \brief Check if a "capability" that is offered by the base object is *not*
+   * \brief Remove a "capability" that is offered by the base object that is *not*
    * supported by this object, and should be hidden in the editor interface.
    */
-  bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
-    return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
+  ObjectMetadata& MarkBaseObjectCapabilityAsUnsupported(
+      const gd::String& capability) {
+    supportedBaseObjectCapabilities.erase(capability);
+    return *this;
+  }
+
+  /**
+   * \brief Check if a "capability" that is offered by the base object is
+   * supported by this object, and should *not* be hidden in the editor interface.
+   */
+  bool IsSupportedBaseObjectCapability(const gd::String& capability) const {
+    return capability.empty() ||
+           supportedBaseObjectCapabilities.find(capability) !=
+               supportedBaseObjectCapabilities.end();
   }
 
   const gd::String& GetName() const override { return name; }
@@ -331,7 +343,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String description;
   gd::String iconFilename;
   gd::String categoryFullName;
-  std::set<gd::String> unsupportedBaseObjectCapabilities;
+  std::set<gd::String> supportedBaseObjectCapabilities;
   bool hidden = false;
 
   std::shared_ptr<gd::ObjectConfiguration>

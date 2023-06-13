@@ -1,12 +1,10 @@
-
 /*
  * GDevelop JS Platform
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
 declare namespace gdjs {
-export interface Resizable {
-    
+  export interface Resizable {
     /**
      * Change the width of the object. This changes the scale on X axis of the object.
      *
@@ -28,9 +26,9 @@ export interface Resizable {
      * @param newHeight The new height of the object, in pixels.
      */
     setSize(newWidth: float, newHeight: float): void;
-}
+  }
 
-export interface Scalable {
+  export interface Scalable {
     /**
      * Change the scale on X and Y axis of the object.
      *
@@ -72,5 +70,15 @@ export interface Scalable {
      * @return the scale of the object on X axis
      */
     getScaleX(): float;
+  }
+
+  export interface Flippable {
+    flipX(enable: boolean): void;
+
+    flipY(enable: boolean): void;
+
+    isFlippedX(): boolean;
+
+    isFlippedY(): boolean;
   }
 }

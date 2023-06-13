@@ -25,7 +25,7 @@ const enumerateExpressionMetadataMap = (
 
     if (
       scope.objectMetadata &&
-      scope.objectMetadata.isUnsupportedBaseObjectCapability(
+      !scope.objectMetadata.isSupportedBaseObjectCapability(
         exprMetadata.getRequiredBaseObjectCapability()
       )
     )

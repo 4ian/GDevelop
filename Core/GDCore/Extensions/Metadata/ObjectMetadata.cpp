@@ -39,6 +39,7 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
     return blueprintObject_->Clone();
   }) {
   blueprintObject = blueprintObject_;
+  supportedBaseObjectCapabilities.insert("effect");
 }
 
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
@@ -56,7 +57,9 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
           "Error: Event-based objects don't have blueprint. "
           "This method should not never be called.");
       return nullptr;
-    }) {}
+    }) {
+      supportedBaseObjectCapabilities.insert("effect");
+    }
 
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& name_,
@@ -70,6 +73,7 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
       extensionNamespace(extensionNamespace_) {
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
+  supportedBaseObjectCapabilities.insert("effect");
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddCondition(

@@ -205,6 +205,8 @@ const defineTileMap = function (
       objectTileMap
     )
     .setCategoryFullName(_('Advanced'))
+    .markBaseObjectCapabilityAsSupported("resizable")
+    .markBaseObjectCapabilityAsSupported("scalable")
     .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js')
@@ -799,6 +801,8 @@ const defineCollisionMask = function (
       collisionMaskObject
     )
     .setCategoryFullName(_('Advanced'))
+    .markBaseObjectCapabilityAsSupported("resizable")
+    .markBaseObjectCapabilityAsSupported("scalable")
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')

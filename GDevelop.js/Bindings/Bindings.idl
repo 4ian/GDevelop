@@ -1633,9 +1633,10 @@ interface ObjectMetadata {
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
 
-    [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
-    [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
-    boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] SetString GetSupportedBaseObjectCapabilities();
+    [Ref] ObjectMetadata MarkBaseObjectCapabilityAsUnsupported([Const] DOMString capability);
+    [Ref] ObjectMetadata MarkBaseObjectCapabilityAsSupported([Const] DOMString capability);
+    boolean IsSupportedBaseObjectCapability([Const] DOMString capability);
 
     [Ref] ObjectMetadata SetHidden();
     boolean IsHidden();

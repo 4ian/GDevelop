@@ -283,7 +283,7 @@ module.exports = {
         textInputObject
       )
       .setCategoryFullName(_('User interface'))
-      .addUnsupportedBaseObjectCapability('effect')
+      .markBaseObjectCapabilityAsUnsupported('effect')
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'

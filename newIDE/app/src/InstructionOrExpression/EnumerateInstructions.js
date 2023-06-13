@@ -220,7 +220,7 @@ const enumerateExtensionInstructions = (
 
     if (
       scope.objectMetadata &&
-      scope.objectMetadata.isUnsupportedBaseObjectCapability(
+      !scope.objectMetadata.isSupportedBaseObjectCapability(
         instrMetadata.getRequiredBaseObjectCapability()
       )
     )

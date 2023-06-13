@@ -323,11 +323,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         const ObjectMetadata& objInfo =
             MetadataProvider::GetObjectMetadata(platform, objectType);
 
-        if (objInfo.IsUnsupportedBaseObjectCapability(
+        if (objInfo.IsSupportedBaseObjectCapability(
                 instrInfos.GetRequiredBaseObjectCapability())) {
-          conditionCode +=
-              "/* Object with unsupported capability - skipped. */\n";
-        } else {
           AddIncludeFiles(objInfo.includeFiles);
           context.SetCurrentObject(realObjects[i]);
           context.ObjectsListNeeded(realObjects[i]);
@@ -344,6 +341,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
                                                    context);
 
           context.SetNoCurrentObject();
+        } else {
+          conditionCode +=
+              "/* Object with unsupported capability - skipped. */\n";
         }
       }
     }
@@ -515,10 +515,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         const ObjectMetadata& objInfo =
             MetadataProvider::GetObjectMetadata(platform, objectType);
 
-        if (objInfo.IsUnsupportedBaseObjectCapability(
+        if (objInfo.IsSupportedBaseObjectCapability(
                 instrInfos.GetRequiredBaseObjectCapability())) {
-          actionCode += "/* Object with unsupported capability - skipped. */\n";
-        } else {
           AddIncludeFiles(objInfo.includeFiles);
           context.SetCurrentObject(realObjects[i]);
           context.ObjectsListNeeded(realObjects[i]);
@@ -535,6 +533,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                                              optionalAsyncCallbackName);
 
           context.SetNoCurrentObject();
+        } else {
+          actionCode += "/* Object with unsupported capability - skipped. */\n";
         }
       }
     }

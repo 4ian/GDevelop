@@ -403,7 +403,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                            "FakeObjectWithUnsupportedCapability",
                            "This is FakeObjectWithUnsupportedCapability",
                            "")
-                       .AddUnsupportedBaseObjectCapability("effect");
+                       .MarkBaseObjectCapabilityAsUnsupported("effect")
+                       .MarkBaseObjectCapabilityAsSupported("resizable");
   }
 
   // Actions and expressions with several parameter types.

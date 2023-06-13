@@ -34,6 +34,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
               _("Tiled Sprite"),
               _("Displays an image repeated over an area."),
               "CppPlatform/Extensions/TiledSpriteIcon.png")
+          .MarkBaseObjectCapabilityAsSupported("resizable")
           .SetCategoryFullName(_("General"));
 
   obj.AddCondition("Opacity",

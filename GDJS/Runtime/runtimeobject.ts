@@ -153,7 +153,8 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget, gdjs.Resizable, gdjs.Scalable {
+  export class RuntimeObject
+    implements EffectsTarget, gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
     name: string;
     type: string;
     x: float = 0;
@@ -2555,6 +2556,16 @@ namespace gdjs {
     }
     getScaleX(): number {
       return 1;
+    }
+
+    // Implementation of the Flippable interface.
+    flipX(enable: boolean) {}
+    flipY(enable: boolean) {}
+    isFlippedX(): boolean {
+      return false;
+    }
+    isFlippedY(): boolean {
+      return false;
     }
 
     /**

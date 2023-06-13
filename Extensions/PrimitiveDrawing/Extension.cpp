@@ -31,6 +31,9 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
               _("Allows you to draw simple shapes on the screen using the "
                 "events."),
               "CppPlatform/Extensions/primitivedrawingicon.png")
+          .MarkBaseObjectCapabilityAsSupported("resizable")
+          .MarkBaseObjectCapabilityAsSupported("scalable")
+          .MarkBaseObjectCapabilityAsSupported("flippable")
           .SetCategoryFullName(_("Advanced"));
 
 #if defined(GD_IDE_ONLY)
@@ -669,6 +672,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/flipX.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddAction("FlipY",
@@ -680,6 +684,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/flipY.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddCondition("FlippedX",
@@ -689,7 +694,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-      .AddParameter("object", _("Object"), "Drawer");
+      .AddParameter("object", _("Object"), "Drawer")
+      .SetHidden();
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
@@ -698,7 +704,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
-      .AddParameter("object", _("Object"), "Drawer");
+      .AddParameter("object", _("Object"), "Drawer")
+      .SetHidden();
 
   // Deprecated
   obj.AddAction("Width",

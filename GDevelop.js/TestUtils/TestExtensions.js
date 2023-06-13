@@ -137,7 +137,7 @@ module.exports = {
           '',
           fakeObject
         )
-        .addUnsupportedBaseObjectCapability('effect');
+        .markBaseObjectCapabilityAsUnsupported('effect');
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

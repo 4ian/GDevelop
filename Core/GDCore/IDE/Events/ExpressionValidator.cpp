@@ -105,7 +105,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     const gd::ObjectMetadata &objectMetadata =
         MetadataProvider::GetObjectMetadata(platform, objectType);
 
-    if (objectMetadata.IsUnsupportedBaseObjectCapability(
+    if (!objectMetadata.IsSupportedBaseObjectCapability(
             metadata.GetRequiredBaseObjectCapability())) {
       RaiseTypeError(
           _("This expression exists, but it can't be used on this object."),

@@ -1672,6 +1672,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"), "Object")
       .UseStandardParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
   // The expression is standard.
@@ -1687,6 +1688,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"), "Object")
       .UseStandardParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
   obj.AddAction("SetSize",
@@ -1699,6 +1701,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
+      .SetRequiresBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 }
 // Instruction for Scalable capability.
@@ -1716,6 +1719,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetRequiresBaseObjectCapability("scalable")
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction(
@@ -1731,6 +1735,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetRequiresBaseObjectCapability("scalable")
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction(
@@ -1746,7 +1751,56 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
+      .SetRequiresBaseObjectCapability("scalable")
       .MarkAsAdvanced();
+}
+// Instruction for Flippable capability.
+{
+  obj.AddAction("FlipX",
+                _("Flip the object horizontally"),
+                _("Flip the object horizontally"),
+                _("Flip horizontally _PARAM0_: _PARAM1_"),
+                _("Effects"),
+                "res/actions/flipX24.png",
+                "res/actions/flipX.png")
+
+      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("yesorno", _("Activate flipping"))
+      .SetRequiresBaseObjectCapability("flippable")
+      .MarkAsSimple();
+
+  obj.AddAction("FlipY",
+                _("Flip the object vertically"),
+                _("Flip the object vertically"),
+                _("Flip vertically _PARAM0_: _PARAM1_"),
+                _("Effects"),
+                "res/actions/flipY24.png",
+                "res/actions/flipY.png")
+
+      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("yesorno", _("Activate flipping"))
+      .SetRequiresBaseObjectCapability("flippable")
+      .MarkAsSimple();
+
+  obj.AddCondition("FlippedX",
+                   _("Horizontally flipped"),
+                   _("Check if the object is horizontally flipped"),
+                   _("_PARAM0_ is horizontally flipped"),
+                   _("Effects"),
+                   "res/actions/flipX24.png",
+                   "res/actions/flipX.png")
+      .AddParameter("object", _("Object"), "Object")
+      .SetRequiresBaseObjectCapability("flippable");
+
+  obj.AddCondition("FlippedY",
+                   _("Vertically flipped"),
+                   _("Check if the object is vertically flipped"),
+                   _("_PARAM0_ is vertically flipped"),
+                   _("Effects"),
+                   "res/actions/flipY24.png",
+                   "res/actions/flipY.png")
+      .AddParameter("object", _("Object"), "Object")
+      .SetRequiresBaseObjectCapability("flippable");
 }
 }
 

@@ -145,7 +145,7 @@ const checkHasRequiredCapability = ({
     project.getCurrentPlatform(),
     object.getType()
   );
-  return !objectMetadata.isUnsupportedBaseObjectCapability(
+  return objectMetadata.isSupportedBaseObjectCapability(
     requiredObjectCapability
   );
 };

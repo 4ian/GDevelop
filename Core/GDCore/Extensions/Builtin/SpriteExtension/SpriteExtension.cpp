@@ -32,7 +32,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                    _("Animated object which can be used for "
                                      "most elements of a game"),
                                    "CppPlatform/Extensions/spriteicon.png")
-          .SetCategoryFullName(_("General"));
+          .SetCategoryFullName(_("General"))
+          .MarkBaseObjectCapabilityAsSupported("resizable")
+          .MarkBaseObjectCapabilityAsSupported("scalable")
+          .MarkBaseObjectCapabilityAsSupported("flippable");
 
   obj.AddAction("Opacity",
                 _("Sprite opacity"),
@@ -472,9 +475,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
-
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddAction("FlipY",
@@ -484,9 +487,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
-
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddCondition("FlippedX",
@@ -496,8 +499,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-
-      .AddParameter("object", _("Object"), "Sprite");
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
@@ -506,8 +509,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
-
-      .AddParameter("object", _("Object"), "Sprite");
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
   obj.AddAction("TourneVers",
                 "Rotate an object toward another",

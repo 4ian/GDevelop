@@ -382,6 +382,12 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("setScaleY")
       .SetIncludeFile("runtimeobject.js");
 
+  // Instructions for the Flippable capability
+  objectActions["FlipX"].SetFunctionName("flipX");
+  objectActions["FlipY"].SetFunctionName("flipY");
+  objectConditions["FlippedX"].SetFunctionName("isFlippedX");
+  objectConditions["FlippedY"].SetFunctionName("isFlippedY");
+
   GetAllActions()["MoveObjects"].SetCustomCodeGenerator(
       [](gd::Instruction &,
          gd::EventsCodeGenerator &,

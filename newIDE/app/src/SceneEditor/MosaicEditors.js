@@ -476,11 +476,10 @@ const MosaicEditors = React.forwardRef<Props, MosaicEditorsInterface>(
         type: 'secondary',
         title: t`Objects`,
         toolbarControls: [
-          <I18n key="tags">
-            {({ i18n }) => (
-              <TagsButton buildMenuTemplate={buildObjectTagsMenuTemplate} />
-            )}
-          </I18n>,
+          <TagsButton
+            key="tags"
+            buildMenuTemplate={buildObjectTagsMenuTemplate}
+          />,
           <CloseButton key="close" />,
         ],
         renderEditor: () => (

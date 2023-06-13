@@ -105,7 +105,7 @@ const SwipeableDrawer = (props: Props) => {
         }}
         controls={props.topBarControls}
       />
-      <div style={{ display: 'flex', flex: 1 }}>{props.children}</div>
+      <div style={{ display: 'flex', flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>{props.children}</div>
     </div>
   );
 };

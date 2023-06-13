@@ -96,9 +96,9 @@ type Props = {|
   ...InstancesEditorPropsWithoutSizeAndScroll,
   width: number,
   height: number,
-  onViewPositionChanged: ViewPosition => void,
-  onMouseMove: MouseEvent => void,
-  onMouseLeave: MouseEvent => void,
+  onViewPositionChanged?: ViewPosition => void,
+  onMouseMove?: MouseEvent => void,
+  onMouseLeave?: MouseEvent => void,
   screenType: ScreenType,
   showObjectInstancesIn3D: boolean,
 |};
@@ -161,7 +161,7 @@ export default class InstancesEditor extends Component<Props> {
     // project can be used here for initializing stuff, but don't keep references to it.
     // Instead, create editors in _mountEditorComponents (as they will be destroyed/recreated
     // if the project changes).
-    const { project } = this.props;
+    const { project, onMouseMove, onMouseLeave } = this.props;
 
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
@@ -257,12 +257,14 @@ export default class InstancesEditor extends Component<Props> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
-    this.pixiRenderer.view.addEventListener('mousemove', event => {
-      this.props.onMouseMove(event);
-    });
-    this.pixiRenderer.view.addEventListener('mouseout', event => {
-      this.props.onMouseLeave(event);
-    });
+    if (onMouseMove)
+      this.pixiRenderer.view.addEventListener('mousemove', event => {
+        onMouseMove(event);
+      });
+    if (onMouseLeave)
+      this.pixiRenderer.view.addEventListener('mouseout', event => {
+        onMouseLeave(event);
+      });
     this.pixiRenderer.view.addEventListener('focusout', event => {
       if (this.keyboardShortcuts) {
         this.keyboardShortcuts.resetModifiers();

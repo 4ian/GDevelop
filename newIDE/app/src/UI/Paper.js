@@ -2,6 +2,7 @@
 import * as React from 'react';
 import MuiPaper from '@material-ui/core/Paper';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
+import { type GDevelopTheme } from './Theme';
 
 type Props = {|
   id?: string,
@@ -16,6 +17,16 @@ type Props = {|
   square?: boolean,
 |};
 
+export const getBackgroundColor = (
+  gdevelopTheme: GDevelopTheme,
+  backgroundColor: 'light' | 'medium' | 'dark'
+) =>
+  backgroundColor === 'dark'
+    ? gdevelopTheme.paper.backgroundColor.dark
+    : backgroundColor === 'medium'
+    ? gdevelopTheme.paper.backgroundColor.medium
+    : gdevelopTheme.paper.backgroundColor.light;
+
 const Paper = ({
   id,
   children,
@@ -26,12 +37,7 @@ const Paper = ({
   square,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor =
-    background === 'dark'
-      ? gdevelopTheme.paper.backgroundColor.dark
-      : background === 'medium'
-      ? gdevelopTheme.paper.backgroundColor.medium
-      : gdevelopTheme.paper.backgroundColor.light;
+  const backgroundColor = getBackgroundColor(gdevelopTheme, background)
   return (
     <MuiPaper
       id={id}

@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import {
   createNewEmptyProject,
   createNewProjectFromAIGeneratedProject,
@@ -16,7 +18,6 @@ import {
   type FileMetadata,
 } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import { type I18n as I18nType } from '@lingui/core';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { registerGame } from './GDevelopServices/Game';
 import {
@@ -25,7 +26,6 @@ import {
 } from '../ProjectsStorage/ResourceMover';
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { t } from '@lingui/macro';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type EditorTabsState } from '../Mainframe/EditorTabs/EditorTabsHandler';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
@@ -52,8 +52,7 @@ type Props = {|
 |};
 
 /**
- * Helper for Mainframe to open a dialog when the component is mounted.
- * This corresponds to when a user opens the app on web, with a parameter in the URL.
+ * Helper for Mainframe to create a new project.
  */
 const useCreateProject = ({
   beforeCreatingProject,

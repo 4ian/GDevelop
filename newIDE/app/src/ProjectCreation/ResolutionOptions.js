@@ -10,7 +10,7 @@ import DesktopHD from './Icons/DesktopHD';
 import DesktopMobileLandscape from './Icons/DesktopMobileLandscape';
 import MobilePortrait from './Icons/MobilePortrait';
 import CustomSize from './Icons/CustomSize';
-import TextField from '../UI/TextField';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 
 const styles = {
   optionsContainer: {
@@ -91,6 +91,50 @@ export const resolutionOptions: {
     icon: <CustomSize fontSize="large" style={styles.largeIcon} />,
   },
 };
+
+const maxCustomSize = 9999;
+const minCustomSize = 1;
+export const defaultCustomWidth = 800;
+export const defaultCustomHeight = 600;
+
+const ResolutionDimensionTextField = ({
+  value,
+  onChange,
+  defaultValue,
+}: {
+  value: ?number,
+  onChange: (value: ?number) => void,
+  defaultValue: number,
+}) => (
+  <SemiControlledTextField
+    margin="none"
+    style={styles.customSizeField}
+    inputStyle={{ padding: 0 }}
+    type="number"
+    value={value ? value.toString(10) : ''}
+    onChange={newValueString => {
+      // Allow any value, we will clean the value on blur.
+      const newValueInt = parseInt(newValueString, 10);
+      // Important to allow null when the user is clearing the field.
+      const newValue = isNaN(newValueInt) ? null : newValueInt;
+      onChange(newValue);
+    }}
+    onBlur={() => {
+      const newValueInt = parseInt(
+        value || defaultValue, // Default if empty.
+        10
+      );
+      const newValueWithinLimits = Math.min(
+        Math.max(newValueInt, minCustomSize),
+        maxCustomSize
+      );
+      onChange(newValueWithinLimits);
+    }}
+    min={0} // This value is not valid, but it's required to start at 0 for the step to go from 10 to 10.
+    max={maxCustomSize}
+    step={10}
+  />
+);
 
 // Styles to give the impression of pressing an element.
 const useStylesForButtonBase = (selected: boolean) =>
@@ -196,64 +240,18 @@ const ResolutionOptions = ({
                       <Text size="body-small" noMargin color="secondary">
                         W
                       </Text>
-                      <TextField
-                        margin="none"
-                        style={styles.customSizeField}
-                        inputStyle={{ padding: 0 }}
-                        type="number"
-                        value={customWidth || ''}
-                        onChange={(e, newValue: string) => {
-                          // Allow any value, we will clean the value on blur.
-                          const newWidth = parseInt(newValue, 10);
-                          onCustomWidthChange(
-                            isNaN(newWidth) ? null : newWidth
-                          );
-                        }}
-                        onBlur={() => {
-                          const newWidth = parseInt(
-                            customWidth || 800, // Default to 600 if empty.
-                            10
-                          );
-                          const newWidthWithinLimits = Math.min(
-                            Math.max(newWidth, 1),
-                            10000
-                          );
-                          onCustomWidthChange(newWidthWithinLimits);
-                        }}
-                        min={1}
-                        max={10000}
-                        step={1}
+                      <ResolutionDimensionTextField
+                        value={customWidth}
+                        onChange={onCustomWidthChange}
+                        defaultValue={defaultCustomWidth}
                       />
                       <Text size="body-small" noMargin color="secondary">
                         H
                       </Text>
-                      <TextField
-                        margin="none"
-                        style={styles.customSizeField}
-                        inputStyle={{ padding: 0 }}
-                        type="number"
-                        value={customHeight || ''}
-                        onChange={(e, newValue: string) => {
-                          // Allow any value, we will clean the value on blur.
-                          const newHeight = parseInt(newValue, 10);
-                          onCustomHeightChange(
-                            isNaN(newHeight) ? null : newHeight
-                          );
-                        }}
-                        onBlur={() => {
-                          const newHeight = parseInt(
-                            customHeight || 600, // Default to 600 if empty.
-                            10
-                          );
-                          const newHeightWithinLimits = Math.min(
-                            Math.max(newHeight, 1),
-                            10000
-                          );
-                          onCustomHeightChange(newHeightWithinLimits);
-                        }}
-                        min={1}
-                        max={10000}
-                        step={1}
+                      <ResolutionDimensionTextField
+                        value={customHeight}
+                        onChange={onCustomHeightChange}
+                        defaultValue={defaultCustomHeight}
                       />
                     </Line>
                   )}

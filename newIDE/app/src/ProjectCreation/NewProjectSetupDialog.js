@@ -39,6 +39,8 @@ import {
 import ResolutionOptions, {
   type ResolutionOption,
   resolutionOptions,
+  defaultCustomWidth,
+  defaultCustomHeight,
 } from './ResolutionOptions';
 import Text from '../UI/Text';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
@@ -121,8 +123,12 @@ const NewProjectSetupDialog = ({
     resolutionOption,
     setResolutionOption,
   ] = React.useState<ResolutionOption>('desktopMobileLandscape');
-  const [customWidth, setCustomWidth] = React.useState<?number>(800);
-  const [customHeight, setCustomHeight] = React.useState<?number>(600);
+  const [customWidth, setCustomWidth] = React.useState<?number>(
+    defaultCustomWidth
+  );
+  const [customHeight, setCustomHeight] = React.useState<?number>(
+    defaultCustomHeight
+  );
   const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
     false
   );
@@ -186,9 +192,13 @@ const NewProjectSetupDialog = ({
     checkIfHasTooManyCloudProjects(authenticatedUser);
 
   const selectedWidth =
-    resolutionOptions[resolutionOption].width || customWidth || 800;
+    resolutionOptions[resolutionOption].width ||
+    customWidth ||
+    defaultCustomWidth;
   const selectedHeight =
-    resolutionOptions[resolutionOption].height || customHeight || 600;
+    resolutionOptions[resolutionOption].height ||
+    customHeight ||
+    defaultCustomHeight;
   const selectedOrientation = resolutionOptions[resolutionOption].orientation;
 
   const generateProject = React.useCallback(

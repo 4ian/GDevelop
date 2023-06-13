@@ -234,6 +234,29 @@ const enumerateExtensionInstructions = (
   return allInstructions;
 };
 
+const enumerateExtensionInstructionsWithAnyCapabilities = (
+  prefix: string,
+  instructions: gdMapStringInstructionMetadata,
+  scope: InstructionOrExpressionScope
+): Array<EnumeratedInstructionMetadata> => {
+  //Get the map containing the metadata of the instructions provided by the extension...
+  const instructionsTypes = instructions.keys();
+  const allInstructions = [];
+
+  //... and add each instruction
+  for (let j = 0; j < instructionsTypes.size(); ++j) {
+    const type = instructionsTypes.at(j);
+    const instrMetadata = instructions.get(type);
+    if (instrMetadata.isHidden()) continue;
+
+    allInstructions.push(
+      enumerateInstruction(prefix, type, instrMetadata, scope)
+    );
+  }
+
+  return allInstructions;
+};
+
 /**
  * List all the instructions available.
  */
@@ -277,13 +300,21 @@ export const enumerateAllInstructions = (
       const scope = { extension, objectMetadata };
       allInstructions = [
         ...allInstructions,
-        ...enumerateExtensionInstructions(
-          prefix,
-          isCondition
-            ? extension.getAllConditionsForObject(objectType)
-            : extension.getAllActionsForObject(objectType),
-          scope
-        ),
+        ...(objectType === ''
+          ? enumerateExtensionInstructionsWithAnyCapabilities(
+              prefix,
+              isCondition
+                ? extension.getAllConditionsForObject(objectType)
+                : extension.getAllActionsForObject(objectType),
+              scope
+            )
+          : enumerateExtensionInstructions(
+              prefix,
+              isCondition
+                ? extension.getAllConditionsForObject(objectType)
+                : extension.getAllActionsForObject(objectType),
+              scope
+            )),
         ...enumerateExtraObjectInstructions(
           isCondition,
           extension,

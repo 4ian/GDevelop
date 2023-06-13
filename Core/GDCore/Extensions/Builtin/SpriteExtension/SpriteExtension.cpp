@@ -287,7 +287,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("AnimationName",
                    _("Current animation name"),
-                   _("Check the animation by played by the object."),
+                   _("Check the animation played by the object."),
                    _("The animation of _PARAM0_ is _PARAM1_"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",

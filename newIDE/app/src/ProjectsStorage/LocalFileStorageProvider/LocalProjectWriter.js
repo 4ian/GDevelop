@@ -233,11 +233,25 @@ export const onAutoSaveProject = (
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
   t`An error occurred when saving the project. Please try again by choosing another location.`;
 
+// See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/g;
+const consecutiveSpacesRegex = /\s+/g;
+const cleanUpProjectFileName = (projectFileName: string) =>
+  (projectFileName.length > 200
+    ? projectFileName.substring(0, 200)
+    : projectFileName
+  )
+    .replace(forbiddenCharacterRegex, ' ')
+    .replace(consecutiveSpacesRegex, ' ')
+    .trim();
+
 export const onRenderNewProjectSaveAsLocationChooser = ({
+  projectName,
   saveAsLocation,
   setSaveAsLocation,
   newProjectsDefaultFolder,
 }: {
+  projectName: string,
   saveAsLocation: ?SaveAsLocation,
   setSaveAsLocation: (?SaveAsLocation) => void,
   newProjectsDefaultFolder?: string,
@@ -247,9 +261,12 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
     : newProjectsDefaultFolder
     ? newProjectsDefaultFolder
     : '';
+  const projectFileName = projectName
+    ? cleanUpProjectFileName(projectName) + '.json'
+    : 'game.json';
   if (!saveAsLocation) {
     setSaveAsLocation({
-      fileIdentifier: path.join(outputPath, 'game.json'),
+      fileIdentifier: path.join(outputPath, projectFileName),
     });
   }
 
@@ -259,7 +276,7 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
       value={outputPath}
       onChange={newOutputPath =>
         setSaveAsLocation({
-          fileIdentifier: path.join(newOutputPath, 'game.json'),
+          fileIdentifier: path.join(newOutputPath, projectFileName),
         })
       }
       type="create-game"

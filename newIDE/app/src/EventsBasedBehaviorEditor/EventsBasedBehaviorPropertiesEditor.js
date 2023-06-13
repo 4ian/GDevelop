@@ -415,9 +415,9 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                   >
                                     {connectDragSource(
                                       <span>
-                                        <Spacer />
-                                        <DragHandleIcon />
-                                        <Spacer />
+                                        <Column>
+                                          <DragHandleIcon />
+                                        </Column>
                                       </span>
                                     )}
                                     <ResponsiveLineStackLayout expand>

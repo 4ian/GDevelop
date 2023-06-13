@@ -26,6 +26,8 @@ export type Subscription = {|
 
   redemptionCode?: string | null,
   redemptionCodeValidUntil?: number | null,
+
+  benefitsFromEducationPlan?: boolean,
 |};
 
 /**
@@ -82,11 +84,16 @@ export type PlanDetails = {
   legacyPlanId?: string,
   name: string,
   monthlyPriceInEuros: number | null,
+  yearlyPriceInEuros?: number | null,
+  isPerUser?: true,
   smallDescription?: MessageDescriptor,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
 };
+
+export const EDUCATION_PLAN_MIN_SEATS = 5;
+export const EDUCATION_PLAN_MAX_SEATS = 300;
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
   {
@@ -145,6 +152,25 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_education',
+    name: 'GDevelop Education',
+    monthlyPriceInEuros: 2.99,
+    yearlyPriceInEuros: 29.99,
+    isPerUser: true,
+    smallDescription: t`Schools and universities.`,
+    descriptionBullets: [
+      {
+        message: t`Students anonymity.`,
+      },
+      {
+        message: t`Organize students per classroom.`,
+      },
+      {
+        message: t`You and your students receive a Gold subscription.`,
       },
     ],
   },
@@ -275,10 +301,18 @@ export const changeUserSubscription = (
     .then(response => response.data);
 };
 
-export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
+export const canSeamlesslyChangeSubscription = (
+  subscription: Subscription,
+  planId: string
+) => {
   // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
   // Otherwise (Paypal), it needs to be cancelled first.
-  return !!subscription.stripeSubscriptionId;
+  // If the user changes for an education plan and already has a subscription made with
+  // Stripe, the Stripe subscription has to be cancelled first.
+  return (
+    !!subscription.stripeSubscriptionId &&
+    !planId.startsWith('gdevelop_education')
+  );
 };
 
 export const hasMobileAppStoreSubscriptionPlan = (
@@ -354,18 +388,26 @@ export const getRedirectToSubscriptionPortalUrl = (
     });
 };
 
-export const getRedirectToCheckoutUrl = (
+export const getRedirectToCheckoutUrl = ({
+  planId,
+  userId,
+  userEmail,
+  quantity,
+}: {
   planId: string,
   userId: string,
-  userEmail: string
-): string => {
-  return `${
-    GDevelopUsageApi.baseUrl
-  }/subscription-v2/action/redirect-to-checkout?planId=${encodeURIComponent(
-    planId
-  )}&userId=${encodeURIComponent(userId)}&customerEmail=${encodeURIComponent(
-    userEmail
-  )}`;
+  userEmail: string,
+  quantity?: number,
+}): string => {
+  const url = new URL(
+    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout`
+  );
+  url.searchParams.set('planId', planId);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  if (quantity !== undefined && quantity > 1)
+    url.searchParams.set('quantity', quantity.toString());
+  return url.toString();
 };
 
 export const redeemCode = async (

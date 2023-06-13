@@ -100,6 +100,7 @@
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
+#include "../../Extensions/3D/Model3DObjectConfiguration.h"
 #include "BehaviorJsImplementation.h"
 #include "BehaviorSharedDataJsImplementation.h"
 #include "ObjectJsImplementation.h"

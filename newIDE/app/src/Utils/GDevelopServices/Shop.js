@@ -25,6 +25,9 @@ export type PrivateAssetPackListingData = {|
   createdAt: string,
   thumbnailUrls: string[],
   prices: StripePrice[],
+
+  /** The id of the product on the app stores - if any. */
+  appStoreProductId: string | null,
 |};
 
 type Purchase = {|
@@ -35,12 +38,19 @@ type Purchase = {|
   createdAt: string,
   cancelledAt?: string,
   stripeCheckoutSessionId?: string,
+  appStoreTransactionId?: string,
 |};
 
-export const listListedPrivateAssetPacks = async (): Promise<
-  Array<PrivateAssetPackListingData>
-> => {
-  const response = await client.get('/asset-pack');
+export const listListedPrivateAssetPacks = async ({
+  onlyAppStorePrivateAssetPacks,
+}: {|
+  onlyAppStorePrivateAssetPacks?: ?boolean,
+|}): Promise<Array<PrivateAssetPackListingData>> => {
+  const response = await client.get('/asset-pack', {
+    params: {
+      withAppStoreProductId: !!onlyAppStorePrivateAssetPacks,
+    },
+  });
   return response.data;
 };
 

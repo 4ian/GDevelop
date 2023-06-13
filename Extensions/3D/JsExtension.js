@@ -39,159 +39,13 @@ module.exports = {
       .setIcon('res/conditions/3d_box.svg');
 
     {
-      const Model3DObject = new gd.ObjectJsImplementation();
-      // $FlowExpectedError - ignore Flow warning as we're creating an object
-      Model3DObject.updateProperty = function (
-        objectContent,
-        propertyName,
-        newValue
-      ) {
-        if (
-          propertyName === 'width' ||
-          propertyName === 'height' ||
-          propertyName === 'depth' ||
-          propertyName === 'rotationX' ||
-          propertyName === 'rotationY' ||
-          propertyName === 'rotationZ'
-        ) {
-          objectContent[propertyName] = parseFloat(newValue);
-          return true;
-        }
-        if (
-          propertyName === 'modelResourceName' ||
-          propertyName === 'materialType'
-        ) {
-          objectContent[propertyName] = newValue;
-          return true;
-        }
-        if (propertyName === 'keepAspectRatio') {
-          objectContent[propertyName] = newValue === '1';
-          return true;
-        }
-
-        return false;
-      };
-      // $FlowExpectedError - ignore Flow warning as we're creating an object
-      Model3DObject.getProperties = function (objectContent) {
-        const objectProperties = new gd.MapStringPropertyDescriptor();
-
-        objectProperties
-          .getOrCreate('width')
-          .setValue((objectContent.width || 0).toString())
-          .setType('number')
-          .setLabel(_('Width'))
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setGroup(_('Default size'));
-
-        objectProperties
-          .getOrCreate('height')
-          .setValue((objectContent.height || 0).toString())
-          .setType('number')
-          .setLabel(_('Height'))
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setGroup(_('Default size'));
-
-        objectProperties
-          .getOrCreate('depth')
-          .setValue((objectContent.depth || 0).toString())
-          .setType('number')
-          .setLabel(_('Depth'))
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setGroup(_('Default size'));
-
-        objectProperties
-          .getOrCreate('keepAspectRatio')
-          .setValue(objectContent.keepAspectRatio ? 'true' : 'false')
-          .setType('boolean')
-          .setLabel(_('Reduce initial dimensions to keep aspect ratio'))
-          .setGroup(_('Default size'));
-
-        objectProperties
-          .getOrCreate('rotationX')
-          .setValue((objectContent.rotationX || 0).toString())
-          .setType('number')
-          .setLabel(_('Rotation around X axis'))
-          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-          .setGroup(_('Default orientation'));
-
-        objectProperties
-          .getOrCreate('rotationY')
-          .setValue((objectContent.rotationY || 0).toString())
-          .setType('number')
-          .setLabel(_('Rotation around Y axis'))
-          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-          .setGroup(_('Default orientation'));
-
-        objectProperties
-          .getOrCreate('rotationZ')
-          .setValue((objectContent.rotationZ || 0).toString())
-          .setType('number')
-          .setLabel(_('Rotation around Z axis'))
-          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
-          .setGroup(_('Default orientation'));
-
-        objectProperties
-          .getOrCreate('modelResourceName')
-          .setValue(objectContent.modelResourceName || '')
-          .setType('resource')
-          .addExtraInfo('model3D')
-          .setLabel(_('3D model'));
-
-        objectProperties
-          .getOrCreate('materialType')
-          .setValue(objectContent.materialType || 'Basic')
-          .setType('choice')
-          .addExtraInfo('Basic')
-          .addExtraInfo('StandardWithoutMetalness')
-          .addExtraInfo('KeepOriginal')
-          .setLabel(_('Material modifier'));
-
-        return objectProperties;
-      };
-      Model3DObject.setRawJSONContent(
-        JSON.stringify({
-          width: 100,
-          height: 100,
-          depth: 100,
-          keepAspectRatio: true,
-          rotationX: 0,
-          rotationY: 0,
-          rotationZ: 0,
-          modelResourceName: '',
-          materialType: 'Basic',
-        })
-      );
-
-      // $FlowExpectedError
-      Model3DObject.updateInitialInstanceProperty = function (
-        objectContent,
-        instance,
-        propertyName,
-        newValue,
-        project,
-        layout
-      ) {
-        return false;
-      };
-
-      // $FlowExpectedError
-      Model3DObject.getInitialInstanceProperties = function (
-        content,
-        instance,
-        project,
-        layout
-      ) {
-        const instanceProperties = new gd.MapStringPropertyDescriptor();
-        return instanceProperties;
-      };
-
       const object = extension
         .addObject(
           'Model3DObject',
           _('3D Model'),
           _('A 3D model.'),
           'JsPlatform/Extensions/3d_box.svg',
-          Model3DObject
+          new gd.Model3DObjectConfiguration()
         )
         .setCategoryFullName(_('3D'))
         .addUnsupportedBaseObjectCapability('effect')
@@ -568,6 +422,124 @@ module.exports = {
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
         .setFunctionName('turnAroundZ');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Animation',
+          _('Animation (by number)'),
+          _(
+            'the number of the animation played by the object (the number from the animations list).'
+          ),
+          _('the number of the animation'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .markAsSimple()
+        .setFunctionName('setAnimationIndex')
+        .setGetter('getAnimationIndex');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'string',
+          'AnimationName',
+          _('Animation (by name)'),
+          _('the animation played by the object'),
+          _('the animation'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .useStandardParameters(
+          'objectAnimationName',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Animation name')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setAnimationName')
+        .setGetter('getAnimationName');
+
+      object
+        .addAction(
+          'PauseAnimation',
+          _('Pause the animation'),
+          _('Pause the animation of the object'),
+          _('Pause the animation of _PARAM0_'),
+          _('Animations and images'),
+          'res/actions/animation24.png',
+          'res/actions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('pauseAnimation');
+
+      object
+        .addAction(
+          'ResumeAnimation',
+          _('Resume the animation'),
+          _('Resume the animation of the object'),
+          _('Resume the animation of _PARAM0_'),
+          _('Animations and images'),
+          'res/actions/animation24.png',
+          'res/actions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('resumeAnimation');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AnimationSpeedScale',
+          _('Animation speed scale'),
+          _(
+            'the animation speed scale (1 = the default speed, >1 = faster and <1 = slower).'
+          ),
+          _('the animation speed scale'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(_('Speed scale'))
+        )
+        .markAsSimple()
+        .setFunctionName('setAnimationSpeedScale')
+        .setGetter('getAnimationSpeedScale');
+
+      object
+        .addCondition(
+          'IsAnimationPaused',
+          _('Animation paused'),
+          _('Check if the animation of an object is paused.'),
+          _('The animation of _PARAM0_ is paused'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('isAnimationPaused');
+
+      object
+        .addCondition(
+          'HasAnimationEnded',
+          _('Animation finished'),
+          _(
+            'Check if the animation being played by the Sprite object is finished.'
+          ),
+          _('The animation of _PARAM0_ is finished'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject')
+        .markAsSimple()
+        .setFunctionName('hasAnimationEnded');
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
@@ -2386,7 +2358,26 @@ module.exports = {
       }
     }
 
+    const getPointForLocation = (location) => {
+      switch (location) {
+        case 'ModelOrigin':
+          return null;
+        case 'ObjectCenter':
+          return [0.5, 0.5, 0.5];
+        case 'BottomCenterZ':
+          return [0.5, 0.5, 0];
+        case 'BottomCenterY':
+          return [0.5, 1, 0.5];
+        case 'TopLeft':
+          return [0, 0, 0];
+        default:
+          return null;
+      }
+    };
+
     class Model3DRendered3DInstance extends Rendered3DInstance {
+      _modelOriginPoint = [0, 0, 0];
+
       constructor(
         project,
         layout,
@@ -2417,6 +2408,12 @@ module.exports = {
         const modelResourceName = properties
           .get('modelResourceName')
           .getValue();
+        this._originPoint = getPointForLocation(
+          properties.get('originLocation').getValue()
+        );
+        this._centerPoint = getPointForLocation(
+          properties.get('centerLocation').getValue()
+        );
 
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
@@ -2428,10 +2425,15 @@ module.exports = {
         this._pixiResourcesLoader
           .get3DModel(project, modelResourceName)
           .then((model3d) => {
-            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(model3d);
-            clonedModel3D.rotation.order = 'ZYX';
+            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
+              model3d.scene
+            );
+            // This group hold the rotation defined by properties.
+            const threeObject = new THREE.Group();
+            threeObject.rotation.order = 'ZYX';
+            threeObject.add(clonedModel3D);
             this._updateDefaultTransformation(
-              clonedModel3D,
+              threeObject,
               rotationX,
               rotationY,
               rotationZ,
@@ -2440,12 +2442,40 @@ module.exports = {
               this._defaultDepth,
               keepAspectRatio
             );
-            this._threeObject.add(clonedModel3D);
+            this._threeObject.add(threeObject);
           });
       }
 
+      getOriginX() {
+        const originPoint = this.getOriginPoint();
+        return this.getWidth() * originPoint[0];
+      }
+
+      getOriginY() {
+        const originPoint = this.getOriginPoint();
+        return this.getHeight() * originPoint[1];
+      }
+
+      getCenterX() {
+        const centerPoint = this.getCenterPoint();
+        return this.getWidth() * centerPoint[0];
+      }
+
+      getCenterY() {
+        const centerPoint = this.getCenterPoint();
+        return this.getHeight() * centerPoint[1];
+      }
+
+      getOriginPoint() {
+        return this._originPoint || this._modelOriginPoint;
+      }
+
+      getCenterPoint() {
+        return this._centerPoint || this._modelOriginPoint;
+      }
+
       _updateDefaultTransformation(
-        model3D,
+        threeObject,
         rotationX,
         rotationY,
         rotationZ,
@@ -2454,41 +2484,63 @@ module.exports = {
         originalDepth,
         keepAspectRatio
       ) {
-        const boundingBox = this._getModelAABB(
-          model3D,
-          rotationX,
-          rotationY,
-          rotationZ
+        threeObject.rotation.set(
+          (rotationX * Math.PI) / 180,
+          (rotationY * Math.PI) / 180,
+          (rotationZ * Math.PI) / 180
         );
+        threeObject.updateMatrixWorld(true);
+        const boundingBox = new THREE.Box3().setFromObject(threeObject);
+
+        const modelWidth = boundingBox.max.x - boundingBox.min.x;
+        const modelHeight = boundingBox.max.y - boundingBox.min.y;
+        const modelDepth = boundingBox.max.z - boundingBox.min.z;
+        this._modelOriginPoint[0] = -boundingBox.min.x / modelWidth;
+        this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
+        this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
+
+        // The model is flipped on Y axis.
+        this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
 
         // Center the model.
-        model3D.position.set(
-          -(boundingBox.min.x + boundingBox.max.x) / 2,
-          (model3D.position.y = -(boundingBox.min.y + boundingBox.max.y) / 2),
-          (model3D.position.z = -(boundingBox.min.z + boundingBox.max.z) / 2)
-        );
+        const centerPoint = this._centerPoint;
+        if (centerPoint) {
+          threeObject.position.set(
+            -(
+              boundingBox.min.x +
+              (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
+            ),
+            // The model is flipped on Y axis.
+            -(
+              boundingBox.min.y +
+              (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
+            ),
+            -(
+              boundingBox.min.z +
+              (boundingBox.max.z - boundingBox.min.z) * centerPoint[2]
+            )
+          );
+        }
 
         // Rotate the model.
-        model3D.scale.set(1, 1, 1);
-        model3D.rotation.set(
+        threeObject.scale.set(1, 1, 1);
+        threeObject.rotation.set(
           (rotationX * Math.PI) / 180,
           (rotationY * Math.PI) / 180,
           (rotationZ * Math.PI) / 180
         );
 
         // Stretch the model in a 1x1x1 cube.
-        const modelWidth = boundingBox.max.x - boundingBox.min.x;
-        const modelHeight = boundingBox.max.y - boundingBox.min.y;
-        const modelDepth = boundingBox.max.z - boundingBox.min.z;
-
         const scaleX = 1 / modelWidth;
         const scaleY = 1 / modelHeight;
         const scaleZ = 1 / modelDepth;
 
         const scaleMatrix = new THREE.Matrix4();
-        scaleMatrix.makeScale(scaleX, scaleY, scaleZ);
-        model3D.updateMatrix();
-        model3D.applyMatrix4(scaleMatrix);
+        // Flip on Y because the Y axis is on the opposite side of direct basis.
+        // It avoids models to be like a mirror refection.
+        scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
+        threeObject.updateMatrix();
+        threeObject.applyMatrix4(scaleMatrix);
 
         if (keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
@@ -2501,26 +2553,6 @@ module.exports = {
           this._defaultHeight = scaleRatio * modelHeight;
           this._defaultDepth = scaleRatio * modelDepth;
         }
-
-        model3D.updateMatrix();
-      }
-
-      _getModelAABB(model3D, rotationX, rotationY, rotationZ) {
-        // The original model is used because `setFromObject` is working in
-        // world transformation.
-
-        model3D.rotation.set(
-          (rotationX * Math.PI) / 180,
-          (rotationY * Math.PI) / 180,
-          (rotationZ * Math.PI) / 180
-        );
-
-        const aabb = new THREE.Box3().setFromObject(model3D);
-
-        // Revert changes.
-        model3D.rotation.set(0, 0, 0);
-
-        return aabb;
       }
 
       updateThreeObject() {
@@ -2528,10 +2560,12 @@ module.exports = {
         const height = this.getHeight();
         const depth = this.getDepth();
 
+        const originPoint = this.getOriginPoint();
+        const centerPoint = this.getCenterPoint();
         this._threeObject.position.set(
-          this._instance.getX() + width / 2,
-          this._instance.getY() + height / 2,
-          this._instance.getZ() + depth / 2
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0]),
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]),
+          this._instance.getZ() - depth * (originPoint[2] - centerPoint[2])
         );
 
         this._threeObject.rotation.set(
@@ -2552,19 +2586,25 @@ module.exports = {
       updatePixiObject() {
         const width = this.getWidth();
         const height = this.getHeight();
+        const centerPoint = this.getCenterPoint();
+        const centerX = width * centerPoint[0];
+        const centerY = height * centerPoint[1];
 
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);
         this._pixiObject.lineStyle(1, 0xffd900, 0);
-        this._pixiObject.moveTo(-width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, height / 2);
-        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.moveTo(0 - centerX, 0 - centerY);
+        this._pixiObject.lineTo(width - centerX, 0 - centerY);
+        this._pixiObject.lineTo(width - centerX, height - centerY);
+        this._pixiObject.lineTo(0 - centerX, height - centerY);
         this._pixiObject.endFill();
 
-        this._pixiObject.position.x = this._instance.getX() + width / 2;
-        this._pixiObject.position.y = this._instance.getY() + height / 2;
-        this._pixiObject.angle = this._instance.getAngle();
+        const originPoint = this.getOriginPoint();
+        (this._pixiObject.position.x =
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0])),
+          (this._pixiObject.position.y =
+            this._instance.getY() - height * (originPoint[1] - centerPoint[1])),
+          (this._pixiObject.angle = this._instance.getAngle());
       }
 
       update() {

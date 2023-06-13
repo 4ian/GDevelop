@@ -316,6 +316,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
             style: {
               fontSize: props.style ? props.style.fontSize : undefined,
               fontStyle: props.style ? props.style.fontStyle : undefined,
+              padding: props.style ? props.style.padding : undefined,
             },
             readOnly: props.readOnly,
             inputProps: {

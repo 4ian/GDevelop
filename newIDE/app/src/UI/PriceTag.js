@@ -1,21 +1,15 @@
 // @flow
-
 import * as React from 'react';
-import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
-
 import Text from './Text';
 import { makeStyles } from '@material-ui/core';
-import { Trans } from '@lingui/macro';
 
 type Props = {|
-  value: number,
+  label: React.Node,
   /**
    * To be used when the component is over an element for which
    * we don't control the background (e.g. an image).
    */
   withOverlay?: boolean,
-  owned?: boolean,
 |};
 
 const useStyles = makeStyles(theme => {
@@ -48,26 +42,15 @@ const useStyles = makeStyles(theme => {
   };
 });
 
-export const formatPrice = (i18n: I18nType, value: number) =>
-  `€ ${i18n
-    .number(value / 100, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    .replace(/\D00$/, '')}`;
-
-function PriceTag({ value, withOverlay, owned }: Props) {
+function PriceTag({ label, withOverlay }: Props) {
   const classes = useStyles({ withOverlay });
+
   return (
-    <I18n>
-      {({ i18n }) => (
-        <div className={classes.container}>
-          <Text noMargin size="sub-title" color="inherit">
-            {owned ? <Trans>✅ Owned</Trans> : formatPrice(i18n, value)}
-          </Text>
-        </div>
-      )}
-    </I18n>
+    <div className={classes.container}>
+      <Text noMargin size="sub-title" color="inherit">
+        {label}
+      </Text>
+    </div>
   );
 }
 

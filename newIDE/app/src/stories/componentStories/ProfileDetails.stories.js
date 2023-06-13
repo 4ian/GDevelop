@@ -8,6 +8,7 @@ import paperDecorator from '../PaperDecorator';
 import ProfileDetails from '../../Profile/ProfileDetails';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
@@ -36,7 +37,9 @@ type ArgsTypes = {|
   profile: Profile,
 |};
 
-const getAssetPacksListingData = userId => [
+const getAssetPacksListingData = (
+  userId
+): Array<PrivateAssetPackListingData> => [
   {
     id: 'assetPackId',
     sellerId: userId,
@@ -57,6 +60,7 @@ const getAssetPacksListingData = userId => [
         stripePriceId: 'stripePriceId',
       },
     ],
+    appStoreProductId: null,
   },
 ];
 

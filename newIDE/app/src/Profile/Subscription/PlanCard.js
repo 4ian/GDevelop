@@ -8,7 +8,7 @@ import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { LineStackLayout } from '../../UI/Layout';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
@@ -25,6 +25,48 @@ type Props = {|
   background: 'medium' | 'dark',
 |};
 
+const getPlanPrice = ({
+  plan,
+  hidePrice,
+}: {
+  plan: PlanDetails,
+  hidePrice?: boolean,
+}): React.Node => {
+  if (hidePrice || plan.monthlyPriceInEuros === null) return null;
+  if (plan.monthlyPriceInEuros === 0)
+    return (
+      <Text noMargin color="secondary">
+        <Trans>Free</Trans>
+      </Text>
+    );
+  const prices = [];
+  prices.push(
+    plan.isPerUser ? (
+      <Text key="month" noMargin color="secondary">
+        <Trans>{plan.monthlyPriceInEuros}€/seat/month</Trans>
+      </Text>
+    ) : (
+      <Text key="month" noMargin color="secondary">
+        <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
+      </Text>
+    )
+  );
+  if (plan.yearlyPriceInEuros) {
+    prices.push(
+      plan.isPerUser ? (
+        <Text key="year" noMargin color="secondary">
+          <Trans>or {plan.yearlyPriceInEuros}€/seat/year</Trans>
+        </Text>
+      ) : (
+        <Text key="year" noMargin color="secondary">
+          <Trans>or {plan.yearlyPriceInEuros}€/year</Trans>
+        </Text>
+      )
+    );
+  }
+  return prices;
+};
+
 const PlanCard = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -38,15 +80,9 @@ const PlanCard = (props: Props) => {
                 <b>{props.plan.name}</b>
               </span>
             </Text>
-            <Text color="secondary">
-              {props.hidePrice ||
-              props.plan.monthlyPriceInEuros === null ? null : props.plan
-                  .monthlyPriceInEuros === 0 ? (
-                <Trans>Free</Trans>
-              ) : (
-                <Trans>{props.plan.monthlyPriceInEuros}€/month</Trans>
-              )}
-            </Text>
+            <Column noMargin alignItems="flex-end">
+              {getPlanPrice({ plan: props.plan, hidePrice: props.hidePrice })}
+            </Column>
           </Line>
           <Text color="secondary" noMargin>
             {props.plan.smallDescription
@@ -77,9 +113,14 @@ const PlanCard = (props: Props) => {
             </Column>
           </Line>
           {props.actions && (
-            <LineStackLayout expand justifyContent="flex-end" noMargin>
+            <ResponsiveLineStackLayout
+              expand
+              noMargin
+              alignItems="center"
+              justifyContent="flex-end"
+            >
               {props.actions}
-            </LineStackLayout>
+            </ResponsiveLineStackLayout>
           )}
         </Card>
       )}

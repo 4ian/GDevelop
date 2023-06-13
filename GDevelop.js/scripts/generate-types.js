@@ -188,6 +188,7 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         `  asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;`,
         `  asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;`,
         `  asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;`,
+        `  asModel3DConfiguration(gdObjectConfiguration): gdModel3DObjectConfiguration;`,
         '',
         `  asImageResource(gdResource): gdImageResource;`,
         '',

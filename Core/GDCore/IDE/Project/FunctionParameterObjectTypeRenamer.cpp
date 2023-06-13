@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 
 namespace gd {
 
@@ -17,8 +18,8 @@ void FunctionParameterObjectTypeRenamer::DoVisitEventsFunction(
     gd::EventsFunction &eventsFunction) {
   for (auto &&parameter : eventsFunction.GetParameters()) {
     if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
-        parameter.GetExtraInfo() == oldObjectType) {
-      parameter.SetExtraInfo(newObjectType);
+        gd::ParameterMetadataTools::GetParameterObjectType(parameter) == oldObjectType) {
+      gd::ParameterMetadataTools::SetParameterObjectType(parameter, newObjectType);
     }
   }
 }

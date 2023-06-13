@@ -29,7 +29,7 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
       outputObjectsContainer.InsertNewObject(
           project,
-          parameter.GetExtraInfo(),
+          GetParameterObjectType(parameter),
           parameter.GetName(),
           outputObjectsContainer.GetObjectsCount());
 
@@ -169,6 +169,25 @@ size_t ParameterMetadataTools::GetObjectParameterIndexFor(
   }
 
   return gd::String::npos;
+}
+
+gd::String ParameterMetadataTools::GetParameterObjectType(
+    const gd::ParameterMetadata &parameterMetadata) {
+  return parameterMetadata.GetExtraInfo().Split('&')[0];
+}
+
+bool ParameterMetadataTools::IsParameterMatchingObjectType(
+    const gd::ParameterMetadata &parameterMetadata,
+    const gd::String &objectType) {
+  auto parameterObjectType = GetParameterObjectType(parameterMetadata);
+  return parameterObjectType.empty() || objectType == parameterObjectType;
+}
+
+void ParameterMetadataTools::SetParameterObjectType(gd::ParameterMetadata &parameterMetadata,
+                            const gd::String &objectType) {
+  const auto &extraInfo = parameterMetadata.GetExtraInfo();
+  const size_t objectTypeEnd = extraInfo.find("&");
+  parameterMetadata.SetExtraInfo(objectType + extraInfo.substr(objectTypeEnd));
 }
 
 }  // namespace gd

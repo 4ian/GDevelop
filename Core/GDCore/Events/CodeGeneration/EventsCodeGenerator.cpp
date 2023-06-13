@@ -301,11 +301,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                     GetObjectsAndGroups(),
-                                     objectInParameter) !=
-                     instrInfos.parameters[pNb].GetExtraInfo()) {
+      } else if (!gd::ParameterMetadataTools::IsParameterMatchingObjectType(
+                     instrInfos.parameters[pNb],
+                     gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                         GetObjectsAndGroups(),
+                                         objectInParameter))) {
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -491,11 +491,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (!instrInfos.parameters[pNb].GetExtraInfo().empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                     GetObjectsAndGroups(),
-                                     objectInParameter) !=
-                     instrInfos.parameters[pNb].GetExtraInfo()) {
+      } else if (!gd::ParameterMetadataTools::IsParameterMatchingObjectType(
+                     instrInfos.parameters[pNb],
+                     gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                         GetObjectsAndGroups(),
+                                         objectInParameter))) {
         return "/* Mismatched object type - skipped. */";
       }
     }

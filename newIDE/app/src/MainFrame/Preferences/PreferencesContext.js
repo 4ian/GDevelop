@@ -38,7 +38,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'new-generate-project-from-prompt';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -162,6 +163,10 @@ export const allAlertMessages: Array<{
     label: (
       <Trans>Project package names should not begin with com.example</Trans>
     ),
+  },
+  {
+    key: 'new-generate-project-from-prompt',
+    label: <Trans>New project generation from prompt warning</Trans>,
   },
 ];
 

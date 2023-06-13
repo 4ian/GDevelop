@@ -273,6 +273,11 @@ export const limitsForNoSubscriptionUser: Limits = {
       max: 2,
       limitReached: false,
     },
+    'ai-project-generation': {
+      current: 0,
+      max: 3,
+      limitReached: false,
+    },
   },
   message: undefined,
 };
@@ -300,6 +305,11 @@ export const limitsForSilverUser: Limits = {
     'cordova-build': {
       current: 2,
       max: 10,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
       limitReached: false,
     },
   },
@@ -331,6 +341,11 @@ export const limitsForGoldUser: Limits = {
       max: 70,
       limitReached: false,
     },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
   },
   message: undefined,
 };
@@ -358,6 +373,11 @@ export const limitsReached: Limits = {
     'cordova-build': {
       current: 10,
       max: 10,
+      limitReached: true,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 3,
       limitReached: true,
     },
   },

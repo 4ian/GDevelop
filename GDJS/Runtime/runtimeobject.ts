@@ -2568,6 +2568,54 @@ namespace gdjs {
       return false;
     }
 
+    // Implementation of the Animable interface.
+    /**
+     * Get the index of the animation being played.
+     * @return The index of the new animation being played
+     */
+    getAnimationIndex(): number {
+      return 0;
+    }
+    /**
+     * Change the animation being played.
+     * @param animationIndex The index of the new animation to be played
+     */
+    setAnimationIndex(animationIndex: number): void {}
+    /**
+     * Get the name of the animation being played.
+     * @return The name of the new animation being played
+     */
+    getAnimationName(): string {
+      return '';
+    }
+    /**
+     * Change the animation being played.
+     * @param newAnimationName The name of the new animation to be played
+     */
+    setAnimationName(newAnimationName: string): void {}
+    isCurrentAnimationName(name: string): boolean {
+      return false;
+    }
+    /**
+     * Return true if animation has ended.
+     * The animation had ended if:
+     * - it's not configured as a loop;
+     * - the current frame is the last frame;
+     * - the last frame has been displayed long enough.
+     */
+    hasAnimationEnded(): boolean {
+      return false;
+    }
+    isAnimationPaused() {
+      return false;
+    }
+    pauseAnimation() {}
+    resumeAnimation() {}
+    getAnimationSpeedScale() {
+      return 1;
+    }
+    setAnimationSpeedScale(ratio: float): void {}
+
     /**
      * Get the identifier associated to an object name.
      * Some features may want to compare objects name a large number of time. In this case,

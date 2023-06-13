@@ -81,4 +81,51 @@ declare namespace gdjs {
 
     isFlippedY(): boolean;
   }
+
+  export interface Animable {
+    /**
+     * Get the index of the animation being played.
+     * @return The index of the new animation being played
+     */
+    getAnimationIndex(): number;
+
+    /**
+     * Change the animation being played.
+     * @param animationIndex The index of the new animation to be played
+     */
+    setAnimationIndex(animationIndex: number): void;
+
+    /**
+     * Get the name of the animation being played.
+     * @return The name of the new animation being played
+     */
+    getAnimationName(): string;
+
+    /**
+     * Change the animation being played.
+     * @param newAnimationName The name of the new animation to be played
+     */
+    setAnimationName(newAnimationName: string): void;
+
+    isCurrentAnimationName(name: string): boolean;
+
+    /**
+     * Return true if animation has ended.
+     * The animation had ended if:
+     * - it's not configured as a loop;
+     * - the current frame is the last frame;
+     * - the last frame has been displayed long enough.
+     */
+    hasAnimationEnded(): boolean;
+
+    isAnimationPaused(): boolean;
+
+    pauseAnimation(): void;
+
+    resumeAnimation(): void;
+
+    getAnimationSpeedScale(): float;
+
+    setAnimationSpeedScale(ratio: float): void;
+  }
 }

@@ -1669,7 +1669,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scaleWidth24_black.png")
 
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .UseStandardParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("resizable")
@@ -1685,7 +1685,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scaleHeight24_black.png")
 
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .UseStandardParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("resizable")
@@ -1714,7 +1714,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
@@ -1730,7 +1730,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale on X axis"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
@@ -1746,7 +1746,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale on Y axis"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
@@ -1764,7 +1764,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
 
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .AddParameter("yesorno", _("Activate flipping"))
       .SetRequiresBaseObjectCapability("flippable")
       .MarkAsSimple();
@@ -1777,7 +1777,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
 
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .AddParameter("yesorno", _("Activate flipping"))
       .SetRequiresBaseObjectCapability("flippable")
       .MarkAsSimple();
@@ -1789,7 +1789,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .SetRequiresBaseObjectCapability("flippable");
 
   obj.AddCondition("FlippedY",
@@ -1799,8 +1799,125 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
-      .AddParameter("object", _("Object"), "Object")
+      .AddParameter("object", _("Object"))
       .SetRequiresBaseObjectCapability("flippable");
+}
+// Instruction for Animable capability.
+{
+    obj
+      .AddExpressionAndConditionAndAction(
+        "number",
+        "Animation",
+        _("Animation (by number)"),
+        _(
+          "the number of the animation played by the object (the number from the animations list)."
+        ),
+        _("the number of the animation"),
+        _("Animations and images"),
+        "res/actions/animation24.png"
+      )
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsSimple();
+
+    obj
+      .AddExpressionAndConditionAndAction(
+        "string",
+        "AnimationName",
+        _("Animation (by name)"),
+        _("the animation played by the object"),
+        _("the animation"),
+        _("Animations and images"),
+        "res/actions/animation24.png"
+      )
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters(
+        "objectAnimationName",
+        gd::ParameterOptions::MakeNewOptions().SetDescription(
+          _("Animation name")
+        )
+      )
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsAdvanced();
+
+    obj
+      .AddAction(
+        "PauseAnimation",
+        _("Pause the animation"),
+        _("Pause the animation of the object"),
+        _("Pause the animation of _PARAM0_"),
+        _("Animations and images"),
+        "res/actions/animation24.png",
+        "res/actions/animation.png"
+      )
+      .AddParameter("object", _("Object"))
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsSimple();
+
+    obj
+      .AddAction(
+        "ResumeAnimation",
+        _("Resume the animation"),
+        _("Resume the animation of the object"),
+        _("Resume the animation of _PARAM0_"),
+        _("Animations and images"),
+        "res/actions/animation24.png",
+        "res/actions/animation.png"
+      )
+      .AddParameter("object", _("Object"))
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsSimple();
+
+    obj
+      .AddExpressionAndConditionAndAction(
+        "number",
+        "AnimationSpeedScale",
+        _("Animation speed scale"),
+        _(
+          "the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."
+        ),
+        _("the animation speed scale"),
+        _("Animations and images"),
+        "res/actions/animation24.png"
+      )
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters(
+        "number",
+        gd::ParameterOptions::MakeNewOptions().SetDescription(_("Speed scale"))
+      )
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsSimple();
+
+    obj
+      .AddCondition(
+        "IsAnimationPaused",
+        _("Animation paused"),
+        _("Check if the animation of an object is paused."),
+        _("The animation of _PARAM0_ is paused"),
+        _("Animations and images"),
+        "res/conditions/animation24.png",
+        "res/conditions/animation.png"
+      )
+      .AddParameter("object", _("Object"))
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsSimple();
+
+    obj
+      .AddCondition(
+        "HasAnimationEnded",
+        _("Animation finished"),
+        _(
+          "Check if the animation being played by the Sprite object is finished."
+        ),
+        _("The animation of _PARAM0_ is finished"),
+        _("Animations and images"),
+        "res/conditions/animation24.png",
+        "res/conditions/animation.png"
+      )
+      .AddParameter("object", _("Object"))
+      .SetRequiresBaseObjectCapability("animable")
+      .MarkAsSimple();
 }
 }
 

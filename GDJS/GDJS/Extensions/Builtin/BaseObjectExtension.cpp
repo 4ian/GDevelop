@@ -356,37 +356,90 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["SetSize"]
       .SetFunctionName("setSize")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["Width"].SetFunctionName("getWidth");
+  objectConditions["Width"]
+      .SetFunctionName("getWidth")
+      .SetIncludeFile("runtimeobject.js");
   objectActions["SetWidth"]
       .SetFunctionName("setWidth")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["Height"].SetFunctionName("getHeight");
+  objectConditions["Height"]
+      .SetFunctionName("getHeight")
+      .SetIncludeFile("runtimeobject.js");
   objectActions["SetHeight"]
       .SetFunctionName("setHeight")
       .SetIncludeFile("runtimeobject.js");
 
   // Instructions for the Scalable capability
   objectExpressions["Scale"].SetFunctionName("getScale");
-  objectConditions["Scale"].SetFunctionName("getScale");
+  objectConditions["Scale"]
+      .SetFunctionName("getScale")
+      .SetIncludeFile("runtimeobject.js");
   objectActions["SetScale"]
       .SetFunctionName("setScale")
       .SetIncludeFile("runtimeobject.js");
   objectExpressions["ScaleX"].SetFunctionName("getScaleX");
-  objectConditions["ScaleX"].SetFunctionName("getScaleX");
+  objectConditions["ScaleX"]
+      .SetFunctionName("getScaleX")
+      .SetIncludeFile("runtimeobject.js");
   objectActions["SetScaleX"]
       .SetFunctionName("setScaleX")
       .SetIncludeFile("runtimeobject.js");
   objectExpressions["ScaleY"].SetFunctionName("getScaleY");
-  objectConditions["ScaleY"].SetFunctionName("getScaleY");
+  objectConditions["ScaleY"]
+      .SetFunctionName("getScaleY")
+      .SetIncludeFile("runtimeobject.js");
   objectActions["SetScaleY"]
       .SetFunctionName("setScaleY")
       .SetIncludeFile("runtimeobject.js");
 
   // Instructions for the Flippable capability
-  objectActions["FlipX"].SetFunctionName("flipX");
-  objectActions["FlipY"].SetFunctionName("flipY");
-  objectConditions["FlippedX"].SetFunctionName("isFlippedX");
-  objectConditions["FlippedY"].SetFunctionName("isFlippedY");
+  objectActions["FlipX"]
+      .SetFunctionName("flipX")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["FlipY"]
+      .SetFunctionName("flipY")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["FlippedX"]
+      .SetFunctionName("isFlippedX")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["FlippedY"]
+      .SetFunctionName("isFlippedY")
+      .SetIncludeFile("runtimeobject.js");
+
+  // Instructions for the Animable capability
+  objectExpressions["Animation"].SetFunctionName("getAnimationIndex");
+  objectConditions["Animation"]
+      .SetFunctionName("getAnimationIndex")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["SetAnimation"]
+      .SetFunctionName("setAnimationIndex")
+      .SetIncludeFile("runtimeobject.js");
+  objectExpressions["AnimationName"].SetFunctionName("getAnimationName");
+  objectConditions["AnimationName"]
+      .SetFunctionName("getAnimationName")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["SetAnimationName"]
+      .SetFunctionName("setAnimationName")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["PauseAnimation"]
+      .SetFunctionName("pauseAnimation")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ResumeAnimation"]
+      .SetFunctionName("resumeAnimation")
+      .SetIncludeFile("runtimeobject.js");
+  objectExpressions["AnimationSpeedScale"].SetFunctionName("getAnimationSpeedScale");
+  objectConditions["AnimationSpeedScale"]
+      .SetFunctionName("getAnimationSpeedScale")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["SetAnimationSpeedScale"]
+      .SetFunctionName("setAnimationSpeedScale")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["IsAnimationPaused"]
+      .SetFunctionName("isAnimationPaused")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["HasAnimationEnded"]
+      .SetFunctionName("hasAnimationEnded")
+      .SetIncludeFile("runtimeobject.js");
 
   GetAllActions()["MoveObjects"].SetCustomCodeGenerator(
       [](gd::Instruction &,

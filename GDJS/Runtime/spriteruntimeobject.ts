@@ -614,8 +614,13 @@ namespace gdjs {
     /**
      * Change the animation being played.
      * @param newAnimation The index of the new animation to be played
+     * @deprecated Use `setAnimationIndex` instead
      */
     setAnimation(newAnimation: number): void {
+      this.setAnimationIndex(newAnimation);
+    }
+
+    setAnimationIndex(newAnimation: number): void {
       newAnimation = newAnimation | 0;
       if (
         newAnimation < this._animations.length &&
@@ -633,10 +638,6 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the animation being played.
-     * @param newAnimationName The name of the new animation to be played
-     */
     setAnimationName(newAnimationName: string): void {
       if (!newAnimationName) {
         return;
@@ -651,15 +652,16 @@ namespace gdjs {
     /**
      * Get the index of the animation being played.
      * @return The index of the new animation being played
+     * @deprecated Use `getAnimationIndex` instead
      */
     getAnimation(): number {
+      return this.getAnimationIndex();
+    }
+
+    getAnimationIndex(): number {
       return this._currentAnimation;
     }
 
-    /**
-     * Get the name of the animation being played.
-     * @return The name of the new animation being played
-     */
     getAnimationName(): string {
       if (this._currentAnimation >= this._animations.length) {
         return '';
@@ -667,7 +669,10 @@ namespace gdjs {
       return this._animations[this._currentAnimation].name;
     }
 
-    isCurrentAnimationName(name): boolean {
+    /**
+     * @deprecated Use `getAnimationName` instead
+     */
+    isCurrentAnimationName(name: string): boolean {
       return this.getAnimationName() === name;
     }
 
@@ -768,10 +773,10 @@ namespace gdjs {
     /**
      * @deprecated
      * Return true if animation has ended.
-     * Prefer using hasAnimationEnded2. This method returns true as soon as
+     * Prefer using `hasAnimationEnded2`. This method returns true as soon as
      * the animation enters the last frame, not at the end of the last frame.
      */
-    hasAnimationEnded(): boolean {
+    hasAnimationEndedLegacy(): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -794,8 +799,14 @@ namespace gdjs {
      * - it's not configured as a loop;
      * - the current frame is the last frame;
      * - the last frame has been displayed long enough.
+     *
+     * @deprecated Use `hasAnimationEnded` instead.
      */
     hasAnimationEnded2(): boolean {
+      return this.hasAnimationEnded();
+    }
+
+    hasAnimationEnded(): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -815,15 +826,29 @@ namespace gdjs {
       );
     }
 
-    animationPaused() {
+    /**
+     * @deprecated Use `isAnimationPaused` instead.
+     */
+    animationPaused(): boolean {
+      return this.isAnimationPaused();
+    }
+
+    isAnimationPaused(): boolean {
       return this._animationPaused;
     }
 
-    pauseAnimation() {
+    pauseAnimation(): void {
       this._animationPaused = true;
     }
 
-    playAnimation() {
+    /**
+     * @deprecated Use `resumeAnimation` instead.
+     */
+    playAnimation(): void {
+      this.resumeAnimation();
+    }
+
+    resumeAnimation(): void {
       this._animationPaused = false;
     }
 
@@ -831,7 +856,7 @@ namespace gdjs {
       return this._animationSpeedScale;
     }
 
-    setAnimationSpeedScale(ratio): void {
+    setAnimationSpeedScale(ratio: float): void {
       this._animationSpeedScale = ratio;
     }
 

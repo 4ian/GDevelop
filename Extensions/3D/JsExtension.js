@@ -52,6 +52,7 @@ module.exports = {
         .markBaseObjectCapabilityAsSupported('resizable')
         .markBaseObjectCapabilityAsSupported('scalable')
         .markBaseObjectCapabilityAsSupported('flippable')
+        .markBaseObjectCapabilityAsSupported('animable')
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
@@ -465,6 +466,7 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject')
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
         .markAsSimple()
+        .setHidden()
         .setFunctionName('setAnimationIndex')
         .setGetter('getAnimationIndex');
 
@@ -486,6 +488,7 @@ module.exports = {
           )
         )
         .markAsAdvanced()
+        .setHidden()
         .setFunctionName('setAnimationName')
         .setGetter('getAnimationName');
 
@@ -501,6 +504,7 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject')
         .markAsSimple()
+        .setHidden()
         .setFunctionName('pauseAnimation');
 
       object
@@ -515,6 +519,7 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject')
         .markAsSimple()
+        .setHidden()
         .setFunctionName('resumeAnimation');
 
       object
@@ -535,6 +540,7 @@ module.exports = {
           gd.ParameterOptions.makeNewOptions().setDescription(_('Speed scale'))
         )
         .markAsSimple()
+        .setHidden()
         .setFunctionName('setAnimationSpeedScale')
         .setGetter('getAnimationSpeedScale');
 
@@ -550,6 +556,7 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject')
         .markAsSimple()
+        .setHidden()
         .setFunctionName('isAnimationPaused');
 
       object
@@ -566,6 +573,7 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject')
         .markAsSimple()
+        .setHidden()
         .setFunctionName('hasAnimationEnded');
     }
 

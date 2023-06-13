@@ -45,7 +45,7 @@ SpriteExtension::SpriteExtension() {
   spriteConditions["AnimationName"].SetFunctionName("isCurrentAnimationName");
   spriteConditions["Direction"].SetFunctionName("getDirectionOrAngle");
   spriteConditions["Sprite"].SetFunctionName("getAnimationFrame");
-  spriteConditions["AnimationEnded"].SetFunctionName("hasAnimationEnded");
+  spriteConditions["AnimationEnded"].SetFunctionName("hasAnimationEndedLegacy");
   spriteConditions["AnimationEnded2"].SetFunctionName("hasAnimationEnded2");
   spriteActions["PauseAnimation"].SetFunctionName("pauseAnimation");
   spriteActions["PlayAnimation"].SetFunctionName("playAnimation");

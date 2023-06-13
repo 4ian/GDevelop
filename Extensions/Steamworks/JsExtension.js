@@ -59,6 +59,8 @@ module.exports = {
       .setName('Steamworks')
       .setDependencyType('npm')
       .setExportName('steamworks.js')
+      // Note: Updating steamworks.js here only updates it for the game builds,
+      // also update newIDE/electron-app/app/package.json to update it for previews as well!
       .setVersion('0.2.0');
 
     extension
@@ -76,7 +78,7 @@ module.exports = {
       .addParameter(
         'identifier',
         _('Achievement ID'),
-        'steamAchievement',
+        'SteamAchievement',
         false
       )
       .getCodeExtraInformation()
@@ -96,7 +98,7 @@ module.exports = {
       .addParameter(
         'identifier',
         _('Achievement ID'),
-        'steamAchievement',
+        'SteamAchievement',
         false
       )
       .getCodeExtraInformation()
@@ -116,7 +118,7 @@ module.exports = {
       .addParameter(
         'identifier',
         _('Achievement ID'),
-        'steamAchievement',
+        'SteamAchievement',
         false
       )
       .getCodeExtraInformation()
@@ -269,6 +271,312 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.isOnSteamDeck');
+
+    extension
+      .addAction(
+        'CreateLobby',
+        _('Create a lobby'),
+        _(
+          'Creates a new steam lobby owned by the player, for other players to join.'
+        ),
+        _(
+          'Create a lobby visible to _PARAM0_ with max. _PARAM1_ players (store results in _PARAM2_)'
+        ),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'stringWithSelector',
+        'Visibility',
+        JSON.stringify(['Private', 'FriendsOnly', 'Public', 'Invisible']),
+        false
+      )
+      .setParameterLongDescription(
+        `[Click here](https://partner.steamgames.com/doc/api/ISteamMatchmaking#ELobbyType) to learn more about the different lobby visibilities.`
+      )
+      .addParameter('expression', 'Maximal player count', '', false)
+      .addParameter('scenevar', 'Store results in', '', true)
+      .setParameterLongDescription(
+        `The variable will be set to the ID of the lobby if successful, otherwise to "failure".`
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.createLobby');
+
+    extension
+      .addAction(
+        'GetLobbies',
+        _('Get a list of lobbies'),
+        _(
+          'Fills an array variable with a list of lobbies for the player to join.'
+        ),
+        _('Fill _PARAM0_ with a list of lobbies'),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('scenevar', 'Array to fill with lobbies', '', false)
+      .setParameterLongDescription(
+        `The variable will be set to an array of the IDs of the lobbies if they could be successfully obtained. If they could not be obtained, it is set to the string "failure".`
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.getLobbiesList');
+
+    extension
+      .addAction(
+        'JoinLobby',
+        _('Join a lobby (by ID)'),
+        _('Join a Steam lobby, using its lobby ID.'),
+        _('Join lobby _PARAM0_ (store result in _PARAM1_)'),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('string', 'Lobby ID', '', false)
+      .addParameter('scenevar', 'Store results in', '', true)
+      .setParameterLongDescription(
+        `The variable will be set to the ID of the lobby if successful, otherwise to "failure".`
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.joinLobby');
+
+    extension
+      .addAction(
+        'LeaveLobby',
+        _('Leave current lobby'),
+        _('Marks the player as having left the current lobby.'),
+        _('Leave the current lobby'),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.leaveCurrentLobby');
+
+    extension
+      .addAction(
+        'OpenInviteDialogue',
+        _('Open invite dialogue'),
+        _(
+          'Opens the steam invitation dialogue to let the player invite their Steam friends to the current lobby. Only works if the player is currently in a lobby.'
+        ),
+        _('Open lobby invitation dialogue'),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName(
+        'gdjs.steamworks.openDialogForInvitingUsersToTheCurrentLobby'
+      );
+
+    extension
+      .addAction(
+        'SetCurrentLobbyAttribute',
+        _('Set a lobby attribute'),
+        _(
+          'Sets an attribute of the current lobby. Attributes are readable to anyone that can see the lobby. They can contain public information about the lobby like a description, or for example a P2P ID for knowing where to connect to join this lobby.'
+        ),
+        _(
+          'Set current lobby attribute _PARAM0_ to _PARAM1_ (store result in _PARAM2_)'
+        ),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'The attribute to set',
+        'SteamLobbyAttribute',
+        false
+      )
+      .addParameter('string', 'Value to set the attribute to', '', false)
+      .addParameter('scenevar', 'Variable where to store the result', '', true)
+      .setParameterLongDescription(
+        'The variable will be set to true if the attribute was successfully set and to false if it could not be set.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.setCurrentLobbyAttribute');
+
+    extension
+      .addAction(
+        'SetCurrentLobbyJoinability',
+        _('Set the lobby joinability'),
+        _('Sets whether other users can join the current lobby or not.'),
+        _('Make current lobby joinable: _PARAM0_ (store result in _PARAM1_)'),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('yesorno', 'Should the lobby be joinable?', '', false)
+      .addParameter('scenevar', 'Variable where to store the result', '', true)
+      .setParameterLongDescription(
+        'The variable will be set to true if the joinability was successfully set and to false if it could not be changed.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.setCurrentLobbyJoinability');
+
+    extension
+      .addAction(
+        'GetCurrentLobbyMembers',
+        _("Get the lobby's members"),
+        _('Gets the Steam ID of all players in the current lobby.'),
+        _('Store the array of all players in _PARAM0_'),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'scenevar',
+        'Variable where to store the player list',
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getCurrentLobbyMembersList');
+
+    extension
+      .addAction(
+        'GetLobbyMembers',
+        _("Get a lobby's members"),
+        _('Gets the Steam ID of all players in a lobby.'),
+        _('Store the array of all players of lobby _PARAM0_ in _PARAM1_'),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('string', 'The lobby ID', '', false)
+      .addParameter(
+        'scenevar',
+        'Variable where to store the player list',
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getLobbyMembersList');
+
+    extension
+      .addStrExpression(
+        'CurrentLobbyID',
+        _("Current lobby's ID"),
+        _(
+          'The ID of the current lobby, useful for letting other players join it.'
+        ),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getCurrentLobbyId');
+
+    extension
+      .addStrExpression(
+        'CurrentLobbyAttribute',
+        _('Attribute of the lobby'),
+        _("Obtains the value of one of the current lobby's attributes."),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getCurrentLobbyAttribute');
+
+    extension
+      .addExpression(
+        'CurrentLobbyMemberCount',
+        _('Member count of the lobby'),
+        _("Obtains the current lobby's member count."),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getCurrentLobbyMemberCount');
+
+    extension
+      .addExpression(
+        'CurrentLobbyMemberLimit',
+        _('Member limit of the lobby'),
+        _("Obtains the current lobby's maximum member limit."),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getCurrentLobbyMemberLimit');
+
+    extension
+      .addStrExpression(
+        'CurrentLobbyOwner',
+        _('Owner of the lobby'),
+        _('Obtains the Steam ID of the user that owns the current lobby.'),
+        _('Matchmaking/Current lobby'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getCurrentLobbyOwner');
+
+    extension
+      .addStrExpression(
+        'LobbyAttribute',
+        _('Attribute of a lobby'),
+        _("Obtains the value of one of a lobby's attributes."),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('string', 'The ID of the lobby', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getLobbyAttribute');
+
+    extension
+      .addExpression(
+        'LobbyMemberCount',
+        _('Member count of a lobby'),
+        _("Obtains a lobby's member count."),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('string', 'The ID of the lobby', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getLobbyMemberCount');
+
+    extension
+      .addExpression(
+        'LobbyMemberLimit',
+        _('Member limit of a lobby'),
+        _("Obtains a lobby's maximum member limit."),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('string', 'The ID of the lobby', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getLobbyMemberLimit');
+
+    extension
+      .addStrExpression(
+        'LobbyOwner',
+        _('Owner of a lobby'),
+        _('Obtains the Steam ID of the user that owns a lobby.'),
+        _('Matchmaking'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('string', 'The ID of the lobby', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getLobbyOwner');
 
     return extension;
   },

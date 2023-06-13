@@ -8,6 +8,7 @@ project(GD-Extensions)
 include(CMakeUtils.txt) #Functions to factor common tasks done in CMakeLists.txt of extensions
 
 #Add all the CMakeLists (for non pure JS extensions):
+ADD_SUBDIRECTORY(3D)
 ADD_SUBDIRECTORY(AnchorBehavior)
 ADD_SUBDIRECTORY(DestroyOutsideBehavior)
 ADD_SUBDIRECTORY(DraggableBehavior)

@@ -543,9 +543,9 @@ export default function EffectsList(props: Props) {
                                   >
                                     {connectDragSource(
                                       <span>
-                                        <Spacer />
-                                        <DragHandleIcon />
-                                        <Spacer />
+                                        <Column>
+                                          <DragHandleIcon />
+                                        </Column>
                                       </span>
                                     )}
                                     <ResponsiveLineStackLayout expand>

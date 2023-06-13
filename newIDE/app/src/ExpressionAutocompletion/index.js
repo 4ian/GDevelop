@@ -236,9 +236,11 @@ const getAutocompletionsForObject = function(
     gd,
     globalObjectsContainer,
     objectsContainer,
+    project,
   } = expressionAutocompletionContext;
 
   const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
+    project.getCurrentPlatform(),
     globalObjectsContainer,
     objectsContainer
   );

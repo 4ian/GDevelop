@@ -9,13 +9,12 @@ import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
-import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-const gd: libGDevelop = global.gd;
+import checkHasRequiredCapabilities from '../Utils/CheckHasRequiredCapabilities';
 
 type Props = {|
   project: ?gdProject,
@@ -28,7 +27,7 @@ type Props = {|
    * If specified, an object without this required capability won't be selectable.
    * Note that this does not work with groups - which are assumed to have all capabilities.
    */
-  requiredObjectCapability?: ?string,
+  requiredObjectCapabilities?: Array<string>,
 
   noGroups?: boolean,
 
@@ -60,6 +59,7 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
+  requiredObjectCapabilities,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
@@ -67,12 +67,15 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
+  requiredObjectCapabilities: ?Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
+    project && project.getCurrentPlatform(),
     globalObjectsContainer,
     objectsContainer,
-    allowedObjectType || undefined
+    allowedObjectType || undefined,
+    requiredObjectCapabilities || []
   );
   const objects = list.allObjectsList.map(({ object }) => {
     return {
@@ -113,43 +116,6 @@ const getObjectsAndGroupsDataSource = ({
     : fullList;
 };
 
-const checkHasRequiredCapability = ({
-  project,
-  globalObjectsContainer,
-  objectsContainer,
-  requiredObjectCapability,
-  objectName,
-}: {|
-  project: ?gdProject,
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
-  requiredObjectCapability: ?string,
-  objectName: string,
-|}) => {
-  if (!requiredObjectCapability) return true;
-  if (!project) return true;
-
-  const object = getObjectByName(
-    globalObjectsContainer,
-    objectsContainer,
-    objectName
-  );
-  if (!object) {
-    // Either the object does not exist or it's a group - not a problem because:
-    // - if the object does not exist, we can't know its capabilities, we assume it has all.
-    // - a group is assumed to have all the capabilities.
-    return true;
-  }
-
-  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-    project.getCurrentPlatform(),
-    object.getType()
-  );
-  return objectMetadata.isSupportedBaseObjectCapability(
-    requiredObjectCapability
-  );
-};
-
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
 const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
@@ -171,7 +137,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       globalObjectsContainer,
       objectsContainer,
       allowedObjectType,
-      requiredObjectCapability,
+      requiredObjectCapabilities,
       noGroups,
       errorTextIfInvalid,
       margin,
@@ -189,6 +155,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       objectsContainer,
       noGroups,
       allowedObjectType,
+      requiredObjectCapabilities,
       excludedObjectOrGroupNames,
     });
 
@@ -197,13 +164,15 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
 
-    const hasObjectWithRequiredCapability = checkHasRequiredCapability({
-      project,
-      requiredObjectCapability,
-      globalObjectsContainer,
-      objectsContainer,
-      objectName: value,
-    });
+    const hasObjectWithRequiredCapability =
+      !requiredObjectCapabilities ||
+      checkHasRequiredCapabilities({
+        platform: project && project.getCurrentPlatform(),
+        requiredObjectCapabilities,
+        globalObjectsContainer,
+        objectsContainer,
+        objectName: value,
+      });
 
     const errorText = !hasObjectWithRequiredCapability ? (
       <Trans>This object exists, but can't be used here.</Trans>

@@ -1669,7 +1669,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scaleWidth24_black.png")
 
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&resizable")
       .UseStandardParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("resizable")
@@ -1685,7 +1685,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scaleHeight24_black.png")
 
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&resizable")
       .UseStandardParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("resizable")
@@ -1698,7 +1698,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scale24_black.png",
                 "res/actions/scale_black.png")
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&resizable")
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
       .SetRequiresBaseObjectCapability("resizable")
@@ -1714,7 +1714,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&scalable")
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
@@ -1746,7 +1746,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale on Y axis"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&scalable")
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
@@ -1764,7 +1764,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
 
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&flippable")
       .AddParameter("yesorno", _("Activate flipping"))
       .SetRequiresBaseObjectCapability("flippable")
       .MarkAsSimple();
@@ -1777,7 +1777,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
 
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&flippable")
       .AddParameter("yesorno", _("Activate flipping"))
       .SetRequiresBaseObjectCapability("flippable")
       .MarkAsSimple();
@@ -1789,7 +1789,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&flippable")
       .SetRequiresBaseObjectCapability("flippable");
 
   obj.AddCondition("FlippedY",
@@ -1799,7 +1799,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&flippable")
       .SetRequiresBaseObjectCapability("flippable");
 }
 // Instruction for Animable capability.
@@ -1816,7 +1816,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         _("Animations and images"),
         "res/actions/animation24.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("animable")
       .MarkAsSimple();
@@ -1831,7 +1831,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         _("Animations and images"),
         "res/actions/animation24.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .UseStandardParameters(
         "objectAnimationName",
         gd::ParameterOptions::MakeNewOptions().SetDescription(
@@ -1851,7 +1851,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         "res/actions/animation24.png",
         "res/actions/animation.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .SetRequiresBaseObjectCapability("animable")
       .MarkAsSimple();
 
@@ -1865,7 +1865,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         "res/actions/animation24.png",
         "res/actions/animation.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .SetRequiresBaseObjectCapability("animable")
       .MarkAsSimple();
 
@@ -1881,7 +1881,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         _("Animations and images"),
         "res/actions/animation24.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .UseStandardParameters(
         "number",
         gd::ParameterOptions::MakeNewOptions().SetDescription(_("Speed scale"))
@@ -1899,7 +1899,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         "res/conditions/animation24.png",
         "res/conditions/animation.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .SetRequiresBaseObjectCapability("animable")
       .MarkAsSimple();
 
@@ -1915,7 +1915,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
         "res/conditions/animation24.png",
         "res/conditions/animation.png"
       )
-      .AddParameter("object", _("Object"))
+      .AddParameter("object", _("Object"), "&animable")
       .SetRequiresBaseObjectCapability("animable")
       .MarkAsSimple();
 }

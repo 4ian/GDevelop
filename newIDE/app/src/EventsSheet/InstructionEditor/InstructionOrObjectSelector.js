@@ -163,6 +163,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
+      this.props.project.getCurrentPlatform(),
       this.props.globalObjectsContainer,
       this.props.objectsContainer
     );
@@ -292,6 +293,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     const isOutsideLayout = globalObjectsContainer !== project;
 
     const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
+      project.getCurrentPlatform(),
       globalObjectsContainer,
       objectsContainer
     );

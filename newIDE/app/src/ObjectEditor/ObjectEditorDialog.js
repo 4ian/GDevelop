@@ -187,9 +187,9 @@ const InnerDialog = (props: InnerDialogProps) => {
             },
             objectMetadata.isSupportedBaseObjectCapability('effect')
               ? {
-                label: <Trans>Effects</Trans>,
-                value: 'effects',
-              }
+                  label: <Trans>Effects</Trans>,
+                  value: 'effects',
+                }
               : null,
           ].filter(Boolean)}
         />

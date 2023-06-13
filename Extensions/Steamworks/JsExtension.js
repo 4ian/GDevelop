@@ -578,6 +578,170 @@ module.exports = {
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.getLobbyOwner');
 
+    extension
+      .addCondition(
+        'PlayerOwnsApp',
+        _('Player owns an application'),
+        _('Checks if the current user owns an application on Steam.'),
+        _('App _PARAM0_ owned on Steam'),
+        _('Steam Apps'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'The Steam App ID of the application',
+        'SteamAppID',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isAppOwned');
+
+    extension
+      .addCondition(
+        'PlayerInstalledApp',
+        _('Player installed an application'),
+        _(
+          'Checks if the current user has a Steam application currently installed.'
+        ),
+        _('App _PARAM0_ installed from Steam'),
+        _('Steam Apps'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'The Steam App ID of the application',
+        'SteamAppID',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isAppInstalled');
+
+    extension
+      .addCondition(
+        'PlayerInstalledDLC',
+        _('Player installed DLC'),
+        _('Checks if the current user has installed a piece of DLC.'),
+        _('DLC _PARAM0_ installed from Steam'),
+        _('Steam Apps'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'The Steam App ID of the DLC',
+        'SteamAppID',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isDLCInstalled');
+
+    extension
+      .addStrExpression(
+        'InstalledApplicationPath',
+        _('Get installed app path'),
+        _('Gets the path to an installed Steam application.'),
+        _('Steam Apps'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'The Steam App ID of the application',
+        'SteamAppID',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getAppInstallDirectory');
+
+    extension
+      .addCondition(
+        'PlayerIsVACBanned',
+        _('Player has a VAC ban'),
+        _('Checks if the current user has a VAC ban on their account.'),
+        _('Player has a VAC ban'),
+        _('Player'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isVacBanned');
+
+    extension
+      .addCondition(
+        'PlayerIsLowViolence',
+        _('Player cannot be exposed to violence'),
+        _(
+          'Checks if the current user may only be exposed to low violence, due to e.g. their age and content restrictions in their country.'
+        ),
+        _('Player cannot be exposed to violence'),
+        _('Player'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isLowViolence');
+
+    extension
+      .addCondition(
+        'PlayerBoughtGame',
+        _('Player bought the game'),
+        _(
+          'Checks if the current user actually bought & owns the game. If the "Require Steam" checkbox has been checked in the game properties, this will always be true as Steam will not allow to launch the game if it is not owned. Can be used to display an anti-piracy message instead of straight up blocking the launch of the game.'
+        ),
+        _('Player bought the game'),
+        _('Player'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.userBoughtTheGame');
+
+    extension
+      .addStrExpression(
+        'GameLanguage',
+        _('Game language'),
+        _('Gets the language the user set in the Steam game properties.'),
+        _('Game properties'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.currentGameLanguage');
+
+    extension
+      .addStrExpression(
+        'BetaName',
+        _('Current beta name'),
+        _(
+          'Gets the name of the beta the player enrolled to in the Steam game properties.'
+        ),
+        _('Game properties'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.currentBetaName');
+
+    extension
+      .addExpression(
+        'AppBuildID',
+        _('Current app build ID'),
+        _('Gets the ID of the current app build.'),
+        _('Game properties'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getBuildId');
+
     return extension;
   },
   runExtensionSanityTests: function (

@@ -320,5 +320,47 @@ namespace gdjs {
         );
       }
     }
+
+    // ---
+
+    export function isAppOwned(appId: string): boolean {
+      return !!steamAPI && steamAPI.apps.isSubscribedApp(Number(appId));
+    }
+
+    export function isAppInstalled(appId: string): boolean {
+      return !!steamAPI && steamAPI.apps.isAppInstalled(Number(appId));
+    }
+
+    export function isDLCInstalled(dlcId: string): boolean {
+      return !!steamAPI && steamAPI.apps.isDlcInstalled(Number(dlcId));
+    }
+
+    export function getAppInstallDirectory(appId: string): string {
+      return steamAPI ? steamAPI.apps.appInstallDir(Number(appId)) : '';
+    }
+
+    export function isVacBanned(): boolean {
+      return !!steamAPI && steamAPI.apps.isVacBanned();
+    }
+
+    export function isLowViolence(): boolean {
+      return !!steamAPI && steamAPI.apps.isLowViolence();
+    }
+
+    export function userBoughtTheGame(): boolean {
+      return !!steamAPI && steamAPI.apps.isSubscribed();
+    }
+
+    export function currentGameLanguage(): string {
+      return steamAPI ? steamAPI.apps.currentGameLanguage() : '';
+    }
+
+    export function currentBetaName(): string {
+      return steamAPI ? steamAPI.apps.currentBetaName() || '' : '';
+    }
+
+    export function getBuildId(): number {
+      return steamAPI ? steamAPI.apps.appBuildId() : 0;
+    }
   }
 }

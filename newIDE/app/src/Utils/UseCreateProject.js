@@ -27,7 +27,7 @@ import {
 import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { type EditorTabsState } from '../Mainframe/EditorTabs/EditorTabsHandler';
+import { type EditorTabsState } from '../MainFrame/EditorTabs/EditorTabsHandler';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 
 type Props = {|

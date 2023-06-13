@@ -101,10 +101,12 @@ const ResolutionDimensionTextField = ({
   value,
   onChange,
   defaultValue,
+  disabled,
 }: {
   value: ?number,
   onChange: (value: ?number) => void,
   defaultValue: number,
+  disabled?: boolean,
 }) => (
   <SemiControlledTextField
     margin="none"
@@ -244,6 +246,7 @@ const ResolutionOptions = ({
                         value={customWidth}
                         onChange={onCustomWidthChange}
                         defaultValue={defaultCustomWidth}
+                        disabled={disabled}
                       />
                       <Text size="body-small" noMargin color="secondary">
                         H
@@ -252,6 +255,7 @@ const ResolutionOptions = ({
                         value={customHeight}
                         onChange={onCustomHeightChange}
                         defaultValue={defaultCustomHeight}
+                        disabled={disabled}
                       />
                     </Line>
                   )}

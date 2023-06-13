@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Text from '../../UI/Text';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { getBackgroundColor } from '../../UI/Paper';
 import { ColumnStackLayout } from '../../UI/Layout';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -14,6 +14,7 @@ type SwipeableDrawerTopBarProps = {|
   onClick: () => void,
   onSwipeUp: () => void,
   onSwipeDown: () => void,
+  controls: ?React.Node,
 |};
 
 const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
@@ -53,9 +54,15 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
           />
         </div>
         <Column>
-          <Text size="sub-title" noMargin>
-            {props.title}
-          </Text>
+          <Line
+            noMargin
+            justifyContent={props.controls ? 'space-between' : 'flex-start'}
+          >
+            <Text size="sub-title" noMargin>
+              {props.title}
+            </Text>
+            {props.controls}
+          </Line>
         </Column>
       </ColumnStackLayout>
     </div>
@@ -70,6 +77,7 @@ type Props = {|
   title: React.Node,
   openingState: DrawerOpeningState,
   setOpeningState: DrawerOpeningState => void,
+  topBarControls: ?React.Node,
 |};
 
 const SwipeableDrawer = (props: Props) => {
@@ -95,6 +103,7 @@ const SwipeableDrawer = (props: Props) => {
           if (openingState === 'half-opened') setOpeningState('closed');
           else if (openingState === 'opened') setOpeningState('half-opened');
         }}
+        controls={props.topBarControls}
       />
       <div style={{ display: 'flex', flex: 1 }}>{props.children}</div>
     </div>

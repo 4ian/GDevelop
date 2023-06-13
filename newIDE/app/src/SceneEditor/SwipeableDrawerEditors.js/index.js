@@ -14,7 +14,6 @@ import InstancePropertiesEditor, {
 import { type InstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import TagsButton from '../../UI/EditorMosaic/TagsButton';
-import CloseButton from '../../UI/EditorMosaic/CloseButton';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
 import ObjectGroupsList from '../../ObjectGroupsList';
 import InstancesSelection from '../../InstancesEditor/InstancesSelection';
@@ -390,6 +389,17 @@ const SwipeableDrawerEditors = React.forwardRef<Props, MosaicEditorsInterface>(
                 }
                 openingState={drawerOpeningState}
                 setOpeningState={setDrawerOpeningState}
+                topBarControls={
+                  selectedEditorId === 'objects-list'
+                    ? [
+                        <TagsButton
+                          key="tags"
+                          size="small"
+                          buildMenuTemplate={buildObjectTagsMenuTemplate}
+                        />,
+                      ]
+                    : null
+                }
               >
                 {selectedEditorId === 'objects-list' && (
                   <I18n>

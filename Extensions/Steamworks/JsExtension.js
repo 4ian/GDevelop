@@ -45,14 +45,12 @@ module.exports = {
       .setDescription(
         'Your Steam app ID, obtained from the Steamworks partner website.'
       )
-      .setType('number')
-      .setValue(480);
+      .setType('number');
 
     extension
       .registerProperty('RequireSteam')
       .setDescription(_('Require Steam to launch the game'))
-      .setType('boolean')
-      .setValue(false);
+      .setType('boolean');
 
     extension
       .addDependency()

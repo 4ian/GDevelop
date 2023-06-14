@@ -11,6 +11,8 @@ import IconButton from '../../UI/IconButton';
 import { type EditorId } from '..';
 import Paper from '../../UI/Paper';
 
+const styles = { container: { padding: 4, paddingBottom: 8 } };
+
 type Props = {|
   selectedEditorId: ?EditorId,
   selectEditor: (?EditorId) => void,
@@ -41,7 +43,7 @@ const editors = {
 
 const BottomToolbar = (props: Props) => {
   return (
-    <Paper background="medium" square style={{ padding: 4, paddingBottom: 8 }}>
+    <Paper background="medium" square style={styles.container}>
       <Toolbar>
         <ToolbarGroup>
           {Object.keys(editors).map(editorId => {

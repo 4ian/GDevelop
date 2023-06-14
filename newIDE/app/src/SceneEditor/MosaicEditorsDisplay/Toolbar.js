@@ -2,24 +2,24 @@
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { ToolbarGroup } from '../UI/Toolbar';
-import ToolbarSeparator from '../UI/ToolbarSeparator';
-import IconButton from '../UI/IconButton';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import ToolbarCommands from './ToolbarCommands';
-import InstancesSelection from '../InstancesEditor/InstancesSelection';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
-import ObjectIcon from '../UI/CustomSvgIcons/Object';
-import ObjectGroupIcon from '../UI/CustomSvgIcons/ObjectGroup';
-import EditIcon from '../UI/CustomSvgIcons/Edit';
-import InstancesListIcon from '../UI/CustomSvgIcons/InstancesList';
-import LayersIcon from '../UI/CustomSvgIcons/Layers';
-import UndoIcon from '../UI/CustomSvgIcons/Undo';
-import RedoIcon from '../UI/CustomSvgIcons/Redo';
-import TrashIcon from '../UI/CustomSvgIcons/Trash';
-import GridIcon from '../UI/CustomSvgIcons/Grid';
-import ZoomInIcon from '../UI/CustomSvgIcons/ZoomIn';
-import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
+import { ToolbarGroup } from '../../UI/Toolbar';
+import ToolbarSeparator from '../../UI/ToolbarSeparator';
+import IconButton from '../../UI/IconButton';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import ToolbarCommands from '../ToolbarCommands';
+import InstancesSelection from '../../InstancesEditor/InstancesSelection';
+import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
+import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import ObjectGroupIcon from '../../UI/CustomSvgIcons/ObjectGroup';
+import EditIcon from '../../UI/CustomSvgIcons/Edit';
+import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
+import LayersIcon from '../../UI/CustomSvgIcons/Layers';
+import UndoIcon from '../../UI/CustomSvgIcons/Undo';
+import RedoIcon from '../../UI/CustomSvgIcons/Redo';
+import TrashIcon from '../../UI/CustomSvgIcons/Trash';
+import GridIcon from '../../UI/CustomSvgIcons/Grid';
+import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
+import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
 
 type Props = {|
   toggleObjectsList: () => void,

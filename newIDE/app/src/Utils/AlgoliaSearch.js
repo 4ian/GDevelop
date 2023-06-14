@@ -1,5 +1,5 @@
 // @flow
-
+import * as React from 'react';
 import algoliasearch from 'algoliasearch/lite';
 
 const algoliaClient = algoliasearch(
@@ -40,7 +40,7 @@ type AlgoliaSearchHitHierarchy = {|
 |};
 
 export type AlgoliaSearchHit = {|
-  content: string | null,
+  content: string | React.Node | null,
   url: string,
   hierarchy: AlgoliaSearchHitHierarchy,
   objectID: string,

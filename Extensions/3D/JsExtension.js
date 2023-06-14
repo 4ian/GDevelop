@@ -2518,6 +2518,10 @@ module.exports = {
       getDefaultHeight() {
         return this._defaultHeight;
       }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
+      }
     }
 
     const getPointForLocation = (location) => {

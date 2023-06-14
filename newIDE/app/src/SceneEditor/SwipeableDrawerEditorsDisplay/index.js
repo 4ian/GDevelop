@@ -45,6 +45,12 @@ const editorTitleById = {
 
 const noop = () => {};
 
+const styles = {
+  container: { width: '100%' },
+  bottomContainer: { position: 'absolute', bottom: 0, width: '100%' },
+  instancesListContainer: { display: 'flex', flex: 1 },
+};
+
 // Forward ref to allow Scene editor to force update some editors
 const SwipeableDrawerEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayProps,
@@ -220,7 +226,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   return (
     <FullSizeMeasurer>
       {({ width, height }) => (
-        <div style={{ width: '100%' }}>
+        <div style={styles.container}>
           <InstancesEditor
             ref={editorRef}
             height={height}
@@ -250,7 +256,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
             pauseRendering={!props.isActive}
             showObjectInstancesIn3D={values.showObjectInstancesIn3D}
           />
-          <div style={{ position: 'absolute', bottom: 0, width: '100%' }}>
+          <div style={styles.bottomContainer}>
             <SwipeableDrawer
               maxHeight={height}
               title={
@@ -360,7 +366,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                 <Paper
                   background="medium"
                   square
-                  style={{ display: 'flex', flex: 1 }}
+                  style={styles.instancesListContainer}
                 >
                   <InstancesList
                     instances={initialInstances}

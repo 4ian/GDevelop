@@ -9,6 +9,36 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useSwipeGesture from './UseSwipeGesture';
 
 const topMargin = 52; // This is equal to the height of the bottom bar.
+
+const styles = {
+  container: {
+    flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  childrenContainer: {
+    display: 'flex',
+    flex: 1,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+  },
+  topBarContainer: {
+    borderRadius: '8px 8px 0 0',
+    padding: 4,
+  },
+  topBarHandleContainer: {
+    height: 4,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topBarHandle: {
+    height: 4,
+    width: '40%',
+    backgroundColor: 'black',
+    borderRadius: 2,
+  },
+};
+
 type SwipeableDrawerTopBarProps = {|
   title: React.Node,
   onClick: () => void,
@@ -27,8 +57,7 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
   return (
     <div
       style={{
-        borderRadius: '8px 8px 0 0',
-        padding: 4,
+        ...styles.topBarContainer,
         backgroundColor: getBackgroundColor(gdevelopTheme, 'light'),
       }}
       onClick={props.onClick}
@@ -36,22 +65,8 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
       onTouchEnd={onTouchEnd}
     >
       <ColumnStackLayout noMargin>
-        <div
-          style={{
-            height: 4,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <span
-            style={{
-              height: 4,
-              width: '40%',
-              backgroundColor: 'black',
-              borderRadius: 2,
-            }}
-          />
+        <div style={styles.topBarHandleContainer}>
+          <span style={styles.topBarHandle} />
         </div>
         <Column>
           <Line
@@ -91,9 +106,7 @@ const SwipeableDrawer = (props: Props) => {
       : props.maxHeight - topMargin;
   const display = openingState === 'closed' ? 'none' : 'flex';
   return (
-    <div
-      style={{ height, display, flexDirection: 'column', overflow: 'hidden' }}
-    >
+    <div style={{ ...styles.container, height, display }}>
       <SwipeableDrawerTopBar
         title={props.title}
         onClick={() => setOpeningState('closed')}
@@ -106,16 +119,7 @@ const SwipeableDrawer = (props: Props) => {
         }}
         controls={props.topBarControls}
       />
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-        }}
-      >
-        {props.children}
-      </div>
+      <div style={styles.childrenContainer}>{props.children}</div>
     </div>
   );
 };

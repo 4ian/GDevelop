@@ -13,24 +13,41 @@ describe('EnumerateInstructions', () => {
     const instructions = enumerateAllInstructions(true);
 
     // Test for the proper presence of a few conditions
-    expect(instructions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          displayedName: 'Animation finished',
-          fullGroupName: 'General/Sprite/Animations and images',
-          type: 'AnimationEnded2',
-        }),
-        expect.objectContaining({
-          displayedName: 'Trigger once while true',
-          fullGroupName: 'Advanced/Events and control flow',
-          type: 'BuiltinCommonInstructions::Once',
-        }),
-        expect.objectContaining({
-          displayedName: 'The cursor/touch is on an object',
-          fullGroupName: 'General/Objects/Mouse and touch',
-          type: 'SourisSurObjet',
-        }),
-      ])
+    expect(
+      instructions.find(instruction => instruction.type === 'HasAnimationEnded')
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'Animation finished',
+        fullGroupName: 'General/Objects/Animations and images',
+        type: 'HasAnimationEnded',
+      })
+    );
+    expect(
+      instructions.find(instruction => instruction.type === 'Sprite')
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'Current frame',
+        fullGroupName: 'General/Sprite/Animations and images',
+        type: 'Sprite',
+      })
+    );
+    expect(
+      instructions.find(instruction => instruction.type === 'BuiltinCommonInstructions::Once')
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'Trigger once while true',
+        fullGroupName: 'Advanced/Events and control flow',
+        type: 'BuiltinCommonInstructions::Once',
+      })
+    );
+    expect(
+      instructions.find(instruction => instruction.type === 'SourisSurObjet')
+    ).toEqual(
+      expect.objectContaining({
+        displayedName: 'The cursor/touch is on an object',
+        fullGroupName: 'General/Objects/Mouse and touch',
+        type: 'SourisSurObjet',
+      })
     );
   });
 

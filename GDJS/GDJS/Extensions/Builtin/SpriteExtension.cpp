@@ -105,14 +105,8 @@ SpriteExtension::SpriteExtension() {
       "getDirectionOrAngle");  // Deprecated
   spriteExpressions["Direction"].SetFunctionName("getDirectionOrAngle");
   spriteExpressions["Anim"].SetFunctionName("getAnimation");  // Deprecated
-  spriteExpressions["Animation"].SetFunctionName("getAnimation");
-  spriteStrExpressions["AnimationName"].SetFunctionName("getAnimationName");
   spriteExpressions["Sprite"].SetFunctionName("getAnimationFrame");
   spriteExpressions["AnimationFrameCount"].SetFunctionName("getAnimationFrameCount");
-  spriteExpressions["AnimationSpeedScale"].SetFunctionName(
-      "getAnimationSpeedScale");
-  spriteExpressions["ScaleX"].SetFunctionName("getScaleX");
-  spriteExpressions["ScaleY"].SetFunctionName("getScaleY");
   spriteExpressions["Opacity"].SetFunctionName("getOpacity");
 }
 

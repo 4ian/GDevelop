@@ -300,21 +300,13 @@ export const enumerateAllInstructions = (
       const scope = { extension, objectMetadata };
       allInstructions = [
         ...allInstructions,
-        ...(objectType === ''
-          ? enumerateExtensionInstructionsWithAnyCapabilities(
-              prefix,
-              isCondition
-                ? extension.getAllConditionsForObject(objectType)
-                : extension.getAllActionsForObject(objectType),
-              scope
-            )
-          : enumerateExtensionInstructions(
-              prefix,
-              isCondition
-                ? extension.getAllConditionsForObject(objectType)
-                : extension.getAllActionsForObject(objectType),
-              scope
-            )),
+        ...enumerateExtensionInstructionsWithAnyCapabilities(
+          prefix,
+          isCondition
+            ? extension.getAllConditionsForObject(objectType)
+            : extension.getAllActionsForObject(objectType),
+          scope
+        ),
         ...enumerateExtraObjectInstructions(
           isCondition,
           extension,

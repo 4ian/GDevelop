@@ -32,7 +32,9 @@ describe('EnumerateInstructions', () => {
       })
     );
     expect(
-      instructions.find(instruction => instruction.type === 'BuiltinCommonInstructions::Once')
+      instructions.find(
+        instruction => instruction.type === 'BuiltinCommonInstructions::Once'
+      )
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Trigger once while true',

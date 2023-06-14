@@ -1576,7 +1576,11 @@ module.exports = {
       const effect = extension
         .addEffect('HemisphereLight')
         .setFullName(_('Hemisphere light'))
-        .setDescription(_('A light that illuminates objects from every direction with a gradient.'))
+        .setDescription(
+          _(
+            'A light that illuminates objects from every direction with a gradient.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/HemisphereLight.js');
@@ -2297,6 +2301,8 @@ module.exports = {
     );
 
     class Model3DRendered2DInstance extends RenderedInstance {
+      _modelOriginPoint = [0, 0, 0];
+
       constructor(
         project,
         layout,
@@ -2316,36 +2322,192 @@ module.exports = {
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
         this._defaultHeight = parseFloat(properties.get('height').getValue());
+        this._defaultDepth = parseFloat(properties.get('depth').getValue());
+        const rotationX = parseFloat(properties.get('rotationX').getValue());
+        const rotationY = parseFloat(properties.get('rotationY').getValue());
+        const rotationZ = parseFloat(properties.get('rotationZ').getValue());
+        const keepAspectRatio =
+          properties.get('keepAspectRatio').getValue() === 'true';
+        const modelResourceName = properties
+          .get('modelResourceName')
+          .getValue();
+        this._originPoint = getPointForLocation(
+          properties.get('originLocation').getValue()
+        );
+        this._centerPoint = getPointForLocation(
+          properties.get('centerLocation').getValue()
+        );
 
         // This renderer shows a placeholder for the object:
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
+
+        this._pixiResourcesLoader
+          .get3DModel(project, modelResourceName)
+          .then((model3d) => {
+            const clonedModel3D = THREE_ADDONS.SkeletonUtils.clone(
+              model3d.scene
+            );
+            // This group hold the rotation defined by properties.
+            const threeObject = new THREE.Group();
+            threeObject.rotation.order = 'ZYX';
+            threeObject.add(clonedModel3D);
+            this._updateDefaultTransformation(
+              threeObject,
+              rotationX,
+              rotationY,
+              rotationZ,
+              this._defaultWidth,
+              this._defaultHeight,
+              this._defaultDepth,
+              keepAspectRatio
+            );
+          });
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/3d_box.svg';
       }
 
+      getOriginX() {
+        const originPoint = this.getOriginPoint();
+        return this.getWidth() * originPoint[0];
+      }
+
+      getOriginY() {
+        const originPoint = this.getOriginPoint();
+        return this.getHeight() * originPoint[1];
+      }
+
+      getCenterX() {
+        const centerPoint = this.getCenterPoint();
+        return this.getWidth() * centerPoint[0];
+      }
+
+      getCenterY() {
+        const centerPoint = this.getCenterPoint();
+        return this.getHeight() * centerPoint[1];
+      }
+
+      getOriginPoint() {
+        return this._originPoint || this._modelOriginPoint;
+      }
+
+      getCenterPoint() {
+        return this._centerPoint || this._modelOriginPoint;
+      }
+
+      _updateDefaultTransformation(
+        threeObject,
+        rotationX,
+        rotationY,
+        rotationZ,
+        originalWidth,
+        originalHeight,
+        originalDepth,
+        keepAspectRatio
+      ) {
+        threeObject.rotation.set(
+          (rotationX * Math.PI) / 180,
+          (rotationY * Math.PI) / 180,
+          (rotationZ * Math.PI) / 180
+        );
+        threeObject.updateMatrixWorld(true);
+        const boundingBox = new THREE.Box3().setFromObject(threeObject);
+
+        const modelWidth = boundingBox.max.x - boundingBox.min.x;
+        const modelHeight = boundingBox.max.y - boundingBox.min.y;
+        const modelDepth = boundingBox.max.z - boundingBox.min.z;
+        this._modelOriginPoint[0] = -boundingBox.min.x / modelWidth;
+        this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
+        this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
+
+        // The model is flipped on Y axis.
+        this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
+
+        // Center the model.
+        const centerPoint = this._centerPoint;
+        if (centerPoint) {
+          threeObject.position.set(
+            -(
+              boundingBox.min.x +
+              (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
+            ),
+            // The model is flipped on Y axis.
+            -(
+              boundingBox.min.y +
+              (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
+            ),
+            -(
+              boundingBox.min.z +
+              (boundingBox.max.z - boundingBox.min.z) * centerPoint[2]
+            )
+          );
+        }
+
+        // Rotate the model.
+        threeObject.scale.set(1, 1, 1);
+        threeObject.rotation.set(
+          (rotationX * Math.PI) / 180,
+          (rotationY * Math.PI) / 180,
+          (rotationZ * Math.PI) / 180
+        );
+
+        // Stretch the model in a 1x1x1 cube.
+        const scaleX = 1 / modelWidth;
+        const scaleY = 1 / modelHeight;
+        const scaleZ = 1 / modelDepth;
+
+        const scaleMatrix = new THREE.Matrix4();
+        // Flip on Y because the Y axis is on the opposite side of direct basis.
+        // It avoids models to be like a mirror refection.
+        scaleMatrix.makeScale(scaleX, -scaleY, scaleZ);
+        threeObject.updateMatrix();
+        threeObject.applyMatrix4(scaleMatrix);
+
+        if (keepAspectRatio) {
+          // Reduce the object dimensions to keep aspect ratio.
+          const widthRatio = originalWidth / modelWidth;
+          const heightRatio = originalHeight / modelHeight;
+          const depthRatio = originalDepth / modelDepth;
+          const scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+
+          this._defaultWidth = scaleRatio * modelWidth;
+          this._defaultHeight = scaleRatio * modelHeight;
+          this._defaultDepth = scaleRatio * modelDepth;
+        }
+      }
+
       update() {
         const width = this.getWidth();
         const height = this.getHeight();
+        const centerPoint = this.getCenterPoint();
+        const centerX = width * centerPoint[0];
+        const centerY = height * centerPoint[1];
 
+        const minX = 0 - centerX;
+        const minY = 0 - centerY;
+        const maxX = width - centerX;
+        const maxY = height - centerY;
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x0033ff);
         this._pixiObject.lineStyle(1, 0xffd900, 1);
-        this._pixiObject.moveTo(-width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, height / 2);
-        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.moveTo(minX, minY);
+        this._pixiObject.lineTo(maxX, minY);
+        this._pixiObject.lineTo(maxX, maxY);
+        this._pixiObject.lineTo(minX, maxY);
         this._pixiObject.endFill();
 
-        this._pixiObject.moveTo(-width / 2, -height / 2);
-        this._pixiObject.lineTo(width / 2, height / 2);
-        this._pixiObject.moveTo(width / 2, -height / 2);
-        this._pixiObject.lineTo(-width / 2, height / 2);
+        this._pixiObject.moveTo(minX, minY);
+        this._pixiObject.lineTo(maxX, maxY);
+        this._pixiObject.moveTo(maxX, minY);
+        this._pixiObject.lineTo(minX, maxY);
 
-        this._pixiObject.position.x = this._instance.getX() + width / 2;
-        this._pixiObject.position.y = this._instance.getY() + height / 2;
+        const originPoint = this.getOriginPoint();
+        this._pixiObject.position.x =
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0]);
+        this._pixiObject.position.y =
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
         this._pixiObject.angle = this._instance.getAngle();
       }
 
@@ -2355,6 +2517,10 @@ module.exports = {
 
       getDefaultHeight() {
         return this._defaultHeight;
+      }
+
+      getDefaultDepth() {
+        return this._defaultDepth;
       }
     }
 
@@ -2590,21 +2756,25 @@ module.exports = {
         const centerX = width * centerPoint[0];
         const centerY = height * centerPoint[1];
 
+        const minX = 0 - centerX;
+        const minY = 0 - centerY;
+        const maxX = width - centerX;
+        const maxY = height - centerY;
         this._pixiObject.clear();
         this._pixiObject.beginFill(0x999999, 0.2);
         this._pixiObject.lineStyle(1, 0xffd900, 0);
-        this._pixiObject.moveTo(0 - centerX, 0 - centerY);
-        this._pixiObject.lineTo(width - centerX, 0 - centerY);
-        this._pixiObject.lineTo(width - centerX, height - centerY);
-        this._pixiObject.lineTo(0 - centerX, height - centerY);
+        this._pixiObject.moveTo(minX, minY);
+        this._pixiObject.lineTo(maxX, minY);
+        this._pixiObject.lineTo(maxX, maxY);
+        this._pixiObject.lineTo(minX, maxY);
         this._pixiObject.endFill();
 
         const originPoint = this.getOriginPoint();
-        (this._pixiObject.position.x =
-          this._instance.getX() - width * (originPoint[0] - centerPoint[0])),
-          (this._pixiObject.position.y =
-            this._instance.getY() - height * (originPoint[1] - centerPoint[1])),
-          (this._pixiObject.angle = this._instance.getAngle());
+        this._pixiObject.position.x =
+          this._instance.getX() - width * (originPoint[0] - centerPoint[0]);
+        this._pixiObject.position.y =
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
+        this._pixiObject.angle = this._instance.getAngle();
       }
 
       update() {

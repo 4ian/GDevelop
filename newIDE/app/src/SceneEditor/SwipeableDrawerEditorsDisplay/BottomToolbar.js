@@ -53,6 +53,8 @@ const BottomToolbar = (props: Props) => {
               <IconButton
                 color="default"
                 key={editorId}
+                disableRipple
+                disableFocusRipple
                 id={buttonId}
                 onClick={() => {
                   props.selectEditor(editorId);

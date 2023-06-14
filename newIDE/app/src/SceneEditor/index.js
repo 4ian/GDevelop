@@ -16,7 +16,8 @@ import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
-import Toolbar from './Toolbar';
+import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
+import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
@@ -58,8 +59,9 @@ import { getInstancesInLayoutForObject } from '../Utils/Layout';
 import { zoomInFactor, zoomOutFactor } from '../Utils/ZoomUtils';
 import debounce from 'lodash/debounce';
 import { mapFor } from '../Utils/MapFor';
-import MosaicEditors, { type MosaicEditorsInterface } from './MosaicEditors';
-import SwipeableDrawerEditors from './SwipeableDrawerEditors.js';
+import MosaicEditorsDisplay from './MosaicEditorsDisplay';
+import SwipeableDrawerEditorsDisplay from './SwipeableDrawerEditorsDisplay';
+import { type SceneEditorsDisplayInterface } from './EditorsDisplay.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -148,7 +150,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   instancesSelection: InstancesSelection;
   contextMenu: ?ContextMenuInterface;
-  editorDisplay: ?MosaicEditorsInterface;
+  editorDisplay: ?SceneEditorsDisplayInterface;
 
   constructor(props: Props) {
     super(props);
@@ -203,44 +205,75 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   updateToolbar = () => {
-    const openedEditorNames = this.editorDisplay
-      ? this.editorDisplay.getOpenedEditorsNames()
-      : [];
-    this.props.setToolbar(
-      <Toolbar
-        instancesSelection={this.instancesSelection}
-        toggleObjectsList={this.toggleObjectsList}
-        isObjectsListShown={openedEditorNames.includes('objects-list')}
-        toggleObjectGroupsList={this.toggleObjectGroupsList}
-        isObjectGroupsListShown={openedEditorNames.includes(
-          'object-groups-list'
-        )}
-        toggleProperties={this.toggleProperties}
-        isPropertiesShown={openedEditorNames.includes('properties')}
-        deleteSelection={this.deleteSelection}
-        toggleInstancesList={this.toggleInstancesList}
-        isInstancesListShown={openedEditorNames.includes('instances-list')}
-        toggleLayersList={this.toggleLayersList}
-        isLayersListShown={openedEditorNames.includes('layers-list')}
-        toggleWindowMask={this.toggleWindowMask}
-        isWindowMaskShown={() =>
-          !!this.state.instancesEditorSettings.windowMask
-        }
-        toggleGrid={this.toggleGrid}
-        isGridShown={() => !!this.state.instancesEditorSettings.grid}
-        openSetupGrid={this.openSetupGrid}
-        setZoomFactor={this.setZoomFactor}
-        getContextMenuZoomItems={this.getContextMenuZoomItems}
-        canUndo={canUndo(this.state.history)}
-        canRedo={canRedo(this.state.history)}
-        undo={this.undo}
-        redo={this.redo}
-        onOpenSettings={this.openSceneProperties}
-        settingsIcon={<EditSceneIcon />}
-        canRenameObject={this.state.selectedObjectsWithContext.length === 1}
-        onRenameObject={this._startRenamingSelectedObject}
-      />
-    );
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+
+    if (editorDisplay.getName() === 'mosaic') {
+      this.props.setToolbar(
+        <MosaicEditorsDisplayToolbar
+          instancesSelection={this.instancesSelection}
+          toggleObjectsList={this.toggleObjectsList}
+          isObjectsListShown={editorDisplay.isEditorVisible('objects-list')}
+          toggleObjectGroupsList={this.toggleObjectGroupsList}
+          isObjectGroupsListShown={editorDisplay.isEditorVisible(
+            'object-groups-list'
+          )}
+          toggleProperties={this.toggleProperties}
+          isPropertiesShown={editorDisplay.isEditorVisible('properties')}
+          deleteSelection={this.deleteSelection}
+          toggleInstancesList={this.toggleInstancesList}
+          isInstancesListShown={editorDisplay.isEditorVisible('instances-list')}
+          toggleLayersList={this.toggleLayersList}
+          isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
+          toggleWindowMask={this.toggleWindowMask}
+          isWindowMaskShown={() =>
+            !!this.state.instancesEditorSettings.windowMask
+          }
+          toggleGrid={this.toggleGrid}
+          isGridShown={() => !!this.state.instancesEditorSettings.grid}
+          openSetupGrid={this.openSetupGrid}
+          setZoomFactor={this.setZoomFactor}
+          getContextMenuZoomItems={this.getContextMenuZoomItems}
+          canUndo={canUndo(this.state.history)}
+          canRedo={canRedo(this.state.history)}
+          undo={this.undo}
+          redo={this.redo}
+          onOpenSettings={this.openSceneProperties}
+          settingsIcon={<EditSceneIcon />}
+          canRenameObject={this.state.selectedObjectsWithContext.length === 1}
+          onRenameObject={this._startRenamingSelectedObject}
+        />
+      );
+    } else {
+      this.props.setToolbar(
+        <SwipeableDrawerEditorsDisplayToolbar
+          instancesSelection={this.instancesSelection}
+          toggleObjectsList={this.toggleObjectsList}
+          toggleObjectGroupsList={this.toggleObjectGroupsList}
+          toggleProperties={this.toggleProperties}
+          deleteSelection={this.deleteSelection}
+          toggleInstancesList={this.toggleInstancesList}
+          toggleLayersList={this.toggleLayersList}
+          toggleWindowMask={this.toggleWindowMask}
+          isWindowMaskShown={() =>
+            !!this.state.instancesEditorSettings.windowMask
+          }
+          toggleGrid={this.toggleGrid}
+          isGridShown={() => !!this.state.instancesEditorSettings.grid}
+          openSetupGrid={this.openSetupGrid}
+          setZoomFactor={this.setZoomFactor}
+          getContextMenuZoomItems={this.getContextMenuZoomItems}
+          canUndo={canUndo(this.state.history)}
+          canRedo={canRedo(this.state.history)}
+          undo={this.undo}
+          redo={this.redo}
+          onOpenSettings={this.openSceneProperties}
+          settingsIcon={<EditSceneIcon />}
+          canRenameObject={this.state.selectedObjectsWithContext.length === 1}
+          onRenameObject={this._startRenamingSelectedObject}
+        />
+      );
+    }
   };
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
@@ -1448,7 +1481,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       <ResponsiveWindowMeasurer>
         {windowWidth => {
           const EditorsDisplay =
-            windowWidth === 'small' ? SwipeableDrawerEditors : MosaicEditors;
+            windowWidth === 'small'
+              ? SwipeableDrawerEditorsDisplay
+              : MosaicEditorsDisplay;
           return (
             <div
               style={styles.container}

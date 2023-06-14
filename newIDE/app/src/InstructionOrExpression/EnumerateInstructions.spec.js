@@ -106,7 +106,7 @@ describe('EnumerateInstructions', () => {
     expect(getObjectParameterIndex(triggerOnce.metadata)).toBe(-1);
 
     const spriteAnimationEnded = conditions.filter(
-      ({ type }) => type === 'AnimationEnded2'
+      ({ type }) => type === 'HasAnimationEnded'
     )[0];
     expect(spriteAnimationEnded).not.toBeUndefined();
     expect(getObjectParameterIndex(spriteAnimationEnded.metadata)).toBe(0);
@@ -129,7 +129,7 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Animation finished',
-          type: 'AnimationEnded2',
+          type: 'HasAnimationEnded',
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',

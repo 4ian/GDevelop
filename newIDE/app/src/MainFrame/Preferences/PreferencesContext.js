@@ -8,6 +8,7 @@ import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+import { isWebGLSupported } from '../../Utils/WebGL';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -327,7 +328,7 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
-    showObjectInstancesIn3D: false,
+    showObjectInstancesIn3D: isWebGLSupported(),
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',

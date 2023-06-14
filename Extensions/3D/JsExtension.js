@@ -429,7 +429,7 @@ module.exports = {
           'Animation',
           _('Animation (by number)'),
           _(
-            'the number of the animation played by the object (the number from the animations list).'
+            'the number of the animation played by the object (the number from the animations list)'
           ),
           _('the number of the animation'),
           _('Animations and images'),
@@ -496,7 +496,7 @@ module.exports = {
           'AnimationSpeedScale',
           _('Animation speed scale'),
           _(
-            'the animation speed scale (1 = the default speed, >1 = faster and <1 = slower).'
+            'the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)'
           ),
           _('the animation speed scale'),
           _('Animations and images'),

@@ -742,6 +742,89 @@ module.exports = {
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.getBuildId');
 
+    extension
+      .addCondition(
+        'DigitalActionPressed',
+        _('Digital action activated'),
+        _(
+          'Triggers when a digital action (a button that is either pressed or not) of a Steam Input controller has been triggered.'
+        ),
+        _('Digital action _PARAM1_ of controller _PARAM0_ has been activated'),
+        _('Input'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('expression', 'Controller number', '', false)
+      .addParameter('identifier', 'ActionName', 'SteamInputAction', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .addIncludeFile('Extensions/Steamworks/Z_steamworksinputtools.js')
+      .setFunctionName('gdjs.steamworks.isDigitalActionPressed');
+
+    extension
+      .addAction(
+        'ActivateActionSet',
+        _('Activate an action set'),
+        _('Activates a Steam Input action set of a Steam Input controller.'),
+        _('Activate action set _PARAM1_ of controller _PARAM0_'),
+        _('Input'),
+        'JsPlatform/Extensions/icon.png',
+        'JsPlatform/Extensions/icon.png'
+      )
+      .addParameter('expression', 'Controller number', '', false)
+      .addParameter('identifier', 'ActionName', 'SteamInputActionSet', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .addIncludeFile('Extensions/Steamworks/Z_steamworksinputtools.js')
+      .setFunctionName('gdjs.steamworks.isDigitalActionPressed');
+
+    extension
+      .addExpression(
+        'ControllerCount',
+        _('Controller count'),
+        _('The amount of connected Steam Input controllers.'),
+        _('Input'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .addIncludeFile('Extensions/Steamworks/Z_steamworksinputtools.js')
+      .setFunctionName('gdjs.steamworks.getControllerCount');
+
+    extension
+      .addExpression(
+        'ActionVectorX',
+        _('Analog X-Action vector'),
+        _(
+          'The action vector of a Steam Input analog joystick on the X-axis, from 1 (all right) to -1 (all left).'
+        ),
+        _('Input'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('expression', 'Controller number', '', false)
+      .addParameter('identifier', 'ActionName', 'SteamInputAction', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .addIncludeFile('Extensions/Steamworks/Z_steamworksinputtools.js')
+      .setFunctionName('gdjs.steamworks.getAnalogActionVectorX');
+
+    extension
+      .addExpression(
+        'ActionVectorY',
+        _('Analog Y-Action vector'),
+        _(
+          'The action vector of a Steam Input analog joystick on the Y-axis, from 1 (all up) to -1 (all down).'
+        ),
+        _('Input'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('expression', 'Controller number', '', false)
+      .addParameter('identifier', 'ActionName', 'SteamInputAction', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .addIncludeFile('Extensions/Steamworks/Z_steamworksinputtools.js')
+      .setFunctionName('gdjs.steamworks.getAnalogActionVectorY');
+
     return extension;
   },
   runExtensionSanityTests: function (

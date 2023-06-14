@@ -34,7 +34,6 @@ const styles = {
   topBarHandle: {
     height: 4,
     width: '40%',
-    backgroundColor: 'black',
     borderRadius: 2,
   },
 };
@@ -66,7 +65,13 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
     >
       <ColumnStackLayout noMargin>
         <div style={styles.topBarHandleContainer}>
-          <span style={styles.topBarHandle} />
+          <span
+            style={{
+              ...styles.topBarHandle,
+              backgroundColor:
+                gdevelopTheme.palette.type === 'dark' ? '#1D1D26' : '#7F7F85',
+            }}
+          />
         </div>
         <Column>
           <Line

@@ -1576,7 +1576,11 @@ module.exports = {
       const effect = extension
         .addEffect('HemisphereLight')
         .setFullName(_('Hemisphere light'))
-        .setDescription(_('A light that illuminates objects from every direction with a gradient.'))
+        .setDescription(
+          _(
+            'A light that illuminates objects from every direction with a gradient.'
+          )
+        )
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/HemisphereLight.js');
@@ -2337,7 +2341,7 @@ module.exports = {
         // This renderer shows a placeholder for the object:
         this._pixiObject = new PIXI.Graphics();
         this._pixiContainer.addChild(this._pixiObject);
-        
+
         this._pixiResourcesLoader
           .get3DModel(project, modelResourceName)
           .then((model3d) => {
@@ -2503,7 +2507,7 @@ module.exports = {
         this._pixiObject.position.x =
           this._instance.getX() - width * (originPoint[0] - centerPoint[0]);
         this._pixiObject.position.y =
-            this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
         this._pixiObject.angle = this._instance.getAngle();
       }
 
@@ -2765,7 +2769,7 @@ module.exports = {
         this._pixiObject.position.x =
           this._instance.getX() - width * (originPoint[0] - centerPoint[0]);
         this._pixiObject.position.y =
-            this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
+          this._instance.getY() - height * (originPoint[1] - centerPoint[1]);
         this._pixiObject.angle = this._instance.getAngle();
       }
 

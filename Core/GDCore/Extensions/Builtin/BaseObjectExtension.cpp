@@ -29,8 +29,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetIcon("res/actions/force24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
       .SetIcon("res/conditions/var24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Timers"))
+      .SetIcon("res/actions/timer24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
+      .SetIcon("res/actions/visibilite24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Position"))
       .SetIcon("res/actions/position24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Angle"))
+      .SetIcon("res/actions/direction24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
+      .SetIcon("res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Scale"))
+      .SetIcon("res/actions/scale24_black.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Animations and images"))
+      .SetIcon("res/conditions/animation24.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -1189,7 +1201,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddExpression("ObjectTimerElapsedTime",
                     _("Object timer value"),
                     _("Value of an object timer"),
-                    _("Object timers"),
+                    _("Timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("identifier", _("Timer's name"), "objectTimer");

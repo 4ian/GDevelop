@@ -486,6 +486,12 @@ module.exports = {
         _('Matchmaking/Current lobby'),
         'JsPlatform/Extensions/steam.svg'
       )
+      .addParameter(
+        'identifier',
+        'The attribute to read',
+        'sceneSteamLobbyAttribute',
+        false
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.getCurrentLobbyAttribute');
@@ -535,6 +541,12 @@ module.exports = {
         'JsPlatform/Extensions/steam.svg'
       )
       .addParameter('string', 'The ID of the lobby', '', false)
+      .addParameter(
+        'identifier',
+        'The attribute to read',
+        'sceneSteamLobbyAttribute',
+        false
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.getLobbyAttribute');
@@ -824,6 +836,106 @@ module.exports = {
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .addIncludeFile('Extensions/Steamworks/Z_steamworksinputtools.js')
       .setFunctionName('gdjs.steamworks.getAnalogActionVectorY');
+
+    extension
+      .addCondition(
+        'IsSteamCloudEnabled',
+        _('Is Steam Cloud enabled?'),
+        _(
+          'Checks whether steam cloud has been enabled or not for this application.'
+        ),
+        _('Steam Cloud is enabled'),
+        _('Cloud Save'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.isCloudEnabled');
+
+    extension
+      .addCondition(
+        'CloudFileExists',
+        _('File exists'),
+        _('Checks if a file exists on Steam Cloud.'),
+        _('File _PARAM0_ exists on Steam Cloud'),
+        _('Cloud Save'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter('identifier', 'File name', 'SteamFileName', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.fileExists');
+
+    extension
+      .addAction(
+        'WriteCloudFile',
+        _('Write a file'),
+        _('Writes a file onto the Steam Cloud.'),
+        _(
+          'Write _PARAM1_ into the file _PARAM0_ on Steam Cloud (store result in _PARAM2_)'
+        ),
+        _('Cloud Save'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'Name of file to write',
+        'SteamFileName',
+        false
+      )
+      .addParameter('string', 'File contents', '', false)
+      .addParameter('scenevar', 'Variable where to store the result', '', true)
+      .setParameterLongDescription(
+        'The variable will be set to true if the file was successfully written and to false if it could not be.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.writeFile');
+
+    extension
+      .addAction(
+        'DeleteCloudFile',
+        _('Delete a file'),
+        _('Deletes a file from the Steam Cloud.'),
+        _('Delete file _PARAM0_ from Steam Cloud (store result in _PARAM1_)'),
+        _('Cloud Save'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'Name of file to delete',
+        'SteamFileName',
+        false
+      )
+      .addParameter('scenevar', 'Variable where to store the result', '', true)
+      .setParameterLongDescription(
+        'The variable will be set to true if the file was successfully deleted and to false if it could not be.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.deleteFile');
+
+    extension
+      .addStrExpression(
+        'ReadCloudFile',
+        _('Read a file'),
+        _('Reads a file from Steam Cloud and returns its contents.'),
+        _('Cloud Save'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        'Name of file to read',
+        'SteamFileName',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.readFile');
 
     return extension;
   },

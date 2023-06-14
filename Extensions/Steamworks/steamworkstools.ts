@@ -43,7 +43,7 @@ namespace gdjs {
 
     // ---
 
-    export function claimAchievement(achievement: string) {
+    export function claimAchievement(achievement: string): void {
       if (steamAPI) steamAPI.achievement.activate(achievement);
       else
         logger.warn(
@@ -51,7 +51,7 @@ namespace gdjs {
         );
     }
 
-    export function unclaimAchievement(achievement: string) {
+    export function unclaimAchievement(achievement: string): void {
       if (steamAPI) steamAPI.achievement.clear(achievement);
       else
         logger.warn(
@@ -59,8 +59,8 @@ namespace gdjs {
         );
     }
 
-    export function hasAchievement(achievement: string) {
-      return steamAPI && steamAPI.achievement.isActivated(achievement);
+    export function hasAchievement(achievement: string): boolean {
+      return !!steamAPI && steamAPI.achievement.isActivated(achievement);
     }
 
     // ---
@@ -83,7 +83,7 @@ namespace gdjs {
       return steamAPI ? steamAPI.localplayer.getLevel() : 0;
     }
 
-    export function setRichPresence(key: string, value: string) {
+    export function setRichPresence(key: string, value: string): void {
       if (steamAPI) steamAPI.localplayer.setRichPresence(key, value);
       else
         logger.warn(
@@ -93,7 +93,7 @@ namespace gdjs {
 
     // ---
 
-    export function isSteamworksProperlyLoaded() {
+    export function isSteamworksProperlyLoaded(): boolean {
       return !!steamAPI;
     }
 
@@ -361,6 +361,37 @@ namespace gdjs {
 
     export function getBuildId(): number {
       return steamAPI ? steamAPI.apps.appBuildId() : 0;
+    }
+
+    // ---
+
+    export function isCloudEnabled(): boolean {
+      return (
+        !!steamAPI &&
+        steamAPI.cloud.isEnabledForAccount() &&
+        steamAPI.cloud.isEnabledForApp()
+      );
+    }
+
+    export function readFile(fileName: string): string {
+      return steamAPI ? steamAPI.cloud.readFile(fileName) : '';
+    }
+
+    export function writeFile(
+      fileName: string,
+      content: string,
+      results: gdjs.Variable
+    ): void {
+      if (steamAPI)
+        results.setBoolean(steamAPI.cloud.writeFile(fileName, content));
+    }
+
+    export function fileExists(fileName: string): boolean {
+      return steamAPI ? steamAPI.cloud.fileExists(fileName) : false;
+    }
+
+    export function deleteFile(fileName: string, results: gdjs.Variable): void {
+      if (steamAPI) results.setBoolean(steamAPI.cloud.deleteFile(fileName));
     }
   }
 }

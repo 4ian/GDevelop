@@ -937,6 +937,310 @@ module.exports = {
       .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
       .setFunctionName('gdjs.steamworks.readFile');
 
+    extension
+      .addAction(
+        'CreateWorkshopItem',
+        _('Create a Workshop item'),
+        _(
+          'Creates an item owned by the current player on the Steam Workshop. This only assignes an ID to an item for the user - use the action "Update workshop item" to set the item data and upload the workshop file.'
+        ),
+        _('Create a Workshop item and store its ID in _PARAM0_'),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'scenevar',
+        'The variable where to store the result',
+        '',
+        false
+      )
+      .setParameterLongDescription(
+        'This will be set to the Workshop item ID if successful and to the string "failure" otherwise.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.createWorkshopItem');
+
+    extension
+      .addAction(
+        'UpdateWorkshopItem',
+        _('Update a Workshop item'),
+        _(
+          'Releases an update to a Workshop item owned by the player. If you leave a field empty, it will be kept unmodified as it was before the update.'
+        ),
+        _(
+          'Update the Workshop item _PARAM0_ with itemId title description changeNote previewPath contentPath tags visibility'
+        ),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .addParameter('string', _('Title'), '', true)
+      .addParameter('string', _('Description'), '', true)
+      .addParameter('string', _('Changelog'), '', true)
+      .addParameter('string', _('Path to the preview image file'), '', true)
+      .setParameterLongDescription(
+        'An absolute file-path to an image file to be shown as preview of the workshop item on Steam.'
+      )
+      .addParameter(
+        'string',
+        _("Path to the file with the item's file"),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        "An absolute file-path to a file that contains the all the data for your workshop item. You can use the Filesystem actions to write a JSON file with your player's Workshop item's data to a file in the temporary data folder, and pass the path here."
+      )
+      .addParameter('string', _('Tags'), '', true)
+      .setParameterLongDescription(
+        'The tags must be comma-separated without spaces after the comma, for example: `mytag,another tag,my_last_tag`.'
+      )
+      .addParameter(
+        'stringWithSelector',
+        _('Visibility'),
+        JSON.stringify(['Public', 'FriendsOnly', 'Private', 'Unlisted']),
+        true
+      )
+      .addParameter(
+        'scenevar',
+        'The variable where to store the result',
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        'This will be set to `true` if the update is successfully release and to `false` otherwise.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.updateWorkshopItem');
+
+    extension
+      .addAction(
+        'SubscribeWorkshopItem',
+        _('Subscribe to a Workshop item'),
+        _(
+          'Makes the player subscribe to a workshop item. This will cause it to be downloaded and installed ASAP.'
+        ),
+        _('Subscribe to Workshop item _PARAM0_ (store result in _PARAM1_)'),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .addParameter(
+        'scenevar',
+        'The variable where to store the result',
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        'This will be set to `true` if successful and to `false` otherwise.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.subscribeToWorkshopItem');
+
+    extension
+      .addAction(
+        'UnsubscribeWorkshopItem',
+        _('Unsubscribe to a Workshop item'),
+        _(
+          'Makes the player unsubscribe to a workshop item. This will cause it to removed after quitting the game.'
+        ),
+        _('Unsubscribe to Workshop item _PARAM0_ (store result in _PARAM1_)'),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .addParameter(
+        'scenevar',
+        'The variable where to store the result',
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        'This will be set to `true` if successful and to `false` otherwise.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setAsyncFunctionName('gdjs.steamworks.unsubscribeToWorkshopItem');
+
+    extension
+      .addAction(
+        'DownloadWorkshopItem',
+        _('Download a Workshop item'),
+        _('Initiates the download of a Workshop item now.'),
+        _(
+          'Start downloading workshop item _PARAM0_ now, pause other downloads: _PARAM1_'
+        ),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .addParameter('yesorno', 'Stop other downloads?', '', true)
+      .setParameterLongDescription(
+        "This will temporarily pause any other Steam download on the player's machine to download the Workshop item NOW without waiting for other pending downloads to finish."
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.startWorkshopDownload');
+
+    extension
+      .addCondition(
+        'QueryWorkshopItemState',
+        _('Check workshop item state'),
+        _('Check whether a state flag is set for a Workshop item.'),
+        _('Flag _PARAM1_ is set on Workshop item _PARAM0_'),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .addParameter(
+        'stringWithSelector',
+        'State flag to check for',
+        JSON.stringify([
+          'None',
+          'Subscribed',
+          'LegacyItem',
+          'Installed',
+          'NeedsUpdate',
+          'Downloading',
+          'DownloadPending',
+        ]),
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.workshopItemState');
+
+    extension
+      .addStrExpression(
+        'WorkshopItemLocation',
+        _('Workshop item installation location'),
+        _('The file path to the contents file of an installed workshop item.'),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getWorkshopItemLocation');
+
+    extension
+      .addExpression(
+        'WorkshopItemSize',
+        _('Workshop item size'),
+        _(
+          'The size on disk taken by the contents file of an installed workshop item.'
+        ),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getWorkshopItemSizeOnDisk');
+
+    extension
+      .addExpression(
+        'WorkshopItemInstallationTimestamp',
+        _('Workshop item installation time'),
+        _(
+          'The timestamp of the last time the contents file of an installed workshop item was updated.'
+        ),
+        _('Workshop'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getWorkshopItemInstallTimestamp');
+
+    extension
+      .addExpression(
+        'WorkshopItemDownloadProgress',
+        _('Workshop item download progress'),
+        _(
+          'The amount of data that has been downloaded by Steam for a currrently downloading item so far.'
+        ),
+        _('Workshop/Download'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getWorkshopItemDownloadProgress');
+
+    extension
+      .addExpression(
+        'WorkshopItemDownloadTotal',
+        _('Workshop item download total'),
+        _(
+          'The amount of data that needs to be downloaded in total by Steam for a currrently downloading item.'
+        ),
+        _('Workshop/Download'),
+        'JsPlatform/Extensions/steam.svg'
+      )
+      .addParameter(
+        'identifier',
+        _('Workshop Item ID'),
+        'SteamWorkshopItem',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Steamworks/steamworkstools.js')
+      .setFunctionName('gdjs.steamworks.getWorkshopItemDownloadTotal');
+
     return extension;
   },
   runExtensionSanityTests: function (

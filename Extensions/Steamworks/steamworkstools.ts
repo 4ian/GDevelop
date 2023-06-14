@@ -393,5 +393,173 @@ namespace gdjs {
     export function deleteFile(fileName: string, results: gdjs.Variable): void {
       if (steamAPI) results.setBoolean(steamAPI.cloud.deleteFile(fileName));
     }
+
+    // ---
+
+    export function createWorkshopItem(result: gdjs.Variable): gdjs.AsyncTask {
+      if (steamAPI)
+        return new gdjs.PromiseTask(
+          steamAPI.workshop
+            .createItem()
+            .then(({ itemId }) => {
+              result.setString(itemId.toString());
+            })
+            .catch(() => {
+              result.setString('failure');
+            })
+        );
+      else {
+        result.setString('failure');
+        return new gdjs.ResolveTask();
+      }
+    }
+
+    enum UgcItemVisibility {
+      Public = 0,
+      FriendsOnly = 1,
+      Private = 2,
+      Unlisted = 3,
+    }
+
+    export function updateWorkshopItem(
+      itemId: string,
+      title: string,
+      description: string,
+      changeNote: string,
+      previewPath: string,
+      contentPath: string,
+      tags: string,
+      visibility: keyof import('steamworks.js/client').workshop.UgcItemVisibility,
+      result: gdjs.Variable
+    ): gdjs.AsyncTask {
+      if (steamAPI) {
+        const changes: import('steamworks.js/client').workshop.UgcUpdate = {};
+
+        if (title) changes.title = title;
+        if (description) changes.description = description;
+        if (changeNote) changes.changeNote = changeNote;
+        if (previewPath) changes.previewPath = previewPath;
+        if (contentPath) changes.contentPath = contentPath;
+        if (tags) changes.tags = tags.split(',');
+        if (visibility)
+          //@ts-ignore const enum 😩
+          changes.visibility = UgcItemVisibility[visibility];
+
+        return new gdjs.PromiseTask(
+          steamAPI.workshop
+            .updateItem(BigInt(itemId), changes)
+            .then(() => {
+              result.setBoolean(true);
+            })
+            .catch(() => {
+              result.setBoolean(false);
+            })
+        );
+      } else {
+        result.setBoolean(false);
+        return new gdjs.ResolveTask();
+      }
+    }
+
+    export function subscribeToWorkshopItem(
+      itemId: string,
+      result: gdjs.Variable
+    ): gdjs.AsyncTask {
+      if (steamAPI)
+        return new gdjs.PromiseTask(
+          steamAPI.workshop
+            .subscribe(BigInt(itemId))
+            .then(() => {
+              result.setBoolean(true);
+            })
+            .catch(() => {
+              result.setBoolean(false);
+            })
+        );
+      else {
+        result.setBoolean(false);
+        return new gdjs.ResolveTask();
+      }
+    }
+
+    export function unsubscribeToWorkshopItem(
+      itemId: string,
+      result: gdjs.Variable
+    ): gdjs.AsyncTask {
+      if (steamAPI)
+        return new gdjs.PromiseTask(
+          steamAPI.workshop
+            .unsubscribe(BigInt(itemId))
+            .then(() => {
+              result.setBoolean(true);
+            })
+            .catch(() => {
+              result.setBoolean(false);
+            })
+        );
+      else {
+        result.setBoolean(false);
+        return new gdjs.ResolveTask();
+      }
+    }
+
+    export function startWorkshopDownload(
+      itemId: string,
+      highPriority: boolean
+    ): void {
+      if (steamAPI) steamAPI.workshop.download(BigInt(itemId), highPriority);
+    }
+
+    enum WorkshopItemStates {
+      None = 0,
+      Subscribed = 1,
+      LegacyItem = 2,
+      Installed = 4,
+      NeedsUpdate = 8,
+      Downloading = 16,
+      DownloadPending = 32,
+    }
+
+    export function workshopItemState(
+      itemId: string,
+      state: keyof WorkshopItemStates
+    ): boolean {
+      return (
+        !!steamAPI &&
+        (steamAPI.workshop.state(BigInt(itemId)) &
+          WorkshopItemStates[state]) !==
+          0
+      );
+    }
+
+    export function getWorkshopItemLocation(itemId: string): string {
+      return steamAPI
+        ? steamAPI.workshop.installInfo(BigInt(itemId))?.folder || ''
+        : '';
+    }
+
+    export function getWorkshopItemSizeOnDisk(itemId: string): number {
+      return steamAPI
+        ? Number(steamAPI.workshop.installInfo(BigInt(itemId))?.sizeOnDisk) || 0
+        : 0;
+    }
+
+    export function getWorkshopItemInstallTimestamp(itemId: string): number {
+      return steamAPI
+        ? steamAPI.workshop.installInfo(BigInt(itemId))?.timestamp || 0
+        : 0;
+    }
+
+    export function getWorkshopItemDownloadProgress(itemId: string): number {
+      return steamAPI
+        ? Number(steamAPI.workshop.downloadInfo(BigInt(itemId))?.current) || 0
+        : 0;
+    }
+
+    export function getWorkshopItemDownloadTotal(itemId: string): number {
+      return steamAPI
+        ? Number(steamAPI.workshop.downloadInfo(BigInt(itemId))?.total) || 0
+        : 0;
+    }
   }
 }

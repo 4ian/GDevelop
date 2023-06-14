@@ -44,7 +44,7 @@ export const Default = () => (
                 content: 'Everything is an object in GDevelop',
                 hierarchy: { lvl0: 'Scene editor', lvl1: 'Objects' },
                 objectID: 'everyting-is-an-object',
-                url: 'https://wiki.gdevelop.io/gdevelop5/objects'
+                url: 'https://wiki.gdevelop.io/gdevelop5/objects',
               },
               handler: action('Open wiki command'),
             },

@@ -187,7 +187,12 @@ void ParameterMetadataTools::SetParameterObjectType(gd::ParameterMetadata &param
                             const gd::String &objectType) {
   const auto &extraInfo = parameterMetadata.GetExtraInfo();
   const size_t objectTypeEnd = extraInfo.find("&");
-  parameterMetadata.SetExtraInfo(objectType + extraInfo.substr(objectTypeEnd));
+  if (objectTypeEnd >= extraInfo.size()) {
+    parameterMetadata.SetExtraInfo(objectType);
+  }
+  else {
+    parameterMetadata.SetExtraInfo(objectType + extraInfo.substr(objectTypeEnd));
+  }
 }
 
 }  // namespace gd

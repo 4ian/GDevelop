@@ -778,8 +778,8 @@ module.exports = {
         _('Activates a Steam Input action set of a Steam Input controller.'),
         _('Activate action set _PARAM1_ of controller _PARAM0_'),
         _('Input'),
-        'JsPlatform/Extensions/icon.png',
-        'JsPlatform/Extensions/icon.png'
+        'JsPlatform/Extensions/steam.svg',
+        'JsPlatform/Extensions/steam.svg'
       )
       .addParameter('expression', 'Controller number', '', false)
       .addParameter('identifier', 'ActionName', 'SteamInputActionSet', false)

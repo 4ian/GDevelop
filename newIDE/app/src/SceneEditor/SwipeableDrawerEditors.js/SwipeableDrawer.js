@@ -57,6 +57,7 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
           <Line
             noMargin
             justifyContent={props.controls ? 'space-between' : 'flex-start'}
+            alignItems="center"
           >
             <Text size="sub-title" noMargin>
               {props.title}
@@ -105,7 +106,16 @@ const SwipeableDrawer = (props: Props) => {
         }}
         controls={props.topBarControls}
       />
-      <div style={{ display: 'flex', flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>{props.children}</div>
+      <div
+        style={{
+          display: 'flex',
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
+        {props.children}
+      </div>
     </div>
   );
 };

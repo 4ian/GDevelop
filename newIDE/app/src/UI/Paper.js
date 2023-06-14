@@ -37,7 +37,7 @@ const Paper = ({
   square,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const backgroundColor = getBackgroundColor(gdevelopTheme, background)
+  const backgroundColor = getBackgroundColor(gdevelopTheme, background);
   return (
     <MuiPaper
       id={id}

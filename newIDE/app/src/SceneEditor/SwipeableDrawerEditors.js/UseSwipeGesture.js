@@ -12,8 +12,6 @@ const useSwipeGesture = (props: Props) => {
   const startYRef = React.useRef<?number>(null);
 
   const onTouchStart = React.useCallback((event: TouchEvent) => {
-    console.log(event)
-    console.log(event.touches)
     startTimeRef.current = Date.now();
     startYRef.current = event.touches[0].clientY;
   }, []);
@@ -26,9 +24,6 @@ const useSwipeGesture = (props: Props) => {
 
       const deltaY = event.changedTouches[0].clientY - startY;
       const deltaTimeInSeconds = (Date.now() - startTime) / 1000;
-      console.log('END')
-      console.log(Math.abs(deltaY))
-      console.log(Math.abs(deltaY) / deltaTimeInSeconds)
       if (
         Math.abs(deltaY) > 30 &&
         Math.abs(deltaY) / deltaTimeInSeconds > 200

@@ -122,8 +122,9 @@ namespace gdjs {
       string,
       import('steamworks.js/client').matchmaking.Lobby
     >();
-    let currentLobby: import('steamworks.js/client').matchmaking.Lobby | null =
-      null;
+    let currentLobby:
+      | import('steamworks.js/client').matchmaking.Lobby
+      | null = null;
 
     export function getKnownLobby(lobbyId: string) {
       if (!steamAPI) {

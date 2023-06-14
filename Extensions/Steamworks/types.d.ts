@@ -354,6 +354,9 @@ declare module 'steamworks.js' {
   export function electronEnableSteamOverlay(
     disableEachFrameInvalidation?: boolean
   ): void;
-  export type Client = Omit<typeof import('steamworks.js/client'), 'init' | 'runCallbacks'>;
+  export type Client = Omit<
+    typeof import('steamworks.js/client'),
+    'init' | 'runCallbacks'
+  >;
   export const SteamCallback: typeof import('steamworks.js/client').callback.SteamCallback;
 }

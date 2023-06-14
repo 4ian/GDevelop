@@ -24,7 +24,7 @@ export const hasAppStoreUserSubscription = () => {
 
 // Products:
 
-export const shouldUseAppStoreProduct = () => true;
+export const shouldUseAppStoreProduct = () => false;
 
 export const getAppStoreProduct = (
   productId: string | null

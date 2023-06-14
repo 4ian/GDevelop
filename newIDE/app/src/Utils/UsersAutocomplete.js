@@ -3,7 +3,9 @@ import * as React from 'react';
 import { useState } from 'react';
 import { t } from '@lingui/macro';
 import { useDebounce } from './UseDebounce';
-import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
+import SemiControlledMultiAutoComplete, {
+  type SemiControlledMultiAutoCompleteInterface,
+} from '../UI/SemiControlledMultiAutoComplete';
 import {
   searchCreatorPublicProfilesByUsername,
   type UserPublicProfile,
@@ -41,6 +43,9 @@ export const UsersAutocomplete = ({
     setCompletionUserPublicProfiles,
   ] = React.useState<Array<UserPublicProfile>>([]);
   const [error, setError] = React.useState(null);
+  const autocompleteRef = React.useRef<?SemiControlledMultiAutoCompleteInterface>(
+    null
+  );
 
   // Recalculate if the userInput has changed.
   const searchUserPublicProfiles = useDebounce(async () => {
@@ -60,6 +65,7 @@ export const UsersAutocomplete = ({
       console.error('Could not load the users: ', err);
     } finally {
       setLoading(false);
+      focusInput();
     }
   }, 500);
 
@@ -108,6 +114,10 @@ export const UsersAutocomplete = ({
     [userIds]
   );
 
+  const focusInput = React.useCallback(() => {
+    if (autocompleteRef.current) autocompleteRef.current.focusInput();
+  }, []);
+
   // Do only once.
   React.useEffect(
     () => {
@@ -139,6 +149,7 @@ export const UsersAutocomplete = ({
       onInputChange={(event, value) => {
         setUserInput(value);
       }}
+      ref={autocompleteRef}
       dataSource={completionUserPublicProfiles
         .map((userPublicProfile: UserPublicProfile) => {
           if (userPublicProfile.username && userPublicProfile.id) {

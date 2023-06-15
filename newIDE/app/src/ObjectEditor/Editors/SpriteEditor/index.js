@@ -149,6 +149,8 @@ export default function SpriteEditor({
       const draggedIndex = draggedAnimationIndex.current;
       if (draggedIndex === null) return;
 
+      setNameErrors({});
+
       spriteConfiguration.moveAnimation(
         draggedIndex,
         targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
@@ -160,6 +162,8 @@ export default function SpriteEditor({
 
   const addAnimation = React.useCallback(
     () => {
+      setNameErrors({});
+
       const emptyAnimation = new gd.Animation();
       emptyAnimation.setDirectionsCount(1);
       spriteConfiguration.addAnimation(emptyAnimation);
@@ -191,6 +195,8 @@ export default function SpriteEditor({
       });
       if (!deleteAnswer) return;
 
+      setNameErrors({});
+
       spriteConfiguration.removeAnimation(index);
       forceUpdate();
       onSizeUpdated();
@@ -211,11 +217,7 @@ export default function SpriteEditor({
       const currentName = animation.getName();
       if (currentName === newName) return;
 
-      if (nameErrors[animation.ptr]) {
-        const newNameErrors = { ...nameErrors };
-        delete newNameErrors[animation.ptr];
-        setNameErrors(newNameErrors);
-      }
+      setNameErrors({});
 
       const otherNames = mapFor(
         0,

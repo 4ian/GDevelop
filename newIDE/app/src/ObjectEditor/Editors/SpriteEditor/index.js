@@ -33,6 +33,7 @@ import { makeDragSourceAndDropTarget } from '../../../UI/DragAndDrop/DragSourceA
 import { DragHandleIcon } from '../../../UI/DragHandle';
 import DropIndicator from '../../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -111,8 +112,6 @@ export default function SpriteEditor({
   const windowWidth = useResponsiveWindowWidth();
   const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
 
-  const draggedAnimationIndex = React.useRef<number | null>(null);
-
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
   const [
@@ -135,6 +134,9 @@ export default function SpriteEditor({
     },
     [justAddedAnimationName]
   );
+  const { showConfirmation } = useAlertDialog();
+
+  const draggedAnimationIndex = React.useRef<number | null>(null);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -180,26 +182,40 @@ export default function SpriteEditor({
   );
 
   const removeAnimation = React.useCallback(
-    (index: number, i18n: I18nType) => {
-      const answer = Window.showConfirmDialog(
-        i18n._(t`Are you sure you want to remove this animation?`)
-      );
+    async (index: number, i18n: I18nType) => {
+      const deleteAnswer = await showConfirmation({
+        title: t`Remove the animation`,
+        message: t`Are you sure you want to remove this animation?`,
+        confirmButtonLabel: t`Remove`,
+        dismissButtonLabel: t`Cancel`,
+      });
+      if (!deleteAnswer) return;
 
-      if (answer) {
-        spriteConfiguration.removeAnimation(index);
-        forceUpdate();
-        onSizeUpdated();
-        if (onObjectUpdated) onObjectUpdated();
-      }
+      spriteConfiguration.removeAnimation(index);
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
     },
-    [forceUpdate, onObjectUpdated, onSizeUpdated, spriteConfiguration]
+    [
+      forceUpdate,
+      onObjectUpdated,
+      onSizeUpdated,
+      showConfirmation,
+      spriteConfiguration,
+    ]
   );
 
   const changeAnimationName = React.useCallback(
-    (changedAnimationIndex: number, newName: string, i18n: I18nType) => {
+    (changedAnimationIndex: number, newName: string) => {
       const animation = spriteConfiguration.getAnimation(changedAnimationIndex);
       const currentName = animation.getName();
       if (currentName === newName) return;
+
+      if (nameErrors[animation.ptr]) {
+        const newNameErrors = { ...nameErrors };
+        delete newNameErrors[animation.ptr];
+        setNameErrors(newNameErrors);
+      }
 
       const otherNames = mapFor(
         0,
@@ -207,14 +223,11 @@ export default function SpriteEditor({
         index => {
           return index === changedAnimationIndex
             ? undefined // Don't check the current animation name as we're changing it.
-            : currentName;
+            : spriteConfiguration.getAnimation(index).getName();
         }
       );
 
-      if (
-        newName !== '' &&
-        otherNames.filter(name => name === newName).length
-      ) {
+      if (newName !== '' && otherNames.some(name => name === newName)) {
         setNameErrors({
           ...nameErrors,
           [animation.ptr]: (
@@ -262,10 +275,10 @@ export default function SpriteEditor({
   );
 
   return (
-    <>
-      <ScrollView ref={scrollView}>
-        <I18n>
-          {({ i18n }) => (
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <ScrollView ref={scrollView}>
             <Column noMargin expand useFullHeight>
               {spriteConfiguration.getAnimationsCount() === 0 ? (
                 <Column noMargin expand justifyContent="center">
@@ -363,8 +376,7 @@ export default function SpriteEditor({
                                         onChange={newName =>
                                           changeAnimationName(
                                             animationIndex,
-                                            newName,
-                                            i18n
+                                            newName
                                           )
                                         }
                                         fullWidth
@@ -414,8 +426,7 @@ export default function SpriteEditor({
                                             onChangeName={newName =>
                                               changeAnimationName(
                                                 animationIndex,
-                                                newName,
-                                                i18n
+                                                newName
                                               )
                                             }
                                             onSpriteUpdated={onObjectUpdated}
@@ -435,174 +446,174 @@ export default function SpriteEditor({
                 </React.Fragment>
               )}
             </Column>
-          )}
-        </I18n>
-      </ScrollView>
-      <Column noMargin>
-        <ResponsiveLineStackLayout
-          justifyContent="space-between"
-          noColumnMargin
-        >
-          {windowWidth !== 'small' ? (
-            <ResponsiveLineStackLayout noMargin noColumnMargin>
-              <FlatButton
-                label={<Trans>Edit collision masks</Trans>}
-                onClick={() => setCollisionMasksEditorOpen(true)}
-                disabled={hasNoAnimations}
-              />
-              {!isAnimationListLocked && (
-                <FlatButton
-                  label={<Trans>Edit points</Trans>}
-                  onClick={() => setPointsEditorOpen(true)}
+          </ScrollView>
+          <Column noMargin>
+            <ResponsiveLineStackLayout
+              justifyContent="space-between"
+              noColumnMargin
+            >
+              {windowWidth !== 'small' ? (
+                <ResponsiveLineStackLayout noMargin noColumnMargin>
+                  <FlatButton
+                    label={<Trans>Edit collision masks</Trans>}
+                    onClick={() => setCollisionMasksEditorOpen(true)}
+                    disabled={hasNoAnimations}
+                  />
+                  {!isAnimationListLocked && (
+                    <FlatButton
+                      label={<Trans>Edit points</Trans>}
+                      onClick={() => setPointsEditorOpen(true)}
+                      disabled={hasNoAnimations}
+                    />
+                  )}
+                  {!isAnimationListLocked && (
+                    <FlatButton
+                      label={<Trans>Advanced options</Trans>}
+                      onClick={() => setAdvancedOptionsOpen(true)}
+                      disabled={hasNoAnimations}
+                    />
+                  )}
+                </ResponsiveLineStackLayout>
+              ) : (
+                <FlatButtonWithSplitMenu
+                  label={<Trans>Edit collision masks</Trans>}
+                  onClick={() => setCollisionMasksEditorOpen(true)}
                   disabled={hasNoAnimations}
+                  buildMenuTemplate={i18n => [
+                    {
+                      label: i18n._(t`Edit points`),
+                      disabled: hasNoAnimations,
+                      click: () => setPointsEditorOpen(true),
+                    },
+                    {
+                      label: i18n._(t`Advanced options`),
+                      disabled: hasNoAnimations,
+                      click: () => setAdvancedOptionsOpen(true),
+                    },
+                  ]}
                 />
               )}
               {!isAnimationListLocked && (
-                <FlatButton
-                  label={<Trans>Advanced options</Trans>}
-                  onClick={() => setAdvancedOptionsOpen(true)}
-                  disabled={hasNoAnimations}
+                <RaisedButton
+                  label={<Trans>Add an animation</Trans>}
+                  primary
+                  onClick={addAnimation}
+                  icon={<Add />}
                 />
               )}
             </ResponsiveLineStackLayout>
-          ) : (
-            <FlatButtonWithSplitMenu
-              label={<Trans>Edit collision masks</Trans>}
-              onClick={() => setCollisionMasksEditorOpen(true)}
-              disabled={hasNoAnimations}
-              buildMenuTemplate={i18n => [
-                {
-                  label: i18n._(t`Edit points`),
-                  disabled: hasNoAnimations,
-                  click: () => setPointsEditorOpen(true),
-                },
-                {
-                  label: i18n._(t`Advanced options`),
-                  disabled: hasNoAnimations,
-                  click: () => setAdvancedOptionsOpen(true),
-                },
-              ]}
-            />
-          )}
-          {!isAnimationListLocked && (
-            <RaisedButton
-              label={<Trans>Add an animation</Trans>}
-              primary
-              onClick={addAnimation}
-              icon={<Add />}
-            />
-          )}
-        </ResponsiveLineStackLayout>
-      </Column>
-      {advancedOptionsOpen && (
-        <Dialog
-          title={<Trans>Advanced options</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              onClick={() => setAdvancedOptionsOpen(false)}
-            />,
-          ]}
-          maxWidth="sm"
-          flexBody
-          onRequestClose={() => setAdvancedOptionsOpen(false)}
-          open
-        >
-          <Column noMargin>
-            <Checkbox
-              label={
-                <Trans>
-                  Don't play the animation when the object is far from the
-                  camera or hidden (recommended for performance)
-                </Trans>
-              }
-              checked={!spriteConfiguration.getUpdateIfNotVisible()}
-              onCheck={(_, value) => {
-                spriteConfiguration.setUpdateIfNotVisible(!value);
-
-                forceUpdate();
-                if (onObjectUpdated) onObjectUpdated();
-              }}
-            />
           </Column>
-        </Dialog>
+          {advancedOptionsOpen && (
+            <Dialog
+              title={<Trans>Advanced options</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setAdvancedOptionsOpen(false)}
+                />,
+              ]}
+              maxWidth="sm"
+              flexBody
+              onRequestClose={() => setAdvancedOptionsOpen(false)}
+              open
+            >
+              <Column noMargin>
+                <Checkbox
+                  label={
+                    <Trans>
+                      Don't play the animation when the object is far from the
+                      camera or hidden (recommended for performance)
+                    </Trans>
+                  }
+                  checked={!spriteConfiguration.getUpdateIfNotVisible()}
+                  onCheck={(_, value) => {
+                    spriteConfiguration.setUpdateIfNotVisible(!value);
+
+                    forceUpdate();
+                    if (onObjectUpdated) onObjectUpdated();
+                  }}
+                />
+              </Column>
+            </Dialog>
+          )}
+          {pointsEditorOpen && (
+            <Dialog
+              title={<Trans>Edit points</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setPointsEditorOpen(false)}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/objects/sprite/edit-points"
+                  key="help"
+                />,
+              ]}
+              onRequestClose={() => setPointsEditorOpen(false)}
+              maxWidth="lg"
+              flexBody
+              fullHeight
+              open={pointsEditorOpen}
+            >
+              <PointsEditor
+                objectConfiguration={spriteConfiguration}
+                resourcesLoader={ResourcesLoader}
+                project={project}
+                onPointsUpdated={onObjectUpdated}
+                onRenamedPoint={(oldName, newName) =>
+                  // TODO EBO Refactor event-based object events when a point is renamed.
+                  layout &&
+                  object &&
+                  gd.WholeProjectRefactorer.renameObjectPoint(
+                    project,
+                    layout,
+                    object,
+                    oldName,
+                    newName
+                  )
+                }
+              />
+            </Dialog>
+          )}
+          {collisionMasksEditorOpen && (
+            <Dialog
+              title={<Trans>Edit collision masks</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setCollisionMasksEditorOpen(false)}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/objects/sprite/collision-mask"
+                  key="help"
+                />,
+              ]}
+              maxWidth="lg"
+              flexBody
+              fullHeight
+              onRequestClose={() => setCollisionMasksEditorOpen(false)}
+              open={collisionMasksEditorOpen}
+            >
+              <CollisionMasksEditor
+                objectConfiguration={spriteConfiguration}
+                resourcesLoader={ResourcesLoader}
+                project={project}
+                onMasksUpdated={onObjectUpdated}
+              />
+            </Dialog>
+          )}
+        </>
       )}
-      {pointsEditorOpen && (
-        <Dialog
-          title={<Trans>Edit points</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              onClick={() => setPointsEditorOpen(false)}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              helpPagePath="/objects/sprite/edit-points"
-              key="help"
-            />,
-          ]}
-          onRequestClose={() => setPointsEditorOpen(false)}
-          maxWidth="lg"
-          flexBody
-          fullHeight
-          open={pointsEditorOpen}
-        >
-          <PointsEditor
-            objectConfiguration={spriteConfiguration}
-            resourcesLoader={ResourcesLoader}
-            project={project}
-            onPointsUpdated={onObjectUpdated}
-            onRenamedPoint={(oldName, newName) =>
-              // TODO EBO Refactor event-based object events when a point is renamed.
-              layout &&
-              object &&
-              gd.WholeProjectRefactorer.renameObjectPoint(
-                project,
-                layout,
-                object,
-                oldName,
-                newName
-              )
-            }
-          />
-        </Dialog>
-      )}
-      {collisionMasksEditorOpen && (
-        <Dialog
-          title={<Trans>Edit collision masks</Trans>}
-          actions={[
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary
-              onClick={() => setCollisionMasksEditorOpen(false)}
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              helpPagePath="/objects/sprite/collision-mask"
-              key="help"
-            />,
-          ]}
-          maxWidth="lg"
-          flexBody
-          fullHeight
-          onRequestClose={() => setCollisionMasksEditorOpen(false)}
-          open={collisionMasksEditorOpen}
-        >
-          <CollisionMasksEditor
-            objectConfiguration={spriteConfiguration}
-            resourcesLoader={ResourcesLoader}
-            project={project}
-            onMasksUpdated={onObjectUpdated}
-          />
-        </Dialog>
-      )}
-    </>
+    </I18n>
   );
 }

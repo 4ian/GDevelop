@@ -101,7 +101,7 @@ export default function SpriteEditor({
   const windowWidth = useResponsiveWindowWidth();
   const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
 
-  const draggedAnimationIndex = React.useRef<?number>(null);
+  const draggedAnimationIndex = React.useRef<number | null>(null);
 
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 

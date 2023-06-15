@@ -55,7 +55,17 @@ const MaterialUIContextMenu = React.forwardRef<
             top: anchorPosition[1],
           }}
           anchorReference={'anchorPosition'}
-          onClose={() => setOpenMenu(false)}
+          onClose={(event, reason) => {
+            if (reason === 'backdropClick') {
+              // Prevent any side effect of a backdrop click that should only
+              // close the context menu.
+              // When used in the ElementWithMenu component, there are cases where
+              // the event propagates to the element on which the menu is set up and
+              // then the event bubbles up, triggering click events on its way up.
+              event.stopPropagation();
+            }
+            setOpenMenu(false);
+          }}
           TransitionComponent={Fade}
           {...menuImplementation.getMenuProps()}
         >

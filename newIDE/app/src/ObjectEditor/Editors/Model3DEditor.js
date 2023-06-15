@@ -248,7 +248,7 @@ const Model3DEditor = ({
   );
   const { showAlert } = useAlertDialog();
 
-  const draggedAnimationIndex = React.useRef<?number>(null);
+  const draggedAnimationIndex = React.useRef<number | null>(null);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const forceUpdate = useForceUpdate();
@@ -385,7 +385,7 @@ const Model3DEditor = ({
   const moveAnimation = React.useCallback(
     (targetIndex: number) => {
       const draggedIndex = draggedAnimationIndex.current;
-      if (!draggedIndex) return;
+      if (draggedIndex === null) return;
 
       model3DConfiguration.moveAnimation(
         draggedIndex,

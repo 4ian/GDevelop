@@ -305,7 +305,9 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       renamedObjectWithContext={props.renamedObjectWithContext}
                       onRenameObjectStart={props.onRenameObjectStart}
                       onRenameObjectFinish={props.onRenameObjectFinish}
-                      onAddObjectInstance={props.onAddObjectInstance}
+                      onAddObjectInstance={objectName =>
+                        props.onAddObjectInstance(objectName, 'upperCenter')
+                      }
                       onObjectPasted={props.updateBehaviorsSharedData}
                       selectedObjectTags={selectedObjectTags}
                       beforeSetAsGlobalObject={objectName =>

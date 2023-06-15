@@ -496,14 +496,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     else this.toggleObjectsList();
   };
 
-  addInstanceAtTheCenter = (objectName: string) => {
+  addInstanceOnTheScene = (
+    objectName: string,
+    targetPosition: 'center' | 'upperCenter' = 'center'
+  ) => {
     if (!this.editorDisplay) {
       return;
     }
     const viewPosition = this.editorDisplay.viewControls.getViewPosition();
-    const position = viewPosition
-      ? [viewPosition.getViewX(), viewPosition.getViewY()]
-      : [0, 0];
+    let position = [0, 0];
+    if (viewPosition) {
+      position = viewPosition.toSceneCoordinates(
+        viewPosition.getWidth() / 2,
+        viewPosition.getHeight() /
+          // If the target position is the upper center, the Y position is at the first
+          // quarter of the screen. Otherwise, it's at the half of the screen.
+          (targetPosition === 'upperCenter' ? 4 : 2)
+      );
+    }
     this._addInstance(position, objectName);
   };
 
@@ -1510,7 +1520,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 initialInstances={initialInstances}
                 instancesSelection={this.instancesSelection}
                 onSelectInstances={this._onSelectInstances}
-                onAddObjectInstance={this.addInstanceAtTheCenter}
+                onAddObjectInstance={this.addInstanceOnTheScene}
                 selectedLayer={this.state.selectedLayer}
                 editLayer={this.editLayer}
                 editLayerEffects={this.editLayerEffects}

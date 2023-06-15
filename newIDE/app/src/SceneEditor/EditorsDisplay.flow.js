@@ -49,7 +49,10 @@ export type SceneEditorsDisplayProps = {|
     objectWithContext: ObjectWithContext,
     cb: (boolean) => void
   ) => void,
-  onAddObjectInstance: (objectName: string) => void,
+  onAddObjectInstance: (
+    objectName: string,
+    targetPosition?: 'center' | 'upperCenter'
+  ) => void,
   onRenameObjectStart: (?ObjectWithContext) => void,
   onRenameObjectFinish: (
     objectWithContext: ObjectWithContext,

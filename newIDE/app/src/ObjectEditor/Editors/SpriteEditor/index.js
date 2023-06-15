@@ -41,6 +41,16 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
 );
 
 const styles = {
+  rowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginTop: 5,
+  },
+  rowContent: {
+    display: 'flex',
+    flex: 1,
+    alignItems: 'center',
+  },
   animationLine: {
     // Use a non standard spacing because:
     // - The SortableAnimationsList won't work with <Spacer /> or <LargeSpacer /> between elements.

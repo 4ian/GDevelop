@@ -42,19 +42,6 @@ if (typeof importScripts === 'function') {
       })
     );
 
-    // Cache resources from GDevelop cloudfront server (CORS enabled).
-    workbox.routing.registerRoute(
-      /https:\/\/resources\.gdevelop-app\.com\/.*$/,
-      workbox.strategies.networkFirst({
-        cacheName: 'gdevelop-resources-cache',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 500,
-          }),
-        ],
-      })
-    );
-
     // TODO: this should be useless?
     workbox.routing.registerRoute(
       /\.(?:png|gif|jpg|jpeg)$/,

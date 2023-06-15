@@ -11,6 +11,7 @@ import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import StringArrayEditor from '../../StringArrayEditor';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import CapabilitiesEditor from './CapabilitiesEditor';
 
 type Props = {|
   project: gdProject,
@@ -232,6 +233,19 @@ export default function ValueTypeEditor({
               }}
             />
           )}
+          {valueTypeMetadata.isObject() &&
+            valueTypeMetadata.getExtraInfo().length === 0 && (
+              <CapabilitiesEditor
+                resizable={false}
+                scalable={false}
+                flippable={false}
+                animable={false}
+                onResizableChange={(resizable: boolean) => {}}
+                onScalableChange={(scalable: boolean) => {}}
+                onFlippableChange={(flippable: boolean) => {}}
+                onAnimableChange={(animable: boolean) => {}}
+              />
+            )}
         </ColumnStackLayout>
       )}
     </I18n>

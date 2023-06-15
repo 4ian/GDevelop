@@ -12,6 +12,7 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import CapabilitiesEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/CapabilitiesEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,6 +110,18 @@ export default function EventsBasedBehaviorEditor({
                   ] /* More than one type of object are using the behavior. Only "any object" can be used on this behavior */
             }
           />
+          {eventsBasedBehavior.getObjectType().length === 0 && (
+            <CapabilitiesEditor
+              resizable={false}
+              scalable={false}
+              flippable={false}
+              animable={false}
+              onResizableChange={(resizable: boolean) => {}}
+              onScalableChange={(scalable: boolean) => {}}
+              onFlippableChange={(flippable: boolean) => {}}
+              onAnimableChange={(animable: boolean) => {}}
+            />
+          )}
           {allObjectTypes.length > 1 && (
             <AlertMessage kind="info">
               <Trans>

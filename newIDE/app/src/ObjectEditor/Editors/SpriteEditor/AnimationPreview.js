@@ -14,6 +14,7 @@ import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import Play from '../../../UI/CustomSvgIcons/Play';
 import Pause from '../../../UI/CustomSvgIcons/Pause';
+import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -73,7 +74,7 @@ const AnimationPreview = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  const fps = 1 / timeBetweenFrames;
+  const fps = Number.parseFloat((1 / timeBetweenFrames).toFixed(4));
 
   // Use useRef for mutable variables that we want to persist
   // to be readable from inside the animation callback.
@@ -269,9 +270,9 @@ const AnimationPreview = ({
                 value={fps.toString()}
                 onChange={text => {
                   if (!text) return;
-                  const fps = Number.parseFloat(text);
-                  if (fps > 0) {
-                    const newTimeBetweenFrames = 1 / fps;
+                  const newFps = Number.parseFloat(text);
+                  if (newFps > 0) {
+                    const newTimeBetweenFrames = 1 / newFps;
                     timeBetweenFramesRef.current = newTimeBetweenFrames;
                     if (onChangeTimeBetweenFrames) {
                       onChangeTimeBetweenFrames(newTimeBetweenFrames);
@@ -284,13 +285,15 @@ const AnimationPreview = ({
                 min={0}
                 max={100}
                 style={styles.timeField}
-                autoFocus="desktop"
               />
               <Timer style={styles.timeIcon} />
               <SemiControlledTextField
                 commitOnBlur
                 margin="none"
-                value={timeBetweenFramesRef.current.toString()}
+                value={toFixedWithoutTrailingZeros(
+                  timeBetweenFramesRef.current,
+                  6
+                )}
                 onChange={text => {
                   if (!text) return;
                   const time = Number.parseFloat(text);

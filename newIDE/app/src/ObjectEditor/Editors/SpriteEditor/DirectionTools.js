@@ -19,6 +19,7 @@ import { Tooltip } from '@material-ui/core';
 import Text from '../../../UI/Text';
 import Edit from '../../../UI/CustomSvgIcons/Edit';
 import Play from '../../../UI/CustomSvgIcons/Play';
+import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
 
 const styles = {
   container: {
@@ -62,9 +63,10 @@ const DirectionTools = ({
   const forceUpdate = useForceUpdate();
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const currentTimeBetweenFrames = direction.getTimeBetweenFrames();
-  const timeBetweenFramesFormatted = direction
-    .getTimeBetweenFrames()
-    .toString();
+  const timeBetweenFramesFormatted = toFixedWithoutTrailingZeros(
+    direction.getTimeBetweenFrames(),
+    6
+  );
 
   const saveTimeBetweenFrames = newTimeBetweenFramesString => {
     if (!newTimeBetweenFramesString) return;

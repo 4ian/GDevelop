@@ -129,23 +129,30 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
-const InstructionMissing = (props: {| instructionType: string |}) => {
+const InstructionMissing = (props: {|
+  instructionType: string,
+  isCondition: boolean,
+|}) => {
   const { name, behaviorName, extensionName } = getFunctionNameFromType(
     props.instructionType
   );
   if (behaviorName) {
     return (
       <span className="instruction-missing">
-        <span className="function-name">{name}</span> on behavior{' '}
+        <span className="function-name">{name}</span>{' '}
+        {props.isCondition ? 'condition' : 'action'} on behavior{' '}
         <span className="behavior-name">{behaviorName}</span> from{' '}
-        <span className="extension-name">{extensionName}</span> missing.
+        <span className="extension-name">{extensionName}</span> extension is
+        missing.
       </span>
     );
   } else {
     return (
       <span className="instruction-missing">
-        <span className="function-name">{name}</span> from{' '}
-        <span className="extension-name">{extensionName}</span> missing.
+        <span className="function-name">{name}</span>{' '}
+        {props.isCondition ? 'condition' : 'action'} from{' '}
+        <span className="extension-name">{extensionName}</span> extension is
+        missing.
       </span>
     );
   }
@@ -214,6 +221,7 @@ const Instruction = (props: Props) => {
               return (
                 <InstructionMissing
                   instructionType={instruction.getType()}
+                  isCondition={isCondition}
                   key={`unknown-behavior-instruction-${i}`}
                 />
               );

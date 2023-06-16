@@ -6,7 +6,7 @@ import { I18n } from '@lingui/react';
 import Timer from '@material-ui/icons/Timer';
 import TextButton from '../../../UI/TextButton';
 import InlineCheckbox from '../../../UI/InlineCheckbox';
-import TextField from '../../../UI/TextField';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
@@ -40,8 +40,6 @@ const styles = {
   },
 };
 
-const formatTime = (time: number) => Number(time.toFixed(6));
-
 type Props = {|
   animationName: string,
   direction: gdDirection,
@@ -62,22 +60,16 @@ const DirectionTools = ({
   onDirectionUpdated,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [timeBetweenFrames, setTimeBetweenFrames] = React.useState(
-    formatTime(direction.getTimeBetweenFrames())
-  );
   const [previewOpen, setPreviewOpen] = React.useState(false);
+  const currentTimeBetweenFrames = direction.getTimeBetweenFrames();
+  const timeBetweenFramesFormatted = direction
+    .getTimeBetweenFrames()
+    .toString();
 
-  React.useEffect(
-    () => {
-      setTimeBetweenFrames(formatTime(direction.getTimeBetweenFrames()));
-    },
-    [direction]
-  );
-
-  const saveTimeBetweenFrames = () => {
-    const currentTimeBetweenFrames = direction.getTimeBetweenFrames();
+  const saveTimeBetweenFrames = newTimeBetweenFramesString => {
+    if (!newTimeBetweenFramesString) return;
     const newTimeBetweenFrames = Math.max(
-      parseFloat(timeBetweenFrames),
+      parseFloat(newTimeBetweenFramesString),
       0.00001
     );
     if (currentTimeBetweenFrames === newTimeBetweenFrames) return;
@@ -86,8 +78,8 @@ const DirectionTools = ({
 
     if (newTimeIsValid) {
       direction.setTimeBetweenFrames(newTimeBetweenFrames);
-      setTimeBetweenFrames(formatTime(newTimeBetweenFrames));
       if (onDirectionUpdated) onDirectionUpdated();
+      forceUpdate();
     }
   };
 
@@ -100,9 +92,6 @@ const DirectionTools = ({
 
   const openPreview = (open: boolean) => {
     setPreviewOpen(open);
-    if (!open) {
-      saveTimeBetweenFrames();
-    }
   };
 
   const imageResourceExternalEditors = resourceExternalEditors.filter(
@@ -149,12 +138,7 @@ const DirectionTools = ({
               <Tooltip title={<Trans>Time between frames</Trans>}>
                 <Timer style={styles.timeIcon} />
               </Tooltip>
-              <TextField
-                value={timeBetweenFrames}
-                onChange={(e, text) =>
-                  setTimeBetweenFrames(parseFloat(text) || 0)
-                }
-                onBlur={() => saveTimeBetweenFrames()}
+              <SemiControlledTextField
                 id="direction-time-between-frames"
                 margin="none"
                 style={styles.timeField}
@@ -163,6 +147,9 @@ const DirectionTools = ({
                 precision={2}
                 min={0.01}
                 max={5}
+                commitOnBlur
+                value={timeBetweenFramesFormatted}
+                onChange={saveTimeBetweenFrames}
               />
               <InlineCheckbox
                 checked={direction.isLooping()}
@@ -201,8 +188,8 @@ const DirectionTools = ({
                 isImageResourceSmooth={(name: string) =>
                   isProjectImageResourceSmooth(project, name)
                 }
-                timeBetweenFrames={timeBetweenFrames}
-                onChangeTimeBetweenFrames={text => setTimeBetweenFrames(text)}
+                timeBetweenFrames={currentTimeBetweenFrames}
+                onChangeTimeBetweenFrames={saveTimeBetweenFrames}
                 isLooping={direction.isLooping()}
                 hideAnimationLoader // No need to show a loader in the Direction Tools.
               />

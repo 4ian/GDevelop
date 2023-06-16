@@ -16,7 +16,6 @@ import HelpButton from '../../../UI/HelpButton';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
-import Window from '../../../Utils/Window';
 import { type EditorProps } from '../EditorProps.flow';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';

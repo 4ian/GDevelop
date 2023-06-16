@@ -7,7 +7,7 @@ import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
 import Timer from '@material-ui/icons/Timer';
-import TextField from '../../../UI/TextField';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import FlatButton from '../../../UI/FlatButton';
 import Text from '../../../UI/Text';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
@@ -73,10 +73,7 @@ const AnimationPreview = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  // Use state for elements that don't need to be read from inside the animation callback.
-  const [fps, setFps] = React.useState<number>(
-    Math.round(1 / timeBetweenFrames)
-  );
+  const fps = 1 / timeBetweenFrames;
 
   // Use useRef for mutable variables that we want to persist
   // to be readable from inside the animation callback.
@@ -101,10 +98,6 @@ const AnimationPreview = ({
   // When outside variables change, we need to update the animation callback.
   React.useEffect(
     () => {
-      if (timeBetweenFrames !== timeBetweenFramesRef.current) {
-        timeBetweenFramesRef.current = timeBetweenFrames;
-        setFps(Math.round(1 / timeBetweenFrames));
-      }
       if (isLooping !== isLoopingRef.current) {
         isLoopingRef.current = isLooping;
       }
@@ -270,16 +263,15 @@ const AnimationPreview = ({
               <Text>
                 <Trans>FPS:</Trans>
               </Text>
-              <TextField
+              <SemiControlledTextField
+                commitOnBlur
                 margin="none"
-                value={fps}
-                onChange={(e, text) => {
-                  const fps = parseFloat(text);
+                value={fps.toString()}
+                onChange={text => {
+                  if (!text) return;
+                  const fps = Number.parseFloat(text);
                   if (fps > 0) {
-                    setFps(fps);
-                    const newTimeBetweenFrames = parseFloat(
-                      (1 / fps).toFixed(4)
-                    );
+                    const newTimeBetweenFrames = 1 / fps;
                     timeBetweenFramesRef.current = newTimeBetweenFrames;
                     if (onChangeTimeBetweenFrames) {
                       onChangeTimeBetweenFrames(newTimeBetweenFrames);
@@ -289,20 +281,20 @@ const AnimationPreview = ({
                 }}
                 id="direction-time-between-frames"
                 type="number"
-                step={1}
-                min={1}
+                min={0}
                 max={100}
                 style={styles.timeField}
                 autoFocus="desktop"
               />
               <Timer style={styles.timeIcon} />
-              <TextField
+              <SemiControlledTextField
+                commitOnBlur
                 margin="none"
-                value={timeBetweenFramesRef.current}
-                onChange={(e, text) => {
-                  const time = parseFloat(text);
+                value={timeBetweenFramesRef.current.toString()}
+                onChange={text => {
+                  if (!text) return;
+                  const time = Number.parseFloat(text);
                   if (time > 0) {
-                    setFps(Math.round(1 / time));
                     timeBetweenFramesRef.current = time;
                     if (onChangeTimeBetweenFrames) {
                       onChangeTimeBetweenFrames(time);

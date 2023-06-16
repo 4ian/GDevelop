@@ -230,7 +230,7 @@ export default function SpriteEditor({
       );
 
       if (newName !== '' && otherNames.some(name => name === newName)) {
-        // The indexes can be used as a key because error are cleared when
+        // The indexes can be used as a key because errors are cleared when
         // animations are moved.
         setNameErrors({
           ...nameErrors,

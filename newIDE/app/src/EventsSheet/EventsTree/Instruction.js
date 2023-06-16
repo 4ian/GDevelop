@@ -39,6 +39,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
+import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -128,6 +129,28 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
+const InstructionMissing = (props: {| instructionType: string |}) => {
+  const { name, behaviorName, extensionName } = getFunctionNameFromType(
+    props.instructionType
+  );
+  if (behaviorName) {
+    return (
+      <span className="instruction-missing">
+        <span className="function-name">{name}</span> on behavior{' '}
+        <span className="behavior-name">{behaviorName}</span> from{' '}
+        <span className="extension-name">{extensionName}</span> missing.
+      </span>
+    );
+  } else {
+    return (
+      <span className="instruction-missing">
+        <span className="function-name">{name}</span> from{' '}
+        <span className="extension-name">{extensionName}</span> missing.
+      </span>
+    );
+  }
+};
+
 const Instruction = (props: Props) => {
   const {
     instruction,
@@ -187,6 +210,14 @@ const Instruction = (props: Props) => {
             parameterIndex >= 0 && parameterIndex < parametersCount;
 
           if (!isParameter) {
+            if (value === 'Unknown or unsupported instruction') {
+              return (
+                <InstructionMissing
+                  instructionType={instruction.getType()}
+                  key={`unknown-behavior-instruction-${i}`}
+                />
+              );
+            }
             return <span key={i}>{i === 0 ? capitalize(value) : value}</span>;
           }
 

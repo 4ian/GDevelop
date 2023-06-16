@@ -230,9 +230,11 @@ export default function SpriteEditor({
       );
 
       if (newName !== '' && otherNames.some(name => name === newName)) {
+        // The indexes can be used as a key because error are cleared when
+        // animations are moved.
         setNameErrors({
           ...nameErrors,
-          [animation.ptr]: (
+          [changedAnimationIndex]: (
             <Trans>The animation name {newName} is already taken</Trans>
           ),
         });
@@ -314,7 +316,7 @@ export default function SpriteEditor({
 
                       return (
                         <DragSourceAndDropTarget
-                          key={animation.ptr}
+                          key={animationIndex}
                           beginDrag={() => {
                             draggedAnimationIndex.current = animationIndex;
                             return {};
@@ -333,7 +335,7 @@ export default function SpriteEditor({
                           }) =>
                             connectDropTarget(
                               <div
-                                key={animation.ptr}
+                                key={animationIndex}
                                 style={styles.rowContainer}
                               >
                                 {isAnimationListLocked && (
@@ -372,7 +374,7 @@ export default function SpriteEditor({
                                       <SemiControlledTextField
                                         margin="none"
                                         commitOnBlur
-                                        errorText={nameErrors[animation.ptr]}
+                                        errorText={nameErrors[animationIndex]}
                                         translatableHintText={t`Optional animation name`}
                                         value={animation.getName()}
                                         onChange={newName =>

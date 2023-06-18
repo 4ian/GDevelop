@@ -25,7 +25,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "minimist": "^1.2.3",
-    "steamworks.js": "^0.2.0",
+    "steamworks.js": "0.2.0",
     "ws": "^5.1.1"
   }
 }

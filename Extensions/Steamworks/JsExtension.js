@@ -128,7 +128,7 @@ module.exports = {
         'SteamID',
         _('Steam ID'),
         _(
-          "The player's unique Steam ID number. Note that it is too big a number to load correctly as a float, and must be used as a string."
+          'The player's unique Steam ID number. Note that it is too big a number to load correctly as a traditional number ("floating point number"), and must be used as a string.'
         ),
         _('Player'),
         'JsPlatform/Extensions/steam.svg'

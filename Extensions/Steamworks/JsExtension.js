@@ -590,7 +590,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'PlayerOwnsApp',
+        'IsPlayerOwningApp',
         _('Player owns an application'),
         _('Checks if the current user owns an application on Steam.'),
         _('App _PARAM0_ owned on Steam'),
@@ -610,7 +610,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'PlayerInstalledApp',
+        'HasPlayerInstalledApp',
         _('Player installed an application'),
         _(
           'Checks if the current user has a Steam application currently installed.'
@@ -632,7 +632,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'PlayerInstalledDLC',
+        'HasPlayerInstalledDLC',
         _('Player installed DLC'),
         _('Checks if the current user has installed a piece of DLC.'),
         _('DLC _PARAM0_ installed from Steam'),
@@ -670,7 +670,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'PlayerIsVACBanned',
+        'IsPlayerVACBanned',
         _('Player has a VAC ban'),
         _('Checks if the current user has a VAC ban on their account.'),
         _('Player has a VAC ban'),
@@ -684,7 +684,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'PlayerIsLowViolence',
+        'IsPlayerLowViolence',
         _('Player cannot be exposed to violence'),
         _(
           'Checks if the current user may only be exposed to low violence, due to e.g. their age and content restrictions in their country.'
@@ -700,7 +700,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'PlayerBoughtGame',
+        'HasPlayerBoughtGame',
         _('Player bought the game'),
         _(
           'Checks if the current user actually bought & owns the game. If the "Require Steam" checkbox has been checked in the game properties, this will always be true as Steam will not allow to launch the game if it is not owned. Can be used to display an anti-piracy message instead of straight up blocking the launch of the game.'
@@ -754,7 +754,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'DigitalActionPressed',
+        'IsDigitalActionPressed',
         _('Digital action activated'),
         _(
           'Triggers when a digital action (a button that is either pressed or not) of a Steam Input controller has been triggered.'
@@ -853,7 +853,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'CloudFileExists',
+        'IsCloudFileExisting',
         _('File exists'),
         _('Checks if a file exists on Steam Cloud.'),
         _('File _PARAM0_ exists on Steam Cloud'),
@@ -1109,7 +1109,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'QueryWorkshopItemState',
+        'IsWorkshopItemState',
         _('Check workshop item state'),
         _('Check whether a state flag is set for a Workshop item.'),
         _('Flag _PARAM1_ is set on Workshop item _PARAM0_'),

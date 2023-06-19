@@ -124,10 +124,12 @@
   font-weight: bold;
 }
 .gd-events-sheet .instruction-missing .behavior-name {
+  color: var(--event-sheet-instruction-parameter-error-color);
   font-weight: bold;
 }
 .gd-events-sheet .instruction-missing .extension-name {
-  text-decoration: underline;
+  user-select: all;
+  font-weight: bold;
 }
 
 .gd-events-sheet .instruction-parameter.object,

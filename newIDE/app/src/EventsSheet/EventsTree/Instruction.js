@@ -40,6 +40,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -133,9 +134,13 @@ const InstructionMissing = (props: {|
   instructionType: string,
   isCondition: boolean,
 |}) => {
+  const { hasExtensionNamed } = React.useContext(ExtensionStoreContext);
   const { name, behaviorName, extensionName } = getFunctionNameFromType(
     props.instructionType
   );
+  const extensionStoreMention = hasExtensionNamed(extensionName)
+    ? ' Try installing it from the extension store.'
+    : '';
   if (behaviorName) {
     return (
       <span className="instruction-missing">
@@ -144,6 +149,7 @@ const InstructionMissing = (props: {|
         <span className="behavior-name">{behaviorName}</span> from{' '}
         <span className="extension-name">{extensionName}</span> extension is
         missing.
+        {extensionStoreMention}
       </span>
     );
   } else {
@@ -153,6 +159,7 @@ const InstructionMissing = (props: {|
         {props.isCondition ? 'condition' : 'action'} from{' '}
         <span className="extension-name">{extensionName}</span> extension is
         missing.
+        {extensionStoreMention}
       </span>
     );
   }

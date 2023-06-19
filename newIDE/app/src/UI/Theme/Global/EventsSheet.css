@@ -119,6 +119,10 @@
   color: var(--event-sheet-instruction-parameter-number-color);
 }
 
+.gd-events-sheet .instruction-missing {
+  text-decoration: var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
+
 .gd-events-sheet .instruction-missing .function-name {
   color: var(--event-sheet-instruction-parameter-error-color);
   font-weight: bold;

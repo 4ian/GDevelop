@@ -22,7 +22,7 @@ import {
 import axios from 'axios';
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { UsersAutocomplete } from '../../Utils/UsersAutocomplete';
+import { UsersAutocomplete } from '../../Profile/UsersAutocomplete';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {

@@ -28,7 +28,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Steamworks',
-        _('Steamworks (Steam)'),
+        _('Steamworks (Steam) (experimental)'),
         _("Adds integrations for Steam's Steamworks game development SDK."),
         'Arthur Pacaud (arthuro555)',
         'MIT'
@@ -36,7 +36,9 @@ module.exports = {
       .setCategory('Third-party');
 
     extension
-      .addInstructionOrExpressionGroupMetadata(_('Steamworks (Steam)'))
+      .addInstructionOrExpressionGroupMetadata(
+        _('Steamworks (Steam) (experimental)')
+      )
       .setIcon('JsPlatform/Extensions/steam.svg');
 
     extension
@@ -66,7 +68,7 @@ module.exports = {
         'ClaimAchievement',
         _('Claim achievement'),
         _(
-          "Marks a Steam achievement as obtained. Steam will pop-up a notification wit the achievement's data defined on the Steamworks partner website."
+          "Marks a Steam achievement as obtained. Steam will pop-up a notification with the achievement's data defined on the Steamworks partner website."
         ),
         _('Claim steam achievement _PARAM0_'),
         _('Achievements'),

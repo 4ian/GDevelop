@@ -76,7 +76,7 @@ namespace gdjs {
     }
 
     export function getCountry(): string {
-      return steamAPI ? steamAPI.localplayer.getIpCountry() : '??';
+      return steamAPI ? steamAPI.localplayer.getIpCountry() : 'Unknown';
     }
 
     export function getLevel(): number {

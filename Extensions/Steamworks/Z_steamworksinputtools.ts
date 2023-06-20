@@ -4,7 +4,7 @@ namespace gdjs {
       if (gdjs.steamworks.steamAPI) gdjs.steamworks.steamAPI.input.init();
     });
 
-    export function getControllerCount() {
+    export function getControllerCount(): integer {
       return gdjs.steamworks.steamAPI
         ? gdjs.steamworks.steamAPI.input.getControllers().length
         : 0;
@@ -13,53 +13,51 @@ namespace gdjs {
     export function activateActionSet(
       controllerIndex: number,
       actionSetName: string
-    ) {
-      if (gdjs.steamworks.steamAPI) {
-        gdjs.steamworks.steamAPI.input
-          .getControllers()
-          [controllerIndex]?.activateActionSet(
-            gdjs.steamworks.steamAPI.input.getActionSet(actionSetName)
-          );
-      }
+    ): void {
+      if (!gdjs.steamworks.steamAPI) return;
+      gdjs.steamworks.steamAPI.input
+        .getControllers()
+        [controllerIndex]?.activateActionSet(
+          gdjs.steamworks.steamAPI.input.getActionSet(actionSetName)
+        );
     }
 
     export function isDigitalActionPressed(
       controllerIndex: number,
       actionName: string
-    ) {
-      if (gdjs.steamworks.steamAPI) {
-        gdjs.steamworks.steamAPI.input
-          .getControllers()
-          [controllerIndex]?.isDigitalActionPressed(
-            gdjs.steamworks.steamAPI.input.getDigitalAction(actionName)
-          );
-      }
+    ): boolean {
+      if (!gdjs.steamworks.steamAPI) return false;
+      return gdjs.steamworks.steamAPI.input
+        .getControllers()
+        [controllerIndex]?.isDigitalActionPressed(
+          gdjs.steamworks.steamAPI.input.getDigitalAction(actionName)
+        );
     }
 
     export function getAnalogActionVectorX(
       controllerIndex: number,
       actionName: string
-    ) {
-      if (gdjs.steamworks.steamAPI) {
-        gdjs.steamworks.steamAPI.input
-          .getControllers()
-          [controllerIndex]?.getAnalogActionVector(
-            gdjs.steamworks.steamAPI.input.getAnalogAction(actionName)
-          ).x;
-      }
+    ): float {
+      return gdjs.steamworks.steamAPI
+        ? gdjs.steamworks.steamAPI.input
+            .getControllers()
+            [controllerIndex]?.getAnalogActionVector(
+              gdjs.steamworks.steamAPI.input.getAnalogAction(actionName)
+            ).x ?? 0
+        : 0;
     }
 
     export function getAnalogActionVectorY(
       controllerIndex: number,
       actionName: string
-    ) {
-      if (gdjs.steamworks.steamAPI) {
-        gdjs.steamworks.steamAPI.input
-          .getControllers()
-          [controllerIndex]?.getAnalogActionVector(
-            gdjs.steamworks.steamAPI.input.getAnalogAction(actionName)
-          ).y;
-      }
+    ): float {
+      return gdjs.steamworks.steamAPI
+        ? gdjs.steamworks.steamAPI.input
+            .getControllers()
+            [controllerIndex]?.getAnalogActionVector(
+              gdjs.steamworks.steamAPI.input.getAnalogAction(actionName)
+            ).y ?? 0
+        : 0;
     }
   }
 }

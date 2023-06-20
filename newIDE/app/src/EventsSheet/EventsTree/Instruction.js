@@ -153,7 +153,7 @@ const InstructionMissing = (props: {|
       return (
         <span className="instruction-missing">
           <Trans>
-            {functionNode} condition on behavior {behaviorNode} from{' '}
+            {functionNode} condition on behavior {behaviorNode} from
             {extensionNode} extension is missing.
           </Trans>{' '}
           {extensionStoreMention}
@@ -163,7 +163,7 @@ const InstructionMissing = (props: {|
       return (
         <span className="instruction-missing">
           <Trans>
-            {functionNode} action on behavior {behaviorNode} from{' '}
+            {functionNode} action on behavior {behaviorNode} from
             {extensionNode} extension is missing.
           </Trans>{' '}
           {extensionStoreMention}

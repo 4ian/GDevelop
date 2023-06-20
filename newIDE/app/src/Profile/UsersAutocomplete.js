@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { t } from '@lingui/macro';
-import { useDebounce } from './UseDebounce';
+import { useDebounce } from '../Utils/UseDebounce';
 import SemiControlledMultiAutoComplete, {
   type SemiControlledMultiAutoCompleteInterface,
 } from '../UI/SemiControlledMultiAutoComplete';
@@ -10,10 +10,11 @@ import {
   searchCreatorPublicProfilesByUsername,
   type UserPublicProfile,
   getUserPublicProfilesByIds,
-} from './GDevelopServices/User';
+} from '../Utils/GDevelopServices/User';
 import { type AutocompleteOption } from '../UI/SemiControlledMultiAutoComplete';
 
-import useForceUpdate from './UseForceUpdate';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import AuthenticatedUserContext from './AuthenticatedUserContext';
 
 type Props = {|
   userIds: Array<string>,
@@ -38,6 +39,17 @@ export const UsersAutocomplete = ({
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const { profile } = React.useContext<AuthenticatedUserContext>(
+    AuthenticatedUserContext
+  );
+  const completionOwnUserProfile = !!profile
+    ? [
+        {
+          text: profile.username || 'Yourself (no username)',
+          value: profile.id,
+        },
+      ]
+    : [];
   const [
     completionUserPublicProfiles,
     setCompletionUserPublicProfiles,
@@ -59,7 +71,10 @@ export const UsersAutocomplete = ({
       const userPublicProfiles = await searchCreatorPublicProfilesByUsername(
         userInput
       );
-      setCompletionUserPublicProfiles(userPublicProfiles);
+      const filteredPublicProfiles = profile
+        ? userPublicProfiles.filter(({ id }) => id !== profile.id)
+        : userPublicProfiles;
+      setCompletionUserPublicProfiles(filteredPublicProfiles);
     } catch (err) {
       setError(err);
       console.error('Could not load the users: ', err);
@@ -97,7 +112,13 @@ export const UsersAutocomplete = ({
                 userPublicProfilesByIds[userId];
               return userPublicProfile
                 ? {
-                    text: userPublicProfile.username || '(no username)',
+                    text:
+                      userPublicProfile.username ||
+                      `${
+                        !!profile && userPublicProfile.id === profile.id
+                          ? `Yourself`
+                          : `Unknown`
+                      } (no username)`,
                     value: userPublicProfile.id,
                   }
                 : null;
@@ -111,7 +132,7 @@ export const UsersAutocomplete = ({
         setLoading(false);
       }
     },
-    [userIds]
+    [userIds, profile]
   );
 
   const focusInput = React.useCallback(() => {
@@ -150,18 +171,20 @@ export const UsersAutocomplete = ({
         setUserInput(value);
       }}
       ref={autocompleteRef}
-      dataSource={completionUserPublicProfiles
-        .map((userPublicProfile: UserPublicProfile) => {
-          if (userPublicProfile.username && userPublicProfile.id) {
-            return {
-              text: userPublicProfile.username,
-              value: userPublicProfile.id,
-            };
-          }
+      dataSource={completionOwnUserProfile.concat(
+        completionUserPublicProfiles
+          .map((userPublicProfile: UserPublicProfile) => {
+            if (userPublicProfile.username && userPublicProfile.id) {
+              return {
+                text: userPublicProfile.username,
+                value: userPublicProfile.id,
+              };
+            }
 
-          return null;
-        })
-        .filter(Boolean)}
+            return null;
+          })
+          .filter(Boolean)
+      )}
       loading={loading || disabled}
       fullWidth
       error={getErrorMessage(error)}

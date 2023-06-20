@@ -2,7 +2,7 @@
 import React from 'react';
 import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
+import { UsersAutocomplete } from '../Profile/UsersAutocomplete';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';

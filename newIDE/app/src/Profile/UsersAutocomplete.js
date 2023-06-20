@@ -71,7 +71,10 @@ export const UsersAutocomplete = ({
       const userPublicProfiles = await searchCreatorPublicProfilesByUsername(
         userInput
       );
-      setCompletionUserPublicProfiles(userPublicProfiles);
+      const filteredPublicProfiles = profile
+        ? userPublicProfiles.filter(({ id }) => id !== profile.id)
+        : userPublicProfiles;
+      setCompletionUserPublicProfiles(filteredPublicProfiles);
     } catch (err) {
       setError(err);
       console.error('Could not load the users: ', err);

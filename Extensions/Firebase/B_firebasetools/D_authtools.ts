@@ -351,7 +351,7 @@ namespace gdjs {
         export const isAuthenticated = (): boolean => authenticated;
 
         /** @deprecated - Use isAuthenticated instead. */
-        export const isAuthentified = isAuthenticated
+        export const isAuthentified = isAuthenticated;
 
         /**
          * Signs the user in with basic email-password authentication.

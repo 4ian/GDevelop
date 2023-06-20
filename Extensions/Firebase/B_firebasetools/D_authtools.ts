@@ -41,7 +41,7 @@ namespace gdjs {
         /**
          * The current authentication status.
          */
-        export let authentified = false;
+        export let authenticated = false;
 
         /**
          * The logged-in users data.
@@ -345,10 +345,13 @@ namespace gdjs {
         };
 
         /**
-         * Returns true if the user is currently authentified.
-         * @see authentified
+         * Returns true if the user is currently authenticated.
+         * @see authenticated
          */
-        export const isAuthentified = (): boolean => authentified;
+        export const isAuthenticated = (): boolean => authenticated;
+
+        /** @deprecated - Use isAuthenticated instead. */
+        export const isAuthentified = isAuthenticated
 
         /**
          * Signs the user in with basic email-password authentication.
@@ -442,14 +445,14 @@ namespace gdjs {
         firebaseTools.onAppCreated.push(() => {
           firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-              authentified = true;
+              authenticated = true;
               currentUser = user;
               user.getIdToken().then(
                 // Prefetch the token
                 (token) => (_token = token)
               );
             } else {
-              authentified = false;
+              authenticated = false;
               currentUser = null;
             }
           });

@@ -598,8 +598,8 @@ namespace gdjs {
               break;
             }
             case 'connectionId': {
-              const messagegeData = messageContent.data;
-              const connectionId = messagegeData.connectionId;
+              const messageData = messageContent.data;
+              const connectionId = messageData.connectionId;
               if (!connectionId) {
                 logger.error('No connectionId received');
                 return;

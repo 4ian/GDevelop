@@ -68,14 +68,14 @@ gd::InitialInstance& InitialInstancesContainer::InsertNewInitialInstance() {
 }
 
 void InitialInstancesContainer::RemoveInstanceIf(
-    std::function<bool(const gd::InitialInstance&)> predicat) {
+    std::function<bool(const gd::InitialInstance&)> predicate) {
   // Note that we can't use erase–remove idiom here because remove_if would
   // move the instances, and the container must guarantee that
   // iterators/pointers to instances always remain valid.
   for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(),
                                                 end = initialInstances.end();
        it != end;) {
-    if (predicat(*it))
+    if (predicate(*it))
       it = initialInstances.erase(it);
     else
       ++it;

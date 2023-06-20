@@ -523,7 +523,7 @@ export const extractFilenameFromProjectResourceUrl = (url: string): string => {
   return url;
 };
 
-export const extractProjectUuidFromProjetResourceUrl = (
+export const extractProjectUuidFromProjectResourceUrl = (
   url: string
 ): string | null => {
   if (url.startsWith(GDevelopProjectResourcesStorage.baseUrl)) {

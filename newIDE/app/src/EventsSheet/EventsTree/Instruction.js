@@ -138,30 +138,58 @@ const InstructionMissing = (props: {|
   const { name, behaviorName, extensionName } = getFunctionNameFromType(
     props.instructionType
   );
-  const extensionStoreMention = hasExtensionNamed(extensionName)
-    ? ' Try installing it from the extension store.'
-    : '';
+  const extensionStoreMention = hasExtensionNamed(extensionName) ? (
+    <Trans>Try installing it from the extension store.</Trans>
+  ) : (
+    ''
+  );
+
+  const functionNode = <span className="function-name">{name}</span>;
+  const behaviorNode = <span className="behavior-name">{behaviorName}</span>;
+  const extensionNode = <span className="extension-name">{extensionName}</span>;
+
   if (behaviorName) {
-    return (
-      <span className="instruction-missing">
-        <span className="function-name">{name}</span>{' '}
-        {props.isCondition ? 'condition' : 'action'} on behavior{' '}
-        <span className="behavior-name">{behaviorName}</span> from{' '}
-        <span className="extension-name">{extensionName}</span> extension is
-        missing.
-        {extensionStoreMention}
-      </span>
-    );
+    if (props.isCondition) {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} condition on behavior {behaviorNode} from{' '}
+            {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    } else {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} action on behavior {behaviorNode} from{' '}
+            {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    }
   } else {
-    return (
-      <span className="instruction-missing">
-        <span className="function-name">{name}</span>{' '}
-        {props.isCondition ? 'condition' : 'action'} from{' '}
-        <span className="extension-name">{extensionName}</span> extension is
-        missing.
-        {extensionStoreMention}
-      </span>
-    );
+    if (props.isCondition) {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} condition from {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    } else {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} action from {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    }
   }
 };
 

@@ -280,7 +280,7 @@ namespace gdjs {
      * To implement this in your object:
      * * Set `gdjs.YourRuntimeObject.supportsReinitialization = true;` to declare support for recycling.
      * * Implement `reinitialize`. It **must** call the `reinitialize` of `gdjs.RuntimeObject`, and call `this.onCreated();`
-     * at the end of `reinitizalize`.
+     * at the end of `reinitialize`.
      * * It must reset the object as if it was newly constructed (be careful about your renderers and any global state).
      * * The `_runtimeScene`, `_nameId`, `name` and `type` are guaranteed to stay the same and do not
      * need to be set again.

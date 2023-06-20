@@ -39,9 +39,7 @@ export const UsersAutocomplete = ({
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const { profile } = React.useContext<AuthenticatedUserContext>(
-    AuthenticatedUserContext
-  );
+  const { profile } = React.useContext(AuthenticatedUserContext);
   const completionOwnUserProfile = !!profile
     ? [
         {

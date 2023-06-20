@@ -65,14 +65,12 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
-    setShowObjectInstancesIn3D,
+    setUse3DEditor,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
   } = React.useContext(PreferencesContext);
 
-  const initialShowObjectInstancesIn3D = React.useRef<boolean>(
-    values.showObjectInstancesIn3D
-  );
+  const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
 
   return (
     <Dialog
@@ -356,13 +354,12 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             }
           />
           <Toggle
-            onToggle={(e, check) => setShowObjectInstancesIn3D(check)}
-            toggled={values.showObjectInstancesIn3D}
+            onToggle={(e, check) => setUse3DEditor(check)}
+            toggled={values.use3DEditor}
             labelPosition="right"
             label={<Trans>Show objects in 3D in the scene editor</Trans>}
           />
-          {initialShowObjectInstancesIn3D.current !==
-            values.showObjectInstancesIn3D && (
+          {initialUse3DEditor.current !== values.use3DEditor && (
             <AlertMessage kind="info">
               <Trans>
                 For the 3D change to take effect, close and reopen all currently

@@ -39,6 +39,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
+import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
+import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -128,6 +130,69 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
+const InstructionMissing = (props: {|
+  instructionType: string,
+  isCondition: boolean,
+|}) => {
+  const { hasExtensionNamed } = React.useContext(ExtensionStoreContext);
+  const { name, behaviorName, extensionName } = getFunctionNameFromType(
+    props.instructionType
+  );
+  const extensionStoreMention = hasExtensionNamed(extensionName) ? (
+    <Trans>Try installing it from the extension store.</Trans>
+  ) : (
+    ''
+  );
+
+  const functionNode = <span className="function-name">{name}</span>;
+  const behaviorNode = <span className="behavior-name">{behaviorName}</span>;
+  const extensionNode = <span className="extension-name">{extensionName}</span>;
+
+  if (behaviorName) {
+    if (props.isCondition) {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} condition on behavior {behaviorNode} from
+            {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    } else {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} action on behavior {behaviorNode} from
+            {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    }
+  } else {
+    if (props.isCondition) {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} condition from {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    } else {
+      return (
+        <span className="instruction-missing">
+          <Trans>
+            {functionNode} action from {extensionNode} extension is missing.
+          </Trans>{' '}
+          {extensionStoreMention}
+        </span>
+      );
+    }
+  }
+};
+
 const Instruction = (props: Props) => {
   const {
     instruction,
@@ -187,6 +252,15 @@ const Instruction = (props: Props) => {
             parameterIndex >= 0 && parameterIndex < parametersCount;
 
           if (!isParameter) {
+            if (value === 'Unknown or unsupported instruction') {
+              return (
+                <InstructionMissing
+                  instructionType={instruction.getType()}
+                  isCondition={isCondition}
+                  key={`unknown-behavior-instruction-${i}`}
+                />
+              );
+            }
             return <span key={i}>{i === 0 ? capitalize(value) : value}</span>;
           }
 

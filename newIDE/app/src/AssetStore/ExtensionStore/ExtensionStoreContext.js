@@ -33,6 +33,7 @@ type ExtensionStoreState = {|
   setChosenCategory: string => void,
   extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
   filtersState: FiltersState,
+  hasExtensionNamed: (extensionName: string) => boolean,
 |};
 
 export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
@@ -54,6 +55,7 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
     chosenCategory: null,
     setChosenCategory: () => {},
   },
+  hasExtensionNamed: () => false,
 });
 
 type ExtensionStoreStateProviderProps = {|
@@ -183,6 +185,13 @@ export const ExtensionStoreStateProvider = ({
     defaultFirstSearchItemIds: firstExtensionIds,
   });
 
+  const hasExtensionNamed = React.useCallback(
+    (extensionName: string) => {
+      return !!extensionShortHeadersByName[extensionName];
+    },
+    [extensionShortHeadersByName]
+  );
+
   const extensionStoreState = React.useMemo(
     () => ({
       searchResults,
@@ -196,6 +205,7 @@ export const ExtensionStoreStateProvider = ({
       setSearchText,
       extensionShortHeadersByName,
       filtersState,
+      hasExtensionNamed,
     }),
     [
       searchResults,
@@ -208,6 +218,7 @@ export const ExtensionStoreStateProvider = ({
       extensionShortHeadersByName,
       filtersState,
       fetchExtensionsAndFilters,
+      hasExtensionNamed,
     ]
   );
 

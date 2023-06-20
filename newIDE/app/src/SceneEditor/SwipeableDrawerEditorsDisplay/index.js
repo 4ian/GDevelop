@@ -254,7 +254,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               props.instancesEditorShortcutsCallbacks
             }
             pauseRendering={!props.isActive}
-            showObjectInstancesIn3D={values.showObjectInstancesIn3D}
+            showObjectInstancesIn3D={values.use3DEditor}
           />
           <div style={styles.bottomContainer}>
             <SwipeableDrawer

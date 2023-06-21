@@ -78,6 +78,7 @@ export type InAppTutorialFlowStepFormattedTrigger =
 export type InAppTutorialTooltip = {|
   standalone?: true,
   placement?: 'bottom' | 'left' | 'right' | 'top',
+  mobilePlacement?: 'bottom' | 'left' | 'right' | 'top',
   title?: TranslatedText,
   description?: TranslatedText,
   touchDescription?: TranslatedText,

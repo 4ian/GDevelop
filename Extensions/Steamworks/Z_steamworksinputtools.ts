@@ -27,7 +27,7 @@ namespace gdjs {
       actionName: string
     ): boolean {
       if (!gdjs.steamworks.steamAPI) return false;
-      return gdjs.steamworks.steamAPI.input
+      return !!gdjs.steamworks.steamAPI.input
         .getControllers()
         [controllerIndex]?.isDigitalActionPressed(
           gdjs.steamworks.steamAPI.input.getDigitalAction(actionName)

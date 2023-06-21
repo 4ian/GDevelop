@@ -319,6 +319,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "First, let's find a border for our **scene**.",
@@ -508,6 +509,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's find an **object** that we can throw.",
@@ -652,6 +654,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's find a target to aim.",
@@ -795,6 +798,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Finally let's find something to protect $(target).",
@@ -1473,7 +1477,8 @@
             "ar": "تثبيت الملحق في مشروعك."
           }
         },
-        "placement": "left"
+        "placement": "left",
+        "mobilePlacement": "top"
       },
       "isOnClosableDialog": true
     },
@@ -1685,6 +1690,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Let's find a background for our game.",
@@ -1871,6 +1877,26 @@
       }
     },
     {
+      "elementToHighlightId": "#toolbar-open-properties-panel-button",
+      "skippable": true,
+      "nextStepTrigger": {
+        "presenceOfElement": "#instance-properties-editor"
+      },
+      "tooltip": {
+        "description": {
+          "messageByLocale": {
+            "en": "Open the **instance** properties editor panel and select the instance of $(grabArea) on the scene.",
+            "fr": "Ouvrez le panneau d'édition des propriétés de **l'instance** et sélectionnez l'instance de $(grabArea) sur la scène.",
+            "es": "Abre el panel de edición de propiedades de **la instancia** y selecciona la instancia de $(grabArea) en la escena.",
+            "pt": "Abra o painel de edição de propriedades da **instância** e selecione a instância de $(grabArea) na cena.",
+            "th": "เปิดแผงควบคุมสำหรับแก้ไขคุณสมบัติ **instance** และเลือก instance ของ $(grabArea) ใน scence",
+            "ar": "فتح لوحة خصائص **المثيل** وتحديد مثيل الـ $(grabArea) على الشاشة."
+          }
+        },
+        "placement": "bottom"
+      }
+    },
+    {
       "elementToHighlightId": "#instance-properties-editor [id=\"Z Order\"]",
       "nextStepTrigger": {
         "valueEquals": "-1"
@@ -1886,7 +1912,8 @@
             "ar": "تغيير ترتيب $(background) إلى **-1** حيث يكون خلف كل **المثيلات** الأخرى في **المشهد**."
           }
         },
-        "placement": "right"
+        "placement": "right",
+        "mobilePlacement": "top"
       }
     },
     {
@@ -1917,6 +1944,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Let's add some protection for $(target).",
@@ -2186,6 +2214,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's create a winning message!",
@@ -2953,7 +2982,8 @@
             "ar": "التحقق أنه تم تحديد $(grabArea) مع تغيير قيمته إلى **0**."
           }
         },
-        "placement": "right"
+        "placement": "right",
+        "mobilePlacement": "top"
       }
     },
     {
@@ -3539,7 +3569,8 @@
             "ar": "النقر هنا."
           }
         },
-        "placement": "right"
+        "placement": "right",
+        "mobilePlacement": "bottom"
       },
       "mapProjectData": {
         "startScene": "projectLastSceneName"
@@ -3642,6 +3673,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Now let's create a title!",
@@ -4284,6 +4316,7 @@
       },
       "tooltip": {
         "placement": "left",
+        "mobilePlacement": "top",
         "description": {
           "messageByLocale": {
             "en": "Let's create a text that will display the player score.",
@@ -4725,6 +4758,7 @@
       "nextStepTrigger": {
         "valueEquals": "="
       },
+      "skippable": true,
       "tooltip": {
         "description": {
           "messageByLocale": {

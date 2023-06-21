@@ -703,11 +703,7 @@ const InAppTutorialOrchestrator = React.forwardRef<
         const { nextStepTrigger, elementToHighlightId } = currentStep;
         if (nextStepTrigger && nextStepTrigger.valueEquals) {
           if (!elementToHighlightId) return;
-          const elementToWatch = document.querySelector(elementToHighlightId);
-
-          if (elementToWatch) {
-            inputExpectedValueRef.current = nextStepTrigger.valueEquals;
-          }
+          inputExpectedValueRef.current = nextStepTrigger.valueEquals;
           setElementWithValueToWatchIfEquals(elementToHighlightId);
         } else if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
           if (!elementToHighlightId) return;

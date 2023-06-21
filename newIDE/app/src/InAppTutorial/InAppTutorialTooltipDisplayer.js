@@ -327,7 +327,10 @@ const InAppTutorialTooltipDisplayer = ({
 
   const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
-  const placement = tooltip.placement || 'bottom';
+  const placement =
+    screenWidth === 'small' && tooltip.mobilePlacement
+      ? tooltip.mobilePlacement
+      : tooltip.placement || 'bottom';
   const backgroundColor =
     paletteType === 'light'
       ? '#EBEBED' // Grey10

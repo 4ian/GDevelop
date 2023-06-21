@@ -282,7 +282,12 @@ const NewProjectSetupDialog = ({
       if (selectedExampleShortHeader) {
         await onCreateFromExample(
           selectedExampleShortHeader,
-          projectSetup,
+          {
+            // We only pass down the project name as this is the only cusomizable field for an example.
+            projectName,
+            storageProvider,
+            saveAsLocation,
+          },
           i18n
         );
       } else if (allowPlayersToLogIn) {

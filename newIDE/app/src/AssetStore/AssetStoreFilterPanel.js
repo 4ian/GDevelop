@@ -307,7 +307,7 @@ export const AssetStoreFilterPanel = ({
           { label: t`Sprite`, value: 'sprite' },
           { label: t`Tiled sprite`, value: 'tiled' },
           { label: t`Panel sprite`, value: '9patch' },
-          { label: t`3D model`, value: 'model3D' },
+          { label: t`3D model`, value: 'Scene3D::Model3DObject' },
         ]}
         values={assetFiltersState.objectTypeFilter.objectTypes}
         setValues={values => {

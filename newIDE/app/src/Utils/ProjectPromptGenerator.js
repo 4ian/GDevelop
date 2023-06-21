@@ -92,7 +92,7 @@ const places = [
   'space station',
 ];
 
-const things = [
+const collectables = [
   'coins',
   'treasure',
   'gems',
@@ -118,14 +118,34 @@ const goals = [
   'the weapon',
 ];
 
+const gameTypes = [
+  'platformer',
+  'top-down',
+  'side-shooter',
+  'twinstick-shooter',
+  'flappy-bird',
+  'endless-runner',
+  'megaman',
+];
+
+const startWithVowel = word =>
+  ['a', 'e', 'i', 'o', 'u'].includes(word[0].toLowerCase());
+const formatWordWithAdaptedDeterminer = (word: string) =>
+  `${startWithVowel(word) ? 'an' : 'a'} ${word}`;
+
 const generatePrompt = (): string => {
+  const gameType = sample(gameTypes);
   const mainCharacter = sample(mainCharacters);
-  const startWithVowel = ['a', 'e', 'i', 'o', 'u'].includes(
-    mainCharacter[0].toLowerCase()
-  );
-  return `${startWithVowel ? 'an' : 'a'} ${mainCharacter} in a ${sample(
-    places
-  )} collecting ${sample(things)} and trying to reach ${sample(goals)}`;
+  const place = sample(places);
+  const collectable = sample(collectables);
+  const goal = sample(goals);
+  return `${formatWordWithAdaptedDeterminer(
+    gameType
+  )} game with ${formatWordWithAdaptedDeterminer(
+    mainCharacter
+  )} in ${formatWordWithAdaptedDeterminer(
+    place
+  )} collecting ${collectable} and trying to reach ${goal}`;
 };
 
 export default generatePrompt;

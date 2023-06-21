@@ -249,7 +249,7 @@ namespace gdjs {
     }
 
     static NORMALPLATFORM = 0;
-    /** @deprecated - Use  NORMALPLATFORM instead. */
+    /** @deprecated Use NORMALPLATFORM instead. */
     static NORMALPLAFTORM = PlatformRuntimeBehavior.NORMALPLATFORM;
     static JUMPTHRU = 1;
     static LADDER = 2;

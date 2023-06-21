@@ -1,6 +1,7 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "files.associations": {
+        "*.ldtk": "json",
         "*.idl": "java",
         "Fastfile": "ruby",
         "iosfwd": "cpp",
@@ -110,7 +111,13 @@
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
         "xmemory0": "cpp",
-        "memory_resource": "cpp"
+        "memory_resource": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

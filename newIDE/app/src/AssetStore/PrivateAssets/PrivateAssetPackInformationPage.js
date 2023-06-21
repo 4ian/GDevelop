@@ -49,7 +49,7 @@ const sortedContentType = [
   'particleEmitter',
   'font',
   'audio',
-  'model3D',
+  'Scene3D::Model3DObject',
   'partial',
 ];
 
@@ -57,7 +57,7 @@ const contentTypeToMessageDescriptor = {
   sprite: t`Sprites`,
   '9patch': t`Panel sprites`,
   tiled: t`Tiled sprites`,
-  model3D: t`3D model`,
+  'Scene3D::Model3DObject': t`3D model`,
   particleEmitter: t`Particle emitters`,
   font: t`Fonts`,
   audio: t`Audios`,

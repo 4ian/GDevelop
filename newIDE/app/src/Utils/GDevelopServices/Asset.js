@@ -89,7 +89,7 @@ type PrivateAssetPackAssetType =
   | 'tiled'
   | 'partial'
   | 'particleEmitter'
-  | 'model3D';
+  | 'Scene3D::Model3DObject';
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 

@@ -614,10 +614,10 @@ module.exports = {
         .setType('choice')
         .addExtraInfo('Y')
         .addExtraInfo('Z')
-        .setLabel(_('How to set up the face orientation'))
+        .setLabel(_('Faces orientation'))
         .setDescription(
           _(
-            'When set to Z, the left, right and top faces are oriented so that their up side is towards the player. When set to Y, those same faces are oriented towards the top of the screen.'
+            'Either the top of the texture will be at the edge touching the **top face** (Y) or the **front face** (Z).'
           )
         )
         .setGroup(_('Face orientation'));
@@ -668,9 +668,10 @@ module.exports = {
         .setType('choice')
         .addExtraInfo('X')
         .addExtraInfo('Y')
-        .setLabel(
+        .setLabel(_('Back face orientation'))
+        .setDescription(
           _(
-            'Rotation axis around which to get to the back face with the right way up.'
+            'Either the top of the texture will be at the edge touching the **top face** (Y) or the **bottom face** (X).'
           )
         )
         .setGroup(_('Textures'));

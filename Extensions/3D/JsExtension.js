@@ -617,7 +617,7 @@ module.exports = {
         .setLabel(_('Faces orientation'))
         .setDescription(
           _(
-            'Either the top of the texture will be at the edge touching the **top face** (Y) or the **front face** (Z).'
+            'The top of each image can touch the **top face** (Y) or the **front face** (Z).'
           )
         )
         .setGroup(_('Face orientation'));
@@ -671,7 +671,7 @@ module.exports = {
         .setLabel(_('Back face orientation'))
         .setDescription(
           _(
-            'Either the top of the texture will be at the edge touching the **top face** (Y) or the **bottom face** (X).'
+            'The top of the image can touch the **top face** (Y) or the **bottom face** (X).'
           )
         )
         .setGroup(_('Textures'));

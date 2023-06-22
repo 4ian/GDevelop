@@ -188,7 +188,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
 
   const selectInstances = React.useCallback(
     (instances: Array<gdInitialInstance>, multiSelect: boolean) => {
-      onSelectInstances(instances, multiSelect);
+      onSelectInstances(instances, multiSelect, 'upperCenter');
       forceUpdateInstancesList();
       forceUpdateInstancesPropertiesEditor();
     },

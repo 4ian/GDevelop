@@ -985,7 +985,10 @@ export default class InstancesEditor extends Component<Props> {
     this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
   };
 
-  centerViewOnLastInstance = (instances: Array<gdInitialInstance>) => {
+  centerViewOnLastInstance = (
+    instances: Array<gdInitialInstance>,
+    offset?: ?[number, number]
+  ) => {
     if (instances.length === 0) return;
 
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
@@ -994,6 +997,7 @@ export default class InstancesEditor extends Component<Props> {
       new Rectangle()
     );
     this.fitViewToRectangle(lastInstanceRectangle, { adaptZoom: false });
+    if (offset) this.scrollBy(offset[0], offset[1]);
   };
 
   getLastContextMenuSceneCoordinates = () => {

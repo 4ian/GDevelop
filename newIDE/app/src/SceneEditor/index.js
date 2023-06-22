@@ -641,7 +641,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onSelectInstances = (
     instances: Array<gdInitialInstance>,
-    multiSelect: boolean
+    multiSelect: boolean,
+    targetPosition?: 'center' | 'upperCenter'
   ) => {
     this.instancesSelection.selectInstances({
       instances,
@@ -649,9 +650,16 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
       ignoreSeal: true,
     });
+    if (this.editorDisplay) {
+      let offset = null;
+      const { viewControls } = this.editorDisplay;
+      const viewPosition = viewControls.getViewPosition();
+      if (viewPosition && targetPosition === 'upperCenter') {
+        offset = [0, viewPosition.toSceneScale(viewPosition.getHeight() / 4)];
+      }
 
-    if (this.editorDisplay)
-      this.editorDisplay.viewControls.centerViewOnLastInstance(instances);
+      viewControls.centerViewOnLastInstance(instances, offset);
+    }
     this.updateToolbar();
   };
 

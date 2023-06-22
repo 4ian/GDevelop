@@ -25,7 +25,8 @@ export type SceneEditorsDisplayProps = {|
   selectedLayer: string,
   onSelectInstances: (
     instances: Array<gdInitialInstance>,
-    multiSelect: boolean
+    multiSelect: boolean,
+    targetPosition?: 'center' | 'upperCenter'
   ) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
@@ -131,7 +132,10 @@ export type SceneEditorsDisplayInterface = {|
     zoomToInitialPosition: () => void,
     zoomToFitContent: () => void,
     zoomToFitSelection: (Array<gdInitialInstance>) => void,
-    centerViewOnLastInstance: (Array<gdInitialInstance>) => void,
+    centerViewOnLastInstance: (
+      Array<gdInitialInstance>,
+      offset?: ?[number, number]
+    ) => void,
     getLastCursorSceneCoordinates: () => [number, number],
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,

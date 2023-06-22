@@ -70,7 +70,8 @@
           "x64",
           "arm64"
         ]
-      }
+      },
+      "signIgnore": ["node_modules/steamworks.js"]
     },
     "win": {
       "executableName": "GDevelop"

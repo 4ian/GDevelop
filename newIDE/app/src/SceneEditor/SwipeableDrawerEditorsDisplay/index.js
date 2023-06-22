@@ -98,7 +98,8 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
         }
       } else {
         setSelectedEditorId(editorId || null);
-        setDrawerOpeningState('half-opened');
+        if (drawerOpeningState === 'closed')
+          setDrawerOpeningState('half-opened');
       }
     },
     [selectedEditorId, drawerOpeningState]

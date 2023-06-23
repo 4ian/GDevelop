@@ -29,6 +29,11 @@ import { ExternalEditorOpenedDialog } from '../UI/ExternalEditorOpenedDialog';
 import Add from '../UI/CustomSvgIcons/Add';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Cross from '../UI/CustomSvgIcons/Cross';
+import {
+  registerOnResourcesChangedCallback,
+  unregisterOnResourcesChangedCallback,
+  onResourcesChanged,
+} from '../MainFrame/ResourcesManagementCallbacks';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -61,6 +66,7 @@ type State = {|
 |};
 
 export default class ResourceSelector extends React.Component<Props, State> {
+  onResourcesChangedCallbackId: string;
   constructor(props: Props) {
     super(props);
 
@@ -74,6 +80,10 @@ export default class ResourceSelector extends React.Component<Props, State> {
     if (project) {
       this._loadFrom(project.getResourcesManager());
     }
+
+    this.onResourcesChangedCallbackId = registerOnResourcesChangedCallback(
+      this.refreshResources
+    );
   }
 
   allResourcesNames: Array<string>;
@@ -92,6 +102,18 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
     }
   }
+
+  componentWillUnmount() {
+    unregisterOnResourcesChangedCallback(this.onResourcesChangedCallbackId);
+  }
+
+  refreshResources = () => {
+    const { project } = this.props;
+    if (project) {
+      this._loadFrom(project.getResourcesManager());
+      this.forceUpdate();
+    }
+  };
 
   _getResourceSourceItems(): DataSource {
     const { resourceManagementProps } = this.props;
@@ -184,6 +206,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       resources.forEach(resource => resource.delete());
 
       await resourceManagementProps.onFetchNewlyAddedResources();
+      onResourcesChanged();
     } catch (err) {
       // Should never happen, errors should be shown in the interface.
       console.error('Unable to choose a resource', err);
@@ -259,6 +282,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
       this.props.onChange(resources[0].name);
       this._loadFrom(resourcesManager);
+      onResourcesChanged();
       this.forceUpdate();
     } catch (error) {
       this.setState({ externalEditorOpened: false });

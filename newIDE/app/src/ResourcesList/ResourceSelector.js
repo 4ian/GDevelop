@@ -33,7 +33,7 @@ import {
   registerOnResourcesChangedCallback,
   unregisterOnResourcesChangedCallback,
   onResourcesChanged,
-} from '../MainFrame/ResourcesManagementCallbacks';
+} from './ResourcesManagementCallbacks';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },

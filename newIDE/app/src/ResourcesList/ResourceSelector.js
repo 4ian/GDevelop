@@ -340,7 +340,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         {({ i18n }) => (
           <ResponsiveLineStackLayout noMargin expand alignItems="center">
             <Column expand noMargin>
-              <LineStackLayout expand noMargin>
+              <LineStackLayout expand noMargin alignItems="center">
                 <SemiControlledAutoComplete
                   style={props.style}
                   textFieldStyle={styles.textFieldStyle}

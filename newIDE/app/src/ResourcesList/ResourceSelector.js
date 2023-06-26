@@ -73,12 +73,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
-    const [allResourcesNames, setAllResourcesNames] = React.useState<
-      Array<string>
-    >([]);
-    const [notExistingError, setNotExistingError] = React.useState<boolean>(
-      false
-    );
+    const allResourcesNamesRef = React.useRef<Array<string>>([]);
+    const [notFoundError, setNotFoundError] = React.useState<boolean>(false);
     const [resourceName, setResourceName] = React.useState<string>(
       props.initialResourceName
     );
@@ -106,7 +102,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const onResetResourceName = React.useCallback(
       () => {
         setResourceName('');
-        setNotExistingError(false);
+        setNotFoundError(false);
         if (onChange) onChange('');
       },
       [onChange]
@@ -118,17 +114,16 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           onResetResourceName();
           return;
         }
+        const isMissing =
+          allResourcesNamesRef.current.indexOf(newResourceName) === -1;
 
-        const newNotExistingError =
-          allResourcesNames.indexOf(newResourceName) === -1;
-
-        if (!newNotExistingError) {
+        if (!isMissing) {
           if (onChange) onChange(newResourceName);
         }
         setResourceName(newResourceName);
-        setNotExistingError(newNotExistingError);
+        setNotFoundError(isMissing);
       },
-      [onChange, onResetResourceName, allResourcesNames]
+      [onChange, onResetResourceName]
     );
 
     const loadFrom = React.useCallback(
@@ -155,7 +150,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
             );
           }
 
-          setAllResourcesNames(mainResourcesNames);
+          allResourcesNamesRef.current = mainResourcesNames;
         }
       },
       [resourceKind, fallbackResourceKind]
@@ -169,6 +164,13 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         }
       },
       [project, forceUpdate, loadFrom]
+    );
+
+    React.useEffect(
+      refreshResources,
+      // Reload resources when loadFrom - and refreshResources - is updated, that's to say
+      // when resourceKind or fallbackResourceKind is updated, or when the project changes.
+      [refreshResources]
     );
 
     // Transfer responsibility of refreshing project resources to this hook.
@@ -253,15 +255,6 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [addFrom, resourceManagementProps, resourceKind]
     );
 
-    React.useEffect(
-      () => {
-        loadFrom(project.getResourcesManager());
-      },
-      // Reload resources when loadFrom is updated, that's to say when resourceKind
-      // or fallbackResourceKind is updated - or when the project changes.
-      [project, loadFrom]
-    );
-
     const editWith = React.useCallback(
       async (
         i18n: I18nType,
@@ -327,7 +320,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       ]
     );
 
-    const errorText = notExistingError ? (
+    const errorText = notFoundError ? (
       <Trans>This resource does not exist in the game</Trans>
     ) : null;
 
@@ -336,7 +329,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     );
 
     const resourceSourceItems = getResourceSourceItems();
-    const resourceItems = allResourcesNames.map(resourceName => ({
+    const resourceItems = allResourcesNamesRef.current.map(resourceName => ({
       text: resourceName,
       value: resourceName,
     }));

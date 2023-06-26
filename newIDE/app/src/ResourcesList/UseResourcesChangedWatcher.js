@@ -12,11 +12,12 @@ const getProjectCallbacks = (project: gdProject): ?ProjectCallbacks => {
   return callbacksPerProject[project.ptr.toString()];
 };
 const getOrCreateProjectCallbacks = (project: gdProject): ProjectCallbacks => {
-  if (callbacksPerProject.hasOwnProperty(project.ptr.toString())) {
-    return callbacksPerProject[project.ptr.toString()];
+  const projectPtrAsString = project.ptr.toString();
+  if (callbacksPerProject.hasOwnProperty(projectPtrAsString)) {
+    return callbacksPerProject[projectPtrAsString];
   }
-  callbacksPerProject[project.ptr.toString()] = {};
-  return callbacksPerProject[project.ptr.toString()];
+  callbacksPerProject[projectPtrAsString] = {};
+  return callbacksPerProject[projectPtrAsString];
 };
 
 type Props = {| project: gdProject, callback: () => any |};

@@ -70,11 +70,6 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       onChange,
     } = props;
     const forceUpdate = useForceUpdate();
-    const {
-      registerOnResourcesChangedCallback,
-      unregisterOnResourcesChangedCallback,
-      onResourcesChanged,
-    } = useResourcesChangedWatcher({ project });
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
@@ -166,6 +161,22 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [resourceKind, fallbackResourceKind]
     );
 
+    const refreshResources = React.useCallback(
+      () => {
+        if (project) {
+          loadFrom(project.getResourcesManager());
+          forceUpdate();
+        }
+      },
+      [project, forceUpdate, loadFrom]
+    );
+
+    // Transfer responsibility of refreshing project resources to this hook.
+    const { triggerResourcesHaveChanged } = useResourcesChangedWatcher({
+      project,
+      callback: refreshResources,
+    });
+
     const addFrom = React.useCallback(
       async (source: ResourceSource) => {
         try {
@@ -185,9 +196,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           // the case, no new resource will be added.
           project.getResourcesManager().addResource(resource);
 
-          loadFrom(project.getResourcesManager());
           const resourceName: string = resource.getName();
-          onChangeResourceName(resourceName);
 
           // Imperatively set the value of the autoComplete, as it can be (on Windows for example),
           // still focused. This means that when it's then getting blurred, the value we
@@ -200,7 +209,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           resources.forEach(resource => resource.delete());
 
           await resourceManagementProps.onFetchNewlyAddedResources();
-          onResourcesChanged();
+          triggerResourcesHaveChanged();
+          onChangeResourceName(resourceName);
         } catch (err) {
           // Should never happen, errors should be shown in the interface.
           console.error('Unable to choose a resource', err);
@@ -211,8 +221,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         resourceManagementProps,
         resourceKind,
         onChangeResourceName,
-        loadFrom,
-        onResourcesChanged,
+        triggerResourcesHaveChanged,
       ]
     );
 
@@ -244,16 +253,6 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [addFrom, resourceManagementProps, resourceKind]
     );
 
-    const refreshResources = React.useCallback(
-      () => {
-        if (project) {
-          loadFrom(project.getResourcesManager());
-          forceUpdate();
-        }
-      },
-      [project, forceUpdate, loadFrom]
-    );
-
     React.useEffect(
       () => {
         loadFrom(project.getResourcesManager());
@@ -261,23 +260,6 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       // Reload resources when loadFrom is updated, that's to say when resourceKind
       // or fallbackResourceKind is updated - or when the project changes.
       [project, loadFrom]
-    );
-
-    React.useEffect(
-      () => {
-        const resourcesChangedCallbackId = registerOnResourcesChangedCallback(
-          refreshResources
-        );
-        return () => {
-          unregisterOnResourcesChangedCallback(resourcesChangedCallbackId);
-        };
-      },
-      // Subscribe to any resource change at startup (with clean up).
-      [
-        refreshResources,
-        registerOnResourcesChangedCallback,
-        unregisterOnResourcesChangedCallback,
-      ]
     );
 
     const editWith = React.useCallback(
@@ -319,8 +301,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           ]);
 
           onChange(resources[0].name);
-          loadFrom(resourcesManager);
-          onResourcesChanged();
+          triggerResourcesHaveChanged();
           forceUpdate();
         } catch (error) {
           setExternalEditorOpened(false);
@@ -337,13 +318,12 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       },
       [
         forceUpdate,
-        loadFrom,
         onChange,
         project,
         resourceManagementProps,
         resourceName,
         resourcesLoader,
-        onResourcesChanged,
+        triggerResourcesHaveChanged,
       ]
     );
 

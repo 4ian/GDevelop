@@ -19,12 +19,12 @@ const getOrCreateProjectCallbacks = (project: gdProject): ProjectCallbacks => {
   return callbacksPerProject[project.ptr.toString()];
 };
 
-type Props = {| project: gdProject |};
+type Props = {| project: gdProject, callback: () => any |};
 
 /**
  * Hook used to synchronize different components displaying a project's resources.
  */
-const useResourcesChangedWatcher = ({ project }: Props) => {
+const useResourcesChangedWatcher = ({ project, callback }: Props) => {
   const registerOnResourcesChangedCallback = React.useCallback(
     (callback: () => any) => {
       const projectCallbacks = getOrCreateProjectCallbacks(project);
@@ -44,7 +44,7 @@ const useResourcesChangedWatcher = ({ project }: Props) => {
     [project]
   );
 
-  const onResourcesChanged = React.useCallback(
+  const triggerResourcesHaveChanged = React.useCallback(
     () => {
       const projectCallbacks = getProjectCallbacks(project);
       if (!projectCallbacks) return;
@@ -56,10 +56,26 @@ const useResourcesChangedWatcher = ({ project }: Props) => {
     },
     [project]
   );
+
+  React.useEffect(
+    () => {
+      const resourcesChangedCallbackId = registerOnResourcesChangedCallback(
+        callback
+      );
+      return () => {
+        unregisterOnResourcesChangedCallback(resourcesChangedCallbackId);
+      };
+    },
+    // Subscribe to any resource change at startup (with clean up).
+    [
+      callback,
+      registerOnResourcesChangedCallback,
+      unregisterOnResourcesChangedCallback,
+    ]
+  );
+
   return {
-    registerOnResourcesChangedCallback,
-    unregisterOnResourcesChangedCallback,
-    onResourcesChanged,
+    triggerResourcesHaveChanged,
   };
 };
 

@@ -7,6 +7,9 @@ type Props = {|
   onSwipeDown: () => void,
 |};
 
+const minMovement = 30; // px
+const minSpeed = 200; // px/s
+
 const useSwipeGesture = (props: Props) => {
   const startTimeRef = React.useRef<?number>(null);
   const startYRef = React.useRef<?number>(null);
@@ -25,8 +28,8 @@ const useSwipeGesture = (props: Props) => {
       const deltaY = event.changedTouches[0].clientY - startY;
       const deltaTimeInSeconds = (Date.now() - startTime) / 1000;
       if (
-        Math.abs(deltaY) > 30 &&
-        Math.abs(deltaY) / deltaTimeInSeconds > 200
+        Math.abs(deltaY) > minMovement &&
+        Math.abs(deltaY) / deltaTimeInSeconds > minSpeed
       ) {
         if (deltaY < 0) props.onSwipeUp();
         else props.onSwipeDown();

@@ -17,6 +17,14 @@ import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 const gd = global.gd;
 
+const minimumWidths = {
+  table: 400,
+  objectName: 80,
+  icon: 40,
+  numberProperty: 40,
+  layerName: 50,
+};
+
 type State = {|
   searchText: string,
   sortBy: string,
@@ -248,49 +256,64 @@ export default class InstancesList extends Component<Props, State> {
                     sort={this._sort}
                     sortBy={sortBy}
                     sortDirection={sortDirection}
-                    width={Math.max(width, 400)}
+                    width={Math.max(width, minimumWidths.table)}
                   >
                     <RVColumn
                       label={<Trans>Object name</Trans>}
                       dataKey="name"
-                      width={Math.max(width * 0.35, 80)}
+                      width={Math.max(width * 0.35, minimumWidths.objectName)}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label=""
                       dataKey="locked"
-                      width={Math.max(width * 0.05, 40)}
+                      width={Math.max(
+                        width * 0.05,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                       cellRenderer={this._renderLockCell}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}
                       dataKey="x"
-                      width={Math.max(width * 0.1, 40)}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Y</Trans>}
                       dataKey="y"
-                      width={Math.max(width * 0.1, 40)}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Angle</Trans>}
                       dataKey="angle"
-                      width={Math.max(width * 0.1, 40)}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Layer</Trans>}
                       dataKey="layer"
-                      width={Math.max(width * 0.2, 50)}
+                      width={Math.max(width * 0.2, minimumWidths.layerName)}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Z Order</Trans>}
                       dataKey="zOrder"
-                      width={Math.max(width * 0.1, 40)}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                   </RVTable>

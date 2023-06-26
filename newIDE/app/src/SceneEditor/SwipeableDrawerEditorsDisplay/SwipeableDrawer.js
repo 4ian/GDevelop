@@ -89,7 +89,7 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
   );
 };
 
-type DrawerOpeningState = 'closed' | 'half-opened' | 'opened';
+type DrawerOpeningState = 'closed' | 'halfOpen' | 'open';
 
 type Props = {|
   maxHeight: number,
@@ -105,7 +105,7 @@ const SwipeableDrawer = (props: Props) => {
   const height =
     openingState === 'closed'
       ? 0
-      : openingState === 'half-opened'
+      : openingState === 'halfOpen'
       ? props.maxHeight / 2.4
       : props.maxHeight - topMargin;
   const display = openingState === 'closed' ? 'none' : 'flex';
@@ -115,11 +115,11 @@ const SwipeableDrawer = (props: Props) => {
         title={props.title}
         onClick={() => setOpeningState('closed')}
         onSwipeUp={() => {
-          if (openingState === 'half-opened') setOpeningState('opened');
+          if (openingState === 'halfOpen') setOpeningState('open');
         }}
         onSwipeDown={() => {
-          if (openingState === 'half-opened') setOpeningState('closed');
-          else if (openingState === 'opened') setOpeningState('half-opened');
+          if (openingState === 'halfOpen') setOpeningState('closed');
+          else if (openingState === 'open') setOpeningState('halfOpen');
         }}
         controls={props.topBarControls}
       />

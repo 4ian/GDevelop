@@ -106,7 +106,7 @@ const SwipeableDrawer = (props: Props) => {
     openingState === 'closed'
       ? 0
       : openingState === 'halfOpen'
-      ? props.maxHeight / 2.4
+      ? props.maxHeight * 0.42 // Empirical value that leaves space in both editor and canvas.
       : props.maxHeight - topMargin;
   const display = openingState === 'closed' ? 'none' : 'flex';
   return (

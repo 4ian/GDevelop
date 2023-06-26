@@ -29,11 +29,7 @@ import { ExternalEditorOpenedDialog } from '../UI/ExternalEditorOpenedDialog';
 import Add from '../UI/CustomSvgIcons/Add';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import Cross from '../UI/CustomSvgIcons/Cross';
-import {
-  registerOnResourcesChangedCallback,
-  unregisterOnResourcesChangedCallback,
-  onResourcesChanged,
-} from './ResourcesManagementCallbacks';
+import useResourcesChangedWatcher from './UseResourcesChangedWatcher';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
 const styles = {
@@ -74,6 +70,11 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       onChange,
     } = props;
     const forceUpdate = useForceUpdate();
+    const {
+      registerOnResourcesChangedCallback,
+      unregisterOnResourcesChangedCallback,
+      onResourcesChanged,
+    } = useResourcesChangedWatcher({ project });
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
@@ -211,6 +212,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         resourceKind,
         onChangeResourceName,
         loadFrom,
+        onResourcesChanged,
       ]
     );
 
@@ -271,7 +273,11 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         };
       },
       // Subscribe to any resource change at startup (with clean up).
-      [refreshResources]
+      [
+        refreshResources,
+        registerOnResourcesChangedCallback,
+        unregisterOnResourcesChangedCallback,
+      ]
     );
 
     const editWith = React.useCallback(
@@ -337,6 +343,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         resourceManagementProps,
         resourceName,
         resourcesLoader,
+        onResourcesChanged,
       ]
     );
 

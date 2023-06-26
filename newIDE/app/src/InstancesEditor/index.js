@@ -644,7 +644,8 @@ export default class InstancesEditor extends Component<Props> {
 
     if (
       !this.keyboardShortcuts.shouldMultiSelect() &&
-      !this.keyboardShortcuts.shouldMoveView()
+      !this.keyboardShortcuts.shouldMoveView() &&
+      this.props.instancesSelection.hasSelectedInstances()
     ) {
       this.props.instancesSelection.clearSelection();
       this.props.onInstancesSelected([]);

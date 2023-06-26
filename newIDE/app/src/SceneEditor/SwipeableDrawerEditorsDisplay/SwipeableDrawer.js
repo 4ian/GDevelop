@@ -68,8 +68,7 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
           <span
             style={{
               ...styles.topBarHandle,
-              backgroundColor:
-                gdevelopTheme.palette.type === 'dark' ? '#1D1D26' : '#7F7F85',
+              backgroundColor: gdevelopTheme.swipeableDrawer.topBar.pillColor,
             }}
           />
         </div>

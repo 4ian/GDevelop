@@ -8,7 +8,7 @@ include(CMakeUtils.txt) # Functions to factor common tasks done in CMakeLists.tx
 
 # List of non pure JS extensions
 set(
-	GD_EXTENSIONS 
+	GD_EXTENSIONS
 	3D
 	AnchorBehavior
 	DestroyOutsideBehavior

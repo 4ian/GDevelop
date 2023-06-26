@@ -471,8 +471,8 @@ export function createGdevelopTheme({
       },
       swipeableDrawer: {
         topBar: {
-          pillColor: styles['ThemeSwipeableDrawerTopBarPillColor']
-        }
+          pillColor: styles['ThemeSwipeableDrawerTopBarPillColor'],
+        },
       },
       text: {
         color: {

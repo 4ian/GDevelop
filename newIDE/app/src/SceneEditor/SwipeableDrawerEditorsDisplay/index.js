@@ -402,7 +402,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               selectedEditorId={
                 drawerOpeningState === 'closed' ? null : selectedEditorId
               }
-              selectEditor={halfOpenOrCloseDrawerOnEditor}
+              onSelectEditor={halfOpenOrCloseDrawerOnEditor}
             />
           </div>
         </div>

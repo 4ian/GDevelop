@@ -15,7 +15,7 @@ const styles = { container: { padding: 4, paddingBottom: 8 } };
 
 type Props = {|
   selectedEditorId: ?EditorId,
-  selectEditor: (?EditorId) => void,
+  onSelectEditor: EditorId => void,
 |};
 
 const editors = {
@@ -57,7 +57,7 @@ const BottomToolbar = (props: Props) => {
                 disableFocusRipple
                 id={buttonId}
                 onClick={() => {
-                  props.selectEditor(editorId);
+                  props.onSelectEditor(editorId);
                 }}
                 selected={isSelected}
               >

@@ -11,6 +11,8 @@ declare class gdSpriteObject extends gdObjectConfiguration {
   moveAnimation(oldIndex: number, newIndex: number): void;
   setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
   getUpdateIfNotVisible(): boolean;
+  adaptCollisionMaskAutomatically(): boolean;
+  setAdaptCollisionMaskAutomatically(adaptCollisionMaskAutomatically: boolean): void;
   delete(): void;
   ptr: number;
 };

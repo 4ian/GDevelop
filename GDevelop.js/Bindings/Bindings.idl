@@ -3016,6 +3016,9 @@ interface SpriteObject {
 
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
+
+    boolean AdaptCollisionMaskAutomatically();
+    void SetAdaptCollisionMaskAutomatically(boolean adaptCollisionMaskAutomatically);
 };
 SpriteObject implements ObjectConfiguration;
 

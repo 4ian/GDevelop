@@ -9,7 +9,10 @@ import SelectOption from '../../../../UI/SelectOption';
 import Toggle from '../../../../UI/Toggle';
 import { mapFor } from '../../../../Utils/MapFor';
 import { getCurrentElements } from './SpriteObjectHelper';
-import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../../UI/Layout';
 
 type Props = {|
   spriteConfiguration: gdSpriteObject,
@@ -28,8 +31,12 @@ type Props = {|
   setSameForAllAnimations: boolean => void,
   setSameForAllSprites: boolean => void,
 
-  setSameForAllAnimationsLabel: string | React.Node,
-  setSameForAllSpritesLabel: string | React.Node,
+  setSameForAllAnimationsLabel: React.Node,
+  setSameForAllSpritesLabel: React.Node,
+
+  setAutomaticallyAdaptLabel?: React.Node,
+  setAutomaticallyAdapt?: boolean => void,
+  automaticallyAdapt?: boolean,
 |};
 
 /**
@@ -54,6 +61,9 @@ export default class SpriteSelector extends React.Component<Props, void> {
       setSameForAllSprites,
       setSameForAllAnimationsLabel,
       setSameForAllSpritesLabel,
+      setAutomaticallyAdaptLabel,
+      setAutomaticallyAdapt,
+      automaticallyAdapt,
     } = this.props;
 
     const { animation, direction } = getCurrentElements(
@@ -118,18 +128,30 @@ export default class SpriteSelector extends React.Component<Props, void> {
             </SelectField>
           )}
         </ResponsiveLineStackLayout>
-        <Toggle
-          label={setSameForAllAnimationsLabel}
-          labelPosition="right"
-          toggled={sameForAllAnimations}
-          onToggle={(e, checked) => setSameForAllAnimations(checked)}
-        />
-        <Toggle
-          label={setSameForAllSpritesLabel}
-          labelPosition="right"
-          toggled={sameForAllSprites}
-          onToggle={(e, checked) => setSameForAllSprites(checked)}
-        />
+        {direction && !!direction.getSpritesCount() && (
+          <>
+            <Toggle
+              label={setSameForAllAnimationsLabel}
+              labelPosition="right"
+              toggled={sameForAllAnimations}
+              onToggle={(e, checked) => setSameForAllAnimations(checked)}
+            />
+            <Toggle
+              label={setSameForAllSpritesLabel}
+              labelPosition="right"
+              toggled={sameForAllSprites}
+              onToggle={(e, checked) => setSameForAllSprites(checked)}
+            />
+            {setAutomaticallyAdaptLabel && setAutomaticallyAdapt && (
+              <Toggle
+                label={setAutomaticallyAdaptLabel}
+                labelPosition="right"
+                toggled={!!automaticallyAdapt}
+                onToggle={(e, checked) => setAutomaticallyAdapt(checked)}
+              />
+            )}
+          </>
+        )}
       </React.Fragment>
     );
   }

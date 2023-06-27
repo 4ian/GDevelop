@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../../../../UI/FlatButton';
 import EmptyMessage from '../../../../UI/EmptyMessage';
@@ -27,6 +27,8 @@ import EditorMosaic, {
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
+import { getMatchingCollisionMask } from './CollisionMaskHelper';
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -59,6 +61,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onMasksUpdated?: () => void,
+  onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
 const CollisionMasksEditor = ({
@@ -66,6 +69,7 @@ const CollisionMasksEditor = ({
   resourcesLoader,
   project,
   onMasksUpdated,
+  onCreateMatchingSpriteCollisionMask,
 }: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
@@ -259,12 +263,16 @@ const CollisionMasksEditor = ({
                     {...overlayProps}
                     isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
                     polygons={sprite.getCustomCollisionMask()}
-                    onPolygonsUpdated={() =>
+                    onPolygonsUpdated={() => {
+                      // Revert to non-automatic collision mask.
+                      spriteConfiguration.setAdaptCollisionMaskAutomatically(
+                        false
+                      );
                       updateCollisionMasks(
                         sameCollisionMasksForAnimations,
                         sameCollisionMasksForSprites
-                      )
-                    }
+                      );
+                    }}
                     highlightedVerticePtr={highlightedVerticePtr}
                     selectedVerticePtr={selectedVerticePtr}
                     onClickVertice={setSelectedVerticePtr}
@@ -294,6 +302,17 @@ const CollisionMasksEditor = ({
                   chooseSprite={chooseSprite}
                   sameForAllAnimations={sameCollisionMasksForAnimations}
                   sameForAllSprites={sameCollisionMasksForSprites}
+                  automaticallyAdapt={spriteConfiguration.adaptCollisionMaskAutomatically()}
+                  setAutomaticallyAdapt={value => {
+                    spriteConfiguration.setAdaptCollisionMaskAutomatically(
+                      value
+                    );
+                    // Recompute collision mask when enabling automatic.
+                    if (value) {
+                      onCreateMatchingSpriteCollisionMask();
+                    }
+                    forceUpdate();
+                  }}
                   setSameForAllAnimations={
                     setSameCollisionMasksForAllAnimations
                   }
@@ -307,6 +326,12 @@ const CollisionMasksEditor = ({
                       animation
                     </Trans>
                   }
+                  setAutomaticallyAdaptLabel={
+                    <Trans>
+                      Automatically adapt collision mask based on first
+                      animation frames
+                    </Trans>
+                  }
                 />
               </Column>
             </Line>
@@ -315,15 +340,23 @@ const CollisionMasksEditor = ({
                 <React.Fragment>
                   <PolygonsList
                     polygons={sprite.getCustomCollisionMask()}
-                    onPolygonsUpdated={() =>
+                    onPolygonsUpdated={() => {
+                      // Revert to non-automatic collision mask.
+                      spriteConfiguration.setAdaptCollisionMaskAutomatically(
+                        false
+                      );
                       updateCollisionMasks(
                         sameCollisionMasksForAnimations,
                         sameCollisionMasksForSprites
-                      )
-                    }
-                    restoreCollisionMask={() =>
-                      onSetCollisionMaskAutomatic(true)
-                    }
+                      );
+                    }}
+                    restoreCollisionMask={() => {
+                      // Revert to non-automatic collision mask.
+                      spriteConfiguration.setAdaptCollisionMaskAutomatically(
+                        false
+                      );
+                      onSetCollisionMaskAutomatic(true);
+                    }}
                     onHoverVertice={setHighlightedVerticePtr}
                     onClickVertice={setSelectedVerticePtr}
                     selectedVerticePtr={selectedVerticePtr}

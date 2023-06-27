@@ -33,6 +33,7 @@ import { DragHandleIcon } from '../../../UI/DragHandle';
 import DropIndicator from '../../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import { getMatchingCollisionMask } from './CollisionMasksEditor/CollisionMaskHelper';
 
 const gd: libGDevelop = global.gd;
 
@@ -277,179 +278,240 @@ export default function SpriteEditor({
     [forceUpdate, onObjectUpdated, spriteConfiguration]
   );
 
+  const onCreateMatchingSpriteCollisionMask = React.useCallback(
+    async () => {
+      console.log('recalculating collision mask');
+      if (spriteConfiguration.getAnimationsCount() === 0) return;
+      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (firstAnimation.getDirectionsCount() === 0) return;
+      const firstDirection = firstAnimation.getDirection(0);
+      if (firstDirection.getSpritesCount() === 0) return;
+      const firstSprite = firstDirection.getSprite(0);
+      const firstSpriteResourceName = firstSprite.getImageName();
+      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
+        project,
+        firstSpriteResourceName,
+        {}
+      )
+        .replace('file://', '')
+        .split('?')[0];
+      const matchingCollisionMask = await getMatchingCollisionMask(
+        firstAnimationResourceSource
+      );
+
+      if (!matchingCollisionMask) {
+        return;
+      }
+      for (
+        let animationIndex = 0;
+        animationIndex < spriteConfiguration.getAnimationsCount();
+        animationIndex++
+      ) {
+        const animation = spriteConfiguration.getAnimation(animationIndex);
+        for (
+          let directionIndex = 0;
+          directionIndex < animation.getDirectionsCount();
+          directionIndex++
+        ) {
+          const direction = animation.getDirection(directionIndex);
+          for (
+            let spriteIndex = 0;
+            spriteIndex < direction.getSpritesCount();
+            spriteIndex++
+          ) {
+            const sprite = direction.getSprite(spriteIndex);
+            sprite.setCollisionMaskAutomatic(false);
+            sprite.setCustomCollisionMask(matchingCollisionMask);
+          }
+        }
+      }
+
+      forceUpdate();
+    },
+    [spriteConfiguration, project, forceUpdate]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
-        <>
-          <ScrollView ref={scrollView}>
-            <Column noMargin expand useFullHeight>
-              {spriteConfiguration.getAnimationsCount() === 0 ? (
-                <Column noMargin expand justifyContent="center">
-                  <EmptyPlaceholder
-                    title={<Trans>Add your first animation</Trans>}
-                    description={
-                      <Trans>Animations are a sequence of images.</Trans>
-                    }
-                    actionLabel={<Trans>Add an animation</Trans>}
-                    helpPagePath="/objects/sprite"
-                    tutorialId="intermediate-changing-animations"
-                    onAction={addAnimation}
-                  />
-                </Column>
-              ) : (
-                <React.Fragment>
-                  <SpacedDismissableTutorialMessage />
-                  {mapFor(
-                    0,
-                    spriteConfiguration.getAnimationsCount(),
-                    animationIndex => {
-                      const animation = spriteConfiguration.getAnimation(
-                        animationIndex
-                      );
-                      const animationName = animation.getName();
-
-                      const animationRef =
-                        justAddedAnimationName === animationName
-                          ? justAddedAnimationElement
-                          : null;
-
-                      return (
-                        <DragSourceAndDropTarget
-                          key={animationIndex}
-                          beginDrag={() => {
-                            draggedAnimationIndex.current = animationIndex;
-                            return {};
-                          }}
-                          canDrag={() => true}
-                          canDrop={() => true}
-                          drop={() => {
-                            moveAnimation(animationIndex);
-                          }}
-                        >
-                          {({
-                            connectDragSource,
-                            connectDropTarget,
-                            isOver,
-                            canDrop,
-                          }) =>
-                            connectDropTarget(
-                              <div
-                                key={animationIndex}
-                                style={styles.rowContainer}
-                              >
-                                {isAnimationListLocked && (
-                                  <Column expand noMargin>
-                                    <Text size="block-title">
-                                      {animationName}
-                                    </Text>
-                                  </Column>
-                                )}
-                                {!isAnimationListLocked && isOver && (
-                                  <DropIndicator canDrop={canDrop} />
-                                )}
-                                {!isAnimationListLocked && (
-                                  <div
-                                    ref={animationRef}
-                                    style={{
-                                      ...styles.rowContent,
-                                      backgroundColor:
-                                        gdevelopTheme.list.itemsBackgroundColor,
-                                    }}
-                                  >
-                                    <Line noMargin expand alignItems="center">
-                                      {connectDragSource(
-                                        <span>
-                                          <Column>
-                                            <DragHandleIcon />
-                                          </Column>
-                                        </span>
-                                      )}
-                                      <Text noMargin noShrink>
-                                        <Trans>
-                                          Animation #{animationIndex}
-                                        </Trans>
-                                      </Text>
-                                      <Spacer />
-                                      <SemiControlledTextField
-                                        margin="none"
-                                        commitOnBlur
-                                        errorText={nameErrors[animationIndex]}
-                                        translatableHintText={t`Optional animation name`}
-                                        value={animation.getName()}
-                                        onChange={newName =>
-                                          changeAnimationName(
-                                            animationIndex,
-                                            newName
-                                          )
-                                        }
-                                        fullWidth
-                                      />
-                                      <IconButton
-                                        size="small"
-                                        onClick={() =>
-                                          removeAnimation(animationIndex, i18n)
-                                        }
-                                      >
-                                        <Trash />
-                                      </IconButton>
-                                    </Line>
-                                    <Spacer />
-                                  </div>
-                                )}
-                                <div style={styles.animationLine}>
-                                  <Column expand noMargin>
-                                    {mapFor(
-                                      0,
-                                      animation.getDirectionsCount(),
-                                      directionIndex => {
-                                        const direction = animation.getDirection(
-                                          directionIndex
-                                        );
-                                        return (
-                                          <SpritesList
-                                            spriteConfiguration={
-                                              spriteConfiguration
-                                            }
-                                            direction={direction}
-                                            key={directionIndex}
-                                            project={project}
-                                            resourcesLoader={ResourcesLoader}
-                                            resourceManagementProps={
-                                              resourceManagementProps
-                                            }
-                                            onReplaceByDirection={newDirection =>
-                                              replaceDirection(
-                                                animationIndex,
-                                                directionIndex,
-                                                newDirection
-                                              )
-                                            }
-                                            objectName={objectName}
-                                            animationName={animationName}
-                                            onChangeName={newName =>
-                                              changeAnimationName(
-                                                animationIndex,
-                                                newName
-                                              )
-                                            }
-                                            onSpriteUpdated={onObjectUpdated}
-                                          />
-                                        );
-                                      }
-                                    )}
-                                  </Column>
-                                </div>
-                              </div>
-                            )
-                          }
-                        </DragSourceAndDropTarget>
-                      );
-                    }
-                  )}
-                </React.Fragment>
-              )}
+        <Column noMargin expand>
+          {spriteConfiguration.getAnimationsCount() === 0 ? (
+            <Column noMargin expand justifyContent="center">
+              <EmptyPlaceholder
+                title={<Trans>Add your first animation</Trans>}
+                description={
+                  <Trans>Animations are a sequence of images.</Trans>
+                }
+                actionLabel={<Trans>Add an animation</Trans>}
+                helpPagePath="/objects/sprite"
+                tutorialId="intermediate-changing-animations"
+                onAction={addAnimation}
+              />
             </Column>
-          </ScrollView>
+          ) : (
+            <ScrollView ref={scrollView}>
+              <React.Fragment>
+                <SpacedDismissableTutorialMessage />
+                {mapFor(
+                  0,
+                  spriteConfiguration.getAnimationsCount(),
+                  animationIndex => {
+                    const animation = spriteConfiguration.getAnimation(
+                      animationIndex
+                    );
+                    const animationName = animation.getName();
+
+                    const animationRef =
+                      justAddedAnimationName === animationName
+                        ? justAddedAnimationElement
+                        : null;
+
+                    return (
+                      <DragSourceAndDropTarget
+                        key={animationIndex}
+                        beginDrag={() => {
+                          draggedAnimationIndex.current = animationIndex;
+                          return {};
+                        }}
+                        canDrag={() => true}
+                        canDrop={() => true}
+                        drop={() => {
+                          moveAnimation(animationIndex);
+                        }}
+                      >
+                        {({
+                          connectDragSource,
+                          connectDropTarget,
+                          isOver,
+                          canDrop,
+                        }) =>
+                          connectDropTarget(
+                            <div
+                              key={animationIndex}
+                              style={styles.rowContainer}
+                            >
+                              {isAnimationListLocked && (
+                                <Column expand noMargin>
+                                  <Text size="block-title">
+                                    {animationName}
+                                  </Text>
+                                </Column>
+                              )}
+                              {!isAnimationListLocked && isOver && (
+                                <DropIndicator canDrop={canDrop} />
+                              )}
+                              {!isAnimationListLocked && (
+                                <div
+                                  ref={animationRef}
+                                  style={{
+                                    ...styles.rowContent,
+                                    backgroundColor:
+                                      gdevelopTheme.list.itemsBackgroundColor,
+                                  }}
+                                >
+                                  <Line noMargin expand alignItems="center">
+                                    {connectDragSource(
+                                      <span>
+                                        <Column>
+                                          <DragHandleIcon />
+                                        </Column>
+                                      </span>
+                                    )}
+                                    <Text noMargin noShrink>
+                                      <Trans>Animation #{animationIndex}</Trans>
+                                    </Text>
+                                    <Spacer />
+                                    <SemiControlledTextField
+                                      margin="none"
+                                      commitOnBlur
+                                      errorText={nameErrors[animationIndex]}
+                                      translatableHintText={t`Optional animation name`}
+                                      value={animation.getName()}
+                                      onChange={newName =>
+                                        changeAnimationName(
+                                          animationIndex,
+                                          newName
+                                        )
+                                      }
+                                      fullWidth
+                                    />
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        removeAnimation(animationIndex, i18n)
+                                      }
+                                    >
+                                      <Trash />
+                                    </IconButton>
+                                  </Line>
+                                  <Spacer />
+                                </div>
+                              )}
+                              <div style={styles.animationLine}>
+                                <Column expand noMargin>
+                                  {mapFor(
+                                    0,
+                                    animation.getDirectionsCount(),
+                                    directionIndex => {
+                                      const direction = animation.getDirection(
+                                        directionIndex
+                                      );
+                                      return (
+                                        <SpritesList
+                                          spriteConfiguration={
+                                            spriteConfiguration
+                                          }
+                                          direction={direction}
+                                          key={directionIndex}
+                                          project={project}
+                                          resourcesLoader={ResourcesLoader}
+                                          resourceManagementProps={
+                                            resourceManagementProps
+                                          }
+                                          onReplaceByDirection={newDirection =>
+                                            replaceDirection(
+                                              animationIndex,
+                                              directionIndex,
+                                              newDirection
+                                            )
+                                          }
+                                          objectName={objectName}
+                                          animationName={animationName}
+                                          onChangeName={newName =>
+                                            changeAnimationName(
+                                              animationIndex,
+                                              newName
+                                            )
+                                          }
+                                          onSpriteUpdated={() => {
+                                            if (
+                                              animationIndex === 0 &&
+                                              spriteConfiguration.adaptCollisionMaskAutomatically()
+                                            ) {
+                                              console.log(
+                                                'First animation updated, adapting collision mask'
+                                              );
+                                              onCreateMatchingSpriteCollisionMask();
+                                            }
+                                            onObjectUpdated &&
+                                              onObjectUpdated();
+                                          }}
+                                        />
+                                      );
+                                    }
+                                  )}
+                                </Column>
+                              </div>
+                            </div>
+                          )
+                        }
+                      </DragSourceAndDropTarget>
+                    );
+                  }
+                )}
+              </React.Fragment>
+            </ScrollView>
+          )}
           <Column noMargin>
             <ResponsiveLineStackLayout
               justifyContent="space-between"
@@ -612,10 +674,13 @@ export default function SpriteEditor({
                 resourcesLoader={ResourcesLoader}
                 project={project}
                 onMasksUpdated={onObjectUpdated}
+                onCreateMatchingSpriteCollisionMask={
+                  onCreateMatchingSpriteCollisionMask
+                }
               />
             </Dialog>
           )}
-        </>
+        </Column>
       )}
     </I18n>
   );

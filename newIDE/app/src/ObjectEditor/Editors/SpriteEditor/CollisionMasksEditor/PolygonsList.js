@@ -193,7 +193,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
 type PolygonsListProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
-  restoreCollisionMask: () => void,
+  setFullImageCollisionMask: () => Promise<void>,
   onHoverVertice: (ptr: ?number) => void,
   onClickVertice: (ptr: ?number) => void,
   selectedVerticePtr: ?number,
@@ -210,7 +210,7 @@ const PolygonsList = (props: PolygonsListProps) => {
     spriteHeight,
     spriteWidth,
     onPolygonsUpdated,
-    restoreCollisionMask,
+    setFullImageCollisionMask,
     onHoverVertice,
     onClickVertice,
     selectedVerticePtr,
@@ -250,7 +250,7 @@ const PolygonsList = (props: PolygonsListProps) => {
               onRemove={() => {
                 gd.removeFromVectorPolygon2d(polygons, i);
                 if (polygons.size() === 0) {
-                  restoreCollisionMask();
+                  setFullImageCollisionMask();
                 }
                 onPolygonsUpdated();
               }}
@@ -268,13 +268,11 @@ const PolygonsList = (props: PolygonsListProps) => {
               primary
               icon={<Add />}
               label={<Trans>Add collision mask</Trans>}
-              onClick={() => {
-                addCollisionMask();
-              }}
+              onClick={addCollisionMask}
               buildMenuTemplate={i18n => [
                 {
-                  label: i18n._(t`Restore the default collision mask`),
-                  click: restoreCollisionMask,
+                  label: i18n._(t`Use full image as collision mask`),
+                  click: setFullImageCollisionMask,
                 },
               ]}
             />

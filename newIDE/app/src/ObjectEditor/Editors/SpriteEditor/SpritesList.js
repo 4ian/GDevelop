@@ -112,6 +112,7 @@ const SortableList = SortableContainer(
             ) : (
               // If there is only one sprite, don't make it draggable.
               <ImageThumbnail
+                key={sprite.ptr}
                 selectable
                 selected={!!selectedSprites[sprite.ptr]}
                 onSelect={selected => onSelectSprite(sprite, selected)}

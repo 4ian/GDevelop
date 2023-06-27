@@ -320,7 +320,7 @@ export default function SpriteEditor({
             spriteIndex++
           ) {
             const sprite = direction.getSprite(spriteIndex);
-            sprite.setCollisionMaskAutomatic(false);
+            sprite.setFullImageCollisionMask(false);
             sprite.setCustomCollisionMask(matchingCollisionMask);
           }
         }

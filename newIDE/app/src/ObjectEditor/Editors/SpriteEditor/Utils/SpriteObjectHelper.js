@@ -186,8 +186,8 @@ export const copySpritePolygons = (
 ) => {
   if (originalSprite.ptr === destinationSprite.ptr) return;
 
-  destinationSprite.setCollisionMaskAutomatic(
-    originalSprite.isCollisionMaskAutomatic()
+  destinationSprite.setFullImageCollisionMask(
+    originalSprite.isFullImageCollisionMask()
   );
 
   destinationSprite.getCustomCollisionMask().clear();
@@ -230,10 +230,10 @@ export const haveSameCollisionMasks = (
   sprite1: gdSprite,
   sprite2: gdSprite
 ) => {
-  if (sprite1.isCollisionMaskAutomatic() !== sprite2.isCollisionMaskAutomatic())
+  if (sprite1.isFullImageCollisionMask() !== sprite2.isFullImageCollisionMask())
     return false;
 
-  if (sprite1.isCollisionMaskAutomatic() && sprite2.isCollisionMaskAutomatic())
+  if (sprite1.isFullImageCollisionMask() && sprite2.isFullImageCollisionMask())
     return true;
 
   const sprite1CollisionMask = sprite1.getCustomCollisionMask();

@@ -20,6 +20,7 @@ import Text from '../../../UI/Text';
 import Edit from '../../../UI/CustomSvgIcons/Edit';
 import Play from '../../../UI/CustomSvgIcons/Play';
 import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   container: {
@@ -67,6 +68,8 @@ const DirectionTools = ({
     direction.getTimeBetweenFrames(),
     6
   );
+  const hasNoSprites = direction.getSpritesCount() === 0;
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const saveTimeBetweenFrames = newTimeBetweenFramesString => {
     if (!newTimeBetweenFramesString) return;
@@ -134,11 +137,19 @@ const DirectionTools = ({
                 label={<Trans>Preview</Trans>}
                 icon={<Play />}
                 onClick={() => openPreview(true)}
+                disabled={hasNoSprites}
               />
             </LineStackLayout>
             <LineStackLayout noMargin alignItems="center">
               <Tooltip title={<Trans>Time between frames</Trans>}>
-                <Timer style={styles.timeIcon} />
+                <Timer
+                  style={{
+                    ...styles.timeIcon,
+                    color: hasNoSprites
+                      ? gdevelopTheme.text.color.secondary
+                      : gdevelopTheme.text.color.primary,
+                  }}
+                />
               </Tooltip>
               <SemiControlledTextField
                 id="direction-time-between-frames"
@@ -152,15 +163,20 @@ const DirectionTools = ({
                 commitOnBlur
                 value={timeBetweenFramesFormatted}
                 onChange={saveTimeBetweenFrames}
+                disabled={hasNoSprites}
               />
               <InlineCheckbox
                 checked={direction.isLooping()}
                 label={
-                  <Text size="body-small">
+                  <Text
+                    size="body-small"
+                    color={hasNoSprites ? 'secondary' : 'primary'}
+                  >
                     <Trans>Loop</Trans>
                   </Text>
                 }
                 onCheck={(e, check) => setLooping(check)}
+                disabled={hasNoSprites}
               />
             </LineStackLayout>
           </ResponsiveLineStackLayout>

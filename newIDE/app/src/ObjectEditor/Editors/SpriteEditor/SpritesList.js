@@ -316,8 +316,6 @@ const SpritesList = ({
 
       await resourceManagementProps.onFetchNewlyAddedResources();
 
-      console.log('sprite added');
-
       if (resources.length && onSpriteUpdated) onSpriteUpdated();
     },
     [direction, project, resourceManagementProps, forceUpdate, onSpriteUpdated]

@@ -110,7 +110,24 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
-  const hasNoAnimations = spriteConfiguration.getAnimationsCount() === 0;
+  const hasNoSprites = () => {
+    for (
+      let animationIndex = 0;
+      animationIndex < spriteConfiguration.getAnimationsCount();
+      animationIndex++
+    ) {
+      const animation = spriteConfiguration.getAnimation(animationIndex);
+      for (
+        let directionIndex = 0;
+        directionIndex < animation.getDirectionsCount();
+        directionIndex++
+      ) {
+        const direction = animation.getDirection(directionIndex);
+        if (direction.getSpritesCount() > 0) return false;
+      }
+    }
+    return true;
+  };
 
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
@@ -540,20 +557,20 @@ export default function SpriteEditor({
                   <FlatButton
                     label={<Trans>Edit collision masks</Trans>}
                     onClick={() => setCollisionMasksEditorOpen(true)}
-                    disabled={hasNoAnimations}
+                    disabled={hasNoSprites()}
                   />
                   {!isAnimationListLocked && (
                     <FlatButton
                       label={<Trans>Edit points</Trans>}
                       onClick={() => setPointsEditorOpen(true)}
-                      disabled={hasNoAnimations}
+                      disabled={hasNoSprites()}
                     />
                   )}
                   {!isAnimationListLocked && (
                     <FlatButton
                       label={<Trans>Advanced options</Trans>}
                       onClick={() => setAdvancedOptionsOpen(true)}
-                      disabled={hasNoAnimations}
+                      disabled={hasNoSprites()}
                     />
                   )}
                 </ResponsiveLineStackLayout>
@@ -561,16 +578,16 @@ export default function SpriteEditor({
                 <FlatButtonWithSplitMenu
                   label={<Trans>Edit collision masks</Trans>}
                   onClick={() => setCollisionMasksEditorOpen(true)}
-                  disabled={hasNoAnimations}
+                  disabled={hasNoSprites()}
                   buildMenuTemplate={i18n => [
                     {
                       label: i18n._(t`Edit points`),
-                      disabled: hasNoAnimations,
+                      disabled: hasNoSprites(),
                       click: () => setPointsEditorOpen(true),
                     },
                     {
                       label: i18n._(t`Advanced options`),
-                      disabled: hasNoAnimations,
+                      disabled: hasNoSprites(),
                       click: () => setAdvancedOptionsOpen(true),
                     },
                   ]}

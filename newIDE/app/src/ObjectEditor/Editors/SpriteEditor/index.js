@@ -144,6 +144,61 @@ export default function SpriteEditor({
     {}
   );
 
+  // The matching collision mask only takes the first sprite of the first
+  // animation of the object. We consider this is enough to start with, and
+  // the user can then edit the collision mask for further needs.
+  const onCreateMatchingSpriteCollisionMask = React.useCallback(
+    async () => {
+      if (spriteConfiguration.getAnimationsCount() === 0) return;
+      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (firstAnimation.getDirectionsCount() === 0) return;
+      const firstDirection = firstAnimation.getDirection(0);
+      if (firstDirection.getSpritesCount() === 0) return;
+      const firstSprite = firstDirection.getSprite(0);
+      const firstSpriteResourceName = firstSprite.getImageName();
+      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
+        project,
+        firstSpriteResourceName,
+        {}
+      )
+        .replace('file://', '')
+        .split('?')[0];
+      const matchingCollisionMask = await getMatchingCollisionMask(
+        firstAnimationResourceSource
+      );
+
+      if (!matchingCollisionMask) {
+        return;
+      }
+      for (
+        let animationIndex = 0;
+        animationIndex < spriteConfiguration.getAnimationsCount();
+        animationIndex++
+      ) {
+        const animation = spriteConfiguration.getAnimation(animationIndex);
+        for (
+          let directionIndex = 0;
+          directionIndex < animation.getDirectionsCount();
+          directionIndex++
+        ) {
+          const direction = animation.getDirection(directionIndex);
+          for (
+            let spriteIndex = 0;
+            spriteIndex < direction.getSpritesCount();
+            spriteIndex++
+          ) {
+            const sprite = direction.getSprite(spriteIndex);
+            sprite.setFullImageCollisionMask(false);
+            sprite.setCustomCollisionMask(matchingCollisionMask);
+          }
+        }
+      }
+
+      forceUpdate();
+    },
+    [spriteConfiguration, project, forceUpdate]
+  );
+
   const moveAnimation = React.useCallback(
     (targetIndex: number) => {
       const draggedIndex = draggedAnimationIndex.current;
@@ -155,9 +210,17 @@ export default function SpriteEditor({
         draggedIndex,
         targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
       );
+      if (
+        (draggedIndex === 0 || targetIndex === 0) &&
+        spriteConfiguration.adaptCollisionMaskAutomatically()
+      ) {
+        // If the first animation is changed and the collision mask is adapted automatically,
+        // then we need to recompute it.
+        onCreateMatchingSpriteCollisionMask();
+      }
       forceUpdate();
     },
-    [spriteConfiguration, forceUpdate]
+    [spriteConfiguration, forceUpdate, onCreateMatchingSpriteCollisionMask]
   );
 
   const addAnimation = React.useCallback(
@@ -200,6 +263,14 @@ export default function SpriteEditor({
       spriteConfiguration.removeAnimation(index);
       forceUpdate();
       onSizeUpdated();
+      if (
+        index === 0 &&
+        spriteConfiguration.adaptCollisionMaskAutomatically()
+      ) {
+        // If the first animation is removed and the collision mask is
+        // automatically adapted, then recompute it.
+        onCreateMatchingSpriteCollisionMask();
+      }
       if (onObjectUpdated) onObjectUpdated();
     },
     [
@@ -208,6 +279,7 @@ export default function SpriteEditor({
       onSizeUpdated,
       showConfirmation,
       spriteConfiguration,
+      onCreateMatchingSpriteCollisionMask,
     ]
   );
 
@@ -276,59 +348,6 @@ export default function SpriteEditor({
       if (onObjectUpdated) onObjectUpdated();
     },
     [forceUpdate, onObjectUpdated, spriteConfiguration]
-  );
-
-  const onCreateMatchingSpriteCollisionMask = React.useCallback(
-    async () => {
-      console.log('recalculating collision mask');
-      if (spriteConfiguration.getAnimationsCount() === 0) return;
-      const firstAnimation = spriteConfiguration.getAnimation(0);
-      if (firstAnimation.getDirectionsCount() === 0) return;
-      const firstDirection = firstAnimation.getDirection(0);
-      if (firstDirection.getSpritesCount() === 0) return;
-      const firstSprite = firstDirection.getSprite(0);
-      const firstSpriteResourceName = firstSprite.getImageName();
-      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
-        project,
-        firstSpriteResourceName,
-        {}
-      )
-        .replace('file://', '')
-        .split('?')[0];
-      const matchingCollisionMask = await getMatchingCollisionMask(
-        firstAnimationResourceSource
-      );
-
-      if (!matchingCollisionMask) {
-        return;
-      }
-      for (
-        let animationIndex = 0;
-        animationIndex < spriteConfiguration.getAnimationsCount();
-        animationIndex++
-      ) {
-        const animation = spriteConfiguration.getAnimation(animationIndex);
-        for (
-          let directionIndex = 0;
-          directionIndex < animation.getDirectionsCount();
-          directionIndex++
-        ) {
-          const direction = animation.getDirection(directionIndex);
-          for (
-            let spriteIndex = 0;
-            spriteIndex < direction.getSpritesCount();
-            spriteIndex++
-          ) {
-            const sprite = direction.getSprite(spriteIndex);
-            sprite.setFullImageCollisionMask(false);
-            sprite.setCustomCollisionMask(matchingCollisionMask);
-          }
-        }
-      }
-
-      forceUpdate();
-    },
-    [spriteConfiguration, project, forceUpdate]
   );
 
   return (
@@ -488,9 +507,8 @@ export default function SpriteEditor({
                                               animationIndex === 0 &&
                                               spriteConfiguration.adaptCollisionMaskAutomatically()
                                             ) {
-                                              console.log(
-                                                'First animation updated, adapting collision mask'
-                                              );
+                                              // We could optimize this by only updating the mask
+                                              // if the first sprite has changed.
                                               onCreateMatchingSpriteCollisionMask();
                                             }
                                             onObjectUpdated &&

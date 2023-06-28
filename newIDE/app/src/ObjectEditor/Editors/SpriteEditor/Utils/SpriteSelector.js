@@ -25,15 +25,11 @@ type Props = {|
   sameForAllAnimations: boolean,
   sameForAllSprites: boolean,
 
-  setSameForAllAnimations: boolean => void,
-  setSameForAllSprites: boolean => void,
+  setSameForAllAnimations: boolean => Promise<void>,
+  setSameForAllSprites: boolean => Promise<void>,
 
   setSameForAllAnimationsLabel: React.Node,
   setSameForAllSpritesLabel: React.Node,
-
-  setAutomaticallyAdaptLabel?: React.Node,
-  setAutomaticallyAdapt?: boolean => Promise<void>,
-  automaticallyAdapt?: boolean,
 |};
 
 /**
@@ -56,16 +52,20 @@ const SpriteSelector = ({
   setSameForAllSprites,
   setSameForAllAnimationsLabel,
   setSameForAllSpritesLabel,
-  setAutomaticallyAdaptLabel,
-  setAutomaticallyAdapt,
-  automaticallyAdapt,
 }: Props) => {
-  const { animation, direction } = getCurrentElements(
+  const { animation, direction, sprite } = getCurrentElements(
     spriteConfiguration,
     animationIndex,
     directionIndex,
     spriteIndex
   );
+
+  const hideControls =
+    !direction ||
+    !direction.getSpritesCount() ||
+    spriteConfiguration.adaptCollisionMaskAutomatically() ||
+    !sprite ||
+    sprite.isFullImageCollisionMask();
 
   return (
     <React.Fragment>
@@ -120,7 +120,7 @@ const SpriteSelector = ({
           </SelectField>
         )}
       </ResponsiveLineStackLayout>
-      {direction && !!direction.getSpritesCount() && (
+      {!hideControls && (
         <>
           <Toggle
             label={setSameForAllAnimationsLabel}
@@ -134,14 +134,6 @@ const SpriteSelector = ({
             toggled={sameForAllSprites}
             onToggle={(e, checked) => setSameForAllSprites(checked)}
           />
-          {setAutomaticallyAdaptLabel && setAutomaticallyAdapt && (
-            <Toggle
-              label={setAutomaticallyAdaptLabel}
-              labelPosition="right"
-              toggled={!!automaticallyAdapt}
-              onToggle={(e, checked) => setAutomaticallyAdapt(checked)}
-            />
-          )}
         </>
       )}
     </React.Fragment>

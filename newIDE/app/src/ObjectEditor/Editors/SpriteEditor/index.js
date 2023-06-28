@@ -370,7 +370,7 @@ export default function SpriteEditor({
   return (
     <I18n>
       {({ i18n }) => (
-        <Column noMargin expand>
+        <>
           {spriteConfiguration.getAnimationsCount() === 0 ? (
             <Column noMargin expand justifyContent="center">
               <EmptyPlaceholder
@@ -715,7 +715,7 @@ export default function SpriteEditor({
               />
             </Dialog>
           )}
-        </Column>
+        </>
       )}
     </I18n>
   );

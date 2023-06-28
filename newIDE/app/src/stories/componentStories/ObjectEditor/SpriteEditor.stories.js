@@ -79,6 +79,9 @@ export const CollisionMasks = () => (
           objectConfiguration={testProject.spriteObjectConfiguration}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
+          onCreateMatchingSpriteCollisionMask={action(
+            'Created a matching sprite collision mask'
+          )}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

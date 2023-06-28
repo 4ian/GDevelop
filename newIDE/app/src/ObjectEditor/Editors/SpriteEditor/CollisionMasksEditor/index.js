@@ -193,13 +193,13 @@ const CollisionMasksEditor = ({
   const setSameCollisionMasksForAllAnimations = React.useCallback(
     async (enable: boolean) => {
       if (enable) {
-        const result = await showConfirmation({
-          title: t`Use same collision mask?`,
+        const answer = await showConfirmation({
+          title: t`Use same collision mask for all animations?`,
           message: t`Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?`,
           confirmButtonLabel: t`Use same collision mask`,
           dismissButtonLabel: t`Cancel`,
         });
-        if (!result) return;
+        if (!answer) return;
       }
 
       const newSameCollisionMasksForAnimationsValue = enable;
@@ -221,14 +221,14 @@ const CollisionMasksEditor = ({
   const setSameCollisionMasksForAllSprites = React.useCallback(
     async (enable: boolean) => {
       if (enable) {
-        const result = await showConfirmation({
-          title: t`Use same collision mask?`,
+        const answer = await showConfirmation({
+          title: t`Use same collision mask for all frames?`,
           message: t`
-          Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?`,
+          Having the same collision masks for all frames will erase and reset all the other frames collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the frames of the animation?`,
           confirmButtonLabel: t`Use same collision mask`,
           dismissButtonLabel: t`Cancel`,
         });
-        if (!result) return;
+        if (!answer) return;
       }
 
       const newSameCollisionMasksForAnimationsValue =
@@ -256,14 +256,14 @@ const CollisionMasksEditor = ({
     async value => {
       // If enabling automatic while custom was selected, then ask for confirmation.
       if (value && sprite && !sprite.isFullImageCollisionMask()) {
-        const result = await showConfirmation({
+        const answer = await showConfirmation({
           title: t`Adapt collision mask?`,
           message: t`
             You will lose all custom collision masks. Do you want to continue?`,
           confirmButtonLabel: t`Adapt automatically`,
           dismissButtonLabel: t`Cancel`,
         });
-        if (!result) return;
+        if (!answer) return;
       }
 
       spriteConfiguration.setAdaptCollisionMaskAutomatically(value);

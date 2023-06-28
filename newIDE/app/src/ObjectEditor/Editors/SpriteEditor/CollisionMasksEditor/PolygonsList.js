@@ -278,7 +278,7 @@ const PolygonsList = (props: PolygonsListProps) => {
               onClick={addCollisionMask}
               buildMenuTemplate={i18n => [
                 {
-                  label: i18n._(t`Use the automatic collision mask`),
+                  label: i18n._(t`Reset to automatic collision mask`),
                   click: onSetAutomaticallyAdaptCollisionMasks,
                 },
                 {

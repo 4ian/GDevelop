@@ -146,7 +146,7 @@ const DirectionTools = ({
                   style={{
                     ...styles.timeIcon,
                     color: hasNoSprites
-                      ? gdevelopTheme.text.color.secondary
+                      ? gdevelopTheme.text.color.disabled
                       : gdevelopTheme.text.color.primary,
                   }}
                 />
@@ -170,7 +170,10 @@ const DirectionTools = ({
                 label={
                   <Text
                     size="body-small"
-                    color={hasNoSprites ? 'secondary' : 'primary'}
+                    color="primary"
+                    style={{
+                      opacity: hasNoSprites ? 0.5 : 1,
+                    }}
                   >
                     <Trans>Loop</Trans>
                   </Text>

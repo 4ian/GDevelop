@@ -478,6 +478,7 @@ export function createGdevelopTheme({
         color: {
           primary: styles['ThemeTextDefaultColor'],
           secondary: styles['ThemeTextSecondaryColor'],
+          disabled: styles['ThemeTextDisabledColor'],
         },
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],

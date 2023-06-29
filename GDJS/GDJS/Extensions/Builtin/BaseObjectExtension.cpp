@@ -138,12 +138,10 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["SeparateFromObjects"]
       .SetFunctionName("separateFromObjectsList")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["Ecarter"]
-      .codeExtraInformation  // Deprecated
+  objectActions["Ecarter"] // Deprecated
       .SetFunctionName("separateObjectsWithoutForces")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["Rebondir"]
-      .codeExtraInformation  // Deprecated
+  objectActions["Rebondir"] // Deprecated
       .SetFunctionName("separateObjectsWithForces")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["BehaviorActivated"]
@@ -354,7 +352,7 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("getVariableChildCount")
       .SetIncludeFile("runtimeobject.js");
 
-  GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllActions()["MoveObjects"].SetCustomCodeGenerator(
       [](gd::Instruction &,
          gd::EventsCodeGenerator &,
          gd::EventsCodeGenerationContext &) {
@@ -365,7 +363,7 @@ BaseObjectExtension::BaseObjectExtension() {
     return op == "/" || op == "*" || op == "-" || op == "+";
   };
 
-  objectActions["MettreXY"].codeExtraInformation.SetCustomCodeGenerator(
+  objectActions["MettreXY"].SetCustomCodeGenerator(
       [&](gd::Instruction &instruction,
           gd::EventsCodeGenerator &codeGenerator,
           gd::EventsCodeGenerationContext &context) -> gd::String {
@@ -422,7 +420,7 @@ BaseObjectExtension::BaseObjectExtension() {
         return outputCode;
       });
 
-  objectActions["SetCenter"].codeExtraInformation.SetCustomCodeGenerator(
+  objectActions["SetCenter"].SetCustomCodeGenerator(
       [&](gd::Instruction &instruction,
           gd::EventsCodeGenerator &codeGenerator,
           gd::EventsCodeGenerationContext &context) -> gd::String {

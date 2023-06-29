@@ -118,7 +118,7 @@ VariablesExtension::VariablesExtension() {
   GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
       "gdjs.evtTools.variable.variableRemoveAt");
 
-  GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllActions()["ModVarScene"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -150,7 +150,7 @@ VariablesExtension::VariablesExtension() {
         return gd::String("");
       });
 
-  GetAllActions()["ModVarSceneTxt"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllActions()["ModVarSceneTxt"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -176,7 +176,7 @@ VariablesExtension::VariablesExtension() {
         return gd::String("");
       });
 
-  GetAllActions()["ModVarGlobal"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllActions()["ModVarGlobal"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -209,7 +209,7 @@ VariablesExtension::VariablesExtension() {
       });
 
   GetAllActions()["ModVarGlobalTxt"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& context) {

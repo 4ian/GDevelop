@@ -14,10 +14,6 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
-import {
-  isBehaviorLifecycleEventsFunction,
-  isExtensionLifecycleEventsFunction,
-} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -227,7 +223,9 @@ export default class EventsFunctionParametersEditor extends React.Component<
 
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
@@ -241,7 +239,9 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }
     const isAnExtensionLifecycleEventsFunction =
       !eventsBasedBehavior &&
-      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isAnExtensionLifecycleEventsFunction) {
       return (
         <Column noMargin>

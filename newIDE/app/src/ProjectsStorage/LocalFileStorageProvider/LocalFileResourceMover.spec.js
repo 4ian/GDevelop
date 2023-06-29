@@ -3,7 +3,7 @@ import axios from 'axios';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { moveUrlResourcesToLocalFiles } from './LocalFileResourceMover';
 import { makeTestProject } from '../../fixtures/TestProject';
-import path from 'path-browserify';
+import path from 'path';
 const gd: libGDevelop = global.gd;
 
 jest.mock('../../Utils/OptionalRequire');

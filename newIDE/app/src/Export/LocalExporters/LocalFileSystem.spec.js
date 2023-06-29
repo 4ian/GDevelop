@@ -1,6 +1,6 @@
 // @flow
 import LocalFileSystem from './LocalFileSystem';
-import path from 'path-browserify';
+import path from 'path';
 
 describe('LocalFileSystem', () => {
   describe('file content storing and reading', () => {

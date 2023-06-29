@@ -1,6 +1,6 @@
 // @flow
 import { makeTestProject } from '../../fixtures/TestProject';
-import path from 'path-browserify';
+import path from 'path';
 import { moveAllLocalResourcesToCloudResources } from './LocalResourceMover';
 import { readLocalFileToFile } from '../../Utils/LocalFileUploader';
 import {

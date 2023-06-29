@@ -36,6 +36,9 @@ async function getJimpImage(pathToFile: string) {
   }
 }
 
+// 25% of 255 to accept pixels that are not fully transparent (like effects)
+const PIXEL_TRANSPARENCY_THRESHOLD = 64;
+
 export const getMatchingCollisionMask = async (imageFile: string) => {
   // First detect, the most left, right, top and bottom pixels that are not transparent.
   // This will be used to crop the image.
@@ -50,7 +53,7 @@ export const getMatchingCollisionMask = async (imageFile: string) => {
   let maxY = 0;
   jimpImage.scan(0, 0, width, height, function(x, y, idx) {
     const alpha = this.bitmap.data[idx + 3];
-    if (alpha > 0) {
+    if (alpha >= PIXEL_TRANSPARENCY_THRESHOLD) {
       minX = Math.min(minX, x);
       maxX = Math.max(maxX, x);
       minY = Math.min(minY, y);

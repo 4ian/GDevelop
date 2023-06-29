@@ -519,18 +519,21 @@ export default function SpriteEditor({
                                               newName
                                             )
                                           }
-                                          onSpriteUpdated={() => {
-                                            if (
-                                              animationIndex === 0 &&
-                                              spriteConfiguration.adaptCollisionMaskAutomatically()
-                                            ) {
-                                              // We could optimize this by only updating the mask
-                                              // if the first sprite has changed.
-                                              onCreateMatchingSpriteCollisionMask();
-                                            }
-                                            onObjectUpdated &&
-                                              onObjectUpdated();
-                                          }}
+                                          onSpriteUpdated={onObjectUpdated}
+                                          onFirstSpriteUpdated={
+                                            animationIndex === 0
+                                              ? () => {
+                                                  // If the first sprite of the first animation is updated,
+                                                  // we update the automatic collision mask of the object,
+                                                  // if the option is enabled.
+                                                  if (
+                                                    spriteConfiguration.adaptCollisionMaskAutomatically()
+                                                  ) {
+                                                    onCreateMatchingSpriteCollisionMask();
+                                                  }
+                                                }
+                                              : undefined
+                                          }
                                         />
                                       );
                                     }

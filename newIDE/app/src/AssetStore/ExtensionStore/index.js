@@ -126,6 +126,7 @@ export const ExtensionStore = ({
                     tagsHandler={tagsHandler}
                     tags={filters && filters.allTags}
                     placeholder={t`Search extensions`}
+                    autoFocus="desktop"
                   />
                 </Column>
               </ResponsiveLineStackLayout>

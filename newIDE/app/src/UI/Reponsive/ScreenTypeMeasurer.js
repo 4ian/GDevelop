@@ -4,6 +4,8 @@ import * as React from 'react';
 export type ScreenType = 'normal' | 'touch';
 
 let userHasTouchedScreen = false;
+let userHasMovedMouse = false;
+
 if (typeof window !== 'undefined') {
   window.addEventListener(
     'touchstart',
@@ -14,10 +16,7 @@ if (typeof window !== 'undefined') {
     },
     false
   );
-}
 
-let userHasMovedMouse = false;
-if (typeof window !== 'undefined') {
   window.addEventListener(
     'mousemove',
     function onFirstMouseMove() {

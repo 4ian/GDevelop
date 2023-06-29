@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { useResponsiveWindowWidth } from './ResponsiveWindowMeasurer';
 
 export type ScreenType = 'normal' | 'touch';
 
@@ -12,6 +11,21 @@ if (typeof window !== 'undefined') {
       console.info('Touch detected, considering the screen as touch enabled.');
       userHasTouchedScreen = true;
       window.removeEventListener('touchstart', onFirstTouch, false);
+    },
+    false
+  );
+}
+
+let userHasMovedMouse = false;
+if (typeof window !== 'undefined') {
+  window.addEventListener(
+    'mousemove',
+    function onFirstMouseMove() {
+      console.info(
+        'Mouse move detected, considering the device is a desktop/laptop computer.'
+      );
+      userHasMovedMouse = true;
+      window.removeEventListener('mousemove', onFirstMouseMove, false);
     },
     false
   );
@@ -41,8 +55,8 @@ export const useScreenType = (): ScreenType => {
 
 export const useShouldAutofocusInput = (): boolean => {
   const isTouchscreen = useScreenType() === 'touch';
-  const windowWidth = useResponsiveWindowWidth();
-  return (
-    windowWidth === 'large' || (windowWidth === 'medium' && !isTouchscreen)
-  );
+  // Whatever size the screen is, if a touch event has been detected, no autofocus should
+  // be triggered (that would annoyingly open the keyboard) unless a mouse move has been
+  // detected (in that case, the device should be a touch-enabled desktop/laptop computer).
+  return !(isTouchscreen && !userHasMovedMouse);
 };

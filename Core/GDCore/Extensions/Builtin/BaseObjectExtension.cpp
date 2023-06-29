@@ -1833,6 +1833,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetRequiresBaseObjectCapability("animable")
       .MarkAsSimple();
 
+    // TODO There is a conflict with the SetAnimationName from Sprite.
     obj
       .AddExpressionAndConditionAndAction(
         "string",

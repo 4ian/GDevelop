@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Scene3D)
+project(AnchorBehaScene3Dior)
 gd_add_extension_includes()
 
 # Defines

@@ -22,7 +22,8 @@ class ExpressionMetadata;
 namespace gd {
 
 /**
- * \brief Contains user-friendly information about a behavior or an object type.
+ * \brief Contains user-friendly information about instructions and expressions
+ * (usually for a behavior or an object).
  *
  * \ingroup Events
  */
@@ -32,7 +33,7 @@ public:
   virtual ~InstructionOrExpressionContainerMetadata(){};
 
   /**
-   * Declare a new condition as being part of the behavior.
+   * Declare a new condition as being part of the behavior or object.
    * \deprecated Prefer using `AddScopedCondition`, to properly namespace
    * the condition.
    */
@@ -43,7 +44,7 @@ public:
                const gd::String &smallicon_) = 0;
 
   /**
-   * Declare a new action as being part of the behavior.
+   * Declare a new action as being part of the behavior or object.
    * \deprecated Prefer using `AddScopedAction`, to properly namespace
    * the action.
    */
@@ -54,7 +55,7 @@ public:
             const gd::String &smallicon_) = 0;
 
   /**
-   * Declare a new condition as being part of the behavior.
+   * Declare a new condition as being part of the behavior or object.
    */
   virtual gd::InstructionMetadata &
   AddScopedCondition(const gd::String &name_, const gd::String &fullname_,
@@ -63,7 +64,7 @@ public:
                      const gd::String &icon_, const gd::String &smallicon_) = 0;
 
   /**
-   * Declare a new action as being part of the behavior.
+   * Declare a new action as being part of the behavior or object.
    */
   virtual gd::InstructionMetadata &
   AddScopedAction(const gd::String &name_, const gd::String &fullname_,

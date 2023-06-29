@@ -187,6 +187,46 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
+  it('can create metadata for free ExpressionAndConditions without description', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventFunction = eventExtension.insertNewEventsFunction('Value', 0);
+    eventFunction.setFunctionType(gd.EventsFunction.ExpressionAndCondition);
+    eventFunction.setFullName('');
+    eventFunction.setDescription('');
+    eventFunction.setSentence('');
+
+    const metadataDeclarationHelper = new gd.MetadataDeclarationHelper();
+    metadataDeclarationHelper.generateFreeFunctionMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventFunction
+    );
+    metadataDeclarationHelper.delete();
+
+    expect(extension.getAllExpressions().has('Value')).toBe(true);
+    const expression = extension.getAllExpressions().get('Value');
+    expect(expression.getFullName()).toBe('Value');
+    expect(expression.getDescription()).toBe('Return .');
+
+    expect(extension.getAllConditions().has('Value')).toBe(true);
+    const condition = extension.getAllConditions().get('Value');
+    expect(condition.getFullName()).toBe('Value');
+    // TODO The full name could be used when the description is not set.
+    expect(condition.getDescription()).toBe('Compare .');
+    // TODO The full name could be used when the sentence is not set.
+    expect(condition.getSentence()).toBe(' _PARAM1_ _PARAM2_');
+
+    extension.delete();
+    project.delete();
+  });
+
   it('can create metadata for free ActionWithOperator', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();

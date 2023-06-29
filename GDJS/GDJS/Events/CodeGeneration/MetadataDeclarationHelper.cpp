@@ -105,8 +105,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // TODO Change the metadata model to only set a category on the
           // extension. If an extension has behavior or object across
           // several categories, we can assume it"s not scoped correctly.
-          // Note: We shouldn"t rely on gdPlatformExtension but this line
-          // will be removed soon.
+          // Note: EventsFunctionsExtension should be used instead of
+          // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory());
 
   // TODO EBO Use full type to identify object to avoid collision.
@@ -344,7 +344,8 @@ bool MetadataDeclarationHelper::IsExtensionLifecycleEventsFunction(
 
 gd::String
 MetadataDeclarationHelper::RemoveTrailingDot(const gd::String &description) {
-  return description[description.length() - 1] == '.'
+  return description.length() > 0 &&
+                 description[description.length() - 1] == '.'
              ? description.substr(0, description.length() - 1)
              : description;
 }
@@ -483,7 +484,8 @@ gd::InstructionMetadata &MetadataDeclarationHelper::DeclareInstructionMetadata(
 
       auto &action = extension.AddAction(
           eventsFunction.GetName(), eventsFunction.GetName(),
-          "Change " + eventsFunction.GetFullName(),
+          _("Change <subject>")
+              .FindAndReplace("<subject>", eventsFunction.GetFullName()),
           // An operator and an operand are inserted before user parameters.
           "", "", GetExtensionIconUrl(extension),
           GetExtensionIconUrl(extension));
@@ -659,8 +661,9 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
       auto &action = behaviorMetadata.AddScopedAction(
           eventsFunction.GetName(),
           getterFunction.GetFullName() || eventsFunction.GetName(),
-          "Change " +
-              (getterFunction.GetDescription() || eventsFunction.GetFullName()),
+          _("Change <subject>")
+              .FindAndReplace("<subject>", getterFunction.GetDescription() ||
+                                               eventsFunction.GetFullName()),
           // An operator and an operand are inserted before user parameters.
           ShiftSentenceParamIndexes(getterFunction.GetSentence(), 2),
           getterFunction.GetGroup() || eventsBasedBehavior.GetFullName() ||
@@ -677,7 +680,8 @@ MetadataDeclarationHelper::DeclareBehaviorInstructionMetadata(
     } else {
       auto &action = behaviorMetadata.AddScopedAction(
           eventsFunction.GetName(), eventsFunction.GetName(),
-          "Change " + eventsFunction.GetFullName(),
+          _("Change <subject>")
+              .FindAndReplace("<subject>", eventsFunction.GetFullName()),
           // An operator and an operand are inserted before user parameters.
           "",
           eventsBasedBehavior.GetFullName() || eventsBasedBehavior.GetName(),
@@ -851,7 +855,8 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
     } else {
       auto &action = objectMetadata.AddScopedAction(
           eventsFunction.GetName(), eventsFunction.GetName(),
-          "Change " + eventsFunction.GetFullName(),
+          _("Change <subject>")
+              .FindAndReplace("<subject>", eventsFunction.GetFullName()),
           // An operator and an operand are inserted before user parameters.
           "", eventsBasedObject.GetFullName() || eventsBasedObject.GetName(),
           GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
@@ -927,8 +932,10 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
   if (propertyType == "Boolean") {
     auto &conditionMetadata = entityMetadata.AddScopedCondition(
         conditionName, propertyLabel,
-        _("Check the property value for") + " " + uncapitalizedLabel + ".",
-        _("Property") + " " + uncapitalizedLabel + " " + "of _PARAM0_ is true",
+        _("Check the property value for <property_name>.")
+            .FindAndReplace("<property_name>", uncapitalizedLabel),
+        _("Property <property_name> of _PARAM0_ is true")
+            .FindAndReplace("<property_name>", uncapitalizedLabel),
         eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
@@ -936,11 +943,14 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
 
     auto &setterActionMetadata = entityMetadata.AddScopedAction(
         actionName, propertyLabel,
-        _("Update the property value for") + " \"" + uncapitalizedLabel +
-            _("\"."),
-        _("Set property value for") + " " + uncapitalizedLabel + " " +
-            _("of _PARAM0_ to") + " _PARAM" +
-            gd::String::From(valueParameterIndex) + "_",
+        _("Update the property value for \"<property_name>\".")
+            .FindAndReplace("<property_name>", uncapitalizedLabel),
+        _("Set property value for <property_name> of _PARAM0_ to "
+          "<property_value>")
+            .FindAndReplace("<property_name>", uncapitalizedLabel)
+            .FindAndReplace("<property_value>",
+                            "_PARAM" + gd::String::From(valueParameterIndex) +
+                                "_"),
         eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(setterActionMetadata);
@@ -950,11 +960,12 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
 
     auto &toggleActionMetadata = entityMetadata.AddScopedAction(
         toggleActionName, _("Toggle") + " " + propertyLabel,
-        _("Toggle the property value for") + " " + uncapitalizedLabel + ".\n" +
-            _("If it was true, it will become false, and if it was false it "
-              "will become true."),
-        _("Toggle property") + " " + uncapitalizedLabel + " " + _("of") +
-            " _PARAM0_",
+        _("Toggle the property value for <property_name>.\n"
+          "If it was true, it will become false, and if it was false it "
+          "will become true.")
+            .FindAndReplace("<property_name>", uncapitalizedLabel),
+        _("Toggle property <property_name> of _PARAM0_")
+            .FindAndReplace("<property_name>", uncapitalizedLabel),
         eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
@@ -968,8 +979,10 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         entityMetadata.AddExpressionAndConditionAndAction(
             gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType),
             expressionName, propertyLabel,
-            _("the property value for the") + " " + uncapitalizedLabel,
-            _("the property value for the") + " " + uncapitalizedLabel,
+            _("the property value for the <property_name>")
+                .FindAndReplace("<property_name>", uncapitalizedLabel),
+            _("the property value for the <property_name>")
+                .FindAndReplace("<property_name>", uncapitalizedLabel),
             eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
             GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(propertyInstructionMetadata);
@@ -1029,7 +1042,9 @@ void MetadataDeclarationHelper::
 
     auto &propertyName = property->GetName();
     auto propertyLabel =
-        (property->GetLabel() || propertyName) + " " + _("property");
+        _("<property_name> property")
+            .FindAndReplace("<property_name>",
+                            property->GetLabel() || propertyName);
     auto expressionName =
         gd::EventsBasedBehavior::GetPropertyExpressionName(propertyName);
     auto conditionName =
@@ -1059,7 +1074,9 @@ void MetadataDeclarationHelper::
        eventsBasedBehavior.GetSharedPropertyDescriptors().GetInternalVector()) {
     auto &propertyName = property->GetName();
     auto propertyLabel =
-        (property->GetLabel() || propertyName) + " " + _("shared property");
+        _("<property_name> shared property")
+            .FindAndReplace("<property_name>",
+                            property->GetLabel() || propertyName);
     auto expressionName =
         gd::EventsBasedBehavior::GetSharedPropertyExpressionName(propertyName);
     auto conditionName =
@@ -1116,7 +1133,9 @@ void MetadataDeclarationHelper::
        eventsBasedObject.GetPropertyDescriptors().GetInternalVector()) {
     auto &propertyName = property->GetName();
     auto propertyLabel =
-        (property->GetLabel() || propertyName) + " " + _("property");
+        _("<property_name> property")
+            .FindAndReplace("<property_name>",
+                            property->GetLabel() || propertyName);
     auto expressionName =
         gd::EventsBasedObject::GetPropertyExpressionName(propertyName);
     auto conditionName =

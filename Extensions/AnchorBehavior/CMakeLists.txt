@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(AnchorBehaScene3Dior)
+project(AnchorBehavior)
 gd_add_extension_includes()
 
 # Defines

@@ -5,7 +5,7 @@ import { checkIfCredentialsRequired } from '../../../../Utils/CrossOrigin';
 import Jimp from 'jimp/es';
 const lazyRequireFs = optionalLazyRequire('fs');
 
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 async function getJimpImage(pathToFile: string) {
   try {

@@ -416,7 +416,7 @@ namespace gdjs {
       //Make sure to delete already existing animations which are not used anymore.
       this._updateAnimationFrame();
       if (!this._animationFrame) {
-        this.setAnimation(0);
+        this.setAnimationIndex(0);
       }
       this.invalidateHitboxes();
       return true;
@@ -435,7 +435,7 @@ namespace gdjs {
         ) {
           const extraData = initialInstanceData.numberProperties[i];
           if (extraData.name === 'animation') {
-            this.setAnimation(extraData.value);
+            this.setAnimationIndex(extraData.value);
           }
         }
       }
@@ -644,7 +644,8 @@ namespace gdjs {
       }
       for (let i = 0; i < this._animations.length; ++i) {
         if (this._animations[i].name === newAnimationName) {
-          return this.setAnimation(i);
+          this.setAnimationIndex(i);
+          return;
         }
       }
     }
@@ -669,9 +670,6 @@ namespace gdjs {
       return this._animations[this._currentAnimation].name;
     }
 
-    /**
-     * @deprecated Use `getAnimationName` instead
-     */
     isCurrentAnimationName(name: string): boolean {
       return this.getAnimationName() === name;
     }

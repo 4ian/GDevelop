@@ -284,14 +284,14 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["FlippedY"].SetFunctionName("isFlippedY");
 
   // Instructions for the Animable capability
-  objectExpressions["Animation"].SetFunctionName("getAnimationIndex");
-  objectConditions["Animation"].SetFunctionName("getAnimationIndex");
-  objectActions["SetAnimation"].SetFunctionName("setAnimationIndex");
+  objectExpressions["AnimationIndex"].SetFunctionName("getAnimationIndex");
+  objectConditions["AnimationIndex"].SetFunctionName("getAnimationIndex");
+  objectActions["SetAnimationIndex"].SetFunctionName("setAnimationIndex");
   objectStrExpressions["AnimationName"].SetFunctionName("getAnimationName");
-  objectConditions["AnimationName"].SetFunctionName("getAnimationName");
+  objectConditions["AnimationName"].SetFunctionName("isCurrentAnimationName");
   objectActions["SetAnimationName"].SetFunctionName("setAnimationName");
   objectActions["PauseAnimation"].SetFunctionName("pauseAnimation");
-  objectActions["ResumeAnimation"].SetFunctionName("resumeAnimation");
+  objectActions["PlayAnimation"].SetFunctionName("resumeAnimation");
   objectExpressions["AnimationSpeedScale"].SetFunctionName(
       "getAnimationSpeedScale");
   objectConditions["AnimationSpeedScale"].SetFunctionName(

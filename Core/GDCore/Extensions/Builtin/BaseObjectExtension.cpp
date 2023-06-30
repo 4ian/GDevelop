@@ -1106,6 +1106,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .SetHidden();
 
+  obj.AddExpression("Width",
+                    _("Width"),
+                    _("Width of the object"),
+                    _("Size"),
+                    "res/actions/scaleWidth_black.png")
+      .AddParameter("object", _("Object"));
+
   // Deprecated
   obj.AddExpression("Largeur",
                     _("Width"),
@@ -1114,6 +1121,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"))
       .SetHidden();
+
+  obj.AddExpression("Height",
+                    _("Height"),
+                    _("Height of the object"),
+                    _("Size"),
+                    "res/actions/scaleHeight_black.png")
+      .AddParameter("object", _("Object"));
 
   // Deprecated
   obj.AddExpression("Hauteur",
@@ -1671,35 +1685,55 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
 // Instruction for Resizable capability.
 {
-  // The expression is standard.
-  obj.AddExpressionAndConditionAndAction(
-                "number",
-                "Width",
+  obj.AddAction("SetWidth",
                 _("Width"),
-                _("the width of the object"),
+                _("Change the width of the object."),
                 _("the width"),
                 _("Size"),
-                "res/actions/scaleWidth24_black.png")
-
+                "res/actions/scaleWidth24_black.png",
+                "res/actions/scaleWidth_black.png")
       .AddParameter("object", _("Object"), "&resizable")
-      .UseStandardParameters("number",
-                                     gd::ParameterOptions::MakeNewOptions())
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
-  // The expression is standard.
-  obj.AddExpressionAndConditionAndAction(
-                "number",
-                "Height",
+  obj.AddCondition("Width",
+                   _("Width"),
+                   _("Compare the width of the object."),
+                   _("the width"),
+                   _("Size"),
+                   "res/conditions/scaleWidth24_black.png",
+                   "res/conditions/scaleWidth_black.png")
+      .AddParameter("object", _("Object"), "&resizable")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("resizable")
+      .MarkAsAdvanced();
+
+  obj.AddAction("SetHeight",
                 _("Height"),
-                _("the height of the object"),
+                _("Change the height of the object."),
                 _("the height"),
                 _("Size"),
-                "res/actions/scaleHeight24_black.png")
-
+                "res/actions/scaleHeight24_black.png",
+                "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "&resizable")
-      .UseStandardParameters("number",
-                                     gd::ParameterOptions::MakeNewOptions())
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRequiresBaseObjectCapability("resizable")
+      .MarkAsAdvanced();
+
+  obj.AddCondition("Height",
+                   _("Height"),
+                   _("Compare the height of the object."),
+                   _("the height"),
+                   _("Size"),
+                   "res/conditions/scaleHeight24_black.png",
+                   "res/conditions/scaleHeight_black.png")
+      .AddParameter("object", _("Object"), "&resizable")
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .SetRequiresBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
@@ -1839,6 +1873,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/animation.png")
       .AddParameter("object", _("Object"), "&animable")
       .AddParameter("objectAnimationName", _("Animation name"))
+      .SetRequiresBaseObjectCapability("animable")
       .MarkAsAdvanced();
 
   obj.AddCondition("AnimationName",
@@ -1850,6 +1885,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/conditions/animation.png")
       .AddParameter("object", _("Object"), "&animable")
       .AddParameter("objectAnimationName", _("Animation name"))
+      .SetRequiresBaseObjectCapability("animable")
       .MarkAsAdvanced();
 
   obj.AddExpression("AnimationName",
@@ -1857,7 +1893,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("the name of animation played by the object"),
                     _("Animations and images"),
                     "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "&animable");
+      .AddParameter("object", _("Object"), "&animable")
+      .SetRequiresBaseObjectCapability("animable");
 
   obj.AddAction("PauseAnimation", _("Pause the animation"),
                 _("Pause the animation of the object"),

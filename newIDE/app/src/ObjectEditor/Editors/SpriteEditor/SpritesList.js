@@ -112,6 +112,7 @@ const SortableList = SortableContainer(
             ) : (
               // If there is only one sprite, don't make it draggable.
               <ImageThumbnail
+                key={sprite.ptr}
                 selectable
                 key={sprite.ptr}
                 selected={!!selectedSprites[sprite.ptr]}
@@ -173,6 +174,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   onReplaceByDirection: (newDirection: gdDirection) => void,
   onSpriteUpdated?: () => void,
+  onFirstSpriteUpdated?: () => void,
   onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
   objectName: string, // This is used for the default name of images created with Piskel.
   animationName: string, // This is used for the default name of images created with Piskel.
@@ -186,6 +188,7 @@ const SpritesList = ({
   resourceManagementProps,
   onReplaceByDirection,
   onSpriteUpdated,
+  onFirstSpriteUpdated,
   onChangeName,
   objectName,
   animationName,
@@ -269,11 +272,17 @@ const SpritesList = ({
 
       forceUpdate();
       onSpriteUpdated && onSpriteUpdated();
+      if (oldIndex === 0 || newIndex === 0) {
+        // If a sprite was moved from or to the first position,
+        // then the first sprite has changed.
+        onFirstSpriteUpdated && onFirstSpriteUpdated();
+      }
     },
     [
       direction,
       forceUpdate,
       onSpriteUpdated,
+      onFirstSpriteUpdated,
       updateSelectionIndexesAfterMoveDown,
       updateSelectionIndexesAfterMoveUp,
     ]
@@ -317,8 +326,19 @@ const SpritesList = ({
       await resourceManagementProps.onFetchNewlyAddedResources();
 
       if (resources.length && onSpriteUpdated) onSpriteUpdated();
+      if (direction.getSpritesCount() === 1 && onFirstSpriteUpdated) {
+        // If the sprites count is 1, we can assume the first sprite was added.
+        onFirstSpriteUpdated();
+      }
     },
-    [direction, project, resourceManagementProps, forceUpdate, onSpriteUpdated]
+    [
+      direction,
+      project,
+      resourceManagementProps,
+      forceUpdate,
+      onSpriteUpdated,
+      onFirstSpriteUpdated,
+    ]
   );
 
   const editWith = React.useCallback(
@@ -405,6 +425,8 @@ const SpritesList = ({
         newDirection.delete();
 
         if (onSpriteUpdated) onSpriteUpdated();
+        // If an external editor is used to edit the sprites, we assume the first sprite was edited.
+        if (onFirstSpriteUpdated) onFirstSpriteUpdated();
       } catch (error) {
         setExternalEditorOpened(false);
         console.error(
@@ -424,6 +446,7 @@ const SpritesList = ({
       objectName,
       onReplaceByDirection,
       onSpriteUpdated,
+      onFirstSpriteUpdated,
       project,
       resourceManagementProps,
       resourcesLoader,
@@ -434,6 +457,11 @@ const SpritesList = ({
   const deleteSprites = React.useCallback(
     () => {
       const sprites = selectedSprites.current;
+      const firstSpritePtr = spriteConfiguration
+        .getAnimation(0)
+        .getDirection(0)
+        .getSprite(0).ptr;
+      const isFirstSpriteDeleted = !!sprites[firstSpritePtr];
       mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
         const animation = spriteConfiguration.getAnimation(index);
         deleteSpritesFromAnimation(animation, sprites);
@@ -443,8 +471,9 @@ const SpritesList = ({
       selectedSprites.current = {};
       forceUpdate();
       if (onSpriteUpdated) onSpriteUpdated();
+      if (isFirstSpriteDeleted && onFirstSpriteUpdated) onFirstSpriteUpdated();
     },
-    [onSpriteUpdated, spriteConfiguration, forceUpdate]
+    [onSpriteUpdated, onFirstSpriteUpdated, spriteConfiguration, forceUpdate]
   );
 
   const duplicateSprites = React.useCallback(
@@ -463,7 +492,7 @@ const SpritesList = ({
     [onSpriteUpdated, spriteConfiguration, forceUpdate]
   );
 
-  const selectSprite = React.useCallback(
+  const addSpriteToSelection = React.useCallback(
     (sprite, selected) => {
       selectedSprites.current = {
         ...selectedSprites.current,
@@ -529,7 +558,7 @@ const SpritesList = ({
           onAddSprite={onAddSprite}
           resourceManagementProps={resourceManagementProps}
           selectedSprites={selectedSprites.current}
-          onSelectSprite={selectSprite}
+          onSelectSprite={addSpriteToSelection}
           onOpenSpriteContextMenu={openSpriteContextMenu}
           helperClass="sortable-helper"
           lockAxis="x"

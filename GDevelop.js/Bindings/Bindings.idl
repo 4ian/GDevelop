@@ -2965,8 +2965,8 @@ interface Sprite {
     [Ref] Point GetPoint([Const] DOMString name);
     boolean HasPoint([Const] DOMString name);
 
-    boolean IsCollisionMaskAutomatic();
-    void SetCollisionMaskAutomatic(boolean enabled);
+    boolean IsFullImageCollisionMask();
+    void SetFullImageCollisionMask(boolean enabled);
 
     [Ref] VectorPolygon2d GetCustomCollisionMask();
     void SetCustomCollisionMask([Const, Ref] VectorPolygon2d collisionMask);
@@ -3023,6 +3023,9 @@ interface SpriteObject {
 
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
+
+    boolean AdaptCollisionMaskAutomatically();
+    void SetAdaptCollisionMaskAutomatically(boolean adaptCollisionMaskAutomatically);
 };
 SpriteObject implements ObjectConfiguration;
 

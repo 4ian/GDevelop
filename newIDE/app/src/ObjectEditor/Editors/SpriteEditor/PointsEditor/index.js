@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
@@ -15,7 +15,6 @@ import {
   copyAnimationsSpritePoints,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
@@ -26,6 +25,7 @@ import EditorMosaic, {
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -80,6 +80,7 @@ const PointsEditor = ({
   ] = React.useState<?string>(null);
 
   const forceUpdate = useForceUpdate();
+  const { showConfirmation } = useAlertDialog();
 
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const { animation, sprite } = getCurrentElements(
@@ -153,37 +154,50 @@ const PointsEditor = ({
     [animation, sprite]
   );
 
-  const setSamePointsForAllAnimations = (enable: boolean) => {
-    if (enable) {
-      const answer = Window.showConfirmDialog(
-        "Having the same points for all animations will erase and reset all the other animations points. This can't be undone. Are you sure you want to share these points amongst all the animations of the object?"
-      );
-      if (!answer) return;
-    }
+  const setSamePointsForAllAnimations = React.useCallback(
+    async (enable: boolean) => {
+      if (enable) {
+        const answer = await showConfirmation({
+          title: t`Use same points for all animations?`,
+          message: t`
+          Having the same points for all animations will erase and reset all the other animations points. This can't be undone. Are you sure you want to share these points amongst all the animations of the object?`,
+          confirmButtonLabel: t`Use same points`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
 
-    const newSamePointsForAnimations = enable;
-    const newSamePointsForSprites = enable || samePointsForSprites;
+      const newSamePointsForAnimations = enable;
+      const newSamePointsForSprites = enable || samePointsForSprites;
 
-    setSamePointsForAnimations(newSamePointsForAnimations);
-    setSamePointsForSprites(newSamePointsForSprites);
-    updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
-  };
+      setSamePointsForAnimations(newSamePointsForAnimations);
+      setSamePointsForSprites(newSamePointsForSprites);
+      updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
+    },
+    [samePointsForSprites, updatePoints, showConfirmation]
+  );
 
-  const setSamePointsForAllSprites = (enable: boolean) => {
-    if (enable) {
-      const answer = Window.showConfirmDialog(
-        "Having the same points for all frames will erase and reset all the other frames points. This can't be undone. Are you sure you want to share these points amongst all the frames of the animation?"
-      );
-      if (!answer) return;
-    }
+  const setSamePointsForAllSprites = React.useCallback(
+    async (enable: boolean) => {
+      if (enable) {
+        const answer = await showConfirmation({
+          title: t`Use same points for all frames?`,
+          message: t`Having the same points for all frames will erase and reset all the other frames points. This can't be undone. Are you sure you want to share these points amongst all the frames of the animation?`,
+          confirmButtonLabel: t`Use same points`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
 
-    const newSamePointsForAnimations = enable && samePointsForAnimations;
-    const newSamePointsForSprites = enable;
+      const newSamePointsForAnimations = enable && samePointsForAnimations;
+      const newSamePointsForSprites = enable;
 
-    setSamePointsForAnimations(newSamePointsForAnimations);
-    setSamePointsForSprites(newSamePointsForSprites);
-    updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
-  };
+      setSamePointsForAnimations(newSamePointsForAnimations);
+      setSamePointsForSprites(newSamePointsForSprites);
+      updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
+    },
+    [samePointsForAnimations, updatePoints, showConfirmation]
+  );
 
   // Keep panes vertical for small screens, side-by-side for large screens
   const screenSize = useResponsiveWindowWidth();

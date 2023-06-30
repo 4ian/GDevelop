@@ -177,9 +177,7 @@ export default function SpriteEditor({
         project,
         firstSpriteResourceName,
         {}
-      )
-        .replace('file://', '')
-        .split('?')[0];
+      );
       const matchingCollisionMask = await getMatchingCollisionMask(
         firstAnimationResourceSource
       );

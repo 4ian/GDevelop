@@ -178,13 +178,18 @@ export default function SpriteEditor({
         firstSpriteResourceName,
         {}
       );
-      const matchingCollisionMask = await getMatchingCollisionMask(
-        firstAnimationResourceSource
-      );
-
-      if (!matchingCollisionMask) {
-        return;
+      let matchingCollisionMask = null;
+      try {
+        matchingCollisionMask = await getMatchingCollisionMask(
+          firstAnimationResourceSource
+        );
+      } catch (e) {
+        console.error(
+          'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
+          e
+        );
       }
+
       for (
         let animationIndex = 0;
         animationIndex < spriteConfiguration.getAnimationsCount();
@@ -203,8 +208,9 @@ export default function SpriteEditor({
             spriteIndex++
           ) {
             const sprite = direction.getSprite(spriteIndex);
-            sprite.setFullImageCollisionMask(false);
-            sprite.setCustomCollisionMask(matchingCollisionMask);
+            sprite.setFullImageCollisionMask(!matchingCollisionMask);
+            if (matchingCollisionMask)
+              sprite.setCustomCollisionMask(matchingCollisionMask);
           }
         }
       }

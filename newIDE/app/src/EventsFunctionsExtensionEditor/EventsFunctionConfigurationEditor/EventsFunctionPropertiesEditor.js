@@ -478,7 +478,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 onTypeUpdated={() => {
                   if (onConfigurationUpdated) onConfigurationUpdated();
                 }}
-                getLastObjectParameterObjectType={() => ''}
+                getLastObjectParameterObjectType={() => null}
               />
             )}
             {eventsFunction.isAsync() && (

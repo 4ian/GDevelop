@@ -13,8 +13,6 @@
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
-#include "ParameterMetadata.h"
-#include "ParameterOptions.h"
 
 namespace gd {
 class Project;
@@ -22,6 +20,7 @@ class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 class SerializerElement;
+class ObjectType;
 } // namespace gd
 
 namespace gd {
@@ -63,7 +62,13 @@ public:
    * \see gd::InstructionMetadata::SetParameterExtraInfo
    */
   virtual AbstractFunctionMetadata &
-  SetParameterExtraInfo(const gd::String &defaultValue) = 0;
+  SetParameterExtraInfo(const gd::String &extraInfo) = 0;
+
+  /**
+   * \see gd::InstructionMetadata::SetParameterObjectType
+   */
+  virtual AbstractFunctionMetadata &
+  SetParameterObjectType(const gd::ObjectType &objectType) = 0;
 
   /**
    * \see gd::InstructionMetadata::SetParameterLongDescription

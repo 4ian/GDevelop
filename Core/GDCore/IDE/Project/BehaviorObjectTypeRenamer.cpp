@@ -15,8 +15,8 @@ namespace gd {
 
 void BehaviorObjectTypeRenamer::DoVisitEventBasedBehavior(
     gd::EventsBasedBehavior &eventsBasedBehavior) {
-  if (eventsBasedBehavior.GetObjectType() == oldObjectType) {
-    eventsBasedBehavior.SetObjectType(newObjectType);
+  if (eventsBasedBehavior.GetObjectType().GetName() == oldObjectType) {
+    eventsBasedBehavior.GetObjectType().SetName(newObjectType);
   }
 }
 

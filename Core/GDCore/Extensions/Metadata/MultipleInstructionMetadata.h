@@ -85,12 +85,22 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
    * \see gd::InstructionMetadata::SetParameterExtraInfo
    */
   MultipleInstructionMetadata &SetParameterExtraInfo(
-      const gd::String &defaultValue) override {
-    if (expression) expression->SetParameterExtraInfo(defaultValue);
-    if (condition) condition->SetParameterExtraInfo(defaultValue);
-    if (action) action->SetParameterExtraInfo(defaultValue);
+      const gd::String &extraInfo) override {
+    if (expression) expression->SetParameterExtraInfo(extraInfo);
+    if (condition) condition->SetParameterExtraInfo(extraInfo);
+    if (action) action->SetParameterExtraInfo(extraInfo);
     return *this;
   };
+
+  /**
+   * \see gd::InstructionMetadata::SetParameterObjectType
+   */
+  MultipleInstructionMetadata &SetParameterObjectType(const gd::ObjectType &objectType) override {
+    if (expression) expression->SetParameterObjectType(objectType);
+    if (condition) condition->SetParameterObjectType(objectType);
+    if (action) action->SetParameterObjectType(objectType);
+    return *this;
+  }
 
   /**
    * \see gd::InstructionMetadata::SetParameterLongDescription

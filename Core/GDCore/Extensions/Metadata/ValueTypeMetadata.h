@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 
+#include "GDCore/Project/ObjectType.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -57,6 +58,11 @@ class GD_CORE_API ValueTypeMetadata {
     supplementaryInformation = supplementaryInformation_;
     return *this;
   }
+
+  /**
+   * \brief Get the object type.
+   */
+  gd::ObjectType& GetObjectType() { return objectType; };
 
   /**
    * \brief Return true if the parameter is optional.
@@ -237,6 +243,7 @@ class GD_CORE_API ValueTypeMetadata {
  private:
   gd::String name;                      ///< Parameter type
   gd::String supplementaryInformation;  ///< Used if needed
+  gd::ObjectType objectType;
   bool optional;                        ///< True if the parameter is optional
   gd::String defaultValue;     ///< Used as a default value in editor or if an
                                ///< optional parameter is empty.

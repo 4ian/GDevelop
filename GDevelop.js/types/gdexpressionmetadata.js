@@ -27,6 +27,7 @@ declare class gdExpressionMetadata extends gdAbstractFunctionMetadata {
   setDefaultValue(defaultValue: string): gdExpressionMetadata;
   setParameterLongDescription(longDescription: string): gdExpressionMetadata;
   setParameterExtraInfo(extraInfo: string): gdExpressionMetadata;
+  setParameterObjectType(extraInfo: gdObjectType): gdExpressionMetadata;
   setRequiresBaseObjectCapability(capability: string): gdExpressionMetadata;
   getRequiredBaseObjectCapability(): string;
   getCodeExtraInformation(): gdExpressionMetadata;

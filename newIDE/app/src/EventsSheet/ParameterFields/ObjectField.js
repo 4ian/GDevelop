@@ -41,13 +41,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getLongDescription()
       : undefined;
 
-    const objectTypeConstraints = parameterMetadata
-      ? parameterMetadata.getExtraInfo().split('&')
-      : [];
-    const allowedObjectType =
-      objectTypeConstraints.length > 0 ? objectTypeConstraints[0] : undefined;
-    const requiredObjectCapabilities =
-      objectTypeConstraints.length > 1 ? objectTypeConstraints.slice(1) : [];
+    const allowedObjectType = parameterMetadata
+      ? parameterMetadata.getObjectType()
+      : undefined;
 
     return (
       <ObjectSelector
@@ -57,12 +53,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
+        // Some instructions apply to all objects BUT not some objects
+        // lacking a specific capability usually offered by all objects.
         allowedObjectType={allowedObjectType}
-        requiredObjectCapabilities={
-          // Some instructions apply to all objects BUT not some objects
-          // lacking a specific capability usually offered by all objects.
-          requiredObjectCapabilities
-        }
         globalObjectsContainer={props.globalObjectsContainer}
         objectsContainer={props.objectsContainer}
         floatingLabelText={description}

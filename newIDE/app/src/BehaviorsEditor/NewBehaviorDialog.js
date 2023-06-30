@@ -183,8 +183,8 @@ export default function NewBehaviorDialog({
   const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
     // An empty object type means the base object, i.e: any object.
     return (
-      (behaviorMetadata.objectType === '' ||
-        behaviorMetadata.objectType === objectType) &&
+      (behaviorMetadata.objectType.isBaseObject() ||
+        behaviorMetadata.objectType.getName() === objectType) &&
       !isAmongObjectBehaviors(behaviorMetadata)
     );
   };

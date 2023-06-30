@@ -18,8 +18,8 @@ void FunctionParameterObjectTypeRenamer::DoVisitEventsFunction(
     gd::EventsFunction &eventsFunction) {
   for (auto &&parameter : eventsFunction.GetParameters()) {
     if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
-        gd::ParameterMetadataTools::GetParameterObjectType(parameter) == oldObjectType) {
-      gd::ParameterMetadataTools::SetParameterObjectType(parameter, newObjectType);
+        parameter.GetObjectType().GetName() == oldObjectType) {
+      parameter.GetObjectType().SetName(newObjectType);
     }
   }
 }

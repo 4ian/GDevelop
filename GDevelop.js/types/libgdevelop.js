@@ -132,6 +132,7 @@ declare class libGDevelop {
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
   EventsFunctionTools: Class<gdEventsFunctionTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
+  ObjectType: Class<gdObjectType>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;
   EffectMetadata: Class<gdEffectMetadata>;
   EventMetadata: Class<gdEventMetadata>;

@@ -11,7 +11,9 @@
 
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Project/ObjectType.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
@@ -247,7 +249,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   /**
    * \brief Set the type of the object that this behavior can be used on.
    */
-  BehaviorMetadata& SetObjectType(const gd::String& objectType_) {
+  BehaviorMetadata& SetObjectType(const gd::ObjectType& objectType_) {
     objectType = objectType_;
     return *this;
   }
@@ -257,7 +259,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
    *
    * \note An empty string means the base object, so any object.
    */
-  const gd::String& GetObjectType() const { return objectType; }
+  const gd::ObjectType& GetObjectType() const { return objectType; }
 
   /**
    * Check if the behavior is private - it can't be used outside of its
@@ -329,7 +331,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   gd::String description;
   gd::String group;
   gd::String iconFilename;
-  gd::String objectType;
+  gd::ObjectType objectType;
   bool isPrivate = false;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.

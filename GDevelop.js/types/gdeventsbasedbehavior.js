@@ -7,8 +7,7 @@ declare class gdEventsBasedBehavior extends gdAbstractEventsBasedEntity {
   getName(): string;
   setFullName(fullName: string): gdEventsBasedBehavior;
   getFullName(): string;
-  setObjectType(fullName: string): gdEventsBasedBehavior;
-  getObjectType(): string;
+  getObjectType(): gdObjectType;
   setPrivate(isPrivate: boolean): gdEventsBasedBehavior;
   isPrivate(): boolean;
   getSharedPropertyDescriptors(): gdNamedPropertyDescriptorsList;

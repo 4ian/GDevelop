@@ -10,7 +10,7 @@ import {
 
 type Props = {|
   project: gdProject,
-  objectType: string,
+  objectType: ?gdObjectType,
   value: string,
   onChange: string => void,
   disabled?: boolean,
@@ -57,7 +57,10 @@ export default class BehaviorTypeSelector extends React.Component<
             value={metadata.type}
             label={metadata.fullName}
             disabled={
-              metadata.objectType !== '' && metadata.objectType !== objectType
+              objectType
+                ? !metadata.objectType.isBaseObject &&
+                  metadata.objectType !== objectType.getName()
+                : true
             }
           />
         ))}

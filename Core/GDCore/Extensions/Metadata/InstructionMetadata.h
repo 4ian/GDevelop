@@ -286,6 +286,17 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   }
 
   /**
+   * \brief Set the type of object accepted by the last parameter (only apply for
+   * object parameter).
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &SetParameterObjectType(const gd::ObjectType &objectType) override {
+    if (!parameters.empty()) parameters.back().SetObjectType(objectType);
+    return *this;
+  }
+
+  /**
    * \brief Add the default parameters for an instruction manipulating the
    * specified type ("string", "number") with the default operators.
    *

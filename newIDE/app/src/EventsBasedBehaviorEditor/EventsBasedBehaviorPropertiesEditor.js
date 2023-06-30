@@ -86,7 +86,7 @@ type Props = {|
   isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
-  behaviorObjectType?: string,
+  behaviorObjectType?: gdObjectType,
 |};
 
 const validatePropertyName = (
@@ -694,7 +694,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           <BehaviorTypeSelector
                                             project={props.project}
                                             objectType={
-                                              props.behaviorObjectType || ''
+                                              props.behaviorObjectType
                                             }
                                             value={
                                               property.getExtraInfo().size() ===

@@ -2617,7 +2617,7 @@ storiesOf('BehaviorTypeSelector', module)
       project={testProject.project}
       value={''}
       onChange={action('change')}
-      objectType=""
+      objectType={null}
     />
   ))
   .add('with a non existing behavior selected, for a base object', () => (
@@ -2625,7 +2625,7 @@ storiesOf('BehaviorTypeSelector', module)
       project={testProject.project}
       value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
       onChange={action('change')}
-      objectType=""
+      objectType={null}
     />
   ))
   .add('default, for a text object', () => (

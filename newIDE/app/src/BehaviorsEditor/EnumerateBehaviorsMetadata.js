@@ -6,7 +6,7 @@ export type EnumeratedBehaviorMetadata = {|
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   type: string,
-  objectType: string,
+  objectType: gdObjectType,
   defaultName: string,
   fullName: string,
   description: string,

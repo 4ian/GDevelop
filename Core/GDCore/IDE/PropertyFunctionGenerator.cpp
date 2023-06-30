@@ -13,6 +13,7 @@
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/ObjectType.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
@@ -32,14 +33,16 @@ void PropertyFunctionGenerator::GenerateObjectGetterAndSetter(
     gd::Project &project, gd::EventsFunctionsExtension &extension,
     gd::EventsBasedObject &eventsBasedObject,
     const gd::NamedPropertyDescriptor &property) {
-  GenerateGetterAndSetter(project, extension, eventsBasedObject, property, "",
+  // TODO Check if setting the object type name is necessary. 
+  gd::ObjectType objectType;
+  GenerateGetterAndSetter(project, extension, eventsBasedObject, property, objectType,
                           false, false);
 }
 
 void PropertyFunctionGenerator::GenerateGetterAndSetter(
     gd::Project &project, gd::EventsFunctionsExtension &extension,
     gd::AbstractEventsBasedEntity &eventsBasedEntity,
-    const gd::NamedPropertyDescriptor &property, const gd::String &objectType,
+    const gd::NamedPropertyDescriptor &property, const gd::ObjectType &objectType,
     bool isBehavior, bool isSharedProperties) {
   auto &propertyName = property.GetName();
   auto &functionsContainer = eventsBasedEntity.GetEventsFunctions();
@@ -151,7 +154,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       objectParameter.SetType("object")
           .SetName("Object")
           .SetDescription("Object")
-          .SetExtraInfo(objectType);
+          .SetObjectType(objectType);
       if (!isBehavior) {
         gd::String objectFullType = gd::PlatformExtension::GetObjectFullType(
             extension.GetName(), eventsBasedEntity.GetName());

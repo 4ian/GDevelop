@@ -3,7 +3,6 @@ import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
 import { type RequiredExtension } from '../AssetStore/InstallAsset';
-import checkHasRequiredCapabilities from '../Utils/CheckHasRequiredCapabilities';
 
 const gd: libGDevelop = global.gd;
 
@@ -224,36 +223,31 @@ export const enumerateObjectsAndGroups = (
   platform: ?gdPlatform,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  type: ?string = undefined,
+  objectType: ?gdObjectType = undefined,
   requiredObjectCapabilities: Array<string> = []
 ) => {
   const filterObject = (object: gdObject): boolean => {
     return (
-      (!type ||
-        gd.getTypeOfObject(
-          globalObjectsContainer,
-          objectsContainer,
-          object.getName(),
-          false
-        ) === type) &&
-      checkHasRequiredCapabilities({
+      !objectType ||
+      !platform ||
+      objectType.isMatchedBy(
         platform,
         globalObjectsContainer,
         objectsContainer,
-        objectName: object.getName(),
-        requiredObjectCapabilities,
-      })
+        object.getName()
+      )
     );
   };
   const filterGroup = (group: gdObjectGroup): boolean => {
     return (
-      !type ||
+      !objectType ||
+      objectType.isBaseObject() ||
       gd.getTypeOfObject(
         globalObjectsContainer,
         objectsContainer,
         group.getName(),
         true
-      ) === type
+      ) === objectType.getName()
       // TODO Check capabilities intersection of groups
     );
   };

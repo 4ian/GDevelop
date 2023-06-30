@@ -301,11 +301,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (!gd::ParameterMetadataTools::IsParameterMatchingObjectType(
-                     instrInfos.parameters[pNb],
-                     gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                         GetObjectsAndGroups(),
-                                         objectInParameter))) {
+      } else if (instrInfos.parameters[pNb].GetObjectType().GetName() !=
+                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                     GetObjectsAndGroups(),
+                                     objectInParameter)) {
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -491,11 +490,10 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (!gd::ParameterMetadataTools::IsParameterMatchingObjectType(
-                     instrInfos.parameters[pNb],
-                     gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                         GetObjectsAndGroups(),
-                                         objectInParameter))) {
+      } else if (instrInfos.parameters[pNb].GetObjectType().GetName() !=
+                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                     GetObjectsAndGroups(),
+                                     objectInParameter)) {
         return "/* Mismatched object type - skipped. */";
       }
     }
@@ -1057,7 +1055,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
   // Prepare call
   // Add a static_cast if necessary
   gd::String objectFunctionCallNamePart =
-      (!instrInfos.parameters[0].GetExtraInfo().empty())
+      (!instrInfos.parameters[0].GetObjectType().IsBaseObject())
           ? "static_cast<" + objInfo.className + "*>(" +
                 GetObjectListName(objectName, context) + "[i])->" +
                 instrInfos.codeExtraInformation.functionCallName

@@ -11,26 +11,21 @@ import ListIcon from '../../UI/ListIcon';
 import Checkbox from '../../UI/Checkbox';
 
 type Props = {|
-  resizable: boolean,
-  scalable: boolean,
-  flippable: boolean,
-  animable: boolean,
-  onResizableChange: (resizable: boolean) => void,
-  onScalableChange: (scalable: boolean) => void,
-  onFlippableChange: (flippable: boolean) => void,
-  onAnimableChange: (animable: boolean) => void,
+  objectType: gdObjectType,
 |};
 
-export default function CapabilitiesEditor({
-  resizable,
-  scalable,
-  flippable,
-  animable,
-  onResizableChange,
-  onScalableChange,
-  onFlippableChange,
-  onAnimableChange,
-}: Props) {
+export default function CapabilitiesEditor({ objectType }: Props) {
+  const setCapability = React.useCallback(
+    (capability, hasCapability) => {
+      if (hasCapability) {
+        objectType.addCapability('resizable');
+      } else {
+        objectType.removeCapability('resizable');
+      }
+    },
+    [objectType]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -46,8 +41,8 @@ export default function CapabilitiesEditor({
                   <Trans>Resizable</Trans>
                 </LineStackLayout>
               }
-              checked={resizable}
-              onCheck={(e, checked) => onResizableChange(checked)}
+              checked={objectType.hasCapability('resizable')}
+              onCheck={(e, checked) => setCapability('resizable', checked)}
             />
             <Checkbox
               label={
@@ -59,8 +54,8 @@ export default function CapabilitiesEditor({
                   <Trans>Scalable</Trans>
                 </LineStackLayout>
               }
-              checked={scalable}
-              onCheck={(e, checked) => onScalableChange(checked)}
+              checked={objectType.hasCapability('scalable')}
+              onCheck={(e, checked) => setCapability('scalable', checked)}
             />
             <Checkbox
               label={
@@ -69,8 +64,8 @@ export default function CapabilitiesEditor({
                   <Trans>Flippable</Trans>
                 </LineStackLayout>
               }
-              checked={flippable}
-              onCheck={(e, checked) => onFlippableChange(checked)}
+              checked={objectType.hasCapability('flippable')}
+              onCheck={(e, checked) => setCapability('flippable', checked)}
             />
             <Checkbox
               label={
@@ -82,8 +77,8 @@ export default function CapabilitiesEditor({
                   <Trans>Animable</Trans>
                 </LineStackLayout>
               }
-              checked={animable}
-              onCheck={(e, checked) => onAnimableChange(checked)}
+              checked={objectType.hasCapability('animable')}
+              onCheck={(e, checked) => setCapability('animable', checked)}
             />
           </ResponsiveLineStackLayout>
         </ColumnStackLayout>

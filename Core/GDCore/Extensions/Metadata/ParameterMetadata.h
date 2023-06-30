@@ -11,6 +11,7 @@
 
 #include "GDCore/String.h"
 #include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
+#include "GDCore/Project/ObjectType.h"
 
 namespace gd {
 class SerializerElement;
@@ -95,6 +96,24 @@ class GD_CORE_API ParameterMetadata {
    */
   ParameterMetadata &SetExtraInfo(const gd::String &supplementaryInformation_) {
     valueTypeMetadata.SetExtraInfo(supplementaryInformation_);
+    return *this;
+  }
+
+  /**
+   * \brief Get the type of the object.
+   */
+  gd::ObjectType& GetObjectType() { return objectType; }
+
+  /**
+   * \brief Get the type of the object.
+   */
+  const gd::ObjectType& GetObjectType() const { return objectType; }
+
+  /**
+   * \brief Set the type of the object.
+   */
+  ParameterMetadata& SetObjectType(const gd::ObjectType& objectType_) {
+    objectType = objectType_;
     return *this;
   }
 
@@ -237,6 +256,7 @@ class GD_CORE_API ParameterMetadata {
                   ///< i.e. must not be shown in editor
  private:
   gd::ValueTypeMetadata valueTypeMetadata; ///< Parameter type
+  gd::ObjectType objectType;
   gd::String longDescription;  ///< Long description shown in the editor.
   gd::String name;             ///< The name of the parameter to be used in code
                                ///< generation. Optional.

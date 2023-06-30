@@ -92,9 +92,9 @@ export default function EventsBasedBehaviorEditor({
               <Trans>Object on which this behavior can be used</Trans>
             }
             project={project}
-            value={eventsBasedBehavior.getObjectType()}
+            value={eventsBasedBehavior.getObjectType().getName()}
             onChange={(objectType: string) => {
-              eventsBasedBehavior.setObjectType(objectType);
+              eventsBasedBehavior.getObjectType().setName(objectType);
               forceUpdate();
             }}
             allowedObjectTypes={
@@ -110,16 +110,9 @@ export default function EventsBasedBehaviorEditor({
                   ] /* More than one type of object are using the behavior. Only "any object" can be used on this behavior */
             }
           />
-          {eventsBasedBehavior.getObjectType().length === 0 && (
+          {eventsBasedBehavior.getObjectType().getName().length === 0 && (
             <CapabilitiesEditor
-              resizable={false}
-              scalable={false}
-              flippable={false}
-              animable={false}
-              onResizableChange={(resizable: boolean) => {}}
-              onScalableChange={(scalable: boolean) => {}}
-              onFlippableChange={(flippable: boolean) => {}}
-              onAnimableChange={(animable: boolean) => {}}
+              objectType={eventsBasedBehavior.getObjectType()}
             />
           )}
           {allObjectTypes.length > 1 && (

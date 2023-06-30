@@ -11,6 +11,7 @@
 #include "GDCore/Project/NamedPropertyDescriptor.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Project/ObjectType.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -63,15 +64,12 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
   /**
    * \brief Get the object type the behavior should be used with.
    */
-  const gd::String& GetObjectType() const { return objectType; };
+  gd::ObjectType& GetObjectType() { return objectType; };
 
   /**
-   * \brief Set the object type the behavior should be used with.
+   * \brief Get the object type the behavior should be used with.
    */
-  EventsBasedBehavior& SetObjectType(const gd::String& objectType_) {
-    objectType = objectType_;
-    return *this;
-  }
+  const gd::ObjectType& GetObjectType() const { return objectType; };
 
   /**
    * \brief Check if the behavior is private - it can't be used outside of its
@@ -138,7 +136,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
                        const SerializerElement& element) override;
 
  private:
-  gd::String objectType;
+  gd::ObjectType objectType;
   bool isPrivate = false;
   SerializableWithNameList<NamedPropertyDescriptor> sharedPropertyDescriptors;
 };

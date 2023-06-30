@@ -7,6 +7,8 @@ declare class gdParameterMetadata {
   setName(name_: string): gdParameterMetadata;
   getExtraInfo(): string;
   setExtraInfo(extraInfo_: string): gdParameterMetadata;
+  getObjectType(): gdObjectType;
+  setObjectType(objectType: gdObjectType): gdParameterMetadata;
   isOptional(): boolean;
   setOptional(optional_: boolean): gdParameterMetadata;
   getDescription(): string;

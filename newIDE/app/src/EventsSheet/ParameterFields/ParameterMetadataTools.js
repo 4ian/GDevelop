@@ -62,16 +62,16 @@ export const getLastObjectParameterValue = ({
 export const getLastObjectParameterObjectType = (
   parameters: gdVectorParameterMetadata,
   parameterIndex: number
-) => {
+): ?gdObjectType => {
   const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
     parameters,
     parameterIndex
   );
   if (objectParameterIndex < 0 || objectParameterIndex >= parameters.size()) {
-    return '';
+    return null;
   }
 
-  return parameters.at(objectParameterIndex).getExtraInfo();
+  return parameters.at(objectParameterIndex).getObjectType();
 };
 
 /**

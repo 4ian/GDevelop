@@ -5,6 +5,7 @@ declare class gdValueTypeMetadata {
   setName(name_: string): gdValueTypeMetadata;
   getExtraInfo(): string;
   setExtraInfo(extraInfo_: string): gdValueTypeMetadata;
+  getObjectType(): gdObjectType;
   isOptional(): boolean;
   setOptional(optional_: boolean): gdValueTypeMetadata;
   getDefaultValue(): string;

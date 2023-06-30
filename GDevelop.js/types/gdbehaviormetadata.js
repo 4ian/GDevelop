@@ -26,8 +26,8 @@ declare class gdBehaviorMetadata {
   setIncludeFile(includeFile: string): gdBehaviorMetadata;
   addIncludeFile(includeFile: string): gdBehaviorMetadata;
   addRequiredFile(resourceFile: string): gdBehaviorMetadata;
-  setObjectType(objectType: string): gdBehaviorMetadata;
-  getObjectType(): string;
+  setObjectType(objectType: gdObjectType): gdBehaviorMetadata;
+  getObjectType(): gdObjectType;
   isPrivate(): boolean;
   setPrivate(): gdBehaviorMetadata;
   get(): gdBehavior;

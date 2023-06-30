@@ -292,12 +292,7 @@ const Instruction = (props: Props) => {
                 expressionValidator.getAllErrors().size() === 0;
               expressionValidator.delete();
             } else if (gd.ParameterMetadata.isObject(parameterType)) {
-              const objectTypeConstraints = parameterMetadata
-                .getExtraInfo()
-                .split('&');
-              const allowedObjectType = objectTypeConstraints[0]
-                ? objectTypeConstraints[0]
-                : undefined;
+              const objectType = parameterMetadata.getObjectType();
 
               const objectOrGroupName = instruction
                 .getParameter(parameterIndex)
@@ -311,13 +306,13 @@ const Instruction = (props: Props) => {
                     .has(objectOrGroupName) ||
                   objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
                 // Object type matches.
-                (!allowedObjectType ||
+                (objectType.isBaseObject() ||
                   gd.getTypeOfObject(
                     globalObjectsContainer,
                     objectsContainer,
                     objectOrGroupName,
                     /*searchInGroups=*/ true
-                  ) === allowedObjectType);
+                  ) === objectType.getName());
               // TODO Check that object capability matches
             } else if (
               gd.ParameterMetadata.isExpression('resource', parameterType)

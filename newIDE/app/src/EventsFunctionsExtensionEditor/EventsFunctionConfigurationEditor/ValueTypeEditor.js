@@ -20,7 +20,7 @@ type Props = {|
   disabled?: boolean,
   isTypeSelectorShown: boolean,
   isExpressionType?: boolean,
-  getLastObjectParameterObjectType: () => string,
+  getLastObjectParameterObjectType: () => ?gdObjectType,
 |};
 
 const getExtraInfoArray = (type: gdValueTypeMetadata) => {
@@ -126,9 +126,9 @@ export default function ValueTypeEditor({
             {valueTypeMetadata.isObject() && (
               <ObjectTypeSelector
                 project={project}
-                value={valueTypeMetadata.getExtraInfo()}
+                value={valueTypeMetadata.getObjectType().getName()}
                 onChange={(value: string) => {
-                  valueTypeMetadata.setExtraInfo(value);
+                  valueTypeMetadata.getObjectType.setName(value);
                   forceUpdate();
                   onTypeUpdated();
                 }}
@@ -234,16 +234,9 @@ export default function ValueTypeEditor({
             />
           )}
           {valueTypeMetadata.isObject() &&
-            valueTypeMetadata.getExtraInfo().length === 0 && (
+            valueTypeMetadata.getObjectType().getName().length === 0 && (
               <CapabilitiesEditor
-                resizable={false}
-                scalable={false}
-                flippable={false}
-                animable={false}
-                onResizableChange={(resizable: boolean) => {}}
-                onScalableChange={(scalable: boolean) => {}}
-                onFlippableChange={(flippable: boolean) => {}}
-                onAnimableChange={(animable: boolean) => {}}
+                objectType={valueTypeMetadata.getObjectType()}
               />
             )}
         </ColumnStackLayout>

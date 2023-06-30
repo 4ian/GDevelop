@@ -228,7 +228,8 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         fakeBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setObjectType('TextObject::Text');
+      .getObjectType()
+      .setName('TextObject::Text');
 
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

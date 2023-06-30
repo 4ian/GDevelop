@@ -14,20 +14,19 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import checkHasRequiredCapabilities from '../Utils/CheckHasRequiredCapabilities';
 
 type Props = {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
 
-  /** If specified, only this object type should be allowed to be selected. */
-  allowedObjectType?: ?string,
   /**
-   * If specified, an object without this required capability won't be selectable.
+   * If specified, only this object type should be allowed to be selected.
+   *
+   * An object without this required capability won't be selectable.
    * Note that this does not work with groups - which are assumed to have all capabilities.
    */
-  requiredObjectCapabilities?: Array<string>,
+  allowedObjectType?: gdObjectType,
 
   noGroups?: boolean,
 
@@ -59,23 +58,20 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
-  requiredObjectCapabilities,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
-  allowedObjectType: ?string,
-  requiredObjectCapabilities: ?Array<string>,
+  allowedObjectType: ?gdObjectType,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     project && project.getCurrentPlatform(),
     globalObjectsContainer,
     objectsContainer,
-    allowedObjectType || undefined,
-    requiredObjectCapabilities || []
+    allowedObjectType || undefined
   );
   const objects = list.allObjectsList.map(({ object }) => {
     return {
@@ -137,7 +133,6 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       globalObjectsContainer,
       objectsContainer,
       allowedObjectType,
-      requiredObjectCapabilities,
       noGroups,
       errorTextIfInvalid,
       margin,
@@ -155,7 +150,6 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       objectsContainer,
       noGroups,
       allowedObjectType,
-      requiredObjectCapabilities,
       excludedObjectOrGroupNames,
     });
 
@@ -165,14 +159,14 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       ).length !== 0;
 
     const hasObjectWithRequiredCapability =
-      !requiredObjectCapabilities ||
-      checkHasRequiredCapabilities({
-        platform: project && project.getCurrentPlatform(),
-        requiredObjectCapabilities,
+      !project ||
+      !allowedObjectType ||
+      allowedObjectType.isMatchedBy(
+        project.getCurrentPlatform(),
         globalObjectsContainer,
         objectsContainer,
-        objectName: value,
-      });
+        value
+      );
 
     const errorText = !hasObjectWithRequiredCapability ? (
       <Trans>This object exists, but can't be used here.</Trans>

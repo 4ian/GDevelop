@@ -1285,6 +1285,7 @@ interface AbstractFunctionMetadata {
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] AbstractFunctionMetadata SetParameterObjectType([Const, Ref] ObjectType extraInfo);
     
     [Ref] AbstractFunctionMetadata SetHidden();
     [Ref] AbstractFunctionMetadata SetPrivate();
@@ -1336,6 +1337,7 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] InstructionMetadata SetParameterObjectType([Const, Ref] ObjectType extraInfo);
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1404,6 +1406,7 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] ExpressionMetadata SetParameterObjectType([Const, Ref] ObjectType extraInfo);
 
     [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
@@ -1477,6 +1480,8 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetName([Const] DOMString name_);
     [Const, Ref] DOMString GetExtraInfo();
     [Ref] ParameterMetadata SetExtraInfo([Const] DOMString extraInfo_);
+    [Const, Ref] ObjectType GetObjectType();
+    [Ref] ParameterMetadata SetObjectType([Const, Ref] ObjectType objectType);
     boolean IsOptional();
     [Ref] ParameterMetadata SetOptional(boolean optional_);
     [Const, Ref] DOMString GetDescription();
@@ -1506,6 +1511,7 @@ interface ValueTypeMetadata {
     [Ref] ValueTypeMetadata SetName([Const] DOMString name_);
     [Const, Ref] DOMString GetExtraInfo();
     [Ref] ValueTypeMetadata SetExtraInfo([Const] DOMString extraInfo_);
+    [Ref] ObjectType GetObjectType();
     boolean IsOptional();
     [Ref] ValueTypeMetadata SetOptional(boolean optional_);
     [Const, Ref] DOMString GetDefaultValue();
@@ -1642,6 +1648,21 @@ interface ObjectMetadata {
     boolean IsHidden();
 };
 
+interface ObjectType {
+    [Ref] ObjectType SetName([Const] DOMString objectType);
+    [Const, Ref] DOMString GetName();
+
+    [Ref] ObjectType AddCapability([Const] DOMString capability);
+    void RemoveCapability([Const] DOMString capability);
+    boolean HasCapability([Const] DOMString capability);
+
+    boolean IsBaseObject();
+    boolean IsMatchedBy([ Const, Ref ] Platform platform,
+                        [ Const, Ref ] ObjectsContainer globalObjectsContainer,
+                        [ Const, Ref ] ObjectsContainer objectsContainer,
+                        [Const] DOMString objectName);
+};
+
 interface BehaviorMetadata {
     [Const, Ref] DOMString GetName();
     [Const, Ref] DOMString GetFullName();
@@ -1737,8 +1758,8 @@ interface BehaviorMetadata {
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddRequiredFile([Const] DOMString resourceFile);
 
-    [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
-    [Const, Ref] DOMString GetObjectType();
+    [Ref] BehaviorMetadata  SetObjectType([Const, Ref] ObjectType objectType);
+    [Const, Ref] ObjectType GetObjectType();
 
     boolean IsPrivate();
     [Ref] BehaviorMetadata SetPrivate();
@@ -2602,8 +2623,7 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetName();
     [Ref] EventsBasedBehavior SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
-    [Ref] EventsBasedBehavior SetObjectType([Const] DOMString fullName);
-    [Const, Ref] DOMString GetObjectType();
+    [Ref] ObjectType GetObjectType();
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
     boolean IsPrivate();
 

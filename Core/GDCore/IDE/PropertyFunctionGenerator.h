@@ -16,6 +16,7 @@ class EventsBasedObject;
 class AbstractEventsBasedEntity;
 class PropertyDescriptor;
 class NamedPropertyDescriptor;
+class ObjectType;
 }  // namespace gd
 
 namespace gd {
@@ -60,7 +61,7 @@ class GD_CORE_API PropertyFunctionGenerator {
       gd::EventsFunctionsExtension &extension,
       gd::AbstractEventsBasedEntity &eventsBasedEntity,
       const gd::NamedPropertyDescriptor &property,
-      const gd::String &objectType,
+      const gd::ObjectType &objectType,
       bool isBehavior,
       bool isSharedProperties);
 

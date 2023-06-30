@@ -26,7 +26,7 @@ CreateBehavior(gd::EventsFunctionsExtension &eventsExtension) {
           "MyEventsBasedBehavior", 0);
   eventsBasedBehavior.SetFullName("My events based behavior");
   eventsBasedBehavior.SetDescription("An events based behavior for test");
-  eventsBasedBehavior.SetObjectType("");
+  eventsBasedBehavior.GetObjectType().SetName("");
   return eventsBasedBehavior;
 };
 
@@ -486,7 +486,7 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       auto &objectParameter = setter.GetParameters().at(0);
       REQUIRE(objectParameter.GetName() == "Object");
       REQUIRE(objectParameter.GetType() == "object");
-      REQUIRE(objectParameter.GetExtraInfo() ==
+      REQUIRE(objectParameter.GetObjectType().GetName() ==
               "MyEventsExtension::MyEventsBasedObject");
       auto &valueParameter = setter.GetParameters().at(1);
       REQUIRE(valueParameter.GetName() == "Value");

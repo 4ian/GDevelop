@@ -687,7 +687,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testEventsBasedBehavior.setDescription(
     'This is a test events based behavior.\n\nIt does a lot of cool things. It applies to SpriteObject only.'
   );
-  testEventsBasedBehavior.setObjectType('Sprite');
+  testEventsBasedBehavior.getObjectType().setName('Sprite');
 
   // Add some properties
   testEventsBasedBehavior

@@ -74,25 +74,6 @@ class GD_CORE_API ParameterMetadataTools {
   static size_t GetObjectParameterIndexFor(
       const std::vector<gd::ParameterMetadata>& parametersMetadata,
       size_t parameterIndex);
-
-  /**
-   * \brief Return the object type of an object parameter.
-   */
-  static gd::String GetParameterObjectType(
-      const gd::ParameterMetadata &parameterMetadata);
-
-  /**
-   * \brief Check if an object parameter is matching a given object type.
-   */
-  static bool
-  IsParameterMatchingObjectType(const gd::ParameterMetadata &parameterMetadata,
-                                const gd::String &objectType);
-
-  /**
-   * \brief Change the object type but keep the object capabilities.
-   */
-  static void SetParameterObjectType(gd::ParameterMetadata &parameterMetadata,
-                                     const gd::String &objectType);
 };
 }  // namespace gd
 

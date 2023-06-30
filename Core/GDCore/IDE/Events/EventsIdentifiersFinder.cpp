@@ -101,10 +101,7 @@ class GD_CORE_API IdentifierFinderExpressionNodeWorker
 
       if (considerFunction &&
           parameterMetadata.GetType() == "identifier" &&
-          // It's not necessarily an object, but GetParameterObjectType has no
-          // side effect on other identifiers.
-          gd::ParameterMetadataTools::GetParameterObjectType(
-                 parameterMetadata) == identifierType) {
+          parameterMetadata.GetExtraInfo() == identifierType) {
         // Store the value of the parameter
         results.insert(
             gd::ExpressionParser2NodePrinter::PrintNode(*parameterNode));
@@ -156,10 +153,7 @@ class GD_CORE_API IdentifierFinderEventWorker
       for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
         // The parameter has the searched type...
         if (instrInfos.parameters[pNb].GetType() == "identifier" &&
-            // It's not necessarily an object, but GetParameterObjectType has no
-            // side effect on other identifiers.
-            gd::ParameterMetadataTools::GetParameterObjectType(
-                instrInfos.parameters[pNb]) == identifierType) {
+            instrInfos.parameters[pNb].GetExtraInfo() == identifierType) {
           //...remember the value of the parameter.
           if (objectName.empty() || lastObjectParameter == objectName) {
             results.insert(instruction.GetParameter(pNb).GetPlainString());

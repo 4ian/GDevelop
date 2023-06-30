@@ -1042,7 +1042,7 @@ void MetadataDeclarationHelper::
         // as this method is prefixing the value passed with the extension
         // namespace (this was done to ease extension declarations when dealing
         // with object).
-        .SetParameterExtraInfo(eventsBasedBehavior.GetObjectType());
+        .SetParameterObjectType(eventsBasedBehavior.GetObjectType());
 
     // By convention, second parameter is always the behavior:
     instructionOrExpression.AddParameter("behavior", "Behavior",
@@ -1223,7 +1223,8 @@ void MetadataDeclarationHelper::AddParameter(
         // addCodeOnlyParameter) as these methods are prefixing the value passed
         // with the extension namespace (this was done to ease extension
         // declarations when dealing with object).
-        .SetParameterExtraInfo(parameter.GetExtraInfo());
+        .SetParameterExtraInfo(parameter.GetExtraInfo())
+        .SetParameterObjectType(parameter.GetObjectType());
     instructionOrExpression.SetParameterLongDescription(
         parameter.GetLongDescription());
     instructionOrExpression.SetDefaultValue(parameter.GetDefaultValue());

@@ -225,6 +225,17 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   }
 
   /**
+   * \brief Set the type of object accepted by the last parameter (only apply for
+   * object parameter).
+   *
+   * \see AddParameter
+   */
+  ExpressionMetadata &SetParameterObjectType(const gd::ObjectType &objectType) override {
+    if (!parameters.empty()) parameters.back().SetObjectType(objectType);
+    return *this;
+  }
+
+  /**
    * \brief Mark this (object) expression as requiring the specified capability,
    * offered by the base object.
    * This is useful for some objects that don't support this capability, so that

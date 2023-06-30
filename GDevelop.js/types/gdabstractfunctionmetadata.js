@@ -5,6 +5,7 @@ declare class gdAbstractFunctionMetadata {
   setDefaultValue(defaultValue: string): gdAbstractFunctionMetadata;
   setParameterLongDescription(longDescription: string): gdAbstractFunctionMetadata;
   setParameterExtraInfo(extraInfo: string): gdAbstractFunctionMetadata;
+  setParameterObjectType(extraInfo: gdObjectType): gdAbstractFunctionMetadata;
   setHidden(): gdAbstractFunctionMetadata;
   setPrivate(): gdAbstractFunctionMetadata;
   setFunctionName(functionName: string): gdAbstractFunctionMetadata;

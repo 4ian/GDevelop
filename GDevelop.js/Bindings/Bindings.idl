@@ -1337,12 +1337,12 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
-    [Ref] InstructionMetadata SetParameterObjectType([Const, Ref] ObjectType extraInfo);
+    [Ref] InstructionMetadata AddRequiredObjectCapabilityOnLastParameter([Const] DOMString capability);
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
-    [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Ref] InstructionMetadata SetRequiredBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] InstructionMetadata MarkAsSimple();
@@ -1406,9 +1406,9 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
-    [Ref] ExpressionMetadata SetParameterObjectType([Const, Ref] ObjectType extraInfo);
+    [Ref] ExpressionMetadata AddRequiredObjectCapabilityOnLastParameter([Const] DOMString capability);
 
-    [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Ref] ExpressionMetadata SetRequiredBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
@@ -1432,6 +1432,7 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] MultipleInstructionMetadata AddRequiredObjectCapabilityOnLastParameter([Const] DOMString capability);
 
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 

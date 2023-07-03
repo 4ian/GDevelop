@@ -2633,7 +2633,7 @@ storiesOf('BehaviorTypeSelector', module)
       project={testProject.project}
       value={''}
       onChange={action('change')}
-      objectType="TextObject::Text"
+      objectType={testProject.textObjectType}
     />
   ));
 

@@ -295,13 +295,14 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
 
+      auto& parameterObjectType = instrInfos.parameters[pNb].GetObjectType().GetName();
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (instrInfos.parameters[pNb].GetObjectType().GetName() !=
+      } else if (!parameterObjectType.empty() && parameterObjectType !=
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter)) {
@@ -484,13 +485,15 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
+
+      auto& parameterObjectType = instrInfos.parameters[pNb].GetObjectType().GetName();
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
         return "/* Unknown object - skipped. */";
-      } else if (instrInfos.parameters[pNb].GetObjectType().GetName() !=
+      } else if (!parameterObjectType.empty() && parameterObjectType !=
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter)) {

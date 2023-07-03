@@ -95,10 +95,34 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
   /**
    * \see gd::InstructionMetadata::SetParameterObjectType
    */
-  MultipleInstructionMetadata &SetParameterObjectType(const gd::ObjectType &objectType) override {
-    if (expression) expression->SetParameterObjectType(objectType);
-    if (condition) condition->SetParameterObjectType(objectType);
-    if (action) action->SetParameterObjectType(objectType);
+  MultipleInstructionMetadata &
+  SetParameterObjectType(const gd::ObjectType &objectType) override {
+    if (expression) {
+      expression->SetParameterObjectType(objectType);
+    }
+    if (condition) {
+      condition->SetParameterObjectType(objectType);
+    }
+    if (action) {
+      action->SetParameterObjectType(objectType);
+    }
+    return *this;
+  }
+
+  /**
+   * \see gd::InstructionMetadata::AddRequiredObjectCapabilityOnLastParameter
+   */
+  MultipleInstructionMetadata &
+  AddRequiredObjectCapabilityOnLastParameter(const gd::String &capability) {
+    if (expression) {
+      expression->AddRequiredObjectCapabilityOnLastParameter(capability);
+    }
+    if (condition) {
+      condition->AddRequiredObjectCapabilityOnLastParameter(capability);
+    }
+    if (action) {
+      action->AddRequiredObjectCapabilityOnLastParameter(capability);
+    }
     return *this;
   }
 
@@ -124,13 +148,13 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
   };
 
   /**
-   * \see gd::InstructionMetadata::SetRequiresBaseObjectCapability
+   * \see gd::InstructionMetadata::SetRequiredBaseObjectCapability
    */
-  MultipleInstructionMetadata &SetRequiresBaseObjectCapability(
+  MultipleInstructionMetadata &SetRequiredBaseObjectCapability(
       const gd::String &capability) {
-    if (expression) expression->SetRequiresBaseObjectCapability(capability);
-    if (condition) condition->SetRequiresBaseObjectCapability(capability);
-    if (action) action->SetRequiresBaseObjectCapability(capability);
+    if (expression) expression->SetRequiredBaseObjectCapability(capability);
+    if (condition) condition->SetRequiredBaseObjectCapability(capability);
+    if (action) action->SetRequiredBaseObjectCapability(capability);
     return *this;
   }
 

@@ -225,13 +225,30 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   }
 
   /**
-   * \brief Set the type of object accepted by the last parameter (only apply for
-   * object parameter).
+   * \brief Set the type of object accepted by the last parameter (only apply
+   * for object parameter).
    *
    * \see AddParameter
    */
-  ExpressionMetadata &SetParameterObjectType(const gd::ObjectType &objectType) override {
-    if (!parameters.empty()) parameters.back().SetObjectType(objectType);
+  ExpressionMetadata &
+  SetParameterObjectType(const gd::ObjectType &objectType) override {
+    if (!parameters.empty()) {
+      parameters.back().SetObjectType(objectType);
+    }
+    return *this;
+  }
+
+  /**
+   * \brief Set the capabilities of the objects accepted by the last parameter
+   * (only apply for object parameter).
+   *
+   * \see AddParameter
+   */
+  ExpressionMetadata &
+  AddRequiredObjectCapabilityOnLastParameter(const gd::String &capability) {
+    if (!parameters.empty()) {
+      parameters.back().GetObjectType().AddCapability(capability);
+    }
     return *this;
   }
 
@@ -241,7 +258,7 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
    * This is useful for some objects that don't support this capability, so that
    * the editor can hide the expression as it does not apply to them.
    */
-  ExpressionMetadata& SetRequiresBaseObjectCapability(
+  ExpressionMetadata& SetRequiredBaseObjectCapability(
       const gd::String& capability);
 
   /**

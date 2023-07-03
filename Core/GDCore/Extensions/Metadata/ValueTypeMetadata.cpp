@@ -7,6 +7,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 
 namespace gd {
 
@@ -32,7 +33,7 @@ void ValueTypeMetadata::UnserializeFrom(const SerializerElement& element) {
       element.GetStringAttribute("supplementaryInformation");
   objectType.UnserializeFrom(element);
   // Compatibility with GD <= 4.2.166
-  if (name == "object" && !supplementaryInformation.empty()) {
+  if (gd::ParameterMetadata::IsObject(name) && !supplementaryInformation.empty()) {
     objectType.SetName(supplementaryInformation);
     supplementaryInformation = "";
   }

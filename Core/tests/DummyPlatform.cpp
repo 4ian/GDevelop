@@ -122,7 +122,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                         "")
       .AddParameter("object", _("Object"), "")
       .AddParameter("expression", _("Number parameter"))
-      .SetRequiresBaseObjectCapability("effect")
+      .SetRequiredBaseObjectCapability("effect")
       .SetFunctionName("getSomethingRequiringEffectCapability");
   baseObject
       .AddExpression("GetFromBaseExpression",

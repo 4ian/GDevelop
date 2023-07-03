@@ -78,7 +78,7 @@ bool ObjectType::IsMatchedBy(
   );
 
   for (auto& capability : capabilities) {
-    if (objectMetadata.IsSupportedBaseObjectCapability(capability)) {
+    if (!objectMetadata.IsSupportedBaseObjectCapability(capability)) {
       return false;
     }
   }

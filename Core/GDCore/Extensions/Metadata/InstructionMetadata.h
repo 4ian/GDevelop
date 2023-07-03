@@ -24,7 +24,7 @@ class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 class SerializerElement;
-}  // namespace gd
+} // namespace gd
 
 namespace gd {
 
@@ -36,17 +36,14 @@ namespace gd {
  * \ingroup Events
  */
 class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
- public:
+public:
   /**
    * Construct a new instruction metadata.
    */
   InstructionMetadata(const gd::String &extensionNamespace,
-                      const gd::String &name,
-                      const gd::String &fullname,
-                      const gd::String &description,
-                      const gd::String &sentence,
-                      const gd::String &group,
-                      const gd::String &icon,
+                      const gd::String &name, const gd::String &fullname,
+                      const gd::String &description, const gd::String &sentence,
+                      const gd::String &group, const gd::String &icon,
                       const gd::String &smallIcon);
 
   /**
@@ -229,11 +226,10 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    *
    * \see EventsCodeGenerator::GenerateParametersCodes
    */
-  InstructionMetadata &AddParameter(
-      const gd::String &type,
-      const gd::String &label,
-      const gd::String &supplementaryInformation = "",
-      bool parameterIsOptional = false) override;
+  InstructionMetadata &
+  AddParameter(const gd::String &type, const gd::String &label,
+               const gd::String &supplementaryInformation = "",
+               bool parameterIsOptional = false) override;
 
   /**
    * \brief Add a parameter not displayed in editor.
@@ -246,8 +242,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    *
    * \see EventsCodeGenerator::GenerateParametersCodes
    */
-  InstructionMetadata &AddCodeOnlyParameter(
-      const gd::String &type, const gd::String &supplementaryInformation) override;
+  InstructionMetadata &
+  AddCodeOnlyParameter(const gd::String &type,
+                       const gd::String &supplementaryInformation) override;
 
   /**
    * \brief Set the default value used in editor (or if an optional parameter is
@@ -255,8 +252,10 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetDefaultValue(const gd::String &defaultValue_) override {
-    if (!parameters.empty()) parameters.back().SetDefaultValue(defaultValue_);
+  InstructionMetadata &
+  SetDefaultValue(const gd::String &defaultValue_) override {
+    if (!parameters.empty())
+      parameters.back().SetDefaultValue(defaultValue_);
     return *this;
   };
 
@@ -266,8 +265,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetParameterLongDescription(
-      const gd::String &longDescription) override {
+  InstructionMetadata &
+  SetParameterLongDescription(const gd::String &longDescription) override {
     if (!parameters.empty())
       parameters.back().SetLongDescription(longDescription);
     return *this;
@@ -280,19 +279,38 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) override {
-    if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
+  InstructionMetadata &
+  SetParameterExtraInfo(const gd::String &extraInfo) override {
+    if (!parameters.empty())
+      parameters.back().SetExtraInfo(extraInfo);
     return *this;
   }
 
   /**
-   * \brief Set the type of object accepted by the last parameter (only apply for
-   * object parameter).
+   * \brief Set the type of object accepted by the last parameter (only apply
+   * for object parameter).
    *
    * \see AddParameter
    */
-  InstructionMetadata &SetParameterObjectType(const gd::ObjectType &objectType) override {
-    if (!parameters.empty()) parameters.back().SetObjectType(objectType);
+  InstructionMetadata &
+  SetParameterObjectType(const gd::ObjectType &objectType) override {
+    if (!parameters.empty()) {
+      parameters.back().SetObjectType(objectType);
+    }
+    return *this;
+  }
+
+  /**
+   * \brief Set the capabilities of the objects accepted by the last parameter
+   * (only apply for object parameter).
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &
+  AddRequiredObjectCapabilityOnLastParameter(const gd::String &capability) {
+    if (!parameters.empty()) {
+      parameters.back().GetObjectType().AddCapability(capability);
+    }
     return *this;
   }
 
@@ -303,8 +321,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    * \note The type "string" can be declined in several subtypes.
    * \see ParameterMetadata
    */
-  InstructionMetadata &UseStandardOperatorParameters(
-      const gd::String &type, const ParameterOptions &options);
+  InstructionMetadata &
+  UseStandardOperatorParameters(const gd::String &type,
+                                const ParameterOptions &options);
 
   /**
    * \brief Add the default parameters for an instruction comparing the
@@ -313,8 +332,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    * \note The type "string" can be declined in several subtypes.
    * \see ParameterMetadata
    */
-  InstructionMetadata &UseStandardRelationalOperatorParameters(
-      const gd::String &type, const ParameterOptions &options);
+  InstructionMetadata &
+  UseStandardRelationalOperatorParameters(const gd::String &type,
+                                          const ParameterOptions &options);
 
   /**
    * \brief Mark the instruction as an object instruction. Automatically called
@@ -350,8 +370,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    * that don't support this capability, so that the editor can hide the
    * instruction as it does not apply to them.
    */
-  InstructionMetadata &SetRequiresBaseObjectCapability(
-      const gd::String &capability);
+  InstructionMetadata &
+  SetRequiredBaseObjectCapability(const gd::String &capability);
 
   /**
    * \brief Get the required specified capability for this (object) instruction,
@@ -395,8 +415,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   /**
    * \brief Defines information about how generate the code for an instruction
    */
-  class ExtraInformation { 
-   public:
+  class ExtraInformation {
+  public:
     enum AccessType { Reference, MutatorAndOrAccessor, Mutators };
     ExtraInformation() : accessType(Reference), hasCustomCodeGenerator(false){};
     virtual ~ExtraInformation(){};
@@ -410,19 +430,20 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
     std::map<gd::String, gd::String> optionalMutators;
     bool hasCustomCodeGenerator;
     std::function<gd::String(Instruction &instruction,
-                              gd::EventsCodeGenerator &codeGenerator,
-                              gd::EventsCodeGenerationContext &context)>
+                             gd::EventsCodeGenerator &codeGenerator,
+                             gd::EventsCodeGenerationContext &context)>
         customCodeGenerator;
     std::vector<gd::String> includeFiles;
   };
-  ExtraInformation codeExtraInformation;  ///< Information about how generate
-                                          ///< code for the instruction
+  ExtraInformation codeExtraInformation; ///< Information about how generate
+                                         ///< code for the instruction
 
   /**
    * Set the name of the function which will be called in the generated code.
    * \param functionName the name of the function to call.
    */
-  InstructionMetadata &SetFunctionName(const gd::String &functionName_) override {
+  InstructionMetadata &
+  SetFunctionName(const gd::String &functionName_) override {
     codeExtraInformation.functionCallName = functionName_;
     return *this;
   }
@@ -456,12 +477,12 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
     return codeExtraInformation.asyncFunctionCallName;
   }
 
-/**
- * \brief Declare if the instruction being declared is somewhat manipulating
- * in a standard way.
- * 
- * \param type "number" or "string"
- */
+  /**
+   * \brief Declare if the instruction being declared is somewhat manipulating
+   * in a standard way.
+   *
+   * \param type "number" or "string"
+   */
   InstructionMetadata &SetManipulatedType(const gd::String &type_) {
     codeExtraInformation.type = type_;
     return *this;
@@ -496,8 +517,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
     return *this;
   }
 
-  InstructionMetadata &SetMutators(
-      const std::map<gd::String, gd::String> &mutators) {
+  InstructionMetadata &
+  SetMutators(const std::map<gd::String, gd::String> &mutators) {
     codeExtraInformation.optionalMutators = mutators;
     codeExtraInformation.accessType = codeExtraInformation.Mutators;
     return *this;
@@ -516,8 +537,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
    * \brief Add a file to the already existing include files.
    */
   InstructionMetadata &AddIncludeFile(const gd::String &includeFile) override {
-    if (std::find(codeExtraInformation.includeFiles.begin(), codeExtraInformation.includeFiles.end(), includeFile) ==
-        codeExtraInformation.includeFiles.end())
+    if (std::find(codeExtraInformation.includeFiles.begin(),
+                  codeExtraInformation.includeFiles.end(),
+                  includeFile) == codeExtraInformation.includeFiles.end())
       codeExtraInformation.includeFiles.push_back(includeFile);
 
     return *this;
@@ -532,8 +554,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
 
   InstructionMetadata &SetCustomCodeGenerator(
       std::function<gd::String(Instruction &instruction,
-                                gd::EventsCodeGenerator &codeGenerator,
-                                gd::EventsCodeGenerationContext &context)>
+                               gd::EventsCodeGenerator &codeGenerator,
+                               gd::EventsCodeGenerationContext &context)>
           codeGenerator) {
     codeExtraInformation.hasCustomCodeGenerator = true;
     codeExtraInformation.customCodeGenerator = codeGenerator;
@@ -543,26 +565,28 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   InstructionMetadata &RemoveCustomCodeGenerator() {
     codeExtraInformation.hasCustomCodeGenerator = false;
     std::function<gd::String(Instruction & instruction,
-                              gd::EventsCodeGenerator & codeGenerator,
-                              gd::EventsCodeGenerationContext & context)>
+                             gd::EventsCodeGenerator & codeGenerator,
+                             gd::EventsCodeGenerationContext & context)>
         emptyFunction;
     codeExtraInformation.customCodeGenerator = emptyFunction;
     return *this;
   }
 
-  bool HasCustomCodeGenerator() const { return codeExtraInformation.hasCustomCodeGenerator; }
+  bool HasCustomCodeGenerator() const {
+    return codeExtraInformation.hasCustomCodeGenerator;
+  }
 
   /**
    * \brief Return the structure containing the information about code
    * generation for the instruction.
-   * 
+   *
    * \deprecated
    */
   InstructionMetadata &GetCodeExtraInformation() { return *this; }
 
   std::vector<ParameterMetadata> parameters;
 
- private:
+private:
   gd::String fullname;
   gd::String description;
   gd::String helpPath;
@@ -573,8 +597,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   bool canHaveSubInstructions;
   gd::String extensionNamespace;
   bool hidden;
-  int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
-                        ///< use) to 10 (complex to understand)
+  int usageComplexity; ///< Evaluate the instruction from 0 (simple&easy to
+                       ///< use) to 10 (complex to understand)
   bool isPrivate;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
@@ -582,4 +606,4 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   gd::String relevantContext;
 };
 
-}  // namespace gd
+} // namespace gd

@@ -9,21 +9,25 @@ import {
 } from '../../UI/Layout';
 import ListIcon from '../../UI/ListIcon';
 import Checkbox from '../../UI/Checkbox';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 type Props = {|
   objectType: gdObjectType,
 |};
 
 export default function CapabilitiesEditor({ objectType }: Props) {
+  const forceUpdate = useForceUpdate();
+
   const setCapability = React.useCallback(
     (capability, hasCapability) => {
       if (hasCapability) {
-        objectType.addCapability('resizable');
+        objectType.addCapability(capability);
       } else {
-        objectType.removeCapability('resizable');
+        objectType.removeCapability(capability);
       }
+      forceUpdate();
     },
-    [objectType]
+    [forceUpdate, objectType]
   );
 
   return (

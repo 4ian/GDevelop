@@ -11,7 +11,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "ParameterMetadata.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 
 namespace gd {
 InstructionMetadata::InstructionMetadata()
@@ -212,7 +212,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
   return *this;
 }
 
-InstructionMetadata& InstructionMetadata::SetRequiresBaseObjectCapability(
+InstructionMetadata& InstructionMetadata::SetRequiredBaseObjectCapability(
     const gd::String& capability) {
   if (!IsObjectInstruction() && !IsBehaviorInstruction()) {
     gd::LogError("Tried to add capability \"" + capability +

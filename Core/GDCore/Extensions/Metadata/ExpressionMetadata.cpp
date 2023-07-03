@@ -42,21 +42,25 @@ gd::ExpressionMetadata& ExpressionMetadata::AddParameter(
   info.description = description;
   info.codeOnly = false;
   info.SetOptional(parameterIsOptional);
-  info.SetExtraInfo(
-      // For objects/behavior, the supplementary information
-      // parameter is an object/behavior type...
+
+  // For objects/behavior, the supplementary information
+  // parameter is an object/behavior type...
+  gd::String fixedSupplementaryInformation =
       ((gd::ParameterMetadata::IsObject(type) ||
-       gd::ParameterMetadata::IsBehavior(type))
+        gd::ParameterMetadata::IsBehavior(type))
        // Prefix with the namespace if it's not already there.
        && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
           ? (supplementaryInformation.empty()
                  ? ""
-                 : extensionNamespace +
-                       supplementaryInformation  //... so prefix it with the extension
-                                           // namespace.
-             )
-          : supplementaryInformation);  // Otherwise don't change anything
-
+                 //... so prefix it with the extension namespace.
+                 : extensionNamespace + supplementaryInformation)
+          // Otherwise don't change anything
+          : supplementaryInformation;
+  if (gd::ParameterMetadata::IsObject(type)) {
+    info.GetObjectType().SetName(fixedSupplementaryInformation);
+  } else {
+    info.SetExtraInfo(fixedSupplementaryInformation);
+  }
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
 
@@ -75,8 +79,7 @@ gd::ExpressionMetadata& ExpressionMetadata::AddCodeOnlyParameter(
   return *this;
 }
 
-
-gd::ExpressionMetadata& ExpressionMetadata::SetRequiresBaseObjectCapability(
+gd::ExpressionMetadata& ExpressionMetadata::SetRequiredBaseObjectCapability(
     const gd::String& capability) {
   requiredBaseObjectCapability = capability;
   return *this;

@@ -44,6 +44,7 @@ export type TestProject = {|
   colorRelationalOperatorParameterMetadata: gdParameterMetadata,
   unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
   emptyObjectsContainer: gdObjectsContainer,
+  textObjectType: gdObjectType
 |};
 */
 
@@ -820,6 +821,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'whatever-this-is-not-recognised'
   );
 
+  const textObjectType = new gd.ObjectType();
+  textObjectType.setName('TextObject::Text');
+
   return {
     project,
     shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
@@ -863,5 +867,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     colorRelationalOperatorParameterMetadata,
     unknownRelationalOperatorParameterMetadata,
     emptyObjectsContainer: new gd.ObjectsContainer(),
+    textObjectType,
   };
 };

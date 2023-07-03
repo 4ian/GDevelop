@@ -67,7 +67,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         }
         fullWidth
         errorTextIfInvalid={
-          allowedObjectType ? (
+          (allowedObjectType && allowedObjectType.getName()) ? (
             <Trans>The object does not exist or can't be used here.</Trans>
           ) : (
             <Trans>Enter the name of an object.</Trans>

@@ -1276,7 +1276,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetRequiredBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectDoubleParameter",
                 _("Effect parameter (number)"),
@@ -1292,7 +1292,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetRequiredBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectStringParameter",
                 _("Effect parameter (string)"),
@@ -1309,7 +1309,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetRequiredBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectBooleanParameter",
                 _("Effect parameter (enable or disable)"),
@@ -1325,7 +1325,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetRequiredBaseObjectCapability("effect");
 
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
@@ -1337,7 +1337,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .MarkAsSimple()
-      .SetRequiresBaseObjectCapability("effect");
+      .SetRequiredBaseObjectCapability("effect");
 
   obj.AddAction("SetIncludedInParentCollisionMask",
                 _("Include in parent collision mask"),
@@ -1692,10 +1692,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scaleWidth24_black.png",
                 "res/actions/scaleWidth_black.png")
-      .AddParameter("object", _("Object"), "&resizable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("resizable")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .SetRequiresBaseObjectCapability("resizable")
+      .SetRequiredBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
   obj.AddCondition("Width",
@@ -1705,10 +1706,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Size"),
                    "res/conditions/scaleWidth24_black.png",
                    "res/conditions/scaleWidth_black.png")
-      .AddParameter("object", _("Object"), "&resizable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("resizable")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .SetRequiresBaseObjectCapability("resizable")
+      .SetRequiredBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
   obj.AddAction("SetHeight",
@@ -1718,10 +1720,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scaleHeight24_black.png",
                 "res/actions/scaleHeight_black.png")
-      .AddParameter("object", _("Object"), "&resizable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("resizable")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .SetRequiresBaseObjectCapability("resizable")
+      .SetRequiredBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
   obj.AddCondition("Height",
@@ -1731,10 +1734,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Size"),
                    "res/conditions/scaleHeight24_black.png",
                    "res/conditions/scaleHeight_black.png")
-      .AddParameter("object", _("Object"), "&resizable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("resizable")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .SetRequiresBaseObjectCapability("resizable")
+      .SetRequiredBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 
   obj.AddAction("SetSize",
@@ -1744,10 +1748,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Size"),
                 "res/actions/scale24_black.png",
                 "res/actions/scale_black.png")
-      .AddParameter("object", _("Object"), "&resizable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("resizable")
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
-      .SetRequiresBaseObjectCapability("resizable")
+      .SetRequiredBaseObjectCapability("resizable")
       .MarkAsAdvanced();
 }
 // Instruction for Scalable capability.
@@ -1760,12 +1765,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"), "&scalable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("scalable")
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .SetRequiresBaseObjectCapability("scalable")
+      .SetRequiredBaseObjectCapability("scalable")
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction(
@@ -1777,11 +1783,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Scale"),
          "res/actions/scale24_black.png")
       .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("scalable")
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .SetRequiresBaseObjectCapability("scalable")
+      .SetRequiredBaseObjectCapability("scalable")
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction(
@@ -1792,12 +1799,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the scale on Y axis"),
          _("Scale"),
          "res/actions/scale24_black.png")
-      .AddParameter("object", _("Object"), "&scalable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("scalable")
       .UseStandardParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .SetRequiresBaseObjectCapability("scalable")
+      .SetRequiredBaseObjectCapability("scalable")
       .MarkAsAdvanced();
 }
 // Instruction for Flippable capability.
@@ -1809,10 +1817,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
-
-      .AddParameter("object", _("Object"), "&flippable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("flippable")
       .AddParameter("yesorno", _("Activate flipping"))
-      .SetRequiresBaseObjectCapability("flippable")
+      .SetRequiredBaseObjectCapability("flippable")
       .MarkAsSimple();
 
   obj.AddAction("FlipY",
@@ -1822,10 +1830,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
-
-      .AddParameter("object", _("Object"), "&flippable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("flippable")
       .AddParameter("yesorno", _("Activate flipping"))
-      .SetRequiresBaseObjectCapability("flippable")
+      .SetRequiredBaseObjectCapability("flippable")
       .MarkAsSimple();
 
   obj.AddCondition("FlippedX",
@@ -1835,8 +1843,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-      .AddParameter("object", _("Object"), "&flippable")
-      .SetRequiresBaseObjectCapability("flippable");
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("flippable")
+      .SetRequiredBaseObjectCapability("flippable");
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
@@ -1845,8 +1854,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
-      .AddParameter("object", _("Object"), "&flippable")
-      .SetRequiresBaseObjectCapability("flippable");
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("flippable")
+      .SetRequiredBaseObjectCapability("flippable");
 }
 // Instruction for Animable capability.
 {
@@ -1858,9 +1868,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the number of the animation"),
          _("Animations and images"),
          "res/actions/animation24.png")
-      .AddParameter("object", _("Object"), "&animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
-      .SetRequiresBaseObjectCapability("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsSimple();
 
   obj.AddAction("SetAnimationName",
@@ -1871,9 +1882,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
       .AddParameter("objectAnimationName", _("Animation name"))
-      .SetRequiresBaseObjectCapability("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsAdvanced();
 
   obj.AddCondition("AnimationName",
@@ -1883,9 +1895,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
       .AddParameter("objectAnimationName", _("Animation name"))
-      .SetRequiresBaseObjectCapability("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsAdvanced();
 
   obj.AddExpression("AnimationName",
@@ -1893,8 +1906,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("the name of animation played by the object"),
                     _("Animations and images"),
                     "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
-      .SetRequiresBaseObjectCapability("animable");
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
+      .SetRequiredBaseObjectCapability("animable");
 
   obj.AddAction("PauseAnimation", _("Pause the animation"),
                 _("Pause the animation of the object"),
@@ -1902,8 +1916,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
-      .SetRequiresBaseObjectCapability("animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsSimple();
 
   obj.AddAction("PlayAnimation", _("Resume the animation"),
@@ -1912,8 +1927,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Animations and images"),
                 "res/actions/animation24.png",
                 "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
-      .SetRequiresBaseObjectCapability("animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsSimple();
 
   obj.AddExpressionAndConditionAndAction(
@@ -1924,11 +1940,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("the animation speed scale"),
          _("Animations and images"),
          "res/actions/animation24.png")
-      .AddParameter("object", _("Object"), "&animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
       .UseStandardParameters(
           "number", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Speed scale")))
-      .SetRequiresBaseObjectCapability("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsSimple();
 
   obj.AddCondition("IsAnimationPaused",
@@ -1938,8 +1955,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
-      .SetRequiresBaseObjectCapability("animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsSimple();
 
   obj.AddCondition("HasAnimationEnded",
@@ -1950,8 +1968,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
-      .AddParameter("object", _("Object"), "&animable")
-      .SetRequiresBaseObjectCapability("animable")
+      .AddParameter("object", _("Object"))
+      .AddRequiredObjectCapabilityOnLastParameter("animable")
+      .SetRequiredBaseObjectCapability("animable")
       .MarkAsSimple();
 }
 }

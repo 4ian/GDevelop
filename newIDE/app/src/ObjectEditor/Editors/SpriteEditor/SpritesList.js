@@ -114,7 +114,6 @@ const SortableList = SortableContainer(
               <ImageThumbnail
                 key={sprite.ptr}
                 selectable
-                key={sprite.ptr}
                 selected={!!selectedSprites[sprite.ptr]}
                 onSelect={selected => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}

@@ -27,6 +27,7 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     if (parameter.GetName().empty()) continue;
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
+      // TODO Declare object capabilities
       outputObjectsContainer.InsertNewObject(
           project,
           parameter.GetObjectType().GetName(),

@@ -85,7 +85,7 @@ export const setupFunctionFromEvents = ({
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
     newParameter.setName(objectName);
-    newParameter.setExtraInfo(
+    newParameter.getObjectType().setName(
       gd.getTypeOfObject(
         globalObjectsContainer,
         objectsContainer,

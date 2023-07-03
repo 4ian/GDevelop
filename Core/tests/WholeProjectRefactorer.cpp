@@ -76,6 +76,11 @@ const gd::String &GetEventFirstActionType(const gd::BaseEvent &event) {
   return actions.Get(0).GetType();
 }
 
+gd::ParameterMetadata &SetObjectType(gd::ParameterMetadata &objectParameter, const gd::String type) {
+    objectParameter.GetObjectType().SetName(type);
+    return objectParameter;
+}
+
 enum TestEvent {
   FreeFunctionAction,
   FreeFunctionWithExpression,
@@ -866,21 +871,19 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
     auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
         "MyBehaviorEventsFunction", 0);
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    behaviorAction.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
     behaviorAction.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("Behavior")
             .SetType("behavior")
             .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
     behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("ObjectWithMyBehavior")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+        SetObjectType(gd::ParameterMetadata()
+                          .SetName("ObjectWithMyBehavior")
+                          .SetType("object"),
+                      "MyEventsExtension::MyEventsBasedObject"));
     behaviorAction.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("OtherBehavior")
@@ -893,11 +896,9 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         behaviorEventsFunctions
             .InsertNewEventsFunction("MyBehaviorEventsFunctionExpression", 1)
             .SetFunctionType(gd::EventsFunction::Expression);
-    behaviorExpression.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    behaviorExpression.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
     behaviorExpression.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("Behavior")
@@ -951,16 +952,12 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
     auto &objectAction = objectEventsFunctions.InsertNewEventsFunction(
         "MyObjectEventsFunction", 0);
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("OtherObject")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    objectAction.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
+    objectAction.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("OtherObject").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
     objectAction.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("OtherBehavior")
@@ -971,11 +968,9 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         objectEventsFunctions
             .InsertNewEventsFunction("MyObjectEventsFunctionExpression", 1)
             .SetFunctionType(gd::EventsFunction::Expression);
-    objectExpression.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    objectExpression.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
 
     auto &objectExpressionAndCondition =
         objectEventsFunctions
@@ -1017,11 +1012,9 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
     auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
         "MyBehaviorEventsFunction", 0);
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    behaviorAction.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
     behaviorAction.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("Behavior")
@@ -1029,20 +1022,18 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
             .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
     // Define the same objects as in the layout to be consistent with events.
     behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("ObjectWithMyBehavior")
-            .SetType("object")
-            .SetExtraInfo("MyExtension::Sprite"));
+        SetObjectType(gd::ParameterMetadata()
+                          .SetName("ObjectWithMyBehavior")
+                          .SetType("object"),
+                      "MyExtension::Sprite"));
     behaviorAction.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("MyBehavior")
             .SetType("behavior")
             .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
-    behaviorAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("MyCustomObject")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    behaviorAction.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("MyCustomObject").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
   }
 
   // Add an other events based object that uses previously defined events based
@@ -1057,11 +1048,9 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
     auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
     auto &objectAction = objectEventsFunctions.InsertNewEventsFunction(
         "MyObjectEventsFunction", 0);
-    objectAction.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyOtherEventsBasedObject"));
+    objectAction.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyOtherEventsBasedObject"));
 
     // Add a child-object with the same names the one from the scene
     // to be able to use the same events list.
@@ -1083,11 +1072,9 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
                                          .SetName("currentScene")
                                          .SetType("")
                                          .SetCodeOnly(true));
-    action.GetParameters().push_back(
-        gd::ParameterMetadata()
-            .SetName("Object")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+    action.GetParameters().push_back(SetObjectType(
+        gd::ParameterMetadata().SetName("Object").SetType("object"),
+        "MyEventsExtension::MyEventsBasedObject"));
     action.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("Behavior")
@@ -1126,20 +1113,20 @@ SetupProjectWithEventsFunctionExtension(gd::Project &project) {
         eventsExtension.InsertNewEventsFunction("MyOtherEventsFunction", 0);
     // Define the same objects as in the layout to be consistent with events.
     action.GetParameters().push_back(
-        gd::ParameterMetadata()
+        SetObjectType(gd::ParameterMetadata()
             .SetName("ObjectWithMyBehavior")
-            .SetType("object")
-            .SetExtraInfo("MyExtension::Sprite"));
+            .SetType("object"),
+            "MyExtension::Sprite"));
     action.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("MyBehavior")
             .SetType("behavior")
             .SetExtraInfo("MyEventsExtension::MyEventsBasedBehavior"));
     action.GetParameters().push_back(
-        gd::ParameterMetadata()
+        SetObjectType(gd::ParameterMetadata()
             .SetName("MyCustomObject")
-            .SetType("object")
-            .SetExtraInfo("MyEventsExtension::MyEventsBasedObject"));
+            .SetType("object"),
+            "MyEventsExtension::MyEventsBasedObject"));
     auto &group = action.GetObjectGroups().InsertNew("GroupWithMyBehavior");
     group.AddObject("ObjectWithMyBehavior");
   }
@@ -2271,7 +2258,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedObject")
               .GetEventsFunctions()
               .GetEventsFunction("MyObjectEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(1).GetExtraInfo() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters().at(1).GetObjectType().GetName() ==
               "MyEventsExtension::MyRenamedEventsBasedObject");
     }
   }

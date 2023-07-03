@@ -33,8 +33,8 @@ void PropertyFunctionGenerator::GenerateObjectGetterAndSetter(
     gd::Project &project, gd::EventsFunctionsExtension &extension,
     gd::EventsBasedObject &eventsBasedObject,
     const gd::NamedPropertyDescriptor &property) {
-  // TODO Check if setting the object type name is necessary. 
   gd::ObjectType objectType;
+  objectType.SetName(gd::PlatformExtension::GetObjectFullType(extension.GetName(), eventsBasedObject.GetName()));
   GenerateGetterAndSetter(project, extension, eventsBasedObject, property, objectType,
                           false, false);
 }

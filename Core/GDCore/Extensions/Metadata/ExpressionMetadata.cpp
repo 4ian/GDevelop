@@ -43,9 +43,9 @@ gd::ExpressionMetadata& ExpressionMetadata::AddParameter(
   info.codeOnly = false;
   info.SetOptional(parameterIsOptional);
 
-  // For objects/behavior, the supplementary information
-  // parameter is an object/behavior type...
   gd::String fixedSupplementaryInformation =
+      // For objects/behavior, the supplementary information
+      // parameter is an object/behavior type...
       ((gd::ParameterMetadata::IsObject(type) ||
         gd::ParameterMetadata::IsBehavior(type))
        // Prefix with the namespace if it's not already there.

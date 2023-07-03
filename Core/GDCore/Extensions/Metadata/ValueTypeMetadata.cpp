@@ -18,7 +18,9 @@ void ValueTypeMetadata::SerializeTo(SerializerElement& element) const {
   if (!supplementaryInformation.empty()) {
     element.SetAttribute("supplementaryInformation", supplementaryInformation);
   }
-  objectType.SerializeTo(element);
+  if (gd::ParameterMetadata::IsObject(name)) {
+    objectType.SerializeTo(element);
+  }
   if (optional) {
     element.SetAttribute("optional", optional);
   }
@@ -31,11 +33,13 @@ void ValueTypeMetadata::UnserializeFrom(const SerializerElement& element) {
   name = element.GetStringAttribute("type");
   supplementaryInformation =
       element.GetStringAttribute("supplementaryInformation");
-  objectType.UnserializeFrom(element);
-  // Compatibility with GD <= 4.2.166
-  if (gd::ParameterMetadata::IsObject(name) && !supplementaryInformation.empty()) {
-    objectType.SetName(supplementaryInformation);
-    supplementaryInformation = "";
+  if (gd::ParameterMetadata::IsObject(name)) {
+    objectType.UnserializeFrom(element);
+    // Compatibility with GD <= 4.2.166
+    if (!element.HasAttribute("objectType") && !supplementaryInformation.empty()) {
+      objectType.SetName(supplementaryInformation);
+      supplementaryInformation = "";
+    }
   }
   // end of compatibility code
   optional = element.GetBoolAttribute("optional");

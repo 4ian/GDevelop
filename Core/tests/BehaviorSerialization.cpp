@@ -37,7 +37,7 @@ void AddEventsBasedExtension(gd::Project &project) {
           "MyEventsBasedBehavior", 0);
   eventsBasedBehavior.SetFullName("My events based behavior");
   eventsBasedBehavior.SetDescription("An events based behavior for test");
-  eventsBasedBehavior.SetObjectType("");
+  eventsBasedBehavior.GetObjectType().SetName("");
   eventsBasedBehavior.GetPropertyDescriptors()
       .InsertNew("MyProperty", 0)
       .SetType("Number");

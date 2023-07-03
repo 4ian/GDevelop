@@ -127,23 +127,26 @@ const InstructionParametersEditor = React.forwardRef<
 
     const forceUpdate = useForceUpdate();
 
-    const focus: FieldFocusFunction = options => {
-      // Verify that there is a field to focus.
-      if (
-        getVisibleParametersCount(
-          getInstructionMetadata({
-            instructionType: instruction.getType(),
-            isCondition,
-            project,
-          }),
-          objectName
-        ) !== 0
-      ) {
-        if (firstVisibleField.current && firstVisibleField.current.focus) {
-          firstVisibleField.current.focus(options);
+    const focus: FieldFocusFunction = React.useCallback(
+      options => {
+        // Verify that there is a field to focus.
+        if (
+          getVisibleParametersCount(
+            getInstructionMetadata({
+              instructionType: instruction.getType(),
+              isCondition,
+              project,
+            }),
+            objectName
+          ) !== 0
+        ) {
+          if (firstVisibleField.current && firstVisibleField.current.focus) {
+            firstVisibleField.current.focus(options);
+          }
         }
-      }
-    };
+      },
+      [project, objectName, instruction, isCondition]
+    );
 
     React.useImperativeHandle(ref, () => ({
       focus,
@@ -206,9 +209,7 @@ const InstructionParametersEditor = React.forwardRef<
           return () => clearTimeout(timeoutId);
         }
       },
-      // We want to run this effect only when the component did mount.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
+      [focus, focusOnMount]
     );
 
     const instructionType = instruction.getType();

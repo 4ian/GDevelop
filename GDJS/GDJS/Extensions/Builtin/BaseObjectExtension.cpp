@@ -138,10 +138,10 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["SeparateFromObjects"]
       .SetFunctionName("separateFromObjectsList")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["Ecarter"] // Deprecated
+  objectActions["Ecarter"]  // Deprecated
       .SetFunctionName("separateObjectsWithoutForces")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["Rebondir"] // Deprecated
+  objectActions["Rebondir"]  // Deprecated
       .SetFunctionName("separateObjectsWithForces")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["BehaviorActivated"]
@@ -395,16 +395,16 @@ BaseObjectExtension::BaseObjectExtension() {
                   instruction.GetParameter(0).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
-          gd::String newX =
-              isNotAssignmentOperator(op1)
-                  ? (objectListName + "[i].getX() " + op1 + expression1Code)
-                  : expression1Code;
+          gd::String newX = isNotAssignmentOperator(op1)
+                                ? (objectListName + "[i].getX() " + op1 + "(" +
+                                   expression1Code + ")")
+                                : expression1Code;
 
           gd::String op2 = instruction.GetParameter(3).GetPlainString();
-          gd::String newY =
-              isNotAssignmentOperator(op2)
-                  ? (objectListName + "[i].getY() " + op2 + expression2Code)
-                  : expression2Code;
+          gd::String newY = isNotAssignmentOperator(op2)
+                                ? (objectListName + "[i].getY() " + op2 + "(" +
+                                   expression2Code + ")")
+                                : expression2Code;
 
           gd::String call =
               objectListName + "[i].setPosition(" + newX + "," + newY + ")";

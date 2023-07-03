@@ -36,8 +36,8 @@ export const getMatchingCollisionMask = async (
 
       context.drawImage(img, 0, 0);
       // Get the pixel data from the canvas
-      var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      var pixels = imageData.data;
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
 
       let minX = null;
       let maxX = null;

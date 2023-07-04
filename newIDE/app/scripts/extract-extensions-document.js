@@ -243,7 +243,7 @@ const createExtensionReferencePage = async (gd, project, extension, extensionSho
  * @param {gdEventsFunctionsExtension} extension The extension
  * @returns {string}
  */
-const generateReferenceContent = async (gd, project, extension) => {
+const generateReferenceContent = (gd, project, extension) => {
   const extensionMetadata = generateEventsFunctionExtensionMetadata(gd, project, extension);
   const extensionReference = generateExtensionReference(extensionMetadata);
   return rawTextsToString(generateExtensionRawText(extensionReference));

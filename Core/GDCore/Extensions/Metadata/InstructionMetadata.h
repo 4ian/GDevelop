@@ -295,7 +295,7 @@ public:
   InstructionMetadata &
   SetParameterObjectType(const gd::ObjectType &objectType) override {
     if (!parameters.empty()) {
-      parameters.back().SetObjectType(objectType);
+      parameters.back().GetValueTypeMetadata().SetObjectType(objectType);
     }
     return *this;
   }
@@ -309,7 +309,7 @@ public:
   InstructionMetadata &
   AddRequiredObjectCapabilityOnLastParameter(const gd::String &capability) {
     if (!parameters.empty()) {
-      parameters.back().GetObjectType().AddCapability(capability);
+      parameters.back().GetValueTypeMetadata().GetObjectType().AddCapability(capability);
     }
     return *this;
   }

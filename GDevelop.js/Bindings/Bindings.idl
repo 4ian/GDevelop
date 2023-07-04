@@ -1481,8 +1481,6 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetName([Const] DOMString name_);
     [Const, Ref] DOMString GetExtraInfo();
     [Ref] ParameterMetadata SetExtraInfo([Const] DOMString extraInfo_);
-    [Const, Ref] ObjectType GetObjectType();
-    [Ref] ParameterMetadata SetObjectType([Const, Ref] ObjectType objectType);
     boolean IsOptional();
     [Ref] ParameterMetadata SetOptional(boolean optional_);
     [Const, Ref] DOMString GetDescription();
@@ -1513,6 +1511,7 @@ interface ValueTypeMetadata {
     [Const, Ref] DOMString GetExtraInfo();
     [Ref] ValueTypeMetadata SetExtraInfo([Const] DOMString extraInfo_);
     [Ref] ObjectType GetObjectType();
+    void SetObjectType([Const, Ref] ObjectType objectType);
     boolean IsOptional();
     [Ref] ValueTypeMetadata SetOptional(boolean optional_);
     [Const, Ref] DOMString GetDefaultValue();

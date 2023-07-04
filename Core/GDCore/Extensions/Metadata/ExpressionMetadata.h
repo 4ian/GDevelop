@@ -233,7 +233,7 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   ExpressionMetadata &
   SetParameterObjectType(const gd::ObjectType &objectType) override {
     if (!parameters.empty()) {
-      parameters.back().SetObjectType(objectType);
+      parameters.back().GetValueTypeMetadata().SetObjectType(objectType);
     }
     return *this;
   }
@@ -247,7 +247,7 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   ExpressionMetadata &
   AddRequiredObjectCapabilityOnLastParameter(const gd::String &capability) {
     if (!parameters.empty()) {
-      parameters.back().GetObjectType().AddCapability(capability);
+      parameters.back().GetValueTypeMetadata().GetObjectType().AddCapability(capability);
     }
     return *this;
   }

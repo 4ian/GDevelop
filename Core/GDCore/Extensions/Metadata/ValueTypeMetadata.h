@@ -65,6 +65,18 @@ class GD_CORE_API ValueTypeMetadata {
   gd::ObjectType& GetObjectType() { return objectType; };
 
   /**
+   * \brief Get the type of the object.
+   */
+  const gd::ObjectType& GetObjectType() const { return objectType; }
+
+  /**
+   * \brief Set the type of the object.
+   */
+  void SetObjectType(const gd::ObjectType& objectType_) {
+    objectType = objectType_;
+  }
+
+  /**
    * \brief Return true if the parameter is optional.
    */
   bool IsOptional() const { return optional; }

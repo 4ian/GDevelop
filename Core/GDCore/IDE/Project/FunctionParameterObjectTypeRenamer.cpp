@@ -17,9 +17,10 @@ namespace gd {
 void FunctionParameterObjectTypeRenamer::DoVisitEventsFunction(
     gd::EventsFunction &eventsFunction) {
   for (auto &&parameter : eventsFunction.GetParameters()) {
+    auto &objectType = parameter.GetValueTypeMetadata().GetObjectType();
     if (gd::ParameterMetadata::IsObject(parameter.GetType()) &&
-        parameter.GetObjectType().GetName() == oldObjectType) {
-      parameter.GetObjectType().SetName(newObjectType);
+        objectType.GetName() == oldObjectType) {
+      objectType.SetName(newObjectType);
     }
   }
 }

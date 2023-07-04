@@ -292,7 +292,9 @@ const Instruction = (props: Props) => {
                 expressionValidator.getAllErrors().size() === 0;
               expressionValidator.delete();
             } else if (gd.ParameterMetadata.isObject(parameterType)) {
-              const objectType = parameterMetadata.getObjectType();
+              const objectType = parameterMetadata
+                .getValueTypeMetadata()
+                .getObjectType();
 
               const objectOrGroupName = instruction
                 .getParameter(parameterIndex)

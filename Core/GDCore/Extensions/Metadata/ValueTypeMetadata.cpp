@@ -40,6 +40,7 @@ void ValueTypeMetadata::UnserializeFrom(const SerializerElement& element) {
       objectType.SetName(supplementaryInformation);
       supplementaryInformation = "";
     }
+    std::cout << "Unserialized object type: " << objectType.GetName() << std::endl;
   }
   // end of compatibility code
   optional = element.GetBoolAttribute("optional");

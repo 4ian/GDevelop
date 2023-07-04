@@ -295,7 +295,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
 
-      auto& parameterObjectType = instrInfos.parameters[pNb].GetObjectType().GetName();
+      auto& parameterObjectType = instrInfos.parameters[pNb].GetValueTypeMetadata().GetObjectType().GetName();
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
@@ -486,7 +486,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].GetType())) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
 
-      auto& parameterObjectType = instrInfos.parameters[pNb].GetObjectType().GetName();
+      auto& parameterObjectType = instrInfos.parameters[pNb].GetValueTypeMetadata().GetObjectType().GetName();
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
@@ -1058,7 +1058,7 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
   // Prepare call
   // Add a static_cast if necessary
   gd::String objectFunctionCallNamePart =
-      (!instrInfos.parameters[0].GetObjectType().IsBaseObject())
+      (!instrInfos.parameters[0].GetValueTypeMetadata().GetObjectType().IsBaseObject())
           ? "static_cast<" + objInfo.className + "*>(" +
                 GetObjectListName(objectName, context) + "[i])->" +
                 instrInfos.codeExtraInformation.functionCallName

@@ -486,8 +486,9 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       auto &objectParameter = setter.GetParameters().at(0);
       REQUIRE(objectParameter.GetName() == "Object");
       REQUIRE(objectParameter.GetType() == "object");
-      REQUIRE(objectParameter.GetObjectType().GetName() ==
-              "MyEventsExtension::MyEventsBasedObject");
+      REQUIRE(
+          objectParameter.GetValueTypeMetadata().GetObjectType().GetName() ==
+          "MyEventsExtension::MyEventsBasedObject");
       auto &valueParameter = setter.GetParameters().at(1);
       REQUIRE(valueParameter.GetName() == "Value");
       REQUIRE(valueParameter.GetType() == "yesorno");

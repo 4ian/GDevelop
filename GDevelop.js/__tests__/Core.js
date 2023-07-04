@@ -4058,7 +4058,7 @@ describe('libGD.js', function () {
       parameter3.setDescription(
         'This parameter will be skipped, as it has no name'
       );
-      parameter3.getObjectType().setName('Sprite');
+      parameter3.getValueTypeMetadata().getObjectType().setName('Sprite');
       const parameter4 = new gd.ParameterMetadata();
       parameter4.setType('string');
       parameter4.setName('MyString');
@@ -4067,7 +4067,7 @@ describe('libGD.js', function () {
       parameter5.setType('objectList');
       parameter5.setName('MySpriteObject');
       parameter5.setDescription('The second object to be used, a sprite');
-      parameter5.getObjectType().setName('Sprite');
+      parameter5.getValueTypeMetadata().getObjectType().setName('Sprite');
 
       parameters.push_back(parameter1);
       parameters.push_back(parameter2);

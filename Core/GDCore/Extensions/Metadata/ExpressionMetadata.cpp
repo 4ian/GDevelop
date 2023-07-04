@@ -57,7 +57,7 @@ gd::ExpressionMetadata& ExpressionMetadata::AddParameter(
           // Otherwise don't change anything
           : supplementaryInformation;
   if (gd::ParameterMetadata::IsObject(type)) {
-    info.GetObjectType().SetName(fixedSupplementaryInformation);
+    info.GetValueTypeMetadata().GetObjectType().SetName(fixedSupplementaryInformation);
   } else {
     info.SetExtraInfo(fixedSupplementaryInformation);
   }

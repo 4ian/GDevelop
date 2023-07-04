@@ -71,7 +71,10 @@ export const getLastObjectParameterObjectType = (
     return null;
   }
 
-  return parameters.at(objectParameterIndex).getObjectType();
+  return parameters
+    .at(objectParameterIndex)
+    .getValueTypeMetadata()
+    .getObjectType();
 };
 
 /**

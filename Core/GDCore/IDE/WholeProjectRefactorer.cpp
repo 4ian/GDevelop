@@ -102,6 +102,7 @@ void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
         .SetType("object")
         .SetName(behaviorObjectParameterName)
         .SetDescription("Object")
+        .GetValueTypeMetadata()
         .SetObjectType(eventsBasedBehavior.GetObjectType());
     parameters[1]
         .SetType("behavior")

@@ -128,7 +128,7 @@ export default function ValueTypeEditor({
                 project={project}
                 value={valueTypeMetadata.getObjectType().getName()}
                 onChange={(value: string) => {
-                  valueTypeMetadata.getObjectType.setName(value);
+                  valueTypeMetadata.getObjectType().setName(value);
                   forceUpdate();
                   onTypeUpdated();
                 }}

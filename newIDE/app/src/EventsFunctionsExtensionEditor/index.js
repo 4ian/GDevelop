@@ -164,6 +164,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Initialize this "context" of objects with the function
     // (as done during code generation).
     if (eventsBasedBehavior) {
+      console.trace();
       gd.EventsFunctionTools.behaviorEventsFunctionToObjectsContainer(
         project,
         eventsBasedBehavior,

@@ -85,14 +85,17 @@ export const setupFunctionFromEvents = ({
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
     newParameter.setName(objectName);
-    newParameter.getObjectType().setName(
-      gd.getTypeOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        objectName,
-        true
-      )
-    );
+    newParameter
+      .getValueTypeMetadata()
+      .getObjectType()
+      .setName(
+        gd.getTypeOfObject(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName,
+          true
+        )
+      );
     parameters.push_back(newParameter);
 
     const behaviorNames: Array<string> = eventsContext

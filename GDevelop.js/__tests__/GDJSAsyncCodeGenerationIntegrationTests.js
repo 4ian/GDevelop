@@ -2428,7 +2428,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         eventsFunction.getParameters().push_back(parameter);
         parameter.setType('object');
         parameter.setName('MyParamObject');
-        parameter.getObjectType().setName(
+        parameter.getValueTypeMetadata().getObjectType().setName(
           'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
         );
         eventsFunction.getParameters().push_back(parameter);
@@ -2492,7 +2492,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         eventsFunction.getParameters().push_back(parameter);
         parameter.setType('object');
         parameter.setName('MyParamObject');
-        parameter.getObjectType().setName(
+        parameter.getValueTypeMetadata().getObjectType().setName(
           'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
         );
         eventsFunction.getParameters().push_back(parameter);
@@ -2556,7 +2556,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         eventsFunction.getParameters().push_back(parameter);
         parameter.setType('object');
         parameter.setName('MyParamObject');
-        parameter.getObjectType().setName(
+        parameter.getValueTypeMetadata().getObjectType().setName(
           'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
         );
         eventsFunction.getParameters().push_back(parameter);
@@ -2712,7 +2712,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       eventsFunction.getParameters().push_back(parameter);
       parameter.setType('object');
       parameter.setName('MyParamObject');
-      parameter.getObjectType().setName(
+      parameter.getValueTypeMetadata().getObjectType().setName(
         'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
       );
       eventsFunction.getParameters().push_back(parameter);
@@ -3210,7 +3210,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       eventsFunction.getParameters().push_back(parameter);
       parameter.setType('object');
       parameter.setName('MyParamObject');
-      parameter.getObjectType().setName(
+      parameter.getValueTypeMetadata().getObjectType().setName(
         'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
       );
       eventsFunction.getParameters().push_back(parameter);
@@ -3466,7 +3466,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       eventsFunction.getParameters().push_back(parameter);
       parameter.setType('object');
       parameter.setName('MyParamObject');
-      parameter.getObjectType().setName(
+      parameter.getValueTypeMetadata().getObjectType().setName(
         'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
       );
       eventsFunction.getParameters().push_back(parameter);

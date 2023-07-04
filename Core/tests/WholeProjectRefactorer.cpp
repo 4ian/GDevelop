@@ -76,9 +76,10 @@ const gd::String &GetEventFirstActionType(const gd::BaseEvent &event) {
   return actions.Get(0).GetType();
 }
 
-gd::ParameterMetadata &SetObjectType(gd::ParameterMetadata &objectParameter, const gd::String type) {
-    objectParameter.GetObjectType().SetName(type);
-    return objectParameter;
+gd::ParameterMetadata &SetObjectType(gd::ParameterMetadata &objectParameter,
+                                     const gd::String type) {
+  objectParameter.GetValueTypeMetadata().GetObjectType().SetName(type);
+  return objectParameter;
 }
 
 enum TestEvent {
@@ -1863,8 +1864,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
             .GetEventsFunction("MyEventsFunction");
-    REQUIRE(myEventsFunction.GetParameters().at(1).GetObjectType().GetName() ==
-            "MyRenamedExtension::MyEventsBasedObject");
+    REQUIRE(myEventsFunction.GetParameters()
+                .at(1)
+                .GetValueTypeMetadata()
+                .GetObjectType()
+                .GetName() == "MyRenamedExtension::MyEventsBasedObject");
     REQUIRE(myEventsFunction.GetParameters().at(2).GetExtraInfo() ==
             "MyRenamedExtension::MyEventsBasedBehavior");
 
@@ -1876,8 +1880,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedBehavior")
               .GetEventsFunctions()
               .GetEventsFunction("MyBehaviorEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetObjectType().GetName() ==
-              "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .at(2)
+                  .GetValueTypeMetadata()
+                  .GetObjectType()
+                  .GetName() == "MyRenamedExtension::MyEventsBasedObject");
       REQUIRE(myBehaviorEventsFunction.GetParameters().at(3).GetExtraInfo() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
     }
@@ -1890,8 +1897,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedObject")
               .GetEventsFunctions()
               .GetEventsFunction("MyObjectEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(1).GetObjectType().GetName() ==
-              "MyRenamedExtension::MyEventsBasedObject");
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .at(1)
+                  .GetValueTypeMetadata()
+                  .GetObjectType()
+                  .GetName() == "MyRenamedExtension::MyEventsBasedObject");
       REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetExtraInfo() ==
               "MyRenamedExtension::MyEventsBasedBehavior");
     }
@@ -2235,8 +2245,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &myEventsFunction =
         project.GetEventsFunctionsExtension("MyEventsExtension")
             .GetEventsFunction("MyEventsFunction");
-    REQUIRE(myEventsFunction.GetParameters().at(1).GetObjectType().GetName() ==
-            "MyEventsExtension::MyRenamedEventsBasedObject");
+    REQUIRE(myEventsFunction.GetParameters()
+                .at(1)
+                .GetValueTypeMetadata()
+                .GetObjectType()
+                .GetName() == "MyEventsExtension::MyRenamedEventsBasedObject");
 
     // Behavior function
     {
@@ -2246,7 +2259,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedBehavior")
               .GetEventsFunctions()
               .GetEventsFunction("MyBehaviorEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(2).GetObjectType().GetName() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .at(2)
+                  .GetValueTypeMetadata()
+                  .GetObjectType()
+                  .GetName() ==
               "MyEventsExtension::MyRenamedEventsBasedObject");
     }
 
@@ -2258,7 +2275,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
               .Get("MyEventsBasedObject")
               .GetEventsFunctions()
               .GetEventsFunction("MyObjectEventsFunction");
-      REQUIRE(myBehaviorEventsFunction.GetParameters().at(1).GetObjectType().GetName() ==
+      REQUIRE(myBehaviorEventsFunction.GetParameters()
+                  .at(1)
+                  .GetValueTypeMetadata()
+                  .GetObjectType()
+                  .GetName() ==
               "MyEventsExtension::MyRenamedEventsBasedObject");
     }
   }

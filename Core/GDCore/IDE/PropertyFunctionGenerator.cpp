@@ -154,6 +154,7 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       objectParameter.SetType("object")
           .SetName("Object")
           .SetDescription("Object")
+          .GetValueTypeMetadata()
           .SetObjectType(objectType);
       if (!isBehavior) {
         gd::String objectFullType = gd::PlatformExtension::GetObjectFullType(

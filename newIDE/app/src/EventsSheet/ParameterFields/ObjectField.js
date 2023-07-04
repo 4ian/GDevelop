@@ -42,7 +42,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       : undefined;
 
     const allowedObjectType = parameterMetadata
-      ? parameterMetadata.getObjectType()
+      ? parameterMetadata.getValueTypeMetadata().getObjectType()
       : undefined;
 
     return (
@@ -67,7 +67,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         }
         fullWidth
         errorTextIfInvalid={
-          (allowedObjectType && allowedObjectType.getName()) ? (
+          allowedObjectType && allowedObjectType.getName() ? (
             <Trans>The object does not exist or can't be used here.</Trans>
           ) : (
             <Trans>Enter the name of an object.</Trans>

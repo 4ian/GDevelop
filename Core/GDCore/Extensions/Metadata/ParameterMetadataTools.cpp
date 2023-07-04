@@ -30,7 +30,7 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
       // TODO Declare object capabilities
       outputObjectsContainer.InsertNewObject(
           project,
-          parameter.GetObjectType().GetName(),
+          parameter.GetValueTypeMetadata().GetObjectType().GetName(),
           parameter.GetName(),
           outputObjectsContainer.GetObjectsCount());
 

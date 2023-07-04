@@ -158,7 +158,6 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
 
-    console.log("allowedObjectType: " + allowedObjectType.getName());
     const hasObjectWithRequiredCapability =
       !project ||
       !allowedObjectType ||

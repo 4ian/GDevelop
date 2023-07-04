@@ -9,6 +9,7 @@ import {
   silverSubscriptionWithExpiredRedemptionCode,
   silverSubscriptionWithRedemptionCode,
   subscriptionForGoldUser,
+  subscriptionForStartupUser,
   subscriptionForIndieUser,
   subscriptionForProUser,
   subscriptionForEducationPlan,
@@ -70,6 +71,16 @@ export const WithGoldSubscription = () => (
   <AlertProvider>
     <SubscriptionDetails
       subscription={subscriptionForGoldUser}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  </AlertProvider>
+);
+
+export const WithStartupSubscription = () => (
+  <AlertProvider>
+    <SubscriptionDetails
+      subscription={subscriptionForStartupUser}
       onManageSubscription={action('manage subscription')}
       isManageSubscriptionLoading={false}
     />

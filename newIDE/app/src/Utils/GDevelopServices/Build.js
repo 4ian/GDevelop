@@ -97,7 +97,7 @@ export const getWebBuildThumbnailUrl = (
   const resourceManager = project.getResourcesManager();
   const resourceName = project
     .getPlatformSpecificAssets()
-    .get('liluo', `thumbnail`);
+    .get('gdgames', `thumbnail`);
   if (!resourceManager.hasResource(resourceName)) {
     return '';
   }

@@ -13,68 +13,68 @@ branches:
     - master
     - /experimental-build.*/
 init:
-- ps: ''
+  - ps: ""
 install:
-- ps: Install-Product node 16
-# Build GDevelop.js (and run tests to ensure it works).
-# (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
-- cmd: >-
-    cd GDevelop.js
+  - ps: Install-Product node 16
+  # Build GDevelop.js (and run tests to ensure it works).
+  # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
+  - cmd: >-
+      cd GDevelop.js
 
-    npm -v && npm install
+      npm -v && npm install
 
-    git clone https://github.com/juj/emsdk.git
+      git clone https://github.com/juj/emsdk.git
 
-    cd emsdk
+      cd emsdk
 
-    emsdk install 1.39.6
+      emsdk install 1.39.6
 
-    CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
+      CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
 
-    cd ..\..
+      cd ..\..
 
-# Build GDevelop IDE
-- cmd: >-
-    cd newIDE\app
+  # Build GDevelop IDE
+  - cmd: >-
+      cd newIDE\app
 
-    npm -v && npm install
+      npm -v && npm install
 
-    cd ..\electron-app
+      cd ..\electron-app
 
-    npm -v && npm install
+      npm -v && npm install
 
-    cd ..\..
+      cd ..\..
 
 # Package the app for Windows (and sign it with the certificate set in environment variables).
 # Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
-- ps: >-
-    cd newIDE\electron-app
+  - ps: >-
+      cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
+      node --max-old-space-size=4096 scripts/build.js --win nsis --publish=never
 
-    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
+      Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
 
-    cd ..\..
+      cd ..\..
 
-# Clean dist folder to keep only installers/binaries.
-- cmd: >-
-    DEL /F/Q/S newIDE\electron-app\dist\win-unpacked
+  # Clean dist folder to keep only installers/binaries.
+  - cmd: >-
+      DEL /F/Q/S newIDE\electron-app\dist\win-unpacked
 
 # Run a few tests on Windows.
 test_script:
-- cmd: >-
-    cd GDevelop.js
+  - cmd: >-
+      cd GDevelop.js
 
-    npm test
+      npm test
 
-    cd ..
+      cd ..
 
-    cd newIDE\app
+      cd newIDE\app
 
-    npm test
+      npm test
 
-    cd ..\..
+      cd ..\..
 
 artifacts:
   - path: newIDE\electron-app\dist

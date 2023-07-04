@@ -244,7 +244,7 @@ const createExtensionReferencePage = async (gd, project, extension, extensionSho
  * @returns {string}
  */
 const generateReferenceContent = async (gd, project, extension) => {
-  const extensionMetadata = generateEventsFunctionExtensionMetadata(project, extension);
+  const extensionMetadata = generateEventsFunctionExtensionMetadata(gd, project, extension);
   const extensionReference = generateExtensionReference(extensionMetadata);
   return rawTextsToString(generateExtensionRawText(extensionReference));
 }
@@ -311,25 +311,28 @@ const generateEventsFunctionExtensionMetadata = (
 
 /**
  * Generate a section for an extension.
- * @param {ExtensionHeader} extensionHeader The extension header
+ * @param {gdEventsFunctionsExtension} extension The extension
  */
-const generateExtensionSection = extensionHeader => {
-  const folderName = getExtensionFolderName(extensionHeader.name);
+const generateExtensionSection = extension => {
+  const folderName = getExtensionFolderName(extension.getName());
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
-  const helpPageUrl = getHelpLink(extensionHeader.helpPath) || referencePageUrl;
+  const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
 
-  return `|${generateSvgImageIcon(extensionHeader.previewIconUrl)}|**${
-    extensionHeader.fullName
-  }**|${extensionHeader.shortDescription}|${`[Read more...](${helpPageUrl})` +
+  return `|${generateSvgImageIcon(extension.getPreviewIconUrl())}|**${
+    extension.getFullName()
+  }**|${extension.getShortDescription()}|${`[Read more...](${helpPageUrl})` +
     (helpPageUrl !== referencePageUrl
       ? ` ([reference](${referencePageUrl}))`
       : '')}|\n`;
 };
 
-const generateAllExtensionsSections = extensionShortHeaders => {
+/**
+ * @param {gdEventsFunctionsExtension} extension The extension
+ */
+const generateAllExtensionsSections = extensions => {
   let extensionSectionsContent = '';
   const extensionsByCategory = sortKeys(
-    groupBy(extensionShortHeaders, pair => pair.category || 'General')
+    groupBy(extensions, pair => pair.getCategory() || 'General')
   );
   for (const category in extensionsByCategory) {
     const extensions = extensionsByCategory[category];
@@ -338,8 +341,8 @@ const generateAllExtensionsSections = extensionShortHeaders => {
     extensionSectionsContent += '||Name|Description||\n';
     extensionSectionsContent += '|---|---|---|---|\n';
 
-    for (const extensionHeader of extensions) {
-      extensionSectionsContent += generateExtensionSection(extensionHeader);
+    for (const extension of extensions) {
+      extensionSectionsContent += generateExtensionSection(extension);
     }
     extensionSectionsContent += '\n';
   }

@@ -409,7 +409,7 @@ describe('libGD.js - GDJS related tests', function () {
       parameter3.setType('objectList');
       parameter3.setName('MySprite');
       parameter3.setDescription('The second object to be used, a sprite');
-      parameter3.setExtraInfo('Sprite');
+      parameter3.getObjectType().setName('Sprite');
       const parameter4 = new gd.ParameterMetadata();
       parameter4.setType('string');
       parameter4.setName('MyString');
@@ -534,7 +534,7 @@ describe('libGD.js - GDJS related tests', function () {
       parameter2.setType('objectList');
       parameter2.setName('MySprite');
       parameter2.setDescription('The second object to be used, a sprite');
-      parameter2.setExtraInfo('Sprite');
+      parameter2.getObjectType().setName('Sprite');
       parameters.push_back(parameter1);
       parameters.push_back(parameter2);
 

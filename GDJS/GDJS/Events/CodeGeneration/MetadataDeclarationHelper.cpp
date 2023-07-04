@@ -1224,7 +1224,7 @@ void MetadataDeclarationHelper::AddParameter(
         // with the extension namespace (this was done to ease extension
         // declarations when dealing with object).
         .SetParameterExtraInfo(parameter.GetExtraInfo())
-        .SetParameterObjectType(parameter.GetObjectType());
+        .SetParameterObjectType(parameter.GetValueTypeMetadata().GetObjectType());
     instructionOrExpression.SetParameterLongDescription(
         parameter.GetLongDescription());
     instructionOrExpression.SetDefaultValue(parameter.GetDefaultValue());

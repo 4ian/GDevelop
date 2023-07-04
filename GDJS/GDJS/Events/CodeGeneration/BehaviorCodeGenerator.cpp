@@ -19,6 +19,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
     const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  std::cout << "GenerateRuntimeBehaviorCompleteCode" << std::endl;
   auto& eventsFunctionsVector =
       eventsBasedBehavior.GetEventsFunctions().GetInternalVector();
 

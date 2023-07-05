@@ -24,8 +24,9 @@ const {
 } = require('./lib/ExtensionReferenceGenerator');
 const { mapVector, mapFor } = require('./lib/MapFor');
 
+/** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
 
-/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number, helpPath: string, description: string, iconUrl: string}} ExtensionHeader */
+/** @typedef {{ tier: 'community' | 'reviewed', shortDescription: string, authorIds: Array<string>, authors?: Array<{id: string, username: string}>, extensionNamespace: string, fullName: string, name: string, version: string, gdevelopVersion?: string, url: string, headerUrl: string, tags: Array<string>, category: string, previewIconUrl: string, eventsBasedBehaviorsCount: number, eventsFunctionsCount: number}} ExtensionShortHeader */
 
 const extensionShortHeadersUrl =
   'https://api.gdevelop-app.com/asset/extension-short-header';
@@ -60,9 +61,9 @@ const generateAuthorNamesWithLinks = authors => {
  * (useful as containing author public profiles information).
  * 
  * @param {any} gd
- * @param {gdProject} project
+ * @param {any} project (gdProject)
  * 
- * @returns {Promise<gdEventsFunctionsExtension>} A promise to all extensions
+ * @returns {Promise<any>} A promise to all extensions (gdEventsFunctionsExtension)
  */
 const addAllExtensionsToProject = async (gd, project) => {
   const response = await axios.get(extensionShortHeadersUrl);
@@ -105,10 +106,10 @@ const addAllExtensionsToProject = async (gd, project) => {
  * Tool function to restore a serializable object from a JS object.
  * Most gd.* objects are "serializable", meaning they have a serializeTo
  * and unserializeFrom method.
- * @param {gdSerializable} serializable A gd.* object to restore
+ * @param {any} serializable A gd.* object to restore (gdSerializable)
  * @param {Object} object The JS object to be used to restore the serializable.
  * @param {string} methodName The name of the unserialization method. "unserializeFrom" by default
- * @param {?gdProject} optionalProject The project to pass as argument for unserialization
+ * @param {?any} optionalProject The project to pass as argument for unserialization (gdProject)
  */
 function unserializeFromJSObject(
   gd,
@@ -167,8 +168,8 @@ const sortKeys = table => {
 /**
  * Create a page for an extension.
  * @param {any} gd
- * @param {gdProject} project
- * @param {gdEventsFunctionsExtension} extension The extension
+ * @param {any} project (gdProject)
+ * @param {any} extension The extension (gdEventsFunctionsExtension)
  * @param {ExtensionHeader} extensionShortHeader
  * @param {boolean} isCommunity The tier
  */
@@ -256,12 +257,12 @@ const generateExtensionFooterText = ({ extension }) => {
 
 /**
  * Generate the metadata for the events based extension
- * @param {gdProject} project A project containing of the extensions
- * @param {eventsFunctionsExtension} eventsFunctionsExtension An extension
- * @returns {gdPlatformExtension} the extension metadata
+ * @param {any} project A project containing of the extensions (gdProject)
+ * @param {any} eventsFunctionsExtension An extension (gdEventsFunctionsExtension)
+ * @returns {any} the extension metadata (gdPlatformExtension)
  */
 const generateEventsFunctionExtensionMetadata = (
-  gd, project, eventsFunctionsExtension) => {
+    gd, project, eventsFunctionsExtension) => {
   const extension = new gd.PlatformExtension();
   gd.MetadataDeclarationHelper.declareExtension(
     extension,
@@ -316,7 +317,7 @@ const generateEventsFunctionExtensionMetadata = (
 
 /**
  * Generate a section for an extension.
- * @param {gdEventsFunctionsExtension} extension The extension
+ * @param {any} extension The extension (gdEventsFunctionsExtension)
  */
 const generateExtensionSection = extension => {
   const folderName = getExtensionFolderName(extension.getName());
@@ -332,7 +333,7 @@ const generateExtensionSection = extension => {
 };
 
 /**
- * @param {gdEventsFunctionsExtension} extension The extension
+ * @param {Array<any>} extensions The extension (gdEventsFunctionsExtension)
  */
 const generateAllExtensionsSections = extensions => {
   let extensionSectionsContent = '';

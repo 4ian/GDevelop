@@ -39,6 +39,10 @@ const {
   generateHeader,
 } = require('./lib/ExtensionReferenceGenerator');
 
+/** @typedef {import("./lib/ExtensionReferenceGenerator.js").RawText} RawText */
+/** @typedef {import("./lib/ExtensionReferenceGenerator.js").ExtensionReference} ExtensionReference */
+
+/** @returns {RawText} */
 const generateFileHeaderText = () => {
   return {
     text: `# Expressions reference

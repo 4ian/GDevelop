@@ -452,8 +452,8 @@ const generateExtensionReference = extension => {
 
 /**
  * @param {ExtensionReference} extensionReference
- * @param {{extension: gdPlatformExtension} => RawText} generateExtensionHeaderText
- * @param {{extension: gdPlatformExtension} => RawText} generateExtensionFooterText
+ * @param {({extension: gdPlatformExtension, depth: number}) => RawText} generateExtensionHeaderText
+ * @param {({extension: gdPlatformExtension}) => RawText} generateExtensionFooterText
  * @returns {Array<RawText>}}}
  */
 const generateExtensionRawText = (extensionReference, generateExtensionHeaderText, generateExtensionFooterText) => {

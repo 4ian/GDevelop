@@ -173,7 +173,7 @@ const sortKeys = table => {
  * @param {any} gd
  * @param {any} project (gdProject)
  * @param {any} extension The extension (gdEventsFunctionsExtension)
- * @param {ExtensionHeader} extensionShortHeader
+ * @param {ExtensionShortHeader} extensionShortHeader
  * @param {boolean} isCommunity The tier
  */
 const createExtensionReferencePage = async (
@@ -217,6 +217,7 @@ const createExtensionReferencePage = async (
 
 /**
  *
+ * @param {{ extension: any }} extension (gdPlatformExtension)
  * @param {ExtensionShortHeader} extensionShortHeader
  * @param {boolean} isCommunity
  * @returns {RawText}
@@ -405,6 +406,11 @@ Here are listed all the extensions available in GDevelop. The list is divided in
     const extensionShortHeader = extensionShortHeaders.find(
       header => header.name === extension.getName()
     );
+    if (!extensionShortHeader) {
+      throw new Error(
+        `Could not find header for extension: ${extension.getName()}`
+      );
+    }
     await createExtensionReferencePage(
       gd,
       project,
@@ -428,6 +434,11 @@ does or inspect its content before using it.
     const extensionShortHeader = extensionShortHeaders.find(
       header => header.name === extension.getName()
     );
+    if (!extensionShortHeader) {
+      throw new Error(
+        `Could not find header for extension: ${extension.getName()}`
+      );
+    }
     await createExtensionReferencePage(
       gd,
       project,

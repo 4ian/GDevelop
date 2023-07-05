@@ -315,67 +315,105 @@ export default function SubscriptionDialog({
                 }
               />
             </LineStackLayout>
-            {getSubscriptionPlans().map(plan => {
-              const userPlanId = authenticatedUser.subscription
-                ? authenticatedUser.subscription.planId
-                : null;
-              const isFreePlan = !plan.planId;
-              const isUserCurrentOrLegacyPlan =
-                userPlanId === plan.planId ||
-                (!!userPlanId && userPlanId === plan.legacyPlanId);
-              let actions: React.Node = null;
-              if (isFreePlan) {
-                // If no plan (free usage), do not display button.
-              } else if (plan.planId === 'gdevelop_education') {
-                if (!isUserCurrentOrLegacyPlan) {
-                  actions = [
-                    <ResponsiveLineStackLayout
-                      key="options"
-                      expand
-                      noColumnMargin
-                      noMargin
-                    >
-                      <SemiControlledTextField
-                        value={educationPlanSeatsCount.toString()}
-                        floatingLabelFixed
-                        fullWidth
-                        floatingLabelText={<Trans>Number of seats</Trans>}
-                        commitOnBlur
-                        type="number"
-                        onChange={value => {
-                          const newValue = parseInt(value);
-                          setEducationPlanSeatsCount(
-                            Math.min(
-                              EDUCATION_PLAN_MAX_SEATS,
-                              Math.max(
-                                Number.isNaN(newValue)
-                                  ? EDUCATION_PLAN_MIN_SEATS
-                                  : newValue,
-                                EDUCATION_PLAN_MIN_SEATS
-                              )
-                            )
-                          );
-                        }}
-                        min={EDUCATION_PLAN_MIN_SEATS}
-                        max={EDUCATION_PLAN_MAX_SEATS}
-                        step={1}
-                        helperMarkdownText={i18n._(
-                          t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
-                        )}
-                      />
-                      <SelectField
-                        value={educationPlanPeriodicity}
-                        floatingLabelText={<Trans>Engagement</Trans>}
-                        fullWidth
-                        onChange={(e, i, newValue) => {
-                          // $FlowExpectedError - Flow does not infer the type given the select options.
-                          setEducationPlanPeriodicity(newValue);
-                        }}
+            {getSubscriptionPlans()
+              .filter(plan => !plan.hideInSubscriptionDialog)
+              .map(plan => {
+                const userPlanId = authenticatedUser.subscription
+                  ? authenticatedUser.subscription.planId
+                  : null;
+                const isFreePlan = !plan.planId;
+                const isUserCurrentOrLegacyPlan =
+                  userPlanId === plan.planId ||
+                  (!!userPlanId && userPlanId === plan.legacyPlanId);
+                let actions: React.Node = null;
+                if (isFreePlan) {
+                  // If no plan (free usage), do not display button.
+                } else if (plan.planId === 'gdevelop_education') {
+                  if (!isUserCurrentOrLegacyPlan) {
+                    actions = [
+                      <ResponsiveLineStackLayout
+                        key="options"
+                        expand
+                        noColumnMargin
+                        noMargin
                       >
-                        <SelectOption value="yearly" label={t`Per year`} />
-                        <SelectOption value="monthly" label={t`Per month`} />
-                      </SelectField>
-                    </ResponsiveLineStackLayout>,
+                        <SemiControlledTextField
+                          value={educationPlanSeatsCount.toString()}
+                          floatingLabelFixed
+                          fullWidth
+                          floatingLabelText={<Trans>Number of seats</Trans>}
+                          commitOnBlur
+                          type="number"
+                          onChange={value => {
+                            const newValue = parseInt(value);
+                            setEducationPlanSeatsCount(
+                              Math.min(
+                                EDUCATION_PLAN_MAX_SEATS,
+                                Math.max(
+                                  Number.isNaN(newValue)
+                                    ? EDUCATION_PLAN_MIN_SEATS
+                                    : newValue,
+                                  EDUCATION_PLAN_MIN_SEATS
+                                )
+                              )
+                            );
+                          }}
+                          min={EDUCATION_PLAN_MIN_SEATS}
+                          max={EDUCATION_PLAN_MAX_SEATS}
+                          step={1}
+                          helperMarkdownText={i18n._(
+                            t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
+                          )}
+                        />
+                        <SelectField
+                          value={educationPlanPeriodicity}
+                          floatingLabelText={<Trans>Engagement</Trans>}
+                          fullWidth
+                          onChange={(e, i, newValue) => {
+                            // $FlowExpectedError - Flow does not infer the type given the select options.
+                            setEducationPlanPeriodicity(newValue);
+                          }}
+                        >
+                          <SelectOption value="yearly" label={t`Per year`} />
+                          <SelectOption value="monthly" label={t`Per month`} />
+                        </SelectField>
+                      </ResponsiveLineStackLayout>,
+                      <RaisedButton
+                        primary
+                        key="upgrade"
+                        disabled={isLoading}
+                        label={
+                          <LeftLoader isLoading={isLoading}>
+                            <Trans>Choose this plan</Trans>
+                          </LeftLoader>
+                        }
+                        onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
+                      />,
+                    ];
+                  } else {
+                    actions = [
+                      <Text key="contact">
+                        <Trans>Contact us for more information.</Trans>
+                      </Text>,
+                    ];
+                  }
+                } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
+                  actions = [
+                    <FlatButton
+                      key="cancel"
+                      disabled={isLoading}
+                      label={
+                        <LeftLoader isLoading={isLoading}>
+                          <Trans>Cancel your subscription</Trans>
+                        </LeftLoader>
+                      }
+                      onClick={() =>
+                        buyUpdateOrCancelPlan(i18n, { planId: null })
+                      }
+                    />,
+                  ];
+                } else {
+                  actions = [
                     <RaisedButton
                       primary
                       key="upgrade"
@@ -388,55 +426,19 @@ export default function SubscriptionDialog({
                       onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
                     />,
                   ];
-                } else {
-                  actions = [
-                    <Text key="contact">
-                      <Trans>Contact us for more information.</Trans>
-                    </Text>,
-                  ];
                 }
-              } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
-                actions = [
-                  <FlatButton
-                    key="cancel"
-                    disabled={isLoading}
-                    label={
-                      <LeftLoader isLoading={isLoading}>
-                        <Trans>Cancel your subscription</Trans>
-                      </LeftLoader>
-                    }
-                    onClick={() =>
-                      buyUpdateOrCancelPlan(i18n, { planId: null })
-                    }
-                  />,
-                ];
-              } else {
-                actions = [
-                  <RaisedButton
-                    primary
-                    key="upgrade"
-                    disabled={isLoading}
-                    label={
-                      <LeftLoader isLoading={isLoading}>
-                        <Trans>Choose this plan</Trans>
-                      </LeftLoader>
-                    }
-                    onClick={() => buyUpdateOrCancelPlan(i18n, plan)}
-                  />,
-                ];
-              }
 
-              return (
-                <PlanCard
-                  key={plan.planId || 'free'}
-                  plan={plan}
-                  actions={actions}
-                  isPending={isLoading}
-                  isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
-                  background="medium"
-                />
-              );
-            })}
+                return (
+                  <PlanCard
+                    key={plan.planId || 'free'}
+                    plan={plan}
+                    actions={actions}
+                    isPending={isLoading}
+                    isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
+                    background="medium"
+                  />
+                );
+              })}
             <PlanCard
               plan={businessPlan}
               actions={

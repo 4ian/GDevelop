@@ -140,9 +140,7 @@ const SubscriptionDetails = ({
                           onClick={onManageSubscription}
                           disabled={isManageSubscriptionLoading}
                         />
-                      ) : (
-                        undefined
-                      ),
+                      ) : null,
                       <RaisedButton
                         key="manage"
                         label={<Trans>Manage subscription</Trans>}

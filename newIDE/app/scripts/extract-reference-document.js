@@ -186,7 +186,8 @@ const generateExtensionRawTexts = extensionReferences => {
         texts: generateExtensionRawText(
           extensionReference,
           generateExtensionHeaderText,
-          generateExtensionFooterText),
+          generateExtensionFooterText
+        ),
       };
     });
 

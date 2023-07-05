@@ -57,12 +57,12 @@ const generateAuthorNamesWithLinks = authors => {
 
 /**
  * Add a serialized (JS object) events function extension to the project.
- * 
+ *
  * (useful as containing author public profiles information).
- * 
+ *
  * @param {any} gd
  * @param {any} project (gdProject)
- * 
+ *
  * @returns {Promise<any>} A promise to all extensions (gdEventsFunctionsExtension)
  */
 const addAllExtensionsToProject = async (gd, project) => {
@@ -83,12 +83,15 @@ const addAllExtensionsToProject = async (gd, project) => {
           }).`
         );
       }
-      
+
       const { name } = serializedExtension;
       if (!name)
         return Promise.reject(new Error('Malformed extension (missing name).'));
 
-      const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(name, 0);
+      const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+        name,
+        0
+      );
       unserializeFromJSObject(
         gd,
         newEventsFunctionsExtension,
@@ -173,14 +176,30 @@ const sortKeys = table => {
  * @param {ExtensionHeader} extensionShortHeader
  * @param {boolean} isCommunity The tier
  */
-const createExtensionReferencePage = async (gd, project, extension, extensionShortHeader, isCommunity) => {
-
-  const extensionMetadata = generateEventsFunctionExtensionMetadata(gd, project, extension);
+const createExtensionReferencePage = async (
+  gd,
+  project,
+  extension,
+  extensionShortHeader,
+  isCommunity
+) => {
+  const extensionMetadata = generateEventsFunctionExtensionMetadata(
+    gd,
+    project,
+    extension
+  );
   const extensionReference = generateExtensionReference(extensionMetadata);
-  const referencePageContent = rawTextsToString(generateExtensionRawText(
-    extensionReference,
-    reference => generateExtensionHeaderText(reference, extensionShortHeader, isCommunity),
-    generateExtensionFooterText)
+  const referencePageContent = rawTextsToString(
+    generateExtensionRawText(
+      extensionReference,
+      reference =>
+        generateExtensionHeaderText(
+          reference,
+          extensionShortHeader,
+          isCommunity
+        ),
+      generateExtensionFooterText
+    )
   );
 
   const folderName = getExtensionFolderName(extension.getName());
@@ -197,12 +216,16 @@ const createExtensionReferencePage = async (gd, project, extension, extensionSho
 };
 
 /**
- * 
+ *
  * @param {ExtensionShortHeader} extensionShortHeader
  * @param {boolean} isCommunity
  * @returns {RawText}
  */
-const generateExtensionHeaderText = ({ extension }, extensionShortHeader, isCommunity) => {
+const generateExtensionHeaderText = (
+  { extension },
+  extensionShortHeader,
+  isCommunity
+) => {
   const folderName = getExtensionFolderName(extension.getName());
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
@@ -212,33 +235,32 @@ const generateExtensionHeaderText = ({ extension }, extensionShortHeader, isComm
 
   return {
     text:
-    `# ${extension.getFullName()}` +
-    '\n\n' +
-    generateSvgImageIcon(extensionShortHeader.previewIconUrl) +
-    '\n' +
-    `${extensionShortHeader.shortDescription}\n` +
-    '\n' +
-    `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
-    '\n' +
-    (isCommunity
-      ? `!!! warning
+      `# ${extension.getFullName()}` +
+      '\n\n' +
+      generateSvgImageIcon(extensionShortHeader.previewIconUrl) +
+      '\n' +
+      `${extensionShortHeader.shortDescription}\n` +
+      '\n' +
+      `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
+      '\n' +
+      (isCommunity
+        ? `!!! warning
     This is an extension made by a community member — but not reviewed
     by the GDevelop extension team. As such, we can't guarantee it
     meets all the quality standards of official extensions. In case of
     doubt, contact the author to know more about what the extension
     does or inspect its content before using it.
 \n\n`
-      : '') +
-    '---\n' +
-    '\n' +
-    convertCommonMarkdownToPythonMarkdown(extension.getDescription()) +
-    '\n' +
-    (extension.getHelpPath() ? `\n[Read more...](${helpPageUrl})\n` : ``) +
-    '\n' +
-    `!!! tip
+        : '') +
+      '---\n' +
+      '\n' +
+      convertCommonMarkdownToPythonMarkdown(extension.getDescription()) +
+      '\n' +
+      (extension.getHelpPath() ? `\n[Read more...](${helpPageUrl})\n` : ``) +
+      '\n' +
+      `!!! tip
     Learn [how to install new extensions](/gdevelop5/extensions/search) by following a step-by-step guide.` +
-    '\n'
-    ,
+      '\n',
   };
 };
 
@@ -246,12 +268,12 @@ const generateExtensionHeaderText = ({ extension }, extensionShortHeader, isComm
 const generateExtensionFooterText = ({ extension }) => {
   return {
     text:
-    `
+      `
 ---
 
 *This page is an auto-generated reference page about the **${extension.getFullName()}** extension, made by the community of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
-    ' ' +
-    'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).'
+      ' ' +
+      'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).',
   };
 };
 
@@ -262,7 +284,10 @@ const generateExtensionFooterText = ({ extension }) => {
  * @returns {any} the extension metadata (gdPlatformExtension)
  */
 const generateEventsFunctionExtensionMetadata = (
-    gd, project, eventsFunctionsExtension) => {
+  gd,
+  project,
+  eventsFunctionsExtension
+) => {
   const extension = new gd.PlatformExtension();
   gd.MetadataDeclarationHelper.declareExtension(
     extension,
@@ -324,9 +349,9 @@ const generateExtensionSection = extension => {
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
 
-  return `|${generateSvgImageIcon(extension.getPreviewIconUrl())}|**${
-    extension.getFullName()
-  }**|${extension.getShortDescription()}|${`[Read more...](${helpPageUrl})` +
+  return `|${generateSvgImageIcon(
+    extension.getPreviewIconUrl()
+  )}|**${extension.getFullName()}**|${extension.getShortDescription()}|${`[Read more...](${helpPageUrl})` +
     (helpPageUrl !== referencePageUrl
       ? ` ([reference](${referencePageUrl}))`
       : '')}|\n`;
@@ -355,7 +380,7 @@ const generateAllExtensionsSections = extensions => {
   return extensionSectionsContent;
 };
 
-const generateExtensionsList = async (gd) => {
+const generateExtensionsList = async gd => {
   let content = `## Extensions list
 
 Here are listed all the extensions available in GDevelop. The list is divided in [two tiers](/gdevelop5/extensions/tiers/):
@@ -377,8 +402,16 @@ Here are listed all the extensions available in GDevelop. The list is divided in
 
   content += '## Reviewed extensions\n\n';
   for (const extension of reviewedExtensions) {
-    const extensionShortHeader = extensionShortHeaders.find(header => header.name === extension.getName());
-    await createExtensionReferencePage(gd, project, extension, extensionShortHeader, false);
+    const extensionShortHeader = extensionShortHeaders.find(
+      header => header.name === extension.getName()
+    );
+    await createExtensionReferencePage(
+      gd,
+      project,
+      extension,
+      extensionShortHeader,
+      false
+    );
   }
   content += generateAllExtensionsSections(reviewedExtensions);
 
@@ -392,8 +425,16 @@ does or inspect its content before using it.
 
 `;
   for (const extension of communityExtensions) {
-    const extensionShortHeader = extensionShortHeaders.find(header => header.name === extension.getName());
-    await createExtensionReferencePage(gd, project, extension, extensionShortHeader, true);
+    const extensionShortHeader = extensionShortHeaders.find(
+      header => header.name === extension.getName()
+    );
+    await createExtensionReferencePage(
+      gd,
+      project,
+      extension,
+      extensionShortHeader,
+      true
+    );
   }
   content += generateAllExtensionsSections(communityExtensions);
   project.delete();

@@ -121,7 +121,7 @@ const generateExpressionsTableHeader = headerOptions => {
   // We don't put a header for the last column
   const text =
     (headerOptions ? generateHeader(headerOptions).text + '\n' : '') +
-`| Expression | Description |  |
+    `| Expression | Description |  |
 |-----|-----|-----|`;
   return {
     text,
@@ -342,20 +342,14 @@ const generateExtensionReference = extension => {
       instructionsMetadata: extension.getAllActionsForObject(objectType),
       objectMetadata,
     });
-    const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts(
-      {
-        areConditions: true,
-        instructionsMetadata: extension.getAllConditionsForObject(
-          objectType
-        ),
-        objectMetadata,
-      }
-    );
+    const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+      areConditions: true,
+      instructionsMetadata: extension.getAllConditionsForObject(objectType),
+      objectMetadata,
+    });
     const expressionsReferenceTexts = [
       ...generateExpressionsReferenceRowsTexts({
-        expressionsMetadata: extension.getAllExpressionsForObject(
-          objectType
-        ),
+        expressionsMetadata: extension.getAllExpressionsForObject(objectType),
         objectMetadata,
       }),
       ...generateExpressionsReferenceRowsTexts({
@@ -381,20 +375,14 @@ const generateExtensionReference = extension => {
     const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
     const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
       areConditions: false,
-      instructionsMetadata: extension.getAllActionsForBehavior(
-        behaviorType
-      ),
+      instructionsMetadata: extension.getAllActionsForBehavior(behaviorType),
       behaviorMetadata,
     });
-    const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts(
-      {
-        areConditions: true,
-        instructionsMetadata: extension.getAllConditionsForBehavior(
-          behaviorType
-        ),
-        behaviorMetadata,
-      }
-    );
+    const conditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+      areConditions: true,
+      instructionsMetadata: extension.getAllConditionsForBehavior(behaviorType),
+      behaviorMetadata,
+    });
     const expressionsReferenceTexts = [
       ...generateExpressionsReferenceRowsTexts({
         expressionsMetadata: extension.getAllExpressionsForBehavior(
@@ -424,12 +412,10 @@ const generateExtensionReference = extension => {
     areConditions: false,
     instructionsMetadata: extension.getAllActions(),
   });
-  const freeConditionsReferenceTexts = generateInstructionsReferenceRowsTexts(
-    {
-      areConditions: true,
-      instructionsMetadata: extension.getAllConditions(),
-    }
-  );
+  const freeConditionsReferenceTexts = generateInstructionsReferenceRowsTexts({
+    areConditions: true,
+    instructionsMetadata: extension.getAllConditions(),
+  });
   const freeExpressionsReferenceTexts = [
     ...generateExpressionsReferenceRowsTexts({
       expressionsMetadata: extensionStrExpressions,
@@ -448,7 +434,7 @@ const generateExtensionReference = extension => {
     objectReferences,
     behaviorReferences,
   };
-}
+};
 
 /**
  * @param {ExtensionReference} extensionReference
@@ -456,7 +442,11 @@ const generateExtensionReference = extension => {
  * @param {({extension: gdPlatformExtension}) => RawText} generateExtensionFooterText
  * @returns {Array<RawText>}}}
  */
-const generateExtensionRawText = (extensionReference, generateExtensionHeaderText, generateExtensionFooterText) => {
+const generateExtensionRawText = (
+  extensionReference,
+  generateExtensionHeaderText,
+  generateExtensionFooterText
+) => {
   const {
     extension,
     freeActionsReferenceTexts,
@@ -473,86 +463,86 @@ const generateExtensionRawText = (extensionReference, generateExtensionHeaderTex
   };
 
   return [
-          generateExtensionHeaderText({ extension, depth: 1 }),
-          ...withHeaderIfNotEmpty(freeActionsReferenceTexts, {
-            headerName: 'Actions',
-            depth: 2,
-          }),
-          ...withHeaderIfNotEmpty(freeConditionsReferenceTexts, {
-            headerName: 'Conditions',
-            depth: 2,
-          }),
-          freeExpressionsReferenceTexts.length
-            ? generateExpressionsTableHeader({
-                headerName: 'Expressions',
-                depth: 2,
-              })
-            : { text: '' },
-          ...freeExpressionsReferenceTexts,
-          ...objectReferences.flatMap(objectReference => {
-            const {
-              objectMetadata,
-              actionsReferenceTexts,
-              conditionsReferenceTexts,
-              expressionsReferenceTexts,
-            } = objectReference;
-            return [
-              generateObjectHeaderText({
-                extension,
-                objectMetadata,
-                showExtensionName: false,
-                showHelpLink: false,
-              }),
-              ...withHeaderIfNotEmpty(actionsReferenceTexts, {
-                headerName: 'Object actions',
-                depth: 3,
-              }),
-              ...withHeaderIfNotEmpty(conditionsReferenceTexts, {
-                headerName: 'Object conditions',
-                depth: 3,
-              }),
-              expressionsReferenceTexts.length
-                ? generateExpressionsTableHeader({
-                    headerName: 'Object expressions',
-                    depth: 3,
-                  })
-                : generateObjectNoExpressionsText(),
-              ...expressionsReferenceTexts,
-            ];
-          }),
-          ...behaviorReferences.flatMap(behaviorReference => {
-            const {
-              behaviorMetadata,
-              actionsReferenceTexts,
-              conditionsReferenceTexts,
-              expressionsReferenceTexts,
-            } = behaviorReference;
-            return [
-              generateBehaviorHeaderText({
-                extension,
-                behaviorMetadata,
-                showExtensionName: false,
-                showHelpLink: false,
-              }),
-              ...withHeaderIfNotEmpty(actionsReferenceTexts, {
-                headerName: 'Behavior actions',
-                depth: 3,
-              }),
-              ...withHeaderIfNotEmpty(conditionsReferenceTexts, {
-                headerName: 'Behavior conditions',
-                depth: 3,
-              }),
-              expressionsReferenceTexts.length
-                ? generateExpressionsTableHeader({
-                    headerName: 'Behavior expressions',
-                    depth: 3,
-                  })
-                : generateBehaviorNoExpressionsText(),
-              ...expressionsReferenceTexts,
-            ];
-          }),
-          generateExtensionFooterText({ extension }),
-        ].filter(Boolean);
+    generateExtensionHeaderText({ extension, depth: 1 }),
+    ...withHeaderIfNotEmpty(freeActionsReferenceTexts, {
+      headerName: 'Actions',
+      depth: 2,
+    }),
+    ...withHeaderIfNotEmpty(freeConditionsReferenceTexts, {
+      headerName: 'Conditions',
+      depth: 2,
+    }),
+    freeExpressionsReferenceTexts.length
+      ? generateExpressionsTableHeader({
+          headerName: 'Expressions',
+          depth: 2,
+        })
+      : { text: '' },
+    ...freeExpressionsReferenceTexts,
+    ...objectReferences.flatMap(objectReference => {
+      const {
+        objectMetadata,
+        actionsReferenceTexts,
+        conditionsReferenceTexts,
+        expressionsReferenceTexts,
+      } = objectReference;
+      return [
+        generateObjectHeaderText({
+          extension,
+          objectMetadata,
+          showExtensionName: false,
+          showHelpLink: false,
+        }),
+        ...withHeaderIfNotEmpty(actionsReferenceTexts, {
+          headerName: 'Object actions',
+          depth: 3,
+        }),
+        ...withHeaderIfNotEmpty(conditionsReferenceTexts, {
+          headerName: 'Object conditions',
+          depth: 3,
+        }),
+        expressionsReferenceTexts.length
+          ? generateExpressionsTableHeader({
+              headerName: 'Object expressions',
+              depth: 3,
+            })
+          : generateObjectNoExpressionsText(),
+        ...expressionsReferenceTexts,
+      ];
+    }),
+    ...behaviorReferences.flatMap(behaviorReference => {
+      const {
+        behaviorMetadata,
+        actionsReferenceTexts,
+        conditionsReferenceTexts,
+        expressionsReferenceTexts,
+      } = behaviorReference;
+      return [
+        generateBehaviorHeaderText({
+          extension,
+          behaviorMetadata,
+          showExtensionName: false,
+          showHelpLink: false,
+        }),
+        ...withHeaderIfNotEmpty(actionsReferenceTexts, {
+          headerName: 'Behavior actions',
+          depth: 3,
+        }),
+        ...withHeaderIfNotEmpty(conditionsReferenceTexts, {
+          headerName: 'Behavior conditions',
+          depth: 3,
+        }),
+        expressionsReferenceTexts.length
+          ? generateExpressionsTableHeader({
+              headerName: 'Behavior expressions',
+              depth: 3,
+            })
+          : generateBehaviorNoExpressionsText(),
+        ...expressionsReferenceTexts,
+      ];
+    }),
+    generateExtensionFooterText({ extension }),
+  ].filter(Boolean);
 };
 
 module.exports = {

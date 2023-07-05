@@ -38,22 +38,6 @@ const generateSvgImageIcon = iconUrl => {
   return `<img src="${iconUrl}" class="extension-icon"></img>`;
 };
 
-/** @returns {string} */
-const generateExtensionFooterText = fullName => {
-  return (
-    `
----
-
-!!! tip
-
-    Learn [how to install new extensions](/gdevelop5/extensions/search) by following a step-by-step guide.
-
-*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
-    ' ' +
-    'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).'
-  );
-};
-
 /**
  * @param {{id: string, username: string}[]} authors
  */
@@ -147,7 +131,7 @@ function unserializeFromJSObject(
 /**
  * Return the list of all extensions and their associated short headers
  * (useful as containing author public profiles information).
- * @returns {Promise<Array<ExtensionHeader>>} A promise to all extension headers
+ * @returns {Promise<Array<ExtensionShortHeader>>} A promise to all extension headers
  */
 const getAllExtensionShortHeaders = async () => {
   const response = await axios.get(extensionShortHeadersUrl);
@@ -189,6 +173,35 @@ const sortKeys = table => {
  * @param {boolean} isCommunity The tier
  */
 const createExtensionReferencePage = async (gd, project, extension, extensionShortHeader, isCommunity) => {
+
+  const extensionMetadata = generateEventsFunctionExtensionMetadata(gd, project, extension);
+  const extensionReference = generateExtensionReference(extensionMetadata);
+  const referencePageContent = rawTextsToString(generateExtensionRawText(
+    extensionReference,
+    reference => generateExtensionHeaderText(reference, extensionShortHeader, isCommunity),
+    generateExtensionFooterText)
+  );
+
+  const folderName = getExtensionFolderName(extension.getName());
+  const extensionReferenceFilePath = path.join(
+    extensionsRootPath,
+    folderName,
+    'index.md'
+  );
+  await fs.mkdir(path.dirname(extensionReferenceFilePath), {
+    recursive: true,
+  });
+  await fs.writeFile(extensionReferenceFilePath, referencePageContent);
+  console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
+};
+
+/**
+ * 
+ * @param {ExtensionShortHeader} extensionShortHeader
+ * @param {boolean} isCommunity
+ * @returns {RawText}
+ */
+const generateExtensionHeaderText = ({ extension }, extensionShortHeader, isCommunity) => {
   const folderName = getExtensionFolderName(extension.getName());
   const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}`;
   const helpPageUrl = getHelpLink(extension.getHelpPath()) || referencePageUrl;
@@ -196,12 +209,13 @@ const createExtensionReferencePage = async (gd, project, extension, extensionSho
     extensionShortHeader.authors || []
   );
 
-  const referencePageContent =
+  return {
+    text:
     `# ${extension.getFullName()}` +
     '\n\n' +
-    generateSvgImageIcon(extension.getPreviewIconUrl()) +
+    generateSvgImageIcon(extensionShortHeader.previewIconUrl) +
     '\n' +
-    `${extension.getShortDescription()}\n` +
+    `${extensionShortHeader.shortDescription}\n` +
     '\n' +
     `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
     '\n' +
@@ -220,34 +234,25 @@ const createExtensionReferencePage = async (gd, project, extension, extensionSho
     '\n' +
     (extension.getHelpPath() ? `\n[Read more...](${helpPageUrl})\n` : ``) +
     '\n' +
-    generateReferenceContent(gd, project, extension) +
-    '\n' +
-    generateExtensionFooterText(extension.getFullName());
-
-  const extensionReferenceFilePath = path.join(
-    extensionsRootPath,
-    folderName,
-    'index.md'
-  );
-  await fs.mkdir(path.dirname(extensionReferenceFilePath), {
-    recursive: true,
-  });
-  await fs.writeFile(extensionReferenceFilePath, referencePageContent);
-  console.info(`ℹ️ File generated: ${extensionReferenceFilePath}`);
+    `!!! tip
+    Learn [how to install new extensions](/gdevelop5/extensions/search) by following a step-by-step guide.` +
+    '\n'
+    ,
+  };
 };
 
-/**
- * Create a page for an extension.
- * @param {any} gd
- * @param {gdProject} project
- * @param {gdEventsFunctionsExtension} extension The extension
- * @returns {string}
- */
-const generateReferenceContent = (gd, project, extension) => {
-  const extensionMetadata = generateEventsFunctionExtensionMetadata(gd, project, extension);
-  const extensionReference = generateExtensionReference(extensionMetadata);
-  return rawTextsToString(generateExtensionRawText(extensionReference));
-}
+/** @returns {RawText} */
+const generateExtensionFooterText = ({ extension }) => {
+  return {
+    text:
+    `
+---
+
+*This page is an auto-generated reference page about the **${extension.getFullName()}** extension, made by the community of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
+    ' ' +
+    'Learn more about [all GDevelop community-made extensions here](/gdevelop5/extensions).'
+  };
+};
 
 /**
  * Generate the metadata for the events based extension

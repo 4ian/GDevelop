@@ -11,6 +11,7 @@ const shell = require('shelljs');
 const {
   gdevelopWikiUrlRoot,
   getHelpLink,
+  generateReadMoreLink,
   improperlyFormattedHelpPaths,
   getExtensionFolderName,
 } = require('./lib/WikiHelpLink');
@@ -30,53 +31,13 @@ const {
   generateExtensionReference,
   generateExtensionRawText,
   rawTextsToString,
-  generateExtensionHeaderText,
   generateExpressionsTableHeader,
   generateObjectHeaderText,
   generateObjectNoExpressionsText,
   generateBehaviorHeaderText,
   generateBehaviorNoExpressionsText,
-
+  generateHeader,
 } = require('./lib/ExtensionReferenceGenerator');
-
-// Types definitions used in this script:
-
-/**
- * @typedef {Object} RawText A text to be shown on a page
- * @prop {string} text The text to render (in Markdown/Dokuwiki syntax)
- */
-
-/**
- * @typedef {Object} ReferenceText A text with metadata to format/manipulate/order it.
- * @prop {string} orderKey The type of the expression, instruction, or anything that help to uniquely order this text.
- * @prop {string} text The text to render (in Markdown/Dokuwiki syntax)
- */
-
-/**
- * @typedef {Object} ObjectReference
- * @prop {any} objectMetadata The object.
- * @prop {Array<ReferenceText>} actionsReferenceTexts Reference texts for the object actions.
- * @prop {Array<ReferenceText>} conditionsReferenceTexts Reference texts for the object conditions.
- * @prop {Array<ReferenceText>} expressionsReferenceTexts Reference texts for the object expressions.
- */
-
-/**
- * @typedef {Object} BehaviorReference
- * @prop {any} behaviorMetadata The behavior.
- * @prop {Array<ReferenceText>} actionsReferenceTexts Reference texts for the behavior actions.
- * @prop {Array<ReferenceText>} conditionsReferenceTexts Reference texts for the behavior conditions.
- * @prop {Array<ReferenceText>} expressionsReferenceTexts Reference texts for the behavior expressions.
- */
-
-/**
- * @typedef {Object} ExtensionReference
- * @prop {any} extension The extension.
- * @prop {Array<ReferenceText>} freeExpressionsReferenceTexts Reference texts for free expressions.
- * @prop {Array<ReferenceText>} freeActionsReferenceTexts Reference texts for free actions.
- * @prop {Array<ReferenceText>} freeConditionsReferenceTexts Reference texts for free conditions.
- * @prop {Array<ObjectReference>} objectReferences Reference of all extension objects.
- * @prop {Array<BehaviorReference>} behaviorReferences Reference of all extension behaviors.
- */
 
 const generateFileHeaderText = () => {
   return {
@@ -98,7 +59,6 @@ object or behavior they belong too. When \`Object\` is written, you should enter
 `,
   };
 };
-
 
 /** @returns {RawText} */
 const generateExtensionSeparatorText = () => {
@@ -180,6 +140,29 @@ Remember that you can also [search for new features in the community extensions]
   ];
 };
 
+/** @returns {RawText} */
+const generateExtensionHeaderText = ({ extension, depth }) => {
+  return {
+    text:
+      generateHeader({ headerName: extension.getFullName(), depth }).text +
+      `
+${extension.getDescription()} ${generateReadMoreLink(extension.getHelpPath())}
+`,
+  };
+};
+
+/** @returns {RawText} */
+const generateExtensionFooterText = ({ extension }) => {
+  return {
+    text:
+      `
+---
+*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [GDevelop, the open-source, cross-platform game engine designed for everyone](https://gdevelop.io/).*` +
+      ' ' +
+      'Learn more about [all GDevelop features here](/gdevelop5/all-features).',
+  };
+};
+
 /**
  * @param {Array<ExtensionReference>} extensionReferences
  * @returns {{allExtensionRawTexts: Array<{folderName: string, texts: Array<RawText>}>}}
@@ -196,7 +179,10 @@ const generateExtensionRawTexts = extensionReferences => {
         folderName: getExtensionFolderName(
           extensionReference.extension.getName()
         ),
-        texts: generateExtensionRawText(extensionReference),
+        texts: generateExtensionRawText(
+          extensionReference,
+          generateExtensionHeaderText,
+          generateExtensionFooterText),
       };
     });
 

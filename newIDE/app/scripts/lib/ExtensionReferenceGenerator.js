@@ -266,7 +266,7 @@ const generateInstructionsReferenceRowsTexts = ({
     .map(instructionType => {
       const instructionMetadata = instructionsMetadata.get(instructionType);
 
-      if (instructionMetadata.isHidden()) return null;
+      if (instructionMetadata.isHidden() || instructionMetadata.isPrivate()) return null;
 
       return generateInstructionReferenceRowsText({
         instructionType,
@@ -295,7 +295,7 @@ const generateExpressionsReferenceRowsTexts = ({
     .map(expressionType => {
       const expressionMetadata = expressionsMetadata.get(expressionType);
 
-      if (!expressionMetadata.isShown()) return null;
+      if (!expressionMetadata.isShown() || expressionMetadata.isPrivate()) return null;
 
       return generateExpressionReferenceRowsText({
         expressionType,
@@ -373,6 +373,11 @@ const generateExtensionReference = extension => {
   /** @type {Array<BehaviorReference>} */
   let behaviorReferences = behaviorTypes.map(behaviorType => {
     const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
+
+    if (behaviorMetadata.isPrivate()) {
+      return null;
+    }
+
     const actionsReferenceTexts = generateInstructionsReferenceRowsTexts({
       areConditions: false,
       instructionsMetadata: extension.getAllActionsForBehavior(behaviorType),
@@ -405,7 +410,7 @@ const generateExtensionReference = extension => {
       conditionsReferenceTexts,
       expressionsReferenceTexts,
     };
-  });
+  }).filter(Boolean);
 
   // Free (non objects/non behaviors) actions/conditions/expressions
   const freeActionsReferenceTexts = generateInstructionsReferenceRowsTexts({

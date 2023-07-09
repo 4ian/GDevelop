@@ -250,8 +250,7 @@ const generateExtensionHeaderText = (
     by the GDevelop extension team. As such, we can't guarantee it
     meets all the quality standards of official extensions. In case of
     doubt, contact the author to know more about what the extension
-    does or inspect its content before using it.
-\n\n`
+    does or inspect its content before using it.\n\n`
         : '') +
       '---\n' +
       '\n' +
@@ -391,14 +390,21 @@ Here are listed all the extensions available in GDevelop. The list is divided in
 
 `;
   const project = new gd.ProjectHelper.createNewGDJSProject();
-  const extensions = await addAllExtensionsToProject(gd, project);
+  await addAllExtensionsToProject(gd, project);
   const extensionShortHeaders = await getAllExtensionShortHeaders();
 
-  const reviewedExtensions = extensions.filter(
-    pair => pair.tier !== 'community'
+  const reviewedExtensionShortHeaders = extensionShortHeaders.filter(
+    header => header.tier !== 'community'
   );
-  const communityExtensions = extensions.filter(
-    pair => pair.tier === 'community'
+  const communityExtensionShortHeaders = extensionShortHeaders.filter(
+    header => header.tier === 'community'
+  );
+
+  const reviewedExtensions = reviewedExtensionShortHeaders.map(
+    header => project.getEventsFunctionsExtension(header.name)
+  );
+  const communityExtensions = communityExtensionShortHeaders.map(
+    header => project.getEventsFunctionsExtension(header.name)
   );
 
   content += '## Reviewed extensions\n\n';

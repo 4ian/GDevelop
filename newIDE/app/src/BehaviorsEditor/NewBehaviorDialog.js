@@ -12,6 +12,8 @@ import ListIcon from '../UI/ListIcon';
 import { Tabs } from '../UI/Tabs';
 import { List, ListItem } from '../UI/List';
 import { Column, Line } from '../UI/Grid';
+import { ColumnStackLayout } from '../UI/Layout';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { getHelpLink } from '../Utils/HelpLink';
@@ -40,6 +42,18 @@ import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Visibility from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Edit from '../UI/CustomSvgIcons/Edit';
+import SearchBarSelectField from '../UI/SearchBarSelectField';
+import SelectOption from '../UI/SelectOption';
+import Toggle from '../UI/Toggle';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import { ListSearchResults } from '../UI/Search/ListSearchResults';
+import { ExtensionListItem } from '../AssetStore/ExtensionStore/ExtensionListItem';
+import {
+  sendExtensionDetailsOpened,
+  sendExtensionAddedToProject,
+} from '../Utils/Analytics/EventSender';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -79,6 +93,9 @@ const BehaviorListItem = ({
   />
 );
 
+const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
+  extensionShortHeader.name;
+
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension?: gdEventsFunctionsExtension,
@@ -100,7 +117,6 @@ export default function NewBehaviorDialog({
 }: Props) {
   const windowWidth = useResponsiveWindowWidth();
   const [showDeprecated, setShowDeprecated] = React.useState(false);
-  const [searchText, setSearchText] = React.useState('');
   const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
     'installed'
   );
@@ -113,6 +129,61 @@ export default function NewBehaviorDialog({
     EventsFunctionsExtensionsContext
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const [
+    selectedExtensionShortHeader,
+    setSelectedExtensionShortHeader,
+  ] = React.useState<?ExtensionShortHeader>(null);
+  const preferences = React.useContext(PreferencesContext);
+  const {
+    filters,
+    searchResults,
+    error,
+    fetchExtensionsAndFilters,
+    filtersState,
+    searchText,
+    setSearchText,
+    allCategories,
+    chosenCategory,
+    setChosenCategory,
+  } = React.useContext(ExtensionStoreContext);
+
+  React.useEffect(
+    () => {
+      fetchExtensionsAndFilters();
+    },
+    [fetchExtensionsAndFilters]
+  );
+
+  const filteredSearchResults = searchResults
+    ? searchResults.filter(
+        ({ item: extensionShortHeader }) =>
+          extensionShortHeader.eventsBasedBehaviorsCount > 0
+      )
+    : null;
+
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: filtersState.chosenFilters,
+    }),
+    [filtersState]
+  );
+
+  const getExtensionsMatches = (
+    extensionShortHeader: ExtensionShortHeader
+  ): SearchMatch[] => {
+    if (!searchResults) return [];
+    const extensionMatches = searchResults.find(
+      result => result.item.name === extensionShortHeader.name
+    );
+    return extensionMatches ? extensionMatches.matches : [];
+  };
+
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-behaviors-and-functions'
+  );
 
   const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
@@ -240,45 +311,75 @@ export default function NewBehaviorDialog({
           flexColumnBody
           fullHeight
           id="new-behavior-dialog"
-          fixedContent={
-            <Tabs
-              value={currentTab}
-              onChange={setCurrentTab}
-              options={[
-                {
-                  label: <Trans>Installed behaviors</Trans>,
-                  value: 'installed',
-                },
-                {
-                  label: <Trans>Search new behaviors</Trans>,
-                  value: 'search',
-                },
-              ]}
-              // Enforce scroll on small screen, because the tabs have long names.
-              variant={windowWidth === 'small' ? 'scrollable' : undefined}
-            />
-          }
         >
-          {currentTab === 'installed' && (
-            <React.Fragment>
-              <Line>
-                <Column expand noMargin>
-                  <SearchBar
-                    value={searchText}
-                    onRequestSearch={() => {
-                      if (behaviors.length) {
-                        chooseBehavior(i18n, behaviors[0]);
-                      } else if (showDeprecated && deprecatedBehaviors.length) {
-                        chooseBehavior(i18n, deprecatedBehaviors[0]);
-                      }
+          <React.Fragment>
+            <ColumnStackLayout expand noMargin useFullHeight>
+              <ColumnStackLayout noMargin>
+                <ResponsiveLineStackLayout noMargin>
+                  <SearchBarSelectField
+                    value={chosenCategory}
+                    onChange={(e, i, value: string) => {
+                      setChosenCategory(value);
                     }}
-                    onChange={setSearchText}
-                    ref={searchBar}
-                    placeholder={t`Search installed behaviors`}
-                    autoFocus="desktop"
+                  >
+                    <SelectOption value="" label={t`All categories`} />
+                    {allCategories.map(category => (
+                      <SelectOption
+                        key={category}
+                        value={category}
+                        label={category}
+                      />
+                    ))}
+                  </SearchBarSelectField>
+                  <Column expand noMargin>
+                    <SearchBar
+                      id="behavior-search-bar"
+                      ref={searchBar}
+                      value={searchText}
+                      onChange={setSearchText}
+                      onRequestSearch={() => {
+                        if (behaviors.length) {
+                          chooseBehavior(i18n, behaviors[0]);
+                        } else if (showDeprecated && deprecatedBehaviors.length) {
+                          chooseBehavior(i18n, deprecatedBehaviors[0]);
+                        }
+                      }}
+                      tagsHandler={tagsHandler}
+                      tags={filters && filters.allTags}
+                      placeholder={t`Search behaviors`}
+                      autoFocus="desktop"
+                    />
+                  </Column>
+                </ResponsiveLineStackLayout>
+                <ColumnStackLayout>
+                  <Toggle
+                    onToggle={(e, check) =>
+                      preferences.setShowCommunityExtensions(check)
+                    }
+                    toggled={preferences.values.showCommunityExtensions}
+                    labelPosition="right"
+                    label={
+                      <Trans>
+                        Show community extensions (not officially reviewed)
+                      </Trans>
+                    }
                   />
-                </Column>
-              </Line>
+                  <Toggle
+                    key="toggle-deprecated"
+                    onToggle={(e, check) =>
+                      setShowDeprecated(check)
+                    }
+                    toggled={showDeprecated}
+                    labelPosition="right"
+                    label={
+                      <Trans>
+                        Show deprecated (old) behaviors
+                      </Trans>
+                    }
+                  />
+                </ColumnStackLayout>
+                {DismissableTutorialMessage}
+              </ColumnStackLayout>
               {hasSearchNoResult && (
                 <EmptyMessage>
                   <Trans>
@@ -322,25 +423,6 @@ export default function NewBehaviorDialog({
                 </List>
                 <Line justifyContent="center" alignItems="center">
                   <FlatButton
-                    key="toggle-deprecated"
-                    leftIcon={
-                      !showDeprecated ? <Visibility /> : <VisibilityOff />
-                    }
-                    primary={false}
-                    onClick={() => {
-                      setShowDeprecated(!showDeprecated);
-                    }}
-                    label={
-                      !showDeprecated ? (
-                        <Trans>Show deprecated (old) behaviors</Trans>
-                      ) : (
-                        <Trans>Hide deprecated (old) behaviors</Trans>
-                      )
-                    }
-                  />
-                </Line>
-                <Line justifyContent="center" alignItems="center">
-                  <FlatButton
                     leftIcon={<Edit />}
                     primary={false}
                     onClick={() =>
@@ -351,23 +433,36 @@ export default function NewBehaviorDialog({
                     label={<Trans>Create your own behavior</Trans>}
                   />
                 </Line>
-              </ScrollView>
-            </React.Fragment>
-          )}
-          {currentTab === 'search' && (
-            <Line expand>
-              <Column expand noMargin>
-                <ExtensionStore
-                  project={project}
-                  isInstalling={isInstalling}
-                  onInstall={async extensionShortHeader =>
-                    onInstallExtension(i18n, extensionShortHeader)
+                <Subheader>
+                  Extension store
+                </Subheader>
+                <ListSearchResults
+                  disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
+                  onRetry={fetchExtensionsAndFilters}
+                  error={error}
+                  searchItems={
+                    filteredSearchResults &&
+                    filteredSearchResults.map(({ item }) => item)
                   }
-                  showOnlyWithBehaviors
+                  getSearchItemUniqueId={getExtensionName}
+                  renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+                    <ExtensionListItem
+                      id={`extension-list-item-${extensionShortHeader.name}`}
+                      key={extensionShortHeader.name}
+                      project={project}
+                      onHeightComputed={onHeightComputed}
+                      extensionShortHeader={extensionShortHeader}
+                      matches={getExtensionsMatches(extensionShortHeader)}
+                      onChoose={() => {
+                        sendExtensionDetailsOpened(extensionShortHeader.name);
+                        setSelectedExtensionShortHeader(extensionShortHeader);
+                      }}
+                    />
+                  )}
                 />
-              </Column>
-            </Line>
-          )}
+              </ScrollView>
+            </ColumnStackLayout>
+          </React.Fragment>
           <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={

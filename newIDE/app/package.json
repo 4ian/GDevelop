@@ -59,6 +59,7 @@
     "react": "16.14.0",
     "react-color": "2.13.8",
     "react-dnd": "7.7.0",
+    "react-dnd-html5-backend": "7.7.0",
     "react-dnd-multi-backend": "3.2.2",
     "react-dom": "16.14.0",
     "react-error-boundary": "^1.2.0",

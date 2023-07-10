@@ -16,7 +16,9 @@ const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
-const loaded3DModels = {};
+const loading3DModelPromises: {
+  [resourceName: string]: Promise<THREE.THREE_ADDONS.GLTF>,
+} = {};
 
 const createInvalidModel = (): GLTF => {
   /**
@@ -308,9 +310,21 @@ export default class PixiResourcesLoader {
     project: gdProject,
     resourceName: string
   ): Promise<THREE.THREE_ADDONS.GLTF> {
-    const loaded3DModel = loaded3DModels[resourceName];
-    if (loaded3DModel) return Promise.resolve(loaded3DModel);
+    const loading3DModelPromise = loading3DModelPromises[resourceName];
+    if (loading3DModelPromise) return loading3DModelPromise;
 
+    const loadingPromise = PixiResourcesLoader._load3DModel(
+      project,
+      resourceName
+    );
+    loading3DModelPromises[resourceName] = loadingPromise;
+    return loadingPromise;
+  }
+
+  static _load3DModel(
+    project: gdProject,
+    resourceName: string
+  ): Promise<THREE.THREE_ADDONS.GLTF> {
     if (!project.getResourcesManager().hasResource(resourceName))
       return Promise.resolve(invalidModel);
 
@@ -323,14 +337,11 @@ export default class PixiResourcesLoader {
 
     const gltfLoader = getOrCreateGltfLoader();
     gltfLoader.withCredentials = checkIfCredentialsRequired(url);
-    // TODO Cache promises that are not yet resolved to void `load` being
-    // called more than once for the same resource.
     return new Promise((resolve, reject) => {
       gltfLoader.load(
         url,
         gltf => {
           traverseToSetBasicMaterialFromMeshes(gltf.scene);
-          loaded3DModels[resourceName] = gltf;
           resolve(gltf);
         },
         undefined,

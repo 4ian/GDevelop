@@ -16,7 +16,7 @@ const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
-const loading3DModelPromises: {
+const loadedOrLoading3DModelPromises: {
   [resourceName: string]: Promise<THREE.THREE_ADDONS.GLTF>,
 } = {};
 
@@ -53,6 +53,37 @@ const getOrCreateGltfLoader = () => {
     gltfLoader.setDRACOLoader(dracoLoader);
   }
   return gltfLoader;
+};
+
+const load3DModel = (
+  project: gdProject,
+  resourceName: string
+): Promise<THREE.THREE_ADDONS.GLTF> => {
+  if (!project.getResourcesManager().hasResource(resourceName))
+    return Promise.resolve(invalidModel);
+
+  const resource = project.getResourcesManager().getResource(resourceName);
+  if (resource.getKind() !== 'model3D') return Promise.resolve(invalidModel);
+
+  const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+    isResourceForPixi: true,
+  });
+
+  const gltfLoader = getOrCreateGltfLoader();
+  gltfLoader.withCredentials = checkIfCredentialsRequired(url);
+  return new Promise((resolve, reject) => {
+    gltfLoader.load(
+      url,
+      gltf => {
+        traverseToSetBasicMaterialFromMeshes(gltf.scene);
+        resolve(gltf);
+      },
+      undefined,
+      error => {
+        reject(error);
+      }
+    );
+  });
 };
 
 const determineCrossOrigin = (url: string) => {
@@ -310,46 +341,12 @@ export default class PixiResourcesLoader {
     project: gdProject,
     resourceName: string
   ): Promise<THREE.THREE_ADDONS.GLTF> {
-    const loading3DModelPromise = loading3DModelPromises[resourceName];
-    if (loading3DModelPromise) return loading3DModelPromise;
+    const promise = loadedOrLoading3DModelPromises[resourceName];
+    if (promise) return promise;
 
-    const loadingPromise = PixiResourcesLoader._load3DModel(
-      project,
-      resourceName
-    );
-    loading3DModelPromises[resourceName] = loadingPromise;
+    const loadingPromise = load3DModel(project, resourceName);
+    loadedOrLoading3DModelPromises[resourceName] = loadingPromise;
     return loadingPromise;
-  }
-
-  static _load3DModel(
-    project: gdProject,
-    resourceName: string
-  ): Promise<THREE.THREE_ADDONS.GLTF> {
-    if (!project.getResourcesManager().hasResource(resourceName))
-      return Promise.resolve(invalidModel);
-
-    const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'model3D') return Promise.resolve(invalidModel);
-
-    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-      isResourceForPixi: true,
-    });
-
-    const gltfLoader = getOrCreateGltfLoader();
-    gltfLoader.withCredentials = checkIfCredentialsRequired(url);
-    return new Promise((resolve, reject) => {
-      gltfLoader.load(
-        url,
-        gltf => {
-          traverseToSetBasicMaterialFromMeshes(gltf.scene);
-          resolve(gltf);
-        },
-        undefined,
-        error => {
-          reject(error);
-        }
-      );
-    });
   }
 
   /**

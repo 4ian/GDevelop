@@ -14,7 +14,6 @@ orbs:
 jobs:
   # Build the **entire** app for macOS.
   build-macos:
-    # resource_class: macos.m1.large.gen1
     macos:
       xcode: 14.2.0
     steps:
@@ -34,11 +33,11 @@ jobs:
           command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
 
       # GDevelop.js dependencies
-      #- restore_cache:
-      #    keys:
-      #      - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
-      #      # fallback to using the latest cache if no exact match is found
-      #      - gd-macos-nodejs-dependencies---
+      - restore_cache:
+          keys:
+            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - gd-macos-nodejs-dependencies---
 
       - run:
           name: Install GDevelop.js dependencies
@@ -54,18 +53,18 @@ jobs:
           name: Install GDevelop IDE dependencies
           command: cd newIDE/app && npm install && cd ../electron-app && npm install
 
-      #- save_cache:
-      #    paths:
-      #      - newIDE/electron-app/node_modules
-      #      - newIDE/app/node_modules
-      #      - GDevelop.js/node_modules
-      #    key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+      - save_cache:
+          paths:
+            - newIDE/electron-app/node_modules
+            - newIDE/app/node_modules
+            - GDevelop.js/node_modules
+          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
       - run:
           name: Build GDevelop IDE
-          command: export CSC_FOR_PULL_REQUEST=true && export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && CI=false npm run build -- --mac --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && CI=false npm run build -- --mac --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.

@@ -157,6 +157,26 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     ],
   },
   {
+    planId: 'gdevelop_startup',
+    name: 'GDevelop Startup',
+    monthlyPriceInEuros: 30,
+    smallDescription: t`Small game studios and startups.`,
+    descriptionBullets: [
+      {
+        message: t`500 cloud projects with 5GB of resources per project.`,
+      },
+      {
+        message: t`Unlimited packagings per day for Android, web and desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+      {
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+  {
     planId: 'gdevelop_education',
     name: 'GDevelop Education',
     monthlyPriceInEuros: 2.99,
@@ -172,28 +192,6 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`You and your students receive a Gold subscription.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_startup',
-    name: 'GDevelop Startup',
-    monthlyPriceInEuros: 30,
-    isPerUser: true,
-    smallDescription: t`Small game studios and startups.`,
-    hideInSubscriptionDialog: true,
-    descriptionBullets: [
-      {
-        message: t`500 cloud projects with 5GB of resources per project.`,
-      },
-      {
-        message: t`Unlimited packagings per day for Android, web and desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
       },
     ],
   },

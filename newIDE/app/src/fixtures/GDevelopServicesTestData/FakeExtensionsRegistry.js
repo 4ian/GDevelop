@@ -1530,4 +1530,10 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       ],
     },
   ],
+  behavior: {
+    headers: [],
+  },
+  object: {
+    headers: [],
+  },
 };

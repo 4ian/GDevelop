@@ -12,8 +12,6 @@ import ListIcon from '../UI/ListIcon';
 import { Tabs } from '../UI/Tabs';
 import { List, ListItem } from '../UI/List';
 import { Column, Line } from '../UI/Grid';
-import { ColumnStackLayout } from '../UI/Layout';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { getHelpLink } from '../Utils/HelpLink';
@@ -24,7 +22,8 @@ import {
 } from './EnumerateBehaviorsMetadata';
 import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
-import { ExtensionStore } from '../AssetStore/ExtensionStore';
+import { BehaviorStore } from '../AssetStore/BehaviorStore';
+import { SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import Window from '../Utils/Window';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
@@ -42,18 +41,6 @@ import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Visibility from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Edit from '../UI/CustomSvgIcons/Edit';
-import SearchBarSelectField from '../UI/SearchBarSelectField';
-import SelectOption from '../UI/SelectOption';
-import Toggle from '../UI/Toggle';
-import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
-import { ListSearchResults } from '../UI/Search/ListSearchResults';
-import { ExtensionListItem } from '../AssetStore/ExtensionStore/ExtensionListItem';
-import {
-  sendExtensionDetailsOpened,
-  sendExtensionAddedToProject,
-} from '../Utils/Analytics/EventSender';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -75,7 +62,7 @@ const BehaviorListItem = ({
   <ListItem
     leftIcon={
       <ListIcon
-        src={behaviorMetadata.iconFilename}
+        src={behaviorMetadata.previewIconUrl}
         iconSize={40}
         isGDevelopIcon
       />
@@ -92,9 +79,6 @@ const BehaviorListItem = ({
     id={'behavior-item-' + behaviorMetadata.type.replace(/:/g, '-')}
   />
 );
-
-const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
-  extensionShortHeader.name;
 
 type Props = {|
   project: gdProject,
@@ -115,13 +99,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
-  const windowWidth = useResponsiveWindowWidth();
   const [showDeprecated, setShowDeprecated] = React.useState(false);
-  const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
-    'installed'
-  );
-  const searchBar = React.useRef<?SearchBarInterface>(null);
-  const scrollView = React.useRef((null: ?ScrollViewInterface));
 
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionInstallTime, setExtensionInstallTime] = React.useState(0);
@@ -130,61 +108,6 @@ export default function NewBehaviorDialog({
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const [
-    selectedExtensionShortHeader,
-    setSelectedExtensionShortHeader,
-  ] = React.useState<?ExtensionShortHeader>(null);
-  const preferences = React.useContext(PreferencesContext);
-  const {
-    filters,
-    searchResults,
-    error,
-    fetchExtensionsAndFilters,
-    filtersState,
-    searchText,
-    setSearchText,
-    allCategories,
-    chosenCategory,
-    setChosenCategory,
-  } = React.useContext(ExtensionStoreContext);
-
-  React.useEffect(
-    () => {
-      fetchExtensionsAndFilters();
-    },
-    [fetchExtensionsAndFilters]
-  );
-
-  const filteredSearchResults = searchResults
-    ? searchResults.filter(
-        ({ item: extensionShortHeader }) =>
-          extensionShortHeader.eventsBasedBehaviorsCount > 0
-      )
-    : null;
-
-  const tagsHandler = React.useMemo(
-    () => ({
-      add: filtersState.addFilter,
-      remove: filtersState.removeFilter,
-      chosenTags: filtersState.chosenFilters,
-    }),
-    [filtersState]
-  );
-
-  const getExtensionsMatches = (
-    extensionShortHeader: ExtensionShortHeader
-  ): SearchMatch[] => {
-    if (!searchResults) return [];
-    const extensionMatches = searchResults.find(
-      result => result.item.name === extensionShortHeader.name
-    );
-    return extensionMatches ? extensionMatches.matches : [];
-  };
-
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-behaviors-and-functions'
-  );
-
   const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_EXTENSION,
@@ -192,44 +115,42 @@ export default function NewBehaviorDialog({
   );
 
   const platform = project.getCurrentPlatform();
-  const behaviorsMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
+  const installedBehaviorMetadataByName: {
+    [name: string]: SearchableBehaviorMetadata,
+  } = React.useMemo(
     () => {
-      return project && platform
-        ? enumerateBehaviorsMetadata(
-            platform,
-            project,
-            eventsFunctionsExtension
-          )
-        : [];
+      const behaviorMetadataList =
+        project && platform
+          ? enumerateBehaviorsMetadata(
+              platform,
+              project,
+              eventsFunctionsExtension
+            )
+          : [];
+      const installedBehaviorMetadataByName = {};
+      behaviorMetadataList.forEach(behavior => {
+        installedBehaviorMetadataByName[behavior.behaviorMetadata.getName()] = {
+          name: behavior.behaviorMetadata.getName(),
+          // TODO Add the tags of the extension.
+          tags: [],
+          ...behavior,
+        };
+      });
+      return installedBehaviorMetadataByName;
     },
     [project, platform, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
-  );
-
-  const shouldAutofocusSearchbar = useShouldAutofocusInput();
-  React.useEffect(
-    () => {
-      setTimeout(() => {
-        if (shouldAutofocusSearchbar && searchBar.current)
-          searchBar.current.focus();
-      }, 20 /* Be sure that the search bar is shown */);
-    },
-    [shouldAutofocusSearchbar]
   );
 
   if (!open || !project) return null;
 
   const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
 
-  const filteredBehaviorMetadata = filterEnumeratedBehaviorMetadata(
-    behaviorsMetadata,
-    searchText
-  );
-  const behaviors = filteredBehaviorMetadata.filter(
-    ({ type }) => !deprecatedBehaviorsInformation[type]
-  );
-  const deprecatedBehaviors = filteredBehaviorMetadata.filter(
-    ({ type }) => !!deprecatedBehaviorsInformation[type]
-  );
+  // const behaviors = filteredBehaviorMetadata.filter(
+  //   ({ type }) => !deprecatedBehaviorsInformation[type]
+  // );
+  // const deprecatedBehaviors = filteredBehaviorMetadata.filter(
+  //   ({ type }) => !!deprecatedBehaviorsInformation[type]
+  // );
 
   const _chooseBehavior = (
     i18n: I18nType,
@@ -260,9 +181,6 @@ export default function NewBehaviorDialog({
     );
   };
 
-  const hasSearchNoResult =
-    !!searchText && !behaviors.length && !deprecatedBehaviors.length;
-
   const onInstallExtension = async (
     i18n: I18nType,
     extensionShortHeader: ExtensionShortHeader
@@ -280,8 +198,6 @@ export default function NewBehaviorDialog({
         // Setting the extension install time will force a reload of
         // the behavior metadata, and so the list of behaviors.
         setExtensionInstallTime(Date.now());
-        setCurrentTab('installed');
-        if (scrollView.current) scrollView.current.scrollToBottom();
         return true;
       }
       return false;
@@ -312,157 +228,22 @@ export default function NewBehaviorDialog({
           fullHeight
           id="new-behavior-dialog"
         >
-          <React.Fragment>
-            <ColumnStackLayout expand noMargin useFullHeight>
-              <ColumnStackLayout noMargin>
-                <ResponsiveLineStackLayout noMargin>
-                  <SearchBarSelectField
-                    value={chosenCategory}
-                    onChange={(e, i, value: string) => {
-                      setChosenCategory(value);
-                    }}
-                  >
-                    <SelectOption value="" label={t`All categories`} />
-                    {allCategories.map(category => (
-                      <SelectOption
-                        key={category}
-                        value={category}
-                        label={category}
-                      />
-                    ))}
-                  </SearchBarSelectField>
-                  <Column expand noMargin>
-                    <SearchBar
-                      id="behavior-search-bar"
-                      ref={searchBar}
-                      value={searchText}
-                      onChange={setSearchText}
-                      onRequestSearch={() => {
-                        if (behaviors.length) {
-                          chooseBehavior(i18n, behaviors[0]);
-                        } else if (showDeprecated && deprecatedBehaviors.length) {
-                          chooseBehavior(i18n, deprecatedBehaviors[0]);
-                        }
-                      }}
-                      tagsHandler={tagsHandler}
-                      tags={filters && filters.allTags}
-                      placeholder={t`Search behaviors`}
-                      autoFocus="desktop"
-                    />
-                  </Column>
-                </ResponsiveLineStackLayout>
-                <ColumnStackLayout>
-                  <Toggle
-                    onToggle={(e, check) =>
-                      preferences.setShowCommunityExtensions(check)
-                    }
-                    toggled={preferences.values.showCommunityExtensions}
-                    labelPosition="right"
-                    label={
-                      <Trans>
-                        Show community extensions (not officially reviewed)
-                      </Trans>
-                    }
-                  />
-                  <Toggle
-                    key="toggle-deprecated"
-                    onToggle={(e, check) =>
-                      setShowDeprecated(check)
-                    }
-                    toggled={showDeprecated}
-                    labelPosition="right"
-                    label={
-                      <Trans>
-                        Show deprecated (old) behaviors
-                      </Trans>
-                    }
-                  />
-                </ColumnStackLayout>
-                {DismissableTutorialMessage}
-              </ColumnStackLayout>
-              {hasSearchNoResult && (
-                <EmptyMessage>
-                  <Trans>
-                    No behavior found for your search. Try another search, or
-                    search for new behaviors to install.
-                  </Trans>
-                </EmptyMessage>
-              )}
-              <ScrollView ref={scrollView}>
-                <List>
-                  {behaviors.map((behaviorMetadata, index) => (
-                    <BehaviorListItem
-                      i18n={i18n}
-                      key={index}
-                      behaviorMetadata={behaviorMetadata}
-                      alreadyInstalled={isAmongObjectBehaviors(
-                        behaviorMetadata
-                      )}
-                      onClick={() => chooseBehavior(i18n, behaviorMetadata)}
-                      disabled={!canBehaviorBeUsed(behaviorMetadata)}
-                    />
-                  ))}
-                  {showDeprecated && !!deprecatedBehaviors.length && (
-                    <Subheader>
-                      Deprecated (old, prefer not to use anymore)
-                    </Subheader>
-                  )}
-                  {showDeprecated &&
-                    deprecatedBehaviors.map((behaviorMetadata, index) => (
-                      <BehaviorListItem
-                        i18n={i18n}
-                        key={index}
-                        behaviorMetadata={behaviorMetadata}
-                        alreadyInstalled={isAmongObjectBehaviors(
-                          behaviorMetadata
-                        )}
-                        onClick={() => chooseBehavior(i18n, behaviorMetadata)}
-                        disabled={!canBehaviorBeUsed(behaviorMetadata)}
-                      />
-                    ))}
-                </List>
-                <Line justifyContent="center" alignItems="center">
-                  <FlatButton
-                    leftIcon={<Edit />}
-                    primary={false}
-                    onClick={() =>
-                      Window.openExternalURL(
-                        getHelpLink('/behaviors/events-based-behaviors')
-                      )
-                    }
-                    label={<Trans>Create your own behavior</Trans>}
-                  />
-                </Line>
-                <Subheader>
-                  Extension store
-                </Subheader>
-                <ListSearchResults
-                  disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-                  onRetry={fetchExtensionsAndFilters}
-                  error={error}
-                  searchItems={
-                    filteredSearchResults &&
-                    filteredSearchResults.map(({ item }) => item)
-                  }
-                  getSearchItemUniqueId={getExtensionName}
-                  renderSearchItem={(extensionShortHeader, onHeightComputed) => (
-                    <ExtensionListItem
-                      id={`extension-list-item-${extensionShortHeader.name}`}
-                      key={extensionShortHeader.name}
-                      project={project}
-                      onHeightComputed={onHeightComputed}
-                      extensionShortHeader={extensionShortHeader}
-                      matches={getExtensionsMatches(extensionShortHeader)}
-                      onChoose={() => {
-                        sendExtensionDetailsOpened(extensionShortHeader.name);
-                        setSelectedExtensionShortHeader(extensionShortHeader);
-                      }}
-                    />
-                  )}
-                />
-              </ScrollView>
-            </ColumnStackLayout>
-          </React.Fragment>
+          <Line expand>
+            <Column expand noMargin>
+              <BehaviorStore
+                project={project}
+                objectType={objectType}
+                objectBehaviorsTypes={objectBehaviorsTypes}
+                isInstalling={isInstalling}
+                onInstall={async extensionShortHeader =>
+                  onInstallExtension(i18n, extensionShortHeader)
+                }
+                installedBehaviorMetadataByName={
+                  installedBehaviorMetadataByName
+                }
+              />
+            </Column>
+          </Line>
           <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={

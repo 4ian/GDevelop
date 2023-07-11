@@ -6,9 +6,8 @@ import { type UserPublicProfile } from './User';
 
 type ExtensionTier = 'community' | 'reviewed';
 
-export type ExtensionShortHeader = {|
+export type ExtensionRegistryItemHeader = {|
   tier: ExtensionTier,
-  shortDescription: string,
   authorIds: Array<string>,
   authors?: Array<UserPublicProfile>,
   extensionNamespace: string,
@@ -21,14 +20,33 @@ export type ExtensionShortHeader = {|
   tags: Array<string>,
   category: string,
   previewIconUrl: string,
+|};
+
+export type ExtensionShortHeader = {|
+  ...ExtensionRegistryItemHeader,
+  shortDescription: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
 |};
+
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
   helpPath: string,
   description: string,
   iconUrl: string,
+|};
+
+export type BehaviorShortHeader = {|
+  ...ExtensionRegistryItemHeader,
+  description: string,
+  extensionName: string,
+  objectType: string,
+|};
+
+export type ObjectShortHeader = {|
+  ...ExtensionRegistryItemHeader,
+  description: string,
+  extensionName: string,
 |};
 
 /**
@@ -51,6 +69,12 @@ export type ExtensionsRegistry = {
   allTags: Array<string>,
   allCategories: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
+  behavior: {
+    headers: Array<BehaviorShortHeader>,
+  },
+  object: {
+    headers: Array<ObjectShortHeader>,
+  },
   views?: {
     default: {
       firstExtensionIds: Array<string>,

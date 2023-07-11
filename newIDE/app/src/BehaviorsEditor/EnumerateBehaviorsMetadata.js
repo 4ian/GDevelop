@@ -10,7 +10,7 @@ export type EnumeratedBehaviorMetadata = {|
   defaultName: string,
   fullName: string,
   description: string,
-  iconFilename: string,
+  previewIconUrl: string,
 |};
 
 export const enumerateBehaviorsMetadata = (
@@ -44,7 +44,7 @@ export const enumerateBehaviorsMetadata = (
           defaultName: behaviorMetadata.getDefaultName(),
           fullName: behaviorMetadata.getFullName(),
           description: behaviorMetadata.getDescription(),
-          iconFilename: behaviorMetadata.getIconFilename(),
+          previewIconUrl: behaviorMetadata.getIconFilename(),
           objectType: behaviorMetadata.getObjectType(),
         }));
     })

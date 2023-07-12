@@ -13,6 +13,8 @@ import {
 } from '../../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
+const gd: libGDevelop = global.gd;
+
 const emptySearchText = '';
 
 const noExcludedTiers = new Set();
@@ -36,20 +38,20 @@ type BehaviorStoreState = {|
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
     matches: SearchMatch[],
   |}>,
-  fetchExtensionsAndFilters: () => void,
+  fetchBehaviorsAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
   allCategories: string[],
   chosenCategory: string,
   setChosenCategory: string => void,
-  installedBehaviorMetadataByName: {
+  installedBehaviorMetadataByType: {
     [name: string]: SearchableBehaviorMetadata,
   },
-  setInstalledBehaviorMetadataByName: ({
+  setInstalledBehaviorMetadataByType: ({
     [name: string]: SearchableBehaviorMetadata,
   }) => void,
-  behaviorShortHeadersByName: { [name: string]: BehaviorShortHeader },
+  behaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
   filtersState: FiltersState,
   hasBehaviorNamed: (behaviorName: string) => boolean,
 |};
@@ -57,7 +59,7 @@ type BehaviorStoreState = {|
 export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
   filters: null,
   searchResults: null,
-  fetchExtensionsAndFilters: () => {},
+  fetchBehaviorsAndFilters: () => {},
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -65,9 +67,9 @@ export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
   // '' means all categories.
   chosenCategory: '',
   setChosenCategory: () => {},
-  installedBehaviorMetadataByName: {},
-  setInstalledBehaviorMetadataByName: () => {},
-  behaviorShortHeadersByName: {},
+  installedBehaviorMetadataByType: {},
+  setInstalledBehaviorMetadataByType: () => {},
+  behaviorShortHeadersByType: {},
   filtersState: {
     chosenFilters: new Set(),
     addFilter: () => {},
@@ -88,14 +90,14 @@ export const BehaviorStoreStateProvider = ({
   defaultSearchText,
 }: BehaviorStoreStateProviderProps) => {
   const [
-    installedBehaviorMetadataByName,
-    setInstalledBehaviorMetadataByName,
+    installedBehaviorMetadataByType,
+    setInstalledBehaviorMetadataByType,
   ] = React.useState<{
     [string]: SearchableBehaviorMetadata,
   }>({});
   const [
-    behaviorShortHeadersByName,
-    setBehaviorShortHeadersByName,
+    behaviorShortHeadersByType,
+    setBehaviorShortHeadersByType,
   ] = React.useState<{
     [string]: BehaviorShortHeader,
   }>({});
@@ -104,9 +106,9 @@ export const BehaviorStoreStateProvider = ({
   const { showCommunityExtensions } = preferences.values;
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [allCategories, setAllCategories] = React.useState<Array<string>>([]);
-  const [firstExtensionIds, setFirstExtensionIds] = React.useState<
-    Array<string>
-  >([]);
+  const [firstBehaviorIds, setFirstBehaviorIds] = React.useState<Array<string>>(
+    []
+  );
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -116,11 +118,11 @@ export const BehaviorStoreStateProvider = ({
   const [chosenCategory, setChosenCategory] = React.useState('');
   const filtersState = useFilters();
 
-  const fetchExtensionsAndFilters = React.useCallback(
+  const fetchBehaviorsAndFilters = React.useCallback(
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (Object.keys(behaviorShortHeadersByName).length || isLoading.current)
+      if (Object.keys(behaviorShortHeadersByType).length || isLoading.current)
         return;
 
       (async () => {
@@ -143,31 +145,37 @@ export const BehaviorStoreStateProvider = ({
               tag1.toLowerCase().localeCompare(tag2.toLowerCase())
             );
 
-          const behaviorShortHeadersByName = {};
+          const behaviorShortHeadersByType = {};
           behaviorShortHeaders.forEach(behavior => {
-            behaviorShortHeadersByName[behavior.name] = behavior;
+            behaviorShortHeadersByType[behavior.type] = behavior;
           });
 
           console.info(
             `Loaded ${
               behaviorShortHeaders ? behaviorShortHeaders.length : 0
-            } extensions from the extension store.`
+            } behaviors from the extension store.`
           );
-          setBehaviorShortHeadersByName(behaviorShortHeadersByName);
+          setBehaviorShortHeadersByType(behaviorShortHeadersByType);
           setFilters({
             allTags: sortedTags,
             defaultTags: sortedTags,
             tagsTree: [],
           });
           setAllCategories(sortedCategories);
-          setFirstExtensionIds(
+          setFirstBehaviorIds(
             extensionRegistry.views
-              ? extensionRegistry.views.default.firstExtensionIds
+              ? extensionRegistry.views.default.firstBehaviorIds.map(
+                  ({ extensionName, behaviorName }) =>
+                    gd.PlatformExtension.getBehaviorFullType(
+                      extensionName,
+                      behaviorName
+                    )
+                )
               : []
           );
         } catch (error) {
           console.error(
-            `Unable to load the extensions from the extension store:`,
+            `Unable to load the behaviors from the extension store:`,
             error
           );
           setError(error);
@@ -176,34 +184,40 @@ export const BehaviorStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [behaviorShortHeadersByName, isLoading]
+    [behaviorShortHeadersByType, isLoading]
   );
 
   React.useEffect(
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (Object.keys(behaviorShortHeadersByName).length || isLoading.current)
+      if (Object.keys(behaviorShortHeadersByType).length || isLoading.current)
         return;
 
       const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching extensions from extension store...');
-        fetchExtensionsAndFilters();
+        console.info('Pre-fetching behaviors from extension store...');
+        fetchBehaviorsAndFilters();
       }, 5000);
       return () => clearTimeout(timeoutId);
     },
-    [fetchExtensionsAndFilters, behaviorShortHeadersByName, isLoading]
+    [fetchBehaviorsAndFilters, behaviorShortHeadersByType, isLoading]
   );
 
-  // TODO Use a memo for all the behavior by name.
-  /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
-  const allBehaviors = {};
-  for (const name in behaviorShortHeadersByName) {
-    allBehaviors[name] = behaviorShortHeadersByName[name];
-  }
-  for (const name in installedBehaviorMetadataByName) {
-    allBehaviors[name] = installedBehaviorMetadataByName[name];
-  }
+  const allBehaviors = React.useMemo(() => {
+    /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
+    const allBehaviors = {};
+    console.log('Installed behaviors:');
+    for (const type in installedBehaviorMetadataByType) {
+      allBehaviors[type] = installedBehaviorMetadataByType[type];
+      console.log(allBehaviors[type]);
+    }
+    for (const type in behaviorShortHeadersByType) {
+      allBehaviors[type] = behaviorShortHeadersByType[type];
+    }
+    console.log('All behaviors:');
+    console.log(allBehaviors);
+    return allBehaviors;
+  }, [installedBehaviorMetadataByType, behaviorShortHeadersByType]);
 
   const searchResults: ?Array<{|
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
@@ -216,20 +230,20 @@ export const BehaviorStoreStateProvider = ({
     excludedTiers: showCommunityExtensions
       ? noExcludedTiers
       : excludedCommunityTiers,
-    defaultFirstSearchItemIds: firstExtensionIds,
+    defaultFirstSearchItemIds: firstBehaviorIds,
   });
 
   const hasBehaviorNamed = React.useCallback(
     (extensionName: string) => {
-      return !!behaviorShortHeadersByName[extensionName];
+      return !!behaviorShortHeadersByType[extensionName];
     },
-    [behaviorShortHeadersByName]
+    [behaviorShortHeadersByType]
   );
 
   const behaviorStoreState = React.useMemo(
     () => ({
       searchResults,
-      fetchExtensionsAndFilters,
+      fetchBehaviorsAndFilters,
       filters,
       allCategories,
       chosenCategory,
@@ -237,9 +251,9 @@ export const BehaviorStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
-      installedBehaviorMetadataByName,
-      setInstalledBehaviorMetadataByName,
-      behaviorShortHeadersByName,
+      installedBehaviorMetadataByType,
+      setInstalledBehaviorMetadataByType,
+      behaviorShortHeadersByType,
       filtersState,
       hasBehaviorNamed,
     }),
@@ -251,11 +265,11 @@ export const BehaviorStoreStateProvider = ({
       chosenCategory,
       setChosenCategory,
       searchText,
-      installedBehaviorMetadataByName,
-      setInstalledBehaviorMetadataByName,
-      behaviorShortHeadersByName,
+      installedBehaviorMetadataByType,
+      setInstalledBehaviorMetadataByType,
+      behaviorShortHeadersByType,
       filtersState,
-      fetchExtensionsAndFilters,
+      fetchBehaviorsAndFilters,
       hasBehaviorNamed,
     ]
   );

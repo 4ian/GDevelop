@@ -32,7 +32,7 @@ type Props = {|
   project: gdProject,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
-  installedBehaviorMetadataByName: {
+  installedBehaviorMetadataByType: {
     [name: string]: SearchableBehaviorMetadata,
   },
   onInstall: (
@@ -50,37 +50,38 @@ export const BehaviorStore = ({
   project,
   objectType,
   objectBehaviorsTypes,
-  installedBehaviorMetadataByName,
+  installedBehaviorMetadataByType,
   onInstall,
   onChoose,
 }: Props) => {
+  console.log("render BehaviorStore");
   const preferences = React.useContext(PreferencesContext);
   const {
     filters,
     searchResults,
     error,
-    fetchExtensionsAndFilters,
+    fetchBehaviorsAndFilters,
     filtersState,
     searchText,
     setSearchText,
     allCategories,
     chosenCategory,
     setChosenCategory,
-    setInstalledBehaviorMetadataByName,
+    setInstalledBehaviorMetadataByType,
   } = React.useContext(BehaviorStoreContext);
 
   React.useEffect(
     () => {
-      fetchExtensionsAndFilters();
+      setInstalledBehaviorMetadataByType(installedBehaviorMetadataByType);
     },
-    [fetchExtensionsAndFilters]
+    [installedBehaviorMetadataByType, setInstalledBehaviorMetadataByType]
   );
 
   React.useEffect(
     () => {
-      setInstalledBehaviorMetadataByName(installedBehaviorMetadataByName);
+      fetchBehaviorsAndFilters();
     },
-    [installedBehaviorMetadataByName, setInstalledBehaviorMetadataByName]
+    [fetchBehaviorsAndFilters]
   );
 
   const filteredSearchResults = searchResults ? searchResults : null;
@@ -175,7 +176,7 @@ export const BehaviorStore = ({
             </ColumnStackLayout>
             <ListSearchResults
               disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-              onRetry={fetchExtensionsAndFilters}
+              onRetry={fetchBehaviorsAndFilters}
               error={error}
               searchItems={
                 filteredSearchResults &&

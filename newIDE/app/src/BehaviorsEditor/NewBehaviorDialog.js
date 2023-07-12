@@ -101,6 +101,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
+  console.log("render NewBehaviorDialog");
   const [showDeprecated, setShowDeprecated] = React.useState(false);
 
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -117,7 +118,7 @@ export default function NewBehaviorDialog({
   );
 
   const platform = project.getCurrentPlatform();
-  const installedBehaviorMetadataByName: {
+  const installedBehaviorMetadataByType: {
     [name: string]: SearchableBehaviorMetadata,
   } = React.useMemo(
     () => {
@@ -129,16 +130,16 @@ export default function NewBehaviorDialog({
               eventsFunctionsExtension
             )
           : [];
-      const installedBehaviorMetadataByName = {};
+      const installedBehaviorMetadataByType = {};
       behaviorMetadataList.forEach(behavior => {
-        installedBehaviorMetadataByName[behavior.behaviorMetadata.getName()] = {
+        installedBehaviorMetadataByType[behavior.behaviorMetadata.getName()] = {
           type: behavior.behaviorMetadata.getName(),
           // TODO Add the tags of the extension.
           tags: [],
           ...behavior,
         };
       });
-      return installedBehaviorMetadataByName;
+      return installedBehaviorMetadataByType;
     },
     [project, platform, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
   );
@@ -245,8 +246,8 @@ export default function NewBehaviorDialog({
                   onInstallExtension(i18n, extensionShortHeader)
                 }
                 onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
-                installedBehaviorMetadataByName={
-                  installedBehaviorMetadataByName
+                installedBehaviorMetadataByType={
+                  installedBehaviorMetadataByType
                 }
               />
             </Column>

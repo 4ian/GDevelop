@@ -8,7 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import muiDecorator from '../../ThemeDecorator';
 import NewBehaviorDialog from '../../../BehaviorsEditor/NewBehaviorDialog';
-import { ExtensionStoreStateProvider } from '../../../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { BehaviorStoreStateProvider } from '../../../AssetStore/BehaviorStore/BehaviorStoreContext';
 
 export default {
   title: 'ObjectEditor/NewBehaviorDialog',
@@ -17,7 +17,7 @@ export default {
 };
 
 export const DefaultForSpriteObject = () => (
-  <ExtensionStoreStateProvider>
+  <BehaviorStoreStateProvider>
     <NewBehaviorDialog
       open
       project={testProject.project}
@@ -29,5 +29,5 @@ export const DefaultForSpriteObject = () => (
         'PlatformBehavior::PlatformBehavior',
       ]}
     />
-  </ExtensionStoreStateProvider>
+  </BehaviorStoreStateProvider>
 );

@@ -82,6 +82,7 @@ export type ExtensionsRegistry = {
   views?: {
     default: {
       firstExtensionIds: Array<string>,
+      firstBehaviorIds: Array<{extensionName: string, behaviorName: string}>,
     },
   },
 };
@@ -154,7 +155,7 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
         ),
         behavior: {
           ...extensionsRegistry.behavior,
-          headers: adaptBehaviorHeader(extensionsRegistry.behavior.headers),
+          headers: extensionsRegistry.behavior.headers.map(adaptBehaviorHeader),
         },
       };
     });
@@ -164,10 +165,10 @@ const adaptBehaviorHeader = (
   header: BehaviorShortHeader
 ): BehaviorShortHeader => {
   header.type = gd.PlatformExtension.getBehaviorFullType(
-    header.extensionNamespace,
+    header.extensionNamespace || header.extensionName,
     header.name
   );
-  transformTagsAsStringToTagsAsArray(header);
+  header = transformTagsAsStringToTagsAsArray(header);
   return header;
 };
 

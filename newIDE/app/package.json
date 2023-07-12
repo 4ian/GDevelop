@@ -16,7 +16,6 @@
     "flow-bin": "0.131.0",
     "flow-coverage-report": "^0.4.0",
     "folder-hash": "^3.0.0",
-    "follow-redirects": "^1.2.3",
     "iso-639-1": "^2.0.3",
     "minimist": "1.2.5",
     "patch-package": "^6.4.7",
@@ -45,7 +44,6 @@
     "blueimp-md5": "^2.10.0",
     "classnames": "2.2.5",
     "date-fns": "2.16.1",
-    "downshift": "^3.2.12",
     "element-closest": "2.0.2",
     "firebase": "9.0.0-beta.2",
     "fontfaceobserver": "2.0.13",
@@ -57,14 +55,12 @@
     "pixi-simple-gesture": "github:4ian/pixi-simple-gesture#v0.3.3",
     "pixi.js-legacy": "6.1.2",
     "posthog-js": "^1.57.2",
-    "prop-types": "^15.5.10",
     "qr-creator": "^1.0.0",
     "react": "16.14.0",
     "react-color": "2.13.8",
     "react-dnd": "7.7.0",
     "react-dnd-html5-backend": "7.7.0",
     "react-dnd-multi-backend": "3.2.2",
-    "react-dnd-touch-backend": "0.8.3",
     "react-dom": "16.14.0",
     "react-error-boundary": "^1.2.0",
     "react-instantsearch-hooks": "^6.41.0",
@@ -86,7 +82,6 @@
     "source-map-explorer": "^2.0.1",
     "three": "0.152.0",
     "url-search-params": "^1.0.2",
-    "wait-promise": "0.4.1",
     "xxhashjs": "^0.2.2"
   },
   "scripts": {
@@ -127,10 +122,6 @@
                 "Trans"
               ],
               "message": "Please import Trans from @lingui/macro"
-            },
-            {
-              "name": "prop-types",
-              "message": "Don't import anything from prop-types - use Flow/TypeScript types instead."
             }
           ]
         }

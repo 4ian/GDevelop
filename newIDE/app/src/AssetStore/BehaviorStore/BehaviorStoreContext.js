@@ -89,6 +89,7 @@ export const BehaviorStoreStateProvider = ({
   children,
   defaultSearchText,
 }: BehaviorStoreStateProviderProps) => {
+  console.log("BehaviorStoreStateProvider");
   const [
     installedBehaviorMetadataByType,
     setInstalledBehaviorMetadataByType,
@@ -203,21 +204,32 @@ export const BehaviorStoreStateProvider = ({
     [fetchBehaviorsAndFilters, behaviorShortHeadersByType, isLoading]
   );
 
-  const allBehaviors = React.useMemo(() => {
-    /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
-    const allBehaviors = {};
-    console.log('Installed behaviors:');
-    for (const type in installedBehaviorMetadataByType) {
-      allBehaviors[type] = installedBehaviorMetadataByType[type];
-      console.log(allBehaviors[type]);
-    }
-    for (const type in behaviorShortHeadersByType) {
-      allBehaviors[type] = behaviorShortHeadersByType[type];
-    }
-    console.log('All behaviors:');
-    console.log(allBehaviors);
-    return allBehaviors;
-  }, [installedBehaviorMetadataByType, behaviorShortHeadersByType]);
+  const allBehaviors = React.useMemo(
+    () => {
+      /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
+      const allBehaviors = {};
+      console.log('Installed behaviors:');
+      for (const type in installedBehaviorMetadataByType) {
+        allBehaviors[type] = installedBehaviorMetadataByType[type];
+        console.log(allBehaviors[type]);
+      }
+      for (const type in behaviorShortHeadersByType) {
+        allBehaviors[type] = behaviorShortHeadersByType[type];
+      }
+      console.log('All behaviors:');
+      console.log(allBehaviors);
+      return allBehaviors;
+    },
+    [installedBehaviorMetadataByType, behaviorShortHeadersByType]
+  );
+
+  const defaultFirstSearchItemIds = React.useMemo(
+    () => [
+      ...Object.keys(installedBehaviorMetadataByType),
+      ...firstBehaviorIds,
+    ],
+    [firstBehaviorIds, installedBehaviorMetadataByType]
+  );
 
   const searchResults: ?Array<{|
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
@@ -230,7 +242,7 @@ export const BehaviorStoreStateProvider = ({
     excludedTiers: showCommunityExtensions
       ? noExcludedTiers
       : excludedCommunityTiers,
-    defaultFirstSearchItemIds: firstBehaviorIds,
+    defaultFirstSearchItemIds: defaultFirstSearchItemIds,
   });
 
   const hasBehaviorNamed = React.useCallback(
@@ -251,7 +263,6 @@ export const BehaviorStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
-      installedBehaviorMetadataByType,
       setInstalledBehaviorMetadataByType,
       behaviorShortHeadersByType,
       filtersState,
@@ -265,7 +276,6 @@ export const BehaviorStoreStateProvider = ({
       chosenCategory,
       setChosenCategory,
       searchText,
-      installedBehaviorMetadataByType,
       setInstalledBehaviorMetadataByType,
       behaviorShortHeadersByType,
       filtersState,

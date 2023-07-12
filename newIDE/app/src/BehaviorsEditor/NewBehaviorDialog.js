@@ -122,6 +122,7 @@ export default function NewBehaviorDialog({
     [name: string]: SearchableBehaviorMetadata,
   } = React.useMemo(
     () => {
+      console.log("evaluate installedBehaviorMetadataByType");
       const behaviorMetadataList =
         project && platform
           ? enumerateBehaviorsMetadata(

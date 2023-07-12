@@ -20,9 +20,12 @@ const styles = {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
-    padding: 8,
+    padding: 4,
     width: '100%',
   },
+  icon: {
+    paddingTop: 4,
+  }
 };
 
 type Props = {|
@@ -76,11 +79,13 @@ export const BehaviorListItem = ({
     <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
       <div style={styles.container} ref={containerRef}>
         <LineStackLayout>
-          <IconContainer
-            alt={behaviorShortHeader.fullName}
-            src={behaviorShortHeader.previewIconUrl}
-            size={32}
-          />
+          <div style={styles.icon}>
+            <IconContainer
+              alt={behaviorShortHeader.fullName}
+              src={behaviorShortHeader.previewIconUrl}
+              size={32}
+            />
+          </div>
           <Column expand>
             <LineStackLayout noMargin alignItems="baseline">
               <Text

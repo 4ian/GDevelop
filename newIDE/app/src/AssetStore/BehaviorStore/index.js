@@ -72,6 +72,7 @@ export const BehaviorStore = ({
 
   React.useEffect(
     () => {
+      console.log("setInstalledBehaviorMetadataByType");
       setInstalledBehaviorMetadataByType(installedBehaviorMetadataByType);
     },
     [installedBehaviorMetadataByType, setInstalledBehaviorMetadataByType]
@@ -79,6 +80,7 @@ export const BehaviorStore = ({
 
   React.useEffect(
     () => {
+      console.log("fetchBehaviorsAndFilters");
       fetchBehaviorsAndFilters();
     },
     [fetchBehaviorsAndFilters]
@@ -95,7 +97,7 @@ export const BehaviorStore = ({
     [filtersState]
   );
 
-  const getExtensionsMatches = (
+  const getExtensionsMatches = React.useCallback((
     extensionShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
   ): SearchMatch[] => {
     if (!searchResults) return [];
@@ -103,7 +105,7 @@ export const BehaviorStore = ({
       result => result.item.name === extensionShortHeader.name
     );
     return extensionMatches ? extensionMatches.matches : [];
-  };
+  }, [searchResults]);
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-behaviors-and-functions'

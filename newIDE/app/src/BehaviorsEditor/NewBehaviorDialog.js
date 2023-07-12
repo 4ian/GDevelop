@@ -101,7 +101,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
-  console.log("render NewBehaviorDialog");
+  console.log('render NewBehaviorDialog');
   const [showDeprecated, setShowDeprecated] = React.useState(false);
 
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -122,7 +122,7 @@ export default function NewBehaviorDialog({
     [name: string]: SearchableBehaviorMetadata,
   } = React.useMemo(
     () => {
-      console.log("evaluate installedBehaviorMetadataByType");
+      console.log('evaluate installedBehaviorMetadataByType');
       const behaviorMetadataList =
         project && platform
           ? enumerateBehaviorsMetadata(
@@ -135,6 +135,7 @@ export default function NewBehaviorDialog({
       behaviorMetadataList.forEach(behavior => {
         installedBehaviorMetadataByType[behavior.behaviorMetadata.getName()] = {
           type: behavior.behaviorMetadata.getName(),
+          category: behavior.behaviorMetadata.getGroup(),
           // TODO Add the tags of the extension.
           tags: [],
           ...behavior,

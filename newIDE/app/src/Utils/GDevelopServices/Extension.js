@@ -82,7 +82,7 @@ export type ExtensionsRegistry = {
   views?: {
     default: {
       firstExtensionIds: Array<string>,
-      firstBehaviorIds: Array<{extensionName: string, behaviorName: string}>,
+      firstBehaviorIds: Array<{ extensionName: string, behaviorName: string }>,
     },
   },
 };

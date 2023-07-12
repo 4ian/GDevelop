@@ -54,7 +54,7 @@ export const BehaviorStore = ({
   onInstall,
   onChoose,
 }: Props) => {
-  console.log("render BehaviorStore");
+  console.log('render BehaviorStore');
   const preferences = React.useContext(PreferencesContext);
   const {
     filters,
@@ -72,7 +72,7 @@ export const BehaviorStore = ({
 
   React.useEffect(
     () => {
-      console.log("setInstalledBehaviorMetadataByType");
+      console.log('setInstalledBehaviorMetadataByType');
       setInstalledBehaviorMetadataByType(installedBehaviorMetadataByType);
     },
     [installedBehaviorMetadataByType, setInstalledBehaviorMetadataByType]
@@ -80,7 +80,7 @@ export const BehaviorStore = ({
 
   React.useEffect(
     () => {
-      console.log("fetchBehaviorsAndFilters");
+      console.log('fetchBehaviorsAndFilters');
       fetchBehaviorsAndFilters();
     },
     [fetchBehaviorsAndFilters]
@@ -97,15 +97,18 @@ export const BehaviorStore = ({
     [filtersState]
   );
 
-  const getExtensionsMatches = React.useCallback((
-    extensionShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
-  ): SearchMatch[] => {
-    if (!searchResults) return [];
-    const extensionMatches = searchResults.find(
-      result => result.item.name === extensionShortHeader.name
-    );
-    return extensionMatches ? extensionMatches.matches : [];
-  }, [searchResults]);
+  const getExtensionsMatches = React.useCallback(
+    (
+      extensionShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+    ): SearchMatch[] => {
+      if (!searchResults) return [];
+      const extensionMatches = searchResults.find(
+        result => result.item.name === extensionShortHeader.name
+      );
+      return extensionMatches ? extensionMatches.matches : [];
+    },
+    [searchResults]
+  );
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-behaviors-and-functions'

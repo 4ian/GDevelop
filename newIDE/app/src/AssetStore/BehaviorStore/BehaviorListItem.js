@@ -25,7 +25,7 @@ const styles = {
   },
   icon: {
     paddingTop: 4,
-  }
+  },
 };
 
 type Props = {|

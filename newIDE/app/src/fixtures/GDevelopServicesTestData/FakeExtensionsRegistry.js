@@ -451,6 +451,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'Bounce',
         'BoidsMovement',
       ],
+      firstBehaviorIds: [],
     },
   },
   extensionShortHeaders: [

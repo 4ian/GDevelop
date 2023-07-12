@@ -45,9 +45,6 @@ type BehaviorStoreState = {|
   allCategories: string[],
   chosenCategory: string,
   setChosenCategory: string => void,
-  installedBehaviorMetadataByType: {
-    [name: string]: SearchableBehaviorMetadata,
-  },
   setInstalledBehaviorMetadataByType: ({
     [name: string]: SearchableBehaviorMetadata,
   }) => void,
@@ -67,7 +64,6 @@ export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
   // '' means all categories.
   chosenCategory: '',
   setChosenCategory: () => {},
-  installedBehaviorMetadataByType: {},
   setInstalledBehaviorMetadataByType: () => {},
   behaviorShortHeadersByType: {},
   filtersState: {
@@ -89,7 +85,7 @@ export const BehaviorStoreStateProvider = ({
   children,
   defaultSearchText,
 }: BehaviorStoreStateProviderProps) => {
-  console.log("BehaviorStoreStateProvider");
+  console.log('BehaviorStoreStateProvider');
   const [
     installedBehaviorMetadataByType,
     setInstalledBehaviorMetadataByType,
@@ -234,16 +230,19 @@ export const BehaviorStoreStateProvider = ({
   const searchResults: ?Array<{|
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
     matches: SearchMatch[],
-  |}> = useSearchStructuredItem(allBehaviors, {
-    searchText,
-    chosenItemCategory: chosenCategory,
-    chosenCategory: filtersState.chosenCategory,
-    chosenFilters: filtersState.chosenFilters,
-    excludedTiers: showCommunityExtensions
-      ? noExcludedTiers
-      : excludedCommunityTiers,
-    defaultFirstSearchItemIds: defaultFirstSearchItemIds,
-  });
+  |}> = useSearchStructuredItem(
+    behaviorShortHeadersByType, //allBehaviors,
+    {
+      searchText,
+      chosenItemCategory: chosenCategory,
+      chosenCategory: filtersState.chosenCategory,
+      chosenFilters: filtersState.chosenFilters,
+      excludedTiers: showCommunityExtensions
+        ? noExcludedTiers
+        : excludedCommunityTiers,
+      defaultFirstSearchItemIds: firstBehaviorIds, //defaultFirstSearchItemIds,
+    }
+  );
 
   const hasBehaviorNamed = React.useCallback(
     (extensionName: string) => {

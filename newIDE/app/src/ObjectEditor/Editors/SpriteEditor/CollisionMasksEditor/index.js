@@ -27,6 +27,7 @@ import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWin
 import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
+import AlertMessage from '../../../../UI/AlertMessage';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -37,6 +38,8 @@ const styles = {
   },
   rightContainer: {
     display: 'flex',
+    paddingLeft: 4,
+    paddingRight: 4,
   },
 };
 
@@ -363,7 +366,7 @@ const CollisionMasksEditor = ({
         <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>
             <Line>
-              <Column expand>
+              <Column expand noMargin>
                 <SpriteSelector
                   spriteConfiguration={spriteConfiguration}
                   animationIndex={animationIndex}
@@ -416,12 +419,12 @@ const CollisionMasksEditor = ({
                 !sprite.isFullImageCollisionMask() &&
                 spriteConfiguration.adaptCollisionMaskAutomatically() && (
                   <React.Fragment>
-                    <EmptyMessage>
+                    <AlertMessage kind="info">
                       <Trans>
                         Automatic collision mask activated. Click on the button
                         to replace it with a custom one.
                       </Trans>
-                    </EmptyMessage>
+                    </AlertMessage>
                     <Line justifyContent="center">
                       <FlatButton
                         label={<Trans>Use a custom collision mask</Trans>}
@@ -433,12 +436,12 @@ const CollisionMasksEditor = ({
                 )}
               {!!sprite && sprite.isFullImageCollisionMask() && (
                 <React.Fragment>
-                  <EmptyMessage>
+                  <AlertMessage kind="info">
                     <Trans>
                       This sprite uses a rectangle that is as large as the
                       sprite for its collision mask.
                     </Trans>
-                  </EmptyMessage>
+                  </AlertMessage>
                   <Line justifyContent="center">
                     <FlatButton
                       label={<Trans>Use a custom collision mask</Trans>}

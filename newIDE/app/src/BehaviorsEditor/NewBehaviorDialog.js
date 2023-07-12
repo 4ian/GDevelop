@@ -23,7 +23,7 @@ import {
 import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
-import { SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
+import { type SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import Window from '../Utils/Window';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
@@ -41,6 +41,8 @@ import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Visibility from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Edit from '../UI/CustomSvgIcons/Edit';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -130,7 +132,7 @@ export default function NewBehaviorDialog({
       const installedBehaviorMetadataByName = {};
       behaviorMetadataList.forEach(behavior => {
         installedBehaviorMetadataByName[behavior.behaviorMetadata.getName()] = {
-          name: behavior.behaviorMetadata.getName(),
+          type: behavior.behaviorMetadata.getName(),
           // TODO Add the tags of the extension.
           tags: [],
           ...behavior,
@@ -152,15 +154,19 @@ export default function NewBehaviorDialog({
   //   ({ type }) => !!deprecatedBehaviorsInformation[type]
   // );
 
-  const _chooseBehavior = (
-    i18n: I18nType,
-    { type, defaultName }: EnumeratedBehaviorMetadata
-  ) => {
-    if (deprecatedBehaviorsInformation[type]) {
-      showMessageBox(i18n._(deprecatedBehaviorsInformation[type].warning));
+  const _chooseBehavior = (i18n: I18nType, behaviorType: string) => {
+    if (deprecatedBehaviorsInformation[behaviorType]) {
+      showMessageBox(
+        i18n._(deprecatedBehaviorsInformation[behaviorType].warning)
+      );
     }
 
-    return onChoose(type, defaultName);
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      project.getCurrentPlatform(),
+      behaviorType
+    );
+
+    return onChoose(behaviorType, behaviorMetadata.getDefaultName());
   };
   const chooseBehavior = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
@@ -183,7 +189,7 @@ export default function NewBehaviorDialog({
 
   const onInstallExtension = async (
     i18n: I18nType,
-    extensionShortHeader: ExtensionShortHeader
+    extensionShortHeader: { url: string }
   ) => {
     setIsInstalling(true);
     try {
@@ -238,6 +244,7 @@ export default function NewBehaviorDialog({
                 onInstall={async extensionShortHeader =>
                   onInstallExtension(i18n, extensionShortHeader)
                 }
+                onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
                 installedBehaviorMetadataByName={
                   installedBehaviorMetadataByName
                 }

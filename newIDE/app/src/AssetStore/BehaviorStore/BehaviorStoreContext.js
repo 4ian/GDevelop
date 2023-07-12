@@ -18,16 +18,17 @@ const emptySearchText = '';
 const noExcludedTiers = new Set();
 const excludedCommunityTiers = new Set(['community']);
 
-export interface SearchableBehaviorMetadata {
-  name: string;
-  fullName: string;
-  description: string;
-  objectType: string;
-  previewIconUrl: string;
-
-  category: string;
-  tags: string[];
-}
+export type SearchableBehaviorMetadata = {|
+  extensionNamespace: string,
+  name: string,
+  fullName: string,
+  description: string,
+  objectType: string,
+  previewIconUrl: string,
+  category: string,
+  tags: string[],
+  type: string,
+|};
 
 type BehaviorStoreState = {|
   filters: ?Filters,

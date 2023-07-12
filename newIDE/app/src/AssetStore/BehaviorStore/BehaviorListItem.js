@@ -10,7 +10,9 @@ import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import Chip from '../../UI/Chip';
 import { LineStackLayout } from '../../UI/Layout';
-import { SearchableBehaviorMetadata } from './BehaviorStoreContext';
+import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
+
+const gd: libGDevelop = global.gd;
 
 const styles = {
   button: { width: '100%' },

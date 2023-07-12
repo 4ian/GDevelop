@@ -4,6 +4,8 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type UserPublicProfile } from './User';
 
+const gd: libGDevelop = global.gd;
+
 type ExtensionTier = 'community' | 'reviewed';
 
 export type ExtensionRegistryItemHeader = {|
@@ -41,6 +43,8 @@ export type BehaviorShortHeader = {|
   description: string,
   extensionName: string,
   objectType: string,
+  /** This attribute is calculated. */
+  type: string,
 |};
 
 export type ObjectShortHeader = {|
@@ -104,7 +108,9 @@ type SerializedExtensionWithTagsAsString = {
  * Transform the tags from their old representation sent by the API (a string)
  * to their new representation (array of strings).
  */
-const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
+const transformTagsAsStringToTagsAsArray = <
+  T: { tags: string } | { tags: string[] }
+>(
   dataWithTags: T
 ): $Exact<{ ...T, tags: Array<string> }> => {
   // Handle potential future update of the API that would
@@ -146,8 +152,23 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
         extensionShortHeaders: extensionsRegistry.extensionShortHeaders.map(
           transformTagsAsStringToTagsAsArray
         ),
+        behavior: {
+          ...extensionsRegistry.behavior,
+          headers: adaptBehaviorHeader(extensionsRegistry.behavior.headers),
+        },
       };
     });
+};
+
+const adaptBehaviorHeader = (
+  header: BehaviorShortHeader
+): BehaviorShortHeader => {
+  header.type = gd.PlatformExtension.getBehaviorFullType(
+    header.extensionNamespace,
+    header.name
+  );
+  transformTagsAsStringToTagsAsArray(header);
+  return header;
 };
 
 export const getExtensionHeader = (
@@ -162,9 +183,9 @@ export const getExtensionHeader = (
   });
 };
 
-export const getExtension = (
-  extensionHeader: ExtensionShortHeader | ExtensionHeader
-): Promise<SerializedExtension> => {
+export const getExtension = (extensionHeader: {
+  url: string,
+}): Promise<SerializedExtension> => {
   return axios.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(

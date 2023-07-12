@@ -25,7 +25,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import SearchBarSelectField from '../../UI/SearchBarSelectField';
 import SelectOption from '../../UI/SelectOption';
-import { SearchableBehaviorMetadata } from './BehaviorStoreContext';
+import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
 
 type Props = {|
   isInstalling: boolean,
@@ -35,7 +35,10 @@ type Props = {|
   installedBehaviorMetadataByName: {
     [name: string]: SearchableBehaviorMetadata,
   },
-  onInstall: ExtensionShortHeader => Promise<boolean>,
+  onInstall: (
+    (BehaviorShortHeader | SearchableBehaviorMetadata) & { url: string }
+  ) => Promise<boolean>,
+  onChoose: (behaviorType: string) => void,
 |};
 
 const getBehaviorName = (
@@ -49,12 +52,9 @@ export const BehaviorStore = ({
   objectBehaviorsTypes,
   installedBehaviorMetadataByName,
   onInstall,
+  onChoose,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
-  const [
-    selectedBehaviorShortHeader,
-    setSelectedBehaviorShortHeader,
-  ] = React.useState<?(BehaviorShortHeader | SearchableBehaviorMetadata)>(null);
   const {
     filters,
     searchResults,
@@ -106,6 +106,20 @@ export const BehaviorStore = ({
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-behaviors-and-functions'
+  );
+
+  const installAndChoose = React.useCallback(
+    async (
+      behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
+    ) => {
+      // TODO Handle updates for new behaviors.
+      if (behaviorShortHeader.url) {
+        sendExtensionAddedToProject(behaviorShortHeader.name);
+        const wasInstalled = await onInstall(behaviorShortHeader);
+      }
+      onChoose(behaviorShortHeader.type);
+    },
+    [onInstall, onChoose]
   );
 
   return (
@@ -178,8 +192,7 @@ export const BehaviorStore = ({
                   behaviorShortHeader={behaviorShortHeader}
                   matches={getExtensionsMatches(behaviorShortHeader)}
                   onChoose={() => {
-                    sendExtensionDetailsOpened(behaviorShortHeader.name);
-                    setSelectedBehaviorShortHeader(behaviorShortHeader);
+                    installAndChoose(behaviorShortHeader);
                   }}
                 />
               )}
@@ -187,19 +200,6 @@ export const BehaviorStore = ({
           </ColumnStackLayout>
         )}
       </ResponsiveWindowMeasurer>
-      {!!selectedBehaviorShortHeader && (
-        <ExtensionInstallDialog
-          project={project}
-          isInstalling={isInstalling}
-          extensionShortHeader={selectedBehaviorShortHeader}
-          onInstall={async () => {
-            sendExtensionAddedToProject(selectedBehaviorShortHeader.name);
-            const wasInstalled = await onInstall(selectedBehaviorShortHeader);
-            if (wasInstalled) setSelectedBehaviorShortHeader(null);
-          }}
-          onClose={() => setSelectedBehaviorShortHeader(null)}
-        />
-      )}
     </React.Fragment>
   );
 };

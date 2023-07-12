@@ -1915,6 +1915,8 @@ interface PlatformExtension {
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
+    [Const, Value] DOMString STATIC_GetBehaviorFullType(
+        [Const] DOMString extensionName, [Const] DOMString behaviorName);
 };
 
 interface EventsList {

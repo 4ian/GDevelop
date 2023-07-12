@@ -17,7 +17,7 @@ export const installExtension = async (
   i18n: I18nType,
   project: gdProject,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
-  extensionShortHeader: ExtensionShortHeader
+  extensionShortHeader: { url: string }
 ): Promise<boolean> => {
   try {
     const serializedExtension = await getExtension(extensionShortHeader);

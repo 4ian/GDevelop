@@ -27,7 +27,7 @@ const styles = {
   },
 };
 
-export default class ForEachEvent extends React.Component<
+export default class WhileEvent extends React.Component<
   EventRendererProps,
   *
 > {

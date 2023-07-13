@@ -28,6 +28,7 @@ export type SearchableBehaviorMetadata = {|
   previewIconUrl: string,
   category: string,
   tags: string[],
+  isDeprecated?: boolean,
 |};
 
 type BehaviorStoreState = {|

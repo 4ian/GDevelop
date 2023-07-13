@@ -150,10 +150,13 @@ export default function NewBehaviorDialog({
   );
 
   const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
-    () =>
-      allInstalledBehaviorMetadataList.filter(
+    () => {
+      const deprecatedBehaviors = allInstalledBehaviorMetadataList.filter(
         behavior => deprecatedBehaviorsInformation[behavior.type]
-      ),
+      );
+      deprecatedBehaviors.forEach(behavior => (behavior.isDeprecated = true));
+      return deprecatedBehaviors;
+    },
     [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
   );
 

@@ -48,7 +48,7 @@ export const BehaviorListItem = ({
   // An empty object type means the base object, i.e: any object.
   const isObjectIncompatible =
     behaviorShortHeader.objectType &&
-    objectType === behaviorShortHeader.objectType;
+    objectType !== behaviorShortHeader.objectType;
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -103,7 +103,7 @@ export const BehaviorListItem = ({
               {isObjectIncompatible && (
                 <Chip
                   size="small"
-                  label={<Trans>Incompatible object</Trans>}
+                  label={<Trans>Incompatible with the object</Trans>}
                   color="secondary"
                   variant="outlined"
                 />
@@ -111,7 +111,14 @@ export const BehaviorListItem = ({
               {behaviorShortHeader.tier === 'community' && (
                 <Chip
                   size="small"
-                  label={<Trans>Community extension</Trans>}
+                  label={<Trans>Community-made</Trans>}
+                  color="primary"
+                />
+              )}
+              {behaviorShortHeader.isDeprecated && (
+                <Chip
+                  size="small"
+                  label={<Trans>Deprecated</Trans>}
                   color="primary"
                 />
               )}

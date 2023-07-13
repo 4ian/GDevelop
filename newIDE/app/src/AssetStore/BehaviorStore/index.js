@@ -4,17 +4,13 @@ import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
 import {
   type BehaviorShortHeader,
-  type ExtensionShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { BehaviorListItem } from './BehaviorListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import Toggle from '../../UI/Toggle';
 import {
-  sendExtensionDetailsOpened,
   sendExtensionAddedToProject,
 } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
@@ -29,6 +25,19 @@ import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import IconButton from '../../UI/IconButton';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+
+export const useExtensionUpdateAlertDialog = () => {
+  const { showConfirmation } = useAlertDialog();
+  return async (): Promise<boolean> => {
+    return await showConfirmation({
+      title: t`Extension update`,
+      message: t`This behavior needs an extensions update. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
+      confirmButtonLabel: t`Update the extension`,
+      dismissButtonLabel: t`Cancel`,
+    });
+  };
+};
 
 type Props = {|
   isInstalling: boolean,
@@ -129,18 +138,38 @@ export const BehaviorStore = ({
     'intro-behaviors-and-functions'
   );
 
+  const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
+
   const installAndChoose = React.useCallback(
     async (
       behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
     ) => {
-      // TODO Handle updates for new behaviors.
+      const isExtensionAlreadyInstalled =
+        behaviorShortHeader.extensionName &&
+        project.hasEventsFunctionsExtensionNamed(
+          behaviorShortHeader.extensionName
+        );
+      if (isExtensionAlreadyInstalled) {
+        const shouldUpdateExtension = await showExtensionUpdateConfirmation();
+        if (!shouldUpdateExtension) {
+          return;
+        }
+      }
+
       if (behaviorShortHeader.url) {
         sendExtensionAddedToProject(behaviorShortHeader.name);
         const wasInstalled = await onInstall(behaviorShortHeader);
+        if (wasInstalled) {
+          onChoose(behaviorShortHeader.type);
+        }
+        else {
+          // TODO Handle installation failures.
+        }
+      } else {
+        onChoose(behaviorShortHeader.type);
       }
-      onChoose(behaviorShortHeader.type);
     },
-    [onInstall, onChoose]
+    [project, onChoose, showExtensionUpdateConfirmation, onInstall]
   );
 
   return (
@@ -229,7 +258,7 @@ export const BehaviorStore = ({
               getSearchItemUniqueId={getBehaviorType}
               renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
                 <BehaviorListItem
-                  id={`behavior-list-item-${behaviorShortHeader.type}`}
+                  id={'behavior-item-' + behaviorShortHeader.type.replace(/:/g, '-')}
                   key={behaviorShortHeader.type}
                   objectType={objectType}
                   objectBehaviorsTypes={objectBehaviorsTypes}

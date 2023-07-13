@@ -162,13 +162,6 @@ export default function NewBehaviorDialog({
 
   if (!open || !project) return null;
 
-  // const behaviors = filteredBehaviorMetadata.filter(
-  //   ({ type }) => !deprecatedBehaviorsInformation[type]
-  // );
-  // const deprecatedBehaviors = filteredBehaviorMetadata.filter(
-  //   ({ type }) => !!deprecatedBehaviorsInformation[type]
-  // );
-
   const _chooseBehavior = (i18n: I18nType, behaviorType: string) => {
     if (deprecatedBehaviorsInformation[behaviorType]) {
       showMessageBox(
@@ -188,19 +181,6 @@ export default function NewBehaviorDialog({
     TRIVIAL_FIRST_BEHAVIOR,
     _chooseBehavior
   );
-
-  const isAmongObjectBehaviors = (
-    behaviorMetadata: EnumeratedBehaviorMetadata
-  ) => objectBehaviorsTypes.includes(behaviorMetadata.type);
-
-  const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
-    // An empty object type means the base object, i.e: any object.
-    return (
-      (behaviorMetadata.objectType === '' ||
-        behaviorMetadata.objectType === objectType) &&
-      !isAmongObjectBehaviors(behaviorMetadata)
-    );
-  };
 
   const onInstallExtension = async (
     i18n: I18nType,

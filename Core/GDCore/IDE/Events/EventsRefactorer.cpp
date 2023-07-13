@@ -555,6 +555,22 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
   }
 }
 
+gd::String ReplaceAllOccurrencesCaseInsensitive(gd::String context,
+                                               gd::String from,
+                                               const gd::String& to) {
+  size_t lookHere = 0;
+  size_t foundHere;
+  size_t fromSize = from.size();
+  size_t toSize = to.size();
+  while ((foundHere = context.FindCaseInsensitive(from, lookHere)) !=
+         gd::String::npos) {
+    context.replace(foundHere, fromSize, to);
+    lookHere = foundHere + toSize;
+  }
+
+  return context;
+}
+
 std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
     gd::ObjectsContainer& project,
     gd::ObjectsContainer& layout,
@@ -570,6 +586,32 @@ std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
 
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventModified = false;
+
+    std::vector<gd::Expression*> allObjectExpressions =
+        events[i].GetAllObjectExpressions();
+    for (std::size_t j = 0; j < allObjectExpressions.size(); ++j) {
+      gd::String newExpressionPlainString =
+          matchCase ? allObjectExpressions[j]->GetPlainString().FindAndReplace(
+                          toReplace, newString, true)
+                    : ReplaceAllOccurrencesCaseInsensitive(
+                          allObjectExpressions[j]->GetPlainString(),
+                          toReplace,
+                          newString);
+
+      if (newExpressionPlainString !=
+          allObjectExpressions[j]->GetPlainString()) {
+        *allObjectExpressions[j] = gd::Expression(newExpressionPlainString);
+
+        if (!eventModified) {
+          modifiedEvents.push_back(EventsSearchResult(
+              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+              &events,
+              i));
+          eventModified = true;
+        }
+      }
+    }
+
     if (inConditions) {
       vector<gd::InstructionsList*> conditionsVectors =
           events[i].GetAllConditionsVectors();
@@ -640,22 +682,6 @@ std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
     }
   }
   return modifiedEvents;
-}
-
-gd::String ReplaceAllOccurrencesCaseInsensitive(gd::String context,
-                                               gd::String from,
-                                               const gd::String& to) {
-  size_t lookHere = 0;
-  size_t foundHere;
-  size_t fromSize = from.size();
-  size_t toSize = to.size();
-  while ((foundHere = context.FindCaseInsensitive(from, lookHere)) !=
-         gd::String::npos) {
-    context.replace(foundHere, fromSize, to);
-    lookHere = foundHere + toSize;
-  }
-
-  return context;
 }
 
 bool EventsRefactorer::ReplaceStringInActions(gd::ObjectsContainer& project,
@@ -788,6 +814,24 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventAddedInResults = false;
+
+    std::vector<gd::Expression*> allObjectExpressions =
+        events[i].GetAllObjectExpressions();
+    for (std::size_t j = 0; j < allObjectExpressions.size(); ++j) {
+      size_t foundPosition =
+          matchCase
+              ? allObjectExpressions[j]->GetPlainString().find(search)
+              : allObjectExpressions[j]->GetPlainString().FindCaseInsensitive(
+                    search);
+
+      if (foundPosition != gd::String::npos && !eventAddedInResults) {
+        results.push_back(EventsSearchResult(
+            std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+            &events,
+            i));
+        eventAddedInResults = true;
+      }
+    }
 
     if (inConditions) {
       vector<gd::InstructionsList*> conditionsVectors =

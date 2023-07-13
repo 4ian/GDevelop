@@ -97,8 +97,6 @@ export const BehaviorStoreStateProvider = ({
 
   const preferences = React.useContext(PreferencesContext);
   const { showCommunityExtensions } = preferences.values;
-  const [filters, setFilters] = React.useState<?Filters>(null);
-  const [allCategories, setAllCategories] = React.useState<Array<string>>([]);
   const [firstBehaviorIds, setFirstBehaviorIds] = React.useState<Array<string>>(
     []
   );
@@ -124,19 +122,7 @@ export const BehaviorStoreStateProvider = ({
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const { allTags, allCategories } = extensionRegistry;
           const behaviorShortHeaders = extensionRegistry.behavior.headers;
-
-          const sortedTags = allTags
-            .slice()
-            .sort((tag1, tag2) =>
-              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
-            );
-          const sortedCategories = allCategories
-            .slice()
-            .sort((tag1, tag2) =>
-              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
-            );
 
           const behaviorShortHeadersByType = {};
           behaviorShortHeaders.forEach(behavior => {
@@ -149,12 +135,6 @@ export const BehaviorStoreStateProvider = ({
             } behaviors from the extension store.`
           );
           setBehaviorShortHeadersByType(behaviorShortHeadersByType);
-          setFilters({
-            allTags: sortedTags,
-            defaultTags: sortedTags,
-            tagsTree: [],
-          });
-          setAllCategories(sortedCategories);
           setFirstBehaviorIds(
             extensionRegistry.views
               ? extensionRegistry.views.default.firstBehaviorIds.map(
@@ -211,6 +191,38 @@ export const BehaviorStoreStateProvider = ({
       return allBehaviors;
     },
     [installedBehaviorMetadataList, behaviorShortHeadersByType]
+  );
+
+  const allCategories = React.useMemo(
+    () => {
+      const categoriesSet = new Set();
+      for (const type in allBehaviors) {
+        categoriesSet.add(allBehaviors[type].category);
+      }
+      const sortedCategories = [...categoriesSet].sort((tag1, tag2) =>
+        tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+      );
+      return sortedCategories;
+    },
+    [allBehaviors]
+  );
+
+  const filters = React.useMemo(
+    () => {
+      const tagsSet = new Set();
+      for (const type in allBehaviors) {
+        allBehaviors[type].tags.forEach(tag => tagsSet.add(tag));
+      }
+      const sortedTags = [...tagsSet].sort((tag1, tag2) =>
+        tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+      );
+      return {
+        allTags: sortedTags,
+        defaultTags: sortedTags,
+        tagsTree: [],
+      };
+    },
+    [allBehaviors]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(

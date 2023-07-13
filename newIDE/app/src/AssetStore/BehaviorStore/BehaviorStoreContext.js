@@ -205,10 +205,10 @@ export const BehaviorStoreStateProvider = ({
       /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
       const allBehaviors = {};
       console.log('Installed behaviors:');
-      for (const type in installedBehaviorMetadataByType) {
-        allBehaviors[type] = installedBehaviorMetadataByType[type];
-        console.log(allBehaviors[type]);
-      }
+      // for (const type in installedBehaviorMetadataByType) {
+      //   allBehaviors[type] = installedBehaviorMetadataByType[type];
+      //   console.log(allBehaviors[type]);
+      // }
       for (const type in behaviorShortHeadersByType) {
         allBehaviors[type] = behaviorShortHeadersByType[type];
       }
@@ -221,7 +221,7 @@ export const BehaviorStoreStateProvider = ({
 
   const defaultFirstSearchItemIds = React.useMemo(
     () => [
-      ...Object.keys(installedBehaviorMetadataByType),
+      //...Object.keys(installedBehaviorMetadataByType),
       ...firstBehaviorIds,
     ],
     [firstBehaviorIds, installedBehaviorMetadataByType]
@@ -231,7 +231,7 @@ export const BehaviorStoreStateProvider = ({
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
     matches: SearchMatch[],
   |}> = useSearchStructuredItem(
-    behaviorShortHeadersByType, //allBehaviors,
+    allBehaviors,
     {
       searchText,
       chosenItemCategory: chosenCategory,
@@ -240,7 +240,7 @@ export const BehaviorStoreStateProvider = ({
       excludedTiers: showCommunityExtensions
         ? noExcludedTiers
         : excludedCommunityTiers,
-      defaultFirstSearchItemIds: firstBehaviorIds, //defaultFirstSearchItemIds,
+      defaultFirstSearchItemIds: defaultFirstSearchItemIds,
     }
   );
 

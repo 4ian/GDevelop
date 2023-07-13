@@ -101,8 +101,6 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
-  const [showDeprecated, setShowDeprecated] = React.useState(false);
-
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionInstallTime, setExtensionInstallTime] = React.useState(0);
   const eventsFunctionsExtensionsState = React.useContext(
@@ -116,7 +114,9 @@ export default function NewBehaviorDialog({
     installExtension
   );
 
-  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+  const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
+
+  const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
       const behaviorMetadataList =
@@ -141,9 +141,23 @@ export default function NewBehaviorDialog({
     [project, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  if (!open || !project) return null;
+  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () =>
+      allInstalledBehaviorMetadataList.filter(
+        behavior => !deprecatedBehaviorsInformation[behavior.type]
+      ),
+    [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
+  );
 
-  const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
+  const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () =>
+      allInstalledBehaviorMetadataList.filter(
+        behavior => deprecatedBehaviorsInformation[behavior.type]
+      ),
+    [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
+  );
+
+  if (!open || !project) return null;
 
   // const behaviors = filteredBehaviorMetadata.filter(
   //   ({ type }) => !deprecatedBehaviorsInformation[type]
@@ -242,6 +256,7 @@ export default function NewBehaviorDialog({
             }
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
+            deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
           />
           <DismissableInfoBar
             identifier="extension-installed-explanation"

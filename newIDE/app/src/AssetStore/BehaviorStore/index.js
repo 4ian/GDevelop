@@ -20,12 +20,15 @@ import {
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
 import { t } from '@lingui/macro';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import SearchBarSelectField from '../../UI/SearchBarSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import IconButton from '../../UI/IconButton';
+import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 
 type Props = {|
   isInstalling: boolean,
@@ -33,6 +36,7 @@ type Props = {|
   objectType: string,
   objectBehaviorsTypes: Array<string>,
   installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
+  deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
   onInstall: (
     (BehaviorShortHeader | SearchableBehaviorMetadata) & { url: string }
   ) => Promise<boolean>,
@@ -49,6 +53,7 @@ export const BehaviorStore = ({
   objectType,
   objectBehaviorsTypes,
   installedBehaviorMetadataList,
+  deprecatedBehaviorMetadataList,
   onInstall,
   onChoose,
 }: Props) => {
@@ -68,11 +73,25 @@ export const BehaviorStore = ({
     setInstalledBehaviorMetadataList,
   } = React.useContext(BehaviorStoreContext);
 
+  const [showDeprecated, setShowDeprecated] = React.useState(false);
+
   React.useEffect(
     () => {
-      setInstalledBehaviorMetadataList(installedBehaviorMetadataList);
+      setInstalledBehaviorMetadataList(
+        showDeprecated
+          ? [
+              ...installedBehaviorMetadataList,
+              ...deprecatedBehaviorMetadataList,
+            ]
+          : installedBehaviorMetadataList
+      );
     },
-    [installedBehaviorMetadataList, setInstalledBehaviorMetadataList]
+    [
+      deprecatedBehaviorMetadataList,
+      installedBehaviorMetadataList,
+      setInstalledBehaviorMetadataList,
+      showDeprecated,
+    ]
   );
 
   React.useEffect(
@@ -146,33 +165,57 @@ export const BehaviorStore = ({
                     />
                   ))}
                 </SearchBarSelectField>
-                <Column expand noMargin>
-                  <SearchBar
-                    id="extension-search-bar"
-                    value={searchText}
-                    onChange={setSearchText}
-                    onRequestSearch={() => {}}
-                    tagsHandler={tagsHandler}
-                    tags={filters && filters.allTags}
-                    placeholder={t`Search extensions`}
-                    autoFocus="desktop"
+                <Line expand noMargin>
+                  <Column expand noMargin>
+                    <SearchBar
+                      id="extension-search-bar"
+                      value={searchText}
+                      onChange={setSearchText}
+                      onRequestSearch={() => {}}
+                      tagsHandler={tagsHandler}
+                      tags={filters && filters.allTags}
+                      placeholder={t`Search extensions`}
+                      autoFocus="desktop"
+                    />
+                  </Column>
+                  <ElementWithMenu
+                    key="menu"
+                    element={
+                      <IconButton size="small">
+                        <ThreeDotsMenu />
+                      </IconButton>
+                    }
+                    buildMenuTemplate={(i18n: I18nType) => [
+                      {
+                        label: preferences.values.showCommunityExtensions
+                          ? i18n._(
+                              t`Hide community extensions (not officially reviewed)`
+                            )
+                          : i18n._(
+                              t`Show community extensions (not officially reviewed)`
+                            ),
+                        click: () => {
+                          preferences.setShowCommunityExtensions(
+                            !preferences.values.showCommunityExtensions
+                          );
+                        },
+                      },
+                      {
+                        label: showDeprecated
+                          ? i18n._(
+                              t`Hide deprecated behaviors (prefer not to use anymore)`
+                            )
+                          : i18n._(
+                              t`Show deprecated behaviors (prefer not to use anymore)`
+                            ),
+                        click: () => {
+                          setShowDeprecated(!showDeprecated);
+                        },
+                      },
+                    ]}
                   />
-                </Column>
+                </Line>
               </ResponsiveLineStackLayout>
-              <Column>
-                <Toggle
-                  onToggle={(e, check) =>
-                    preferences.setShowCommunityExtensions(check)
-                  }
-                  toggled={preferences.values.showCommunityExtensions}
-                  labelPosition="right"
-                  label={
-                    <Trans>
-                      Show community extensions (not officially reviewed)
-                    </Trans>
-                  }
-                />
-              </Column>
               {DismissableTutorialMessage}
             </ColumnStackLayout>
             <ListSearchResults

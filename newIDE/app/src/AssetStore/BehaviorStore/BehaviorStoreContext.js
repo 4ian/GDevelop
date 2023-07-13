@@ -21,15 +21,13 @@ const noExcludedTiers = new Set();
 const excludedCommunityTiers = new Set(['community']);
 
 export type SearchableBehaviorMetadata = {|
-  extensionNamespace: string,
-  name: string,
+  type: string,
   fullName: string,
   description: string,
   objectType: string,
   previewIconUrl: string,
   category: string,
   tags: string[],
-  type: string,
 |};
 
 type BehaviorStoreState = {|
@@ -45,9 +43,9 @@ type BehaviorStoreState = {|
   allCategories: string[],
   chosenCategory: string,
   setChosenCategory: string => void,
-  setInstalledBehaviorMetadataByType: ({
-    [name: string]: SearchableBehaviorMetadata,
-  }) => void,
+  setInstalledBehaviorMetadataList: (
+    installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>
+  ) => void,
   behaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
   filtersState: FiltersState,
   hasBehaviorNamed: (behaviorName: string) => boolean,
@@ -64,7 +62,7 @@ export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
   // '' means all categories.
   chosenCategory: '',
   setChosenCategory: () => {},
-  setInstalledBehaviorMetadataByType: () => {},
+  setInstalledBehaviorMetadataList: () => {},
   behaviorShortHeadersByType: {},
   filtersState: {
     chosenFilters: new Set(),
@@ -85,13 +83,10 @@ export const BehaviorStoreStateProvider = ({
   children,
   defaultSearchText,
 }: BehaviorStoreStateProviderProps) => {
-  console.log('BehaviorStoreStateProvider');
   const [
-    installedBehaviorMetadataByType,
-    setInstalledBehaviorMetadataByType,
-  ] = React.useState<{
-    [string]: SearchableBehaviorMetadata,
-  }>({});
+    installedBehaviorMetadataList,
+    setInstalledBehaviorMetadataList,
+  ] = React.useState<Array<SearchableBehaviorMetadata>>([]);
   const [
     behaviorShortHeadersByType,
     setBehaviorShortHeadersByType,
@@ -204,45 +199,40 @@ export const BehaviorStoreStateProvider = ({
     () => {
       /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
       const allBehaviors = {};
-      console.log('Installed behaviors:');
-      // for (const type in installedBehaviorMetadataByType) {
-      //   allBehaviors[type] = installedBehaviorMetadataByType[type];
-      //   console.log(allBehaviors[type]);
-      // }
       for (const type in behaviorShortHeadersByType) {
         allBehaviors[type] = behaviorShortHeadersByType[type];
       }
-      console.log('All behaviors:');
-      console.log(allBehaviors);
+      for (const installedBehaviorMetadata of installedBehaviorMetadataList) {
+        allBehaviors[
+          installedBehaviorMetadata.type
+        ] = installedBehaviorMetadata;
+      }
       return allBehaviors;
     },
-    [installedBehaviorMetadataByType, behaviorShortHeadersByType]
+    [installedBehaviorMetadataList, behaviorShortHeadersByType]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(
     () => [
-      //...Object.keys(installedBehaviorMetadataByType),
+      ...installedBehaviorMetadataList.map(behavior => behavior.type),
       ...firstBehaviorIds,
     ],
-    [firstBehaviorIds, installedBehaviorMetadataByType]
+    [firstBehaviorIds, installedBehaviorMetadataList]
   );
 
   const searchResults: ?Array<{|
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
     matches: SearchMatch[],
-  |}> = useSearchStructuredItem(
-    allBehaviors,
-    {
-      searchText,
-      chosenItemCategory: chosenCategory,
-      chosenCategory: filtersState.chosenCategory,
-      chosenFilters: filtersState.chosenFilters,
-      excludedTiers: showCommunityExtensions
-        ? noExcludedTiers
-        : excludedCommunityTiers,
-      defaultFirstSearchItemIds: defaultFirstSearchItemIds,
-    }
-  );
+  |}> = useSearchStructuredItem(allBehaviors, {
+    searchText,
+    chosenItemCategory: chosenCategory,
+    chosenCategory: filtersState.chosenCategory,
+    chosenFilters: filtersState.chosenFilters,
+    excludedTiers: showCommunityExtensions
+      ? noExcludedTiers
+      : excludedCommunityTiers,
+    defaultFirstSearchItemIds: defaultFirstSearchItemIds,
+  });
 
   const hasBehaviorNamed = React.useCallback(
     (extensionName: string) => {
@@ -262,7 +252,7 @@ export const BehaviorStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
-      setInstalledBehaviorMetadataByType,
+      setInstalledBehaviorMetadataList,
       behaviorShortHeadersByType,
       filtersState,
       hasBehaviorNamed,
@@ -275,7 +265,7 @@ export const BehaviorStoreStateProvider = ({
       chosenCategory,
       setChosenCategory,
       searchText,
-      setInstalledBehaviorMetadataByType,
+      setInstalledBehaviorMetadataList,
       behaviorShortHeadersByType,
       filtersState,
       fetchBehaviorsAndFilters,

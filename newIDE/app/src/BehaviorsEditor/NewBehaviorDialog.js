@@ -101,7 +101,6 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
-  console.log('render NewBehaviorDialog');
   const [showDeprecated, setShowDeprecated] = React.useState(false);
 
   const [isInstalling, setIsInstalling] = React.useState(false);
@@ -117,12 +116,9 @@ export default function NewBehaviorDialog({
     installExtension
   );
 
-  const platform = project.getCurrentPlatform();
-  const installedBehaviorMetadataByType: {
-    [name: string]: SearchableBehaviorMetadata,
-  } = React.useMemo(
+  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
     () => {
-      console.log('evaluate installedBehaviorMetadataByType');
+      const platform = project.getCurrentPlatform();
       const behaviorMetadataList =
         project && platform
           ? enumerateBehaviorsMetadata(
@@ -131,19 +127,18 @@ export default function NewBehaviorDialog({
               eventsFunctionsExtension
             )
           : [];
-      const installedBehaviorMetadataByType = {};
-      behaviorMetadataList.forEach(behavior => {
-        installedBehaviorMetadataByType[behavior.behaviorMetadata.getName()] = {
-          type: behavior.behaviorMetadata.getName(),
-          category: behavior.behaviorMetadata.getGroup(),
-          // TODO Add the tags of the extension.
-          tags: [],
-          ...behavior,
-        };
-      });
-      return installedBehaviorMetadataByType;
+      return behaviorMetadataList.map(behavior => ({
+        type: behavior.type,
+        fullName: behavior.fullName,
+        description: behavior.description,
+        previewIconUrl: behavior.previewIconUrl,
+        objectType: behavior.objectType,
+        category: behavior.category,
+        // TODO Add the tags of the extension.
+        tags: [],
+      }));
     },
-    [project, platform, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
+    [project, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   if (!open || !project) return null;
@@ -233,27 +228,21 @@ export default function NewBehaviorDialog({
           ]}
           open
           onRequestClose={onClose}
-          flexColumnBody
+          flexBody
           fullHeight
           id="new-behavior-dialog"
         >
-          <Line expand>
-            <Column expand noMargin>
-              <BehaviorStore
-                project={project}
-                objectType={objectType}
-                objectBehaviorsTypes={objectBehaviorsTypes}
-                isInstalling={isInstalling}
-                onInstall={async extensionShortHeader =>
-                  onInstallExtension(i18n, extensionShortHeader)
-                }
-                onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
-                installedBehaviorMetadataByType={
-                  installedBehaviorMetadataByType
-                }
-              />
-            </Column>
-          </Line>
+          <BehaviorStore
+            project={project}
+            objectType={objectType}
+            objectBehaviorsTypes={objectBehaviorsTypes}
+            isInstalling={isInstalling}
+            onInstall={async extensionShortHeader =>
+              onInstallExtension(i18n, extensionShortHeader)
+            }
+            onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
+            installedBehaviorMetadataList={installedBehaviorMetadataList}
+          />
           <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={

@@ -12,15 +12,12 @@ import Chip from '../../UI/Chip';
 import { LineStackLayout } from '../../UI/Layout';
 import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
 
-const gd: libGDevelop = global.gd;
-
 const styles = {
   button: { width: '100%' },
   container: {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
-    padding: 4,
     width: '100%',
   },
   icon: {

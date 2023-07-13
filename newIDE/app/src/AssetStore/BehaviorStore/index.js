@@ -32,25 +32,23 @@ type Props = {|
   project: gdProject,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
-  installedBehaviorMetadataByType: {
-    [name: string]: SearchableBehaviorMetadata,
-  },
+  installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
   onInstall: (
     (BehaviorShortHeader | SearchableBehaviorMetadata) & { url: string }
   ) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
 |};
 
-const getBehaviorName = (
+const getBehaviorType = (
   behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata
-) => behaviorShortHeader.name;
+) => behaviorShortHeader.type;
 
 export const BehaviorStore = ({
   isInstalling,
   project,
   objectType,
   objectBehaviorsTypes,
-  installedBehaviorMetadataByType,
+  installedBehaviorMetadataList,
   onInstall,
   onChoose,
 }: Props) => {
@@ -67,20 +65,18 @@ export const BehaviorStore = ({
     allCategories,
     chosenCategory,
     setChosenCategory,
-    setInstalledBehaviorMetadataByType,
+    setInstalledBehaviorMetadataList,
   } = React.useContext(BehaviorStoreContext);
 
   React.useEffect(
     () => {
-      console.log('setInstalledBehaviorMetadataByType');
-      setInstalledBehaviorMetadataByType(installedBehaviorMetadataByType);
+      setInstalledBehaviorMetadataList(installedBehaviorMetadataList);
     },
-    [installedBehaviorMetadataByType, setInstalledBehaviorMetadataByType]
+    [installedBehaviorMetadataList, setInstalledBehaviorMetadataList]
   );
 
   React.useEffect(
     () => {
-      console.log('fetchBehaviorsAndFilters');
       fetchBehaviorsAndFilters();
     },
     [fetchBehaviorsAndFilters]
@@ -103,7 +99,7 @@ export const BehaviorStore = ({
     ): SearchMatch[] => {
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(
-        result => result.item.name === extensionShortHeader.name
+        result => result.item.type === extensionShortHeader.type
       );
       return extensionMatches ? extensionMatches.matches : [];
     },
@@ -187,11 +183,11 @@ export const BehaviorStore = ({
                 filteredSearchResults &&
                 filteredSearchResults.map(({ item }) => item)
               }
-              getSearchItemUniqueId={getBehaviorName}
+              getSearchItemUniqueId={getBehaviorType}
               renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
                 <BehaviorListItem
-                  id={`behavior-list-item-${behaviorShortHeader.name}`}
-                  key={behaviorShortHeader.name}
+                  id={`behavior-list-item-${behaviorShortHeader.type}`}
+                  key={behaviorShortHeader.type}
                   objectType={objectType}
                   objectBehaviorsTypes={objectBehaviorsTypes}
                   onHeightComputed={onHeightComputed}

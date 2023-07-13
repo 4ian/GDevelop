@@ -11,6 +11,7 @@ export type EnumeratedBehaviorMetadata = {|
   fullName: string,
   description: string,
   previewIconUrl: string,
+  category: string,
 |};
 
 export const enumerateBehaviorsMetadata = (
@@ -46,6 +47,7 @@ export const enumerateBehaviorsMetadata = (
           description: behaviorMetadata.getDescription(),
           previewIconUrl: behaviorMetadata.getIconFilename(),
           objectType: behaviorMetadata.getObjectType(),
+          category: extension.getCategory(),
         }));
     })
   );

@@ -556,8 +556,8 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
 }
 
 gd::String ReplaceAllOccurrencesCaseInsensitive(gd::String context,
-                                               gd::String from,
-                                               const gd::String& to) {
+                                                const gd::String& from,
+                                                const gd::String& to) {
   size_t lookHere = 0;
   size_t foundHere;
   size_t fromSize = from.size();

@@ -15,7 +15,7 @@ using namespace std;
 namespace gd {
 
 ForEachEvent::ForEachEvent()
-    : BaseEvent(), objectsToPick(""), objectsToPickSelected(false) {}
+    : BaseEvent(), objectsToPick("") {}
 
 vector<gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;

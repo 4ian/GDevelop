@@ -67,8 +67,6 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   gd::InstructionsList conditions;
   gd::InstructionsList actions;
   gd::EventsList events;
-
-  bool objectsToPickSelected;
 };
 
 }  // namespace gd

@@ -1,4 +1,5 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
 import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';

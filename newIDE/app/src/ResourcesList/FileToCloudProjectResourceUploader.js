@@ -39,19 +39,40 @@ const resourceKindToInputAcceptedMimes = {
   tilemap: ['application/json'],
   tileset: ['application/json'],
   bitmapFont: [],
-  model3D: ['model/gltf-binary'],
+  model3D: [
+    'file',
+    // The following mime type is not handled by Safari. The verification will be handled
+    // after the files have been picked.
+    // 'model/gltf-binary'
+  ],
+};
+
+const getFileNameExtension = (fileName: string): string => {
+  return fileName.split('.').reverse()[0];
+};
+
+const getAcceptedExtensions = (
+  resourceKind: ResourceKind,
+  withLeadingDot: boolean = true
+): string[] => {
+  const resourceKindMetadata =
+    allResourceKindsAndMetadata.find(({ kind }) => kind === resourceKind) ||
+    null;
+  if (!resourceKindMetadata) return [];
+  return withLeadingDot
+    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
+    : resourceKindMetadata.fileExtensions;
+};
+
+const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
+  return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 
 export const getInputAcceptedMimesAndExtensions = (
   resourceKind: ResourceKind
 ) => {
-  const resourceKindMetadata =
-    allResourceKindsAndMetadata.find(({ kind }) => kind === resourceKind) ||
-    null;
-  const acceptedExtensions = resourceKindMetadata
-    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
-    : [];
-  const acceptedMimes = resourceKindToInputAcceptedMimes[resourceKind] || [];
+  const acceptedExtensions = getAcceptedExtensions(resourceKind);
+  const acceptedMimes = getAcceptedMimeTypes(resourceKind);
 
   return [...acceptedMimes, ...acceptedExtensions].join(',');
 };
@@ -171,6 +192,28 @@ export const FileToCloudProjectResourceUploader = ({
     [canUploadFiles, onUpload, error]
   );
 
+  const shouldValidateFilePostPicking = React.useMemo(
+    () => {
+      const acceptedMimeTypes = getAcceptedMimeTypes(options.resourceKind);
+      // Safari does not use file extensions to filter files pre-picking and
+      // Safari also does not recognize all mime types. So if the only accepted
+      // mime type is 'file', the file validation should happen post-picking.
+      return acceptedMimeTypes.length === 1 && acceptedMimeTypes[0] === 'file';
+    },
+    [options.resourceKind]
+  );
+
+  const validateFilePostPicking = React.useCallback(
+    (file: File) => {
+      const acceptedExtensions = getAcceptedExtensions(
+        options.resourceKind,
+        false
+      );
+      return acceptedExtensions.includes(getFileNameExtension(file.name));
+    },
+    [options.resourceKind]
+  );
+
   return (
     <ColumnStackLayout noMargin>
       {!isConnected ? (
@@ -203,7 +246,12 @@ export const FileToCloudProjectResourceUploader = ({
               onChange={event => {
                 const files = [];
                 for (let i = 0; i < event.currentTarget.files.length; i++) {
-                  files.push(event.currentTarget.files[i]);
+                  if (
+                    !shouldValidateFilePostPicking ||
+                    validateFilePostPicking(event.currentTarget.files[i])
+                  ) {
+                    files.push(event.currentTarget.files[i]);
+                  }
                 }
                 setSelectedFiles(files);
 

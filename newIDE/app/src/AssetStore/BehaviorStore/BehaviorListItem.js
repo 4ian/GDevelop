@@ -72,8 +72,10 @@ export const BehaviorListItem = ({
     );
   };
 
+  const isEnabled = !alreadyAdded && !isObjectIncompatible;
+
   return (
-    <ButtonBase id={id} onClick={onChoose} focusRipple style={styles.button}>
+    <ButtonBase id={id} onClick={isEnabled && onChoose} focusRipple style={styles.button}>
       <div style={styles.container} ref={containerRef}>
         <LineStackLayout>
           <div style={styles.icon}>

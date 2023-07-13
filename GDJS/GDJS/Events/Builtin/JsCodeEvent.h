@@ -50,6 +50,12 @@ class JsCodeEvent : public gd::BaseEvent {
   bool IsEventsSheetExpanded() const { return eventsSheetExpanded; }
   void SetEventsSheetExpanded(bool enable) { eventsSheetExpanded = enable; };
 
+  std::vector<gd::Expression*> GetAllObjectExpressions() override {
+    std::vector<gd::Expression*> allObjectExpressions;
+    allObjectExpressions.push_back(&parameterObjects);
+    return allObjectExpressions;
+  }
+
  private:
   void Init(const JsCodeEvent& event);
 

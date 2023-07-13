@@ -803,6 +803,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
               i));
+          eventAddedInResults = true;
         }
       }
     }
@@ -820,6 +821,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
               i));
+          eventAddedInResults = true;
         }
       }
     }

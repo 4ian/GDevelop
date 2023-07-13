@@ -1,10 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import {
-  getExtension,
-  type ExtensionShortHeader,
-} from '../../Utils/GDevelopServices/Extension';
+import { getExtension } from '../../Utils/GDevelopServices/Extension';
 import { addSerializedExtensionsToProject } from '../InstallAsset';
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { t } from '@lingui/macro';

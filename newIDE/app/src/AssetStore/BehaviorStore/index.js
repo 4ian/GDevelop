@@ -1,18 +1,13 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
-import {
-  type BehaviorShortHeader,
-} from '../../Utils/GDevelopServices/Extension';
+import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { BehaviorListItem } from './BehaviorListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import {
-  sendExtensionAddedToProject,
-} from '../../Utils/Analytics/EventSender';
+import { sendExtensionAddedToProject } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
 import { t } from '@lingui/macro';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -161,8 +156,7 @@ export const BehaviorStore = ({
         const wasInstalled = await onInstall(behaviorShortHeader);
         if (wasInstalled) {
           onChoose(behaviorShortHeader.type);
-        }
-        else {
+        } else {
           // TODO Handle installation failures.
         }
       } else {
@@ -258,7 +252,10 @@ export const BehaviorStore = ({
               getSearchItemUniqueId={getBehaviorType}
               renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
                 <BehaviorListItem
-                  id={'behavior-item-' + behaviorShortHeader.type.replace(/:/g, '-')}
+                  id={
+                    'behavior-item-' +
+                    behaviorShortHeader.type.replace(/:/g, '-')
+                  }
                   key={behaviorShortHeader.type}
                   objectType={objectType}
                   objectBehaviorsTypes={objectBehaviorsTypes}

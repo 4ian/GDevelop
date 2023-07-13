@@ -1,5 +1,5 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -7,80 +7,22 @@ import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
-import Subheader from '../UI/Subheader';
-import ListIcon from '../UI/ListIcon';
-import { Tabs } from '../UI/Tabs';
-import { List, ListItem } from '../UI/List';
-import { Column, Line } from '../UI/Grid';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
-import { getHelpLink } from '../Utils/HelpLink';
-import {
-  type EnumeratedBehaviorMetadata,
-  enumerateBehaviorsMetadata,
-  filterEnumeratedBehaviorMetadata,
-} from './EnumerateBehaviorsMetadata';
-import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
-import EmptyMessage from '../UI/EmptyMessage';
+import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
 import { type SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
-import Window from '../Utils/Window';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
-import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_BEHAVIOR,
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
-import Visibility from '../UI/CustomSvgIcons/Visibility';
-import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
-import Edit from '../UI/CustomSvgIcons/Edit';
 
 const gd: libGDevelop = global.gd;
-
-const styles = {
-  disabledItem: { opacity: 0.6 },
-};
-
-const BehaviorListItem = ({
-  i18n,
-  behaviorMetadata,
-  alreadyInstalled,
-  onClick,
-  disabled,
-}: {|
-  i18n: I18nType,
-  behaviorMetadata: EnumeratedBehaviorMetadata,
-  alreadyInstalled: boolean,
-  onClick: () => void,
-  disabled: boolean,
-|}) => (
-  <ListItem
-    leftIcon={
-      <ListIcon
-        src={behaviorMetadata.previewIconUrl}
-        iconSize={40}
-        isGDevelopIcon
-      />
-    }
-    key={behaviorMetadata.type}
-    primaryText={`${behaviorMetadata.fullName} ${
-      alreadyInstalled ? i18n._(t`(already added to this object)`) : ''
-    }`}
-    secondaryText={behaviorMetadata.description}
-    secondaryTextLines={2}
-    onClick={onClick}
-    style={disabled ? styles.disabledItem : undefined}
-    disabled={disabled}
-    id={'behavior-item-' + behaviorMetadata.type.replace(/:/g, '-')}
-  />
-);
 
 type Props = {|
   project: gdProject,

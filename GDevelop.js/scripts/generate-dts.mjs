@@ -138,6 +138,7 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
 
     let methodName = Parser.readUntil('(');
     const isStatic = methodName.includes('STATIC_');
+    const isConstructor = returnType === 'void' && methodName === interfaceName;
     // Remove prefixes which are not part of the actual function name
     methodName = methodName
       .replace('WRAPPED_', '')
@@ -145,8 +146,6 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
       .replace('STATIC_', '');
     // Convert PascalCase to camelCase
     methodName = methodName[0].toLowerCase() + methodName.slice(1);
-
-    const isConstructor = returnType === 'void' && methodName === interfaceName;
 
     /** @type {Array<{name:string, type:string, optional:boolean, defaultValue:(number | typeof none)}>} */
     const parameters = [];

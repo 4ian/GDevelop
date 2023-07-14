@@ -19,7 +19,7 @@ class EmscriptenObject {
 }
 
 export class VectorString extends EmscriptenObject {
-  vectorString(): void;
+  constructor(): void;
   push_back(str: string): void;
   resize(size: number): void;
   size(): number;
@@ -49,7 +49,7 @@ export class VectorVariable extends EmscriptenObject {
 }
 
 export class MapStringString extends EmscriptenObject {
-  mapStringString(): void;
+  constructor(): void;
   get(name: string): string;
   set(name: string, str: string): void;
   has(name: string): boolean;
@@ -57,7 +57,7 @@ export class MapStringString extends EmscriptenObject {
 }
 
 export class MapStringBoolean extends EmscriptenObject {
-  mapStringBoolean(): void;
+  constructor(): void;
   get(name: string): boolean;
   set(name: string, value: boolean): void;
   has(name: string): boolean;
@@ -65,7 +65,7 @@ export class MapStringBoolean extends EmscriptenObject {
 }
 
 export class MapStringDouble extends EmscriptenObject {
-  mapStringDouble(): void;
+  constructor(): void;
   get(name: string): number;
   set(name: string, value: number): void;
   has(name: string): number;
@@ -108,7 +108,7 @@ export class MapExtensionProperties extends EmscriptenObject {
 }
 
 export class SetString extends EmscriptenObject {
-  setString(): void;
+  constructor(): void;
   fREE_toNewVectorString(): VectorString;
 }
 
@@ -122,14 +122,14 @@ export class ProjectHelper extends EmscriptenObject {
 }
 
 export class EventsVariablesFinder extends EmscriptenObject {
-  eventsVariablesFinder(): void;
+  constructor(): void;
   static findAllGlobalVariables(platform: Platform, project: Project): SetString;
   static findAllLayoutVariables(platform: Platform, project: Project, layout: Layout): SetString;
   static findAllObjectVariables(platform: Platform, project: Project, layout: Layout, obj: gdObject): SetString;
 }
 
 export class EventsIdentifiersFinder extends EmscriptenObject {
-  eventsIdentifiersFinder(): void;
+  constructor(): void;
   static findAllIdentifierExpressions(platform: Platform, project: Project, layout: Layout, identifierType: string, contextObjectName: string): SetString;
 }
 
@@ -140,7 +140,7 @@ export class EventsFunctionSelfCallChecker extends EmscriptenObject {
 }
 
 export class InstructionOrExpressionGroupMetadata extends EmscriptenObject {
-  instructionOrExpressionGroupMetadata(): void;
+  constructor(): void;
   setIcon(icon: string): InstructionOrExpressionGroupMetadata;
   getIcon(): string;
 }
@@ -184,13 +184,13 @@ export class JsPlatform extends EmscriptenObject {
 }
 
 export class PairStringVariable extends EmscriptenObject {
-  pairStringVariable(): void;
+  constructor(): void;
   getName(): string;
   getVariable(): Variable;
 }
 
 export class Variable extends EmscriptenObject {
-  variable(): void;
+  constructor(): void;
   static isPrimitive(type: Variable_Type): boolean;
   getType(): Variable_Type;
   castTo(type: string): void;
@@ -222,7 +222,7 @@ export class Variable extends EmscriptenObject {
 }
 
 export class VariablesContainer extends EmscriptenObject {
-  variablesContainer(): void;
+  constructor(): void;
   has(name: string): boolean;
   get(name: string): Variable;
   getAt(index: number): Variable;
@@ -242,7 +242,7 @@ export class VariablesContainer extends EmscriptenObject {
 }
 
 export class ObjectGroup extends EmscriptenObject {
-  objectGroup(): void;
+  constructor(): void;
   getName(): string;
   setName(name: string): void;
   addObject(objectName: string): void;
@@ -254,7 +254,7 @@ export class ObjectGroup extends EmscriptenObject {
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
-  objectGroupsContainer(): void;
+  constructor(): void;
   has(name: string): boolean;
   insert(objectGroup: ObjectGroup, position: number): ObjectGroup;
   insertNew(name: string, position: number): ObjectGroup;
@@ -271,7 +271,7 @@ export class ObjectGroupsContainer extends EmscriptenObject {
 }
 
 export class PlatformSpecificAssets extends EmscriptenObject {
-  platformSpecificAssets(): void;
+  constructor(): void;
   has(platform: string, name: string): boolean;
   get(platform: string, name: string): string;
   remove(platform: string, name: string): void;
@@ -282,7 +282,7 @@ export class PlatformSpecificAssets extends EmscriptenObject {
 }
 
 export class LoadingScreen extends EmscriptenObject {
-  loadingScreen(): void;
+  constructor(): void;
   isGDevelopLogoShownDuringLoadingScreen(): boolean;
   showGDevelopLogoDuringLoadingScreen(show: boolean): LoadingScreen;
   getGDevelopLogoStyle(): string;
@@ -316,7 +316,7 @@ export class LoadingScreen extends EmscriptenObject {
 }
 
 export class Watermark extends EmscriptenObject {
-  watermark(): void;
+  constructor(): void;
   isGDevelopWatermarkShown(): boolean;
   showGDevelopWatermark(show: boolean): Watermark;
   getPlacement(): string;
@@ -326,7 +326,7 @@ export class Watermark extends EmscriptenObject {
 }
 
 export class ObjectsContainer extends EmscriptenObject {
-  objectsContainer(): void;
+  constructor(): void;
   insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
   insertObject(obj: gdObject, pos: number): gdObject;
   hasObjectNamed(name: string): boolean;
@@ -342,7 +342,7 @@ export class ObjectsContainer extends EmscriptenObject {
 }
 
 export class Project extends EmscriptenObject {
-  project(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   getCategories(): VectorString;
@@ -474,7 +474,7 @@ export class ExtensionProperties extends EmscriptenObject {
 }
 
 export class Behavior extends EmscriptenObject {
-  behavior(): void;
+  constructor(): void;
   clone(): Behavior;
   setName(name: string): void;
   getName(): string;
@@ -487,14 +487,14 @@ export class Behavior extends EmscriptenObject {
 }
 
 export class BehaviorJsImplementation extends EmscriptenObject {
-  behaviorJsImplementation(): void;
+  constructor(): void;
   getProperties(behaviorContent: SerializerElement): MapStringPropertyDescriptor;
   updateProperty(behaviorContent: SerializerElement, name: string, value: string): boolean;
   initializeContent(behaviorContent: SerializerElement): void;
 }
 
 export class BehaviorsSharedData extends EmscriptenObject {
-  behaviorsSharedData(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   getTypeName(): string;
@@ -504,14 +504,14 @@ export class BehaviorsSharedData extends EmscriptenObject {
 }
 
 export class BehaviorSharedDataJsImplementation extends EmscriptenObject {
-  behaviorSharedDataJsImplementation(): void;
+  constructor(): void;
   getProperties(behaviorSharedDataContent: SerializerElement): MapStringPropertyDescriptor;
   updateProperty(behaviorSharedDataContent: SerializerElement, name: string, value: string): boolean;
   initializeContent(behaviorSharedDataContent: SerializerElement): void;
 }
 
 export class ObjectConfiguration extends EmscriptenObject {
-  objectConfiguration(): void;
+  constructor(): void;
   clone(): UniquePtrObjectConfiguration;
   getType(): string;
   getProperties(): MapStringPropertyDescriptor;
@@ -559,7 +559,7 @@ export class UniquePtrObject extends EmscriptenObject {
 }
 
 export class ObjectJsImplementation extends EmscriptenObject {
-  objectJsImplementation(): void;
+  constructor(): void;
   clone(): UniquePtrObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
@@ -581,7 +581,7 @@ export class CustomObjectConfiguration extends EmscriptenObject {
 }
 
 export class Layout extends EmscriptenObject {
-  layout(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   setBackgroundColor(r: number, g: number, b: number): void;
@@ -628,7 +628,7 @@ export class Layout extends EmscriptenObject {
 }
 
 export class ExternalEvents extends EmscriptenObject {
-  externalEvents(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   getAssociatedLayout(): string;
@@ -639,7 +639,7 @@ export class ExternalEvents extends EmscriptenObject {
 }
 
 export class ExternalLayout extends EmscriptenObject {
-  externalLayout(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   setAssociatedLayout(name: string): void;
@@ -651,7 +651,7 @@ export class ExternalLayout extends EmscriptenObject {
 }
 
 export class Effect extends EmscriptenObject {
-  effect(): void;
+  constructor(): void;
   setName(name_: string): void;
   getName(): string;
   setEffectType(effectType_: string): void;
@@ -671,7 +671,7 @@ export class Effect extends EmscriptenObject {
 }
 
 export class EffectsContainer extends EmscriptenObject {
-  effectsContainer(): void;
+  constructor(): void;
   hasEffectNamed(name: string): boolean;
   getEffect(name: string): Effect;
   getEffectAt(index: number): Effect;
@@ -688,7 +688,7 @@ export class EffectsContainer extends EmscriptenObject {
 }
 
 export class Layer extends EmscriptenObject {
-  layer(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   setRenderingType(renderingType: string): void;
@@ -719,7 +719,7 @@ export class Layer extends EmscriptenObject {
 }
 
 export class PropertyDescriptor extends EmscriptenObject {
-  propertyDescriptor(propValue: string): void;
+  constructor(propValue: string): void;
   setValue(value: string): PropertyDescriptor;
   getValue(): string;
   setType(type: string): PropertyDescriptor;
@@ -744,7 +744,7 @@ export class PropertyDescriptor extends EmscriptenObject {
 }
 
 export class MeasurementUnit extends EmscriptenObject {
-  measurementUnit(name: string, label: string, description: string): void;
+  constructor(name: string, label: string, description: string): void;
   getName(): string;
   getLabel(): string;
   getDescription(): string;
@@ -769,20 +769,20 @@ export class MeasurementUnit extends EmscriptenObject {
 }
 
 export class MeasurementBaseUnit extends EmscriptenObject {
-  measurementBaseUnit(name: string, symbol: string, quantity: string): void;
+  constructor(name: string, symbol: string, quantity: string): void;
   getName(): string;
   getSymbol(): string;
   getQuantity(): string;
 }
 
 export class NamedPropertyDescriptor extends EmscriptenObject {
-  namedPropertyDescriptor(): void;
+  constructor(): void;
   setName(name: string): PropertyDescriptor;
   getName(): string;
 }
 
 export class MapStringPropertyDescriptor extends EmscriptenObject {
-  mapStringPropertyDescriptor(): void;
+  constructor(): void;
   getOrCreate(name: string): PropertyDescriptor;
   get(name: string): PropertyDescriptor;
   set(name: string, prop: PropertyDescriptor): void;
@@ -791,7 +791,7 @@ export class MapStringPropertyDescriptor extends EmscriptenObject {
 }
 
 export class MapStringSerializerValue extends EmscriptenObject {
-  mapStringSerializerValue(): void;
+  constructor(): void;
   getOrCreate(name: string): SerializerValue;
   get(name: string): SerializerValue;
   set(name: string, prop: SerializerValue): void;
@@ -806,7 +806,7 @@ export class VectorPairStringSharedPtrSerializerElement extends EmscriptenObject
 }
 
 export class Resource extends EmscriptenObject {
-  resource(): void;
+  constructor(): void;
   clone(): Resource;
   setName(name: string): void;
   getName(): string;
@@ -829,7 +829,7 @@ export class Resource extends EmscriptenObject {
 }
 
 export class ResourcesManager extends EmscriptenObject {
-  resourcesManager(): void;
+  constructor(): void;
   getAllResourceNames(): VectorString;
   findFilesNotInResources(filesToCheck: VectorString): VectorString;
   hasResource(name: string): boolean;
@@ -846,41 +846,41 @@ export class ResourcesManager extends EmscriptenObject {
 }
 
 export class ImageResource extends EmscriptenObject {
-  imageResource(): void;
+  constructor(): void;
   isSmooth(): boolean;
   setSmooth(enable: boolean): void;
 }
 
 export class AudioResource extends EmscriptenObject {
-  audioResource(): void;
+  constructor(): void;
 }
 
 export class FontResource extends EmscriptenObject {
-  fontResource(): void;
+  constructor(): void;
 }
 
 export class BitmapFontResource extends EmscriptenObject {
-  bitmapFontResource(): void;
+  constructor(): void;
 }
 
 export class VideoResource extends EmscriptenObject {
-  videoResource(): void;
+  constructor(): void;
 }
 
 export class JsonResource extends EmscriptenObject {
-  jsonResource(): void;
+  constructor(): void;
 }
 
 export class TilemapResource extends EmscriptenObject {
-  tilemapResource(): void;
+  constructor(): void;
 }
 
 export class TilesetResource extends EmscriptenObject {
-  tilesetResource(): void;
+  constructor(): void;
 }
 
 export class InitialInstance extends EmscriptenObject {
-  initialInstance(): void;
+  constructor(): void;
   setObjectName(name: string): void;
   getObjectName(): string;
   getX(): number;
@@ -926,7 +926,7 @@ export class InitialInstance extends EmscriptenObject {
 }
 
 export class InitialInstancesContainer extends EmscriptenObject {
-  initialInstancesContainer(): void;
+  constructor(): void;
   clone(): InitialInstancesContainer;
   getInstancesCount(): number;
   iterateOverInstances(func: InitialInstanceFunctor): void;
@@ -945,7 +945,7 @@ export class InitialInstancesContainer extends EmscriptenObject {
 }
 
 export class HighestZOrderFinder extends EmscriptenObject {
-  highestZOrderFinder(): void;
+  constructor(): void;
   restrictSearchToLayer(layer: string): void;
   getHighestZOrder(): number;
   getLowestZOrder(): number;
@@ -954,7 +954,7 @@ export class HighestZOrderFinder extends EmscriptenObject {
 }
 
 export class InitialInstanceJSFunctor extends EmscriptenObject {
-  initialInstanceJSFunctor(): void;
+  constructor(): void;
   invoke(instance: InitialInstance): void;
 }
 
@@ -971,7 +971,7 @@ export class SerializerValue extends EmscriptenObject {
 }
 
 export class SerializerElement extends EmscriptenObject {
-  serializerElement(): void;
+  constructor(): void;
   setBoolValue(value: boolean): void;
   setStringValue(value: string): void;
   setIntValue(value: number): void;
@@ -1011,7 +1011,7 @@ export class Serializer extends EmscriptenObject {
 }
 
 export class InstructionsList extends EmscriptenObject {
-  instructionsList(): void;
+  constructor(): void;
   insert(instr: Instruction, pos: number): Instruction;
   insertInstructions(list: InstructionsList, begin: number, end: number, pos: number): void;
   size(): number;
@@ -1026,7 +1026,7 @@ export class InstructionsList extends EmscriptenObject {
 }
 
 export class Instruction extends EmscriptenObject {
-  instruction(): void;
+  constructor(): void;
   cLONE_Instruction(): Instruction;
   setType(type: string): void;
   getType(): string;
@@ -1082,7 +1082,7 @@ export class AbstractFunctionMetadata extends EmscriptenObject {
 }
 
 export class InstructionMetadata extends EmscriptenObject {
-  instructionMetadata(): void;
+  constructor(): void;
   getFullName(): string;
   getDescription(): string;
   getSentence(): string;
@@ -1137,7 +1137,7 @@ export class InstructionMetadata extends EmscriptenObject {
 }
 
 export class ExpressionMetadata extends EmscriptenObject {
-  expressionMetadata(returnType: string, extensionNamespace: string, name: string, fullname: string, description: string, group: string, smallicon: string): void;
+  constructor(returnType: string, extensionNamespace: string, name: string, fullname: string, description: string, group: string, smallicon: string): void;
   getReturnType(): string;
   getFullName(): string;
   getDescription(): string;
@@ -1195,7 +1195,7 @@ export class MultipleInstructionMetadata extends EmscriptenObject {
 }
 
 export class DependencyMetadata extends EmscriptenObject {
-  dependencyMetadata(): void;
+  constructor(): void;
   getName(): string;
   setName(name_: string): DependencyMetadata;
   getExportName(): string;
@@ -1212,7 +1212,7 @@ export class DependencyMetadata extends EmscriptenObject {
 }
 
 export class ParameterMetadata extends EmscriptenObject {
-  parameterMetadata(): void;
+  constructor(): void;
   getType(): string;
   setType(type_: string): ParameterMetadata;
   getName(): string;
@@ -1239,7 +1239,7 @@ export class ParameterMetadata extends EmscriptenObject {
 }
 
 export class ValueTypeMetadata extends EmscriptenObject {
-  valueTypeMetadata(): void;
+  constructor(): void;
   getName(): string;
   setName(name_: string): ValueTypeMetadata;
   getExtraInfo(): string;
@@ -1263,7 +1263,7 @@ export class ValueTypeMetadata extends EmscriptenObject {
 }
 
 export class VectorParameterMetadata extends EmscriptenObject {
-  vectorParameterMetadata(): void;
+  constructor(): void;
   push_back(parameterMetadata: ParameterMetadata): void;
   size(): number;
   at(index: number): ParameterMetadata;
@@ -1376,7 +1376,7 @@ export class EventMetadata extends EmscriptenObject {
 }
 
 export class PlatformExtension extends EmscriptenObject {
-  platformExtension(): void;
+  constructor(): void;
   setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): PlatformExtension;
   setExtensionHelpPath(helpPath: string): PlatformExtension;
   setIconUrl(iconUrl: string): PlatformExtension;
@@ -1435,7 +1435,7 @@ export class PlatformExtension extends EmscriptenObject {
 }
 
 export class EventsList extends EmscriptenObject {
-  eventsList(): void;
+  constructor(): void;
   insertEvent(event: BaseEvent, pos: number): BaseEvent;
   insertNewEvent(project: Project, type: string, pos: number): BaseEvent;
   insertEvents(list: EventsList, begin: number, end: number, pos: number): void;
@@ -1452,7 +1452,7 @@ export class EventsList extends EmscriptenObject {
 }
 
 export class BaseEvent extends EmscriptenObject {
-  baseEvent(): void;
+  constructor(): void;
   clone(): BaseEvent;
   getType(): string;
   setType(type: string): void;
@@ -1469,7 +1469,7 @@ export class BaseEvent extends EmscriptenObject {
 }
 
 export class StandardEvent extends EmscriptenObject {
-  standardEvent(): void;
+  constructor(): void;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
   clone(): StandardEvent;
@@ -1488,7 +1488,7 @@ export class StandardEvent extends EmscriptenObject {
 }
 
 export class RepeatEvent extends EmscriptenObject {
-  repeatEvent(): void;
+  constructor(): void;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
   setRepeatExpression(expr: string): void;
@@ -1509,7 +1509,7 @@ export class RepeatEvent extends EmscriptenObject {
 }
 
 export class WhileEvent extends EmscriptenObject {
-  whileEvent(): void;
+  constructor(): void;
   getConditions(): InstructionsList;
   getWhileConditions(): InstructionsList;
   getActions(): InstructionsList;
@@ -1529,7 +1529,7 @@ export class WhileEvent extends EmscriptenObject {
 }
 
 export class ForEachEvent extends EmscriptenObject {
-  forEachEvent(): void;
+  constructor(): void;
   setObjectToPick(objects: string): void;
   getObjectToPick(): string;
   getConditions(): InstructionsList;
@@ -1550,7 +1550,7 @@ export class ForEachEvent extends EmscriptenObject {
 }
 
 export class ForEachChildVariableEvent extends EmscriptenObject {
-  forEachChildVariableEvent(): void;
+  constructor(): void;
   getConditions(): InstructionsList;
   getActions(): InstructionsList;
   getIterableVariableName(): string;
@@ -1575,7 +1575,7 @@ export class ForEachChildVariableEvent extends EmscriptenObject {
 }
 
 export class CommentEvent extends EmscriptenObject {
-  commentEvent(): void;
+  constructor(): void;
   getComment(): string;
   setComment(type: string): void;
   setBackgroundColor(r: number, g: number, b: number): void;
@@ -1602,7 +1602,7 @@ export class CommentEvent extends EmscriptenObject {
 }
 
 export class GroupEvent extends EmscriptenObject {
-  groupEvent(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   setBackgroundColor(r: number, g: number, b: number): void;
@@ -1630,7 +1630,7 @@ export class GroupEvent extends EmscriptenObject {
 }
 
 export class LinkEvent extends EmscriptenObject {
-  linkEvent(): void;
+  constructor(): void;
   setTarget(name: string): void;
   getTarget(): string;
   getIncludeConfig(): number;
@@ -1656,7 +1656,7 @@ export class LinkEvent extends EmscriptenObject {
 }
 
 export class EventsRemover extends EmscriptenObject {
-  eventsRemover(): void;
+  constructor(): void;
   addEventToRemove(eventToRemove: BaseEvent): void;
   addInstructionToRemove(instructionToRemove: Instruction): void;
   launch(events: EventsList): void;
@@ -1677,7 +1677,7 @@ export class EventsSearchResult extends EmscriptenObject {
 }
 
 export class VectorEventsSearchResult extends EmscriptenObject {
-  vectorEventsSearchResult(): void;
+  constructor(): void;
   cLONE_VectorEventsSearchResult(): VectorEventsSearchResult;
   push_back(result: EventsSearchResult): void;
   resize(size: number): void;
@@ -1836,7 +1836,7 @@ export class VectorExpressionParserDiagnostic extends EmscriptenObject {
 }
 
 export class ExpressionValidator extends EmscriptenObject {
-  expressionValidator(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string): void;
+  constructor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string): void;
   getAllErrors(): VectorExpressionParserDiagnostic;
   getFatalErrors(): VectorExpressionParserDiagnostic;
 }
@@ -1881,7 +1881,7 @@ export class UniquePtrExpressionNode extends EmscriptenObject {
 }
 
 export class EventsFunction extends EmscriptenObject {
-  eventsFunction(): void;
+  constructor(): void;
   clone(): EventsFunction;
   setDescription(description: string): EventsFunction;
   getDescription(): string;
@@ -1934,7 +1934,7 @@ export class AbstractEventsBasedEntity extends EmscriptenObject {
 }
 
 export class EventsBasedBehavior extends EmscriptenObject {
-  eventsBasedBehavior(): void;
+  constructor(): void;
   setDescription(description: string): EventsBasedBehavior;
   getDescription(): string;
   setName(name: string): EventsBasedBehavior;
@@ -1971,7 +1971,7 @@ export class EventsBasedBehaviorsList extends EmscriptenObject {
 }
 
 export class EventsBasedObject extends EmscriptenObject {
-  eventsBasedObject(): void;
+  constructor(): void;
   setDescription(description: string): EventsBasedObject;
   getDescription(): string;
   setName(name: string): EventsBasedObject;
@@ -2013,7 +2013,7 @@ export class EventsBasedObjectsList extends EmscriptenObject {
 }
 
 export class NamedPropertyDescriptorsList extends EmscriptenObject {
-  namedPropertyDescriptorsList(): void;
+  constructor(): void;
   insertNew(name: string, pos: number): NamedPropertyDescriptor;
   insert(item: NamedPropertyDescriptor, pos: number): NamedPropertyDescriptor;
   has(name: string): boolean;
@@ -2028,7 +2028,7 @@ export class NamedPropertyDescriptorsList extends EmscriptenObject {
 }
 
 export class EventsFunctionsExtension extends EmscriptenObject {
-  eventsFunctionsExtension(): void;
+  constructor(): void;
   setNamespace(namespace_: string): EventsFunctionsExtension;
   getNamespace(): string;
   setVersion(version: string): EventsFunctionsExtension;
@@ -2080,7 +2080,7 @@ export class AbstractFileSystem extends EmscriptenObject {
 }
 
 export class AbstractFileSystemJS extends EmscriptenObject {
-  abstractFileSystemJS(): void;
+  constructor(): void;
   mkDir(dir: string): void;
   dirExists(dir: string): void;
   clearDir(dir: string): void;
@@ -2105,31 +2105,31 @@ export class ArbitraryEventsWorker extends EmscriptenObject {
 }
 
 export class EventsLeaderboardsLister extends EmscriptenObject {
-  eventsLeaderboardsLister(project: Project): void;
+  constructor(project: Project): void;
   getLeaderboardIds(): SetString;
   launch(events: EventsList): void;
 }
 
 export class EventsLeaderboardsRenamer extends EmscriptenObject {
-  eventsLeaderboardsRenamer(project: Project, leaderboardIdMap: MapStringString): void;
+  constructor(project: Project, leaderboardIdMap: MapStringString): void;
   launch(events: EventsList): void;
 }
 
 export class EventsParametersLister extends EmscriptenObject {
-  eventsParametersLister(project: Project): void;
+  constructor(project: Project): void;
   getParametersAndTypes(): MapStringString;
   launch(events: EventsList): void;
 }
 
 export class EventsPositionFinder extends EmscriptenObject {
-  eventsPositionFinder(): void;
+  constructor(): void;
   getPositions(): VectorInt;
   addEventToSearch(event: BaseEvent): void;
   launch(events: EventsList): void;
 }
 
 export class EventsTypesLister extends EmscriptenObject {
-  eventsTypesLister(project: Project): void;
+  constructor(project: Project): void;
   getAllEventsTypes(): VectorString;
   getAllConditionsTypes(): VectorString;
   getAllActionsTypes(): VectorString;
@@ -2137,7 +2137,7 @@ export class EventsTypesLister extends EmscriptenObject {
 }
 
 export class InstructionsTypeRenamer extends EmscriptenObject {
-  instructionsTypeRenamer(project: Project, oldType: string, newType: string): void;
+  constructor(project: Project, oldType: string, newType: string): void;
   launch(events: EventsList): void;
 }
 
@@ -2148,7 +2148,7 @@ export class EventsContext extends EmscriptenObject {
 }
 
 export class EventsContextAnalyzer extends EmscriptenObject {
-  eventsContextAnalyzer(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
+  constructor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
   getEventsContext(): EventsContext;
   launch(events: EventsList): void;
 }
@@ -2158,20 +2158,20 @@ export class ArbitraryResourceWorker extends EmscriptenObject {
 }
 
 export class ArbitraryResourceWorkerJS extends EmscriptenObject {
-  arbitraryResourceWorkerJS(): void;
+  constructor(): void;
   exposeImage(image: string): void;
   exposeShader(shader: string): void;
   exposeFile(file: string): void;
 }
 
 export class ResourcesMergingHelper extends EmscriptenObject {
-  resourcesMergingHelper(fs: AbstractFileSystem): void;
+  constructor(fs: AbstractFileSystem): void;
   setBaseDirectory(basePath: string): void;
   getAllResourcesOldAndNewFilename(): MapStringString;
 }
 
 export class ResourcesRenamer extends EmscriptenObject {
-  resourcesRenamer(oldToNewNames: MapStringString): void;
+  constructor(oldToNewNames: MapStringString): void;
 }
 
 export class ProjectResourcesCopier extends EmscriptenObject {
@@ -2179,7 +2179,7 @@ export class ProjectResourcesCopier extends EmscriptenObject {
 }
 
 export class ResourcesInUseHelper extends EmscriptenObject {
-  resourcesInUseHelper(): void;
+  constructor(): void;
   getAllImages(): SetString;
   getAllAudios(): SetString;
   getAllFonts(): SetString;
@@ -2188,13 +2188,13 @@ export class ResourcesInUseHelper extends EmscriptenObject {
 }
 
 export class EditorSettings extends EmscriptenObject {
-  editorSettings(): void;
+  constructor(): void;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
 }
 
 export class Point extends EmscriptenObject {
-  point(name: string): void;
+  constructor(name: string): void;
   setName(name: string): void;
   getName(): string;
   setXY(x: number, y: number): void;
@@ -2205,7 +2205,7 @@ export class Point extends EmscriptenObject {
 }
 
 export class VectorPoint extends EmscriptenObject {
-  vectorPoint(): void;
+  constructor(): void;
   push_back(pt: Point): void;
   size(): number;
   at(index: number): Point;
@@ -2214,7 +2214,7 @@ export class VectorPoint extends EmscriptenObject {
 }
 
 export class Sprite extends EmscriptenObject {
-  sprite(): void;
+  constructor(): void;
   setImageName(name: string): void;
   getImageName(): string;
   getOrigin(): Point;
@@ -2233,7 +2233,7 @@ export class Sprite extends EmscriptenObject {
 }
 
 export class Direction extends EmscriptenObject {
-  direction(): void;
+  constructor(): void;
   addSprite(sprite: Sprite): void;
   getSprite(index: number): Sprite;
   getSpritesCount(): number;
@@ -2252,7 +2252,7 @@ export class Direction extends EmscriptenObject {
 }
 
 export class Animation extends EmscriptenObject {
-  animation(): void;
+  constructor(): void;
   setName(name: string): void;
   getName(): string;
   setDirectionsCount(count: number): void;
@@ -2265,7 +2265,7 @@ export class Animation extends EmscriptenObject {
 }
 
 export class SpriteObject extends EmscriptenObject {
-  spriteObject(): void;
+  constructor(): void;
   addAnimation(animation: Animation): void;
   getAnimation(index: number): Animation;
   getAnimationsCount(): number;
@@ -2281,7 +2281,7 @@ export class SpriteObject extends EmscriptenObject {
 }
 
 export class TextObject extends EmscriptenObject {
-  textObject(): void;
+  constructor(): void;
   setString(string: string): void;
   getString(): string;
   setCharacterSize(size: number): void;
@@ -2303,7 +2303,7 @@ export class TextObject extends EmscriptenObject {
 }
 
 export class TiledSpriteObject extends EmscriptenObject {
-  tiledSpriteObject(): void;
+  constructor(): void;
   setTexture(texture: string): void;
   getTexture(): string;
   setWidth(width: number): void;
@@ -2313,7 +2313,7 @@ export class TiledSpriteObject extends EmscriptenObject {
 }
 
 export class PanelSpriteObject extends EmscriptenObject {
-  panelSpriteObject(): void;
+  constructor(): void;
   getLeftMargin(): number;
   setLeftMargin(newMargin: number): void;
   getTopMargin(): number;
@@ -2333,7 +2333,7 @@ export class PanelSpriteObject extends EmscriptenObject {
 }
 
 export class ShapePainterObject extends EmscriptenObject {
-  shapePainterObject(): void;
+  constructor(): void;
   setCoordinatesAbsolute(): void;
   setCoordinatesRelative(): void;
   areCoordinatesAbsolute(): boolean;
@@ -2358,11 +2358,11 @@ export class ShapePainterObject extends EmscriptenObject {
 }
 
 export class TextEntryObject extends EmscriptenObject {
-  textEntryObject(): void;
+  constructor(): void;
 }
 
 export class ParticleEmitterObject extends EmscriptenObject {
-  particleEmitterObject(): void;
+  constructor(): void;
   setRendererType(type: ParticleEmitterObject_RendererType): void;
   getRendererType(): ParticleEmitterObject_RendererType;
   setParticleTexture(resourceName: string): void;
@@ -2443,12 +2443,12 @@ export class ParticleEmitterObject extends EmscriptenObject {
 }
 
 export class LayoutCodeGenerator extends EmscriptenObject {
-  layoutCodeGenerator(project: Project): void;
+  constructor(project: Project): void;
   generateLayoutCompleteCode(layout: Layout, includes: SetString, compilationForRuntime: boolean): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
-  behaviorCodeGenerator(project: Project): void;
+  constructor(project: Project): void;
   generateRuntimeBehaviorCompleteCode(extensionName: string, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
@@ -2459,7 +2459,7 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 }
 
 export class ObjectCodeGenerator extends EmscriptenObject {
-  objectCodeGenerator(project: Project): void;
+  constructor(project: Project): void;
   generateRuntimeObjectCompleteCode(extensionName: string, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
@@ -2467,12 +2467,12 @@ export class ObjectCodeGenerator extends EmscriptenObject {
 }
 
 export class EventsFunctionsExtensionCodeGenerator extends EmscriptenObject {
-  eventsFunctionsExtensionCodeGenerator(project: Project): void;
+  constructor(project: Project): void;
   generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
 }
 
 export class PreviewExportOptions extends EmscriptenObject {
-  previewExportOptions(project: Project, outputPath: string): void;
+  constructor(project: Project, outputPath: string): void;
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): PreviewExportOptions;
   useWindowMessageDebuggerClient(): PreviewExportOptions;
   setLayoutName(layoutName: string): PreviewExportOptions;
@@ -2489,13 +2489,13 @@ export class PreviewExportOptions extends EmscriptenObject {
 }
 
 export class ExportOptions extends EmscriptenObject {
-  exportOptions(project: Project, outputPath: string): void;
+  constructor(project: Project, outputPath: string): void;
   setFallbackAuthor(id: string, username: string): ExportOptions;
   setTarget(target: string): ExportOptions;
 }
 
 export class Exporter extends EmscriptenObject {
-  exporter(fs: AbstractFileSystem, gdjsRoot: string): void;
+  constructor(fs: AbstractFileSystem, gdjsRoot: string): void;
   setCodeOutputDirectory(path: string): void;
   exportProjectForPixiPreview(options: PreviewExportOptions): boolean;
   exportWholePixiProject(options: ExportOptions): boolean;
@@ -2503,7 +2503,7 @@ export class Exporter extends EmscriptenObject {
 }
 
 export class JsCodeEvent extends EmscriptenObject {
-  jsCodeEvent(): void;
+  constructor(): void;
   getInlineCode(): string;
   setInlineCode(type: string): void;
   getParameterObjects(): string;
@@ -2526,7 +2526,7 @@ export class JsCodeEvent extends EmscriptenObject {
 }
 
 export class MetadataDeclarationHelper extends EmscriptenObject {
-  metadataDeclarationHelper(): void;
+  constructor(): void;
   static declareExtension(extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension): void;
   generateFreeFunctionMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): AbstractFunctionMetadata;
   static generateBehaviorMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, behaviorMethodMangledNames: MapStringString): BehaviorMetadata;

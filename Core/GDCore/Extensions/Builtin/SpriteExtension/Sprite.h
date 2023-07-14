@@ -7,6 +7,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 #include <memory>
+
 #include "GDCore/Extensions/Builtin/SpriteExtension/Point.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"
 #include "GDCore/String.h"
@@ -43,7 +44,7 @@ class GD_CORE_API Sprite {
 
   /**
    * \brief Get the collision mask (custom or automatically generated owing to
-   * IsCollisionMaskAutomatic())
+   * IsFullImageCollisionMask())
    *
    * \warning If the image has not been loaded ( using LoadImage ) and the
    * collision mask is set as automatic, the returned mask won't be correct.
@@ -66,7 +67,7 @@ class GD_CORE_API Sprite {
 
   /**
    * \brief Set the custom collision mask.
-   * Call then `SetCollisionMaskAutomatic(false)` to use it.
+   * Call then `SetFullImageCollisionMask(false)` to use it.
    */
   void SetCustomCollisionMask(const std::vector<Polygon2d>& collisionMask);
 
@@ -74,15 +75,15 @@ class GD_CORE_API Sprite {
    * \brief Return true if the collision mask is a bounding box, false if a
    * custom collision mask is used.
    */
-  inline bool IsCollisionMaskAutomatic() const {
-    return automaticCollisionMask;
+  inline bool IsFullImageCollisionMask() const {
+    return fullImageCollisionMask;
   }
 
   /**
    * \brief Un/set use of the custom collision mask.
    */
-  inline void SetCollisionMaskAutomatic(bool enabled) {
-    automaticCollisionMask = enabled;
+  inline void SetFullImageCollisionMask(bool enabled) {
+    fullImageCollisionMask = enabled;
   };
 
   /**
@@ -161,9 +162,9 @@ class GD_CORE_API Sprite {
  private:
   gd::String image;  ///< Name of the image to be loaded in Image Manager.
 
-  bool automaticCollisionMask;  ///< True to use the custom collision mask.
-                                ///< Otherwise, a basic bounding box is returned
-                                ///< by GetCollisionMask()
+  bool fullImageCollisionMask;  ///< True to use a bounding box wrapping the
+                                ///< whole image as collision mask. If false,
+                                ///< custom collision mask is used.
   std::vector<Polygon2d> customCollisionMask;  ///< Custom collision mask
 
   std::vector<Point> points;  ///< List of the points used by the sprite

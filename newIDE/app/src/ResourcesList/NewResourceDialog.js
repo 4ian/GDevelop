@@ -131,9 +131,8 @@ export const NewResourceDialog = ({
       ]}
       secondaryActions={[
         importTabAdvancedResourceSources.length > 0 ? (
-          <Column>
+          <Column key="show-advanced-toggle">
             <Toggle
-              key="show-advanced-toggle"
               onToggle={(e, check) => setIsShowingAdvanced(check)}
               toggled={isShowingAdvanced}
               labelPosition="right"

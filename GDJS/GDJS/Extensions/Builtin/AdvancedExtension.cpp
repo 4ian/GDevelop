@@ -18,7 +18,6 @@ AdvancedExtension::AdvancedExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
   GetAllActions()["SetReturnNumber"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -35,7 +34,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["SetReturnString"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -52,7 +50,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["SetReturnBoolean"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -67,7 +64,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["CopyArgumentToVariable"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
@@ -86,7 +82,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["CopyVariableToArgument"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
@@ -105,7 +100,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllConditions()["GetArgumentAsBoolean"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -161,7 +155,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllConditions()["CompareArgumentAsNumber"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
@@ -188,7 +181,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllConditions()["CompareArgumentAsString"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {

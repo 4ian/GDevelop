@@ -2,7 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import ResourceSelector, {
+  type ResourceSelectorInterface,
+} from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import {
   type ParameterFieldProps,
@@ -14,7 +16,7 @@ const ImageResourceField = React.forwardRef<
   ParameterFieldProps,
   ParameterFieldInterface
 >((props, ref) => {
-  const field = React.useRef<?ResourceSelector>(null);
+  const field = React.useRef<?ResourceSelectorInterface>(null);
   const focus: FieldFocusFunction = options => {
     if (field.current) field.current.focus(options);
   };

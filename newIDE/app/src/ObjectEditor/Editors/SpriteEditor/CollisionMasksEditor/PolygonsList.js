@@ -193,7 +193,8 @@ const PolygonSection = (props: PolygonSectionProps) => {
 type PolygonsListProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
-  restoreCollisionMask: () => void,
+  onSetFullImageCollisionMask: () => Promise<void>,
+  onSetAutomaticallyAdaptCollisionMasks: () => Promise<void>,
   onHoverVertice: (ptr: ?number) => void,
   onClickVertice: (ptr: ?number) => void,
   selectedVerticePtr: ?number,
@@ -210,7 +211,8 @@ const PolygonsList = (props: PolygonsListProps) => {
     spriteHeight,
     spriteWidth,
     onPolygonsUpdated,
-    restoreCollisionMask,
+    onSetFullImageCollisionMask,
+    onSetAutomaticallyAdaptCollisionMasks,
     onHoverVertice,
     onClickVertice,
     selectedVerticePtr,
@@ -227,6 +229,17 @@ const PolygonsList = (props: PolygonsListProps) => {
       onPolygonsUpdated();
     },
     [spriteHeight, spriteWidth, polygons, onPolygonsUpdated]
+  );
+
+  const onRemovePolygon = React.useCallback(
+    (index: number) => {
+      gd.removeFromVectorPolygon2d(polygons, index);
+      if (polygons.size() === 0) {
+        onSetFullImageCollisionMask();
+      }
+      onPolygonsUpdated();
+    },
+    [polygons, onPolygonsUpdated, onSetFullImageCollisionMask]
   );
 
   React.useEffect(
@@ -247,13 +260,7 @@ const PolygonsList = (props: PolygonsListProps) => {
               key={`polygon-${i}`}
               polygon={polygon}
               onUpdated={onPolygonsUpdated}
-              onRemove={() => {
-                gd.removeFromVectorPolygon2d(polygons, i);
-                if (polygons.size() === 0) {
-                  restoreCollisionMask();
-                }
-                onPolygonsUpdated();
-              }}
+              onRemove={() => onRemovePolygon(i)}
               onHoverVertice={onHoverVertice}
               onClickVertice={onClickVertice}
               selectedVerticePtr={selectedVerticePtr}
@@ -268,13 +275,15 @@ const PolygonsList = (props: PolygonsListProps) => {
               primary
               icon={<Add />}
               label={<Trans>Add collision mask</Trans>}
-              onClick={() => {
-                addCollisionMask();
-              }}
+              onClick={addCollisionMask}
               buildMenuTemplate={i18n => [
                 {
-                  label: i18n._(t`Restore the default collision mask`),
-                  click: restoreCollisionMask,
+                  label: i18n._(t`Reset to automatic collision mask`),
+                  click: onSetAutomaticallyAdaptCollisionMasks,
+                },
+                {
+                  label: i18n._(t`Use full image as collision mask`),
+                  click: onSetFullImageCollisionMask,
                 },
               ]}
             />

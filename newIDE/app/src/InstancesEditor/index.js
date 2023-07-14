@@ -96,9 +96,9 @@ type Props = {|
   ...InstancesEditorPropsWithoutSizeAndScroll,
   width: number,
   height: number,
-  onViewPositionChanged: ViewPosition => void,
-  onMouseMove: MouseEvent => void,
-  onMouseLeave: MouseEvent => void,
+  onViewPositionChanged?: ViewPosition => void,
+  onMouseMove?: MouseEvent => void,
+  onMouseLeave?: MouseEvent => void,
   screenType: ScreenType,
   showObjectInstancesIn3D: boolean,
 |};
@@ -161,7 +161,7 @@ export default class InstancesEditor extends Component<Props> {
     // project can be used here for initializing stuff, but don't keep references to it.
     // Instead, create editors in _mountEditorComponents (as they will be destroyed/recreated
     // if the project changes).
-    const { project } = this.props;
+    const { project, onMouseMove, onMouseLeave } = this.props;
 
     this.keyboardShortcuts = new KeyboardShortcuts({
       shortcutCallbacks: {
@@ -257,12 +257,14 @@ export default class InstancesEditor extends Component<Props> {
       'mouseup',
       this.keyboardShortcuts.onMouseUp
     );
-    this.pixiRenderer.view.addEventListener('mousemove', event => {
-      this.props.onMouseMove(event);
-    });
-    this.pixiRenderer.view.addEventListener('mouseout', event => {
-      this.props.onMouseLeave(event);
-    });
+    if (onMouseMove)
+      this.pixiRenderer.view.addEventListener('mousemove', event => {
+        onMouseMove(event);
+      });
+    if (onMouseLeave)
+      this.pixiRenderer.view.addEventListener('mouseout', event => {
+        onMouseLeave(event);
+      });
     this.pixiRenderer.view.addEventListener('focusout', event => {
       if (this.keyboardShortcuts) {
         this.keyboardShortcuts.resetModifiers();
@@ -368,9 +370,9 @@ export default class InstancesEditor extends Component<Props> {
    * this when the initial instances were recreated to ensure that there
    * is not mismatch between renderers and the instances that were updated.
    */
-  forceRemount() {
+  forceRemount = () => {
     this._mountEditorComponents(this.props);
-  }
+  };
 
   _mountEditorComponents(props: Props) {
     //Remove and delete any existing editor component
@@ -558,14 +560,14 @@ export default class InstancesEditor extends Component<Props> {
    * See also ResourcesLoader and PixiResourcesLoader.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetInstanceRenderersFor(objectName: string) {
+  resetInstanceRenderersFor = (objectName: string) => {
     if (this.instancesRenderer)
       this.instancesRenderer.resetInstanceRenderersFor(objectName);
-  }
+  };
 
-  zoomBy(value: number) {
+  zoomBy = (value: number) => {
     this.setZoomFactor(this.getZoomFactor() * value);
-  }
+  };
 
   /**
    * Zoom and scroll so that the cursor stays on the same position scene-wise.
@@ -642,7 +644,8 @@ export default class InstancesEditor extends Component<Props> {
 
     if (
       !this.keyboardShortcuts.shouldMultiSelect() &&
-      !this.keyboardShortcuts.shouldMoveView()
+      !this.keyboardShortcuts.shouldMoveView() &&
+      this.props.instancesSelection.hasSelectedInstances()
     ) {
       this.props.instancesSelection.clearSelection();
       this.props.onInstancesSelected([]);
@@ -925,7 +928,7 @@ export default class InstancesEditor extends Component<Props> {
     return this.canvasArea.getBoundingClientRect();
   }
 
-  zoomToFitContent() {
+  zoomToFitContent = () => {
     const { initialInstances } = this.props;
     if (initialInstances.getInstancesCount() === 0) return;
 
@@ -954,9 +957,9 @@ export default class InstancesEditor extends Component<Props> {
     initialInstances.iterateOverInstances(getInstanceRectangle);
     getInstanceRectangle.delete();
     if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
-  }
+  };
 
-  zoomToInitialPosition() {
+  zoomToInitialPosition = () => {
     const width = this.props.project.getGameResolutionWidth();
     const height = this.props.project.getGameResolutionHeight();
     const x = width / 2;
@@ -965,9 +968,9 @@ export default class InstancesEditor extends Component<Props> {
       getRecommendedInitialZoomFactor(Math.max(height, width))
     );
     this.scrollTo(x, y);
-  }
+  };
 
-  zoomToFitSelection(instances: Array<gdInitialInstance>) {
+  zoomToFitSelection = (instances: Array<gdInitialInstance>) => {
     if (instances.length === 0) return;
     const [firstInstance, ...otherInstances] = instances;
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
@@ -981,9 +984,12 @@ export default class InstancesEditor extends Component<Props> {
       );
     });
     this.fitViewToRectangle(selectedInstancesRectangle, { adaptZoom: true });
-  }
+  };
 
-  centerViewOnLastInstance(instances: Array<gdInitialInstance>) {
+  centerViewOnLastInstance = (
+    instances: Array<gdInitialInstance>,
+    offset?: ?[number, number]
+  ) => {
     if (instances.length === 0) return;
 
     const instanceMeasurer = this.instancesRenderer.getInstanceMeasurer();
@@ -992,7 +998,8 @@ export default class InstancesEditor extends Component<Props> {
       new Rectangle()
     );
     this.fitViewToRectangle(lastInstanceRectangle, { adaptZoom: false });
-  }
+    if (offset) this.scrollBy(offset[0], offset[1]);
+  };
 
   getLastContextMenuSceneCoordinates = () => {
     return this.viewPosition.toSceneCoordinates(
@@ -1008,7 +1015,7 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  getViewPosition = () /*: ?ViewPosition */ => {
+  getViewPosition = (): ?ViewPosition => {
     return this.viewPosition;
   };
 

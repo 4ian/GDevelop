@@ -47,36 +47,23 @@ const artifactsToDownload = {
     url: 'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest.yml',
     outputFilename: 'latest.yml',
   },
-  // macOS (Intel):
+  // macOS (Universal):
   'macOS zip': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-mac.zip`,
-    outputFilename: `GDevelop-5-${version}-mac.zip`,
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-universal-mac.zip`,
+    outputFilename: `GDevelop-5-${version}-universal-mac.zip`,
   },
   'macOS dmg': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}.dmg`,
-    outputFilename: `GDevelop-5-${version}.dmg`,
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-universal.dmg`,
+    outputFilename: `GDevelop-5-${version}-universal.dmg`,
   },
   'macOS dmg blockmap': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}.dmg.blockmap`,
-    outputFilename: `GDevelop-5-${version}.dmg.blockmap`,
+    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-universal.dmg.blockmap`,
+    outputFilename: `GDevelop-5-${version}-universal.dmg.blockmap`,
   },
   'macOS auto-update file': {
     url:
       'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest-mac.yml',
     outputFilename: 'latest-mac.yml',
-  },
-  // macOS (Apple Silicon):
-  'macOS zip (Apple Silicon)': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64-mac.zip`,
-    outputFilename: `GDevelop-5-${version}-arm64-mac.zip`,
-  },
-  'macOS dmg (Apple Silicon)': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64.dmg`,
-    outputFilename: `GDevelop-5-${version}-arm64.dmg`,
-  },
-  'macOS dmg blockmap (Apple Silicon)': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-arm64.dmg.blockmap`,
-    outputFilename: `GDevelop-5-${version}-arm64.dmg.blockmap`,
   },
   // Linux (amd64 and arm64):
   'Linux AppImage (amd64)': {

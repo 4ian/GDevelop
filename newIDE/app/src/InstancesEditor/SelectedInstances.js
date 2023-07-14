@@ -190,7 +190,7 @@ export default class SelectedInstances {
     );
   }
 
-  getSelectionAABB(): Rectangle {
+  getSelectionAABB = (): Rectangle => {
     const selectionAABB = new Rectangle();
     const selection = this.instancesSelection.getSelectedInstances();
     let instanceRect = new Rectangle();
@@ -208,7 +208,7 @@ export default class SelectedInstances {
       }
     }
     return selectionAABB;
-  }
+  };
 
   render() {
     const {

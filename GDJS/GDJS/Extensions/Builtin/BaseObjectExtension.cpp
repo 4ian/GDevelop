@@ -138,12 +138,10 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["SeparateFromObjects"]
       .SetFunctionName("separateFromObjectsList")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["Ecarter"]
-      .codeExtraInformation  // Deprecated
+  objectActions["Ecarter"]  // Deprecated
       .SetFunctionName("separateObjectsWithoutForces")
       .SetIncludeFile("runtimeobject.js");
-  objectActions["Rebondir"]
-      .codeExtraInformation  // Deprecated
+  objectActions["Rebondir"]  // Deprecated
       .SetFunctionName("separateObjectsWithForces")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["BehaviorActivated"]
@@ -354,7 +352,7 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("getVariableChildCount")
       .SetIncludeFile("runtimeobject.js");
 
-  GetAllActions()["MoveObjects"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllActions()["MoveObjects"].SetCustomCodeGenerator(
       [](gd::Instruction &,
          gd::EventsCodeGenerator &,
          gd::EventsCodeGenerationContext &) {
@@ -365,7 +363,7 @@ BaseObjectExtension::BaseObjectExtension() {
     return op == "/" || op == "*" || op == "-" || op == "+";
   };
 
-  objectActions["MettreXY"].codeExtraInformation.SetCustomCodeGenerator(
+  objectActions["MettreXY"].SetCustomCodeGenerator(
       [&](gd::Instruction &instruction,
           gd::EventsCodeGenerator &codeGenerator,
           gd::EventsCodeGenerationContext &context) -> gd::String {
@@ -397,16 +395,16 @@ BaseObjectExtension::BaseObjectExtension() {
                   instruction.GetParameter(0).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
-          gd::String newX =
-              isNotAssignmentOperator(op1)
-                  ? (objectListName + "[i].getX() " + op1 + expression1Code)
-                  : expression1Code;
+          gd::String newX = isNotAssignmentOperator(op1)
+                                ? (objectListName + "[i].getX() " + op1 + "(" +
+                                   expression1Code + ")")
+                                : expression1Code;
 
           gd::String op2 = instruction.GetParameter(3).GetPlainString();
-          gd::String newY =
-              isNotAssignmentOperator(op2)
-                  ? (objectListName + "[i].getY() " + op2 + expression2Code)
-                  : expression2Code;
+          gd::String newY = isNotAssignmentOperator(op2)
+                                ? (objectListName + "[i].getY() " + op2 + "(" +
+                                   expression2Code + ")")
+                                : expression2Code;
 
           gd::String call =
               objectListName + "[i].setPosition(" + newX + "," + newY + ")";
@@ -422,7 +420,7 @@ BaseObjectExtension::BaseObjectExtension() {
         return outputCode;
       });
 
-  objectActions["SetCenter"].codeExtraInformation.SetCustomCodeGenerator(
+  objectActions["SetCenter"].SetCustomCodeGenerator(
       [&](gd::Instruction &instruction,
           gd::EventsCodeGenerator &codeGenerator,
           gd::EventsCodeGenerationContext &context) -> gd::String {

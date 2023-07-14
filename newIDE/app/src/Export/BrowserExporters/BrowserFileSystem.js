@@ -1,5 +1,5 @@
 // @flow
-import path from 'path';
+import path from 'path-browserify';
 const gd: libGDevelop = global.gd;
 
 export type BlobFileDescriptor = {|

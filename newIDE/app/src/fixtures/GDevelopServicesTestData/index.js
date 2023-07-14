@@ -200,6 +200,13 @@ export const subscriptionForGoldUser: Subscription = {
   userId: 'silver-user',
 };
 
+export const subscriptionForStartupUser: Subscription = {
+  planId: 'gdevelop_startup',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'silver-user',
+};
+
 export const subscriptionForEducationPlan: Subscription = {
   planId: 'gdevelop_education',
   createdAt: 1515084011000,
@@ -350,6 +357,40 @@ export const limitsForGoldUser: Limits = {
   message: undefined,
 };
 
+export const limitsForStartupUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 500,
+      canMaximumCountBeIncreased: false,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 1000,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
 export const limitsReached: Limits = {
   capabilities: {
     analytics: {
@@ -453,6 +494,11 @@ export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
 export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
+  limits: limitsForGoldUser,
+};
+export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForStartupUser,
   limits: limitsForGoldUser,
 };
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {

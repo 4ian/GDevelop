@@ -32,6 +32,7 @@ type Props = {|
   onPolygonsUpdated: () => void,
   forcedCursor: string | null,
   deactivateControls?: boolean,
+  hideControls?: boolean,
 |};
 
 const CollisionMasksPreview = (props: Props) => {
@@ -57,6 +58,7 @@ const CollisionMasksPreview = (props: Props) => {
     onClickVertice,
     forcedCursor,
     deactivateControls,
+    hideControls,
   } = props;
 
   if (deactivateControls) {
@@ -329,36 +331,39 @@ const CollisionMasksPreview = (props: Props) => {
             />
           );
         })}
-        {mapVector(polygons, (polygon, polygonIndex) => {
-          const vertices = polygon.getVertices();
-          return mapVector(vertices, (vertex, vertexIndex) => (
-            <circle
-              onPointerDown={
-                deactivateControls
-                  ? null
-                  : () => onStartDragVertex(vertex, polygonIndex, vertexIndex)
-              }
-              {...dataObjectToProps({ draggable: 'true' })}
-              key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
-              fill={
-                vertex.ptr === props.highlightedVerticePtr
-                  ? 'rgba(0,0,0,0.75)'
-                  : vertex.ptr === props.selectedVerticePtr
-                  ? 'rgba(107,175,255,0.75)'
-                  : 'rgba(255,133,105,0.75)'
-              }
-              stroke={
-                vertex.ptr === props.highlightedVerticePtr ? 'white' : undefined
-              }
-              strokeWidth={2}
-              cx={vertex.get_x() * imageZoomFactor}
-              cy={vertex.get_y() * imageZoomFactor}
-              r={7}
-              style={vertexCircleStyle}
-            />
-          ));
-        })}
-        {newVertexHintPoint && (
+        {!hideControls &&
+          mapVector(polygons, (polygon, polygonIndex) => {
+            const vertices = polygon.getVertices();
+            return mapVector(vertices, (vertex, vertexIndex) => (
+              <circle
+                onPointerDown={
+                  deactivateControls
+                    ? null
+                    : () => onStartDragVertex(vertex, polygonIndex, vertexIndex)
+                }
+                {...dataObjectToProps({ draggable: 'true' })}
+                key={`polygon-${polygonIndex}-vertex-${vertexIndex}`}
+                fill={
+                  vertex.ptr === props.highlightedVerticePtr
+                    ? 'rgba(0,0,0,0.75)'
+                    : vertex.ptr === props.selectedVerticePtr
+                    ? 'rgba(107,175,255,0.75)'
+                    : 'rgba(255,133,105,0.75)'
+                }
+                stroke={
+                  vertex.ptr === props.highlightedVerticePtr
+                    ? 'white'
+                    : undefined
+                }
+                strokeWidth={2}
+                cx={vertex.get_x() * imageZoomFactor}
+                cy={vertex.get_y() * imageZoomFactor}
+                r={7}
+                style={vertexCircleStyle}
+              />
+            ));
+          })}
+        {!hideControls && newVertexHintPoint && (
           <circle
             onPointerDown={
               deactivateControls ? null : () => addVertex(newVertexHintPoint)

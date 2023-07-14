@@ -136,16 +136,20 @@ describe('SpriteObjectHelper', () => {
         vertice.delete();
       };
 
+      // Empty sprites have the same collision masks.
       const sprite1 = new gd.Sprite();
       const sprite2 = new gd.Sprite();
       expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(true);
       expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(true);
 
-      sprite1.setCollisionMaskAutomatic(false);
+      // A sprite with a full image collision mask is different from a sprite without.
+      sprite1.setFullImageCollisionMask(true);
       expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(false);
       expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(false);
+      sprite1.setFullImageCollisionMask(false);
 
       {
+        // Adding a polygon to a sprite makes it different from a sprite without.
         const polygon1 = new gd.Polygon2d();
         addVertice(polygon1, 0, 0);
         addVertice(polygon1, 0, 10);
@@ -157,7 +161,7 @@ describe('SpriteObjectHelper', () => {
       }
 
       {
-        sprite2.setCollisionMaskAutomatic(false);
+        // Adding the same polygon to the other sprite makes them the same.
         const polygon2 = new gd.Polygon2d();
         addVertice(polygon2, 0, 0);
         addVertice(polygon2, 0, 10);
@@ -167,6 +171,7 @@ describe('SpriteObjectHelper', () => {
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(true);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(true);
 
+        // Moving a vertice of the polygon makes them different again.
         sprite2
           .getCustomCollisionMask()
           .at(0)
@@ -176,6 +181,7 @@ describe('SpriteObjectHelper', () => {
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(false);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(false);
 
+        // Moving the same vertice of the other polygon makes them the same again.
         sprite1
           .getCustomCollisionMask()
           .at(0)

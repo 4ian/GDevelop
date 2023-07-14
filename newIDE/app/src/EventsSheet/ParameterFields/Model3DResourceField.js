@@ -2,7 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import ResourceSelector, {
+  type ResourceSelectorInterface,
+} from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import {
   type ParameterFieldProps,
@@ -12,7 +14,7 @@ import {
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function Model3DResourceField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?ResourceSelector>(null);
+    const field = React.useRef<?ResourceSelectorInterface>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };

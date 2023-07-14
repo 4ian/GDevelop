@@ -22,6 +22,13 @@ const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const electron = optionalRequire('electron');
 
+// Make sure that the process object is available, even if we are not in Node.
+// This is needed by some libraries like path-browserify for example.
+// and it avoids hard crashes when using them.
+global.process = global.process || {
+  cwd: () => '/',
+};
+
 // Use the user preferred theme to define the loading screen color.
 
 let color = 'f0f0f0';

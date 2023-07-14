@@ -87,6 +87,7 @@ export type PlanDetails = {
   yearlyPriceInEuros?: number | null,
   isPerUser?: true,
   smallDescription?: MessageDescriptor,
+  hideInSubscriptionDialog?: boolean,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
@@ -146,6 +147,26 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`100 packagings per day for Android and for desktop.`,
+      },
+      {
+        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
+      },
+      {
+        message: t`Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.`,
+      },
+    ],
+  },
+  {
+    planId: 'gdevelop_startup',
+    name: 'GDevelop Startup',
+    monthlyPriceInEuros: 30,
+    smallDescription: t`Small game studios and startups.`,
+    descriptionBullets: [
+      {
+        message: t`500 cloud projects with 5GB of resources per project.`,
+      },
+      {
+        message: t`Unlimited packagings per day for Android, web and desktop.`,
       },
       {
         message: t`Unlimited leaderboards and unlimited player feedback responses.`,

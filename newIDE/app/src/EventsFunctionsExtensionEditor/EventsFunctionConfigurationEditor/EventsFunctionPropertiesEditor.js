@@ -11,11 +11,6 @@ import SelectOption from '../../UI/SelectOption';
 import { mapVector, mapFor } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import {
-  isBehaviorLifecycleEventsFunction,
-  isObjectLifecycleEventsFunction,
-  isExtensionLifecycleEventsFunction,
-} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -166,7 +161,9 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
       !eventsBasedObject &&
-      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
@@ -182,7 +179,9 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     const isAnObjectLifecycleEventsFunction =
       !!eventsBasedObject &&
       !eventsBasedBehavior &&
-      isObjectLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isAnObjectLifecycleEventsFunction) {
       return (
         <EmptyMessage>
@@ -197,7 +196,9 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
     const isAnExtensionLifecycleEventsFunction =
       !eventsBasedBehavior &&
       !eventsBasedObject &&
-      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isAnExtensionLifecycleEventsFunction) {
       return (
         <Column noMargin>

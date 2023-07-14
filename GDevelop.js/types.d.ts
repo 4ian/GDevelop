@@ -19,18 +19,18 @@ class EmscriptenObject {
 }
 
 export class VectorString extends EmscriptenObject {
-  constructor(): void;
+  vectorString(): void;
   push_back(str: string): void;
   resize(size: number): void;
   size(): number;
   at(index: number): string;
-  WRAPPED_set(index: number, str: string): void;
+  set(index: number, str: string): void;
   clear(): void;
 }
 
 export class VectorPlatformExtension extends EmscriptenObject {
   size(): number;
-  WRAPPED_at(index: number): PlatformExtension;
+  at(index: number): PlatformExtension;
 }
 
 export class VectorDependencyMetadata extends EmscriptenObject {
@@ -45,482 +45,482 @@ export class VectorInt extends EmscriptenObject {
 
 export class VectorVariable extends EmscriptenObject {
   size(): number;
-  WRAPPED_at(index: number): Variable;
+  at(index: number): Variable;
 }
 
 export class MapStringString extends EmscriptenObject {
-  constructor(): void;
-  MAP_get(name: string): string;
-  MAP_set(name: string, str: string): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  mapStringString(): void;
+  get(name: string): string;
+  set(name: string, str: string): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapStringBoolean extends EmscriptenObject {
-  constructor(): void;
-  MAP_get(name: string): boolean;
-  MAP_set(name: string, value: boolean): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  mapStringBoolean(): void;
+  get(name: string): boolean;
+  set(name: string, value: boolean): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapStringDouble extends EmscriptenObject {
-  constructor(): void;
-  MAP_get(name: string): number;
-  MAP_set(name: string, value: number): void;
-  MAP_has(name: string): number;
-  MAP_keys(): VectorString;
+  mapStringDouble(): void;
+  get(name: string): number;
+  set(name: string, value: number): void;
+  has(name: string): number;
+  keys(): VectorString;
 }
 
 export class MapStringVariable extends EmscriptenObject {
-  MAP_get(name: string): Variable;
-  MAP_set(name: string, prop: Variable): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  get(name: string): Variable;
+  set(name: string, prop: Variable): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapStringExpressionMetadata extends EmscriptenObject {
-  MAP_get(name: string): ExpressionMetadata;
-  MAP_set(name: string, prop: ExpressionMetadata): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  get(name: string): ExpressionMetadata;
+  set(name: string, prop: ExpressionMetadata): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapStringInstructionMetadata extends EmscriptenObject {
-  MAP_get(name: string): InstructionMetadata;
-  MAP_set(name: string, prop: InstructionMetadata): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  get(name: string): InstructionMetadata;
+  set(name: string, prop: InstructionMetadata): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapStringEventMetadata extends EmscriptenObject {
-  MAP_get(name: string): EventMetadata;
-  MAP_set(name: string, prop: EventMetadata): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  get(name: string): EventMetadata;
+  set(name: string, prop: EventMetadata): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapExtensionProperties extends EmscriptenObject {
-  MAP_get(name: string): MapStringPropertyDescriptor;
-  MAP_set(name: string, prop: MapStringPropertyDescriptor): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  get(name: string): MapStringPropertyDescriptor;
+  set(name: string, prop: MapStringPropertyDescriptor): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class SetString extends EmscriptenObject {
-  constructor(): void;
-  FREE_toNewVectorString(): VectorString;
+  setString(): void;
+  fREE_toNewVectorString(): VectorString;
 }
 
 export class ProjectHelper extends EmscriptenObject {
-  STATIC_CreateNewGDJSProject(): Project;
-  STATIC_InitializePlatforms(): void;
-  STATIC_SanityCheckBehaviorProperty(behavior: Behavior, propertyName: string, newValue: string): string;
-  STATIC_SanityCheckBehaviorsSharedDataProperty(behavior: BehaviorsSharedData, propertyName: string, newValue: string): string;
-  STATIC_SanityCheckObjectProperty(configuration: ObjectConfiguration, propertyName: string, newValue: string): string;
-  STATIC_SanityCheckObjectInitialInstanceProperty(configuration: ObjectConfiguration, propertyName: string, newValue: string): string;
+  static createNewGDJSProject(): Project;
+  static initializePlatforms(): void;
+  static sanityCheckBehaviorProperty(behavior: Behavior, propertyName: string, newValue: string): string;
+  static sanityCheckBehaviorsSharedDataProperty(behavior: BehaviorsSharedData, propertyName: string, newValue: string): string;
+  static sanityCheckObjectProperty(configuration: ObjectConfiguration, propertyName: string, newValue: string): string;
+  static sanityCheckObjectInitialInstanceProperty(configuration: ObjectConfiguration, propertyName: string, newValue: string): string;
 }
 
 export class EventsVariablesFinder extends EmscriptenObject {
-  constructor(): void;
-  STATIC_FindAllGlobalVariables(platform: Platform, project: Project): SetString;
-  STATIC_FindAllLayoutVariables(platform: Platform, project: Project, layout: Layout): SetString;
-  STATIC_FindAllObjectVariables(platform: Platform, project: Project, layout: Layout, obj: gdObject): SetString;
+  eventsVariablesFinder(): void;
+  static findAllGlobalVariables(platform: Platform, project: Project): SetString;
+  static findAllLayoutVariables(platform: Platform, project: Project, layout: Layout): SetString;
+  static findAllObjectVariables(platform: Platform, project: Project, layout: Layout, obj: gdObject): SetString;
 }
 
 export class EventsIdentifiersFinder extends EmscriptenObject {
-  constructor(): void;
-  STATIC_FindAllIdentifierExpressions(platform: Platform, project: Project, layout: Layout, identifierType: string, contextObjectName: string): SetString;
+  eventsIdentifiersFinder(): void;
+  static findAllIdentifierExpressions(platform: Platform, project: Project, layout: Layout, identifierType: string, contextObjectName: string): SetString;
 }
 
 export class EventsFunctionSelfCallChecker extends EmscriptenObject {
-  STATIC_IsFreeFunctionOnlyCallingItself(project: Project, extension: EventsFunctionsExtension, eventsFunction: EventsFunction): boolean;
-  STATIC_IsBehaviorFunctionOnlyCallingItself(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction): boolean;
-  STATIC_IsObjectFunctionOnlyCallingItself(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction): boolean;
+  static isFreeFunctionOnlyCallingItself(project: Project, extension: EventsFunctionsExtension, eventsFunction: EventsFunction): boolean;
+  static isBehaviorFunctionOnlyCallingItself(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction): boolean;
+  static isObjectFunctionOnlyCallingItself(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction): boolean;
 }
 
 export class InstructionOrExpressionGroupMetadata extends EmscriptenObject {
-  constructor(): void;
-  SetIcon(icon: string): InstructionOrExpressionGroupMetadata;
-  GetIcon(): string;
+  instructionOrExpressionGroupMetadata(): void;
+  setIcon(icon: string): InstructionOrExpressionGroupMetadata;
+  getIcon(): string;
 }
 
 export class VersionWrapper extends EmscriptenObject {
-  STATIC_Major(): number;
-  STATIC_Minor(): number;
-  STATIC_Build(): number;
-  STATIC_Revision(): number;
-  STATIC_FullString(): string;
-  STATIC_Status(): string;
-  STATIC_Year(): string;
-  STATIC_Month(): string;
-  STATIC_Date(): string;
+  static major(): number;
+  static minor(): number;
+  static build(): number;
+  static revision(): number;
+  static fullString(): string;
+  static status(): string;
+  static year(): string;
+  static month(): string;
+  static date(): string;
 }
 
 export class Platform extends EmscriptenObject {
-  GetName(): string;
-  GetFullName(): string;
-  GetSubtitle(): string;
-  GetDescription(): string;
-  GetInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  IsExtensionLoaded(name: string): boolean;
-  RemoveExtension(name: string): void;
-  ReloadBuiltinExtensions(): void;
-  GetAllPlatformExtensions(): VectorPlatformExtension;
+  getName(): string;
+  getFullName(): string;
+  getSubtitle(): string;
+  getDescription(): string;
+  getInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
+  isExtensionLoaded(name: string): boolean;
+  removeExtension(name: string): void;
+  reloadBuiltinExtensions(): void;
+  getAllPlatformExtensions(): VectorPlatformExtension;
 }
 
 export class JsPlatform extends EmscriptenObject {
-  STATIC_Get(): JsPlatform;
-  AddNewExtension(extension: PlatformExtension): void;
-  GetName(): string;
-  GetFullName(): string;
-  GetSubtitle(): string;
-  GetDescription(): string;
-  GetInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  IsExtensionLoaded(name: string): boolean;
-  RemoveExtension(name: string): void;
-  ReloadBuiltinExtensions(): void;
-  GetAllPlatformExtensions(): VectorPlatformExtension;
+  static get(): JsPlatform;
+  addNewExtension(extension: PlatformExtension): void;
+  getName(): string;
+  getFullName(): string;
+  getSubtitle(): string;
+  getDescription(): string;
+  getInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
+  isExtensionLoaded(name: string): boolean;
+  removeExtension(name: string): void;
+  reloadBuiltinExtensions(): void;
+  getAllPlatformExtensions(): VectorPlatformExtension;
 }
 
 export class PairStringVariable extends EmscriptenObject {
-  constructor(): void;
-  WRAPPED_GetName(): string;
-  WRAPPED_GetVariable(): Variable;
+  pairStringVariable(): void;
+  getName(): string;
+  getVariable(): Variable;
 }
 
 export class Variable extends EmscriptenObject {
-  constructor(): void;
-  STATIC_IsPrimitive(type: Variable_Type): boolean;
-  GetType(): Variable_Type;
-  CastTo(type: string): void;
-  SetString(str: string): void;
-  GetString(): string;
-  SetValue(val: number): void;
-  GetValue(): number;
-  SetBool(val: boolean): void;
-  GetBool(): boolean;
-  SetFolded(val: boolean): void;
-  IsFolded(): boolean;
-  GetChildrenCount(): number;
-  Contains(variableToSearch: Variable, recursive: boolean): boolean;
-  HasChild(str: string): boolean;
-  GetChild(str: string): Variable;
-  RemoveChild(name: string): void;
-  RenameChild(oldName: string, newName: string): boolean;
-  GetAllChildrenNames(): VectorString;
-  RemoveRecursively(variableToRemove: Variable): void;
-  GetAtIndex(index: number): Variable;
-  PushNew(): Variable;
-  RemoveAtIndex(index: number): void;
-  GetAllChildrenArray(): VectorVariable;
-  MoveChildInArray(oldIndex: number, newIndex: number): void;
-  InsertAtIndex(variable: Variable, index: number): boolean;
-  InsertChild(name: string, variable: Variable): boolean;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  variable(): void;
+  static isPrimitive(type: Variable_Type): boolean;
+  getType(): Variable_Type;
+  castTo(type: string): void;
+  setString(str: string): void;
+  getString(): string;
+  setValue(val: number): void;
+  getValue(): number;
+  setBool(val: boolean): void;
+  getBool(): boolean;
+  setFolded(val: boolean): void;
+  isFolded(): boolean;
+  getChildrenCount(): number;
+  contains(variableToSearch: Variable, recursive: boolean): boolean;
+  hasChild(str: string): boolean;
+  getChild(str: string): Variable;
+  removeChild(name: string): void;
+  renameChild(oldName: string, newName: string): boolean;
+  getAllChildrenNames(): VectorString;
+  removeRecursively(variableToRemove: Variable): void;
+  getAtIndex(index: number): Variable;
+  pushNew(): Variable;
+  removeAtIndex(index: number): void;
+  getAllChildrenArray(): VectorVariable;
+  moveChildInArray(oldIndex: number, newIndex: number): void;
+  insertAtIndex(variable: Variable, index: number): boolean;
+  insertChild(name: string, variable: Variable): boolean;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class VariablesContainer extends EmscriptenObject {
-  constructor(): void;
-  Has(name: string): boolean;
-  Get(name: string): Variable;
-  GetAt(index: number): Variable;
-  GetNameAt(index: number): string;
-  Insert(name: string, variable: Variable, index: number): Variable;
-  InsertNew(name: string, index: number): Variable;
-  Remove(name: string): void;
-  Rename(oldName: string, newName: string): boolean;
-  Swap(firstIndex: number, secondIndex: number): void;
-  Move(oldIndex: number, newIndex: number): void;
-  GetPosition(name: string): number;
-  Count(): number;
-  Clear(): void;
-  RemoveRecursively(variableToRemove: Variable): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  variablesContainer(): void;
+  has(name: string): boolean;
+  get(name: string): Variable;
+  getAt(index: number): Variable;
+  getNameAt(index: number): string;
+  insert(name: string, variable: Variable, index: number): Variable;
+  insertNew(name: string, index: number): Variable;
+  remove(name: string): void;
+  rename(oldName: string, newName: string): boolean;
+  swap(firstIndex: number, secondIndex: number): void;
+  move(oldIndex: number, newIndex: number): void;
+  getPosition(name: string): number;
+  count(): number;
+  clear(): void;
+  removeRecursively(variableToRemove: Variable): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class ObjectGroup extends EmscriptenObject {
-  constructor(): void;
-  GetName(): string;
-  SetName(name: string): void;
-  AddObject(objectName: string): void;
-  RemoveObject(objectName: string): void;
-  Find(objectName: string): boolean;
-  GetAllObjectsNames(): VectorString;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  objectGroup(): void;
+  getName(): string;
+  setName(name: string): void;
+  addObject(objectName: string): void;
+  removeObject(objectName: string): void;
+  find(objectName: string): boolean;
+  getAllObjectsNames(): VectorString;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class ObjectGroupsContainer extends EmscriptenObject {
-  constructor(): void;
-  Has(name: string): boolean;
-  Insert(objectGroup: ObjectGroup, position: number): ObjectGroup;
-  InsertNew(name: string, position: number): ObjectGroup;
-  Count(): number;
-  Get(name: string): ObjectGroup;
-  GetAt(index: number): ObjectGroup;
-  Clear(): void;
-  Remove(name: string): void;
-  GetPosition(name: string): number;
-  Rename(oldName: string, newName: string): boolean;
-  Move(oldIndex: number, newIndex: number): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  objectGroupsContainer(): void;
+  has(name: string): boolean;
+  insert(objectGroup: ObjectGroup, position: number): ObjectGroup;
+  insertNew(name: string, position: number): ObjectGroup;
+  count(): number;
+  get(name: string): ObjectGroup;
+  getAt(index: number): ObjectGroup;
+  clear(): void;
+  remove(name: string): void;
+  getPosition(name: string): number;
+  rename(oldName: string, newName: string): boolean;
+  move(oldIndex: number, newIndex: number): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class PlatformSpecificAssets extends EmscriptenObject {
-  constructor(): void;
-  Has(platform: string, name: string): boolean;
-  Get(platform: string, name: string): string;
-  Remove(platform: string, name: string): void;
-  Set(platform: string, name: string, resourceName: string): void;
-  ExposeResources(worker: ArbitraryResourceWorker): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  platformSpecificAssets(): void;
+  has(platform: string, name: string): boolean;
+  get(platform: string, name: string): string;
+  remove(platform: string, name: string): void;
+  set(platform: string, name: string, resourceName: string): void;
+  exposeResources(worker: ArbitraryResourceWorker): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class LoadingScreen extends EmscriptenObject {
-  constructor(): void;
-  IsGDevelopLogoShownDuringLoadingScreen(): boolean;
-  ShowGDevelopLogoDuringLoadingScreen(show: boolean): LoadingScreen;
-  GetGDevelopLogoStyle(): string;
-  SetGDevelopLogoStyle(value: string): LoadingScreen;
-  GetBackgroundImageResourceName(): string;
-  SetBackgroundImageResourceName(value: string): LoadingScreen;
-  GetBackgroundColor(): number;
-  SetBackgroundColor(value: number): LoadingScreen;
-  GetBackgroundFadeInDuration(): number;
-  SetBackgroundFadeInDuration(value: number): LoadingScreen;
-  GetMinDuration(): number;
-  SetMinDuration(value: number): LoadingScreen;
-  GetLogoAndProgressFadeInDuration(): number;
-  SetLogoAndProgressFadeInDuration(value: number): LoadingScreen;
-  GetLogoAndProgressLogoFadeInDelay(): number;
-  SetLogoAndProgressLogoFadeInDelay(value: number): LoadingScreen;
-  GetShowProgressBar(): boolean;
-  SetShowProgressBar(value: boolean): LoadingScreen;
-  GetProgressBarMaxWidth(): number;
-  SetProgressBarMaxWidth(value: number): LoadingScreen;
-  GetProgressBarMinWidth(): number;
-  SetProgressBarMinWidth(value: number): LoadingScreen;
-  GetProgressBarWidthPercent(): number;
-  SetProgressBarWidthPercent(value: number): LoadingScreen;
-  GetProgressBarHeight(): number;
-  SetProgressBarHeight(value: number): LoadingScreen;
-  GetProgressBarColor(): number;
-  SetProgressBarColor(value: number): LoadingScreen;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  loadingScreen(): void;
+  isGDevelopLogoShownDuringLoadingScreen(): boolean;
+  showGDevelopLogoDuringLoadingScreen(show: boolean): LoadingScreen;
+  getGDevelopLogoStyle(): string;
+  setGDevelopLogoStyle(value: string): LoadingScreen;
+  getBackgroundImageResourceName(): string;
+  setBackgroundImageResourceName(value: string): LoadingScreen;
+  getBackgroundColor(): number;
+  setBackgroundColor(value: number): LoadingScreen;
+  getBackgroundFadeInDuration(): number;
+  setBackgroundFadeInDuration(value: number): LoadingScreen;
+  getMinDuration(): number;
+  setMinDuration(value: number): LoadingScreen;
+  getLogoAndProgressFadeInDuration(): number;
+  setLogoAndProgressFadeInDuration(value: number): LoadingScreen;
+  getLogoAndProgressLogoFadeInDelay(): number;
+  setLogoAndProgressLogoFadeInDelay(value: number): LoadingScreen;
+  getShowProgressBar(): boolean;
+  setShowProgressBar(value: boolean): LoadingScreen;
+  getProgressBarMaxWidth(): number;
+  setProgressBarMaxWidth(value: number): LoadingScreen;
+  getProgressBarMinWidth(): number;
+  setProgressBarMinWidth(value: number): LoadingScreen;
+  getProgressBarWidthPercent(): number;
+  setProgressBarWidthPercent(value: number): LoadingScreen;
+  getProgressBarHeight(): number;
+  setProgressBarHeight(value: number): LoadingScreen;
+  getProgressBarColor(): number;
+  setProgressBarColor(value: number): LoadingScreen;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class Watermark extends EmscriptenObject {
-  constructor(): void;
-  IsGDevelopWatermarkShown(): boolean;
-  ShowGDevelopWatermark(show: boolean): Watermark;
-  GetPlacement(): string;
-  SetPlacement(value: string): Watermark;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  watermark(): void;
+  isGDevelopWatermarkShown(): boolean;
+  showGDevelopWatermark(show: boolean): Watermark;
+  getPlacement(): string;
+  setPlacement(value: string): Watermark;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class ObjectsContainer extends EmscriptenObject {
-  constructor(): void;
-  InsertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  InsertObject(obj: gdObject, pos: number): gdObject;
-  HasObjectNamed(name: string): boolean;
-  GetObject(name: string): gdObject;
-  GetObjectAt(pos: number): gdObject;
-  GetObjectPosition(name: string): number;
-  RemoveObject(name: string): void;
-  SwapObjects(first: number, second: number): void;
-  MoveObject(oldIndex: number, newIndex: number): void;
-  MoveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
-  GetObjectsCount(): number;
-  GetObjectGroups(): ObjectGroupsContainer;
+  objectsContainer(): void;
+  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertObject(obj: gdObject, pos: number): gdObject;
+  hasObjectNamed(name: string): boolean;
+  getObject(name: string): gdObject;
+  getObjectAt(pos: number): gdObject;
+  getObjectPosition(name: string): number;
+  removeObject(name: string): void;
+  swapObjects(first: number, second: number): void;
+  moveObject(oldIndex: number, newIndex: number): void;
+  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  getObjectsCount(): number;
+  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class Project extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  GetCategories(): VectorString;
-  SetDescription(description: string): void;
-  GetDescription(): string;
-  SetVersion(authorName: string): void;
-  GetVersion(): string;
-  SetAuthor(authorName: string): void;
-  GetAuthor(): string;
-  GetAuthorIds(): VectorString;
-  GetAuthorUsernames(): VectorString;
-  IsPlayableWithKeyboard(): boolean;
-  SetPlayableWithKeyboard(playable: boolean): void;
-  IsPlayableWithGamepad(): boolean;
-  SetPlayableWithGamepad(playable: boolean): void;
-  IsPlayableWithMobile(): boolean;
-  SetPlayableWithMobile(playable: boolean): void;
-  SetPackageName(packageName: string): void;
-  GetPackageName(): string;
-  SetTemplateSlug(templateSlug: string): void;
-  GetTemplateSlug(): string;
-  SetOrientation(orientation: string): void;
-  GetOrientation(): string;
-  SetProjectUuid(projectUuid: string): void;
-  GetProjectUuid(): string;
-  ResetProjectUuid(): void;
-  SetProjectFile(file: string): void;
-  GetProjectFile(): string;
-  SetGameResolutionSize(width: number, height: number): void;
-  GetGameResolutionWidth(): number;
-  GetGameResolutionHeight(): number;
-  GetAdaptGameResolutionAtRuntime(): boolean;
-  SetAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime: boolean): void;
-  SetScaleMode(scaleMode: string): void;
-  GetScaleMode(): string;
-  SetPixelsRounding(pixelsRounding: boolean): void;
-  GetPixelsRounding(): boolean;
-  SetSizeOnStartupMode(orientation: string): void;
-  GetSizeOnStartupMode(): string;
-  SetAntialiasingMode(antialiasingMode: string): void;
-  GetAntialiasingMode(): string;
-  SetAntialisingEnabledOnMobile(pixelsRounding: boolean): void;
-  IsAntialisingEnabledOnMobile(): boolean;
-  GetMaximumFPS(): number;
-  SetMaximumFPS(fps: number): void;
-  GetMinimumFPS(): number;
-  SetMinimumFPS(fps: number): void;
-  SetFolderProject(enable: boolean): void;
-  IsFolderProject(): boolean;
-  SetUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
-  GetUseDeprecatedZeroAsDefaultZOrder(): boolean;
-  SetLastCompilationDirectory(path: string): void;
-  GetLastCompilationDirectory(): string;
-  GetExtensionProperties(): ExtensionProperties;
-  AddPlatform(platform: Platform): void;
-  GetCurrentPlatform(): Platform;
-  GetPlatformSpecificAssets(): PlatformSpecificAssets;
-  GetLoadingScreen(): LoadingScreen;
-  GetWatermark(): Watermark;
-  HasLayoutNamed(name: string): boolean;
-  GetLayout(name: string): Layout;
-  GetLayoutAt(index: number): Layout;
-  MoveLayout(oldIndex: number, newIndex: number): void;
-  SwapLayouts(first: number, second: number): void;
-  GetLayoutsCount(): number;
-  InsertNewLayout(name: string, position: number): Layout;
-  RemoveLayout(name: string): void;
-  SetFirstLayout(name: string): void;
-  GetFirstLayout(): string;
-  HasExternalEventsNamed(name: string): boolean;
-  GetExternalEvents(name: string): ExternalEvents;
-  GetExternalEventsAt(index: number): ExternalEvents;
-  MoveExternalEvents(oldIndex: number, newIndex: number): void;
-  SwapExternalEvents(first: number, second: number): void;
-  GetExternalEventsCount(): number;
-  InsertNewExternalEvents(name: string, position: number): ExternalEvents;
-  RemoveExternalEvents(name: string): void;
-  HasExternalLayoutNamed(name: string): boolean;
-  GetExternalLayout(name: string): ExternalLayout;
-  GetExternalLayoutAt(index: number): ExternalLayout;
-  MoveExternalLayout(oldIndex: number, newIndex: number): void;
-  SwapExternalLayouts(first: number, second: number): void;
-  GetExternalLayoutsCount(): number;
-  InsertNewExternalLayout(name: string, position: number): ExternalLayout;
-  RemoveExternalLayout(name: string): void;
-  HasEventsFunctionsExtensionNamed(name: string): boolean;
-  GetEventsFunctionsExtension(name: string): EventsFunctionsExtension;
-  GetEventsFunctionsExtensionAt(index: number): EventsFunctionsExtension;
-  MoveEventsFunctionsExtension(oldIndex: number, newIndex: number): void;
-  SwapEventsFunctionsExtensions(first: number, second: number): void;
-  GetEventsFunctionsExtensionsCount(): number;
-  InsertNewEventsFunctionsExtension(name: string, position: number): EventsFunctionsExtension;
-  InsertEventsFunctionsExtension(eventsFunctionsExtension: EventsFunctionsExtension, position: number): EventsFunctionsExtension;
-  RemoveEventsFunctionsExtension(name: string): void;
-  HasEventsBasedBehavior(type: string): boolean;
-  GetEventsBasedBehavior(type: string): EventsBasedBehavior;
-  HasEventsBasedObject(type: string): boolean;
-  GetEventsBasedObject(type: string): EventsBasedObject;
-  GetVariables(): VariablesContainer;
-  GetResourcesManager(): ResourcesManager;
-  ExposeResources(worker: ArbitraryResourceWorker): void;
-  STATIC_ValidateName(name: string): boolean;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
-  FREE_GetTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
-  FREE_GetTypeOfObject(layout: Layout, name: string, searchInGroups: boolean): string;
-  FREE_GetBehaviorsOfObject(layout: Layout, name: string, searchInGroups: boolean): VectorString;
-  InsertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  InsertObject(obj: gdObject, pos: number): gdObject;
-  HasObjectNamed(name: string): boolean;
-  GetObject(name: string): gdObject;
-  GetObjectAt(pos: number): gdObject;
-  GetObjectPosition(name: string): number;
-  RemoveObject(name: string): void;
-  SwapObjects(first: number, second: number): void;
-  MoveObject(oldIndex: number, newIndex: number): void;
-  MoveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
-  GetObjectsCount(): number;
-  GetObjectGroups(): ObjectGroupsContainer;
+  project(): void;
+  setName(name: string): void;
+  getName(): string;
+  getCategories(): VectorString;
+  setDescription(description: string): void;
+  getDescription(): string;
+  setVersion(authorName: string): void;
+  getVersion(): string;
+  setAuthor(authorName: string): void;
+  getAuthor(): string;
+  getAuthorIds(): VectorString;
+  getAuthorUsernames(): VectorString;
+  isPlayableWithKeyboard(): boolean;
+  setPlayableWithKeyboard(playable: boolean): void;
+  isPlayableWithGamepad(): boolean;
+  setPlayableWithGamepad(playable: boolean): void;
+  isPlayableWithMobile(): boolean;
+  setPlayableWithMobile(playable: boolean): void;
+  setPackageName(packageName: string): void;
+  getPackageName(): string;
+  setTemplateSlug(templateSlug: string): void;
+  getTemplateSlug(): string;
+  setOrientation(orientation: string): void;
+  getOrientation(): string;
+  setProjectUuid(projectUuid: string): void;
+  getProjectUuid(): string;
+  resetProjectUuid(): void;
+  setProjectFile(file: string): void;
+  getProjectFile(): string;
+  setGameResolutionSize(width: number, height: number): void;
+  getGameResolutionWidth(): number;
+  getGameResolutionHeight(): number;
+  getAdaptGameResolutionAtRuntime(): boolean;
+  setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime: boolean): void;
+  setScaleMode(scaleMode: string): void;
+  getScaleMode(): string;
+  setPixelsRounding(pixelsRounding: boolean): void;
+  getPixelsRounding(): boolean;
+  setSizeOnStartupMode(orientation: string): void;
+  getSizeOnStartupMode(): string;
+  setAntialiasingMode(antialiasingMode: string): void;
+  getAntialiasingMode(): string;
+  setAntialisingEnabledOnMobile(pixelsRounding: boolean): void;
+  isAntialisingEnabledOnMobile(): boolean;
+  getMaximumFPS(): number;
+  setMaximumFPS(fps: number): void;
+  getMinimumFPS(): number;
+  setMinimumFPS(fps: number): void;
+  setFolderProject(enable: boolean): void;
+  isFolderProject(): boolean;
+  setUseDeprecatedZeroAsDefaultZOrder(enable: boolean): void;
+  getUseDeprecatedZeroAsDefaultZOrder(): boolean;
+  setLastCompilationDirectory(path: string): void;
+  getLastCompilationDirectory(): string;
+  getExtensionProperties(): ExtensionProperties;
+  addPlatform(platform: Platform): void;
+  getCurrentPlatform(): Platform;
+  getPlatformSpecificAssets(): PlatformSpecificAssets;
+  getLoadingScreen(): LoadingScreen;
+  getWatermark(): Watermark;
+  hasLayoutNamed(name: string): boolean;
+  getLayout(name: string): Layout;
+  getLayoutAt(index: number): Layout;
+  moveLayout(oldIndex: number, newIndex: number): void;
+  swapLayouts(first: number, second: number): void;
+  getLayoutsCount(): number;
+  insertNewLayout(name: string, position: number): Layout;
+  removeLayout(name: string): void;
+  setFirstLayout(name: string): void;
+  getFirstLayout(): string;
+  hasExternalEventsNamed(name: string): boolean;
+  getExternalEvents(name: string): ExternalEvents;
+  getExternalEventsAt(index: number): ExternalEvents;
+  moveExternalEvents(oldIndex: number, newIndex: number): void;
+  swapExternalEvents(first: number, second: number): void;
+  getExternalEventsCount(): number;
+  insertNewExternalEvents(name: string, position: number): ExternalEvents;
+  removeExternalEvents(name: string): void;
+  hasExternalLayoutNamed(name: string): boolean;
+  getExternalLayout(name: string): ExternalLayout;
+  getExternalLayoutAt(index: number): ExternalLayout;
+  moveExternalLayout(oldIndex: number, newIndex: number): void;
+  swapExternalLayouts(first: number, second: number): void;
+  getExternalLayoutsCount(): number;
+  insertNewExternalLayout(name: string, position: number): ExternalLayout;
+  removeExternalLayout(name: string): void;
+  hasEventsFunctionsExtensionNamed(name: string): boolean;
+  getEventsFunctionsExtension(name: string): EventsFunctionsExtension;
+  getEventsFunctionsExtensionAt(index: number): EventsFunctionsExtension;
+  moveEventsFunctionsExtension(oldIndex: number, newIndex: number): void;
+  swapEventsFunctionsExtensions(first: number, second: number): void;
+  getEventsFunctionsExtensionsCount(): number;
+  insertNewEventsFunctionsExtension(name: string, position: number): EventsFunctionsExtension;
+  insertEventsFunctionsExtension(eventsFunctionsExtension: EventsFunctionsExtension, position: number): EventsFunctionsExtension;
+  removeEventsFunctionsExtension(name: string): void;
+  hasEventsBasedBehavior(type: string): boolean;
+  getEventsBasedBehavior(type: string): EventsBasedBehavior;
+  hasEventsBasedObject(type: string): boolean;
+  getEventsBasedObject(type: string): EventsBasedObject;
+  getVariables(): VariablesContainer;
+  getResourcesManager(): ResourcesManager;
+  exposeResources(worker: ArbitraryResourceWorker): void;
+  static validateName(name: string): boolean;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
+  fREE_GetTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
+  fREE_GetTypeOfObject(layout: Layout, name: string, searchInGroups: boolean): string;
+  fREE_GetBehaviorsOfObject(layout: Layout, name: string, searchInGroups: boolean): VectorString;
+  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertObject(obj: gdObject, pos: number): gdObject;
+  hasObjectNamed(name: string): boolean;
+  getObject(name: string): gdObject;
+  getObjectAt(pos: number): gdObject;
+  getObjectPosition(name: string): number;
+  removeObject(name: string): void;
+  swapObjects(first: number, second: number): void;
+  moveObject(oldIndex: number, newIndex: number): void;
+  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  getObjectsCount(): number;
+  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
-  GetValue(extension: string, property: string): string;
-  SetValue(extension: string, property: string, newValue: string): void;
-  HasProperty(extension: string, property: string): boolean;
-  GetAllExtensionProperties(extension: string, project: Project): MapStringPropertyDescriptor;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  getValue(extension: string, property: string): string;
+  setValue(extension: string, property: string, newValue: string): void;
+  hasProperty(extension: string, property: string): boolean;
+  getAllExtensionProperties(extension: string, project: Project): MapStringPropertyDescriptor;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class Behavior extends EmscriptenObject {
-  constructor(): void;
-  Clone(): Behavior;
-  SetName(name: string): void;
-  GetName(): string;
-  GetTypeName(): string;
-  GetProperties(): MapStringPropertyDescriptor;
-  UpdateProperty(name: string, value: string): boolean;
-  InitializeContent(): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  behavior(): void;
+  clone(): Behavior;
+  setName(name: string): void;
+  getName(): string;
+  getTypeName(): string;
+  getProperties(): MapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
+  initializeContent(): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class BehaviorJsImplementation extends EmscriptenObject {
-  constructor(): void;
-  GetProperties(behaviorContent: SerializerElement): MapStringPropertyDescriptor;
-  UpdateProperty(behaviorContent: SerializerElement, name: string, value: string): boolean;
-  InitializeContent(behaviorContent: SerializerElement): void;
+  behaviorJsImplementation(): void;
+  getProperties(behaviorContent: SerializerElement): MapStringPropertyDescriptor;
+  updateProperty(behaviorContent: SerializerElement, name: string, value: string): boolean;
+  initializeContent(behaviorContent: SerializerElement): void;
 }
 
 export class BehaviorsSharedData extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  GetTypeName(): string;
-  GetProperties(): MapStringPropertyDescriptor;
-  UpdateProperty(name: string, value: string): boolean;
-  InitializeContent(): void;
+  behaviorsSharedData(): void;
+  setName(name: string): void;
+  getName(): string;
+  getTypeName(): string;
+  getProperties(): MapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
+  initializeContent(): void;
 }
 
 export class BehaviorSharedDataJsImplementation extends EmscriptenObject {
-  constructor(): void;
-  GetProperties(behaviorSharedDataContent: SerializerElement): MapStringPropertyDescriptor;
-  UpdateProperty(behaviorSharedDataContent: SerializerElement, name: string, value: string): boolean;
-  InitializeContent(behaviorSharedDataContent: SerializerElement): void;
+  behaviorSharedDataJsImplementation(): void;
+  getProperties(behaviorSharedDataContent: SerializerElement): MapStringPropertyDescriptor;
+  updateProperty(behaviorSharedDataContent: SerializerElement, name: string, value: string): boolean;
+  initializeContent(behaviorSharedDataContent: SerializerElement): void;
 }
 
 export class ObjectConfiguration extends EmscriptenObject {
-  constructor(): void;
-  Clone(): UniquePtrObjectConfiguration;
-  GetType(): string;
-  GetProperties(): MapStringPropertyDescriptor;
-  UpdateProperty(name: string, value: string): boolean;
-  GetInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
-  UpdateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
-  ExposeResources(worker: ArbitraryResourceWorker): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  objectConfiguration(): void;
+  clone(): UniquePtrObjectConfiguration;
+  getType(): string;
+  getProperties(): MapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
+  getInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
+  exposeResources(worker: ArbitraryResourceWorker): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class UniquePtrObjectConfiguration extends EmscriptenObject {
@@ -530,27 +530,27 @@ export class UniquePtrObjectConfiguration extends EmscriptenObject {
 
 export class gdObject extends EmscriptenObject {
   constructor(name: string, type: string, configuration: ObjectConfiguration): void;
-  Clone(): UniquePtrObject;
-  SetName(name: string): void;
-  GetName(): string;
-  SetAssetStoreId(assetStoreId: string): void;
-  GetAssetStoreId(): string;
-  SetType(type: string): void;
-  GetType(): string;
-  SetTags(tags: string): void;
-  GetTags(): string;
-  Is3DObject(): boolean;
-  GetConfiguration(): ObjectConfiguration;
-  GetVariables(): VariablesContainer;
-  GetEffects(): EffectsContainer;
-  GetAllBehaviorNames(): VectorString;
-  HasBehaviorNamed(name: string): boolean;
-  AddNewBehavior(project: Project, type: string, name: string): Behavior;
-  GetBehavior(name: string): Behavior;
-  RemoveBehavior(name: string): void;
-  RenameBehavior(oldName: string, name: string): boolean;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  clone(): UniquePtrObject;
+  setName(name: string): void;
+  getName(): string;
+  setAssetStoreId(assetStoreId: string): void;
+  getAssetStoreId(): string;
+  setType(type: string): void;
+  getType(): string;
+  setTags(tags: string): void;
+  getTags(): string;
+  is3DObject(): boolean;
+  getConfiguration(): ObjectConfiguration;
+  getVariables(): VariablesContainer;
+  getEffects(): EffectsContainer;
+  getAllBehaviorNames(): VectorString;
+  hasBehaviorNamed(name: string): boolean;
+  addNewBehavior(project: Project, type: string, name: string): Behavior;
+  getBehavior(name: string): Behavior;
+  removeBehavior(name: string): void;
+  renameBehavior(oldName: string, name: string): boolean;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class UniquePtrObject extends EmscriptenObject {
@@ -559,445 +559,445 @@ export class UniquePtrObject extends EmscriptenObject {
 }
 
 export class ObjectJsImplementation extends EmscriptenObject {
-  constructor(): void;
-  Clone(): UniquePtrObjectConfiguration;
-  GetProperties(): MapStringPropertyDescriptor;
-  UpdateProperty(name: string, value: string): boolean;
-  GetInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
-  UpdateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
-  GetRawJSONContent(): string;
-  SetRawJSONContent(newContent: string): ObjectJsImplementation;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  objectJsImplementation(): void;
+  clone(): UniquePtrObjectConfiguration;
+  getProperties(): MapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
+  getInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
+  getRawJSONContent(): string;
+  setRawJSONContent(newContent: string): ObjectJsImplementation;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class CustomObjectConfiguration extends EmscriptenObject {
-  Clone(): UniquePtrObjectConfiguration;
-  GetChildObjectConfiguration(objectName: string): ObjectConfiguration;
-  GetProperties(): MapStringPropertyDescriptor;
-  UpdateProperty(name: string, value: string): boolean;
-  GetInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
-  UpdateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
+  clone(): UniquePtrObjectConfiguration;
+  getChildObjectConfiguration(objectName: string): ObjectConfiguration;
+  getProperties(): MapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
+  getInitialInstanceProperties(instance: InitialInstance, project: Project, scene: Layout): MapStringPropertyDescriptor;
+  updateInitialInstanceProperty(instance: InitialInstance, name: string, value: string, project: Project, scene: Layout): boolean;
 }
 
 export class Layout extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  SetBackgroundColor(r: number, g: number, b: number): void;
-  GetBackgroundColorRed(): number;
-  GetBackgroundColorGreen(): number;
-  GetBackgroundColorBlue(): number;
-  SetWindowDefaultTitle(name: string): void;
-  GetWindowDefaultTitle(): string;
-  GetInitialInstances(): InitialInstancesContainer;
-  GetVariables(): VariablesContainer;
-  GetEvents(): EventsList;
-  UpdateBehaviorsSharedData(project: Project): void;
-  GetAllBehaviorSharedDataNames(): VectorString;
-  HasBehaviorSharedData(behaviorName: string): boolean;
-  GetBehaviorSharedData(behaviorName: string): BehaviorsSharedData;
-  InsertNewLayer(name: string, position: number): void;
-  InsertLayer(layer: Layer, position: number): void;
-  GetLayer(name: string): Layer;
-  GetLayerAt(pos: number): Layer;
-  HasLayerNamed(name: string): boolean;
-  RemoveLayer(name: string): void;
-  GetLayersCount(): number;
-  SwapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
-  MoveLayer(oldIndex: number, newIndex: number): void;
-  SerializeLayersTo(element: SerializerElement): void;
-  UnserializeLayersFrom(element: SerializerElement): void;
-  GetAssociatedEditorSettings(): EditorSettings;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
-  SetStopSoundsOnStartup(enable: boolean): void;
-  StopSoundsOnStartup(): boolean;
-  InsertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  InsertObject(obj: gdObject, pos: number): gdObject;
-  HasObjectNamed(name: string): boolean;
-  GetObject(name: string): gdObject;
-  GetObjectAt(pos: number): gdObject;
-  GetObjectPosition(name: string): number;
-  RemoveObject(name: string): void;
-  SwapObjects(first: number, second: number): void;
-  MoveObject(oldIndex: number, newIndex: number): void;
-  MoveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
-  GetObjectsCount(): number;
-  GetObjectGroups(): ObjectGroupsContainer;
+  layout(): void;
+  setName(name: string): void;
+  getName(): string;
+  setBackgroundColor(r: number, g: number, b: number): void;
+  getBackgroundColorRed(): number;
+  getBackgroundColorGreen(): number;
+  getBackgroundColorBlue(): number;
+  setWindowDefaultTitle(name: string): void;
+  getWindowDefaultTitle(): string;
+  getInitialInstances(): InitialInstancesContainer;
+  getVariables(): VariablesContainer;
+  getEvents(): EventsList;
+  updateBehaviorsSharedData(project: Project): void;
+  getAllBehaviorSharedDataNames(): VectorString;
+  hasBehaviorSharedData(behaviorName: string): boolean;
+  getBehaviorSharedData(behaviorName: string): BehaviorsSharedData;
+  insertNewLayer(name: string, position: number): void;
+  insertLayer(layer: Layer, position: number): void;
+  getLayer(name: string): Layer;
+  getLayerAt(pos: number): Layer;
+  hasLayerNamed(name: string): boolean;
+  removeLayer(name: string): void;
+  getLayersCount(): number;
+  swapLayers(firstLayerIndex: number, secondLayerIndex: number): void;
+  moveLayer(oldIndex: number, newIndex: number): void;
+  serializeLayersTo(element: SerializerElement): void;
+  unserializeLayersFrom(element: SerializerElement): void;
+  getAssociatedEditorSettings(): EditorSettings;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
+  setStopSoundsOnStartup(enable: boolean): void;
+  stopSoundsOnStartup(): boolean;
+  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertObject(obj: gdObject, pos: number): gdObject;
+  hasObjectNamed(name: string): boolean;
+  getObject(name: string): gdObject;
+  getObjectAt(pos: number): gdObject;
+  getObjectPosition(name: string): number;
+  removeObject(name: string): void;
+  swapObjects(first: number, second: number): void;
+  moveObject(oldIndex: number, newIndex: number): void;
+  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  getObjectsCount(): number;
+  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class ExternalEvents extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  GetAssociatedLayout(): string;
-  SetAssociatedLayout(name: string): void;
-  GetEvents(): EventsList;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  externalEvents(): void;
+  setName(name: string): void;
+  getName(): string;
+  getAssociatedLayout(): string;
+  setAssociatedLayout(name: string): void;
+  getEvents(): EventsList;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class ExternalLayout extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  SetAssociatedLayout(name: string): void;
-  GetAssociatedLayout(): string;
-  GetInitialInstances(): InitialInstancesContainer;
-  GetAssociatedEditorSettings(): EditorSettings;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  externalLayout(): void;
+  setName(name: string): void;
+  getName(): string;
+  setAssociatedLayout(name: string): void;
+  getAssociatedLayout(): string;
+  getInitialInstances(): InitialInstancesContainer;
+  getAssociatedEditorSettings(): EditorSettings;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class Effect extends EmscriptenObject {
-  constructor(): void;
-  SetName(name_: string): void;
-  GetName(): string;
-  SetEffectType(effectType_: string): void;
-  GetEffectType(): string;
-  SetDoubleParameter(name: string, value: number): void;
-  GetDoubleParameter(name: string): number;
-  SetStringParameter(name: string, value: string): void;
-  GetStringParameter(name: string): string;
-  SetBooleanParameter(name: string, value: boolean): void;
-  GetBooleanParameter(name: string): boolean;
-  GetAllDoubleParameters(): MapStringDouble;
-  GetAllStringParameters(): MapStringString;
-  GetAllBooleanParameters(): MapStringBoolean;
-  ClearParameters(): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  effect(): void;
+  setName(name_: string): void;
+  getName(): string;
+  setEffectType(effectType_: string): void;
+  getEffectType(): string;
+  setDoubleParameter(name: string, value: number): void;
+  getDoubleParameter(name: string): number;
+  setStringParameter(name: string, value: string): void;
+  getStringParameter(name: string): string;
+  setBooleanParameter(name: string, value: boolean): void;
+  getBooleanParameter(name: string): boolean;
+  getAllDoubleParameters(): MapStringDouble;
+  getAllStringParameters(): MapStringString;
+  getAllBooleanParameters(): MapStringBoolean;
+  clearParameters(): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class EffectsContainer extends EmscriptenObject {
-  constructor(): void;
-  HasEffectNamed(name: string): boolean;
-  GetEffect(name: string): Effect;
-  GetEffectAt(index: number): Effect;
-  GetEffectPosition(name: string): number;
-  GetEffectsCount(): number;
-  InsertNewEffect(name: string, position: number): Effect;
-  InsertEffect(theEffect: Effect, position: number): void;
-  RemoveEffect(name: string): void;
-  SwapEffects(firstEffectIndex: number, secondEffectIndex: number): void;
-  MoveEffect(oldIndex: number, newIndex: number): void;
-  Clear(): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  effectsContainer(): void;
+  hasEffectNamed(name: string): boolean;
+  getEffect(name: string): Effect;
+  getEffectAt(index: number): Effect;
+  getEffectPosition(name: string): number;
+  getEffectsCount(): number;
+  insertNewEffect(name: string, position: number): Effect;
+  insertEffect(theEffect: Effect, position: number): void;
+  removeEffect(name: string): void;
+  swapEffects(firstEffectIndex: number, secondEffectIndex: number): void;
+  moveEffect(oldIndex: number, newIndex: number): void;
+  clear(): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class Layer extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  SetRenderingType(renderingType: string): void;
-  GetRenderingType(): string;
-  SetVisibility(visible: boolean): void;
-  GetVisibility(): boolean;
-  SetLocked(isLocked: boolean): void;
-  IsLocked(): boolean;
-  SetLightingLayer(lightingLayer: boolean): void;
-  IsLightingLayer(): boolean;
-  SetFollowBaseLayerCamera(followBaseLayerCamera: boolean): void;
-  IsFollowingBaseLayerCamera(): boolean;
-  GetCamera3DNearPlaneDistance(): number;
-  SetCamera3DNearPlaneDistance(distance: number): void;
-  GetCamera3DFarPlaneDistance(): number;
-  SetCamera3DFarPlaneDistance(distance: number): void;
-  GetCamera3DFieldOfView(): number;
-  SetCamera3DFieldOfView(angle: number): void;
-  SetAmbientLightColor(r: number, g: number, b: number): void;
-  GetAmbientLightColorRed(): number;
-  GetAmbientLightColorGreen(): number;
-  GetAmbientLightColorBlue(): number;
-  GetEffects(): EffectsContainer;
-  GetCameraCount(): number;
-  SetCameraCount(cameraCount: number): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  layer(): void;
+  setName(name: string): void;
+  getName(): string;
+  setRenderingType(renderingType: string): void;
+  getRenderingType(): string;
+  setVisibility(visible: boolean): void;
+  getVisibility(): boolean;
+  setLocked(isLocked: boolean): void;
+  isLocked(): boolean;
+  setLightingLayer(lightingLayer: boolean): void;
+  isLightingLayer(): boolean;
+  setFollowBaseLayerCamera(followBaseLayerCamera: boolean): void;
+  isFollowingBaseLayerCamera(): boolean;
+  getCamera3DNearPlaneDistance(): number;
+  setCamera3DNearPlaneDistance(distance: number): void;
+  getCamera3DFarPlaneDistance(): number;
+  setCamera3DFarPlaneDistance(distance: number): void;
+  getCamera3DFieldOfView(): number;
+  setCamera3DFieldOfView(angle: number): void;
+  setAmbientLightColor(r: number, g: number, b: number): void;
+  getAmbientLightColorRed(): number;
+  getAmbientLightColorGreen(): number;
+  getAmbientLightColorBlue(): number;
+  getEffects(): EffectsContainer;
+  getCameraCount(): number;
+  setCameraCount(cameraCount: number): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class PropertyDescriptor extends EmscriptenObject {
-  constructor(propValue: string): void;
-  SetValue(value: string): PropertyDescriptor;
-  GetValue(): string;
-  SetType(type: string): PropertyDescriptor;
-  GetType(): string;
-  SetLabel(label: string): PropertyDescriptor;
-  GetLabel(): string;
-  SetDescription(label: string): PropertyDescriptor;
-  GetDescription(): string;
-  SetGroup(label: string): PropertyDescriptor;
-  GetGroup(): string;
-  AddExtraInfo(type: string): PropertyDescriptor;
-  SetExtraInfo(info: VectorString): PropertyDescriptor;
-  GetExtraInfo(): VectorString;
-  SetHidden(enable: boolean): PropertyDescriptor;
-  GetMeasurementUnit(): MeasurementUnit;
-  SetMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
-  IsHidden(): boolean;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
-  SerializeValuesTo(element: SerializerElement): void;
-  UnserializeValuesFrom(element: SerializerElement): void;
+  propertyDescriptor(propValue: string): void;
+  setValue(value: string): PropertyDescriptor;
+  getValue(): string;
+  setType(type: string): PropertyDescriptor;
+  getType(): string;
+  setLabel(label: string): PropertyDescriptor;
+  getLabel(): string;
+  setDescription(label: string): PropertyDescriptor;
+  getDescription(): string;
+  setGroup(label: string): PropertyDescriptor;
+  getGroup(): string;
+  addExtraInfo(type: string): PropertyDescriptor;
+  setExtraInfo(info: VectorString): PropertyDescriptor;
+  getExtraInfo(): VectorString;
+  setHidden(enable: boolean): PropertyDescriptor;
+  getMeasurementUnit(): MeasurementUnit;
+  setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
+  isHidden(): boolean;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
+  serializeValuesTo(element: SerializerElement): void;
+  unserializeValuesFrom(element: SerializerElement): void;
 }
 
 export class MeasurementUnit extends EmscriptenObject {
-  constructor(name: string, label: string, description: string): void;
-  GetName(): string;
-  GetLabel(): string;
-  GetDescription(): string;
-  GetElementsWithWords(): string;
-  GetElementsCount(): number;
-  GetElementPower(elementIndex: number): number;
-  GetElementBaseUnit(elementIndex: number): MeasurementBaseUnit;
-  IsUndefined(): boolean;
-  STATIC_ApplyTranslation(): void;
-  STATIC_GetUndefined(): MeasurementUnit;
-  STATIC_GetDimensionless(): MeasurementUnit;
-  STATIC_GetDegreeAngle(): MeasurementUnit;
-  STATIC_GetSecond(): MeasurementUnit;
-  STATIC_GetPixel(): MeasurementUnit;
-  STATIC_GetPixelSpeed(): MeasurementUnit;
-  STATIC_GetPixelAcceleration(): MeasurementUnit;
-  STATIC_GetNewton(): MeasurementUnit;
-  STATIC_GetDefaultMeasurementUnitsCount(): number;
-  STATIC_GetDefaultMeasurementUnitAtIndex(index: number): MeasurementUnit;
-  STATIC_GetDefaultMeasurementUnitByName(name: string): MeasurementUnit;
-  STATIC_HasDefaultMeasurementUnitNamed(name: string): boolean;
+  measurementUnit(name: string, label: string, description: string): void;
+  getName(): string;
+  getLabel(): string;
+  getDescription(): string;
+  getElementsWithWords(): string;
+  getElementsCount(): number;
+  getElementPower(elementIndex: number): number;
+  getElementBaseUnit(elementIndex: number): MeasurementBaseUnit;
+  isUndefined(): boolean;
+  static applyTranslation(): void;
+  static getUndefined(): MeasurementUnit;
+  static getDimensionless(): MeasurementUnit;
+  static getDegreeAngle(): MeasurementUnit;
+  static getSecond(): MeasurementUnit;
+  static getPixel(): MeasurementUnit;
+  static getPixelSpeed(): MeasurementUnit;
+  static getPixelAcceleration(): MeasurementUnit;
+  static getNewton(): MeasurementUnit;
+  static getDefaultMeasurementUnitsCount(): number;
+  static getDefaultMeasurementUnitAtIndex(index: number): MeasurementUnit;
+  static getDefaultMeasurementUnitByName(name: string): MeasurementUnit;
+  static hasDefaultMeasurementUnitNamed(name: string): boolean;
 }
 
 export class MeasurementBaseUnit extends EmscriptenObject {
-  constructor(name: string, symbol: string, quantity: string): void;
-  GetName(): string;
-  GetSymbol(): string;
-  GetQuantity(): string;
+  measurementBaseUnit(name: string, symbol: string, quantity: string): void;
+  getName(): string;
+  getSymbol(): string;
+  getQuantity(): string;
 }
 
 export class NamedPropertyDescriptor extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): PropertyDescriptor;
-  GetName(): string;
+  namedPropertyDescriptor(): void;
+  setName(name: string): PropertyDescriptor;
+  getName(): string;
 }
 
 export class MapStringPropertyDescriptor extends EmscriptenObject {
-  constructor(): void;
-  MAP_getOrCreate(name: string): PropertyDescriptor;
-  MAP_get(name: string): PropertyDescriptor;
-  MAP_set(name: string, prop: PropertyDescriptor): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  mapStringPropertyDescriptor(): void;
+  getOrCreate(name: string): PropertyDescriptor;
+  get(name: string): PropertyDescriptor;
+  set(name: string, prop: PropertyDescriptor): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class MapStringSerializerValue extends EmscriptenObject {
-  constructor(): void;
-  MAP_getOrCreate(name: string): SerializerValue;
-  MAP_get(name: string): SerializerValue;
-  MAP_set(name: string, prop: SerializerValue): void;
-  MAP_has(name: string): boolean;
-  MAP_keys(): VectorString;
+  mapStringSerializerValue(): void;
+  getOrCreate(name: string): SerializerValue;
+  get(name: string): SerializerValue;
+  set(name: string, prop: SerializerValue): void;
+  has(name: string): boolean;
+  keys(): VectorString;
 }
 
 export class VectorPairStringSharedPtrSerializerElement extends EmscriptenObject {
   size(): number;
-  WRAPPED_GetString(id: number): string;
-  WRAPPED_GetSharedPtrSerializerElement(id: number): SharedPtrSerializerElement;
+  getString(id: number): string;
+  getSharedPtrSerializerElement(id: number): SharedPtrSerializerElement;
 }
 
 export class Resource extends EmscriptenObject {
-  constructor(): void;
-  Clone(): Resource;
-  SetName(name: string): void;
-  GetName(): string;
-  SetKind(kind: string): void;
-  GetKind(): string;
-  IsUserAdded(): boolean;
-  SetUserAdded(yes: boolean): void;
-  UseFile(): boolean;
-  SetFile(file: string): void;
-  GetFile(): string;
-  SetMetadata(metadata: string): void;
-  GetMetadata(): string;
-  SetOrigin(originName: string, originIdentifier: string): void;
-  GetOriginName(): string;
-  GetOriginIdentifier(): string;
-  GetProperties(): MapStringPropertyDescriptor;
-  UpdateProperty(name: string, value: string): boolean;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  resource(): void;
+  clone(): Resource;
+  setName(name: string): void;
+  getName(): string;
+  setKind(kind: string): void;
+  getKind(): string;
+  isUserAdded(): boolean;
+  setUserAdded(yes: boolean): void;
+  useFile(): boolean;
+  setFile(file: string): void;
+  getFile(): string;
+  setMetadata(metadata: string): void;
+  getMetadata(): string;
+  setOrigin(originName: string, originIdentifier: string): void;
+  getOriginName(): string;
+  getOriginIdentifier(): string;
+  getProperties(): MapStringPropertyDescriptor;
+  updateProperty(name: string, value: string): boolean;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class ResourcesManager extends EmscriptenObject {
-  constructor(): void;
-  GetAllResourceNames(): VectorString;
-  FindFilesNotInResources(filesToCheck: VectorString): VectorString;
-  HasResource(name: string): boolean;
-  GetResource(name: string): Resource;
-  GetResourceNameWithOrigin(originName: string, originIdentifier: string): string;
-  GetResourceNameWithFile(file: string): string;
-  AddResource(res: Resource): boolean;
-  RemoveResource(name: string): void;
-  RenameResource(oldName: string, name: string): void;
-  GetResourcePosition(name: string): number;
-  MoveResourceUpInList(oldName: string): boolean;
-  MoveResourceDownInList(oldName: string): boolean;
-  MoveResource(oldIndex: number, newIndex: number): void;
+  resourcesManager(): void;
+  getAllResourceNames(): VectorString;
+  findFilesNotInResources(filesToCheck: VectorString): VectorString;
+  hasResource(name: string): boolean;
+  getResource(name: string): Resource;
+  getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
+  getResourceNameWithFile(file: string): string;
+  addResource(res: Resource): boolean;
+  removeResource(name: string): void;
+  renameResource(oldName: string, name: string): void;
+  getResourcePosition(name: string): number;
+  moveResourceUpInList(oldName: string): boolean;
+  moveResourceDownInList(oldName: string): boolean;
+  moveResource(oldIndex: number, newIndex: number): void;
 }
 
 export class ImageResource extends EmscriptenObject {
-  constructor(): void;
-  IsSmooth(): boolean;
-  SetSmooth(enable: boolean): void;
+  imageResource(): void;
+  isSmooth(): boolean;
+  setSmooth(enable: boolean): void;
 }
 
 export class AudioResource extends EmscriptenObject {
-  constructor(): void;
+  audioResource(): void;
 }
 
 export class FontResource extends EmscriptenObject {
-  constructor(): void;
+  fontResource(): void;
 }
 
 export class BitmapFontResource extends EmscriptenObject {
-  constructor(): void;
+  bitmapFontResource(): void;
 }
 
 export class VideoResource extends EmscriptenObject {
-  constructor(): void;
+  videoResource(): void;
 }
 
 export class JsonResource extends EmscriptenObject {
-  constructor(): void;
+  jsonResource(): void;
 }
 
 export class TilemapResource extends EmscriptenObject {
-  constructor(): void;
+  tilemapResource(): void;
 }
 
 export class TilesetResource extends EmscriptenObject {
-  constructor(): void;
+  tilesetResource(): void;
 }
 
 export class InitialInstance extends EmscriptenObject {
-  constructor(): void;
-  SetObjectName(name: string): void;
-  GetObjectName(): string;
-  GetX(): number;
-  SetX(x: number): void;
-  GetY(): number;
-  SetY(y: number): void;
-  GetZ(): number;
-  SetZ(z: number): void;
-  GetAngle(): number;
-  SetAngle(angle: number): void;
-  GetRotationX(): number;
-  SetRotationX(rotationX: number): void;
-  GetRotationY(): number;
-  SetRotationY(rotationY: number): void;
-  IsLocked(): boolean;
-  SetLocked(lock: boolean): void;
-  IsSealed(): boolean;
-  SetSealed(seal: boolean): void;
-  GetZOrder(): number;
-  SetZOrder(zOrder: number): void;
-  GetLayer(): string;
-  SetLayer(layer: string): void;
-  SetHasCustomSize(enable: boolean): void;
-  HasCustomSize(): boolean;
-  SetHasCustomDepth(enable: boolean): void;
-  HasCustomDepth(): boolean;
-  SetCustomWidth(width: number): void;
-  GetCustomWidth(): number;
-  SetCustomHeight(height: number): void;
-  GetCustomHeight(): number;
-  SetCustomDepth(depth: number): void;
-  GetCustomDepth(): number;
-  ResetPersistentUuid(): InitialInstance;
-  UpdateCustomProperty(name: string, value: string, project: Project, layout: Layout): void;
-  GetCustomProperties(project: Project, layout: Layout): MapStringPropertyDescriptor;
-  GetRawDoubleProperty(name: string): number;
-  GetRawStringProperty(name: string): string;
-  SetRawDoubleProperty(name: string, value: number): void;
-  SetRawStringProperty(name: string, value: string): void;
-  GetVariables(): VariablesContainer;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  initialInstance(): void;
+  setObjectName(name: string): void;
+  getObjectName(): string;
+  getX(): number;
+  setX(x: number): void;
+  getY(): number;
+  setY(y: number): void;
+  getZ(): number;
+  setZ(z: number): void;
+  getAngle(): number;
+  setAngle(angle: number): void;
+  getRotationX(): number;
+  setRotationX(rotationX: number): void;
+  getRotationY(): number;
+  setRotationY(rotationY: number): void;
+  isLocked(): boolean;
+  setLocked(lock: boolean): void;
+  isSealed(): boolean;
+  setSealed(seal: boolean): void;
+  getZOrder(): number;
+  setZOrder(zOrder: number): void;
+  getLayer(): string;
+  setLayer(layer: string): void;
+  setHasCustomSize(enable: boolean): void;
+  hasCustomSize(): boolean;
+  setHasCustomDepth(enable: boolean): void;
+  hasCustomDepth(): boolean;
+  setCustomWidth(width: number): void;
+  getCustomWidth(): number;
+  setCustomHeight(height: number): void;
+  getCustomHeight(): number;
+  setCustomDepth(depth: number): void;
+  getCustomDepth(): number;
+  resetPersistentUuid(): InitialInstance;
+  updateCustomProperty(name: string, value: string, project: Project, layout: Layout): void;
+  getCustomProperties(project: Project, layout: Layout): MapStringPropertyDescriptor;
+  getRawDoubleProperty(name: string): number;
+  getRawStringProperty(name: string): string;
+  setRawDoubleProperty(name: string, value: number): void;
+  setRawStringProperty(name: string, value: string): void;
+  getVariables(): VariablesContainer;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class InitialInstancesContainer extends EmscriptenObject {
-  constructor(): void;
-  Clone(): InitialInstancesContainer;
-  GetInstancesCount(): number;
-  IterateOverInstances(func: InitialInstanceFunctor): void;
-  IterateOverInstancesWithZOrdering(func: InitialInstanceFunctor, layer: string): void;
-  MoveInstancesToLayer(fromLayer: string, toLayer: string): void;
-  RemoveAllInstancesOnLayer(layer: string): void;
-  RemoveInitialInstancesOfObject(obj: string): void;
-  HasInstancesOfObject(objectName: string): boolean;
-  SomeInstancesAreOnLayer(layer: string): boolean;
-  RenameInstancesOfObject(oldName: string, newName: string): void;
-  RemoveInstance(inst: InitialInstance): void;
-  InsertNewInitialInstance(): InitialInstance;
-  InsertInitialInstance(inst: InitialInstance): InitialInstance;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  initialInstancesContainer(): void;
+  clone(): InitialInstancesContainer;
+  getInstancesCount(): number;
+  iterateOverInstances(func: InitialInstanceFunctor): void;
+  iterateOverInstancesWithZOrdering(func: InitialInstanceFunctor, layer: string): void;
+  moveInstancesToLayer(fromLayer: string, toLayer: string): void;
+  removeAllInstancesOnLayer(layer: string): void;
+  removeInitialInstancesOfObject(obj: string): void;
+  hasInstancesOfObject(objectName: string): boolean;
+  someInstancesAreOnLayer(layer: string): boolean;
+  renameInstancesOfObject(oldName: string, newName: string): void;
+  removeInstance(inst: InitialInstance): void;
+  insertNewInitialInstance(): InitialInstance;
+  insertInitialInstance(inst: InitialInstance): InitialInstance;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class HighestZOrderFinder extends EmscriptenObject {
-  constructor(): void;
-  RestrictSearchToLayer(layer: string): void;
-  GetHighestZOrder(): number;
-  GetLowestZOrder(): number;
-  Reset(): void;
-  GetInstancesCount(): number;
+  highestZOrderFinder(): void;
+  restrictSearchToLayer(layer: string): void;
+  getHighestZOrder(): number;
+  getLowestZOrder(): number;
+  reset(): void;
+  getInstancesCount(): number;
 }
 
 export class InitialInstanceJSFunctor extends EmscriptenObject {
-  constructor(): void;
+  initialInstanceJSFunctor(): void;
   invoke(instance: InitialInstance): void;
 }
 
 export class SerializerValue extends EmscriptenObject {
-  GetBool(): boolean;
-  GetString(): string;
-  GetInt(): number;
-  GetDouble(): number;
-  GetRawString(): string;
-  IsBoolean(): boolean;
-  IsString(): boolean;
-  IsInt(): boolean;
-  IsDouble(): boolean;
+  getBool(): boolean;
+  getString(): string;
+  getInt(): number;
+  getDouble(): number;
+  getRawString(): string;
+  isBoolean(): boolean;
+  isString(): boolean;
+  isInt(): boolean;
+  isDouble(): boolean;
 }
 
 export class SerializerElement extends EmscriptenObject {
-  constructor(): void;
-  SetBoolValue(value: boolean): void;
-  SetStringValue(value: string): void;
-  SetIntValue(value: number): void;
-  SetDoubleValue(value: number): void;
-  GetValue(): SerializerValue;
-  GetBoolValue(): boolean;
-  GetStringValue(): string;
-  GetIntValue(): number;
-  GetDoubleValue(): number;
-  IsValueUndefined(): boolean;
-  SetBoolAttribute(name: string, value: boolean): SerializerElement;
-  SetStringAttribute(name: string, value: string): SerializerElement;
-  SetIntAttribute(name: string, value: number): SerializerElement;
-  SetDoubleAttribute(name: string, value: number): SerializerElement;
-  GetBoolAttribute(name: string): boolean;
-  GetStringAttribute(name: string): string;
-  GetIntAttribute(name: string): number;
-  GetDoubleAttribute(name: string): number;
-  ConsiderAsArray(): void;
-  ConsideredAsArray(): boolean;
-  AddChild(str: string): SerializerElement;
-  GetChild(str: string): SerializerElement;
-  WRAPPED_SetChild(str: string, element: SerializerElement): void;
-  HasChild(str: string): boolean;
-  GetAllChildren(): VectorPairStringSharedPtrSerializerElement;
-  GetAllAttributes(): MapStringSerializerValue;
+  serializerElement(): void;
+  setBoolValue(value: boolean): void;
+  setStringValue(value: string): void;
+  setIntValue(value: number): void;
+  setDoubleValue(value: number): void;
+  getValue(): SerializerValue;
+  getBoolValue(): boolean;
+  getStringValue(): string;
+  getIntValue(): number;
+  getDoubleValue(): number;
+  isValueUndefined(): boolean;
+  setBoolAttribute(name: string, value: boolean): SerializerElement;
+  setStringAttribute(name: string, value: string): SerializerElement;
+  setIntAttribute(name: string, value: number): SerializerElement;
+  setDoubleAttribute(name: string, value: number): SerializerElement;
+  getBoolAttribute(name: string): boolean;
+  getStringAttribute(name: string): string;
+  getIntAttribute(name: string): number;
+  getDoubleAttribute(name: string): number;
+  considerAsArray(): void;
+  consideredAsArray(): boolean;
+  addChild(str: string): SerializerElement;
+  getChild(str: string): SerializerElement;
+  setChild(str: string, element: SerializerElement): void;
+  hasChild(str: string): boolean;
+  getAllChildren(): VectorPairStringSharedPtrSerializerElement;
+  getAllAttributes(): MapStringSerializerValue;
 }
 
 export class SharedPtrSerializerElement extends EmscriptenObject {
@@ -1006,700 +1006,700 @@ export class SharedPtrSerializerElement extends EmscriptenObject {
 }
 
 export class Serializer extends EmscriptenObject {
-  STATIC_ToJSON(element: SerializerElement): string;
-  STATIC_FromJSON(json: string): SerializerElement;
+  static toJSON(element: SerializerElement): string;
+  static fromJSON(json: string): SerializerElement;
 }
 
 export class InstructionsList extends EmscriptenObject {
-  constructor(): void;
-  Insert(instr: Instruction, pos: number): Instruction;
-  InsertInstructions(list: InstructionsList, begin: number, end: number, pos: number): void;
+  instructionsList(): void;
+  insert(instr: Instruction, pos: number): Instruction;
+  insertInstructions(list: InstructionsList, begin: number, end: number, pos: number): void;
   size(): number;
-  WRAPPED_set(index: number, instr: Instruction): void;
-  Contains(instr: Instruction): boolean;
-  Get(index: number): Instruction;
-  Remove(instr: Instruction): void;
-  RemoveAt(index: number): void;
-  Clear(): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  set(index: number, instr: Instruction): void;
+  contains(instr: Instruction): boolean;
+  get(index: number): Instruction;
+  remove(instr: Instruction): void;
+  removeAt(index: number): void;
+  clear(): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class Instruction extends EmscriptenObject {
-  constructor(): void;
-  CLONE_Instruction(): Instruction;
-  SetType(type: string): void;
-  GetType(): string;
-  SetInverted(inverted: boolean): void;
-  IsInverted(): boolean;
-  SetAwaited(awaited: boolean): void;
-  IsAwaited(): boolean;
-  SetParameter(id: number, value: string): void;
-  GetParameter(id: number): Expression;
-  SetParametersCount(count: number): void;
-  GetParametersCount(): number;
-  GetSubInstructions(): InstructionsList;
+  instruction(): void;
+  cLONE_Instruction(): Instruction;
+  setType(type: string): void;
+  getType(): string;
+  setInverted(inverted: boolean): void;
+  isInverted(): boolean;
+  setAwaited(awaited: boolean): void;
+  isAwaited(): boolean;
+  setParameter(id: number, value: string): void;
+  getParameter(id: number): Expression;
+  setParametersCount(count: number): void;
+  getParametersCount(): number;
+  getSubInstructions(): InstructionsList;
 }
 
 export class Expression extends EmscriptenObject {
-  GetPlainString(): string;
-  GetRootNode(): ExpressionNode;
+  getPlainString(): string;
+  getRootNode(): ExpressionNode;
 }
 
 export class VectorPairStringTextFormatting extends EmscriptenObject {
   size(): number;
-  WRAPPED_GetString(id: number): string;
-  WRAPPED_GetTextFormatting(id: number): TextFormatting;
+  getString(id: number): string;
+  getTextFormatting(id: number): TextFormatting;
 }
 
 export class TextFormatting extends EmscriptenObject {
-  GetUserData(): number;
+  getUserData(): number;
 }
 
 export class InstructionSentenceFormatter extends EmscriptenObject {
-  STATIC_Get(): InstructionSentenceFormatter;
-  GetAsFormattedText(instr: Instruction, metadata: InstructionMetadata): VectorPairStringTextFormatting;
+  static get(): InstructionSentenceFormatter;
+  getAsFormattedText(instr: Instruction, metadata: InstructionMetadata): VectorPairStringTextFormatting;
 }
 
 export class ParameterOptions extends EmscriptenObject {
-  SetDescription(description: string): ParameterOptions;
-  SetTypeExtraInfo(typeExtraInfo: string): ParameterOptions;
-  STATIC_MakeNewOptions(): ParameterOptions;
+  setDescription(description: string): ParameterOptions;
+  setTypeExtraInfo(typeExtraInfo: string): ParameterOptions;
+  static makeNewOptions(): ParameterOptions;
 }
 
 export class AbstractFunctionMetadata extends EmscriptenObject {
-  AddParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): AbstractFunctionMetadata;
-  AddCodeOnlyParameter(type: string, supplementaryInformation: string): AbstractFunctionMetadata;
-  SetDefaultValue(defaultValue: string): AbstractFunctionMetadata;
-  SetParameterLongDescription(longDescription: string): AbstractFunctionMetadata;
-  SetParameterExtraInfo(extraInfo: string): AbstractFunctionMetadata;
-  SetHidden(): AbstractFunctionMetadata;
-  SetPrivate(): AbstractFunctionMetadata;
-  SetFunctionName(functionName: string): AbstractFunctionMetadata;
-  SetIncludeFile(includeFile: string): AbstractFunctionMetadata;
-  AddIncludeFile(includeFile: string): AbstractFunctionMetadata;
-  GetIncludeFiles(): VectorString;
+  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): AbstractFunctionMetadata;
+  addCodeOnlyParameter(type: string, supplementaryInformation: string): AbstractFunctionMetadata;
+  setDefaultValue(defaultValue: string): AbstractFunctionMetadata;
+  setParameterLongDescription(longDescription: string): AbstractFunctionMetadata;
+  setParameterExtraInfo(extraInfo: string): AbstractFunctionMetadata;
+  setHidden(): AbstractFunctionMetadata;
+  setPrivate(): AbstractFunctionMetadata;
+  setFunctionName(functionName: string): AbstractFunctionMetadata;
+  setIncludeFile(includeFile: string): AbstractFunctionMetadata;
+  addIncludeFile(includeFile: string): AbstractFunctionMetadata;
+  getIncludeFiles(): VectorString;
 }
 
 export class InstructionMetadata extends EmscriptenObject {
-  constructor(): void;
-  GetFullName(): string;
-  GetDescription(): string;
-  GetSentence(): string;
-  GetGroup(): string;
-  GetIconFilename(): string;
-  GetSmallIconFilename(): string;
-  GetHelpPath(): string;
-  CanHaveSubInstructions(): boolean;
-  GetParameter(index: number): ParameterMetadata;
-  GetParametersCount(): number;
-  GetParameters(): VectorParameterMetadata;
-  GetUsageComplexity(): number;
-  IsHidden(): boolean;
-  IsPrivate(): boolean;
-  IsAsync(): boolean;
-  IsOptionallyAsync(): boolean;
-  IsRelevantForLayoutEvents(): boolean;
-  IsRelevantForFunctionEvents(): boolean;
-  IsRelevantForAsynchronousFunctionEvents(): boolean;
-  IsRelevantForCustomObjectEvents(): boolean;
-  SetCanHaveSubInstructions(): InstructionMetadata;
-  SetHelpPath(helpPath: string): InstructionMetadata;
-  SetHidden(): InstructionMetadata;
-  SetPrivate(): InstructionMetadata;
-  SetRelevantForLayoutEventsOnly(): InstructionMetadata;
-  SetRelevantForFunctionEventsOnly(): InstructionMetadata;
-  SetRelevantForAsynchronousFunctionEventsOnly(): InstructionMetadata;
-  SetRelevantForCustomObjectEventsOnly(): InstructionMetadata;
-  AddParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): InstructionMetadata;
-  AddCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
-  SetDefaultValue(defaultValue: string): InstructionMetadata;
-  SetParameterLongDescription(longDescription: string): InstructionMetadata;
-  SetParameterExtraInfo(extraInfo: string): InstructionMetadata;
-  UseStandardOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
-  UseStandardRelationalOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
-  SetRequiresBaseObjectCapability(capability: string): InstructionMetadata;
-  GetRequiredBaseObjectCapability(): string;
-  MarkAsSimple(): InstructionMetadata;
-  MarkAsAdvanced(): InstructionMetadata;
-  MarkAsComplex(): InstructionMetadata;
-  GetCodeExtraInformation(): InstructionMetadata;
-  SetFunctionName(functionName_: string): InstructionMetadata;
-  SetAsyncFunctionName(functionName_: string): InstructionMetadata;
-  GetFunctionName(): string;
-  GetAsyncFunctionName(): string;
-  SetManipulatedType(type_: string): InstructionMetadata;
-  SetGetter(getter: string): InstructionMetadata;
-  SetMutators(mutators: MapStringString): InstructionMetadata;
-  SetIncludeFile(includeFile: string): InstructionMetadata;
-  AddIncludeFile(includeFile: string): InstructionMetadata;
-  GetIncludeFiles(): VectorString;
+  instructionMetadata(): void;
+  getFullName(): string;
+  getDescription(): string;
+  getSentence(): string;
+  getGroup(): string;
+  getIconFilename(): string;
+  getSmallIconFilename(): string;
+  getHelpPath(): string;
+  canHaveSubInstructions(): boolean;
+  getParameter(index: number): ParameterMetadata;
+  getParametersCount(): number;
+  getParameters(): VectorParameterMetadata;
+  getUsageComplexity(): number;
+  isHidden(): boolean;
+  isPrivate(): boolean;
+  isAsync(): boolean;
+  isOptionallyAsync(): boolean;
+  isRelevantForLayoutEvents(): boolean;
+  isRelevantForFunctionEvents(): boolean;
+  isRelevantForAsynchronousFunctionEvents(): boolean;
+  isRelevantForCustomObjectEvents(): boolean;
+  setCanHaveSubInstructions(): InstructionMetadata;
+  setHelpPath(helpPath: string): InstructionMetadata;
+  setHidden(): InstructionMetadata;
+  setPrivate(): InstructionMetadata;
+  setRelevantForLayoutEventsOnly(): InstructionMetadata;
+  setRelevantForFunctionEventsOnly(): InstructionMetadata;
+  setRelevantForAsynchronousFunctionEventsOnly(): InstructionMetadata;
+  setRelevantForCustomObjectEventsOnly(): InstructionMetadata;
+  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): InstructionMetadata;
+  addCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
+  setDefaultValue(defaultValue: string): InstructionMetadata;
+  setParameterLongDescription(longDescription: string): InstructionMetadata;
+  setParameterExtraInfo(extraInfo: string): InstructionMetadata;
+  useStandardOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
+  useStandardRelationalOperatorParameters(type: string, options: ParameterOptions): InstructionMetadata;
+  setRequiresBaseObjectCapability(capability: string): InstructionMetadata;
+  getRequiredBaseObjectCapability(): string;
+  markAsSimple(): InstructionMetadata;
+  markAsAdvanced(): InstructionMetadata;
+  markAsComplex(): InstructionMetadata;
+  getCodeExtraInformation(): InstructionMetadata;
+  setFunctionName(functionName_: string): InstructionMetadata;
+  setAsyncFunctionName(functionName_: string): InstructionMetadata;
+  getFunctionName(): string;
+  getAsyncFunctionName(): string;
+  setManipulatedType(type_: string): InstructionMetadata;
+  setGetter(getter: string): InstructionMetadata;
+  setMutators(mutators: MapStringString): InstructionMetadata;
+  setIncludeFile(includeFile: string): InstructionMetadata;
+  addIncludeFile(includeFile: string): InstructionMetadata;
+  getIncludeFiles(): VectorString;
 }
 
 export class ExpressionMetadata extends EmscriptenObject {
-  constructor(returnType: string, extensionNamespace: string, name: string, fullname: string, description: string, group: string, smallicon: string): void;
-  GetReturnType(): string;
-  GetFullName(): string;
-  GetDescription(): string;
-  GetGroup(): string;
-  GetSmallIconFilename(): string;
-  GetHelpPath(): string;
-  IsShown(): boolean;
-  IsPrivate(): boolean;
-  IsRelevantForLayoutEvents(): boolean;
-  IsRelevantForFunctionEvents(): boolean;
-  IsRelevantForAsynchronousFunctionEvents(): boolean;
-  IsRelevantForCustomObjectEvents(): boolean;
-  GetParameter(id: number): ParameterMetadata;
-  GetParametersCount(): number;
-  GetParameters(): VectorParameterMetadata;
-  SetHidden(): ExpressionMetadata;
-  SetPrivate(): ExpressionMetadata;
-  SetRelevantForLayoutEventsOnly(): ExpressionMetadata;
-  SetRelevantForFunctionEventsOnly(): ExpressionMetadata;
-  SetRelevantForAsynchronousFunctionEventsOnly(): ExpressionMetadata;
-  SetRelevantForCustomObjectEventsOnly(): ExpressionMetadata;
-  AddParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): ExpressionMetadata;
-  AddCodeOnlyParameter(type: string, supplementaryInformation: string): ExpressionMetadata;
-  SetDefaultValue(defaultValue: string): ExpressionMetadata;
-  SetParameterLongDescription(longDescription: string): ExpressionMetadata;
-  SetParameterExtraInfo(extraInfo: string): ExpressionMetadata;
-  SetRequiresBaseObjectCapability(capability: string): ExpressionMetadata;
-  GetRequiredBaseObjectCapability(): string;
-  GetCodeExtraInformation(): ExpressionMetadata;
-  SetFunctionName(functionName: string): ExpressionMetadata;
-  GetFunctionName(): string;
-  SetStatic(): ExpressionMetadata;
-  SetIncludeFile(includeFile: string): ExpressionMetadata;
-  AddIncludeFile(includeFile: string): ExpressionMetadata;
-  GetIncludeFiles(): VectorString;
+  expressionMetadata(returnType: string, extensionNamespace: string, name: string, fullname: string, description: string, group: string, smallicon: string): void;
+  getReturnType(): string;
+  getFullName(): string;
+  getDescription(): string;
+  getGroup(): string;
+  getSmallIconFilename(): string;
+  getHelpPath(): string;
+  isShown(): boolean;
+  isPrivate(): boolean;
+  isRelevantForLayoutEvents(): boolean;
+  isRelevantForFunctionEvents(): boolean;
+  isRelevantForAsynchronousFunctionEvents(): boolean;
+  isRelevantForCustomObjectEvents(): boolean;
+  getParameter(id: number): ParameterMetadata;
+  getParametersCount(): number;
+  getParameters(): VectorParameterMetadata;
+  setHidden(): ExpressionMetadata;
+  setPrivate(): ExpressionMetadata;
+  setRelevantForLayoutEventsOnly(): ExpressionMetadata;
+  setRelevantForFunctionEventsOnly(): ExpressionMetadata;
+  setRelevantForAsynchronousFunctionEventsOnly(): ExpressionMetadata;
+  setRelevantForCustomObjectEventsOnly(): ExpressionMetadata;
+  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): ExpressionMetadata;
+  addCodeOnlyParameter(type: string, supplementaryInformation: string): ExpressionMetadata;
+  setDefaultValue(defaultValue: string): ExpressionMetadata;
+  setParameterLongDescription(longDescription: string): ExpressionMetadata;
+  setParameterExtraInfo(extraInfo: string): ExpressionMetadata;
+  setRequiresBaseObjectCapability(capability: string): ExpressionMetadata;
+  getRequiredBaseObjectCapability(): string;
+  getCodeExtraInformation(): ExpressionMetadata;
+  setFunctionName(functionName: string): ExpressionMetadata;
+  getFunctionName(): string;
+  setStatic(): ExpressionMetadata;
+  setIncludeFile(includeFile: string): ExpressionMetadata;
+  addIncludeFile(includeFile: string): ExpressionMetadata;
+  getIncludeFiles(): VectorString;
 }
 
 export class MultipleInstructionMetadata extends EmscriptenObject {
-  AddParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): MultipleInstructionMetadata;
-  AddCodeOnlyParameter(type: string, supplementaryInformation: string): MultipleInstructionMetadata;
-  SetDefaultValue(defaultValue: string): MultipleInstructionMetadata;
-  SetParameterLongDescription(longDescription: string): MultipleInstructionMetadata;
-  SetParameterExtraInfo(extraInfo: string): MultipleInstructionMetadata;
-  UseStandardParameters(type: string, options: ParameterOptions): MultipleInstructionMetadata;
-  SetHidden(): MultipleInstructionMetadata;
-  SetFunctionName(functionName: string): MultipleInstructionMetadata;
-  SetGetter(getter: string): MultipleInstructionMetadata;
-  SetIncludeFile(includeFile: string): MultipleInstructionMetadata;
-  AddIncludeFile(includeFile: string): MultipleInstructionMetadata;
-  GetIncludeFiles(): VectorString;
-  MarkAsSimple(): MultipleInstructionMetadata;
-  MarkAsAdvanced(): MultipleInstructionMetadata;
-  MarkAsComplex(): MultipleInstructionMetadata;
-  SetPrivate(): MultipleInstructionMetadata;
+  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): MultipleInstructionMetadata;
+  addCodeOnlyParameter(type: string, supplementaryInformation: string): MultipleInstructionMetadata;
+  setDefaultValue(defaultValue: string): MultipleInstructionMetadata;
+  setParameterLongDescription(longDescription: string): MultipleInstructionMetadata;
+  setParameterExtraInfo(extraInfo: string): MultipleInstructionMetadata;
+  useStandardParameters(type: string, options: ParameterOptions): MultipleInstructionMetadata;
+  setHidden(): MultipleInstructionMetadata;
+  setFunctionName(functionName: string): MultipleInstructionMetadata;
+  setGetter(getter: string): MultipleInstructionMetadata;
+  setIncludeFile(includeFile: string): MultipleInstructionMetadata;
+  addIncludeFile(includeFile: string): MultipleInstructionMetadata;
+  getIncludeFiles(): VectorString;
+  markAsSimple(): MultipleInstructionMetadata;
+  markAsAdvanced(): MultipleInstructionMetadata;
+  markAsComplex(): MultipleInstructionMetadata;
+  setPrivate(): MultipleInstructionMetadata;
 }
 
 export class DependencyMetadata extends EmscriptenObject {
-  constructor(): void;
-  GetName(): string;
-  SetName(name_: string): DependencyMetadata;
-  GetExportName(): string;
-  SetExportName(exportName_: string): DependencyMetadata;
-  GetVersion(): string;
-  SetVersion(version_: string): DependencyMetadata;
-  GetDependencyType(): string;
-  SetDependencyType(dependencyType_: string): DependencyMetadata;
-  SetExtraSetting(settingName: string, settingValue: PropertyDescriptor): DependencyMetadata;
-  GetAllExtraSettings(): MapStringPropertyDescriptor;
-  OnlyIfSomeExtraSettingsNonEmpty(): DependencyMetadata;
-  OnlyIfOtherDependencyIsExported(otherDependency: string): DependencyMetadata;
-  CopyFrom(dependencyMetadata: DependencyMetadata): void;
+  dependencyMetadata(): void;
+  getName(): string;
+  setName(name_: string): DependencyMetadata;
+  getExportName(): string;
+  setExportName(exportName_: string): DependencyMetadata;
+  getVersion(): string;
+  setVersion(version_: string): DependencyMetadata;
+  getDependencyType(): string;
+  setDependencyType(dependencyType_: string): DependencyMetadata;
+  setExtraSetting(settingName: string, settingValue: PropertyDescriptor): DependencyMetadata;
+  getAllExtraSettings(): MapStringPropertyDescriptor;
+  onlyIfSomeExtraSettingsNonEmpty(): DependencyMetadata;
+  onlyIfOtherDependencyIsExported(otherDependency: string): DependencyMetadata;
+  copyFrom(dependencyMetadata: DependencyMetadata): void;
 }
 
 export class ParameterMetadata extends EmscriptenObject {
-  constructor(): void;
-  GetType(): string;
-  SetType(type_: string): ParameterMetadata;
-  GetName(): string;
-  SetName(name_: string): ParameterMetadata;
-  GetExtraInfo(): string;
-  SetExtraInfo(extraInfo_: string): ParameterMetadata;
-  IsOptional(): boolean;
-  SetOptional(optional_: boolean): ParameterMetadata;
-  GetDescription(): string;
-  SetDescription(description_: string): ParameterMetadata;
-  GetLongDescription(): string;
-  SetLongDescription(longDescription_: string): ParameterMetadata;
-  IsCodeOnly(): boolean;
-  SetCodeOnly(codeOnly_: boolean): ParameterMetadata;
-  GetDefaultValue(): string;
-  SetDefaultValue(defaultValue_: string): ParameterMetadata;
-  SetValueTypeMetadata(type: ValueTypeMetadata): ParameterMetadata;
-  GetValueTypeMetadata(): ValueTypeMetadata;
-  STATIC_IsObject(param: string): boolean;
-  STATIC_IsBehavior(param: string): boolean;
-  STATIC_IsExpression(type_: string, parameterType: string): boolean;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  parameterMetadata(): void;
+  getType(): string;
+  setType(type_: string): ParameterMetadata;
+  getName(): string;
+  setName(name_: string): ParameterMetadata;
+  getExtraInfo(): string;
+  setExtraInfo(extraInfo_: string): ParameterMetadata;
+  isOptional(): boolean;
+  setOptional(optional_: boolean): ParameterMetadata;
+  getDescription(): string;
+  setDescription(description_: string): ParameterMetadata;
+  getLongDescription(): string;
+  setLongDescription(longDescription_: string): ParameterMetadata;
+  isCodeOnly(): boolean;
+  setCodeOnly(codeOnly_: boolean): ParameterMetadata;
+  getDefaultValue(): string;
+  setDefaultValue(defaultValue_: string): ParameterMetadata;
+  setValueTypeMetadata(type: ValueTypeMetadata): ParameterMetadata;
+  getValueTypeMetadata(): ValueTypeMetadata;
+  static isObject(param: string): boolean;
+  static isBehavior(param: string): boolean;
+  static isExpression(type_: string, parameterType: string): boolean;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class ValueTypeMetadata extends EmscriptenObject {
-  constructor(): void;
-  GetName(): string;
-  SetName(name_: string): ValueTypeMetadata;
-  GetExtraInfo(): string;
-  SetExtraInfo(extraInfo_: string): ValueTypeMetadata;
-  IsOptional(): boolean;
-  SetOptional(optional_: boolean): ValueTypeMetadata;
-  GetDefaultValue(): string;
-  SetDefaultValue(defaultValue_: string): ValueTypeMetadata;
-  IsObject(): boolean;
-  IsBehavior(): boolean;
-  IsNumber(): boolean;
-  IsString(): boolean;
-  IsVariable(): boolean;
-  STATIC_IsTypeObject(parameterType: string): boolean;
-  STATIC_IsTypeBehavior(parameterType: string): boolean;
-  STATIC_IsTypeExpression(type: string, parameterType: string): boolean;
-  STATIC_GetPrimitiveValueType(parameterType: string): string;
-  STATIC_ConvertPropertyTypeToValueType(propertyType: string): string;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  valueTypeMetadata(): void;
+  getName(): string;
+  setName(name_: string): ValueTypeMetadata;
+  getExtraInfo(): string;
+  setExtraInfo(extraInfo_: string): ValueTypeMetadata;
+  isOptional(): boolean;
+  setOptional(optional_: boolean): ValueTypeMetadata;
+  getDefaultValue(): string;
+  setDefaultValue(defaultValue_: string): ValueTypeMetadata;
+  isObject(): boolean;
+  isBehavior(): boolean;
+  isNumber(): boolean;
+  isString(): boolean;
+  isVariable(): boolean;
+  static isTypeObject(parameterType: string): boolean;
+  static isTypeBehavior(parameterType: string): boolean;
+  static isTypeExpression(type: string, parameterType: string): boolean;
+  static getPrimitiveValueType(parameterType: string): string;
+  static convertPropertyTypeToValueType(propertyType: string): string;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class VectorParameterMetadata extends EmscriptenObject {
-  constructor(): void;
+  vectorParameterMetadata(): void;
   push_back(parameterMetadata: ParameterMetadata): void;
   size(): number;
   at(index: number): ParameterMetadata;
-  WRAPPED_set(index: number, parameterMetadata: ParameterMetadata): void;
-  FREE_removeFromVectorParameterMetadata(index: number): void;
-  FREE_swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
+  set(index: number, parameterMetadata: ParameterMetadata): void;
+  fREE_removeFromVectorParameterMetadata(index: number): void;
+  fREE_swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
   clear(): void;
 }
 
 export class ParameterMetadataTools extends EmscriptenObject {
-  STATIC_ParametersToObjectsContainer(project: Project, parameters: VectorParameterMetadata, outputObjectsContainer: ObjectsContainer): void;
-  STATIC_GetObjectParameterIndexFor(parameters: VectorParameterMetadata, parameterIndex: number): number;
+  static parametersToObjectsContainer(project: Project, parameters: VectorParameterMetadata, outputObjectsContainer: ObjectsContainer): void;
+  static getObjectParameterIndexFor(parameters: VectorParameterMetadata, parameterIndex: number): number;
 }
 
 export class EventsFunctionTools extends EmscriptenObject {
-  STATIC_FreeEventsFunctionToObjectsContainer(project: Project, functionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-  STATIC_BehaviorEventsFunctionToObjectsContainer(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-  STATIC_ObjectEventsFunctionToObjectsContainer(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
+  static freeEventsFunctionToObjectsContainer(project: Project, functionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
+  static behaviorEventsFunctionToObjectsContainer(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
+  static objectEventsFunctionToObjectsContainer(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
 }
 
 export class ObjectMetadata extends EmscriptenObject {
-  GetName(): string;
-  GetFullName(): string;
-  GetDescription(): string;
-  GetIconFilename(): string;
-  GetHelpPath(): string;
-  GetCategoryFullName(): string;
-  SetCategoryFullName(categoryFullName: string): ObjectMetadata;
-  AddScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
-  AddStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
-  AddExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
-  AddExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
-  GetAllActions(): MapStringInstructionMetadata;
-  GetAllConditions(): MapStringInstructionMetadata;
-  GetAllExpressions(): MapStringExpressionMetadata;
-  GetAllStrExpressions(): MapStringExpressionMetadata;
-  SetIncludeFile(includeFile: string): ObjectMetadata;
-  AddIncludeFile(includeFile: string): ObjectMetadata;
-  GetUnsupportedBaseObjectCapabilities(): SetString;
-  AddUnsupportedBaseObjectCapability(capability: string): ObjectMetadata;
-  IsUnsupportedBaseObjectCapability(capability: string): boolean;
-  SetHidden(): ObjectMetadata;
-  IsHidden(): boolean;
+  getName(): string;
+  getFullName(): string;
+  getDescription(): string;
+  getIconFilename(): string;
+  getHelpPath(): string;
+  getCategoryFullName(): string;
+  setCategoryFullName(categoryFullName: string): ObjectMetadata;
+  addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
+  addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
+  addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
+  addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
+  getAllActions(): MapStringInstructionMetadata;
+  getAllConditions(): MapStringInstructionMetadata;
+  getAllExpressions(): MapStringExpressionMetadata;
+  getAllStrExpressions(): MapStringExpressionMetadata;
+  setIncludeFile(includeFile: string): ObjectMetadata;
+  addIncludeFile(includeFile: string): ObjectMetadata;
+  getUnsupportedBaseObjectCapabilities(): SetString;
+  addUnsupportedBaseObjectCapability(capability: string): ObjectMetadata;
+  isUnsupportedBaseObjectCapability(capability: string): boolean;
+  setHidden(): ObjectMetadata;
+  isHidden(): boolean;
 }
 
 export class BehaviorMetadata extends EmscriptenObject {
-  GetName(): string;
-  GetFullName(): string;
-  GetDefaultName(): string;
-  GetDescription(): string;
-  GetGroup(): string;
-  GetIconFilename(): string;
-  GetHelpPath(): string;
-  AddScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
-  AddStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
-  AddExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
-  AddExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
-  AddDuplicatedAction(newActionName: string, copiedActionName: string): InstructionMetadata;
-  AddDuplicatedCondition(newConditionName: string, copiedConditionName: string): InstructionMetadata;
-  AddDuplicatedExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
-  AddDuplicatedStrExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
-  GetAllActions(): MapStringInstructionMetadata;
-  GetAllConditions(): MapStringInstructionMetadata;
-  GetAllExpressions(): MapStringExpressionMetadata;
-  GetAllStrExpressions(): MapStringExpressionMetadata;
-  SetIncludeFile(includeFile: string): BehaviorMetadata;
-  AddIncludeFile(includeFile: string): BehaviorMetadata;
-  AddRequiredFile(resourceFile: string): BehaviorMetadata;
-  SetObjectType(objectType: string): BehaviorMetadata;
-  GetObjectType(): string;
-  IsPrivate(): boolean;
-  SetPrivate(): BehaviorMetadata;
-  Get(): Behavior;
-  GetSharedDataInstance(): BehaviorsSharedData;
+  getName(): string;
+  getFullName(): string;
+  getDefaultName(): string;
+  getDescription(): string;
+  getGroup(): string;
+  getIconFilename(): string;
+  getHelpPath(): string;
+  addScopedCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addScopedAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
+  addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
+  addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
+  addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
+  addDuplicatedAction(newActionName: string, copiedActionName: string): InstructionMetadata;
+  addDuplicatedCondition(newConditionName: string, copiedConditionName: string): InstructionMetadata;
+  addDuplicatedExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
+  addDuplicatedStrExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
+  getAllActions(): MapStringInstructionMetadata;
+  getAllConditions(): MapStringInstructionMetadata;
+  getAllExpressions(): MapStringExpressionMetadata;
+  getAllStrExpressions(): MapStringExpressionMetadata;
+  setIncludeFile(includeFile: string): BehaviorMetadata;
+  addIncludeFile(includeFile: string): BehaviorMetadata;
+  addRequiredFile(resourceFile: string): BehaviorMetadata;
+  setObjectType(objectType: string): BehaviorMetadata;
+  getObjectType(): string;
+  isPrivate(): boolean;
+  setPrivate(): BehaviorMetadata;
+  get(): Behavior;
+  getSharedDataInstance(): BehaviorsSharedData;
 }
 
 export class EffectMetadata extends EmscriptenObject {
-  SetFullName(fullName: string): EffectMetadata;
-  SetDescription(description: string): EffectMetadata;
-  SetHelpPath(helpPath: string): EffectMetadata;
-  SetIncludeFile(includeFile: string): EffectMetadata;
-  AddIncludeFile(includeFile: string): EffectMetadata;
-  MarkAsNotWorkingForObjects(): EffectMetadata;
-  MarkAsOnlyWorkingFor2D(): EffectMetadata;
-  MarkAsOnlyWorkingFor3D(): EffectMetadata;
-  MarkAsUnique(): EffectMetadata;
-  GetType(): string;
-  GetFullName(): string;
-  GetDescription(): string;
-  GetHelpPath(): string;
-  IsMarkedAsNotWorkingForObjects(): boolean;
-  IsMarkedAsOnlyWorkingFor2D(): boolean;
-  IsMarkedAsOnlyWorkingFor3D(): boolean;
-  IsMarkedAsUnique(): boolean;
-  GetProperties(): MapStringPropertyDescriptor;
+  setFullName(fullName: string): EffectMetadata;
+  setDescription(description: string): EffectMetadata;
+  setHelpPath(helpPath: string): EffectMetadata;
+  setIncludeFile(includeFile: string): EffectMetadata;
+  addIncludeFile(includeFile: string): EffectMetadata;
+  markAsNotWorkingForObjects(): EffectMetadata;
+  markAsOnlyWorkingFor2D(): EffectMetadata;
+  markAsOnlyWorkingFor3D(): EffectMetadata;
+  markAsUnique(): EffectMetadata;
+  getType(): string;
+  getFullName(): string;
+  getDescription(): string;
+  getHelpPath(): string;
+  isMarkedAsNotWorkingForObjects(): boolean;
+  isMarkedAsOnlyWorkingFor2D(): boolean;
+  isMarkedAsOnlyWorkingFor3D(): boolean;
+  isMarkedAsUnique(): boolean;
+  getProperties(): MapStringPropertyDescriptor;
 }
 
 export class EventMetadata extends EmscriptenObject {
-  GetFullName(): string;
-  GetDescription(): string;
-  GetGroup(): string;
+  getFullName(): string;
+  getDescription(): string;
+  getGroup(): string;
 }
 
 export class PlatformExtension extends EmscriptenObject {
-  constructor(): void;
-  SetExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): PlatformExtension;
-  SetExtensionHelpPath(helpPath: string): PlatformExtension;
-  SetIconUrl(iconUrl: string): PlatformExtension;
-  SetCategory(category: string): PlatformExtension;
-  AddInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
-  MarkAsDeprecated(): void;
-  AddExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
-  AddExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
-  AddCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
-  AddExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
-  AddStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
-  AddDependency(): DependencyMetadata;
-  WRAPPED_AddBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: Behavior, sharedDatasInstance: BehaviorsSharedData): BehaviorMetadata;
-  AddEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): BehaviorMetadata;
-  WRAPPED_AddObject(name: string, fullname: string, description: string, icon24x24: string, instance: ObjectConfiguration): ObjectMetadata;
-  AddEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): ObjectMetadata;
-  AddEffect(name: string): EffectMetadata;
-  RegisterProperty(name: string): PropertyDescriptor;
-  GetFullName(): string;
-  GetName(): string;
-  GetCategory(): string;
-  GetDescription(): string;
-  GetAuthor(): string;
-  GetLicense(): string;
-  GetHelpPath(): string;
-  GetIconUrl(): string;
-  IsBuiltin(): boolean;
-  GetNameSpace(): string;
-  AddDuplicatedAction(newActionName: string, copiedActionName: string): InstructionMetadata;
-  AddDuplicatedCondition(newConditionName: string, copiedConditionName: string): InstructionMetadata;
-  AddDuplicatedExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
-  AddDuplicatedStrExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
-  GetExtensionObjectsTypes(): VectorString;
-  GetBehaviorsTypes(): VectorString;
-  GetExtensionEffectTypes(): VectorString;
-  GetObjectMetadata(type: string): ObjectMetadata;
-  GetBehaviorMetadata(type: string): BehaviorMetadata;
-  GetEffectMetadata(type: string): EffectMetadata;
-  GetAllEvents(): MapStringEventMetadata;
-  GetAllActions(): MapStringInstructionMetadata;
-  GetAllConditions(): MapStringInstructionMetadata;
-  GetAllExpressions(): MapStringExpressionMetadata;
-  GetAllStrExpressions(): MapStringExpressionMetadata;
-  GetAllActionsForObject(objectType: string): MapStringInstructionMetadata;
-  GetAllConditionsForObject(objectType: string): MapStringInstructionMetadata;
-  GetAllExpressionsForObject(objectType: string): MapStringExpressionMetadata;
-  GetAllStrExpressionsForObject(objectType: string): MapStringExpressionMetadata;
-  GetAllActionsForBehavior(autoType: string): MapStringInstructionMetadata;
-  GetAllConditionsForBehavior(autoType: string): MapStringInstructionMetadata;
-  GetAllExpressionsForBehavior(autoType: string): MapStringExpressionMetadata;
-  GetAllStrExpressionsForBehavior(autoType: string): MapStringExpressionMetadata;
-  GetAllProperties(): MapStringPropertyDescriptor;
-  GetAllDependencies(): VectorDependencyMetadata;
-  STATIC_GetNamespaceSeparator(): string;
+  platformExtension(): void;
+  setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): PlatformExtension;
+  setExtensionHelpPath(helpPath: string): PlatformExtension;
+  setIconUrl(iconUrl: string): PlatformExtension;
+  setCategory(category: string): PlatformExtension;
+  addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
+  markAsDeprecated(): void;
+  addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
+  addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): MultipleInstructionMetadata;
+  addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): InstructionMetadata;
+  addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
+  addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
+  addDependency(): DependencyMetadata;
+  addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: Behavior, sharedDatasInstance: BehaviorsSharedData): BehaviorMetadata;
+  addEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): BehaviorMetadata;
+  addObject(name: string, fullname: string, description: string, icon24x24: string, instance: ObjectConfiguration): ObjectMetadata;
+  addEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): ObjectMetadata;
+  addEffect(name: string): EffectMetadata;
+  registerProperty(name: string): PropertyDescriptor;
+  getFullName(): string;
+  getName(): string;
+  getCategory(): string;
+  getDescription(): string;
+  getAuthor(): string;
+  getLicense(): string;
+  getHelpPath(): string;
+  getIconUrl(): string;
+  isBuiltin(): boolean;
+  getNameSpace(): string;
+  addDuplicatedAction(newActionName: string, copiedActionName: string): InstructionMetadata;
+  addDuplicatedCondition(newConditionName: string, copiedConditionName: string): InstructionMetadata;
+  addDuplicatedExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
+  addDuplicatedStrExpression(newExpressionName: string, copiedExpressionName: string): ExpressionMetadata;
+  getExtensionObjectsTypes(): VectorString;
+  getBehaviorsTypes(): VectorString;
+  getExtensionEffectTypes(): VectorString;
+  getObjectMetadata(type: string): ObjectMetadata;
+  getBehaviorMetadata(type: string): BehaviorMetadata;
+  getEffectMetadata(type: string): EffectMetadata;
+  getAllEvents(): MapStringEventMetadata;
+  getAllActions(): MapStringInstructionMetadata;
+  getAllConditions(): MapStringInstructionMetadata;
+  getAllExpressions(): MapStringExpressionMetadata;
+  getAllStrExpressions(): MapStringExpressionMetadata;
+  getAllActionsForObject(objectType: string): MapStringInstructionMetadata;
+  getAllConditionsForObject(objectType: string): MapStringInstructionMetadata;
+  getAllExpressionsForObject(objectType: string): MapStringExpressionMetadata;
+  getAllStrExpressionsForObject(objectType: string): MapStringExpressionMetadata;
+  getAllActionsForBehavior(autoType: string): MapStringInstructionMetadata;
+  getAllConditionsForBehavior(autoType: string): MapStringInstructionMetadata;
+  getAllExpressionsForBehavior(autoType: string): MapStringExpressionMetadata;
+  getAllStrExpressionsForBehavior(autoType: string): MapStringExpressionMetadata;
+  getAllProperties(): MapStringPropertyDescriptor;
+  getAllDependencies(): VectorDependencyMetadata;
+  static getNamespaceSeparator(): string;
 }
 
 export class EventsList extends EmscriptenObject {
-  constructor(): void;
-  InsertEvent(event: BaseEvent, pos: number): BaseEvent;
-  InsertNewEvent(project: Project, type: string, pos: number): BaseEvent;
-  InsertEvents(list: EventsList, begin: number, end: number, pos: number): void;
-  GetEventAt(pos: number): BaseEvent;
-  RemoveEventAt(pos: number): void;
-  RemoveEvent(event: BaseEvent): void;
-  GetEventsCount(): number;
-  Contains(event: BaseEvent, recursive: boolean): boolean;
-  MoveEventToAnotherEventsList(eventToMove: BaseEvent, newEventsList: EventsList, newPosition: number): boolean;
-  IsEmpty(): boolean;
-  Clear(): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  eventsList(): void;
+  insertEvent(event: BaseEvent, pos: number): BaseEvent;
+  insertNewEvent(project: Project, type: string, pos: number): BaseEvent;
+  insertEvents(list: EventsList, begin: number, end: number, pos: number): void;
+  getEventAt(pos: number): BaseEvent;
+  removeEventAt(pos: number): void;
+  removeEvent(event: BaseEvent): void;
+  getEventsCount(): number;
+  contains(event: BaseEvent, recursive: boolean): boolean;
+  moveEventToAnotherEventsList(eventToMove: BaseEvent, newEventsList: EventsList, newPosition: number): boolean;
+  isEmpty(): boolean;
+  clear(): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class BaseEvent extends EmscriptenObject {
-  constructor(): void;
-  Clone(): BaseEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  baseEvent(): void;
+  clone(): BaseEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class StandardEvent extends EmscriptenObject {
-  constructor(): void;
-  GetConditions(): InstructionsList;
-  GetActions(): InstructionsList;
-  Clone(): StandardEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  standardEvent(): void;
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+  clone(): StandardEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class RepeatEvent extends EmscriptenObject {
-  constructor(): void;
-  GetConditions(): InstructionsList;
-  GetActions(): InstructionsList;
-  SetRepeatExpression(expr: string): void;
-  GetRepeatExpression(): string;
-  Clone(): RepeatEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  repeatEvent(): void;
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+  setRepeatExpression(expr: string): void;
+  getRepeatExpression(): string;
+  clone(): RepeatEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class WhileEvent extends EmscriptenObject {
-  constructor(): void;
-  GetConditions(): InstructionsList;
-  GetWhileConditions(): InstructionsList;
-  GetActions(): InstructionsList;
-  Clone(): WhileEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  whileEvent(): void;
+  getConditions(): InstructionsList;
+  getWhileConditions(): InstructionsList;
+  getActions(): InstructionsList;
+  clone(): WhileEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class ForEachEvent extends EmscriptenObject {
-  constructor(): void;
-  SetObjectToPick(objects: string): void;
-  GetObjectToPick(): string;
-  GetConditions(): InstructionsList;
-  GetActions(): InstructionsList;
-  Clone(): ForEachEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  forEachEvent(): void;
+  setObjectToPick(objects: string): void;
+  getObjectToPick(): string;
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+  clone(): ForEachEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class ForEachChildVariableEvent extends EmscriptenObject {
-  constructor(): void;
-  GetConditions(): InstructionsList;
-  GetActions(): InstructionsList;
-  GetIterableVariableName(): string;
-  GetKeyIteratorVariableName(): string;
-  GetValueIteratorVariableName(): string;
-  SetIterableVariableName(newName: string): void;
-  SetKeyIteratorVariableName(newName: string): void;
-  SetValueIteratorVariableName(newName: string): void;
-  Clone(): ForEachChildVariableEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  forEachChildVariableEvent(): void;
+  getConditions(): InstructionsList;
+  getActions(): InstructionsList;
+  getIterableVariableName(): string;
+  getKeyIteratorVariableName(): string;
+  getValueIteratorVariableName(): string;
+  setIterableVariableName(newName: string): void;
+  setKeyIteratorVariableName(newName: string): void;
+  setValueIteratorVariableName(newName: string): void;
+  clone(): ForEachChildVariableEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class CommentEvent extends EmscriptenObject {
-  constructor(): void;
-  GetComment(): string;
-  SetComment(type: string): void;
-  SetBackgroundColor(r: number, g: number, b: number): void;
-  GetBackgroundColorRed(): number;
-  GetBackgroundColorGreen(): number;
-  GetBackgroundColorBlue(): number;
-  SetTextColor(r: number, g: number, b: number): void;
-  GetTextColorRed(): number;
-  GetTextColorGreen(): number;
-  GetTextColorBlue(): number;
-  Clone(): CommentEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  commentEvent(): void;
+  getComment(): string;
+  setComment(type: string): void;
+  setBackgroundColor(r: number, g: number, b: number): void;
+  getBackgroundColorRed(): number;
+  getBackgroundColorGreen(): number;
+  getBackgroundColorBlue(): number;
+  setTextColor(r: number, g: number, b: number): void;
+  getTextColorRed(): number;
+  getTextColorGreen(): number;
+  getTextColorBlue(): number;
+  clone(): CommentEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class GroupEvent extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  SetBackgroundColor(r: number, g: number, b: number): void;
-  GetBackgroundColorR(): number;
-  GetBackgroundColorG(): number;
-  GetBackgroundColorB(): number;
-  SetSource(source: string): void;
-  GetSource(): string;
-  GetCreationParameters(): VectorString;
-  GetCreationTimestamp(): number;
-  SetCreationTimestamp(ts: number): void;
-  Clone(): GroupEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  groupEvent(): void;
+  setName(name: string): void;
+  getName(): string;
+  setBackgroundColor(r: number, g: number, b: number): void;
+  getBackgroundColorR(): number;
+  getBackgroundColorG(): number;
+  getBackgroundColorB(): number;
+  setSource(source: string): void;
+  getSource(): string;
+  getCreationParameters(): VectorString;
+  getCreationTimestamp(): number;
+  setCreationTimestamp(ts: number): void;
+  clone(): GroupEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class LinkEvent extends EmscriptenObject {
-  constructor(): void;
-  SetTarget(name: string): void;
-  GetTarget(): string;
-  GetIncludeConfig(): number;
-  SetIncludeAllEvents(): void;
-  SetIncludeEventsGroup(source: string): void;
-  GetEventsGroupName(): string;
-  SetIncludeStartAndEnd(start: number, end: number): void;
-  GetIncludeStart(): number;
-  GetIncludeEnd(): number;
-  Clone(): LinkEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  linkEvent(): void;
+  setTarget(name: string): void;
+  getTarget(): string;
+  getIncludeConfig(): number;
+  setIncludeAllEvents(): void;
+  setIncludeEventsGroup(source: string): void;
+  getEventsGroupName(): string;
+  setIncludeStartAndEnd(start: number, end: number): void;
+  getIncludeStart(): number;
+  getIncludeEnd(): number;
+  clone(): LinkEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class EventsRemover extends EmscriptenObject {
-  constructor(): void;
-  AddEventToRemove(eventToRemove: BaseEvent): void;
-  AddInstructionToRemove(instructionToRemove: Instruction): void;
-  Launch(events: EventsList): void;
+  eventsRemover(): void;
+  addEventToRemove(eventToRemove: BaseEvent): void;
+  addInstructionToRemove(instructionToRemove: Instruction): void;
+  launch(events: EventsList): void;
 }
 
 export class EventsListUnfolder extends EmscriptenObject {
-  STATIC_UnfoldWhenContaining(list: EventsList, eventToContain: BaseEvent): void;
-  STATIC_FoldAll(list: EventsList): void;
-  STATIC_UnfoldToLevel(list: EventsList, maxLevel: number, currentLevel?: number = 0): void;
+  static unfoldWhenContaining(list: EventsList, eventToContain: BaseEvent): void;
+  static foldAll(list: EventsList): void;
+  static unfoldToLevel(list: EventsList, maxLevel: number, currentLevel?: number = 0): void;
 }
 
 export class EventsSearchResult extends EmscriptenObject {
-  IsEventsListValid(): boolean;
-  GetEventsList(): EventsList;
-  GetPositionInList(): number;
-  IsEventValid(): boolean;
-  GetEvent(): BaseEvent;
+  isEventsListValid(): boolean;
+  getEventsList(): EventsList;
+  getPositionInList(): number;
+  isEventValid(): boolean;
+  getEvent(): BaseEvent;
 }
 
 export class VectorEventsSearchResult extends EmscriptenObject {
-  constructor(): void;
-  CLONE_VectorEventsSearchResult(): VectorEventsSearchResult;
+  vectorEventsSearchResult(): void;
+  cLONE_VectorEventsSearchResult(): VectorEventsSearchResult;
   push_back(result: EventsSearchResult): void;
   resize(size: number): void;
   size(): number;
   at(index: number): EventsSearchResult;
-  WRAPPED_set(index: number, result: EventsSearchResult): void;
+  set(index: number, result: EventsSearchResult): void;
   clear(): void;
 }
 
 export class EventsRefactorer extends EmscriptenObject {
-  STATIC_RenameObjectInEvents(platform: Platform, project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, oldName: string, newName: string): void;
-  STATIC_RemoveObjectInEvents(platform: Platform, project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, name: string): void;
-  STATIC_ReplaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
-  STATIC_SearchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
+  static renameObjectInEvents(platform: Platform, project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, oldName: string, newName: string): void;
+  static removeObjectInEvents(platform: Platform, project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, name: string): void;
+  static replaceStringInEvents(project: ObjectsContainer, layout: ObjectsContainer, events: EventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): VectorEventsSearchResult;
+  static searchInEvents(platform: Platform, events: EventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean, inEventSentences: boolean): VectorEventsSearchResult;
 }
 
 export class UnfilledRequiredBehaviorPropertyProblem extends EmscriptenObject {
-  GetSourceProject(): Project;
-  GetSourceObject(): gdObject;
-  GetSourceBehaviorContent(): Behavior;
-  GetSourcePropertyName(): string;
-  GetExpectedBehaviorTypeName(): string;
+  getSourceProject(): Project;
+  getSourceObject(): gdObject;
+  getSourceBehaviorContent(): Behavior;
+  getSourcePropertyName(): string;
+  getExpectedBehaviorTypeName(): string;
 }
 
 export class VectorUnfilledRequiredBehaviorPropertyProblem extends EmscriptenObject {
@@ -1708,126 +1708,126 @@ export class VectorUnfilledRequiredBehaviorPropertyProblem extends EmscriptenObj
 }
 
 export class ProjectBrowserHelper extends EmscriptenObject {
-  STATIC_ExposeProjectEvents(project: Project, worker: ArbitraryEventsWorker): void;
+  static exposeProjectEvents(project: Project, worker: ArbitraryEventsWorker): void;
 }
 
 export class WholeProjectRefactorer extends EmscriptenObject {
-  STATIC_RenameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
-  STATIC_UpdateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
-  STATIC_RenameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
-  STATIC_RenameBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
-  STATIC_RenameObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
-  STATIC_MoveEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
-  STATIC_MoveBehaviorEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
-  STATIC_MoveObjectEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, functionName: string, oldIndex: number, newIndex: number): void;
-  STATIC_RenameEventsBasedBehaviorProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
-  STATIC_RenameEventsBasedBehaviorSharedProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
-  STATIC_RenameEventsBasedObjectProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
-  STATIC_RenameEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
-  STATIC_RenameEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
-  STATIC_RenameLayout(project: Project, oldName: string, newName: string): void;
-  STATIC_RenameExternalLayout(project: Project, oldName: string, newName: string): void;
-  STATIC_RenameExternalEvents(project: Project, oldName: string, newName: string): void;
-  STATIC_RenameLayer(project: Project, layout: Layout, oldName: string, newName: string): void;
-  STATIC_RenameLayerEffect(project: Project, layout: Layout, layer: Layer, oldName: string, newName: string): void;
-  STATIC_RenameObjectAnimation(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
-  STATIC_RenameObjectPoint(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
-  STATIC_RenameObjectEffect(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
-  STATIC_ObjectOrGroupRenamedInLayout(project: Project, layout: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
-  STATIC_ObjectOrGroupRemovedInLayout(project: Project, layout: Layout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
-  STATIC_ObjectOrGroupRenamedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
-  STATIC_ObjectOrGroupRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
-  STATIC_ObjectOrGroupRenamedInEventsBasedObject(project: Project, globalObjectsContainer: ObjectsContainer, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
-  STATIC_ObjectOrGroupRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
-  STATIC_GlobalObjectOrGroupRenamed(project: Project, oldName: string, newName: string, isObjectGroup: boolean): void;
-  STATIC_GlobalObjectOrGroupRemoved(project: Project, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
-  STATIC_GetAllObjectTypesUsingEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): SetString;
-  STATIC_EnsureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): void;
-  STATIC_EnsureObjectEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject): void;
-  STATIC_AddBehaviorAndRequiredBehaviors(project: Project, obj: gdObject, behaviorType: string, behaviorName: string): void;
-  STATIC_AddRequiredBehaviorsFor(project: Project, obj: gdObject, behaviorName: string): void;
-  STATIC_FindDependentBehaviorNames(project: Project, obj: gdObject, behaviorName: string): VectorString;
-  STATIC_FindInvalidRequiredBehaviorProperties(project: Project): VectorUnfilledRequiredBehaviorPropertyProblem;
-  STATIC_GetBehaviorsWithType(obj: gdObject, type: string): VectorString;
-  STATIC_FixInvalidRequiredBehaviorProperties(project: Project): boolean;
+  static renameEventsFunctionsExtension(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static updateExtensionNameInEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, sourceExtensionName: string): void;
+  static renameEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static renameBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
+  static renameObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
+  static moveEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
+  static moveBehaviorEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
+  static moveObjectEventsFunctionParameter(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, functionName: string, oldIndex: number, newIndex: number): void;
+  static renameEventsBasedBehaviorProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
+  static renameEventsBasedBehaviorSharedProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, oldName: string, newName: string): void;
+  static renameEventsBasedObjectProperty(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, oldName: string, newName: string): void;
+  static renameEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static renameEventsBasedObject(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, oldName: string, newName: string): void;
+  static renameLayout(project: Project, oldName: string, newName: string): void;
+  static renameExternalLayout(project: Project, oldName: string, newName: string): void;
+  static renameExternalEvents(project: Project, oldName: string, newName: string): void;
+  static renameLayer(project: Project, layout: Layout, oldName: string, newName: string): void;
+  static renameLayerEffect(project: Project, layout: Layout, layer: Layer, oldName: string, newName: string): void;
+  static renameObjectAnimation(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectPoint(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
+  static renameObjectEffect(project: Project, layout: Layout, gdObject: gdObject, oldName: string, newName: string): void;
+  static objectOrGroupRenamedInLayout(project: Project, layout: Layout, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectOrGroupRemovedInLayout(project: Project, layout: Layout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectOrGroupRenamedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectOrGroupRemovedInEventsFunction(project: Project, eventsFunction: EventsFunction, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static objectOrGroupRenamedInEventsBasedObject(project: Project, globalObjectsContainer: ObjectsContainer, eventsBasedObject: EventsBasedObject, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static objectOrGroupRemovedInEventsBasedObject(project: Project, eventsBasedObject: EventsBasedObject, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static globalObjectOrGroupRenamed(project: Project, oldName: string, newName: string, isObjectGroup: boolean): void;
+  static globalObjectOrGroupRemoved(project: Project, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
+  static getAllObjectTypesUsingEventsBasedBehavior(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): SetString;
+  static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior): void;
+  static ensureObjectEventsFunctionsProperParameters(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject): void;
+  static addBehaviorAndRequiredBehaviors(project: Project, obj: gdObject, behaviorType: string, behaviorName: string): void;
+  static addRequiredBehaviorsFor(project: Project, obj: gdObject, behaviorName: string): void;
+  static findDependentBehaviorNames(project: Project, obj: gdObject, behaviorName: string): VectorString;
+  static findInvalidRequiredBehaviorProperties(project: Project): VectorUnfilledRequiredBehaviorPropertyProblem;
+  static getBehaviorsWithType(obj: gdObject, type: string): VectorString;
+  static fixInvalidRequiredBehaviorProperties(project: Project): boolean;
 }
 
 export class PropertyFunctionGenerator extends EmscriptenObject {
-  STATIC_GenerateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
-  STATIC_GenerateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;
-  STATIC_CanGenerateGetterAndSetter(eventsBasedBehavior: AbstractEventsBasedEntity, property: NamedPropertyDescriptor): boolean;
-  STATIC_GenerateConditionSkeleton(project: Project, eventFunction: EventsFunction): void;
+  static generateBehaviorGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, property: NamedPropertyDescriptor, isSharedProperties: boolean): void;
+  static generateObjectGetterAndSetter(project: Project, extension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, property: NamedPropertyDescriptor): void;
+  static canGenerateGetterAndSetter(eventsBasedBehavior: AbstractEventsBasedEntity, property: NamedPropertyDescriptor): boolean;
+  static generateConditionSkeleton(project: Project, eventFunction: EventsFunction): void;
 }
 
 export class UsedExtensionsResult extends EmscriptenObject {
-  GetUsedExtensions(): SetString;
+  getUsedExtensions(): SetString;
 }
 
 export class UsedExtensionsFinder extends EmscriptenObject {
-  STATIC_ScanProject(project: Project): UsedExtensionsResult;
+  static scanProject(project: Project): UsedExtensionsResult;
 }
 
 export class InstructionsCountEvaluator extends EmscriptenObject {
-  STATIC_ScanProject(project: Project): number;
+  static scanProject(project: Project): number;
 }
 
 export class ExtensionAndBehaviorMetadata extends EmscriptenObject {
-  GetExtension(): PlatformExtension;
-  GetMetadata(): BehaviorMetadata;
+  getExtension(): PlatformExtension;
+  getMetadata(): BehaviorMetadata;
 }
 
 export class ExtensionAndObjectMetadata extends EmscriptenObject {
-  GetExtension(): PlatformExtension;
-  GetMetadata(): ObjectMetadata;
+  getExtension(): PlatformExtension;
+  getMetadata(): ObjectMetadata;
 }
 
 export class ExtensionAndEffectMetadata extends EmscriptenObject {
-  GetExtension(): PlatformExtension;
-  GetMetadata(): EffectMetadata;
+  getExtension(): PlatformExtension;
+  getMetadata(): EffectMetadata;
 }
 
 export class ExtensionAndInstructionMetadata extends EmscriptenObject {
-  GetExtension(): PlatformExtension;
-  GetMetadata(): InstructionMetadata;
+  getExtension(): PlatformExtension;
+  getMetadata(): InstructionMetadata;
 }
 
 export class ExtensionAndExpressionMetadata extends EmscriptenObject {
-  GetExtension(): PlatformExtension;
-  GetMetadata(): ExpressionMetadata;
+  getExtension(): PlatformExtension;
+  getMetadata(): ExpressionMetadata;
 }
 
 export class MetadataProvider extends EmscriptenObject {
-  STATIC_GetExtensionAndBehaviorMetadata(p: Platform, type: string): ExtensionAndBehaviorMetadata;
-  STATIC_GetExtensionAndObjectMetadata(p: Platform, type: string): ExtensionAndObjectMetadata;
-  STATIC_GetExtensionAndEffectMetadata(p: Platform, type: string): ExtensionAndEffectMetadata;
-  STATIC_GetExtensionAndActionMetadata(p: Platform, type: string): ExtensionAndInstructionMetadata;
-  STATIC_GetExtensionAndConditionMetadata(p: Platform, type: string): ExtensionAndInstructionMetadata;
-  STATIC_GetExtensionAndExpressionMetadata(p: Platform, type: string): ExtensionAndExpressionMetadata;
-  STATIC_GetExtensionAndObjectExpressionMetadata(p: Platform, objectType: string, type: string): ExtensionAndExpressionMetadata;
-  STATIC_GetExtensionAndBehaviorExpressionMetadata(p: Platform, autoType: string, type: string): ExtensionAndExpressionMetadata;
-  STATIC_GetExtensionAndStrExpressionMetadata(p: Platform, type: string): ExtensionAndExpressionMetadata;
-  STATIC_GetExtensionAndObjectStrExpressionMetadata(p: Platform, objectType: string, type: string): ExtensionAndExpressionMetadata;
-  STATIC_GetExtensionAndBehaviorStrExpressionMetadata(p: Platform, autoType: string, type: string): ExtensionAndExpressionMetadata;
-  STATIC_GetBehaviorMetadata(p: Platform, type: string): BehaviorMetadata;
-  STATIC_GetObjectMetadata(p: Platform, type: string): ObjectMetadata;
-  STATIC_GetEffectMetadata(p: Platform, type: string): EffectMetadata;
-  STATIC_GetActionMetadata(p: Platform, type: string): InstructionMetadata;
-  STATIC_GetConditionMetadata(p: Platform, type: string): InstructionMetadata;
-  STATIC_GetExpressionMetadata(p: Platform, type: string): ExpressionMetadata;
-  STATIC_GetObjectExpressionMetadata(p: Platform, objectType: string, type: string): ExpressionMetadata;
-  STATIC_GetBehaviorExpressionMetadata(p: Platform, autoType: string, type: string): ExpressionMetadata;
-  STATIC_GetStrExpressionMetadata(p: Platform, type: string): ExpressionMetadata;
-  STATIC_GetObjectStrExpressionMetadata(p: Platform, objectType: string, type: string): ExpressionMetadata;
-  STATIC_GetBehaviorStrExpressionMetadata(p: Platform, autoType: string, type: string): ExpressionMetadata;
-  STATIC_IsBadExpressionMetadata(metadata: ExpressionMetadata): boolean;
-  STATIC_IsBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
+  static getExtensionAndBehaviorMetadata(p: Platform, type: string): ExtensionAndBehaviorMetadata;
+  static getExtensionAndObjectMetadata(p: Platform, type: string): ExtensionAndObjectMetadata;
+  static getExtensionAndEffectMetadata(p: Platform, type: string): ExtensionAndEffectMetadata;
+  static getExtensionAndActionMetadata(p: Platform, type: string): ExtensionAndInstructionMetadata;
+  static getExtensionAndConditionMetadata(p: Platform, type: string): ExtensionAndInstructionMetadata;
+  static getExtensionAndExpressionMetadata(p: Platform, type: string): ExtensionAndExpressionMetadata;
+  static getExtensionAndObjectExpressionMetadata(p: Platform, objectType: string, type: string): ExtensionAndExpressionMetadata;
+  static getExtensionAndBehaviorExpressionMetadata(p: Platform, autoType: string, type: string): ExtensionAndExpressionMetadata;
+  static getExtensionAndStrExpressionMetadata(p: Platform, type: string): ExtensionAndExpressionMetadata;
+  static getExtensionAndObjectStrExpressionMetadata(p: Platform, objectType: string, type: string): ExtensionAndExpressionMetadata;
+  static getExtensionAndBehaviorStrExpressionMetadata(p: Platform, autoType: string, type: string): ExtensionAndExpressionMetadata;
+  static getBehaviorMetadata(p: Platform, type: string): BehaviorMetadata;
+  static getObjectMetadata(p: Platform, type: string): ObjectMetadata;
+  static getEffectMetadata(p: Platform, type: string): EffectMetadata;
+  static getActionMetadata(p: Platform, type: string): InstructionMetadata;
+  static getConditionMetadata(p: Platform, type: string): InstructionMetadata;
+  static getExpressionMetadata(p: Platform, type: string): ExpressionMetadata;
+  static getObjectExpressionMetadata(p: Platform, objectType: string, type: string): ExpressionMetadata;
+  static getBehaviorExpressionMetadata(p: Platform, autoType: string, type: string): ExpressionMetadata;
+  static getStrExpressionMetadata(p: Platform, type: string): ExpressionMetadata;
+  static getObjectStrExpressionMetadata(p: Platform, objectType: string, type: string): ExpressionMetadata;
+  static getBehaviorStrExpressionMetadata(p: Platform, autoType: string, type: string): ExpressionMetadata;
+  static isBadExpressionMetadata(metadata: ExpressionMetadata): boolean;
+  static isBadBehaviorMetadata(metadata: BehaviorMetadata): boolean;
 }
 
 export class ExpressionParserDiagnostic extends EmscriptenObject {
-  IsError(): boolean;
-  GetMessage(): string;
-  GetStartPosition(): number;
-  GetEndPosition(): number;
+  isError(): boolean;
+  getMessage(): string;
+  getStartPosition(): number;
+  getEndPosition(): number;
 }
 
 export class VectorExpressionParserDiagnostic extends EmscriptenObject {
@@ -1836,22 +1836,22 @@ export class VectorExpressionParserDiagnostic extends EmscriptenObject {
 }
 
 export class ExpressionValidator extends EmscriptenObject {
-  constructor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string): void;
-  GetAllErrors(): VectorExpressionParserDiagnostic;
-  GetFatalErrors(): VectorExpressionParserDiagnostic;
+  expressionValidator(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string): void;
+  getAllErrors(): VectorExpressionParserDiagnostic;
+  getFatalErrors(): VectorExpressionParserDiagnostic;
 }
 
 export class ExpressionCompletionDescription extends EmscriptenObject {
-  GetCompletionKind(): ExpressionCompletionDescription_CompletionKind;
-  GetType(): string;
-  GetPrefix(): string;
-  GetObjectName(): string;
-  GetBehaviorName(): string;
-  IsExact(): boolean;
-  IsLastParameter(): boolean;
-  GetReplacementStartPosition(): number;
-  GetReplacementEndPosition(): number;
-  GetParameterMetadata(): ParameterMetadata;
+  getCompletionKind(): ExpressionCompletionDescription_CompletionKind;
+  getType(): string;
+  getPrefix(): string;
+  getObjectName(): string;
+  getBehaviorName(): string;
+  isExact(): boolean;
+  isLastParameter(): boolean;
+  getReplacementStartPosition(): number;
+  getReplacementEndPosition(): number;
+  getParameterMetadata(): ParameterMetadata;
 }
 
 export class VectorExpressionCompletionDescription extends EmscriptenObject {
@@ -1860,20 +1860,20 @@ export class VectorExpressionCompletionDescription extends EmscriptenObject {
 }
 
 export class ExpressionCompletionFinder extends EmscriptenObject {
-  STATIC_GetCompletionDescriptionsFor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
-  GetCompletionDescriptions(): VectorExpressionCompletionDescription;
+  static getCompletionDescriptionsFor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string, node: ExpressionNode, location: number): VectorExpressionCompletionDescription;
+  getCompletionDescriptions(): VectorExpressionCompletionDescription;
 }
 
 export class ExpressionNodeLocationFinder extends EmscriptenObject {
-  STATIC_GetNodeAtPosition(node: ExpressionNode, searchedPosition: number): ExpressionNode;
+  static getNodeAtPosition(node: ExpressionNode, searchedPosition: number): ExpressionNode;
 }
 
 export class ExpressionTypeFinder extends EmscriptenObject {
-  STATIC_GetType(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string, node: ExpressionNode): string;
+  static getType(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, rootType: string, node: ExpressionNode): string;
 }
 
 export class ExpressionNode extends EmscriptenObject {
-  Visit(worker: ExpressionParser2NodeWorker): void;
+  visit(worker: ExpressionParser2NodeWorker): void;
 }
 
 export class UniquePtrExpressionNode extends EmscriptenObject {
@@ -1881,198 +1881,198 @@ export class UniquePtrExpressionNode extends EmscriptenObject {
 }
 
 export class EventsFunction extends EmscriptenObject {
-  constructor(): void;
-  Clone(): EventsFunction;
-  SetDescription(description: string): EventsFunction;
-  GetDescription(): string;
-  SetName(name: string): EventsFunction;
-  GetName(): string;
-  SetFullName(fullName: string): EventsFunction;
-  GetFullName(): string;
-  SetSentence(sentence: string): EventsFunction;
-  GetSentence(): string;
-  SetGroup(group: string): EventsFunction;
-  GetGroup(): string;
-  SetGetterName(group: string): EventsFunction;
-  GetGetterName(): string;
-  SetExpressionType(type: ValueTypeMetadata): EventsFunction;
-  GetExpressionType(): ValueTypeMetadata;
-  SetPrivate(isPrivate: boolean): EventsFunction;
-  IsPrivate(): boolean;
-  SetAsync(isAsync: boolean): EventsFunction;
-  IsAsync(): boolean;
-  IsAction(): boolean;
-  IsExpression(): boolean;
-  IsCondition(): boolean;
-  SetFunctionType(type: EventsFunction_FunctionType): EventsFunction;
-  GetFunctionType(): EventsFunction_FunctionType;
-  GetEvents(): EventsList;
-  GetParameters(): VectorParameterMetadata;
-  GetParametersForEvents(functionsContainer: EventsFunctionsContainer): VectorParameterMetadata;
-  GetObjectGroups(): ObjectGroupsContainer;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  eventsFunction(): void;
+  clone(): EventsFunction;
+  setDescription(description: string): EventsFunction;
+  getDescription(): string;
+  setName(name: string): EventsFunction;
+  getName(): string;
+  setFullName(fullName: string): EventsFunction;
+  getFullName(): string;
+  setSentence(sentence: string): EventsFunction;
+  getSentence(): string;
+  setGroup(group: string): EventsFunction;
+  getGroup(): string;
+  setGetterName(group: string): EventsFunction;
+  getGetterName(): string;
+  setExpressionType(type: ValueTypeMetadata): EventsFunction;
+  getExpressionType(): ValueTypeMetadata;
+  setPrivate(isPrivate: boolean): EventsFunction;
+  isPrivate(): boolean;
+  setAsync(isAsync: boolean): EventsFunction;
+  isAsync(): boolean;
+  isAction(): boolean;
+  isExpression(): boolean;
+  isCondition(): boolean;
+  setFunctionType(type: EventsFunction_FunctionType): EventsFunction;
+  getFunctionType(): EventsFunction_FunctionType;
+  getEvents(): EventsList;
+  getParameters(): VectorParameterMetadata;
+  getParametersForEvents(functionsContainer: EventsFunctionsContainer): VectorParameterMetadata;
+  getObjectGroups(): ObjectGroupsContainer;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class EventsFunctionsContainer extends EmscriptenObject {
-  InsertNewEventsFunction(name: string, pos: number): EventsFunction;
-  InsertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
-  HasEventsFunctionNamed(name: string): boolean;
-  GetEventsFunction(name: string): EventsFunction;
-  GetEventsFunctionAt(pos: number): EventsFunction;
-  RemoveEventsFunction(name: string): void;
-  MoveEventsFunction(oldIndex: number, newIndex: number): void;
-  GetEventsFunctionsCount(): number;
-  GetEventsFunctionPosition(eventsFunction: EventsFunction): number;
+  insertNewEventsFunction(name: string, pos: number): EventsFunction;
+  insertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
+  hasEventsFunctionNamed(name: string): boolean;
+  getEventsFunction(name: string): EventsFunction;
+  getEventsFunctionAt(pos: number): EventsFunction;
+  removeEventsFunction(name: string): void;
+  moveEventsFunction(oldIndex: number, newIndex: number): void;
+  getEventsFunctionsCount(): number;
+  getEventsFunctionPosition(eventsFunction: EventsFunction): number;
 }
 
 export class AbstractEventsBasedEntity extends EmscriptenObject {
-  GetEventsFunctions(): EventsFunctionsContainer;
-  GetPropertyDescriptors(): NamedPropertyDescriptorsList;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  getEventsFunctions(): EventsFunctionsContainer;
+  getPropertyDescriptors(): NamedPropertyDescriptorsList;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class EventsBasedBehavior extends EmscriptenObject {
-  constructor(): void;
-  SetDescription(description: string): EventsBasedBehavior;
-  GetDescription(): string;
-  SetName(name: string): EventsBasedBehavior;
-  GetName(): string;
-  SetFullName(fullName: string): EventsBasedBehavior;
-  GetFullName(): string;
-  SetObjectType(fullName: string): EventsBasedBehavior;
-  GetObjectType(): string;
-  SetPrivate(isPrivate: boolean): EventsBasedBehavior;
-  IsPrivate(): boolean;
-  GetSharedPropertyDescriptors(): NamedPropertyDescriptorsList;
-  STATIC_GetPropertyActionName(propertyName: string): string;
-  STATIC_GetPropertyConditionName(propertyName: string): string;
-  STATIC_GetPropertyExpressionName(propertyName: string): string;
-  STATIC_GetPropertyToggleActionName(propertyName: string): string;
-  STATIC_GetSharedPropertyActionName(propertyName: string): string;
-  STATIC_GetSharedPropertyConditionName(propertyName: string): string;
-  STATIC_GetSharedPropertyExpressionName(propertyName: string): string;
-  STATIC_GetSharedPropertyToggleActionName(propertyName: string): string;
+  eventsBasedBehavior(): void;
+  setDescription(description: string): EventsBasedBehavior;
+  getDescription(): string;
+  setName(name: string): EventsBasedBehavior;
+  getName(): string;
+  setFullName(fullName: string): EventsBasedBehavior;
+  getFullName(): string;
+  setObjectType(fullName: string): EventsBasedBehavior;
+  getObjectType(): string;
+  setPrivate(isPrivate: boolean): EventsBasedBehavior;
+  isPrivate(): boolean;
+  getSharedPropertyDescriptors(): NamedPropertyDescriptorsList;
+  static getPropertyActionName(propertyName: string): string;
+  static getPropertyConditionName(propertyName: string): string;
+  static getPropertyExpressionName(propertyName: string): string;
+  static getPropertyToggleActionName(propertyName: string): string;
+  static getSharedPropertyActionName(propertyName: string): string;
+  static getSharedPropertyConditionName(propertyName: string): string;
+  static getSharedPropertyExpressionName(propertyName: string): string;
+  static getSharedPropertyToggleActionName(propertyName: string): string;
 }
 
 export class EventsBasedBehaviorsList extends EmscriptenObject {
-  InsertNew(name: string, pos: number): EventsBasedBehavior;
-  Insert(item: EventsBasedBehavior, pos: number): EventsBasedBehavior;
-  Has(name: string): boolean;
-  Get(name: string): EventsBasedBehavior;
-  GetAt(pos: number): EventsBasedBehavior;
-  Remove(name: string): void;
-  Move(oldIndex: number, newIndex: number): void;
-  GetCount(): number;
-  GetPosition(item: EventsBasedBehavior): number;
+  insertNew(name: string, pos: number): EventsBasedBehavior;
+  insert(item: EventsBasedBehavior, pos: number): EventsBasedBehavior;
+  has(name: string): boolean;
+  get(name: string): EventsBasedBehavior;
+  getAt(pos: number): EventsBasedBehavior;
+  remove(name: string): void;
+  move(oldIndex: number, newIndex: number): void;
+  getCount(): number;
+  getPosition(item: EventsBasedBehavior): number;
   size(): number;
   at(index: number): EventsBasedBehavior;
 }
 
 export class EventsBasedObject extends EmscriptenObject {
-  constructor(): void;
-  SetDescription(description: string): EventsBasedObject;
-  GetDescription(): string;
-  SetName(name: string): EventsBasedObject;
-  GetName(): string;
-  SetFullName(fullName: string): EventsBasedObject;
-  GetFullName(): string;
-  SetDefaultName(defaultName: string): EventsBasedObject;
-  GetDefaultName(): string;
-  STATIC_GetPropertyActionName(propertyName: string): string;
-  STATIC_GetPropertyConditionName(propertyName: string): string;
-  STATIC_GetPropertyExpressionName(propertyName: string): string;
-  STATIC_GetPropertyToggleActionName(propertyName: string): string;
-  InsertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
-  InsertObject(obj: gdObject, pos: number): gdObject;
-  HasObjectNamed(name: string): boolean;
-  GetObject(name: string): gdObject;
-  GetObjectAt(pos: number): gdObject;
-  GetObjectPosition(name: string): number;
-  RemoveObject(name: string): void;
-  SwapObjects(first: number, second: number): void;
-  MoveObject(oldIndex: number, newIndex: number): void;
-  MoveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
-  GetObjectsCount(): number;
-  GetObjectGroups(): ObjectGroupsContainer;
+  eventsBasedObject(): void;
+  setDescription(description: string): EventsBasedObject;
+  getDescription(): string;
+  setName(name: string): EventsBasedObject;
+  getName(): string;
+  setFullName(fullName: string): EventsBasedObject;
+  getFullName(): string;
+  setDefaultName(defaultName: string): EventsBasedObject;
+  getDefaultName(): string;
+  static getPropertyActionName(propertyName: string): string;
+  static getPropertyConditionName(propertyName: string): string;
+  static getPropertyExpressionName(propertyName: string): string;
+  static getPropertyToggleActionName(propertyName: string): string;
+  insertNewObject(project: Project, type: string, name: string, pos: number): gdObject;
+  insertObject(obj: gdObject, pos: number): gdObject;
+  hasObjectNamed(name: string): boolean;
+  getObject(name: string): gdObject;
+  getObjectAt(pos: number): gdObject;
+  getObjectPosition(name: string): number;
+  removeObject(name: string): void;
+  swapObjects(first: number, second: number): void;
+  moveObject(oldIndex: number, newIndex: number): void;
+  moveObjectToAnotherContainer(name: string, newObjectsContainer: ObjectsContainer, newPosition: number): void;
+  getObjectsCount(): number;
+  getObjectGroups(): ObjectGroupsContainer;
 }
 
 export class EventsBasedObjectsList extends EmscriptenObject {
-  InsertNew(name: string, pos: number): EventsBasedObject;
-  Insert(item: EventsBasedObject, pos: number): EventsBasedObject;
-  Has(name: string): boolean;
-  Get(name: string): EventsBasedObject;
-  GetAt(pos: number): EventsBasedObject;
-  Remove(name: string): void;
-  Move(oldIndex: number, newIndex: number): void;
-  GetCount(): number;
-  GetPosition(item: EventsBasedObject): number;
+  insertNew(name: string, pos: number): EventsBasedObject;
+  insert(item: EventsBasedObject, pos: number): EventsBasedObject;
+  has(name: string): boolean;
+  get(name: string): EventsBasedObject;
+  getAt(pos: number): EventsBasedObject;
+  remove(name: string): void;
+  move(oldIndex: number, newIndex: number): void;
+  getCount(): number;
+  getPosition(item: EventsBasedObject): number;
   size(): number;
   at(index: number): EventsBasedObject;
 }
 
 export class NamedPropertyDescriptorsList extends EmscriptenObject {
-  constructor(): void;
-  InsertNew(name: string, pos: number): NamedPropertyDescriptor;
-  Insert(item: NamedPropertyDescriptor, pos: number): NamedPropertyDescriptor;
-  Has(name: string): boolean;
-  Get(name: string): NamedPropertyDescriptor;
-  GetAt(pos: number): NamedPropertyDescriptor;
-  Remove(name: string): void;
-  Move(oldIndex: number, newIndex: number): void;
-  GetCount(): number;
-  GetPosition(item: NamedPropertyDescriptor): number;
+  namedPropertyDescriptorsList(): void;
+  insertNew(name: string, pos: number): NamedPropertyDescriptor;
+  insert(item: NamedPropertyDescriptor, pos: number): NamedPropertyDescriptor;
+  has(name: string): boolean;
+  get(name: string): NamedPropertyDescriptor;
+  getAt(pos: number): NamedPropertyDescriptor;
+  remove(name: string): void;
+  move(oldIndex: number, newIndex: number): void;
+  getCount(): number;
+  getPosition(item: NamedPropertyDescriptor): number;
   size(): number;
   at(index: number): NamedPropertyDescriptor;
 }
 
 export class EventsFunctionsExtension extends EmscriptenObject {
-  constructor(): void;
-  SetNamespace(namespace_: string): EventsFunctionsExtension;
-  GetNamespace(): string;
-  SetVersion(version: string): EventsFunctionsExtension;
-  GetVersion(): string;
-  SetShortDescription(shortDescription: string): EventsFunctionsExtension;
-  GetShortDescription(): string;
-  SetDescription(description: string): EventsFunctionsExtension;
-  GetDescription(): string;
-  SetName(name: string): EventsFunctionsExtension;
-  GetName(): string;
-  SetFullName(fullName: string): EventsFunctionsExtension;
-  GetFullName(): string;
-  SetCategory(category: string): EventsFunctionsExtension;
-  GetCategory(): string;
-  GetTags(): VectorString;
-  GetAuthorIds(): VectorString;
-  SetAuthor(author: string): EventsFunctionsExtension;
-  GetAuthor(): string;
-  SetPreviewIconUrl(previewIconUrl: string): EventsFunctionsExtension;
-  GetPreviewIconUrl(): string;
-  SetIconUrl(iconUrl: string): EventsFunctionsExtension;
-  GetIconUrl(): string;
-  SetHelpPath(helpPath: string): EventsFunctionsExtension;
-  GetHelpPath(): string;
-  SetOrigin(originName: string, originIdentifier: string): void;
-  GetOriginName(): string;
-  GetOriginIdentifier(): string;
-  AddDependency(): DependencyMetadata;
-  RemoveDependencyAt(index: number): void;
-  GetAllDependencies(): VectorDependencyMetadata;
-  GetEventsBasedBehaviors(): EventsBasedBehaviorsList;
-  GetEventsBasedObjects(): EventsBasedObjectsList;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
-  STATIC_IsExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
-  InsertNewEventsFunction(name: string, pos: number): EventsFunction;
-  InsertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
-  HasEventsFunctionNamed(name: string): boolean;
-  GetEventsFunction(name: string): EventsFunction;
-  GetEventsFunctionAt(pos: number): EventsFunction;
-  RemoveEventsFunction(name: string): void;
-  MoveEventsFunction(oldIndex: number, newIndex: number): void;
-  GetEventsFunctionsCount(): number;
-  GetEventsFunctionPosition(eventsFunction: EventsFunction): number;
+  eventsFunctionsExtension(): void;
+  setNamespace(namespace_: string): EventsFunctionsExtension;
+  getNamespace(): string;
+  setVersion(version: string): EventsFunctionsExtension;
+  getVersion(): string;
+  setShortDescription(shortDescription: string): EventsFunctionsExtension;
+  getShortDescription(): string;
+  setDescription(description: string): EventsFunctionsExtension;
+  getDescription(): string;
+  setName(name: string): EventsFunctionsExtension;
+  getName(): string;
+  setFullName(fullName: string): EventsFunctionsExtension;
+  getFullName(): string;
+  setCategory(category: string): EventsFunctionsExtension;
+  getCategory(): string;
+  getTags(): VectorString;
+  getAuthorIds(): VectorString;
+  setAuthor(author: string): EventsFunctionsExtension;
+  getAuthor(): string;
+  setPreviewIconUrl(previewIconUrl: string): EventsFunctionsExtension;
+  getPreviewIconUrl(): string;
+  setIconUrl(iconUrl: string): EventsFunctionsExtension;
+  getIconUrl(): string;
+  setHelpPath(helpPath: string): EventsFunctionsExtension;
+  getHelpPath(): string;
+  setOrigin(originName: string, originIdentifier: string): void;
+  getOriginName(): string;
+  getOriginIdentifier(): string;
+  addDependency(): DependencyMetadata;
+  removeDependencyAt(index: number): void;
+  getAllDependencies(): VectorDependencyMetadata;
+  getEventsBasedBehaviors(): EventsBasedBehaviorsList;
+  getEventsBasedObjects(): EventsBasedObjectsList;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
+  static isExtensionLifecycleEventsFunction(eventsFunctionName: string): boolean;
+  insertNewEventsFunction(name: string, pos: number): EventsFunction;
+  insertEventsFunction(eventsFunction: EventsFunction, pos: number): EventsFunction;
+  hasEventsFunctionNamed(name: string): boolean;
+  getEventsFunction(name: string): EventsFunction;
+  getEventsFunctionAt(pos: number): EventsFunction;
+  removeEventsFunction(name: string): void;
+  moveEventsFunction(oldIndex: number, newIndex: number): void;
+  getEventsFunctionsCount(): number;
+  getEventsFunctionPosition(eventsFunction: EventsFunction): number;
 }
 
 export class AbstractFileSystem extends EmscriptenObject {
@@ -2080,77 +2080,77 @@ export class AbstractFileSystem extends EmscriptenObject {
 }
 
 export class AbstractFileSystemJS extends EmscriptenObject {
-  constructor(): void;
-  MkDir(dir: string): void;
-  DirExists(dir: string): void;
-  ClearDir(dir: string): void;
-  GetTempDir(): string;
-  FileNameFrom(dir: string): string;
-  DirNameFrom(dir: string): string;
-  IsAbsolute(fn: string): boolean;
-  CopyFile(src: string, dest: string): void;
-  WriteToFile(fn: string, content: string): void;
-  ReadFile(fn: string): string;
-  ReadDir(dir: string): VectorString;
-  FileExists(fn: string): boolean;
+  abstractFileSystemJS(): void;
+  mkDir(dir: string): void;
+  dirExists(dir: string): void;
+  clearDir(dir: string): void;
+  getTempDir(): string;
+  fileNameFrom(dir: string): string;
+  dirNameFrom(dir: string): string;
+  isAbsolute(fn: string): boolean;
+  copyFile(src: string, dest: string): void;
+  writeToFile(fn: string, content: string): void;
+  readFile(fn: string): string;
+  readDir(dir: string): VectorString;
+  fileExists(fn: string): boolean;
 }
 
 export class ProjectResourcesAdder extends EmscriptenObject {
-  STATIC_GetAllUseless(project: Project, resourceType: string): VectorString;
-  STATIC_RemoveAllUseless(project: Project, resourceType: string): void;
+  static getAllUseless(project: Project, resourceType: string): VectorString;
+  static removeAllUseless(project: Project, resourceType: string): void;
 }
 
 export class ArbitraryEventsWorker extends EmscriptenObject {
-  Launch(events: EventsList): void;
+  launch(events: EventsList): void;
 }
 
 export class EventsLeaderboardsLister extends EmscriptenObject {
-  constructor(project: Project): void;
-  GetLeaderboardIds(): SetString;
-  Launch(events: EventsList): void;
+  eventsLeaderboardsLister(project: Project): void;
+  getLeaderboardIds(): SetString;
+  launch(events: EventsList): void;
 }
 
 export class EventsLeaderboardsRenamer extends EmscriptenObject {
-  constructor(project: Project, leaderboardIdMap: MapStringString): void;
-  Launch(events: EventsList): void;
+  eventsLeaderboardsRenamer(project: Project, leaderboardIdMap: MapStringString): void;
+  launch(events: EventsList): void;
 }
 
 export class EventsParametersLister extends EmscriptenObject {
-  constructor(project: Project): void;
-  GetParametersAndTypes(): MapStringString;
-  Launch(events: EventsList): void;
+  eventsParametersLister(project: Project): void;
+  getParametersAndTypes(): MapStringString;
+  launch(events: EventsList): void;
 }
 
 export class EventsPositionFinder extends EmscriptenObject {
-  constructor(): void;
-  GetPositions(): VectorInt;
-  AddEventToSearch(event: BaseEvent): void;
-  Launch(events: EventsList): void;
+  eventsPositionFinder(): void;
+  getPositions(): VectorInt;
+  addEventToSearch(event: BaseEvent): void;
+  launch(events: EventsList): void;
 }
 
 export class EventsTypesLister extends EmscriptenObject {
-  constructor(project: Project): void;
-  GetAllEventsTypes(): VectorString;
-  GetAllConditionsTypes(): VectorString;
-  GetAllActionsTypes(): VectorString;
-  Launch(events: EventsList): void;
+  eventsTypesLister(project: Project): void;
+  getAllEventsTypes(): VectorString;
+  getAllConditionsTypes(): VectorString;
+  getAllActionsTypes(): VectorString;
+  launch(events: EventsList): void;
 }
 
 export class InstructionsTypeRenamer extends EmscriptenObject {
-  constructor(project: Project, oldType: string, newType: string): void;
-  Launch(events: EventsList): void;
+  instructionsTypeRenamer(project: Project, oldType: string, newType: string): void;
+  launch(events: EventsList): void;
 }
 
 export class EventsContext extends EmscriptenObject {
-  GetReferencedObjectOrGroupNames(): SetString;
-  GetObjectNames(): SetString;
-  GetBehaviorNamesOfObjectOrGroup(objectOrGroupName: string): SetString;
+  getReferencedObjectOrGroupNames(): SetString;
+  getObjectNames(): SetString;
+  getBehaviorNamesOfObjectOrGroup(objectOrGroupName: string): SetString;
 }
 
 export class EventsContextAnalyzer extends EmscriptenObject {
-  constructor(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
-  GetEventsContext(): EventsContext;
-  Launch(events: EventsList): void;
+  eventsContextAnalyzer(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): void;
+  getEventsContext(): EventsContext;
+  launch(events: EventsList): void;
 }
 
 export class ArbitraryResourceWorker extends EmscriptenObject {
@@ -2158,384 +2158,384 @@ export class ArbitraryResourceWorker extends EmscriptenObject {
 }
 
 export class ArbitraryResourceWorkerJS extends EmscriptenObject {
-  constructor(): void;
-  ExposeImage(image: string): void;
-  ExposeShader(shader: string): void;
-  ExposeFile(file: string): void;
+  arbitraryResourceWorkerJS(): void;
+  exposeImage(image: string): void;
+  exposeShader(shader: string): void;
+  exposeFile(file: string): void;
 }
 
 export class ResourcesMergingHelper extends EmscriptenObject {
-  constructor(fs: AbstractFileSystem): void;
-  SetBaseDirectory(basePath: string): void;
-  GetAllResourcesOldAndNewFilename(): MapStringString;
+  resourcesMergingHelper(fs: AbstractFileSystem): void;
+  setBaseDirectory(basePath: string): void;
+  getAllResourcesOldAndNewFilename(): MapStringString;
 }
 
 export class ResourcesRenamer extends EmscriptenObject {
-  constructor(oldToNewNames: MapStringString): void;
+  resourcesRenamer(oldToNewNames: MapStringString): void;
 }
 
 export class ProjectResourcesCopier extends EmscriptenObject {
-  STATIC_CopyAllResourcesTo(project: Project, fs: AbstractFileSystem, destinationDirectory: string, updateOriginalProject: boolean, preserveAbsoluteFilenames: boolean, preserveDirectoryStructure: boolean): boolean;
+  static copyAllResourcesTo(project: Project, fs: AbstractFileSystem, destinationDirectory: string, updateOriginalProject: boolean, preserveAbsoluteFilenames: boolean, preserveDirectoryStructure: boolean): boolean;
 }
 
 export class ResourcesInUseHelper extends EmscriptenObject {
-  constructor(): void;
-  GetAllImages(): SetString;
-  GetAllAudios(): SetString;
-  GetAllFonts(): SetString;
-  GetAllBitmapFonts(): SetString;
-  GetAll(resourceType: string): SetString;
+  resourcesInUseHelper(): void;
+  getAllImages(): SetString;
+  getAllAudios(): SetString;
+  getAllFonts(): SetString;
+  getAllBitmapFonts(): SetString;
+  getAll(resourceType: string): SetString;
 }
 
 export class EditorSettings extends EmscriptenObject {
-  constructor(): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(element: SerializerElement): void;
+  editorSettings(): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(element: SerializerElement): void;
 }
 
 export class Point extends EmscriptenObject {
-  constructor(name: string): void;
-  SetName(name: string): void;
-  GetName(): string;
-  SetXY(x: number, y: number): void;
-  GetX(): number;
-  SetX(x: number): void;
-  GetY(): number;
-  SetY(y: number): void;
+  point(name: string): void;
+  setName(name: string): void;
+  getName(): string;
+  setXY(x: number, y: number): void;
+  getX(): number;
+  setX(x: number): void;
+  getY(): number;
+  setY(y: number): void;
 }
 
 export class VectorPoint extends EmscriptenObject {
-  constructor(): void;
+  vectorPoint(): void;
   push_back(pt: Point): void;
   size(): number;
   at(index: number): Point;
-  WRAPPED_set(index: number, pt: Point): void;
+  set(index: number, pt: Point): void;
   clear(): void;
 }
 
 export class Sprite extends EmscriptenObject {
-  constructor(): void;
-  SetImageName(name: string): void;
-  GetImageName(): string;
-  GetOrigin(): Point;
-  GetCenter(): Point;
-  IsDefaultCenterPoint(): boolean;
-  SetDefaultCenterPoint(defaultPoint: boolean): void;
-  GetAllNonDefaultPoints(): VectorPoint;
-  AddPoint(point: Point): void;
-  DelPoint(name: string): void;
-  GetPoint(name: string): Point;
-  HasPoint(name: string): boolean;
-  IsFullImageCollisionMask(): boolean;
-  SetFullImageCollisionMask(enabled: boolean): void;
-  GetCustomCollisionMask(): VectorPolygon2d;
-  SetCustomCollisionMask(collisionMask: VectorPolygon2d): void;
+  sprite(): void;
+  setImageName(name: string): void;
+  getImageName(): string;
+  getOrigin(): Point;
+  getCenter(): Point;
+  isDefaultCenterPoint(): boolean;
+  setDefaultCenterPoint(defaultPoint: boolean): void;
+  getAllNonDefaultPoints(): VectorPoint;
+  addPoint(point: Point): void;
+  delPoint(name: string): void;
+  getPoint(name: string): Point;
+  hasPoint(name: string): boolean;
+  isFullImageCollisionMask(): boolean;
+  setFullImageCollisionMask(enabled: boolean): void;
+  getCustomCollisionMask(): VectorPolygon2d;
+  setCustomCollisionMask(collisionMask: VectorPolygon2d): void;
 }
 
 export class Direction extends EmscriptenObject {
-  constructor(): void;
-  AddSprite(sprite: Sprite): void;
-  GetSprite(index: number): Sprite;
-  GetSpritesCount(): number;
-  HasNoSprites(): boolean;
-  RemoveSprite(index: number): void;
-  RemoveAllSprites(): void;
-  IsLooping(): boolean;
-  SetLoop(enable: boolean): void;
-  GetTimeBetweenFrames(): number;
-  GetSpriteNames(): VectorString;
-  SetTimeBetweenFrames(time: number): void;
-  SwapSprites(first: number, second: number): void;
-  MoveSprite(oldIndex: number, newIndex: number): void;
-  SetMetadata(metadata: string): void;
-  GetMetadata(): string;
+  direction(): void;
+  addSprite(sprite: Sprite): void;
+  getSprite(index: number): Sprite;
+  getSpritesCount(): number;
+  hasNoSprites(): boolean;
+  removeSprite(index: number): void;
+  removeAllSprites(): void;
+  isLooping(): boolean;
+  setLoop(enable: boolean): void;
+  getTimeBetweenFrames(): number;
+  getSpriteNames(): VectorString;
+  setTimeBetweenFrames(time: number): void;
+  swapSprites(first: number, second: number): void;
+  moveSprite(oldIndex: number, newIndex: number): void;
+  setMetadata(metadata: string): void;
+  getMetadata(): string;
 }
 
 export class Animation extends EmscriptenObject {
-  constructor(): void;
-  SetName(name: string): void;
-  GetName(): string;
-  SetDirectionsCount(count: number): void;
-  GetDirectionsCount(): number;
-  GetDirection(index: number): Direction;
-  SetDirection(direction: Direction, index: number): void;
-  HasNoDirections(): boolean;
-  UseMultipleDirections(): boolean;
-  SetUseMultipleDirections(enable: boolean): void;
+  animation(): void;
+  setName(name: string): void;
+  getName(): string;
+  setDirectionsCount(count: number): void;
+  getDirectionsCount(): number;
+  getDirection(index: number): Direction;
+  setDirection(direction: Direction, index: number): void;
+  hasNoDirections(): boolean;
+  useMultipleDirections(): boolean;
+  setUseMultipleDirections(enable: boolean): void;
 }
 
 export class SpriteObject extends EmscriptenObject {
-  constructor(): void;
-  AddAnimation(animation: Animation): void;
-  GetAnimation(index: number): Animation;
-  GetAnimationsCount(): number;
-  RemoveAnimation(index: number): void;
-  RemoveAllAnimations(): void;
-  HasNoAnimations(): boolean;
-  SwapAnimations(first: number, second: number): void;
-  MoveAnimation(oldIndex: number, newIndex: number): void;
-  SetUpdateIfNotVisible(updateIfNotVisible: boolean): void;
-  GetUpdateIfNotVisible(): boolean;
-  AdaptCollisionMaskAutomatically(): boolean;
-  SetAdaptCollisionMaskAutomatically(adaptCollisionMaskAutomatically: boolean): void;
+  spriteObject(): void;
+  addAnimation(animation: Animation): void;
+  getAnimation(index: number): Animation;
+  getAnimationsCount(): number;
+  removeAnimation(index: number): void;
+  removeAllAnimations(): void;
+  hasNoAnimations(): boolean;
+  swapAnimations(first: number, second: number): void;
+  moveAnimation(oldIndex: number, newIndex: number): void;
+  setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
+  getUpdateIfNotVisible(): boolean;
+  adaptCollisionMaskAutomatically(): boolean;
+  setAdaptCollisionMaskAutomatically(adaptCollisionMaskAutomatically: boolean): void;
 }
 
 export class TextObject extends EmscriptenObject {
-  constructor(): void;
-  SetString(string: string): void;
-  GetString(): string;
-  SetCharacterSize(size: number): void;
-  GetCharacterSize(): number;
-  SetFontName(string: string): void;
-  GetFontName(): string;
-  IsBold(): boolean;
-  SetBold(enable: boolean): void;
-  IsItalic(): boolean;
-  SetItalic(enable: boolean): void;
-  IsUnderlined(): boolean;
-  SetUnderlined(enable: boolean): void;
-  SetColor(r: number, g: number, b: number): void;
-  GetColorR(): number;
-  GetColorG(): number;
-  GetColorB(): number;
-  SetTextAlignment(textAlignment: string): void;
-  GetTextAlignment(): string;
+  textObject(): void;
+  setString(string: string): void;
+  getString(): string;
+  setCharacterSize(size: number): void;
+  getCharacterSize(): number;
+  setFontName(string: string): void;
+  getFontName(): string;
+  isBold(): boolean;
+  setBold(enable: boolean): void;
+  isItalic(): boolean;
+  setItalic(enable: boolean): void;
+  isUnderlined(): boolean;
+  setUnderlined(enable: boolean): void;
+  setColor(r: number, g: number, b: number): void;
+  getColorR(): number;
+  getColorG(): number;
+  getColorB(): number;
+  setTextAlignment(textAlignment: string): void;
+  getTextAlignment(): string;
 }
 
 export class TiledSpriteObject extends EmscriptenObject {
-  constructor(): void;
-  SetTexture(texture: string): void;
-  GetTexture(): string;
-  SetWidth(width: number): void;
-  GetWidth(): number;
-  SetHeight(height: number): void;
-  GetHeight(): number;
+  tiledSpriteObject(): void;
+  setTexture(texture: string): void;
+  getTexture(): string;
+  setWidth(width: number): void;
+  getWidth(): number;
+  setHeight(height: number): void;
+  getHeight(): number;
 }
 
 export class PanelSpriteObject extends EmscriptenObject {
-  constructor(): void;
-  GetLeftMargin(): number;
-  SetLeftMargin(newMargin: number): void;
-  GetTopMargin(): number;
-  SetTopMargin(newMargin: number): void;
-  GetRightMargin(): number;
-  SetRightMargin(newMargin: number): void;
-  GetBottomMargin(): number;
-  SetBottomMargin(newMargin: number): void;
-  IsTiled(): boolean;
-  SetTiled(enable: boolean): void;
-  SetTexture(texture: string): void;
-  GetTexture(): string;
-  SetWidth(width: number): void;
-  GetWidth(): number;
-  SetHeight(height: number): void;
-  GetHeight(): number;
+  panelSpriteObject(): void;
+  getLeftMargin(): number;
+  setLeftMargin(newMargin: number): void;
+  getTopMargin(): number;
+  setTopMargin(newMargin: number): void;
+  getRightMargin(): number;
+  setRightMargin(newMargin: number): void;
+  getBottomMargin(): number;
+  setBottomMargin(newMargin: number): void;
+  isTiled(): boolean;
+  setTiled(enable: boolean): void;
+  setTexture(texture: string): void;
+  getTexture(): string;
+  setWidth(width: number): void;
+  getWidth(): number;
+  setHeight(height: number): void;
+  getHeight(): number;
 }
 
 export class ShapePainterObject extends EmscriptenObject {
-  constructor(): void;
-  SetCoordinatesAbsolute(): void;
-  SetCoordinatesRelative(): void;
-  AreCoordinatesAbsolute(): boolean;
-  SetClearBetweenFrames(value: boolean): void;
-  IsClearedBetweenFrames(): boolean;
-  SetOutlineSize(size: number): void;
-  GetOutlineSize(): number;
-  SetOutlineOpacity(val: number): void;
-  GetOutlineOpacity(): number;
-  SetOutlineColor(r: number, g: number, b: number): void;
-  GetOutlineColorR(): number;
-  GetOutlineColorG(): number;
-  GetOutlineColorB(): number;
-  SetFillOpacity(val: number): void;
-  GetFillOpacity(): number;
-  SetFillColor(r: number, g: number, b: number): void;
-  GetFillColorR(): number;
-  GetFillColorG(): number;
-  GetFillColorB(): number;
-  GetAntialiasing(): string;
-  SetAntialiasing(value: string): void;
+  shapePainterObject(): void;
+  setCoordinatesAbsolute(): void;
+  setCoordinatesRelative(): void;
+  areCoordinatesAbsolute(): boolean;
+  setClearBetweenFrames(value: boolean): void;
+  isClearedBetweenFrames(): boolean;
+  setOutlineSize(size: number): void;
+  getOutlineSize(): number;
+  setOutlineOpacity(val: number): void;
+  getOutlineOpacity(): number;
+  setOutlineColor(r: number, g: number, b: number): void;
+  getOutlineColorR(): number;
+  getOutlineColorG(): number;
+  getOutlineColorB(): number;
+  setFillOpacity(val: number): void;
+  getFillOpacity(): number;
+  setFillColor(r: number, g: number, b: number): void;
+  getFillColorR(): number;
+  getFillColorG(): number;
+  getFillColorB(): number;
+  getAntialiasing(): string;
+  setAntialiasing(value: string): void;
 }
 
 export class TextEntryObject extends EmscriptenObject {
-  constructor(): void;
+  textEntryObject(): void;
 }
 
 export class ParticleEmitterObject extends EmscriptenObject {
-  constructor(): void;
-  SetRendererType(type: ParticleEmitterObject_RendererType): void;
-  GetRendererType(): ParticleEmitterObject_RendererType;
-  SetParticleTexture(resourceName: string): void;
-  GetParticleTexture(): string;
-  SetRendererParam1(newValue: number): void;
-  GetRendererParam1(): number;
-  SetRendererParam2(newValue: number): void;
-  GetRendererParam2(): number;
-  IsRenderingAdditive(): boolean;
-  SetRenderingAdditive(): void;
-  SetRenderingAlpha(): void;
-  SetMaxParticleNb(newValue: number): void;
-  GetMaxParticleNb(): number;
-  SetTank(newValue: number): void;
-  GetTank(): number;
-  SetFlow(newValue: number): void;
-  GetFlow(): number;
-  SetDestroyWhenNoParticles(enable: boolean): void;
-  GetDestroyWhenNoParticles(): boolean;
-  SetEmitterForceMin(newValue: number): void;
-  GetEmitterForceMin(): number;
-  SetEmitterForceMax(newValue: number): void;
-  GetEmitterForceMax(): number;
-  SetConeSprayAngle(newValue: number): void;
-  GetConeSprayAngle(): number;
-  SetZoneRadius(newValue: number): void;
-  GetZoneRadius(): number;
-  SetParticleGravityX(newValue: number): void;
-  GetParticleGravityX(): number;
-  SetParticleGravityY(newValue: number): void;
-  GetParticleGravityY(): number;
-  SetParticleGravityAngle(newValue: number): void;
-  GetParticleGravityAngle(): number;
-  SetParticleGravityLength(newValue: number): void;
-  GetParticleGravityLength(): number;
-  SetParticleLifeTimeMin(newValue: number): void;
-  GetParticleLifeTimeMin(): number;
-  SetParticleLifeTimeMax(newValue: number): void;
-  GetParticleLifeTimeMax(): number;
-  SetParticleRed1(newValue: number): void;
-  GetParticleRed1(): number;
-  SetParticleRed2(newValue: number): void;
-  GetParticleRed2(): number;
-  SetParticleGreen1(newValue: number): void;
-  GetParticleGreen1(): number;
-  SetParticleGreen2(newValue: number): void;
-  GetParticleGreen2(): number;
-  SetParticleBlue1(newValue: number): void;
-  GetParticleBlue1(): number;
-  SetParticleBlue2(newValue: number): void;
-  GetParticleBlue2(): number;
-  SetParticleAlpha1(newValue: number): void;
-  GetParticleAlpha1(): number;
-  SetParticleAlpha2(newValue: number): void;
-  GetParticleAlpha2(): number;
-  SetParticleSize1(newValue: number): void;
-  GetParticleSize1(): number;
-  SetParticleSize2(newValue: number): void;
-  GetParticleSize2(): number;
-  SetParticleAngle1(newValue: number): void;
-  GetParticleAngle1(): number;
-  SetParticleAngle2(newValue: number): void;
-  GetParticleAngle2(): number;
-  SetParticleAlphaRandomness1(newValue: number): void;
-  GetParticleAlphaRandomness1(): number;
-  SetParticleAlphaRandomness2(newValue: number): void;
-  GetParticleAlphaRandomness2(): number;
-  SetParticleSizeRandomness1(newValue: number): void;
-  GetParticleSizeRandomness1(): number;
-  SetParticleSizeRandomness2(newValue: number): void;
-  GetParticleSizeRandomness2(): number;
-  SetParticleAngleRandomness1(newValue: number): void;
-  GetParticleAngleRandomness1(): number;
-  SetParticleAngleRandomness2(newValue: number): void;
-  GetParticleAngleRandomness2(): number;
-  SetJumpForwardInTimeOnCreation(newValue: number): void;
-  GetJumpForwardInTimeOnCreation(): number;
+  particleEmitterObject(): void;
+  setRendererType(type: ParticleEmitterObject_RendererType): void;
+  getRendererType(): ParticleEmitterObject_RendererType;
+  setParticleTexture(resourceName: string): void;
+  getParticleTexture(): string;
+  setRendererParam1(newValue: number): void;
+  getRendererParam1(): number;
+  setRendererParam2(newValue: number): void;
+  getRendererParam2(): number;
+  isRenderingAdditive(): boolean;
+  setRenderingAdditive(): void;
+  setRenderingAlpha(): void;
+  setMaxParticleNb(newValue: number): void;
+  getMaxParticleNb(): number;
+  setTank(newValue: number): void;
+  getTank(): number;
+  setFlow(newValue: number): void;
+  getFlow(): number;
+  setDestroyWhenNoParticles(enable: boolean): void;
+  getDestroyWhenNoParticles(): boolean;
+  setEmitterForceMin(newValue: number): void;
+  getEmitterForceMin(): number;
+  setEmitterForceMax(newValue: number): void;
+  getEmitterForceMax(): number;
+  setConeSprayAngle(newValue: number): void;
+  getConeSprayAngle(): number;
+  setZoneRadius(newValue: number): void;
+  getZoneRadius(): number;
+  setParticleGravityX(newValue: number): void;
+  getParticleGravityX(): number;
+  setParticleGravityY(newValue: number): void;
+  getParticleGravityY(): number;
+  setParticleGravityAngle(newValue: number): void;
+  getParticleGravityAngle(): number;
+  setParticleGravityLength(newValue: number): void;
+  getParticleGravityLength(): number;
+  setParticleLifeTimeMin(newValue: number): void;
+  getParticleLifeTimeMin(): number;
+  setParticleLifeTimeMax(newValue: number): void;
+  getParticleLifeTimeMax(): number;
+  setParticleRed1(newValue: number): void;
+  getParticleRed1(): number;
+  setParticleRed2(newValue: number): void;
+  getParticleRed2(): number;
+  setParticleGreen1(newValue: number): void;
+  getParticleGreen1(): number;
+  setParticleGreen2(newValue: number): void;
+  getParticleGreen2(): number;
+  setParticleBlue1(newValue: number): void;
+  getParticleBlue1(): number;
+  setParticleBlue2(newValue: number): void;
+  getParticleBlue2(): number;
+  setParticleAlpha1(newValue: number): void;
+  getParticleAlpha1(): number;
+  setParticleAlpha2(newValue: number): void;
+  getParticleAlpha2(): number;
+  setParticleSize1(newValue: number): void;
+  getParticleSize1(): number;
+  setParticleSize2(newValue: number): void;
+  getParticleSize2(): number;
+  setParticleAngle1(newValue: number): void;
+  getParticleAngle1(): number;
+  setParticleAngle2(newValue: number): void;
+  getParticleAngle2(): number;
+  setParticleAlphaRandomness1(newValue: number): void;
+  getParticleAlphaRandomness1(): number;
+  setParticleAlphaRandomness2(newValue: number): void;
+  getParticleAlphaRandomness2(): number;
+  setParticleSizeRandomness1(newValue: number): void;
+  getParticleSizeRandomness1(): number;
+  setParticleSizeRandomness2(newValue: number): void;
+  getParticleSizeRandomness2(): number;
+  setParticleAngleRandomness1(newValue: number): void;
+  getParticleAngleRandomness1(): number;
+  setParticleAngleRandomness2(newValue: number): void;
+  getParticleAngleRandomness2(): number;
+  setJumpForwardInTimeOnCreation(newValue: number): void;
+  getJumpForwardInTimeOnCreation(): number;
 }
 
 export class LayoutCodeGenerator extends EmscriptenObject {
-  constructor(project: Project): void;
-  GenerateLayoutCompleteCode(layout: Layout, includes: SetString, compilationForRuntime: boolean): string;
+  layoutCodeGenerator(project: Project): void;
+  generateLayoutCompleteCode(layout: Layout, includes: SetString, compilationForRuntime: boolean): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
-  constructor(project: Project): void;
-  GenerateRuntimeBehaviorCompleteCode(extensionName: string, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
-  STATIC_GetBehaviorPropertyGetterName(propertyName: string): string;
-  STATIC_GetBehaviorPropertySetterName(propertyName: string): string;
-  STATIC_GetBehaviorPropertyToggleFunctionName(propertyName: string): string;
-  STATIC_GetBehaviorSharedPropertyGetterName(propertyName: string): string;
-  STATIC_GetBehaviorSharedPropertySetterName(propertyName: string): string;
-  STATIC_GetBehaviorSharedPropertyToggleFunctionName(propertyName: string): string;
+  behaviorCodeGenerator(project: Project): void;
+  generateRuntimeBehaviorCompleteCode(extensionName: string, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  static getBehaviorPropertyGetterName(propertyName: string): string;
+  static getBehaviorPropertySetterName(propertyName: string): string;
+  static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
+  static getBehaviorSharedPropertyGetterName(propertyName: string): string;
+  static getBehaviorSharedPropertySetterName(propertyName: string): string;
+  static getBehaviorSharedPropertyToggleFunctionName(propertyName: string): string;
 }
 
 export class ObjectCodeGenerator extends EmscriptenObject {
-  constructor(project: Project): void;
-  GenerateRuntimeObjectCompleteCode(extensionName: string, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
-  STATIC_GetObjectPropertyGetterName(propertyName: string): string;
-  STATIC_GetObjectPropertySetterName(propertyName: string): string;
-  STATIC_GetObjectPropertyToggleFunctionName(propertyName: string): string;
+  objectCodeGenerator(project: Project): void;
+  generateRuntimeObjectCompleteCode(extensionName: string, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  static getObjectPropertyGetterName(propertyName: string): string;
+  static getObjectPropertySetterName(propertyName: string): string;
+  static getObjectPropertyToggleFunctionName(propertyName: string): string;
 }
 
 export class EventsFunctionsExtensionCodeGenerator extends EmscriptenObject {
-  constructor(project: Project): void;
-  GenerateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
+  eventsFunctionsExtensionCodeGenerator(project: Project): void;
+  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
 }
 
 export class PreviewExportOptions extends EmscriptenObject {
-  constructor(project: Project, outputPath: string): void;
-  UseWebsocketDebuggerClientWithServerAddress(address: string, port: string): PreviewExportOptions;
-  UseWindowMessageDebuggerClient(): PreviewExportOptions;
-  SetLayoutName(layoutName: string): PreviewExportOptions;
-  SetFallbackAuthor(id: string, username: string): PreviewExportOptions;
-  SetExternalLayoutName(externalLayoutName: string): PreviewExportOptions;
-  SetIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
-  SetProjectDataOnlyExport(enable: boolean): PreviewExportOptions;
-  SetFullLoadingScreen(enable: boolean): PreviewExportOptions;
-  SetIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
-  SetNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;
-  SetElectronRemoteRequirePath(electronRemoteRequirePath: string): PreviewExportOptions;
-  SetGDevelopResourceToken(gdevelopResourceToken: string): PreviewExportOptions;
-  SetAllowAuthenticationUsingIframeForPreview(enable: boolean): PreviewExportOptions;
+  previewExportOptions(project: Project, outputPath: string): void;
+  useWebsocketDebuggerClientWithServerAddress(address: string, port: string): PreviewExportOptions;
+  useWindowMessageDebuggerClient(): PreviewExportOptions;
+  setLayoutName(layoutName: string): PreviewExportOptions;
+  setFallbackAuthor(id: string, username: string): PreviewExportOptions;
+  setExternalLayoutName(externalLayoutName: string): PreviewExportOptions;
+  setIncludeFileHash(includeFile: string, hash: number): PreviewExportOptions;
+  setProjectDataOnlyExport(enable: boolean): PreviewExportOptions;
+  setFullLoadingScreen(enable: boolean): PreviewExportOptions;
+  setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
+  setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;
+  setElectronRemoteRequirePath(electronRemoteRequirePath: string): PreviewExportOptions;
+  setGDevelopResourceToken(gdevelopResourceToken: string): PreviewExportOptions;
+  setAllowAuthenticationUsingIframeForPreview(enable: boolean): PreviewExportOptions;
 }
 
 export class ExportOptions extends EmscriptenObject {
-  constructor(project: Project, outputPath: string): void;
-  SetFallbackAuthor(id: string, username: string): ExportOptions;
-  SetTarget(target: string): ExportOptions;
+  exportOptions(project: Project, outputPath: string): void;
+  setFallbackAuthor(id: string, username: string): ExportOptions;
+  setTarget(target: string): ExportOptions;
 }
 
 export class Exporter extends EmscriptenObject {
-  constructor(fs: AbstractFileSystem, gdjsRoot: string): void;
-  SetCodeOutputDirectory(path: string): void;
-  ExportProjectForPixiPreview(options: PreviewExportOptions): boolean;
-  ExportWholePixiProject(options: ExportOptions): boolean;
-  GetLastError(): string;
+  exporter(fs: AbstractFileSystem, gdjsRoot: string): void;
+  setCodeOutputDirectory(path: string): void;
+  exportProjectForPixiPreview(options: PreviewExportOptions): boolean;
+  exportWholePixiProject(options: ExportOptions): boolean;
+  getLastError(): string;
 }
 
 export class JsCodeEvent extends EmscriptenObject {
-  constructor(): void;
-  GetInlineCode(): string;
-  SetInlineCode(type: string): void;
-  GetParameterObjects(): string;
-  SetParameterObjects(type: string): void;
-  IsEventsSheetExpanded(): boolean;
-  SetEventsSheetExpanded(enable: boolean): void;
-  Clone(): JsCodeEvent;
-  GetType(): string;
-  SetType(type: string): void;
-  IsExecutable(): boolean;
-  CanHaveSubEvents(): boolean;
-  HasSubEvents(): boolean;
-  GetSubEvents(): EventsList;
-  IsDisabled(): boolean;
-  SetDisabled(disable: boolean): void;
-  IsFolded(): boolean;
-  SetFolded(folded: boolean): void;
-  SerializeTo(element: SerializerElement): void;
-  UnserializeFrom(project: Project, element: SerializerElement): void;
+  jsCodeEvent(): void;
+  getInlineCode(): string;
+  setInlineCode(type: string): void;
+  getParameterObjects(): string;
+  setParameterObjects(type: string): void;
+  isEventsSheetExpanded(): boolean;
+  setEventsSheetExpanded(enable: boolean): void;
+  clone(): JsCodeEvent;
+  getType(): string;
+  setType(type: string): void;
+  isExecutable(): boolean;
+  canHaveSubEvents(): boolean;
+  hasSubEvents(): boolean;
+  getSubEvents(): EventsList;
+  isDisabled(): boolean;
+  setDisabled(disable: boolean): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  serializeTo(element: SerializerElement): void;
+  unserializeFrom(project: Project, element: SerializerElement): void;
 }
 
 export class MetadataDeclarationHelper extends EmscriptenObject {
-  constructor(): void;
-  STATIC_DeclareExtension(extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension): void;
-  GenerateFreeFunctionMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): AbstractFunctionMetadata;
-  STATIC_GenerateBehaviorMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, behaviorMethodMangledNames: MapStringString): BehaviorMetadata;
-  STATIC_GenerateObjectMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, objectMethodMangledNames: MapStringString): ObjectMetadata;
-  STATIC_GetFreeFunctionCodeName(eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): string;
-  STATIC_IsBehaviorLifecycleEventsFunction(functionName: string): boolean;
-  STATIC_IsObjectLifecycleEventsFunction(functionName: string): boolean;
-  STATIC_IsExtensionLifecycleEventsFunction(functionName: string): boolean;
-  STATIC_ShiftSentenceParamIndexes(sentence: string, offset: number): string;
+  metadataDeclarationHelper(): void;
+  static declareExtension(extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension): void;
+  generateFreeFunctionMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): AbstractFunctionMetadata;
+  static generateBehaviorMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, behaviorMethodMangledNames: MapStringString): BehaviorMetadata;
+  static generateObjectMetadata(project: Project, extension: PlatformExtension, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, objectMethodMangledNames: MapStringString): ObjectMetadata;
+  static getFreeFunctionCodeName(eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction): string;
+  static isBehaviorLifecycleEventsFunction(functionName: string): boolean;
+  static isObjectLifecycleEventsFunction(functionName: string): boolean;
+  static isExtensionLifecycleEventsFunction(functionName: string): boolean;
+  static shiftSentenceParamIndexes(sentence: string, offset: number): string;
 }
 
 export as namespace gd;

@@ -135,7 +135,17 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
   Parser.setSource(interfaceCode);
   while (!Parser.isDone) {
     const { type: returnType, optional: optionalReturn } = Parser.readType();
-    const methodName = Parser.readUntil('(');
+
+    let methodName = Parser.readUntil('(');
+    const isStatic = methodName.includes('STATIC_');
+    // Remove prefixes which are not part of the actual function name
+    methodName = methodName
+      .replace('WRAPPED_', '')
+      .replace('MAP_', '')
+      .replace('STATIC_', '');
+    // Convert PascalCase to camelCase
+    methodName = methodName[0].toLowerCase() + methodName.slice(1);
+
     const isConstructor = returnType === 'void' && methodName === interfaceName;
 
     /** @type {Array<{name:string, type:string, optional:boolean, defaultValue:(number | typeof none)}>} */
@@ -170,7 +180,9 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
     Parser.skipWhitespaces();
 
     methods.push(
-      `${isConstructor ? `constructor` : methodName}(${parameters
+      `${isStatic ? 'static ' : ''}${
+        isConstructor ? `constructor` : methodName
+      }(${parameters
         .map(
           ({ name, type, optional, defaultValue }) =>
             `${name}${optional ? '?' : ''}: ${

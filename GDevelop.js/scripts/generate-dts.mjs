@@ -19,65 +19,67 @@ const PrimitiveTypes = new Map([
 
 const none = Symbol('No default value');
 class Parser {
-  static i = 0;
+  static parserPosition = 0;
   /** @private */
-  static str = '';
+  static sourceString = '';
   /** @private */
-  static l = 0;
+  static sourceLength = 0;
 
   /** @param {string} str */
-  static set target(str) {
-    this.i = 0;
-    this.str = str;
-    this.l = str.length;
+  static setSource(str) {
+    this.parserPosition = 0;
+    this.sourceString = str;
+    this.sourceLength = str.length;
   }
-  static get done() {
-    return this.i >= this.l;
+  static get isDone() {
+    return this.parserPosition >= this.sourceLength;
   }
-  static get c() {
-    return this.str.charAt(this.i);
+  static get currentCharacter() {
+    return this.sourceString.charAt(this.parserPosition);
   }
-  static get cc() {
-    return this.str.charCodeAt(this.i);
+  static get currentCharacterCode() {
+    return this.sourceString.charCodeAt(this.parserPosition);
   }
+
   static skipWhitespaces() {
-    while (this.cc <= 32) this.i++;
+    while (this.currentCharacterCode <= 32) this.parserPosition++;
     // Comments go everywhere whitespaces go and must be skipped as if it were whitespace
-    if (this.c === '/') {
-      this.i++;
-      if (this.c === '/') {
+    if (this.currentCharacter === '/') {
+      this.parserPosition++;
+      if (this.currentCharacter === '/') {
         // //-style comments
         this.skipUntil('\n');
-      } else if (this.c === '*') {
+      } else if (this.currentCharacter === '*') {
         // /* */-style comments
         do {
           this.skipUntil('*');
-        } while (this.c !== '/');
-        this.i++;
-      } else console.warn(`Unexpected slash!`);
+        } while (this.currentCharacter !== '/');
+        this.parserPosition++;
+      } else console.warn(`Unexpected slash.`);
       this.skipWhitespaces();
     }
   }
   /** @param {string} thisCharacter */
   static skipUntil(thisCharacter, skipOverIt = true) {
-    while (this.c !== thisCharacter && !this.done) this.i++;
-    if (skipOverIt) this.i++;
+    while (this.currentCharacter !== thisCharacter && !this.isDone)
+      this.parserPosition++;
+    if (skipOverIt) this.parserPosition++;
   }
   /** @param {string} thisCharacter */
   static readUntil(thisCharacter, skipOverIt = true) {
     let token = '';
-    while (this.c !== thisCharacter) {
-      token += this.c;
-      this.i++;
+    while (this.currentCharacter !== thisCharacter) {
+      token += this.currentCharacter;
+      this.parserPosition++;
     }
-    if (skipOverIt) this.i++;
+    if (skipOverIt) this.parserPosition++;
     return token;
   }
 
   static readType() {
     // Ignore [Const] and such annotations
     Parser.skipWhitespaces();
-    if (Parser.c === '[') Parser.skipUntil(']');
+    if (Parser.currentCharacter === '[') Parser.skipUntil(']');
     Parser.skipWhitespaces();
 
     // Read the type
@@ -97,13 +99,16 @@ class Parser {
   static readIdentifier() {
     let name = '';
     while (
-      (Parser.cc >= 97 && Parser.cc <= 122) || // [a-z]
-      (Parser.cc >= 65 && Parser.cc <= 90) || // [A-Z]
-      (Parser.cc >= 48 && Parser.cc <= 57) || // [1-9]
-      Parser.c === '_'
+      (Parser.currentCharacterCode >= 97 &&
+        Parser.currentCharacterCode <= 122) || // [a-z]
+      (Parser.currentCharacterCode >= 65 &&
+        Parser.currentCharacterCode <= 90) || // [A-Z]
+      (Parser.currentCharacterCode >= 48 &&
+        Parser.currentCharacterCode <= 57) || // [1-9]
+      Parser.currentCharacter === '_'
     ) {
-      name += Parser.c;
-      Parser.i++;
+      name += Parser.currentCharacter;
+      Parser.parserPosition++;
     }
     return name;
   }
@@ -111,11 +116,11 @@ class Parser {
   static readNumber() {
     let number = '';
     while (
-      Parser.cc >= 48 &&
-      Parser.cc <= 57 // [1-9]
+      Parser.currentCharacterCode >= 48 &&
+      Parser.currentCharacterCode <= 57 // [1-9]
     ) {
-      number += Parser.c;
-      Parser.i++;
+      number += Parser.currentCharacter;
+      Parser.parserPosition++;
     }
     return parseInt(number, 10);
   }
@@ -127,8 +132,8 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
 )) {
   const methods = [];
 
-  Parser.target = interfaceCode;
-  while (!Parser.done) {
+  Parser.setSource(interfaceCode);
+  while (!Parser.isDone) {
     const { type: returnType, optional: optionalReturn } = Parser.readType();
     const methodName = Parser.readUntil('(');
     const isConstructor = returnType === 'void' && methodName === interfaceName;
@@ -136,31 +141,32 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
     /** @type {Array<{name:string, type:string, optional:boolean, defaultValue:(number | typeof none)}>} */
     const parameters = [];
     Parser.skipWhitespaces();
-    if (Parser.c !== ')')
+    if (Parser.currentCharacter !== ')')
       do {
-        if (Parser.c === ',') Parser.i++;
+        if (Parser.currentCharacter === ',') Parser.parserPosition++;
         const { type, optional } = Parser.readType();
         Parser.skipWhitespaces();
         const name = Parser.readIdentifier();
         Parser.skipWhitespaces();
 
         let defaultValue = none;
-        if (Parser.c === '=') {
-          Parser.i++;
+        if (Parser.currentCharacter === '=') {
+          Parser.parserPosition++;
           Parser.skipWhitespaces();
           defaultValue = Parser.readNumber();
           Parser.skipWhitespaces();
         }
 
         parameters.push({ name, type, optional, defaultValue });
-      } while (Parser.c === ',');
+      } while (Parser.currentCharacter === ',');
 
     // Health checks
-    if (!(Parser.c === ')')) console.warn('Expected closing paranthesis!');
-    Parser.i++;
+    if (Parser.currentCharacter !== ')')
+      console.warn('Expected closing paranthesis.');
+    Parser.parserPosition++;
     Parser.skipWhitespaces();
-    if (!(Parser.c === ';')) console.warn('Expected semicolon!');
-    Parser.i++;
+    if (Parser.currentCharacter !== ';') console.warn('Expected semicolon.');
+    Parser.parserPosition++;
     Parser.skipWhitespaces();
 
     methods.push(
@@ -180,7 +186,7 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
   }
 
   interfaces.push(
-    `export class ${interfaceName} extends EmObject {
+    `export class ${interfaceName} extends EmscriptenObject {
   ${methods.join('\n  ')}
 }`
   );
@@ -188,7 +194,7 @@ for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
 
 const dts = `// Automatically generated by GDevelop.js/scripts/generate-dts.js
 
-class EmObject {
+class EmscriptenObject {
   /** The object's index in the WASM memory, and thus its unique identifier. */
   ptr: number;
 
@@ -200,8 +206,8 @@ class EmObject {
    * (e.g. it is a child of a map), objects will be put in an invalid state that will most likely
    * crash the app.
    * 
-   * WIth that said, be careful to do call this method when adequate, as otherwise the memory will 
-   * never be freed, causing a memory leak, which is to be avoided.
+   * If the object is owned by your code, you should still call this method when adequate, as 
+   * otherwise the memory will never be freed, causing a memory leak, which is to be avoided.
    */
   destroy(): void;
 }

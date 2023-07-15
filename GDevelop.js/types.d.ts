@@ -18,6 +18,36 @@ class EmscriptenObject {
   destroy(): void;
 }
 
+enum Variable_Type {
+  String = 0,
+  Number = 1,
+  Boolean = 2,
+  Structure = 3,
+  Array = 4,
+}
+
+enum ExpressionCompletionDescription_CompletionKind {
+  Object = 0,
+  Behavior = 1,
+  Expression = 2,
+  Variable = 3,
+  Text = 4,
+}
+
+enum EventsFunction_FunctionType {
+  Action = 0,
+  Condition = 1,
+  Expression = 2,
+  ExpressionAndCondition = 3,
+  ActionWithOperator = 4,
+}
+
+enum ParticleEmitterObject_RendererType {
+  Point = 0,
+  Line = 1,
+  Quad = 2,
+}
+
 export class VectorString extends EmscriptenObject {
   constructor(): void;
   push_back(str: string): void;

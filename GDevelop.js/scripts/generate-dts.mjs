@@ -126,9 +126,26 @@ class Parser {
   }
 }
 
+const enums = [];
+for (const [_, enumName, enumCode] of bindingsFile.matchAll(
+  /enum\s+([a-zA-Z_]+)\s+{\r?\n?([^}]*)\r?\n}/gm
+)) {
+  const members = [];
+  let i = 0;
+  for (const enumMemberString of enumCode.split('\n')) {
+    const [_, memberName] = enumMemberString.match(/"[a-zA-Z]*::([a-zA-Z]*)"/);
+    members.push(`  ${memberName} = ${i++},`);
+  }
+  enums.push(
+    `enum ${enumName} {
+${members.join('\n')}
+}`
+  );
+}
+
 const interfaces = [];
-for (const [a, interfaceName, interfaceCode] of bindingsFile.matchAll(
-  /interface ([a-zA-Z]+) {\r?\n?([^}]*)\r?\n}/gm
+for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
+  /interface\s+([a-zA-Z]+)\s+{\r?\n?([^}]*)\r?\n}/gm
 )) {
   const methods = [];
 
@@ -222,6 +239,8 @@ class EmscriptenObject {
    */
   destroy(): void;
 }
+
+${enums.join('\n\n')}
 
 ${interfaces.join('\n\n')}
 

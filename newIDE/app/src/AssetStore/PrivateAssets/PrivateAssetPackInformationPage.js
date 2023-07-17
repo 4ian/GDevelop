@@ -135,32 +135,35 @@ const PrivateAssetPackInformationPage = ({
     [id, sellerId, privateAssetPackListingData.appStoreProductId]
   );
 
-  const onClickBuy = async () => {
-    if (!assetPack) return;
-    try {
-      sendAssetPackBuyClicked({
-        assetPackId: assetPack.id,
-        assetPackName: assetPack.name,
-        assetPackTag: assetPack.tag,
-        assetPackKind: 'private',
-      });
+  const onClickBuy = React.useCallback(
+    async () => {
+      if (!assetPack) return;
+      try {
+        sendAssetPackBuyClicked({
+          assetPackId: assetPack.id,
+          assetPackName: assetPack.name,
+          assetPackTag: assetPack.tag,
+          assetPackKind: 'private',
+        });
 
-      if (shouldUseAppStoreProduct()) {
-        try {
-          setAppStoreProductBeingBought(true);
-          await purchaseAppStoreProduct(
-            privateAssetPackListingData.appStoreProductId
-          );
-        } finally {
-          setAppStoreProductBeingBought(false);
+        if (shouldUseAppStoreProduct()) {
+          try {
+            setAppStoreProductBeingBought(true);
+            await purchaseAppStoreProduct(
+              privateAssetPackListingData.appStoreProductId
+            );
+          } finally {
+            setAppStoreProductBeingBought(false);
+          }
+        } else {
+          onOpenPurchaseDialog();
         }
-      } else {
-        onOpenPurchaseDialog();
+      } catch (e) {
+        console.warn('Unable to send event', e);
       }
-    } catch (e) {
-      console.warn('Unable to send event', e);
-    }
-  };
+    },
+    [assetPack, onOpenPurchaseDialog, privateAssetPackListingData]
+  );
 
   const getBuyButton = i18n => {
     if (errorText) return null;

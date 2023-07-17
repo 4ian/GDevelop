@@ -104,7 +104,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     this._addParameterAt(parameters.size());
   };
 
-  _addParameterAt = index => {
+  _addParameterAt = (index: number) => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
     const existingParameterNames = mapVector(parameters, parameterMetadata =>

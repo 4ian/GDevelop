@@ -273,7 +273,10 @@ const PrivateAssetPackInformationPage = ({
                     {isAlreadyReceived && (
                       <Column noMargin expand>
                         <AlertMessage kind="info">
-                          <Trans>You already own this asset pack.</Trans>
+                          <Trans>
+                            You already own this asset pack. Explore the assets
+                            to use them in your project.
+                          </Trans>
                         </AlertMessage>
                       </Column>
                     )}

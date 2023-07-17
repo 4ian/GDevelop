@@ -75,22 +75,35 @@ export type ExtensionsRegistry = {
   extensionShortHeaders: Array<ExtensionShortHeader>,
   behavior: {
     headers: Array<BehaviorShortHeader>,
+    views: {
+      default: {
+        firstIds: Array<{ extensionName: string, behaviorName: string }>,
+      },
+    },
   },
   object: {
     headers: Array<ObjectShortHeader>,
+    views: {
+      default: {
+        firstIds: Array<{ extensionName: string, objectName: string }>,
+      },
+    },
   },
   views?: {
     default: {
       firstExtensionIds: Array<string>,
-      firstBehaviorIds: Array<{ extensionName: string, behaviorName: string }>,
     },
   },
 };
 
 export type BehaviorsRegistry = {
   headers: Array<BehaviorShortHeader>,
-  firstIds: Array<{ extensionName: string; behaviorName: string }>,
-}
+  views: {
+    default: {
+      firstIds: Array<{ extensionName: string, behaviorName: string }>,
+    },
+  },
+};
 
 /**
  * The ExtensionHeader returned by the API, with tags being a string
@@ -175,9 +188,9 @@ export const getBehaviorsRegistry = (): Promise<BehaviorsRegistry> => {
         throw new Error('Unexpected response from the behaviors endpoint.');
       }
       return {
-          ...behaviorsRegistry,
-          headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
-        };
+        ...behaviorsRegistry,
+        headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
+      };
     });
 };
 

@@ -137,7 +137,7 @@ export const BehaviorStoreStateProvider = ({
           setBehaviorShortHeadersByType(behaviorShortHeadersByType);
           setFirstBehaviorIds(
             extensionRegistry.views
-              ? extensionRegistry.views.default.firstBehaviorIds.map(
+              ? extensionRegistry.behavior.views.default.firstIds.map(
                   ({ extensionName, behaviorName }) =>
                     gd.PlatformExtension.getBehaviorFullType(
                       extensionName,

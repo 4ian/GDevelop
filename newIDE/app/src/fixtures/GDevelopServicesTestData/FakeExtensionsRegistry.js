@@ -451,7 +451,6 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
         'Bounce',
         'BoidsMovement',
       ],
-      firstBehaviorIds: [],
     },
   },
   extensionShortHeaders: [
@@ -1532,9 +1531,17 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
     },
   ],
   behavior: {
-    headers: [],
+    views: {
+      default: {
+        headers: [{ extensionName: 'Bounce', behaviorName: 'Bounce' }],
+      },
+    },
   },
   object: {
-    headers: [],
+    views: {
+      default: {
+        headers: [],
+      },
+    },
   },
 };

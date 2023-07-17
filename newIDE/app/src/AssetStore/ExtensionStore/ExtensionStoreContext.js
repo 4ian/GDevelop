@@ -100,9 +100,7 @@ export const ExtensionStoreStateProvider = ({
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const {
-            extensionShortHeaders
-          } = extensionRegistry;
+          const { extensionShortHeaders } = extensionRegistry;
 
           const extensionShortHeadersByName = {};
           extensionShortHeaders.forEach(extension => {

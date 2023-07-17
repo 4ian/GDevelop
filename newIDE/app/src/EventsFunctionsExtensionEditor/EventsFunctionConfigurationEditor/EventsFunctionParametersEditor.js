@@ -368,7 +368,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               click: () => this._removeParameter(i),
                             },
                             {
-                              label: i18n._(t`Add a parameter bellow`),
+                              label: i18n._(t`Add a parameter below`),
                               enabled: !isParameterDisabled(i),
                               click: () => this._addParameterAt(i + 1),
                             },

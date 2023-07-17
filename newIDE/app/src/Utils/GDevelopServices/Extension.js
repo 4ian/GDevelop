@@ -87,6 +87,11 @@ export type ExtensionsRegistry = {
   },
 };
 
+export type BehaviorsRegistry = {
+  headers: Array<BehaviorShortHeader>,
+  firstIds: Array<{ extensionName: string; behaviorName: string }>,
+}
+
 /**
  * The ExtensionHeader returned by the API, with tags being a string
  * (which is kept in the API for compatibility with older GDevelop versions).
@@ -158,6 +163,21 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
           headers: extensionsRegistry.behavior.headers.map(adaptBehaviorHeader),
         },
       };
+    });
+};
+
+export const getBehaviorsRegistry = (): Promise<BehaviorsRegistry> => {
+  return axios
+    .get(`${GDevelopAssetApi.baseUrl}/behaviors-registry`)
+    .then(response => response.data)
+    .then(behaviorsRegistry => {
+      if (!behaviorsRegistry) {
+        throw new Error('Unexpected response from the behaviors endpoint.');
+      }
+      return {
+          ...behaviorsRegistry,
+          headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
+        };
     });
 };
 

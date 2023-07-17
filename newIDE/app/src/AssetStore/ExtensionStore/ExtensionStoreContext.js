@@ -75,8 +75,6 @@ export const ExtensionStoreStateProvider = ({
   }>({});
   const preferences = React.useContext(PreferencesContext);
   const { showCommunityExtensions } = preferences.values;
-  const [filters, setFilters] = React.useState<?Filters>(null);
-  const [allCategories, setAllCategories] = React.useState<Array<string>>([]);
   const [firstExtensionIds, setFirstExtensionIds] = React.useState<
     Array<string>
   >([]);
@@ -103,21 +101,8 @@ export const ExtensionStoreStateProvider = ({
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
           const {
-            extensionShortHeaders,
-            allTags,
-            allCategories,
+            extensionShortHeaders
           } = extensionRegistry;
-
-          const sortedTags = allTags
-            .slice()
-            .sort((tag1, tag2) =>
-              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
-            );
-          const sortedCategories = allCategories
-            .slice()
-            .sort((tag1, tag2) =>
-              tag1.toLowerCase().localeCompare(tag2.toLowerCase())
-            );
 
           const extensionShortHeadersByName = {};
           extensionShortHeaders.forEach(extension => {
@@ -130,12 +115,6 @@ export const ExtensionStoreStateProvider = ({
             } extensions from the extension store.`
           );
           setExtensionShortHeadersByName(extensionShortHeadersByName);
-          setFilters({
-            allTags: sortedTags,
-            defaultTags: sortedTags,
-            tagsTree: [],
-          });
-          setAllCategories(sortedCategories);
           setFirstExtensionIds(
             extensionRegistry.views
               ? extensionRegistry.views.default.firstExtensionIds
@@ -169,6 +148,38 @@ export const ExtensionStoreStateProvider = ({
       return () => clearTimeout(timeoutId);
     },
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
+  );
+
+  const allCategories = React.useMemo(
+    () => {
+      const categoriesSet = new Set();
+      for (const name in extensionShortHeadersByName) {
+        categoriesSet.add(extensionShortHeadersByName[name].category);
+      }
+      const sortedCategories = [...categoriesSet].sort((tag1, tag2) =>
+        tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+      );
+      return sortedCategories;
+    },
+    [extensionShortHeadersByName]
+  );
+
+  const filters = React.useMemo(
+    () => {
+      const tagsSet = new Set();
+      for (const name in extensionShortHeadersByName) {
+        extensionShortHeadersByName[name].tags.forEach(tag => tagsSet.add(tag));
+      }
+      const sortedTags = [...tagsSet].sort((tag1, tag2) =>
+        tag1.toLowerCase().localeCompare(tag2.toLowerCase())
+      );
+      return {
+        allTags: sortedTags,
+        defaultTags: sortedTags,
+        tagsTree: [],
+      };
+    },
+    [extensionShortHeadersByName]
   );
 
   const searchResults: ?Array<{|

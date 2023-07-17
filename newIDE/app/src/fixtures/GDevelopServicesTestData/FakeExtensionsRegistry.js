@@ -1534,7 +1534,7 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
     headers: [],
     views: {
       default: {
-        firstIds: [{ extensionName: 'Bounce', behaviorName: 'Bounce' }],
+        firstIds: [],
       },
     },
   },

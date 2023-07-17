@@ -74,10 +74,16 @@ export const BehaviorListItem = ({
 
   const isEnabled = !alreadyAdded && !isObjectIncompatible;
 
+  const chooseBehavior = React.useCallback(() => {
+    if (isEnabled) {
+      onChoose();
+    }
+  }, [isEnabled, onChoose]);
+
   return (
     <ButtonBase
       id={id}
-      onClick={isEnabled && onChoose}
+      onClick={chooseBehavior}
       focusRipple
       style={styles.button}
     >

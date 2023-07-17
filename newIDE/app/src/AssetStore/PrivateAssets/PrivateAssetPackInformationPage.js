@@ -12,7 +12,11 @@ import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import { ResponsiveLineStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ResponsiveLineStackLayout,
+  LineStackLayout,
+  ColumnStackLayout,
+} from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
@@ -36,6 +40,7 @@ import {
   shouldUseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
 import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const sameCreatorPackCountForSmallWindow = 2;
 const sameCreatorPackCountForMediumWindow = 3;
@@ -85,6 +90,7 @@ const PrivateAssetPackInformationPage = ({
   onAssetPackOpen,
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
@@ -101,6 +107,12 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
+
+  const isAlreadyReceived =
+    !!receivedAssetPacks &&
+    !!receivedAssetPacks.find(
+      assetPack => assetPack.id === privateAssetPackListingData.id
+    );
 
   React.useEffect(
     () => {
@@ -180,7 +192,10 @@ const PrivateAssetPackInformationPage = ({
     );
 
     const disabled =
-      !assetPack || isPurchaseDialogOpen || appStoreProductBeingBought;
+      !assetPack ||
+      isPurchaseDialogOpen ||
+      appStoreProductBeingBought ||
+      isAlreadyReceived;
 
     return (
       <RaisedButton
@@ -244,7 +259,17 @@ const PrivateAssetPackInformationPage = ({
                       horizontalOuterMarginToEatOnMobile={8}
                     />
                   </Column>
-                  <Column useFullHeight expand noMargin>
+                  <ColumnStackLayout useFullHeight expand noMargin>
+                    {isAlreadyReceived && (
+                      <Column noMargin expand>
+                        <AlertMessage kind="info">
+                          <Trans>
+                            You already own this asset pack. If you can't access
+                            the assets, please contact us.
+                          </Trans>
+                        </AlertMessage>
+                      </Column>
+                    )}
                     <Paper
                       variant="outlined"
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
@@ -345,7 +370,7 @@ const PrivateAssetPackInformationPage = ({
                         </ResponsiveLineStackLayout>
                       </Column>
                     </Paper>
-                  </Column>
+                  </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
                 {privateAssetPacksFromSameCreatorListingData &&
                 // Only display packs if there are at least 2. If there is only one,

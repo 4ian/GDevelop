@@ -62,6 +62,8 @@ export type Leaderboard = {|
   primary?: boolean,
   resetLaunchedAt?: string,
   extremeAllowedScore?: number,
+  ignoreCustomPlayerNames?: boolean,
+  autoPlayerNamePrefix?: string,
 |};
 
 export type LeaderboardUpdatePayload = {|
@@ -72,6 +74,8 @@ export type LeaderboardUpdatePayload = {|
   customizationSettings?: LeaderboardCustomizationSettings,
   primary?: boolean,
   extremeAllowedScore?: number | null,
+  ignoreCustomPlayerNames?: boolean,
+  autoPlayerNamePrefix?: string,
 |};
 
 export type LeaderboardEntry = {|

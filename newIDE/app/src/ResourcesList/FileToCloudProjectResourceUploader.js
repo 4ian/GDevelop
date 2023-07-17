@@ -92,6 +92,7 @@ export const FileToCloudProjectResourceUploader = ({
   const [error, setError] = React.useState<?Error>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+  const [filteredOutFiles, setFilteredOutFiles] = React.useState<File[]>([]);
   const hasSelectedFiles = selectedFiles.length > 0;
   const storageProvider = React.useMemo(getStorageProvider, [
     getStorageProvider,
@@ -245,20 +246,33 @@ export const FileToCloudProjectResourceUploader = ({
               disabled={!canChooseFiles}
               onChange={event => {
                 const files = [];
+                const newFilteredOutFiles = [];
                 for (let i = 0; i < event.currentTarget.files.length; i++) {
+                  const selectedFile = event.currentTarget.files[i];
                   if (
                     !shouldValidateFilePostPicking ||
-                    validateFilePostPicking(event.currentTarget.files[i])
+                    validateFilePostPicking(selectedFile)
                   ) {
-                    files.push(event.currentTarget.files[i]);
+                    files.push(selectedFile);
+                  } else {
+                    newFilteredOutFiles.push(selectedFile);
                   }
                 }
+                setFilteredOutFiles(newFilteredOutFiles);
                 setSelectedFiles(files);
 
                 // Remove the previous error, if any, to let a new upload attempt be triggered.
                 setError(null);
               }}
             />
+            {filteredOutFiles.length > 0 && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  The following file(s) cannot be used for this kind of object:{' '}
+                  {filteredOutFiles.map(file => file.name).join(', ')}
+                </Trans>
+              </AlertMessage>
+            )}
           </Column>
         </Line>
       </Paper>

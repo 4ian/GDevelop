@@ -150,6 +150,11 @@ const PrivateAssetPackInformationPage = ({
   const onClickBuy = React.useCallback(
     async () => {
       if (!assetPack) return;
+      if (isAlreadyReceived) {
+        onAssetPackOpen(privateAssetPackListingData);
+        return;
+      }
+
       try {
         sendAssetPackBuyClicked({
           assetPackId: assetPack.id,
@@ -174,7 +179,13 @@ const PrivateAssetPackInformationPage = ({
         console.warn('Unable to send event', e);
       }
     },
-    [assetPack, onOpenPurchaseDialog, privateAssetPackListingData]
+    [
+      assetPack,
+      onOpenPurchaseDialog,
+      privateAssetPackListingData,
+      isAlreadyReceived,
+      onAssetPackOpen,
+    ]
   );
 
   const getBuyButton = i18n => {
@@ -182,6 +193,8 @@ const PrivateAssetPackInformationPage = ({
 
     const label = !assetPack ? (
       <Trans>Loading...</Trans>
+    ) : isAlreadyReceived ? (
+      <Trans>Explore assets</Trans>
     ) : isPurchaseDialogOpen || appStoreProductBeingBought ? (
       <Trans>Processing...</Trans>
     ) : (
@@ -192,10 +205,7 @@ const PrivateAssetPackInformationPage = ({
     );
 
     const disabled =
-      !assetPack ||
-      isPurchaseDialogOpen ||
-      appStoreProductBeingBought ||
-      isAlreadyReceived;
+      !assetPack || isPurchaseDialogOpen || appStoreProductBeingBought;
 
     return (
       <RaisedButton
@@ -263,10 +273,7 @@ const PrivateAssetPackInformationPage = ({
                     {isAlreadyReceived && (
                       <Column noMargin expand>
                         <AlertMessage kind="info">
-                          <Trans>
-                            You already own this asset pack. If you can't access
-                            the assets, please contact us.
-                          </Trans>
+                          <Trans>You already own this asset pack.</Trans>
                         </AlertMessage>
                       </Column>
                     )}

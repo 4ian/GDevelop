@@ -101,6 +101,12 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
+    this._addParameterAt(parameters.size());
+  };
+
+  _addParameterAt = index => {
+    const { eventsFunction } = this.props;
+    const parameters = eventsFunction.getParameters();
     const existingParameterNames = mapVector(parameters, parameterMetadata =>
       parameterMetadata.getName()
     );
@@ -111,7 +117,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
       existingParameterNames.includes(name)
     );
     newParameter.setName(newName);
-    parameters.push_back(newParameter);
+    parameters.insertIntoVectorParameterMetadata(index, newParameter);
     newParameter.delete();
     this.forceUpdate();
     this.props.onParametersUpdated();
@@ -360,6 +366,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               label: i18n._(t`Delete`),
                               enabled: !isParameterDisabled(i),
                               click: () => this._removeParameter(i),
+                            },
+                            {
+                              label: i18n._(t`Add a parameter bellow`),
+                              enabled: !isParameterDisabled(i),
+                              click: () => this._addParameterAt(i + 1),
                             },
                             { type: 'separator' },
                             {

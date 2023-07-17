@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import path from 'path-browserify';
 import {
   allResourceKindsAndMetadata,
   type ChooseResourceOptions,
@@ -45,10 +46,6 @@ const resourceKindToInputAcceptedMimes = {
     // after the files have been picked.
     // 'model/gltf-binary'
   ],
-};
-
-const getFileNameExtension = (fileName: string): string => {
-  return fileName.split('.').reverse()[0];
 };
 
 const getAcceptedExtensions = (
@@ -210,7 +207,9 @@ export const FileToCloudProjectResourceUploader = ({
         options.resourceKind,
         false
       );
-      return acceptedExtensions.includes(getFileNameExtension(file.name));
+      return acceptedExtensions.includes(
+        path.extname(file.name).replace(/^\./, '')
+      );
     },
     [options.resourceKind]
   );

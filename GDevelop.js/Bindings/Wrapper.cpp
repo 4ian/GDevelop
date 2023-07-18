@@ -377,6 +377,12 @@ void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
   vec.erase(vec.begin() + pos);
 }
 
+void insertIntoVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
+                                       size_t pos,
+                                       const ParameterMetadata& parameterMetadata) {
+  vec.insert(vec.begin() + pos, parameterMetadata);
+}
+
 void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
                                    size_t oldIndex,
                                    size_t newIndex) {

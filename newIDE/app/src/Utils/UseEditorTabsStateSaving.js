@@ -24,7 +24,13 @@ const useEditorTabsStateSaving = ({ projectId, editorTabs }: Props) => {
           .filter(editor => editor.key !== 'start page')
           .map(getEditorTabMetadata),
       };
-      setEditorStateForProject(projectId, { editorTabs: editorState });
+
+      setEditorStateForProject(
+        projectId,
+        editorState.editors.length === 0
+          ? undefined
+          : { editorTabs: editorState }
+      );
     },
     [projectId, editorTabs, setEditorStateForProject]
   );

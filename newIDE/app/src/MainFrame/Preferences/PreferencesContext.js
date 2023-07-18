@@ -298,7 +298,7 @@ export type Preferences = {|
   ) => ?{| editorTabs: EditorTabsPersistedState |},
   setEditorStateForProject: (
     projectId: string,
-    options: {| editorTabs: EditorTabsPersistedState |}
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
   ) => void,
 |};
 
@@ -404,7 +404,7 @@ export const initialPreferences = {
   setUseShortcutToClosePreviewWindow: () => {},
   setAllowUsageOfUnicodeIdentifierNames: () => {},
   getEditorStateForProject: projectId => {},
-  setEditorStateForProject: (projectId, options) => {},
+  setEditorStateForProject: (projectId, editorState) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

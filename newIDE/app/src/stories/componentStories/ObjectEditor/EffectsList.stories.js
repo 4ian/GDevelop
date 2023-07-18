@@ -36,7 +36,7 @@ export const withSomeEffectsForA2DLayer = () => (
         layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
-        effectsContainer={testProject.layerWithEffects.getEffects()}
+        effectsContainer={testProject.layerWith2DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
@@ -55,7 +55,7 @@ export const withSomeEffectsForA3DLayer = () => (
         layerRenderingType="3d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
-        effectsContainer={testProject.layerWithEffects.getEffects()}
+        effectsContainer={testProject.layerWith3DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />

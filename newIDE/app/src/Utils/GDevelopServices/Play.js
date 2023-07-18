@@ -47,6 +47,8 @@ export type LeaderboardCustomizationSettings = {|
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
   theme?: LeaderboardTheme,
+  useCustomCss?: boolean,
+  customCss?: string,
 |};
 
 export type Leaderboard = {|
@@ -418,16 +420,24 @@ export const updateComment = async (
 
 export const canUserCustomizeLeaderboardTheme = (
   authenticatedUser: AuthenticatedUser
-): boolean => {
+): {|
+  canUseTheme: boolean,
+  canUseCustomCss: boolean,
+|} => {
   const { limits } = authenticatedUser;
-  return (
-    !!limits &&
-    !!limits.capabilities.leaderboards &&
-    (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
-      'BASIC' ||
-      limits.capabilities.leaderboards.themeCustomizationCapabilities ===
-        'FULL')
-  );
+  return {
+    canUseTheme:
+      !!limits &&
+      !!limits.capabilities.leaderboards &&
+      (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+        'BASIC' ||
+        limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+          'FULL'),
+    canUseCustomCss:
+      !!limits &&
+      !!limits.capabilities.leaderboards &&
+      !!limits.capabilities.leaderboards.canUseCustomCss,
+  };
 };
 
 export const getRGBLeaderboardTheme = (

@@ -197,14 +197,21 @@ export const subscriptionForGoldUser: Subscription = {
   planId: 'gdevelop_gold',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
-  userId: 'silver-user',
+  userId: 'gold-user',
 };
 
 export const subscriptionForStartupUser: Subscription = {
   planId: 'gdevelop_startup',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
-  userId: 'silver-user',
+  userId: 'startup-user',
+};
+
+export const subscriptionForBusinessUser: Subscription = {
+  planId: 'gdevelop_business',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'business-user',
 };
 
 export const subscriptionForEducationPlan: Subscription = {
@@ -272,6 +279,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'NONE',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -306,6 +314,7 @@ export const limitsForSilverUser: Limits = {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'BASIC',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -340,6 +349,7 @@ export const limitsForGoldUser: Limits = {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -374,6 +384,42 @@ export const limitsForStartupUser: Limits = {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 1000,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForBusinessUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 500,
+      canMaximumCountBeIncreased: false,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: true,
     },
   },
   limits: {
@@ -408,6 +454,7 @@ export const limitsReached: Limits = {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'BASIC',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -499,7 +546,12 @@ export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
 export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForStartupUser,
-  limits: limitsForGoldUser,
+  limits: limitsForStartupUser,
+};
+export const fakeBusinessAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForBusinessUser,
+  limits: limitsForBusinessUser,
 };
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,

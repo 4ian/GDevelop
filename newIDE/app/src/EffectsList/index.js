@@ -689,14 +689,16 @@ export default function EffectsList(props: Props) {
                   </Line>
                 )}
                 {props.layerRenderingType !== '2d' && (
-                  <Column>
-                    <Column>
-                      <Line>
-                        <Text size="block-title">
-                          <Trans>3D effects</Trans>
-                        </Text>
-                      </Line>
-                    </Column>
+                  <Column noMargin expand>
+                    {props.layerRenderingType !== '2d' && (
+                      <Column>
+                        <Line>
+                          <Text size="block-title">
+                            <Trans>3D effects</Trans>
+                          </Text>
+                        </Line>
+                      </Column>
+                    )}
                     <Line>
                       <Column noMargin expand>
                         {mapFor(
@@ -778,14 +780,16 @@ export default function EffectsList(props: Props) {
                   </Column>
                 )}
                 {props.layerRenderingType !== '3d' && (
-                  <Column>
-                    <Column>
-                      <Line>
-                        <Text size="block-title">
-                          <Trans>2D effects</Trans>
-                        </Text>
-                      </Line>
-                    </Column>
+                  <Column noMargin expand>
+                    {props.layerRenderingType !== '2d' && (
+                      <Column>
+                        <Line>
+                          <Text size="block-title">
+                            <Trans>2D effects</Trans>
+                          </Text>
+                        </Line>
+                      </Column>
+                    )}
                     <Line>
                       <Column noMargin expand>
                         {mapFor(

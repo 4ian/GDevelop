@@ -238,12 +238,8 @@ const Effect = ({
                       value={effectMetadata.type}
                       label={effectMetadata.fullName}
                       disabled={
-                        (target === 'object' &&
-                          effectMetadata.isMarkedAsNotWorkingForObjects) ||
-                        (layerRenderingType === '3d' &&
-                          effectMetadata.isMarkedAsOnlyWorkingFor2D) ||
-                        (layerRenderingType === '2d' &&
-                          effectMetadata.isMarkedAsOnlyWorkingFor3D)
+                        target === 'object' &&
+                        effectMetadata.isMarkedAsNotWorkingForObjects
                       }
                     />
                   ))}
@@ -722,7 +718,7 @@ export default function EffectsList(props: Props) {
                                 : null;
 
                             return !effectMetadata ||
-                              effectMetadata.isMarkedAsOnlyWorkingFor3D ? (
+                              !effectMetadata.isMarkedAsOnlyWorkingFor2D ? (
                               <DragSourceAndDropTarget
                                 key={effect.ptr}
                                 beginDrag={() => {
@@ -811,7 +807,7 @@ export default function EffectsList(props: Props) {
                                 : null;
 
                             return !effectMetadata ||
-                              effectMetadata.isMarkedAsOnlyWorkingFor2D ? (
+                              !effectMetadata.isMarkedAsOnlyWorkingFor3D ? (
                               <DragSourceAndDropTarget
                                 key={effect.ptr}
                                 beginDrag={() => {

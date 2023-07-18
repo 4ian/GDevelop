@@ -73,6 +73,20 @@ export type EditorTabsPersistedState = {
   currentTab: number,
 };
 
+export type EditorOpeningOptions = {|
+  label?: string,
+  icon?: React.Node,
+  projectItemName: ?string,
+  tabOptions?: TabOptions,
+  renderEditorContainer: (
+    props: RenderEditorContainerPropsWithRef
+  ) => React.Node,
+  key: string,
+  extraEditorProps?: EditorContainerExtraProps,
+  dontFocusTab?: boolean,
+  closable?: boolean,
+|};
+
 export const getEditorTabMetadata = (
   editorTab: EditorTab
 ): EditorTabMetadata => {
@@ -116,19 +130,7 @@ export const openEditorTab = (
     extraEditorProps,
     dontFocusTab,
     closable,
-  }: {|
-    label?: string,
-    icon?: React.Node,
-    projectItemName: ?string,
-    tabOptions?: TabOptions,
-    renderEditorContainer: (
-      props: RenderEditorContainerPropsWithRef
-    ) => React.Node,
-    key: string,
-    extraEditorProps?: EditorContainerExtraProps,
-    dontFocusTab?: boolean,
-    closable?: boolean,
-  |}
+  }: EditorOpeningOptions
 ): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,

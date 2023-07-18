@@ -37,6 +37,7 @@ import {
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
+  type EditorKind,
   getEventsFunctionsExtensionEditor,
   notifyPreviewWillStart,
   moveTabToTheRightOfHoveredTab,
@@ -49,6 +50,7 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
+import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
@@ -187,6 +189,19 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+};
+
+const editorKindToRenderer: {
+  [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
+} = {
+  debugger: renderDebuggerEditorContainer,
+  'scene-events': renderEventsEditorContainer,
+  'external-events': renderExternalEventsEditorContainer,
+  scene: renderSceneEditorContainer,
+  'external-layout': renderExternalLayoutEditorContainer,
+  extension: renderEventsFunctionsExtensionEditorContainer,
+  home: renderHomePageContainer,
+  resources: renderResourcesEditorContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -1522,6 +1537,65 @@ const MainFrame = (props: Props) => {
     [hasPreviewsRunning, launchPreview]
   );
 
+  const getEditorOpeningOptions = React.useCallback(
+    (name: string, kind: EditorKind) => {
+      const label =
+        kind === 'resources'
+          ? i18n._(t`Resources`)
+          : kind === 'home'
+          ? i18n._(t`Home`)
+          : kind === 'debugger'
+          ? i18n._(t`Debugger`)
+          : kind === 'scene-events'
+          ? name + ` ${i18n._(t`(Events)`)}`
+          : kind === 'extension'
+          ? name + ` ${i18n._(t`(Extension)`)}`
+          : name;
+      const tabOptions =
+        kind === 'scene'
+          ? { data: { scene: name, type: 'layout' } }
+          : kind === 'scene-events'
+          ? { data: { scene: name, type: 'layout-events' } }
+          : undefined;
+      const key =
+        kind === 'scene'
+          ? 'layout ' + name
+          : kind === 'scene-events'
+          ? 'layout events ' + name
+          : kind === 'external-events'
+          ? 'external events ' + name
+          : kind === 'external-layout'
+          ? 'external layout ' + name
+          : kind === 'extension'
+          ? 'events functions extension ' + name
+          : kind === 'resources'
+          ? 'resources'
+          : kind === 'home'
+          ? 'start page'
+          : 'debugger';
+      const icon =
+        kind === 'home' ? <HomeIcon titleAccess="Home" /> : undefined;
+      const closable = kind !== 'home';
+      const extraEditorProps =
+        kind === 'resources'
+          ? { fileMetadata: currentFileMetadata }
+          : kind === 'home'
+          ? { storageProviders: props.storageProviders }
+          : undefined;
+      return {
+        icon,
+        closable,
+        label,
+        projectItemName: name,
+        tabOptions,
+        renderEditorContainer: editorKindToRenderer[kind],
+        extraEditorProps,
+        key,
+      };
+    },
+    [i18n, currentFileMetadata, props.storageProviders]
+  );
+
   const openLayout = React.useCallback(
     (
       name: string,
@@ -1531,19 +1605,9 @@ const MainFrame = (props: Props) => {
       }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
       editorTabs = state.editorTabs
     ): EditorTabsState => {
-      const sceneEditorOptions = {
-        label: name,
-        projectItemName: name,
-        tabOptions: { data: { scene: name, type: 'layout' } },
-        renderEditorContainer: renderSceneEditorContainer,
-        key: 'layout ' + name,
-      };
+      const sceneEditorOptions = getEditorOpeningOptions(name, 'scene');
       const eventsEditorOptions = {
-        label: name + ' ' + i18n._(t`(Events)`),
-        projectItemName: name,
-        tabOptions: { data: { scene: name, type: 'layout-events' } },
-        renderEditorContainer: renderEventsEditorContainer,
-        key: 'layout events ' + name,
+        ...getEditorOpeningOptions(name, 'scene-events'),
         dontFocusTab: openSceneEditor,
       };
 
@@ -1563,39 +1627,35 @@ const MainFrame = (props: Props) => {
       openProjectManager(false);
       return tabsWithSceneAndEventsEditors;
     },
-    [i18n, setState, state.editorTabs]
+    [setState, state.editorTabs, getEditorOpeningOptions]
   );
 
   const openExternalEvents = React.useCallback(
     (name: string) => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: name,
-          projectItemName: name,
-          renderEditorContainer: renderExternalEventsEditorContainer,
-          key: 'external events ' + name,
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions(name, 'external-events')
+        ),
       }));
       openProjectManager(false);
     },
-    [setState]
+    [setState, getEditorOpeningOptions]
   );
 
   const openExternalLayout = React.useCallback(
     (name: string) => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: name,
-          projectItemName: name,
-          renderEditorContainer: renderExternalLayoutEditorContainer,
-          key: 'external layout ' + name,
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions(name, 'external-layout')
+        ),
       }));
       openProjectManager(false);
     },
-    [setState, openProjectManager]
+    [setState, openProjectManager, getEditorOpeningOptions]
   );
 
   const openEventsFunctionsExtension = React.useCallback(
@@ -1607,72 +1667,55 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: name + ' ' + i18n._(t`(Extension)`),
-          projectItemName: name,
+          ...getEditorOpeningOptions(name, 'extension'),
           extraEditorProps: {
             initiallyFocusedFunctionName,
             initiallyFocusedBehaviorName,
           },
-          renderEditorContainer: renderEventsFunctionsExtensionEditorContainer,
-          key: 'events functions extension ' + name,
         }),
       }));
       openProjectManager(false);
     },
-    [setState, openProjectManager, i18n]
+    [setState, openProjectManager, getEditorOpeningOptions]
   );
 
   const openResources = React.useCallback(
     () => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Resources`),
-          projectItemName: null,
-          renderEditorContainer: renderResourcesEditorContainer,
-          key: 'resources',
-          extraEditorProps: {
-            fileMetadata: currentFileMetadata,
-          },
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions('', 'resources')
+        ),
       }));
     },
-    [currentFileMetadata, i18n, setState]
+    [getEditorOpeningOptions, setState]
   );
 
   const openHomePage = React.useCallback(
     () => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          icon: <HomeIcon titleAccess="Home" />,
-          label: i18n._(t`Home`),
-          projectItemName: null,
-          renderEditorContainer: renderHomePageContainer,
-          key: 'start page',
-          extraEditorProps: {
-            storageProviders: props.storageProviders,
-          },
-          closable: false,
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions('', 'home')
+        ),
       }));
     },
-    [setState, i18n, props.storageProviders]
+    [setState, getEditorOpeningOptions]
   );
 
   const _openDebugger = React.useCallback(
     () => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Debugger`),
-          projectItemName: null,
-          renderEditorContainer: renderDebuggerEditorContainer,
-          key: 'debugger',
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions('', 'debugger')
+        ),
       }));
     },
-    [i18n, setState]
+    [getEditorOpeningOptions, setState]
   );
 
   const openDebugger = addCreateBadgePreHookIfNotClaimed(

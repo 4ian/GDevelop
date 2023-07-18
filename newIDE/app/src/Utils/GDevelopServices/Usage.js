@@ -63,6 +63,7 @@ export type Capabilities = {
     maximumCountPerGame: number,
     canMaximumCountPerGameBeIncreased: boolean,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
+    canUseCustomCss: boolean,
   },
 };
 

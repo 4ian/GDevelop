@@ -28,6 +28,17 @@ describe('Leaderboards', () => {
       ).to.be('aPlayerNameTh4tIsT00LongToBeSa');
     });
 
+    it('it generates a predefined player name with a random number if input is void/wrong type/empty', () => {
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(null)).to.be('');
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(undefined)).to.be('');
+      expect(gdjs.evtTools.leaderboards.formatPlayerName('')).to.be('');
+
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(5)).to.be('');
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(() => {})).to.be('');
+    });
+
     it('it removes accents from latin letters', () => {
       expect(gdjs.evtTools.leaderboards.formatPlayerName('plâyèrÏonisé')).to.be(
         'playerIonise'

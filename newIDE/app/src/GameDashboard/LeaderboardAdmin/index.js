@@ -865,8 +865,8 @@ export const LeaderboardAdmin = ({
           }}
           tooltip={
             currentLeaderboard.ignoreCustomPlayerNames
-              ? t`Change to ignore custom player usernames`
-              : t`Change to allow custom player usernames`
+              ? t`Change to allow custom player usernames`
+              : t`Change to ignore custom player usernames`
           }
           edge="end"
           disabled={isRequestPending || isEditingName}

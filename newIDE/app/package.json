@@ -62,6 +62,7 @@
     "react-dnd": "7.7.0",
     "react-dnd-html5-backend": "7.7.0",
     "react-dnd-multi-backend": "3.2.2",
+    "react-dnd-touch-backend": "0.8.3",
     "react-dom": "16.14.0",
     "react-error-boundary": "^1.2.0",
     "react-instantsearch-hooks": "^6.41.0",

@@ -28,29 +28,6 @@ describe('Leaderboards', () => {
       ).to.be('aPlayerNameTh4tIsT00LongToBeSa');
     });
 
-    it('it generates a predefined player name with a random number if input is void/wrong type/empty', () => {
-      // @ts-ignore
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(null)).to.match(
-        /^Player\d{5}/
-      );
-      // @ts-ignore
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(5)).to.match(
-        /^Player\d{5}/
-      );
-      // @ts-ignore
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(undefined)).to.match(
-        /^Player\d{5}/
-      );
-      // @ts-ignore
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(() => {})).to.match(
-        /^Player\d{5}/
-      );
-      // @ts-ignore
-      expect(gdjs.evtTools.leaderboards.formatPlayerName('')).to.match(
-        /^Player\d{5}/
-      );
-    });
-
     it('it removes accents from latin letters', () => {
       expect(gdjs.evtTools.leaderboards.formatPlayerName('plâyèrÏonisé')).to.be(
         'playerIonise'

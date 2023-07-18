@@ -885,7 +885,7 @@ export const LeaderboardAdmin = ({
             ref={newAutoPlayerNamePrefixTextFieldRef}
             margin="none"
             style={styles.leaderboardNameTextField}
-            maxLength={50}
+            maxLength={40}
             value={newAutoPlayerNamePrefix}
             onChange={(e, text) => setNewAutoPlayerNamePrefix(text)}
             onKeyPress={event => {

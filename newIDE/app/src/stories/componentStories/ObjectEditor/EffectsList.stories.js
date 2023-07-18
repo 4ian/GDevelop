@@ -45,7 +45,7 @@ export const withSomeEffectsForA2DLayer = () => (
 );
 
 // TODO Add a story with 2 effects of the same type that should be unique.
-// Note that this can be done until the list of unique effect is hardcoded.
+// Note that this can't be done until the list of unique effect is hardcoded.
 
 export const withSomeEffectsForA3DLayer = () => (
   <DragAndDropContextProvider>

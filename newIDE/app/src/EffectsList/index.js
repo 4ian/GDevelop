@@ -691,7 +691,7 @@ export default function EffectsList(props: Props) {
                 {props.layerRenderingType !== '2d' && (
                   <Column noMargin expand>
                     {props.layerRenderingType !== '2d' && (
-                      <Column>
+                      <Column noMargin>
                         <Line>
                           <Text size="block-title">
                             <Trans>3D effects</Trans>
@@ -782,7 +782,7 @@ export default function EffectsList(props: Props) {
                 {props.layerRenderingType !== '3d' && (
                   <Column noMargin expand>
                     {props.layerRenderingType !== '2d' && (
-                      <Column>
+                      <Column noMargin>
                         <Line>
                           <Text size="block-title">
                             <Trans>2D effects</Trans>

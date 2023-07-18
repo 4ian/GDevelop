@@ -11,7 +11,6 @@
     "@types/node": "^14.11.1",
     "@types/sinon": "^10.0.13",
     "@types/three": "0.152.0",
-    "better-docs": "^2.3.2",
     "esbuild": "^0.13.12",
     "lebab": "^3.1.0",
     "minimist": "^1.2.5",

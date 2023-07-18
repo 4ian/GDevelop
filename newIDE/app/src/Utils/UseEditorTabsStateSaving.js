@@ -6,6 +6,7 @@ import {
   type EditorTabsState,
 } from '../MainFrame/EditorTabs/EditorTabsHandler';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { useDebounce } from './UseDebounce';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -14,7 +15,7 @@ type Props = {|
 
 const useEditorTabsStateSaving = ({ projectId, editorTabs }: Props) => {
   const { setEditorStateForProject } = React.useContext(PreferencesContext);
-  React.useEffect(
+  const saveEditorState = React.useCallback(
     () => {
       if (!projectId) return;
       const editorState = {
@@ -26,6 +27,15 @@ const useEditorTabsStateSaving = ({ projectId, editorTabs }: Props) => {
       setEditorStateForProject(projectId, { editorTabs: editorState });
     },
     [projectId, editorTabs, setEditorStateForProject]
+  );
+
+  const saveEditorStateDebounced = useDebounce(saveEditorState, 1000);
+
+  React.useEffect(
+    () => {
+      saveEditorStateDebounced();
+    },
+    [saveEditorStateDebounced, projectId, editorTabs, setEditorStateForProject]
   );
 };
 

@@ -51,6 +51,47 @@ export type EditorTabsState = {
   currentTab: number,
 };
 
+type EditorTabMetadata = {|
+  /** The name of the layout/external layout/external events/extension. */
+  projectItemName: ?string,
+  /** The editor kind. */
+  editorKind:
+    | 'scene'
+    | 'scene-events'
+    | 'external-layout'
+    | 'external-events'
+    | 'extension'
+    | 'debugger'
+    | 'resources',
+|};
+
+export type EditorTabsPersistedState = {
+  editors: Array<EditorTabMetadata>,
+  currentTab: number,
+};
+
+export const getEditorTabMetadata = (
+  editorTab: EditorTab
+): EditorTabMetadata => {
+  return {
+    projectItemName: editorTab.projectItemName,
+    editorKind:
+      editorTab.editorRef instanceof SceneEditorContainer
+        ? 'scene'
+        : editorTab.editorRef instanceof ExternalEventsEditorContainer
+        ? 'external-events'
+        : editorTab.editorRef instanceof ExternalLayoutEditorContainer
+        ? 'external-layout'
+        : editorTab.editorRef instanceof ResourcesEditorContainer
+        ? 'resources'
+        : editorTab.editorRef instanceof EventsEditorContainer
+        ? 'scene-events'
+        : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
+        ? 'extension'
+        : 'debugger',
+  };
+};
+
 export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
     editors: [],

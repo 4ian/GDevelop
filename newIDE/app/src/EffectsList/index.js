@@ -58,7 +58,12 @@ const gd: libGDevelop = global.gd;
 
 const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
-const DragSourceAndDropTarget = makeDragSourceAndDropTarget('effects-list');
+const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
+  '2d-effects-list'
+);
+const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
+  '3d-effects-list'
+);
 
 const styles = {
   rowContainer: {
@@ -739,7 +744,7 @@ export default function EffectsList(props: Props) {
 
                             return !effectMetadata ||
                               !effectMetadata.isMarkedAsOnlyWorkingFor2D ? (
-                              <DragSourceAndDropTarget
+                              <DragSourceAndDropTarget3D
                                 key={effect.ptr}
                                 beginDrag={() => {
                                   draggedEffect.current = effect;
@@ -789,7 +794,7 @@ export default function EffectsList(props: Props) {
                                     </div>
                                   )
                                 }
-                              </DragSourceAndDropTarget>
+                              </DragSourceAndDropTarget3D>
                             ) : null;
                           }
                         )}
@@ -830,7 +835,7 @@ export default function EffectsList(props: Props) {
 
                             return !effectMetadata ||
                               !effectMetadata.isMarkedAsOnlyWorkingFor3D ? (
-                              <DragSourceAndDropTarget
+                              <DragSourceAndDropTarget2D
                                 key={effect.ptr}
                                 beginDrag={() => {
                                   draggedEffect.current = effect;
@@ -880,7 +885,7 @@ export default function EffectsList(props: Props) {
                                     </div>
                                   )
                                 }
-                              </DragSourceAndDropTarget>
+                              </DragSourceAndDropTarget2D>
                             ) : null;
                           }
                         )}

@@ -389,9 +389,7 @@ function LeaderboardAppearanceDialog({
               rows={4}
               rowsMax={15}
               value={customCss}
-              onChange={newCustomCss => {
-                setCustomCss(newCustomCss);
-              }}
+              onChange={setCustomCss}
               disabled={!useCustomCss || isLoading}
             />
             {!canUseCustomCss ? (

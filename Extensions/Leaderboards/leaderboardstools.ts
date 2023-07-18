@@ -335,7 +335,7 @@ namespace gdjs {
               errorCode,
               response.statusText
             );
-            // scoreSavingState.closeSavingWithError(errorCode);
+
             throw errorCode;
           }
 
@@ -349,12 +349,12 @@ namespace gdjs {
               error
             );
           }
-          // scoreSavingState.closeSaving(leaderboardEntryId);
+
           return leaderboardEntryId;
         } catch (error) {
           logger.error('Error while submitting a leaderboard score:', error);
           const errorCode = 'REQUEST_NOT_SENT';
-          // scoreSavingState.closeSavingWithError(errorCode);
+
           throw errorCode;
         }
       };

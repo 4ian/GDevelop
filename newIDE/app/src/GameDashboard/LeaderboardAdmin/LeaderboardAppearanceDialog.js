@@ -378,7 +378,12 @@ function LeaderboardAppearanceDialog({
             </Text>
             <Checkbox
               label={<Trans>Use custom CSS for the leaderboard</Trans>}
-              disabled={(!useCustomCss && !canUseCustomCss) || isLoading}
+              disabled={
+                // Disable the checkbox if it's loading,
+                // or if custom css is not allowed - unless it's already checked,
+                // in which case we allow to uncheck it.
+                (!canUseCustomCss && !useCustomCss) || isLoading
+              }
               checked={useCustomCss}
               onCheck={(e, checked) => setUseCustomCss(checked)}
             />

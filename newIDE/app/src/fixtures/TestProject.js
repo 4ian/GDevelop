@@ -776,7 +776,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create a layer with some 3D effects
   const layerWith3DEffects = new gd.Layer();
   {
-    const effect4 = layerWithEffects
+    const effect4 = layerWith3DEffects
       .getEffects()
       .insertNewEffect('MyEffect4', 1);
 
@@ -785,13 +785,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create a layer with some 2D effects
   const layerWith2DEffects = new gd.Layer();
   {
-    const effect1 = layerWithEffects
+    const effect1 = layerWith2DEffects
       .getEffects()
       .insertNewEffect('MyEffect1', 0);
-    const effect2 = layerWithEffects
+    const effect2 = layerWith2DEffects
       .getEffects()
       .insertNewEffect('MyEffect2', 1);
-    const effect3 = layerWithEffects
+    const effect3 = layerWith2DEffects
       .getEffects()
       .insertNewEffect('MyEffect3', 1);
 

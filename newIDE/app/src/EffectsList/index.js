@@ -651,6 +651,24 @@ export default function EffectsList(props: Props) {
 
   const duplicatedUniqueEffectMetadata = getDuplicatedUniqueEffectMetadata();
 
+  // Count the number of effects to hide titles of empty sections.
+  let effect2DCount = 0;
+  let effect3DCount = 0;
+  for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    const effectMetadata = getEnumeratedEffectMetadata(
+      allEffectMetadata,
+      effect.getEffectType()
+    );
+
+    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor2D) {
+      effect3DCount++;
+    }
+    if (!effectMetadata || !effectMetadata.isMarkedAsOnlyWorkingFor3D) {
+      effect2DCount++;
+    }
+  }
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -688,7 +706,7 @@ export default function EffectsList(props: Props) {
                     </Column>
                   </Line>
                 )}
-                {props.layerRenderingType !== '2d' && (
+                {props.layerRenderingType !== '2d' && effect3DCount > 0 && (
                   <Column noMargin expand>
                     {props.layerRenderingType !== '2d' && (
                       <Column noMargin>
@@ -779,7 +797,7 @@ export default function EffectsList(props: Props) {
                     </Line>
                   </Column>
                 )}
-                {props.layerRenderingType !== '3d' && (
+                {props.layerRenderingType !== '3d' && effect2DCount > 0 && (
                   <Column noMargin expand>
                     {props.layerRenderingType !== '2d' && (
                       <Column noMargin>

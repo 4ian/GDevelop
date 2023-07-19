@@ -46,10 +46,10 @@ export type EditorTab = {|
   closable: boolean,
 |};
 
-export type EditorTabsState = {
+export type EditorTabsState = {|
   editors: Array<EditorTab>,
   currentTab: number,
-};
+|};
 
 export type EditorKind =
   | 'layout'
@@ -68,10 +68,10 @@ type EditorTabMetadata = {|
   editorKind: EditorKind,
 |};
 
-export type EditorTabsPersistedState = {
+export type EditorTabsPersistedState = {|
   editors: Array<EditorTabMetadata>,
   currentTab: number,
-};
+|};
 
 export type EditorOpeningOptions = {|
   label?: string,

@@ -52,14 +52,14 @@ export type EditorTabsState = {
 };
 
 export type EditorKind =
-  | 'scene'
-  | 'scene-events'
-  | 'external-layout'
-  | 'external-events'
-  | 'extension'
+  | 'layout'
+  | 'layout events'
+  | 'external layout'
+  | 'external events'
+  | 'events functions extension'
   | 'debugger'
   | 'resources'
-  | 'home';
+  | 'start page';
 
 type EditorTabMetadata = {|
   /** The name of the layout/external layout/external events/extension. */
@@ -94,20 +94,20 @@ export const getEditorTabMetadata = (
     projectItemName: editorTab.projectItemName,
     editorKind:
       editorTab.editorRef instanceof SceneEditorContainer
-        ? 'scene'
+        ? 'layout'
         : editorTab.editorRef instanceof ExternalEventsEditorContainer
-        ? 'external-events'
+        ? 'external events'
         : editorTab.editorRef instanceof ExternalLayoutEditorContainer
-        ? 'external-layout'
+        ? 'external layout'
         : editorTab.editorRef instanceof ResourcesEditorContainer
         ? 'resources'
         : editorTab.editorRef instanceof EventsEditorContainer
-        ? 'scene-events'
+        ? 'layout events'
         : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
-        ? 'extension'
+        ? 'events functions extension'
         : editorTab.editorRef instanceof DebuggerEditorContainer
         ? 'debugger'
-        : 'home',
+        : 'start page',
   };
 };
 

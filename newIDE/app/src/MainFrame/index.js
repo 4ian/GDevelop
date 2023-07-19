@@ -195,12 +195,12 @@ const editorKindToRenderer: {
   [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
 } = {
   debugger: renderDebuggerEditorContainer,
-  'scene-events': renderEventsEditorContainer,
-  'external-events': renderExternalEventsEditorContainer,
-  scene: renderSceneEditorContainer,
-  'external-layout': renderExternalLayoutEditorContainer,
-  extension: renderEventsFunctionsExtensionEditorContainer,
-  home: renderHomePageContainer,
+  'layout events': renderEventsEditorContainer,
+  'external events': renderExternalEventsEditorContainer,
+  layout: renderSceneEditorContainer,
+  'external layout': renderExternalLayoutEditorContainer,
+  'events functions extension': renderEventsFunctionsExtensionEditorContainer,
+  'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
 };
 
@@ -580,44 +580,37 @@ const MainFrame = (props: Props) => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
-          : kind === 'home'
+          : kind === 'start page'
           ? i18n._(t`Home`)
           : kind === 'debugger'
           ? i18n._(t`Debugger`)
-          : kind === 'scene-events'
+          : kind === 'layout events'
           ? name + ` ${i18n._(t`(Events)`)}`
-          : kind === 'extension'
+          : kind === 'events functions extension'
           ? name + ` ${i18n._(t`(Extension)`)}`
           : name;
       const tabOptions =
-        kind === 'scene'
+        kind === 'layout'
           ? { data: { scene: name, type: 'layout' } }
-          : kind === 'scene-events'
+          : kind === 'layout events'
           ? { data: { scene: name, type: 'layout-events' } }
           : undefined;
-      const key =
-        kind === 'scene'
-          ? 'layout ' + name
-          : kind === 'scene-events'
-          ? 'layout events ' + name
-          : kind === 'external-events'
-          ? 'external events ' + name
-          : kind === 'external-layout'
-          ? 'external layout ' + name
-          : kind === 'extension'
-          ? 'events functions extension ' + name
-          : kind === 'resources'
-          ? 'resources'
-          : kind === 'home'
-          ? 'start page'
-          : 'debugger';
+      const key = [
+        'layout',
+        'layout events',
+        'external events',
+        'external layout',
+        'events functions extension',
+      ].includes(kind)
+        ? `${kind} ${name}`
+        : kind;
       const icon =
-        kind === 'home' ? <HomeIcon titleAccess="Home" /> : undefined;
-      const closable = kind !== 'home';
+        kind === 'start page' ? <HomeIcon titleAccess="Home" /> : undefined;
+      const closable = kind !== 'start page';
       const extraEditorProps =
         kind === 'resources'
           ? { fileMetadata: currentFileMetadata }
-          : kind === 'home'
+          : kind === 'start page'
           ? { storageProviders: props.storageProviders }
           : undefined;
       return {
@@ -641,7 +634,6 @@ const MainFrame = (props: Props) => {
     editorTabs: state.editorTabs,
     getEditorOpeningOptions,
   });
-
 
   useOpenInitialDialog({
     openInAppTutorialDialog: (tutorialId: string) => {
@@ -1608,9 +1600,9 @@ const MainFrame = (props: Props) => {
       }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
       editorTabs = state.editorTabs
     ): EditorTabsState => {
-      const sceneEditorOptions = getEditorOpeningOptions('scene', name);
+      const sceneEditorOptions = getEditorOpeningOptions('layout', name);
       const eventsEditorOptions = {
-        ...getEditorOpeningOptions('scene-events', name),
+        ...getEditorOpeningOptions('layout events', name),
         dontFocusTab: openSceneEditor,
       };
 
@@ -1639,7 +1631,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          getEditorOpeningOptions('external-events', name)
+          getEditorOpeningOptions('external events', name)
         ),
       }));
       openProjectManager(false);
@@ -1653,7 +1645,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          getEditorOpeningOptions('external-layout', name)
+          getEditorOpeningOptions('external layout', name)
         ),
       }));
       openProjectManager(false);
@@ -1670,7 +1662,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          ...getEditorOpeningOptions('extension', name),
+          ...getEditorOpeningOptions('events functions extension', name),
           extraEditorProps: {
             initiallyFocusedFunctionName,
             initiallyFocusedBehaviorName,
@@ -1701,7 +1693,7 @@ const MainFrame = (props: Props) => {
         ...state,
         editorTabs: openEditorTab(
           state.editorTabs,
-          getEditorOpeningOptions('home', '')
+          getEditorOpeningOptions('start page', '')
         ),
       }));
     },

@@ -99,19 +99,19 @@ WithCommunityExtensions.parameters = apiDataFakeBehaviors;
 
 export const WithServerSideErrors = () => (
   <FixedHeightFlexContainer height={400}>
-  <BehaviorStoreStateProvider>
-    <NewBehaviorDialog
-      open
-      project={testProject.project}
-      objectType={'Sprite'}
-      onClose={action('on close')}
-      onChoose={action('on choose')}
-      objectBehaviorsTypes={[
-        'DestroyOutsideBehavior::DestroyOutside',
-        'PlatformBehavior::PlatformBehavior',
-      ]}
-    />
-  </BehaviorStoreStateProvider>
+    <BehaviorStoreStateProvider>
+      <NewBehaviorDialog
+        open
+        project={testProject.project}
+        objectType={'Sprite'}
+        onClose={action('on close')}
+        onChoose={action('on choose')}
+        objectBehaviorsTypes={[
+          'DestroyOutsideBehavior::DestroyOutside',
+          'PlatformBehavior::PlatformBehavior',
+        ]}
+      />
+    </BehaviorStoreStateProvider>
   </FixedHeightFlexContainer>
 );
 WithServerSideErrors.decorators = [withMock];

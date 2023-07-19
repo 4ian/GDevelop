@@ -4,7 +4,7 @@ import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension
 
 export const fakeBehaviorsRegistry: BehaviorsRegistry & {
   // The service gives CSV but it's converted on the fly to an array.
-  headers: Array<BehaviorShortHeader & { tags: any }>,
+  headers: Array<BehaviorShortHeader & { tags: any, type: any }>,
 } = {
   views: {
     default: {

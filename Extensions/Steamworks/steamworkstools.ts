@@ -7,7 +7,7 @@ namespace gdjs {
       const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
       if (!remote) return; // Steamworks is only supported on electron
       const steamworks_js = remote.require(
-        'steamworks.js'
+        '@gdevelop/steamworks.js'
       ) as typeof import('steamworks.js');
 
       // Sets the proper electron flags for the steam overlay to function properly

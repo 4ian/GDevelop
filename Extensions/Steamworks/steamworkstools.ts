@@ -6,39 +6,46 @@ namespace gdjs {
     gdjs.registerFirstRuntimeSceneLoadedCallback((runtimeScene) => {
       const remote = runtimeScene.getGame().getRenderer().getElectronRemote();
       if (!remote) return; // Steamworks is only supported on electron
-      const steamworks_js = remote.require(
-        '@gdevelop/steamworks.js'
-      ) as typeof import('steamworks.js');
 
-      // Sets the proper electron flags for the steam overlay to function properly
-      steamworks_js.electronEnableSteamOverlay();
+      try {
+        const steamworks_js = remote.require(
+          '@gdevelop/steamworks.js'
+        ) as typeof import('steamworks.js');
 
-      const unparsedAppID = runtimeScene
-        .getGame()
-        .getExtensionProperty('Steamworks', 'AppID');
+        // Sets the proper electron flags for the steam overlay to function properly
+        steamworks_js.electronEnableSteamOverlay();
 
-      if (!unparsedAppID) {
-        logger.error(
-          'A steam AppID needs to be configured in the game properties for steamworks features to be used!'
-        );
-        return;
-      }
-
-      const appID = parseInt(unparsedAppID, 10);
-
-      // Restart the game through steam if it needs to be launched with steam but has not been
-      if (
-        runtimeScene
+        const unparsedAppID = runtimeScene
           .getGame()
-          .getExtensionProperty('Steamworks', 'RequireSteam') &&
-        !runtimeScene.getGame().isPreview() &&
-        steamworks_js.restartAppIfNecessary(appID)
-      ) {
-        remote.process.exit(1);
-        return;
-      }
+          .getExtensionProperty('Steamworks', 'AppID');
 
-      steamAPI = steamworks_js.init(appID);
+        if (!unparsedAppID) {
+          logger.error(
+            'A steam AppID needs to be configured in the game properties for steamworks features to be used!'
+          );
+          return;
+        }
+
+        const appID = parseInt(unparsedAppID, 10);
+
+        // Restart the game through steam if it needs to be launched with steam but has not been
+        if (
+          runtimeScene
+            .getGame()
+            .getExtensionProperty('Steamworks', 'RequireSteam') &&
+          !runtimeScene.getGame().isPreview() &&
+          steamworks_js.restartAppIfNecessary(appID)
+        ) {
+          remote.process.exit(1);
+          return;
+        }
+
+        steamAPI = steamworks_js.init(appID);
+      } catch {
+        logger.error(
+          'Something wrong happened while initializing Steamworks! Is Steam currently launched?'
+        );
+      }
     });
 
     // ---
@@ -122,9 +129,8 @@ namespace gdjs {
       string,
       import('steamworks.js/client').matchmaking.Lobby
     >();
-    let currentLobby:
-      | import('steamworks.js/client').matchmaking.Lobby
-      | null = null;
+    let currentLobby: import('steamworks.js/client').matchmaking.Lobby | null =
+      null;
 
     export function getKnownLobby(lobbyId: string) {
       if (!steamAPI) {

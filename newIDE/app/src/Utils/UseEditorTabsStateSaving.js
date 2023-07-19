@@ -37,7 +37,8 @@ const useEditorTabsStateSaving = ({
   } = React.useContext(PreferencesContext);
   const saveEditorState = React.useCallback(
     () => {
-      if (!currentProjectId) return;
+      // Do not save the state if the user is on the start page
+      if (!currentProjectId || editorTabs.currentTab === 0) return;
       const editorState = {
         currentTab: editorTabs.currentTab,
         editors: editorTabs.editors

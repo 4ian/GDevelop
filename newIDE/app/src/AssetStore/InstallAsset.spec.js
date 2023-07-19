@@ -403,10 +403,7 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       await expect(
@@ -496,10 +493,7 @@ describe('InstallAsset', () => {
 
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       await expect(
@@ -626,10 +620,7 @@ describe('InstallAsset', () => {
 
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        headers: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       mockFn(getExtension).mockImplementationOnce(

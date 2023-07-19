@@ -18,12 +18,38 @@ type Props = {|
   editorTabs: EditorTabsState,
   setEditorTabs: EditorTabsState => void,
   currentProjectId: string | null,
-  getEditorOpeningOptions: ({
+  getEditorOpeningOptions: ({|
     kind: EditorKind,
     name: string,
     dontFocusTab?: boolean,
-  }) => EditorOpeningOptions,
+  |}) => EditorOpeningOptions,
 |};
+
+const projectHasItem = ({
+  project,
+  kind,
+  name,
+}: {|
+  project: gdProject,
+  kind: EditorKind,
+  name: string,
+|}) => {
+  if (['debugger', 'start page', 'resources'].includes(kind)) return true;
+  switch (kind) {
+    case 'events functions extension':
+      return project.hasEventsFunctionsExtensionNamed(name);
+    case 'layout':
+      return project.hasLayoutNamed(name);
+    case 'layout events':
+      return project.hasLayoutNamed(name);
+    case 'external layout':
+      return project.hasExternalLayoutNamed(name);
+    case 'external events':
+      return project.hasExternalEventsNamed(name);
+    default:
+      return false;
+  }
+};
 
 const useEditorTabsStateSaving = ({
   currentProjectId,
@@ -90,14 +116,30 @@ const useEditorTabsStateSaving = ({
       const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
       if (!editorState) return;
-      const editorsOpeningOptions = editorState.editorTabs.editors.map(
-        editorMetadata =>
-          getEditorOpeningOptions({
-            kind: editorMetadata.editorKind,
-            name: editorMetadata.projectItemName || '',
-            dontFocusTab: true,
-          })
-      );
+      let shouldOpenSavedCurrentTab = true;
+
+      const editorsOpeningOptions = editorState.editorTabs.editors
+        .map(editorMetadata => {
+          if (
+            projectHasItem({
+              project,
+              kind: editorMetadata.editorKind,
+              name: editorMetadata.projectItemName || '',
+            })
+          ) {
+            return getEditorOpeningOptions({
+              kind: editorMetadata.editorKind,
+              name: editorMetadata.projectItemName || '',
+              dontFocusTab: true,
+            });
+          }
+          // If the project does not contain the target item (it could happen if
+          // the user opens an old version of the project that did not have a scene
+          // for instance), the currentTab will surely be outdated so we don't use it.
+          shouldOpenSavedCurrentTab = false;
+          return null;
+        })
+        .filter(Boolean);
 
       // Close all current tabs
       let newEditorTabs = closeAllEditorTabs(editorTabs);
@@ -118,7 +160,11 @@ const useEditorTabsStateSaving = ({
       }
       newEditorTabs = changeCurrentTab(
         newEditorTabs,
-        editorState.editorTabs.currentTab
+        shouldOpenSavedCurrentTab
+          ? editorState.editorTabs.currentTab
+          : newEditorTabs.editors.length >= 1
+          ? 1
+          : 0
       );
       setEditorTabs(newEditorTabs);
     },

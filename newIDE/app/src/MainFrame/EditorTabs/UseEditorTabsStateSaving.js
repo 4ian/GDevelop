@@ -10,9 +10,9 @@ import {
   changeCurrentTab,
   isStartPageTabPresent,
   closeAllEditorTabs,
-} from '../MainFrame/EditorTabs/EditorTabsHandler';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { useDebounce } from './UseDebounce';
+} from './EditorTabsHandler';
+import PreferencesContext from '../Preferences/PreferencesContext';
+import { useDebounce } from '../../Utils/UseDebounce';
 
 type Props = {|
   editorTabs: EditorTabsState,

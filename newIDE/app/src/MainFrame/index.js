@@ -176,7 +176,7 @@ import useCreateProject from '../Utils/UseCreateProject';
 import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProjectDialog';
-import useEditorTabsStateSaving from '../Utils/UseEditorTabsStateSaving';
+import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 

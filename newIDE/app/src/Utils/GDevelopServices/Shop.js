@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import path from 'path';
+import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
 
 const client = axios.create({
@@ -139,12 +139,14 @@ export const extractFilenameWithExtensionFromProductAuthorizedUrl = (
 export const getStripeCheckoutUrl = async (
   getAuthorizationHeader: () => Promise<string>,
   {
-    stripePriceId,
+    priceName,
+    productId,
     userId,
     customerEmail,
     password,
   }: {|
-    stripePriceId: string,
+    priceName: string,
+    productId: string,
     userId: string,
     customerEmail: string,
     password?: string,
@@ -154,7 +156,8 @@ export const getStripeCheckoutUrl = async (
   const response = await client.post(
     '/purchase/action/create-stripe-checkout-session',
     {
-      stripePriceId,
+      priceName,
+      productId,
       customerEmail,
       password,
     },

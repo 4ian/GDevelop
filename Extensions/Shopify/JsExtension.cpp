@@ -81,12 +81,10 @@ class ShopifyJsExtension : public gd::PlatformExtension {
     DeclareShopifyExtension(*this);
 
     GetAllActions()["Shopify::BuildClient"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Shopify/shopify-buy.umd.polyfilled.min.js")
         .AddIncludeFile("Extensions/Shopify/shopifytools.js")
         .SetFunctionName("gdjs.evtTools.shopify.buildClient");
     GetAllActions()["Shopify::GetCheckoutUrlForProduct"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Shopify/shopify-buy.umd.polyfilled.min.js")
         .AddIncludeFile("Extensions/Shopify/shopifytools.js")
         .SetFunctionName("gdjs.evtTools.shopify.getCheckoutUrlForProduct");

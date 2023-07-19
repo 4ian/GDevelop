@@ -8,6 +8,7 @@ import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+import { isWebGLSupported } from '../../Utils/WebGL';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -206,7 +207,7 @@ export type PreferencesValues = {|
   showCommunityExtensions: boolean,
   showGetStartedSection: boolean,
   showEventBasedObjectsEditor: boolean,
-  showObjectInstancesIn3D: boolean,
+  use3DEditor: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
@@ -274,8 +275,8 @@ export type Preferences = {|
   setShowGetStartedSection: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
-  setShowObjectInstancesIn3D: (enabled: boolean) => void,
-  getShowObjectInstancesIn3D: () => boolean,
+  setUse3DEditor: (enabled: boolean) => void,
+  getUse3DEditor: () => boolean,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
@@ -327,7 +328,7 @@ export const initialPreferences = {
     showCommunityExtensions: false,
     showGetStartedSection: true,
     showEventBasedObjectsEditor: false,
-    showObjectInstancesIn3D: false,
+    use3DEditor: isWebGLSupported(),
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
@@ -381,8 +382,8 @@ export const initialPreferences = {
   setShowGetStartedSection: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
-  setShowObjectInstancesIn3D: (enabled: boolean) => {},
-  getShowObjectInstancesIn3D: () => false,
+  setUse3DEditor: (enabled: boolean) => {},
+  getUse3DEditor: () => false,
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},

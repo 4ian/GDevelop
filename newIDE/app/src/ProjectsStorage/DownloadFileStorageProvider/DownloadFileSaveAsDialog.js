@@ -27,7 +27,7 @@ import {
   type BlobFileDescriptor,
   type TextFileDescriptor,
 } from '../../Utils/BrowserArchiver';
-import path from 'path';
+import path from 'path-browserify';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 const gd: libGDevelop = global.gd;
 

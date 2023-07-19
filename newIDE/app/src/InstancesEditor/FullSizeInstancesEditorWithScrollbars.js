@@ -407,7 +407,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
                   }
                 }
               }}
-              showObjectInstancesIn3D={values.showObjectInstancesIn3D}
+              showObjectInstancesIn3D={values.use3DEditor}
               {...otherProps}
             />
           )}

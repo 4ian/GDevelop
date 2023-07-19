@@ -275,6 +275,7 @@ export default function NewBehaviorDialog({
                     onChange={setSearchText}
                     ref={searchBar}
                     placeholder={t`Search installed behaviors`}
+                    autoFocus="desktop"
                   />
                 </Column>
               </Line>

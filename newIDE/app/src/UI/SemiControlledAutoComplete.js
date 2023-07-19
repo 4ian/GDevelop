@@ -84,6 +84,7 @@ export const autocompleteStyles = {
     padding: 0,
     margin: 0,
   },
+  listbox: { padding: 0, margin: 0 },
   listItemText: {
     margin: '1px 0',
   },
@@ -93,10 +94,7 @@ const useStyles = makeStyles({
   option: {
     cursor: 'default',
   },
-  listbox: {
-    padding: 0,
-    margin: 0,
-  },
+  listbox: autocompleteStyles.listbox,
   input: {
     width: 'auto',
     flexGrow: 1,

@@ -51,7 +51,7 @@ const styles = {
   },
 };
 
-type Item = NamedCommand | CommandOption | AlgoliaSearchHitType;
+type Item = NamedCommand | CommandOption | GoToWikiCommand;
 
 const HitPrimaryText = (
   hit: any,

@@ -12,7 +12,11 @@ import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import { ResponsiveLineStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ResponsiveLineStackLayout,
+  LineStackLayout,
+  ColumnStackLayout,
+} from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
@@ -36,6 +40,7 @@ import {
   shouldUseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
 import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const sameCreatorPackCountForSmallWindow = 2;
 const sameCreatorPackCountForMediumWindow = 3;
@@ -49,6 +54,7 @@ const sortedContentType = [
   'particleEmitter',
   'font',
   'audio',
+  'Scene3D::Model3DObject',
   'partial',
 ];
 
@@ -56,6 +62,7 @@ const contentTypeToMessageDescriptor = {
   sprite: t`Sprites`,
   '9patch': t`Panel sprites`,
   tiled: t`Tiled sprites`,
+  'Scene3D::Model3DObject': t`3D model`,
   particleEmitter: t`Particle emitters`,
   font: t`Fonts`,
   audio: t`Audios`,
@@ -83,6 +90,7 @@ const PrivateAssetPackInformationPage = ({
   onAssetPackOpen,
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
@@ -99,6 +107,12 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
+
+  const isAlreadyReceived =
+    !!receivedAssetPacks &&
+    !!receivedAssetPacks.find(
+      assetPack => assetPack.id === privateAssetPackListingData.id
+    );
 
   React.useEffect(
     () => {
@@ -133,38 +147,54 @@ const PrivateAssetPackInformationPage = ({
     [id, sellerId, privateAssetPackListingData.appStoreProductId]
   );
 
-  const onClickBuy = async () => {
-    if (!assetPack) return;
-    try {
-      sendAssetPackBuyClicked({
-        assetPackId: assetPack.id,
-        assetPackName: assetPack.name,
-        assetPackTag: assetPack.tag,
-        assetPackKind: 'private',
-      });
-
-      if (shouldUseAppStoreProduct()) {
-        try {
-          setAppStoreProductBeingBought(true);
-          await purchaseAppStoreProduct(
-            privateAssetPackListingData.appStoreProductId
-          );
-        } finally {
-          setAppStoreProductBeingBought(false);
-        }
-      } else {
-        onOpenPurchaseDialog();
+  const onClickBuy = React.useCallback(
+    async () => {
+      if (!assetPack) return;
+      if (isAlreadyReceived) {
+        onAssetPackOpen(privateAssetPackListingData);
+        return;
       }
-    } catch (e) {
-      console.warn('Unable to send event', e);
-    }
-  };
+
+      try {
+        sendAssetPackBuyClicked({
+          assetPackId: assetPack.id,
+          assetPackName: assetPack.name,
+          assetPackTag: assetPack.tag,
+          assetPackKind: 'private',
+        });
+
+        if (shouldUseAppStoreProduct()) {
+          try {
+            setAppStoreProductBeingBought(true);
+            await purchaseAppStoreProduct(
+              privateAssetPackListingData.appStoreProductId
+            );
+          } finally {
+            setAppStoreProductBeingBought(false);
+          }
+        } else {
+          onOpenPurchaseDialog();
+        }
+      } catch (e) {
+        console.warn('Unable to send event', e);
+      }
+    },
+    [
+      assetPack,
+      onOpenPurchaseDialog,
+      privateAssetPackListingData,
+      isAlreadyReceived,
+      onAssetPackOpen,
+    ]
+  );
 
   const getBuyButton = i18n => {
     if (errorText) return null;
 
     const label = !assetPack ? (
       <Trans>Loading...</Trans>
+    ) : isAlreadyReceived ? (
+      <Trans>Explore assets</Trans>
     ) : isPurchaseDialogOpen || appStoreProductBeingBought ? (
       <Trans>Processing...</Trans>
     ) : (
@@ -239,7 +269,17 @@ const PrivateAssetPackInformationPage = ({
                       horizontalOuterMarginToEatOnMobile={8}
                     />
                   </Column>
-                  <Column useFullHeight expand noMargin>
+                  <ColumnStackLayout useFullHeight expand noMargin>
+                    {isAlreadyReceived && (
+                      <Column noMargin expand>
+                        <AlertMessage kind="info">
+                          <Trans>
+                            You already own this asset pack. Explore the assets
+                            to use them in your project.
+                          </Trans>
+                        </AlertMessage>
+                      </Column>
+                    )}
                     <Paper
                       variant="outlined"
                       style={{ padding: windowWidth === 'small' ? 20 : 30 }}
@@ -340,7 +380,7 @@ const PrivateAssetPackInformationPage = ({
                         </ResponsiveLineStackLayout>
                       </Column>
                     </Paper>
-                  </Column>
+                  </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
                 {privateAssetPacksFromSameCreatorListingData &&
                 // Only display packs if there are at least 2. If there is only one,

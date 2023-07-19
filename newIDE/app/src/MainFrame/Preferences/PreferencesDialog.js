@@ -26,6 +26,7 @@ import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMea
 import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import AlertMessage from '../../UI/AlertMessage';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -64,10 +65,12 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
     setShowEventBasedObjectsEditor,
-    setShowObjectInstancesIn3D,
+    setUse3DEditor,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
   } = React.useContext(PreferencesContext);
+
+  const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
 
   return (
     <Dialog
@@ -351,15 +354,19 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             }
           />
           <Toggle
-            onToggle={(e, check) => setShowObjectInstancesIn3D(check)}
-            toggled={values.showObjectInstancesIn3D}
+            onToggle={(e, check) => setUse3DEditor(check)}
+            toggled={values.use3DEditor}
             labelPosition="right"
-            label={
-              <Trans>
-                Show objects in 3D in the scene editor (experimental)
-              </Trans>
-            }
+            label={<Trans>Show objects in 3D in the scene editor</Trans>}
           />
+          {initialUse3DEditor.current !== values.use3DEditor && (
+            <AlertMessage kind="info">
+              <Trans>
+                For the 3D change to take effect, close and reopen all currently
+                opened scenes.
+              </Trans>
+            </AlertMessage>
+          )}
           {electron && (
             <>
               <ColumnStackLayout expand noMargin>

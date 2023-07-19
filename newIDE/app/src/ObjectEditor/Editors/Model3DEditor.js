@@ -248,7 +248,7 @@ const Model3DEditor = ({
   );
   const { showAlert } = useAlertDialog();
 
-  const draggedAnimationIndex = React.useRef<?number>(null);
+  const draggedAnimationIndex = React.useRef<number | null>(null);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const forceUpdate = useForceUpdate();
@@ -293,6 +293,7 @@ const Model3DEditor = ({
       if (!model3D) {
         return;
       }
+      setNameErrors({});
 
       const animationSources = mapFor(
         0,
@@ -352,6 +353,8 @@ const Model3DEditor = ({
 
   const addAnimation = React.useCallback(
     () => {
+      setNameErrors({});
+
       const emptyAnimation = new gd.Model3DAnimation();
       model3DConfiguration.addAnimation(emptyAnimation);
       emptyAnimation.delete();
@@ -374,6 +377,8 @@ const Model3DEditor = ({
 
   const removeAnimation = React.useCallback(
     animationIndex => {
+      setNameErrors({});
+
       model3DConfiguration.removeAnimation(animationIndex);
       forceUpdate();
       onSizeUpdated();
@@ -385,7 +390,9 @@ const Model3DEditor = ({
   const moveAnimation = React.useCallback(
     (targetIndex: number) => {
       const draggedIndex = draggedAnimationIndex.current;
-      if (!draggedIndex) return;
+      if (draggedIndex === null) return;
+
+      setNameErrors({});
 
       model3DConfiguration.moveAnimation(
         draggedIndex,
@@ -403,16 +410,15 @@ const Model3DEditor = ({
         .getName();
       if (currentName === newName) return;
       const animation = model3DConfiguration.getAnimation(animationIndex);
-      if (nameErrors[animation.ptr]) {
-        const newNameErrors = { ...nameErrors };
-        delete newNameErrors[animation.ptr];
-        setNameErrors(newNameErrors);
-      }
+
+      setNameErrors({});
 
       if (newName !== '' && model3DConfiguration.hasAnimationNamed(newName)) {
+        // The indexes can be used as a key because errors are cleared when
+        // animations are moved.
         setNameErrors({
           ...nameErrors,
-          [animation.ptr]: (
+          [animationIndex]: (
             <Trans>The animation name {newName} is already taken</Trans>
           ),
         });
@@ -646,7 +652,7 @@ const Model3DEditor = ({
 
                     return (
                       <DragSourceAndDropTarget
-                        key={animation.ptr}
+                        key={animationIndex}
                         beginDrag={() => {
                           draggedAnimationIndex.current = animationIndex;
                           return {};
@@ -665,7 +671,7 @@ const Model3DEditor = ({
                         }) =>
                           connectDropTarget(
                             <div
-                              key={animation.ptr}
+                              key={animationIndex}
                               style={styles.rowContainer}
                             >
                               {isOver && <DropIndicator canDrop={canDrop} />}
@@ -692,7 +698,7 @@ const Model3DEditor = ({
                                   <SemiControlledTextField
                                     margin="none"
                                     commitOnBlur
-                                    errorText={nameErrors[animation.ptr]}
+                                    errorText={nameErrors[animationIndex]}
                                     translatableHintText={t`Optional animation name`}
                                     value={animation.getName()}
                                     onChange={text =>

@@ -84,6 +84,14 @@ export default class ViewPosition {
   };
 
   /**
+   * Convert a length from canvas referential to scene referential.
+   */
+  toSceneScale = (a: number): number =>
+    this.instancesEditorSettings.zoomFactor === 0
+      ? a
+      : a / Math.abs(this.instancesEditorSettings.zoomFactor);
+
+  /**
    * Convert a point from the "world" coordinates (for example, an object position) to the
    * canvas coordinates.
    */

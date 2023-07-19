@@ -46,7 +46,7 @@ const useSwitchStyles = ({
 type Props = {|
   label: React.Node,
   toggled: boolean,
-  onToggle: (e: {||}, toggled: boolean) => void,
+  onToggle: (e: {||}, toggled: boolean) => void | Promise<void>,
   disabled?: boolean,
   labelPosition: 'right' | 'left',
 

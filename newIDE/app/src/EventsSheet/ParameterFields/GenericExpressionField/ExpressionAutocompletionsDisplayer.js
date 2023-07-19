@@ -65,11 +65,12 @@ const DisplayedTextAutocompletion = React.forwardRef(
   ) => (
     <ButtonBase
       style={styles.button}
-      onPointerDown={() => {
-        // Trigger the onClick on the mouse/touch down
-        // to avoid the blur event of the text field to discard the autocompletions.
-        onClick();
-      }}
+      onPointerDown={e =>
+        // Prevent default behavior that gives the focus to the button and makes
+        // the field lose focus, hence closing the autocompletion displayer.
+        e.preventDefault()
+      }
+      onClick={onClick}
       ref={ref}
     >
       <Text style={defaultTextStyle} noMargin align="left">
@@ -111,11 +112,12 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
     return (
       <ButtonBase
         style={styles.button}
-        onPointerDown={() => {
-          // Trigger the onClick on the mouse/touch down
-          // to avoid the blur event of the text field to discard the autocompletions.
-          onClick();
-        }}
+        onPointerDown={e =>
+          // Prevent default behavior that gives the focus to the button and makes
+          // the field lose focus, hence closing the autocompletion displayer.
+          e.preventDefault()
+        }
+        onClick={onClick}
         ref={ref}
       >
         <AutocompletionIcon
@@ -172,11 +174,12 @@ const DisplayedObjectAutocompletion = React.forwardRef(
     return (
       <ButtonBase
         style={styles.button}
-        onPointerDown={() => {
-          // Trigger the onClick on the mouse/touch down
-          // to avoid the blur event of the text field to discard the autocompletions.
-          onClick();
-        }}
+        onPointerDown={e =>
+          // Prevent default behavior that gives the focus to the button and makes
+          // the field lose focus, hence closing the autocompletion displayer.
+          e.preventDefault()
+        }
+        onClick={onClick}
         ref={ref}
       >
         <AutocompletionIcon src={thumbnail} />
@@ -210,11 +213,12 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
     return (
       <ButtonBase
         style={styles.button}
-        onPointerDown={() => {
-          // Trigger the onClick on the mouse/touch down
-          // to avoid the blur event of the text field to discard the autocompletions.
-          onClick();
-        }}
+        onPointerDown={e =>
+          // Prevent default behavior that gives the focus to the button and makes
+          // the field lose focus, hence closing the autocompletion displayer.
+          e.preventDefault()
+        }
+        onClick={onClick}
         ref={ref}
       >
         <AutocompletionIcon src={'res/types/behavior.png'} />

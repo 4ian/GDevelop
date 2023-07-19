@@ -267,11 +267,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     return "/* Unknown instruction - skipped. */";
   }
 
-  AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
+  AddIncludeFiles(instrInfos.GetIncludeFiles());
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
-  if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(
         condition, *this, context);
@@ -459,9 +459,9 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     return "/* Unknown instruction - skipped. */";
   }
 
-  AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
+  AddIncludeFiles(instrInfos.GetIncludeFiles());
 
-  if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (instrInfos.HasCustomCodeGenerator()) {
     return instrInfos.codeExtraInformation.customCodeGenerator(
         action, *this, context);
   }
@@ -1019,15 +1019,15 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
     bool conditionInverted,
     gd::EventsCodeGenerationContext& context) {
   // Generate call
-  gd::String predicat;
+  gd::String predicate;
   if (instrInfos.codeExtraInformation.type == "number" ||
       instrInfos.codeExtraInformation.type == "string") {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos,
         arguments,
         instrInfos.codeExtraInformation.functionCallName);
   } else {
-    predicat = instrInfos.codeExtraInformation.functionCallName + "(" +
+    predicate = instrInfos.codeExtraInformation.functionCallName + "(" +
                GenerateArgumentsList(arguments, 0) + ")";
   }
 
@@ -1040,10 +1040,10 @@ gd::String EventsCodeGenerator::GenerateFreeCondition(
       conditionAlreadyTakeCareOfInversion = true;
   }
   if (!conditionAlreadyTakeCareOfInversion && conditionInverted)
-    predicat = GenerateNegatedPredicat(predicat);
+    predicate = GenerateNegatedPredicate(predicate);
 
   // Generate condition code
-  return returnBoolean + " = " + predicat + ";\n";
+  return returnBoolean + " = " + predicate + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectCondition(
@@ -1065,18 +1065,18 @@ gd::String EventsCodeGenerator::GenerateObjectCondition(
                 instrInfos.codeExtraInformation.functionCallName;
 
   // Create call
-  gd::String predicat;
+  gd::String predicate;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
-    predicat = GenerateRelationalOperatorCall(
+    predicate = GenerateRelationalOperatorCall(
         instrInfos, arguments, objectFunctionCallNamePart, 1);
   } else {
-    predicat = objectFunctionCallNamePart + "(" +
+    predicate = objectFunctionCallNamePart + "(" +
                GenerateArgumentsList(arguments, 1) + ")";
   }
-  if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+  if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
-  return "For each picked object \"" + objectName + "\", check " + predicat +
+  return "For each picked object \"" + objectName + "\", check " + predicate +
          ".\n";
 }
 
@@ -1090,16 +1090,16 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
     bool conditionInverted,
     gd::EventsCodeGenerationContext& context) {
   // Create call
-  gd::String predicat;
+  gd::String predicate;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
-    predicat = GenerateRelationalOperatorCall(instrInfos, arguments, "", 2);
+    predicate = GenerateRelationalOperatorCall(instrInfos, arguments, "", 2);
   } else {
-    predicat = "(" + GenerateArgumentsList(arguments, 2) + ")";
+    predicate = "(" + GenerateArgumentsList(arguments, 2) + ")";
   }
-  if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
+  if (conditionInverted) predicate = GenerateNegatedPredicate(predicate);
 
-  return "For each picked object \"" + objectName + "\", check " + predicat +
+  return "For each picked object \"" + objectName + "\", check " + predicate +
          " for behavior \"" + behaviorName + "\".\n";
 }
 

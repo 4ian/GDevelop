@@ -1,73 +1,71 @@
-cmake_minimum_required(VERSION 2.6)
-cmake_policy(SET CMP0015 NEW)
+cmake_minimum_required(VERSION 3.5)
 
 project(libGD.js)
 
-#Sanity checks
-IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
+# Sanity checks
+if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+	message(STATUS "CMAKE_BUILD_TYPE is empty, assuming build type is Release")
 	set(CMAKE_BUILD_TYPE Release)
-ENDIF()
+endif()
 if(NOT EMSCRIPTEN)
-	error("You're trying to compile libGD.js without emscripten.")
+	message(FATAL_ERROR "You're trying to compile libGD.js without emscripten.")
 endif()
 
 # Compilation flags (https://emscripten.org/docs/tools_reference/emcc.html):
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O2") # Optimizations during compilation
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g --profiling") # Uncomment for debugging + profiling support
-# SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --profiling") # Uncomment for profiling support
+add_compile_options(-O2) # Optimizations during compilation
+# add_compile_options(-g --profiling) # Uncomment for debugging + profiling support
+# add_compile_options(--profiling) # Uncomment for profiling support
 
-#Common directories:
-###
+# Common directories:
+#
 set(GDJS_include_dir ${GD_base_dir}/GDJS)
 set(GDJS_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform)
 
-#Dependencies on external libraries:
-###
+# Dependencies on external libraries:
+#
 include_directories(${GDCORE_include_dir})
 include_directories(${GDJS_include_dir})
 
-#Defines
-###
-add_definitions( -DGD_IDE_ONLY )
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-	add_definitions( -DDEBUG )
-	IF(WIN32)
-		add_definitions( __WXDEBUG__ )
-	ENDIF(WIN32)
-ELSEIF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-	add_definitions( -DRELEASE )
-	add_definitions( -DBOOST_DISABLE_ASSERTS )
-ELSE()
-	add_definitions( -DDEV )
-	add_definitions( -DBOOST_DISABLE_ASSERTS )
-ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+# Defines
+#
+add_definitions(-DGD_IDE_ONLY)
+if("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+	add_definitions(-DDEBUG)
+	if(WIN32)
+		add_definitions(__WXDEBUG__)
+	endif()
+elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+	add_definitions(-DRELEASE)
+	add_definitions(-DBOOST_DISABLE_ASSERTS)
+else()
+	add_definitions(-DDEV)
+	add_definitions(-DBOOST_DISABLE_ASSERTS)
+endif()
 
-add_definitions( -Dlinux )
-add_definitions( -DLINUX )
-add_definitions( -DGD_API= )
-add_definitions( -DGD_CORE_API= )
-add_definitions( -DGD_EXTENSION_API= )
+add_definitions(-Dlinux)
+add_definitions(-DLINUX)
+add_definitions(-DGD_API=)
+add_definitions(-DGD_CORE_API=)
+add_definitions(-DGD_EXTENSION_API=)
 
-#The target
-###
+# The target
+#
 include_directories(.)
 
 add_executable(
 	GD
-	"Bindings/Wrapper.cpp"
 	"Bindings/BehaviorJsImplementation.cpp"
-	"Bindings/ObjectJsImplementation.cpp"
 	"Bindings/BehaviorSharedDataJsImplementation.cpp"
-)
+	"Bindings/ObjectJsImplementation.cpp"
+	"Bindings/Wrapper.cpp")
 
-IF(DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
+if(DISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS)
 	# Disable optimizations at linking time for much faster builds.
-	MESSAGE(STATUS "Disabling optimization at link time for (slightly) faster build")
+	message(STATUS "Disabling optimization at link time for (slightly) faster build")
 	target_link_libraries(GD "-O0")
-ELSE()
+else()
 	target_link_libraries(GD "-O2")
-ENDIF()
+endif()
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/glue.js")
 target_link_libraries(GD "--post-js ${GD_base_dir}/GDevelop.js/Bindings/postjs.js")
 target_link_libraries(GD "-s MODULARIZE=1")
@@ -80,9 +78,8 @@ target_link_libraries(GD "-s \"EXTRA_EXPORTED_RUNTIME_METHODS=['addOnPreMain', '
 # Even if we're building an "executable", prefix it by lib as it's used as a library.
 set_target_properties(GD PROPERTIES PREFIX "lib")
 
-#Linker files
-###
-
+# Linker files
+#
 target_link_libraries(GD GDCore)
 target_link_libraries(GD GDJS)
 target_link_libraries(GD PlatformBehavior)

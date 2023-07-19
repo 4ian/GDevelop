@@ -14,10 +14,6 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
-import {
-  isBehaviorLifecycleEventsFunction,
-  isExtensionLifecycleEventsFunction,
-} from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -105,6 +101,12 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
+    this._addParameterAt(parameters.size());
+  };
+
+  _addParameterAt = (index: number) => {
+    const { eventsFunction } = this.props;
+    const parameters = eventsFunction.getParameters();
     const existingParameterNames = mapVector(parameters, parameterMetadata =>
       parameterMetadata.getName()
     );
@@ -115,7 +117,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
       existingParameterNames.includes(name)
     );
     newParameter.setName(newName);
-    parameters.push_back(newParameter);
+    parameters.insertIntoVectorParameterMetadata(index, newParameter);
     newParameter.delete();
     this.forceUpdate();
     this.props.onParametersUpdated();
@@ -227,7 +229,9 @@ export default class EventsFunctionParametersEditor extends React.Component<
 
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      isBehaviorLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isABehaviorLifecycleEventsFunction) {
       return (
         <EmptyMessage>
@@ -241,7 +245,9 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }
     const isAnExtensionLifecycleEventsFunction =
       !eventsBasedBehavior &&
-      isExtensionLifecycleEventsFunction(eventsFunction.getName());
+      gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+        eventsFunction.getName()
+      );
     if (isAnExtensionLifecycleEventsFunction) {
       return (
         <Column noMargin>
@@ -360,6 +366,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               label: i18n._(t`Delete`),
                               enabled: !isParameterDisabled(i),
                               click: () => this._removeParameter(i),
+                            },
+                            {
+                              label: i18n._(t`Add a parameter below`),
+                              enabled: !isParameterDisabled(i),
+                              click: () => this._addParameterAt(i + 1),
                             },
                             { type: 'separator' },
                             {

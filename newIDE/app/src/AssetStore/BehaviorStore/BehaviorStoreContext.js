@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { type FiltersState, useFilters } from '../../UI/Search/FiltersChooser';
 import {
-  getExtensionsRegistry,
-  type ExtensionsRegistry,
+  getBehaviorsRegistry,
+  type BehaviorsRegistry,
   type BehaviorShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
@@ -121,8 +121,8 @@ export const BehaviorStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const behaviorShortHeaders = extensionRegistry.behavior.headers;
+          const behaviorsRegistry: BehaviorsRegistry = await getBehaviorsRegistry();
+          const behaviorShortHeaders = behaviorsRegistry.headers;
 
           const behaviorShortHeadersByType = {};
           behaviorShortHeaders.forEach(behavior => {
@@ -136,15 +136,13 @@ export const BehaviorStoreStateProvider = ({
           );
           setBehaviorShortHeadersByType(behaviorShortHeadersByType);
           setFirstBehaviorIds(
-            extensionRegistry.views
-              ? extensionRegistry.behavior.views.default.firstIds.map(
-                  ({ extensionName, behaviorName }) =>
-                    gd.PlatformExtension.getBehaviorFullType(
-                      extensionName,
-                      behaviorName
-                    )
+            behaviorsRegistry.views.default.firstIds.map(
+              ({ extensionName, behaviorName }) =>
+                gd.PlatformExtension.getBehaviorFullType(
+                  extensionName,
+                  behaviorName
                 )
-              : []
+            )
           );
         } catch (error) {
           console.error(

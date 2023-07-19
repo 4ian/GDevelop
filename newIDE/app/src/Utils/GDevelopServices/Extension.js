@@ -70,28 +70,10 @@ export type SerializedExtension = {
 
 export type ExtensionsRegistry = {
   version: string,
-  allTags: Array<string>,
-  allCategories: Array<string>,
-  extensionShortHeaders: Array<ExtensionShortHeader>,
-  behavior: {
-    headers: Array<BehaviorShortHeader>,
-    views: {
-      default: {
-        firstIds: Array<{ extensionName: string, behaviorName: string }>,
-      },
-    },
-  },
-  object: {
-    headers: Array<ObjectShortHeader>,
-    views: {
-      default: {
-        firstIds: Array<{ extensionName: string, objectName: string }>,
-      },
-    },
-  },
-  views?: {
+  headers: Array<ExtensionShortHeader>,
+  views: {
     default: {
-      firstExtensionIds: Array<string>,
+      firstIds: Array<string>,
     },
   },
 };
@@ -165,16 +147,19 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
       if (!extensionsRegistry) {
         throw new Error('Unexpected response from the extensions endpoint.');
       }
+      if (!extensionsRegistry.headers) {
+        extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
+      }
+      if (!extensionsRegistry.views.default.firstIds) {
+        extensionsRegistry.views.default.firstIds =
+          extensionsRegistry.views.default.firstExtensionIds;
+      }
       return {
         ...extensionsRegistry,
         // TODO: move this to backend endpoint
-        extensionShortHeaders: extensionsRegistry.extensionShortHeaders.map(
+        headers: extensionsRegistry.headers.map(
           transformTagsAsStringToTagsAsArray
         ),
-        behavior: {
-          ...extensionsRegistry.behavior,
-          headers: extensionsRegistry.behavior.headers.map(adaptBehaviorHeader),
-        },
       };
     });
 };

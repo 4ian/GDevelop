@@ -74,11 +74,14 @@ export const BehaviorListItem = ({
 
   const isEnabled = !alreadyAdded && !isObjectIncompatible;
 
-  const chooseBehavior = React.useCallback(() => {
-    if (isEnabled) {
-      onChoose();
-    }
-  }, [isEnabled, onChoose]);
+  const chooseBehavior = React.useCallback(
+    () => {
+      if (isEnabled) {
+        onChoose();
+      }
+    },
+    [isEnabled, onChoose]
+  );
 
   return (
     <ButtonBase

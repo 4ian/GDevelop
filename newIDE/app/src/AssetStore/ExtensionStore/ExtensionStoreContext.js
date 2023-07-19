@@ -100,24 +100,20 @@ export const ExtensionStoreStateProvider = ({
 
         try {
           const extensionRegistry: ExtensionsRegistry = await getExtensionsRegistry();
-          const { extensionShortHeaders } = extensionRegistry;
+          const { headers } = extensionRegistry;
 
           const extensionShortHeadersByName = {};
-          extensionShortHeaders.forEach(extension => {
+          headers.forEach(extension => {
             extensionShortHeadersByName[extension.name] = extension;
           });
 
           console.info(
             `Loaded ${
-              extensionShortHeaders ? extensionShortHeaders.length : 0
+              headers ? headers.length : 0
             } extensions from the extension store.`
           );
           setExtensionShortHeadersByName(extensionShortHeadersByName);
-          setFirstExtensionIds(
-            extensionRegistry.views
-              ? extensionRegistry.views.default.firstExtensionIds
-              : []
-          );
+          setFirstExtensionIds(extensionRegistry.views.default.firstIds);
         } catch (error) {
           console.error(
             `Unable to load the extensions from the extension store:`,

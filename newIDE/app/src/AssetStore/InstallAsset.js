@@ -373,7 +373,7 @@ export const checkRequiredExtensionsUpdate = async ({
 
   const requiredExtensionShortHeaders = requiredExtensions.map(
     requiredExtension => {
-      const extensionShortHeader = extensionsRegistry.extensionShortHeaders.find(
+      const extensionShortHeader = extensionsRegistry.headers.find(
         extensionShortHeader => {
           return extensionShortHeader.name === requiredExtension.extensionName;
         }

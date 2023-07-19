@@ -172,6 +172,10 @@ export const changeCurrentTab = (
   };
 };
 
+export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
+  return state.editors.some(editor => editor.key === 'start page');
+};
+
 export const closeTabsExceptIf = (
   state: EditorTabsState,
   keepPredicate: (editorTab: EditorTab) => boolean

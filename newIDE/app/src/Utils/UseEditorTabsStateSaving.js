@@ -6,23 +6,30 @@ import {
   type EditorTabsState,
   type EditorOpeningOptions,
   type EditorKind,
+  openEditorTab,
+  changeCurrentTab,
+  isStartPageTabPresent,
+  closeAllEditorTabs,
 } from '../MainFrame/EditorTabs/EditorTabsHandler';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { useDebounce } from './UseDebounce';
 
 type Props = {|
   editorTabs: EditorTabsState,
-  projectId: string | null,
-  getEditorOpeningOptions: (
+  setEditorTabs: EditorTabsState => void,
+  currentProjectId: string | null,
+  getEditorOpeningOptions: ({
     kind: EditorKind,
-    name: string
-  ) => EditorOpeningOptions,
+    name: string,
+    dontFocusTab?: boolean,
+  }) => EditorOpeningOptions,
 |};
 
 const useEditorTabsStateSaving = ({
-  projectId,
+  currentProjectId,
   editorTabs,
   getEditorOpeningOptions,
+  setEditorTabs,
 }: Props) => {
   const {
     setEditorStateForProject,
@@ -30,7 +37,7 @@ const useEditorTabsStateSaving = ({
   } = React.useContext(PreferencesContext);
   const saveEditorState = React.useCallback(
     () => {
-      if (!projectId) return;
+      if (!currentProjectId) return;
       const editorState = {
         currentTab: editorTabs.currentTab,
         editors: editorTabs.editors
@@ -39,39 +46,93 @@ const useEditorTabsStateSaving = ({
       };
 
       setEditorStateForProject(
-        projectId,
+        currentProjectId,
         editorState.editors.length === 0
           ? undefined
           : { editorTabs: editorState }
       );
     },
-    [projectId, editorTabs, setEditorStateForProject]
+    [currentProjectId, editorTabs, setEditorStateForProject]
   );
 
-  const saveEditorStateDebounced = useDebounce(saveEditorState, 1000);
+  const saveEditorStateDebounced = useDebounce(
+    saveEditorState,
+    // Debounce should be deactivated when there is currentProjectId.
+    // Otherwise, if a project is open and the user switches
+    // to the Home tab and then selects another project, this might save the
+    // second project tabs state for the first project.
+    !!currentProjectId ? 1000 : 0
+  );
 
   React.useEffect(
     () => {
       saveEditorStateDebounced();
     },
-    [saveEditorStateDebounced, projectId, editorTabs, setEditorStateForProject]
+    [
+      saveEditorStateDebounced,
+      currentProjectId,
+      editorTabs,
+      setEditorStateForProject,
+    ]
+  );
+
+  const hasARecordForEditorTabs = React.useCallback(
+    (project: gdProject) => {
+      const projectId = project.getProjectUuid();
+      return !!getEditorStateForProject(projectId);
+    },
+    [getEditorStateForProject]
   );
 
   const openEditorsAccordingToPersistedState = React.useCallback(
-    () => {
-      if (!projectId) return;
+    (project: gdProject) => {
+      const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
       if (!editorState) return;
       const editorsOpeningOptions = editorState.editorTabs.editors.map(
         editorMetadata =>
-          getEditorOpeningOptions(
-            editorMetadata.editorKind,
-            editorMetadata.projectItemName || ''
-          )
+          getEditorOpeningOptions({
+            kind: editorMetadata.editorKind,
+            name: editorMetadata.projectItemName || '',
+            dontFocusTab: true,
+          })
       );
+
+      // Close all current tabs
+      let newEditorTabs = closeAllEditorTabs(editorTabs);
+
+      // Always make sure the start page is included in the new editor tabs
+      if (!isStartPageTabPresent(newEditorTabs)) {
+        newEditorTabs = openEditorTab(
+          newEditorTabs,
+          getEditorOpeningOptions({
+            kind: 'start page',
+            name: '',
+          })
+        );
+      }
+
+      for (const editorOpeningOption of editorsOpeningOptions) {
+        newEditorTabs = openEditorTab(newEditorTabs, editorOpeningOption);
+      }
+      newEditorTabs = changeCurrentTab(
+        newEditorTabs,
+        editorState.editorTabs.currentTab
+      );
+      setEditorTabs(newEditorTabs);
     },
-    [getEditorOpeningOptions, projectId]
+    [
+      getEditorOpeningOptions,
+      setEditorTabs,
+      editorTabs,
+      getEditorStateForProject,
+    ]
   );
+
+  return {
+    hasARecordForEditorTabs,
+    openEditorsAccordingToPersistedState,
+  };
 };
 
 export default useEditorTabsStateSaving;

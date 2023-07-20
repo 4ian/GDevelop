@@ -8,7 +8,12 @@ name: Build Storybook
 
 on:
   # Launch on all commits.
+  # Skip if the `chore/` prefix is used for branch.
   push:
+    branches-ignore:
+      - 'chore/**'
+    paths-ignore:
+      - 'newIDE/app/src/locales/**'
   # Allows to run this workflow manually from the Actions tab,
   # to publish on Chromatic (not done by default).
   workflow_dispatch:

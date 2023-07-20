@@ -9,6 +9,8 @@ auto_cancel:
     when: "true"
 blocks:
   - name: Install
+    run:
+      when: "change_in('/', {exclude:['/newIDE/app/src/locales']})"
     task:
       jobs:
         - name: Install node_modules and cache them
@@ -39,6 +41,8 @@ blocks:
               fi
     dependencies: []
   - name: Type checks
+    run:
+      when: "change_in('/', {exclude:['/newIDE/app/src/locales']})"
     dependencies:
       - Install
     task:
@@ -62,6 +66,8 @@ blocks:
             - npm run check-types
             - npm run generate-doc
   - name: Auto formatting
+    run:
+      when: "change_in('/', {exclude:['/newIDE/app/src/locales']})"
     dependencies:
       - Install
     task:
@@ -83,6 +89,8 @@ blocks:
             - npm run check-format
             - cd ..
   - name: Tests
+    run:
+      when: "change_in('/', {exclude:['/newIDE/app/src/locales']})"
     dependencies:
       - Install
     task:

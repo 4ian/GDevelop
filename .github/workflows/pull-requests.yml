@@ -5,6 +5,8 @@ on:
       - opened
       - reopened
       - synchronize
+    paths:
+      - 'newIDE/app/src/locales/**'
 jobs:
   read-locales-metadata:
     if: github.event.pull_request.title == '[Auto PR] Update translations'

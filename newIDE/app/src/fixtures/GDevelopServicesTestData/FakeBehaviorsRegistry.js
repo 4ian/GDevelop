@@ -61,13 +61,20 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Provides an action to make the object bounce from another object it just touched. Add a permanent force to the object and, when in collision with another one, use the action to make it bounce realistically.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+          username: '4ian',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
       authorIds: [
         'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
-        'xpwUwByyImTDcHEqDUqfyg0oRBt1',
-        '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
       ],
       extensionNamespace: '',
@@ -85,6 +92,22 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description: 'Fire bullets, manage ammo, reloading, and overheating.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+          username: '4ian',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -108,11 +131,7 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
     },
     {
       tier: 'reviewed',
-      authorIds: [
-        '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
-        'taRwmWxwAFYFL9yyBwB3cwBw0BO2',
-        'mnImQKdn8nQxwzkS5D6a1JB27V23',
-      ],
+      authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
       extensionNamespace: '',
       fullName: 'Platformer gamepad mapper',
       name: 'PlatformerGamepadMapper',
@@ -128,14 +147,19 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description: 'Control a platformer character with a gamepad.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
+          username: 'Bouh',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
-      authorIds: [
-        '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
-        'taRwmWxwAFYFL9yyBwB3cwBw0BO2',
-        'mnImQKdn8nQxwzkS5D6a1JB27V23',
-      ],
+      authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
       extensionNamespace: '',
       fullName: 'Top-down gamepad mapper',
       name: 'TopDownGamepadMapper',
@@ -151,12 +175,20 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description: 'Control a top-down character with a gamepad.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
+          username: 'Bouh',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
       authorIds: [
         'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
-        'xpwUwByyImTDcHEqDUqfyg0oRBt1',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
       ],
       extensionNamespace: '',
@@ -175,6 +207,22 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Manage health (life) points including a protective shield and armor.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+          username: '4ian',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -194,6 +242,15 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description: 'Smoothly scroll to follow an object.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -214,13 +271,20 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Smoothly scroll to follow a character and stabilize the camera when jumping.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
       authorIds: [
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
-        '1OgYzWp5UeVPbiWGJwI6vqfgZLC3',
-        'v0YRpdAnIucZFgiRCCecqVnGKno2',
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
       ],
       extensionNamespace: '',
@@ -241,13 +305,27 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Control a platformer character with a multitouch controller.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
       authorIds: [
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
-        '1OgYzWp5UeVPbiWGJwI6vqfgZLC3',
-        'v0YRpdAnIucZFgiRCCecqVnGKno2',
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
       ],
       extensionNamespace: '',
@@ -267,12 +345,27 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       description: 'Control a top-down character with a multitouch controller.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
       authorIds: [
         'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
-        '2OwwM8ToR9dx9RJ2sAKTcrLmCB92',
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
       ],
       extensionNamespace: '',
@@ -291,27 +384,22 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.',
       objectType: '',
       type: null,
-    },
-    {
-      tier: 'reviewed',
-      authorIds: ['2OwwM8ToR9dx9RJ2sAKTcrLmCB92'],
-      extensionNamespace: '',
-      fullName: 'Mobile virtual keyboard for Text Entry',
-      name: 'TextEntryVirtualKeyboard',
-      version: '0.0.1',
-      url:
-        'https://resources.gdevelop-app.com/extensions/TextEntryVirtualKeyboard.json',
-      headerUrl:
-        'https://resources.gdevelop-app.com/extensions/TextEntryVirtualKeyboard-header.json',
-      tags: 'javascript,virtual keyboard,mobile',
-      category: 'User interface',
-      previewIconUrl:
-        'https://resources.gdevelop-app.com/assets/Icons/keyboard-close.svg',
-      extensionName: 'TextEntryVirtualKeyboard',
-      description:
-        'Allow to open and close the virtual keyboard on mobile (iOS, Android). To be used on Text Entry objects.',
-      objectType: 'TextEntryObject::TextEntry',
-      type: null,
+      authors: [
+        {
+          id: 'wWP8BSlAW0UP4NeaHa2LcmmDzmH2',
+          username: '4ian',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'reviewed',
@@ -332,92 +420,13 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Set the depth (Z-order) of the instance to the value of its Y position in the scene, creating an illusion of depth. The origin point of the object is used to determine the Z-order.',
       objectType: '',
       type: null,
-    },
-    {
-      tier: 'community',
-      authorIds: ['Zu55H5hcb9YmZTltIVOTAFDJQyB2'],
-      extensionNamespace: '',
-      fullName: 'Dialog Box',
-      name: 'DialogBoxBackGround',
-      version: '1.0.0',
-      url: 'https://resources.gdevelop-app.com/extensions/DialogBox.json',
-      headerUrl:
-        'https://resources.gdevelop-app.com/extensions/DialogBox-header.json',
-      tags: 'dialog',
-      category: 'General',
-      previewIconUrl:
-        'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/UI Essentials/UI Essentials_chat_message_sms.svg',
-      extensionName: 'DialogBox',
-      description:
-        'This extension adds the functionality of a dialog box to your game.\nAdd this to the sprite object that will be the background of the dialog box.',
-      objectType: 'Sprite',
-      type: null,
-    },
-    {
-      tier: 'community',
-      authorIds: ['QjE1CI3drHNR9Wklz2gTC5WbEgh1'],
-      extensionNamespace: '',
-      fullName: 'Draw shock waves in ellipse',
-      name: 'DrawEllipseShockWave',
-      version: '0.0.3',
-      url:
-        'https://resources.gdevelop-app.com/extensions/DrawShockWaveEffect.json',
-      headerUrl:
-        'https://resources.gdevelop-app.com/extensions/DrawShockWaveEffect-header.json',
-      tags: 'Drawing,Color,Opacity,Outline',
-      category: 'Advanced',
-      previewIconUrl:
-        'https://resources.gdevelop-app.com/assets/Icons/octagram-outline.svg',
-      extensionName: 'DrawShockWaveEffect',
-      description: 'Will allow you to draw Ellipse shock wave effects.',
-      objectType: 'PrimitiveDrawing::Drawer',
-      type: null,
-    },
-    {
-      tier: 'community',
-      authorIds: ['QjE1CI3drHNR9Wklz2gTC5WbEgh1'],
-      extensionNamespace: '',
-      fullName: 'Draw shock waves in star',
-      name: 'DrawStarShockWave',
-      version: '0.0.3',
-      url:
-        'https://resources.gdevelop-app.com/extensions/DrawShockWaveEffect.json',
-      headerUrl:
-        'https://resources.gdevelop-app.com/extensions/DrawShockWaveEffect-header.json',
-      tags: 'Drawing,Color,Opacity,Outline',
-      category: 'Advanced',
-      previewIconUrl:
-        'https://resources.gdevelop-app.com/assets/Icons/octagram-outline.svg',
-      extensionName: 'DrawShockWaveEffect',
-      description: 'Will allow you to draw Star shock wave effects.',
-      objectType: 'PrimitiveDrawing::Drawer',
-      type: null,
-    },
-    {
-      tier: 'community',
-      authorIds: ['QjE1CI3drHNR9Wklz2gTC5WbEgh1'],
-      extensionNamespace: '',
-      fullName: 'Dynamic Water Body',
-      name: 'DynamicWaterBody',
-      version: '0.0.2',
-      url: 'https://resources.gdevelop-app.com/extensions/DynamicWater.json',
-      headerUrl:
-        'https://resources.gdevelop-app.com/extensions/DynamicWater-header.json',
-      tags: 'DynamicWater,Lava,etc',
-      category: 'Advanced',
-      previewIconUrl:
-        'https://resources.gdevelop-app.com/assets/Icons/waves.svg',
-      extensionName: 'DynamicWater',
-      description: 'Easily create a realistic liquid surface simulation.',
-      objectType: 'Sprite',
-      type: null,
+      authors: [],
     },
     {
       tier: 'community',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
-        'rotBq28wITdtfsrE7McHQri4k2w2',
       ],
       extensionNamespace: '',
       fullName: 'Revolute joint connector',
@@ -435,13 +444,28 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Create and manage revolute joints between two objects.\nAlso known as a hinge joint because the objects act like they are connected with a hinge that pivots.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'community',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
-        'rotBq28wITdtfsrE7McHQri4k2w2',
       ],
       extensionNamespace: '',
       fullName: 'Weld joint connector',
@@ -459,13 +483,28 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Create and manage weld joints between two objects.\nAlso known as a static joint because the objects stay glued in the same relative position to each other.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'community',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
-        'rotBq28wITdtfsrE7McHQri4k2w2',
       ],
       extensionNamespace: '',
       fullName: 'Distance joint connector',
@@ -483,13 +522,28 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Create and manage distance joints between two objects. \nActs like a spring because the objects try to stay the same distance apart.',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
     {
       tier: 'community',
       authorIds: [
         'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
         'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
-        'rotBq28wITdtfsrE7McHQri4k2w2',
       ],
       extensionNamespace: '',
       fullName: 'Rope joint connector',
@@ -507,6 +561,22 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
         'Create and manage rope joints between two objects. \nObjects can get closer, but they cannot exceed the starting distance from each other.\n',
       objectType: '',
       type: null,
+      authors: [
+        {
+          id: 'IWykYNRvhCZBN3vEgKEbBPOR3Oc2',
+          username: 'D8H',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+        {
+          id: 'gqDaZjCfevOOxBYkK6zlhtZnXCg1',
+          username: 'Fake user #Cg1',
+          description: '',
+          donateLink: null,
+          communityLinks: {},
+        },
+      ],
     },
   ],
 };

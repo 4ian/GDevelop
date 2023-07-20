@@ -62,7 +62,6 @@ export const BehaviorStore = ({
   onInstall,
   onChoose,
 }: Props) => {
-  console.log('render BehaviorStore');
   const preferences = React.useContext(PreferencesContext);
   const {
     filters,

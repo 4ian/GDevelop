@@ -43,7 +43,9 @@ export type BehaviorShortHeader = {|
   description: string,
   extensionName: string,
   objectType: string,
-  /** This attribute is calculated. */
+  /** This attribute is calculated.
+   * @see adaptBehaviorHeader
+   */
   type: string,
 |};
 

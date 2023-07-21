@@ -16,7 +16,7 @@ type TableCellCommonProps = {|
     textAlign?: string,
     wordBreak?: 'break-word',
   |},
-|}
+|};
 
 type TableProps = {|
   children: React.Node, // Should be TableHeader, TableBody or TableFooter

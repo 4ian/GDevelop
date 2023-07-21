@@ -6,6 +6,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
       const adhocInput = document.createElement('input');
       adhocInput.type = 'file';
       adhocInput.multiple = false;
+      adhocInput.accept = 'application/json,.json';
       adhocInput.onchange = e => {
         const file = e.target.files[0];
         return resolve(file);

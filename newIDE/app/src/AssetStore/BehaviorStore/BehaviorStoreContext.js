@@ -49,7 +49,6 @@ type BehaviorStoreState = {|
   ) => void,
   behaviorShortHeadersByType: { [name: string]: BehaviorShortHeader },
   filtersState: FiltersState,
-  hasBehaviorNamed: (behaviorName: string) => boolean,
 |};
 
 export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
@@ -72,7 +71,6 @@ export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
     chosenCategory: null,
     setChosenCategory: () => {},
   },
-  hasBehaviorNamed: () => false,
 });
 
 type BehaviorStoreStateProviderProps = {|
@@ -245,13 +243,6 @@ export const BehaviorStoreStateProvider = ({
     defaultFirstSearchItemIds: defaultFirstSearchItemIds,
   });
 
-  const hasBehaviorNamed = React.useCallback(
-    (extensionName: string) => {
-      return !!behaviorShortHeadersByType[extensionName];
-    },
-    [behaviorShortHeadersByType]
-  );
-
   const behaviorStoreState = React.useMemo(
     () => ({
       searchResults,
@@ -266,7 +257,6 @@ export const BehaviorStoreStateProvider = ({
       setInstalledBehaviorMetadataList,
       behaviorShortHeadersByType,
       filtersState,
-      hasBehaviorNamed,
     }),
     [
       searchResults,
@@ -280,7 +270,6 @@ export const BehaviorStoreStateProvider = ({
       behaviorShortHeadersByType,
       filtersState,
       fetchBehaviorsAndFilters,
-      hasBehaviorNamed,
     ]
   );
 

@@ -44,7 +44,6 @@ export default function NewBehaviorDialog({
   objectBehaviorsTypes,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
-  const [extensionInstallTime, setExtensionInstallTime] = React.useState(0);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -83,7 +82,7 @@ export default function NewBehaviorDialog({
         tags: [],
       }));
     },
-    [project, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
+    [project, eventsFunctionsExtension]
   );
 
   const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
@@ -139,14 +138,7 @@ export default function NewBehaviorDialog({
         eventsFunctionsExtensionsState,
         extensionShortHeader
       );
-
-      if (wasExtensionInstalled) {
-        // Setting the extension install time will force a reload of
-        // the behavior metadata, and so the list of behaviors.
-        setExtensionInstallTime(Date.now());
-        return true;
-      }
-      return false;
+      return wasExtensionInstalled;
     } finally {
       setIsInstalling(false);
     }
@@ -185,16 +177,6 @@ export default function NewBehaviorDialog({
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
-          />
-          <DismissableInfoBar
-            identifier="extension-installed-explanation"
-            message={
-              <Trans>
-                The behavior was added to the project. You can now add it to
-                your object.
-              </Trans>
-            }
-            show={extensionInstallTime !== 0}
           />
         </Dialog>
       )}

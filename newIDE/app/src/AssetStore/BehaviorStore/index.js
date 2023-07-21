@@ -6,7 +6,6 @@ import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension
 import { BehaviorStoreContext } from './BehaviorStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { BehaviorListItem } from './BehaviorListItem';
-import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExtensionAddedToProject } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
@@ -154,10 +153,9 @@ export const BehaviorStore = ({
       if (behaviorShortHeader.url) {
         sendExtensionAddedToProject(behaviorShortHeader.name);
         const wasInstalled = await onInstall(behaviorShortHeader);
+        // An errorBox is already displayed by `installExtension`.
         if (wasInstalled) {
           onChoose(behaviorShortHeader.type);
-        } else {
-          // TODO Handle installation failures.
         }
       } else {
         onChoose(behaviorShortHeader.type);
@@ -168,109 +166,105 @@ export const BehaviorStore = ({
 
   return (
     <React.Fragment>
-      <ResponsiveWindowMeasurer>
-        {windowWidth => (
-          <ColumnStackLayout expand noMargin useFullHeight>
-            <ColumnStackLayout noMargin>
-              <ResponsiveLineStackLayout noMargin>
-                <SearchBarSelectField
-                  value={chosenCategory}
-                  onChange={(e, i, value: string) => {
-                    setChosenCategory(value);
-                  }}
-                >
-                  <SelectOption value="" label={t`All categories`} />
-                  {allCategories.map(category => (
-                    <SelectOption
-                      key={category}
-                      value={category}
-                      label={category}
-                    />
-                  ))}
-                </SearchBarSelectField>
-                <Line expand noMargin>
-                  <Column expand noMargin>
-                    <SearchBar
-                      id="extension-search-bar"
-                      value={searchText}
-                      onChange={setSearchText}
-                      onRequestSearch={() => {}}
-                      tagsHandler={tagsHandler}
-                      tags={filters && filters.allTags}
-                      placeholder={t`Search extensions`}
-                      autoFocus="desktop"
-                    />
-                  </Column>
-                  <ElementWithMenu
-                    key="menu"
-                    element={
-                      <IconButton size="small">
-                        <ThreeDotsMenu />
-                      </IconButton>
-                    }
-                    buildMenuTemplate={(i18n: I18nType) => [
-                      {
-                        label: preferences.values.showCommunityExtensions
-                          ? i18n._(
-                              t`Hide community extensions (not officially reviewed)`
-                            )
-                          : i18n._(
-                              t`Show community extensions (not officially reviewed)`
-                            ),
-                        click: () => {
-                          preferences.setShowCommunityExtensions(
-                            !preferences.values.showCommunityExtensions
-                          );
-                        },
-                      },
-                      {
-                        label: showDeprecated
-                          ? i18n._(
-                              t`Hide deprecated behaviors (prefer not to use anymore)`
-                            )
-                          : i18n._(
-                              t`Show deprecated behaviors (prefer not to use anymore)`
-                            ),
-                        click: () => {
-                          setShowDeprecated(!showDeprecated);
-                        },
-                      },
-                    ]}
-                  />
-                </Line>
-              </ResponsiveLineStackLayout>
-              {DismissableTutorialMessage}
-            </ColumnStackLayout>
-            <ListSearchResults
-              disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-              onRetry={fetchBehaviorsAndFilters}
-              error={error}
-              searchItems={
-                filteredSearchResults &&
-                filteredSearchResults.map(({ item }) => item)
-              }
-              getSearchItemUniqueId={getBehaviorType}
-              renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
-                <BehaviorListItem
-                  id={
-                    'behavior-item-' +
-                    behaviorShortHeader.type.replace(/:/g, '-')
-                  }
-                  key={behaviorShortHeader.type}
-                  objectType={objectType}
-                  objectBehaviorsTypes={objectBehaviorsTypes}
-                  onHeightComputed={onHeightComputed}
-                  behaviorShortHeader={behaviorShortHeader}
-                  matches={getExtensionsMatches(behaviorShortHeader)}
-                  onChoose={() => {
-                    installAndChoose(behaviorShortHeader);
-                  }}
+      <ColumnStackLayout expand noMargin useFullHeight>
+        <ColumnStackLayout noMargin>
+          <ResponsiveLineStackLayout noMargin>
+            <SearchBarSelectField
+              value={chosenCategory}
+              onChange={(e, i, value: string) => {
+                setChosenCategory(value);
+              }}
+            >
+              <SelectOption value="" label={t`All categories`} />
+              {allCategories.map(category => (
+                <SelectOption
+                  key={category}
+                  value={category}
+                  label={category}
                 />
-              )}
+              ))}
+            </SearchBarSelectField>
+            <Line expand noMargin>
+              <Column expand noMargin>
+                <SearchBar
+                  id="extension-search-bar"
+                  value={searchText}
+                  onChange={setSearchText}
+                  onRequestSearch={() => {}}
+                  tagsHandler={tagsHandler}
+                  tags={filters && filters.allTags}
+                  placeholder={t`Search extensions`}
+                  autoFocus="desktop"
+                />
+              </Column>
+              <ElementWithMenu
+                key="menu"
+                element={
+                  <IconButton size="small">
+                    <ThreeDotsMenu />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: preferences.values.showCommunityExtensions
+                      ? i18n._(
+                          t`Hide community extensions (not officially reviewed)`
+                        )
+                      : i18n._(
+                          t`Show community extensions (not officially reviewed)`
+                        ),
+                    click: () => {
+                      preferences.setShowCommunityExtensions(
+                        !preferences.values.showCommunityExtensions
+                      );
+                    },
+                  },
+                  {
+                    label: showDeprecated
+                      ? i18n._(
+                          t`Hide deprecated behaviors (prefer not to use anymore)`
+                        )
+                      : i18n._(
+                          t`Show deprecated behaviors (prefer not to use anymore)`
+                        ),
+                    click: () => {
+                      setShowDeprecated(!showDeprecated);
+                    },
+                  },
+                ]}
+              />
+            </Line>
+          </ResponsiveLineStackLayout>
+          {DismissableTutorialMessage}
+        </ColumnStackLayout>
+        <ListSearchResults
+          disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
+          onRetry={fetchBehaviorsAndFilters}
+          error={error}
+          searchItems={
+            filteredSearchResults &&
+            filteredSearchResults.map(({ item }) => item)
+          }
+          getSearchItemUniqueId={getBehaviorType}
+          renderSearchItem={(behaviorShortHeader, onHeightComputed) => (
+            <BehaviorListItem
+              id={
+                'behavior-item-' + behaviorShortHeader.type.replace(/:/g, '-')
+              }
+              key={behaviorShortHeader.type}
+              objectType={objectType}
+              objectBehaviorsTypes={objectBehaviorsTypes}
+              onHeightComputed={onHeightComputed}
+              behaviorShortHeader={behaviorShortHeader}
+              matches={getExtensionsMatches(behaviorShortHeader)}
+              onChoose={() => {
+                installAndChoose(behaviorShortHeader);
+              }}
             />
-          </ColumnStackLayout>
-        )}
-      </ResponsiveWindowMeasurer>
+          )}
+        />
+      </ColumnStackLayout>
+      )}
     </React.Fragment>
   );
 };

@@ -16,6 +16,8 @@ const downloadStringContentAsFile = (
     document.body.appendChild(adhocLink);
     adhocLink.click();
     adhocLink.remove();
+  } else {
+    return Promise.reject(new Error("Document body couldn't be found."));
   }
   return Promise.resolve();
 };

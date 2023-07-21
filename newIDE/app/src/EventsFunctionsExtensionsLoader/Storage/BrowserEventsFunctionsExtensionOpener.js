@@ -17,19 +17,25 @@ export default class BrowserEventsFunctionsExtensionOpener {
   };
 
   static readEventsFunctionExtensionFile = (file: any): Promise<Object> => {
-    return new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onloadend = event => {
-        const content = reader.result;
-        if (!content) {
-          throw new Error('The selected file is empty')
-        }
-        // content should be a string since the method readAsText guarantees it.
-        // $FlowExpectedError
-        return resolve(JSON.parse(content))
-      };
-      reader.readAsText(file, 'UTF-8');
-
-    })
+    return new Promise((resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        reader.onloadend = event => {
+          const content = reader.result;
+          if (!content) {
+            throw new Error('The selected file is empty');
+          }
+          // content should be a string since the method readAsText guarantees it.
+          // $FlowExpectedError
+          return resolve(JSON.parse(content));
+        };
+        reader.readAsText(file, 'UTF-8');
+      } catch (error) {
+        console.error('An error occurred when reading the file: ', {
+          error,
+        });
+        reject(error);
+      }
+    });
   };
 }

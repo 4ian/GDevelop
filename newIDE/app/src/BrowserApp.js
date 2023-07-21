@@ -27,6 +27,7 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
 import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
+import BrowserEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionOpener';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -40,7 +41,7 @@ export const create = (authentication: Authentication) => {
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}
-      eventsFunctionsExtensionOpener={null}
+      eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (
         <ProjectStorageProviders

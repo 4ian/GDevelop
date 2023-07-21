@@ -1,8 +1,8 @@
 // @flow
 
 export type EventsFunctionsExtensionOpener = {
-  chooseEventsFunctionExtensionFile: () => Promise<?string>,
-  readEventsFunctionExtensionFile: (filepath: string) => Promise<Object>,
+  chooseEventsFunctionExtensionFile: () => Promise<?any>,
+  readEventsFunctionExtensionFile: (filepath: any) => Promise<Object>,
 };
 
 export type EventsFunctionsExtensionWriter = {

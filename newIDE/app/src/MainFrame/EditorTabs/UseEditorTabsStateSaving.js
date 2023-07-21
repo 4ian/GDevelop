@@ -84,7 +84,7 @@ const useEditorTabsStateSaving = ({
 
   const saveEditorStateDebounced = useDebounce(
     saveEditorState,
-    // Debounce should be deactivated when there is currentProjectId.
+    // Debounce should be deactivated when currentProjectId is null.
     // Otherwise, if a project is open and the user switches
     // to the Home tab and then selects another project, this might save the
     // second project tabs state for the first project.

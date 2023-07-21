@@ -45,6 +45,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String>& GetAllVideos() { return GetAll("video"); };
   std::set<gd::String>& GetAllBitmapFonts() { return GetAll("bitmapFont"); };
   std::set<gd::String>& GetAll3DModels() { return GetAll("model3D"); };
+  std::set<gd::String>& GetAllAtlases() { return GetAll("atlas"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
     if (resourceType == "image") return allImages;
     if (resourceType == "audio") return allAudios;
@@ -55,6 +56,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
     if (resourceType == "video") return allVideos;
     if (resourceType == "bitmapFont") return allBitmapFonts;
     if (resourceType == "model3D") return allModel3Ds;
+    if (resourceType == "atlas") return allAtlases;
 
     return emptyResources;
   };
@@ -89,6 +91,9 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   virtual void ExposeModel3D(gd::String& resourceName) override {
     allModel3Ds.insert(resourceName);
   };
+  virtual void ExposeAtlas(gd::String& resourceName) override {
+    allAtlases.insert(resourceName);
+  };
 
  protected:
   std::set<gd::String> allImages;
@@ -100,6 +105,7 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String> allVideos;
   std::set<gd::String> allBitmapFonts;
   std::set<gd::String> allModel3Ds;
+  std::set<gd::String> allAtlases;
   std::set<gd::String> emptyResources;
 };
 

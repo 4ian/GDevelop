@@ -1050,6 +1050,11 @@ interface Model3DResource {
 };
 Model3DResource implements Resource;
 
+interface AtlasResource {
+    void AtlasResource();
+};
+AtlasResource implements Resource;
+
 interface InitialInstance {
     void InitialInstance();
 

@@ -530,4 +530,38 @@ export default class PixiResourcesLoader {
       })
       .then(response => response.data);
   }
+
+  static getResourceAtlasData(
+    project: gdProject,
+    resourceName: string
+  ): Promise<any> {
+    if (!project.getResourcesManager().hasResource(resourceName)) {
+      return Promise.reject(`Unknown atlas file ${resourceName}.`);
+    }
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'atlas') {
+      return Promise.reject(`The resource called ${resourceName} is not a json file.`);
+    }
+
+    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+      isResourceForPixi: true,
+    });
+
+    // const gltfLoader = getOrCreateGltfLoader();
+    // gltfLoader.withCredentials = checkIfCredentialsRequired(url);
+    // return new Promise((resolve, reject) => {
+    //   gltfLoader.load(
+    //     url,
+    //     gltf => {
+    //       traverseToSetBasicMaterialFromMeshes(gltf.scene);
+    //       resolve(gltf);
+    //     },
+    //     undefined,
+    //     error => {
+    //       reject(error);
+    //     }
+    //   );
+    // });
+  }
 }

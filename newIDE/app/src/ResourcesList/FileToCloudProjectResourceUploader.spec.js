@@ -31,5 +31,8 @@ describe('FileToCloudProjectResourceUploader', () => {
     expect(getInputAcceptedMimesAndExtensions('model3D')).toMatchInlineSnapshot(
       `"model/gltf-binary,.glb"`
     );
+    expect(getInputAcceptedMimesAndExtensions('atlas')).toMatchInlineSnapshot(
+      `".atlas"`
+    );
   });
 });

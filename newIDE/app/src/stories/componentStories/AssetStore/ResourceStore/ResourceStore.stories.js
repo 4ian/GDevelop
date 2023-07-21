@@ -53,3 +53,11 @@ export const Model3DResource = () => (
     </ResourceStoreStateProvider>
   </FixedHeightFlexContainer>
 );
+
+export const AtlasResource = () => (
+  <FixedHeightFlexContainer height={400}>
+    <ResourceStoreStateProvider>
+      <ResourceStore onChoose={action('onChoose')} resourceKind="atlas" />
+    </ResourceStoreStateProvider>
+  </FixedHeightFlexContainer>
+);

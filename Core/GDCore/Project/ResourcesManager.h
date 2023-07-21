@@ -508,6 +508,32 @@ class GD_CORE_API Model3DResource : public Resource {
 };
 
 /**
+ * \brief Describe an atlas file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API AtlasResource : public Resource {
+ public:
+  AtlasResource() : Resource() { SetKind("atlas"); };
+  virtual ~AtlasResource(){};
+  virtual AtlasResource* Clone() const override {
+    return new AtlasResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+  virtual bool UseFile() const override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource

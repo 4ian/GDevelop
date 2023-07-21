@@ -50,6 +50,11 @@ void ArbitraryResourceWorker::ExposeModel3D(gd::String& resourceName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeAtlas(gd::String& resourceName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
     // Nothing to do by default - each child class can define here the action to
     // do.
@@ -153,6 +158,8 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
             ExposeVideo(potentiallyUpdatedTargetResourceName);
           } else if (targetResourceKind == "model3D") {
             ExposeModel3D(potentiallyUpdatedTargetResourceName);
+          } else if (targetResourceKind == "atlas") {
+            ExposeAtlas(potentiallyUpdatedTargetResourceName);
           }
 
           if (potentiallyUpdatedTargetResourceName != targetResourceName) {
@@ -243,6 +250,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
           } else if (parameterMetadata.GetType() == "model3DResource") {
             gd::String updatedParameterValue = parameterValue;
             worker.ExposeModel3D(updatedParameterValue);
+            instruction.SetParameter(parameterIndex, updatedParameterValue);
+          } else if (parameterMetadata.GetType() == "atlasResource") {
+            gd::String updatedParameterValue = parameterValue;
+            worker.ExposeAtlas(updatedParameterValue);
             instruction.SetParameter(parameterIndex, updatedParameterValue);
           }
         });

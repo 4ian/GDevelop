@@ -104,6 +104,7 @@ declare class libGDevelop {
   TilemapResource: Class<gdTilemapResource>;
   TilesetResource: Class<gdTilesetResource>;
   Model3DResource: Class<gdModel3DResource>;
+  AtlasResource: Class<gdAtlasResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;

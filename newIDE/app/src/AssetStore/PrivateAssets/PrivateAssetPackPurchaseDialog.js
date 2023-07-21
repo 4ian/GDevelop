@@ -96,7 +96,8 @@ const PrivateAssetPackPurchaseDialog = ({
     try {
       setIsPurchasing(true);
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
-        stripePriceId: privateAssetPackListingData.prices[0].stripePriceId,
+        productId: privateAssetPackListingData.id,
+        priceName: privateAssetPackListingData.prices[0].name,
         userId: profile.id,
         customerEmail: profile.email,
         ...(password ? { password } : undefined),

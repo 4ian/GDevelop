@@ -59,11 +59,17 @@ module.exports = {
         false
       )
       .addParameter('string', _('Name to register for the player'), '', false)
+      .setParameterLongDescription(
+        _(
+          'Let this empty to let the leaderboard auto-generate a player name (e.g: "Player23464"). You can configure this in the leaderboard administration.'
+        )
+      )
       .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
+      .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore')
+      .setAsyncFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
 
     extension
       .addAction(
@@ -89,7 +95,8 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore');
+      .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore')
+      .setAsyncFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore');
 
     extension
       .addCondition(
@@ -154,20 +161,22 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isSaving');
 
-      extension
-        .addCondition(
-          'HasPlayerJustClosedLeaderboardView',
-          _('Closed by player'),
-          _('Check if the player has just closed the leaderboard view.'),
-          _('Player has just closed the leaderboard view'),
-          _('Display leaderboard'),
-          'JsPlatform/Extensions/leaderboard.svg',
-          'JsPlatform/Extensions/leaderboard.svg'
-        )
-        .setHelpPath('/all-features/leaderboards')
-        .getCodeExtraInformation()
-        .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-        .setFunctionName('gdjs.evtTools.leaderboards.hasPlayerJustClosedLeaderboardView');
+    extension
+      .addCondition(
+        'HasPlayerJustClosedLeaderboardView',
+        _('Closed by player'),
+        _('Check if the player has just closed the leaderboard view.'),
+        _('Player has just closed the leaderboard view'),
+        _('Display leaderboard'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .setHelpPath('/all-features/leaderboards')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName(
+        'gdjs.evtTools.leaderboards.hasPlayerJustClosedLeaderboardView'
+      );
 
     extension
       .addStrExpression(

@@ -85,13 +85,11 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancel: props.onCancel,
   });
 
-  const objectMetadata = React.useMemo(
-    () =>
-      gd.MetadataProvider.getObjectMetadata(
-        props.project.getCurrentPlatform(),
-        props.object.getType()
-      ),
-    [props.project, props.object]
+  // Don't use a memo for this because metadata instances are built from
+  // scratch when extensions are refreshed.
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    props.project.getCurrentPlatform(),
+    props.object.getType()
   );
 
   const EditorComponent: ?React.ComponentType<EditorProps> =

@@ -717,7 +717,7 @@ export default function EffectsList(props: Props) {
                 )}
                 {props.layerRenderingType !== '2d' && effect3DCount > 0 && (
                   <Column noMargin expand>
-                    {props.layerRenderingType !== '2d' && (
+                    {props.layerRenderingType !== '3d' && (
                       <Column noMargin>
                         <Line>
                           <Text size="block-title">

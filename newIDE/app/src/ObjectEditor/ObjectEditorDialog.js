@@ -85,8 +85,9 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancel: props.onCancel,
   });
 
-  // Don't use a memo for this because metadata instances are built from
-  // scratch when extensions are refreshed.
+  // Don't use a memo for this because metadata from custom objects are built
+  // from event-based object when extensions are refreshed after an extension
+  // installation.
   const objectMetadata = gd.MetadataProvider.getObjectMetadata(
     props.project.getCurrentPlatform(),
     props.object.getType()

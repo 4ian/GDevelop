@@ -639,7 +639,7 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   static bool IsQuote(gd::String::value_type character) {
-    return character == '"';
+    return character == '"' || character == '\'';
   }
 
   static bool IsBracket(gd::String::value_type character) {

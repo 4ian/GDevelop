@@ -73,6 +73,10 @@ export default class CommentEvent extends React.Component<
       }
     );
   };
+  
+  componentDidMount() {
+    this.edit();
+  }
 
   onChange = (e: any, text: string) => {
     const commentEvent = gd.asCommentEvent(this.props.event);

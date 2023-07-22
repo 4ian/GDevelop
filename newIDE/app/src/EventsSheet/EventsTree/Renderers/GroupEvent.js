@@ -69,6 +69,10 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     }
   };
 
+  componentDidMount() {
+    this.edit();
+  }
+
   render() {
     var groupEvent = gd.asGroupEvent(this.props.event);
 

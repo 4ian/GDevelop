@@ -141,44 +141,42 @@ export const isCompatibleWithExtension = (
       })
     : true;
 
-export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
-    .then(response => response.data)
-    .then(extensionsRegistry => {
-      if (!extensionsRegistry) {
-        throw new Error('Unexpected response from the extensions endpoint.');
-      }
-      if (!extensionsRegistry.headers) {
-        extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
-      }
-      if (!extensionsRegistry.views.default.firstIds) {
-        extensionsRegistry.views.default.firstIds =
-          extensionsRegistry.views.default.firstExtensionIds;
-      }
-      return {
-        ...extensionsRegistry,
-        // TODO: move this to backend endpoint
-        headers: extensionsRegistry.headers.map(
-          transformTagsAsStringToTagsAsArray
-        ),
-      };
-    });
+export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/extensions-registry`
+  );
+  const extensionsRegistry: ExtensionsRegistry = response.data;
+
+  if (!extensionsRegistry) {
+    throw new Error('Unexpected response from the extensions endpoint.');
+  }
+  if (!extensionsRegistry.headers) {
+    extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
+  }
+  if (!extensionsRegistry.views.default.firstIds) {
+    extensionsRegistry.views.default.firstIds =
+      extensionsRegistry.views.default.firstExtensionIds;
+  }
+  return {
+    ...extensionsRegistry,
+    // TODO: move this to backend endpoint
+    headers: extensionsRegistry.headers.map(transformTagsAsStringToTagsAsArray),
+  };
 };
 
-export const getBehaviorsRegistry = (): Promise<BehaviorsRegistry> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/behaviors-registry`)
-    .then(response => response.data)
-    .then(behaviorsRegistry => {
-      if (!behaviorsRegistry) {
-        throw new Error('Unexpected response from the behaviors endpoint.');
-      }
-      return {
-        ...behaviorsRegistry,
-        headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
-      };
-    });
+export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/behaviors-registry`
+  );
+  const behaviorsRegistry: BehaviorsRegistry = response.data;
+
+  if (!behaviorsRegistry) {
+    throw new Error('Unexpected response from the behaviors endpoint.');
+  }
+  return {
+    ...behaviorsRegistry,
+    headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
+  };
 };
 
 const adaptBehaviorHeader = (
@@ -204,9 +202,9 @@ export const getExtensionHeader = (
   });
 };
 
-export const getExtension = (extensionHeader: {
-  url: string,
-}): Promise<SerializedExtension> => {
+export const getExtension = (
+  extensionHeader: ExtensionShortHeader | BehaviorShortHeader
+): Promise<SerializedExtension> => {
   return axios.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(

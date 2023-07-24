@@ -27,7 +27,7 @@ export const useExtensionUpdateAlertDialog = () => {
   return async (): Promise<boolean> => {
     return await showConfirmation({
       title: t`Extension update`,
-      message: t`This behavior needs an extensions update. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
+      message: t`This behavior needs an extension update. You may have to do some adaptations to make sure your game still works.${'\n\n'}Do you want to update it now ?`,
       confirmButtonLabel: t`Update the extension`,
       dismissButtonLabel: t`Cancel`,
     });
@@ -41,9 +41,7 @@ type Props = {|
   objectBehaviorsTypes: Array<string>,
   installedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
   deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata>,
-  onInstall: (
-    (BehaviorShortHeader | SearchableBehaviorMetadata) & { url: string }
-  ) => Promise<boolean>,
+  onInstall: (behaviorShortHeader: BehaviorShortHeader) => Promise<boolean>,
   onChoose: (behaviorType: string) => void,
 |};
 
@@ -66,7 +64,7 @@ export const BehaviorStore = ({
     filters,
     searchResults,
     error,
-    fetchBehaviorsAndFilters,
+    fetchBehaviors,
     filtersState,
     searchText,
     setSearchText,
@@ -99,9 +97,9 @@ export const BehaviorStore = ({
 
   React.useEffect(
     () => {
-      fetchBehaviorsAndFilters();
+      fetchBehaviors();
     },
-    [fetchBehaviorsAndFilters]
+    [fetchBehaviors]
   );
 
   const filteredSearchResults = searchResults ? searchResults : null;
@@ -239,7 +237,7 @@ export const BehaviorStore = ({
         </ColumnStackLayout>
         <ListSearchResults
           disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-          onRetry={fetchBehaviorsAndFilters}
+          onRetry={fetchBehaviors}
           error={error}
           searchItems={
             filteredSearchResults &&

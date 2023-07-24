@@ -37,7 +37,7 @@ type BehaviorStoreState = {|
     item: BehaviorShortHeader | SearchableBehaviorMetadata,
     matches: SearchMatch[],
   |}>,
-  fetchBehaviorsAndFilters: () => void,
+  fetchBehaviors: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
@@ -54,7 +54,7 @@ type BehaviorStoreState = {|
 export const BehaviorStoreContext = React.createContext<BehaviorStoreState>({
   filters: null,
   searchResults: null,
-  fetchBehaviorsAndFilters: () => {},
+  fetchBehaviors: () => {},
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -107,7 +107,7 @@ export const BehaviorStoreStateProvider = ({
   const [chosenCategory, setChosenCategory] = React.useState('');
   const filtersState = useFilters();
 
-  const fetchBehaviorsAndFilters = React.useCallback(
+  const fetchBehaviors = React.useCallback(
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
@@ -165,17 +165,18 @@ export const BehaviorStoreStateProvider = ({
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching behaviors from extension store...');
-        fetchBehaviorsAndFilters();
+        fetchBehaviors();
       }, 5000);
       return () => clearTimeout(timeoutId);
     },
-    [fetchBehaviorsAndFilters, behaviorShortHeadersByType, isLoading]
+    [fetchBehaviors, behaviorShortHeadersByType, isLoading]
   );
 
   const allBehaviors = React.useMemo(
     () => {
-      /** @type {{[name: string]: BehaviorShortHeader | SearchableBehaviorMetadata}} */
-      const allBehaviors = {};
+      const allBehaviors: {
+        [name: string]: BehaviorShortHeader | SearchableBehaviorMetadata,
+      } = {};
       for (const type in behaviorShortHeadersByType) {
         allBehaviors[type] = behaviorShortHeadersByType[type];
       }
@@ -246,7 +247,7 @@ export const BehaviorStoreStateProvider = ({
   const behaviorStoreState = React.useMemo(
     () => ({
       searchResults,
-      fetchBehaviorsAndFilters,
+      fetchBehaviors,
       filters,
       allCategories,
       chosenCategory,
@@ -269,7 +270,7 @@ export const BehaviorStoreStateProvider = ({
       setInstalledBehaviorMetadataList,
       behaviorShortHeadersByType,
       filtersState,
-      fetchBehaviorsAndFilters,
+      fetchBehaviors,
     ]
   );
 

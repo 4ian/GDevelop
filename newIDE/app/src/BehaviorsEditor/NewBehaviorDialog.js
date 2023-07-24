@@ -12,9 +12,9 @@ import { getDeprecatedBehaviorsInformation } from '../Hints';
 import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
 import { BehaviorStore } from '../AssetStore/BehaviorStore';
 import { type SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
+import { type BehaviorShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
-import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   addCreateBadgePreHookIfNotClaimed,
@@ -76,9 +76,7 @@ export default function NewBehaviorDialog({
         objectType: behavior.objectType,
         category: behavior.category,
         // PlatformExtension don't have tags so the information from EventsFunctionsExtension is lost.
-        // TODO Add tags to PlatformExtension.
-        // TODO Handle tags in MetadataDeclarationHelper
-        // TODO Handle tags in enumerateBehaviorsMetadata
+        // TODO (tags): Add tags to PlatformExtension, handle them in MetadataDeclarationHelper and enumerateBehaviorsMetadata.
         tags: [],
       }));
     },
@@ -128,7 +126,7 @@ export default function NewBehaviorDialog({
 
   const onInstallExtension = async (
     i18n: I18nType,
-    extensionShortHeader: { url: string }
+    behaviorShortHeader: BehaviorShortHeader
   ) => {
     setIsInstalling(true);
     try {
@@ -136,7 +134,7 @@ export default function NewBehaviorDialog({
         i18n,
         project,
         eventsFunctionsExtensionsState,
-        extensionShortHeader
+        behaviorShortHeader
       );
       return wasExtensionInstalled;
     } finally {
@@ -171,8 +169,8 @@ export default function NewBehaviorDialog({
             objectType={objectType}
             objectBehaviorsTypes={objectBehaviorsTypes}
             isInstalling={isInstalling}
-            onInstall={async extensionShortHeader =>
-              onInstallExtension(i18n, extensionShortHeader)
+            onInstall={async shortHeader =>
+              onInstallExtension(i18n, shortHeader)
             }
             onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}

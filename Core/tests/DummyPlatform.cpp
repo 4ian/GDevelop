@@ -113,17 +113,6 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   auto& baseObject = baseObjectExtension->AddObject<gd::ObjectConfiguration>(
       "", "Dummy Base Object", "Dummy Base Object", "");
 
-  // Add this expression for all objects. But it requires a "capability".
-  baseObject
-      .AddStrExpression("GetSomethingRequiringEffectCapability",
-                        "Get something, but this requires the effect capability for the object.",
-                        "",
-                        "",
-                        "")
-      .AddParameter("object", _("Object"), "")
-      .AddParameter("expression", _("Number parameter"))
-      .SetRequiresBaseObjectCapability("effect")
-      .SetFunctionName("getSomethingRequiringEffectCapability");
   baseObject
       .AddExpression("GetFromBaseExpression",
                      "This works on any object.",
@@ -394,16 +383,6 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                 "Behavior",
                 "MyExtension::BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior"),
         gd::make_unique<gd::BehaviorsSharedData>());
-  }
-
-  {
-    auto& object = extension
-                       ->AddObject<gd::ObjectConfiguration>(
-                           "FakeObjectWithUnsupportedCapability",
-                           "FakeObjectWithUnsupportedCapability",
-                           "This is FakeObjectWithUnsupportedCapability",
-                           "")
-                       .AddUnsupportedBaseObjectCapability("effect");
   }
 
   // Actions and expressions with several parameter types.

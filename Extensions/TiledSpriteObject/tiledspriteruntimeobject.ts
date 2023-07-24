@@ -17,7 +17,9 @@ namespace gdjs {
   /**
    * The TiledSpriteRuntimeObject displays a tiled texture.
    */
-  export class TiledSpriteRuntimeObject extends gdjs.RuntimeObject {
+  export class TiledSpriteRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable {
     _xOffset: float = 0;
     _yOffset: float = 0;
     opacity: float = 255;

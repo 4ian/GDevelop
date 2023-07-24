@@ -3,6 +3,7 @@ import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
 import { type SelectedTags, hasStringAllTags } from '../Utils/TagsHelper';
 import { type RequiredExtension } from '../AssetStore/InstallAsset';
+
 const gd: libGDevelop = global.gd;
 
 export type EnumeratedObjectMetadata = {|
@@ -223,6 +224,7 @@ export const enumerateObjectsAndGroups = (
   objectsContainer: gdObjectsContainer,
   type: ?string = undefined
 ) => {
+  // TODO Check behaviors
   const filterObject = (object: gdObject): boolean => {
     return (
       !type ||

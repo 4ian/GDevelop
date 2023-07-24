@@ -27,7 +27,9 @@ namespace gdjs {
   /**
    * The PanelSpriteRuntimeObject displays a tiled texture.
    */
-  export class PanelSpriteRuntimeObject extends gdjs.RuntimeObject {
+  export class PanelSpriteRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable {
     _rBorder: integer;
     _lBorder: integer;
     _tBorder: integer;
@@ -190,10 +192,6 @@ namespace gdjs {
       return this._height;
     }
 
-    /**
-     * Set the width of the panel sprite.
-     * @param width The new width in pixels.
-     */
     setWidth(width: float): void {
       if (this._width === width) return;
 
@@ -202,16 +200,17 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Set the height of the panel sprite.
-     * @param height The new height in pixels.
-     */
     setHeight(height: float): void {
       if (this._height === height) return;
 
       this._height = height;
       this._renderer.updateHeight();
       this.invalidateHitboxes();
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

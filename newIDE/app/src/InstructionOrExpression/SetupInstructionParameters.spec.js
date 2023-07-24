@@ -73,9 +73,12 @@ describe('setupInstructionParameters', () => {
     );
 
     // Check that parameters were created and the object name set
-    expect(instruction.getParametersCount()).toBe(2);
+    expect(instruction.getParametersCount()).toBe(3);
     expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
+    // Operator
     expect(instruction.getParameter(1).getPlainString()).toBe('');
+    // Operand
+    expect(instruction.getParameter(2).getPlainString()).toBe('');
   });
 
   it('sets the proper parameters for a behavior', () => {

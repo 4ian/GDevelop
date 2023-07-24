@@ -153,7 +153,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject implements EffectsTarget {
+  export class RuntimeObject implements EffectsTarget, gdjs.EffectHandler {
     name: string;
     type: string;
     x: float = 0;

@@ -19,7 +19,9 @@ namespace gdjs {
    *
    * @see gdjs.CustomRuntimeObjectInstanceContainer
    */
-  export class CustomRuntimeObject extends gdjs.RuntimeObject {
+  export class CustomRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;

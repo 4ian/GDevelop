@@ -84,6 +84,7 @@ void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type, const gd::String& name) const {
+  // TODO Add the default behavior of the object and mark them as transient.
   return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
 }
 

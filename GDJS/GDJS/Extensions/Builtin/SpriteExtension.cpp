@@ -45,7 +45,7 @@ SpriteExtension::SpriteExtension() {
   spriteConditions["AnimationName"].SetFunctionName("isCurrentAnimationName");
   spriteConditions["Direction"].SetFunctionName("getDirectionOrAngle");
   spriteConditions["Sprite"].SetFunctionName("getAnimationFrame");
-  spriteConditions["AnimationEnded"].SetFunctionName("hasAnimationEnded");
+  spriteConditions["AnimationEnded"].SetFunctionName("hasAnimationEndedLegacy");
   spriteConditions["AnimationEnded2"].SetFunctionName("hasAnimationEnded2");
   spriteActions["PauseAnimation"].SetFunctionName("pauseAnimation");
   spriteActions["PlayAnimation"].SetFunctionName("playAnimation");
@@ -105,14 +105,8 @@ SpriteExtension::SpriteExtension() {
       "getDirectionOrAngle");  // Deprecated
   spriteExpressions["Direction"].SetFunctionName("getDirectionOrAngle");
   spriteExpressions["Anim"].SetFunctionName("getAnimation");  // Deprecated
-  spriteExpressions["Animation"].SetFunctionName("getAnimation");
-  spriteStrExpressions["AnimationName"].SetFunctionName("getAnimationName");
   spriteExpressions["Sprite"].SetFunctionName("getAnimationFrame");
   spriteExpressions["AnimationFrameCount"].SetFunctionName("getAnimationFrameCount");
-  spriteExpressions["AnimationSpeedScale"].SetFunctionName(
-      "getAnimationSpeedScale");
-  spriteExpressions["ScaleX"].SetFunctionName("getScaleX");
-  spriteExpressions["ScaleY"].SetFunctionName("getScaleY");
   spriteExpressions["Opacity"].SetFunctionName("getOpacity");
 }
 

@@ -1341,9 +1341,6 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
 
-    [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
-    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
-
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
@@ -1405,9 +1402,6 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
-
-    [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
-    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
     
@@ -1634,9 +1628,9 @@ interface ObjectMetadata {
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
 
-    [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
-    [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
-    boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] SetString GetDefaultBehaviors();
+    boolean HasDefaultBehavior([Const] DOMString behaviorType);
+    [Ref] ObjectMetadata AddDefaultBehavior([Const] DOMString behaviorType);
 
     [Ref] ObjectMetadata SetHidden();
     boolean IsHidden();

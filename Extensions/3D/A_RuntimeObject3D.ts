@@ -16,7 +16,9 @@ namespace gdjs {
   /**
    * Base class for 3D objects.
    */
-  export abstract class RuntimeObject3D extends gdjs.RuntimeObject {
+  export abstract class RuntimeObject3D
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
     /**
      * Position on the Z axis.
      */
@@ -255,6 +257,11 @@ namespace gdjs {
       this._height = height;
       this.getRenderer().updateSize();
       this.invalidateHitboxes();
+    }
+
+    setSize(newWidth: number, newHeight: number): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

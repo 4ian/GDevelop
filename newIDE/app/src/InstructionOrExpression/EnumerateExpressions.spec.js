@@ -68,6 +68,9 @@ describe('EnumerateExpressions', () => {
       1
     );
     expect(
+      filterExpressions(spriteObjectExpressions, 'AnimationSpeedScale')
+    ).toHaveLength(1);
+    expect(
       filterExpressions(spriteObjectExpressions, 'AnimationName')
     ).toHaveLength(1);
 

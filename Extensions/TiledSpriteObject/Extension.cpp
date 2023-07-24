@@ -34,6 +34,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
               _("Tiled Sprite"),
               _("Displays an image repeated over an area."),
               "CppPlatform/Extensions/TiledSpriteIcon.png")
+          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapacity::ResizableBehavior")
           .SetCategoryFullName(_("General"));
 
   obj.AddCondition("Opacity",
@@ -86,6 +88,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("color", _("Tint"));
 
+  // Deprecated
   obj.AddAction("Width",
                 _("Width"),
                 _("Modify the width of a Tiled Sprite."),
@@ -97,9 +100,11 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetWidth")
       .SetGetter("GetWidth");
 
+  // Deprecated
   obj.AddCondition("Width",
                    _("Width"),
                    _("Test the width of a Tiled Sprite."),
@@ -111,8 +116,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("GetWidth");
 
+  // Deprecated
   obj.AddAction("Height",
                 _("Height"),
                 _("Modify the height of a Tiled Sprite."),
@@ -124,9 +131,11 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number",
                                      gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
+  // Deprecated
   obj.AddCondition("Height",
                    _("Height"),
                    _("Test the height of a Tiled Sprite."),
@@ -138,8 +147,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced()
+      .SetHidden()
       .SetFunctionName("GetHeight");
 
+  // Deprecated
   obj.AddAction("SetSize",
                 _("Size"),
                 _("Modify the size of a Tiled Sprite."),
@@ -151,6 +162,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
+      .SetHidden()
       .SetFunctionName("SetSize");
 
   // Deprecated: now available for all objects.

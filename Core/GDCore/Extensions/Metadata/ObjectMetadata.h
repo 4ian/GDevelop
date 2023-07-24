@@ -224,30 +224,26 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   }
 
   /**
-   * \brief The "capabilities" that are offered by the base object that are
-   * *not* supported by this object, and should be hidden in the editor
-   * interface.
+   * \brief The "capabilities" that are offered by through behaviors.
    */
-  const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
-    return unsupportedBaseObjectCapabilities;
+  const std::set<gd::String>& GetDefaultBehaviors() const {
+    return defaultBehaviorTypes;
   }
 
   /**
-   * \brief Add a "capability" that is offered by the base object that is *not*
-   * supported by this object, and should be hidden in the editor interface.
+   * \brief Return true if object has a default behavior of the given type.
    */
-  ObjectMetadata& AddUnsupportedBaseObjectCapability(
-      const gd::String& capability) {
-    unsupportedBaseObjectCapabilities.insert(capability);
+  bool HasDefaultBehavior(const gd::String& behaviorType) const {
+    return defaultBehaviorTypes.find(behaviorType) != defaultBehaviorTypes.end();
+  }
+
+  /**
+   * \brief Add a "capability" that is offered by through a behavior.
+   */
+  ObjectMetadata& AddDefaultBehavior(
+      const gd::String& behaviorType) {
+    defaultBehaviorTypes.insert(behaviorType);
     return *this;
-  }
-
-  /**
-   * \brief Check if a "capability" that is offered by the base object is *not*
-   * supported by this object, and should be hidden in the editor interface.
-   */
-  bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
-    return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
   }
 
   const gd::String& GetName() const override { return name; }
@@ -331,7 +327,7 @@ class GD_CORE_API ObjectMetadata : public InstructionOrExpressionContainerMetada
   gd::String description;
   gd::String iconFilename;
   gd::String categoryFullName;
-  std::set<gd::String> unsupportedBaseObjectCapabilities;
+  std::set<gd::String> defaultBehaviorTypes;
   bool hidden = false;
 
   std::shared_ptr<gd::ObjectConfiguration>

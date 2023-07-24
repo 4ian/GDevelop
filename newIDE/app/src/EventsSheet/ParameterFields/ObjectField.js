@@ -53,16 +53,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
+        // Some instructions apply to all objects BUT not some objects
+        // lacking a specific capability usually offered by all objects.
         allowedObjectType={allowedObjectType}
-        requiredObjectCapability={
-          // Some instructions apply to all objects BUT not some objects
-          // lacking a specific capability usually offered by all objects.
-          props.instructionMetadata
-            ? props.instructionMetadata.getRequiredBaseObjectCapability()
-            : props.expressionMetadata
-            ? props.expressionMetadata.getRequiredBaseObjectCapability()
-            : undefined
-        }
         globalObjectsContainer={props.globalObjectsContainer}
         objectsContainer={props.objectsContainer}
         floatingLabelText={description}

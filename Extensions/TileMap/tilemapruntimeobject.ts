@@ -5,7 +5,9 @@ namespace gdjs {
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    */
-  export class TileMapRuntimeObject extends gdjs.RuntimeObject {
+  export class TileMapRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable {
     _frameElapsedTime: float = 0;
     _opacity: float;
     _tilemapJsonFile: string;
@@ -234,11 +236,6 @@ namespace gdjs {
       return this._animationSpeedScale;
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param width The new width of the object, in pixels.
-     */
     setWidth(width: float): void {
       if (this.getWidth() === width) return;
 
@@ -246,16 +243,16 @@ namespace gdjs {
       this.invalidateHitboxes();
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param height The new height of the object, in pixels.
-     */
     setHeight(height: float): void {
       if (this.getHeight() === height) return;
 
       this._renderer.setHeight(height);
       this.invalidateHitboxes();
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

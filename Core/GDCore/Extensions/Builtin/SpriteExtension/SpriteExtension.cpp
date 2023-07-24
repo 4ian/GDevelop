@@ -2,7 +2,7 @@
  * GDevelop Core
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the GNU Lesser General Public
- * LicenFse.
+ * License.
  */
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
@@ -32,7 +32,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                    _("Animated object which can be used for "
                                      "most elements of a game"),
                                    "CppPlatform/Extensions/spriteicon.png")
-          .SetCategoryFullName(_("General"));
+          .SetCategoryFullName(_("General"))
+          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapacity::ResizableBehavior")
+          .AddDefaultBehavior("ScalableCapacity::ScalableBehavior")
+          .AddDefaultBehavior("FlippableCapacity::FlippableBehavior")
+          .AddDefaultBehavior("AnimatableCapacity::AnimatableBehavior");
 
   obj.AddAction("Opacity",
                 _("Sprite opacity"),
@@ -50,6 +55,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
               _("Opacity (0-255)")))
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddAction("ChangeAnimation",
                 _("Change the animation"),
                 _("Change the animation of the object, using the animation "
@@ -62,8 +68,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddAction("SetAnimationName",
                 _("Change the animation (by name)"),
                 _("Change the animation of the object, using the name of the "
@@ -75,6 +83,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("objectAnimationName", _("Animation name"))
+      .SetHidden()
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -107,6 +116,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                      ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddAction("PauseAnimation",
                 _("Pause the animation"),
                 _("Pause the animation of the object"),
@@ -116,8 +126,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden()
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddAction("PlayAnimation",
                 _("Play the animation"),
                 _("Play the animation of the object"),
@@ -127,8 +139,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden()
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddAction(
          "ChangeAnimationSpeedScale",
          _("Animation speed scale"),
@@ -143,8 +157,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .UseStandardOperatorParameters(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(_("Speed scale")))
+      .SetHidden()
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddAction("TourneVersPos",
                 "Rotate an object toward a position",
                 "Rotate an object towards a position.",
@@ -159,8 +175,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("expression", _("Angular speed (degrees per second)"))
       .SetDefaultValue("0")
       .AddCodeOnlyParameter("currentScene", "")
-      .SetHidden();  // Deprecated
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeScale",
                 _("Scale"),
                 _("Modify the scale of the specified object."),
@@ -174,8 +191,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeScaleWidth",
                 _("Scale on X axis"),
                 _("Modify the scale of the width of an object."),
@@ -189,8 +208,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeScaleHeight",
                 _("Scale on Y axis"),
                 _("Modify the scale of the height of an object."),
@@ -204,8 +225,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Scale (1 by default)")))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeWidth",
                 _("Width"),
                 _("Change the width of a Sprite object."),
@@ -217,8 +240,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("Width",
                    _("Width"),
                    _("Compare the width of a Sprite object."),
@@ -230,8 +255,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("ChangeHeight",
                 _("Height"),
                 _("Change the height of a Sprite object."),
@@ -243,8 +270,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition("Height",
                    _("Height"),
                    _("Compare the height of a Sprite object."),
@@ -256,8 +285,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction("SetSize",
                 _("Size"),
                 _("Change the size of an object."),
@@ -269,8 +300,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
+  // Deprecated
   obj.AddCondition(
          "Animation",
          _("Current animation"),
@@ -283,8 +316,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddCondition("AnimationName",
                    _("Current animation name"),
                    _("Check the animation played by the object."),
@@ -295,6 +330,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("objectAnimationName", _("Animation name"))
+      .SetHidden()
       .MarkAsAdvanced();
 
   obj.AddCondition(
@@ -328,6 +364,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddCondition("AnimStopped",
                    _("Animation paused"),
                    _("Check if the animation of an object is paused."),
@@ -337,8 +374,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden()
       .MarkAsSimple();
 
+  // Deprecated
   obj.AddCondition("AnimationEnded",
                    _("Animation finished"),
                    _("Check if the animation being played by the Sprite object "
@@ -352,6 +391,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .MarkAsSimple()
       .SetHidden();
 
+  // Deprecated
   obj.AddCondition("AnimationEnded2",
                    _("Animation finished"),
                    _("Check if the animation being played by the Sprite object "
@@ -362,6 +402,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddCondition("ScaleWidth",
@@ -456,9 +497,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
-
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddAction("FlipY",
@@ -468,9 +509,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
-
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("yesorno", _("Activate flipping"))
+      .SetHidden()
       .MarkAsSimple();
 
   obj.AddCondition("FlippedX",
@@ -480,8 +521,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
-
-      .AddParameter("object", _("Object"), "Sprite");
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
   obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
@@ -490,9 +531,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
-      .AddParameter("object", _("Object"), "Sprite");
-
+  // Deprecated
   obj.AddAction("TourneVers",
                 "Rotate an object toward another",
                 "Rotate an object towards another.",
@@ -504,7 +546,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("objectPtr", "Rotate toward this object")
       .AddCodeOnlyParameter("currentScene", "")
-      .SetHidden();  // Deprecated
+      .SetHidden();
 
   obj.AddExpression("X",
                     _("X position of a point"),
@@ -542,6 +584,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("objectPointName", _("Name of the point"));
 
+  // Deprecated
   obj.AddExpression("Direc",
                     _("Direction"),
                     _("Direction of the object"),
@@ -550,6 +593,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .SetHidden()
       .AddParameter("object", _("Object"), "Sprite");
 
+  // Deprecated
   obj.AddExpression("Direction",
                     _("Direction"),
                     _("Direction of the object"),
@@ -559,26 +603,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     // interface.
       .AddParameter("object", _("Object"), "Sprite");
 
+  // Deprecated
   obj.AddExpression("Anim",
                     _("Animation"),
                     _("Animation of the object"),
                     _("Animations and images"),
                     "res/actions/animation.png")
       .SetHidden()
-      .AddParameter("object", _("Object"), "Sprite");
-
-  obj.AddExpression("Animation",
-                    _("Animation"),
-                    _("Animation of the object"),
-                    _("Animations and images"),
-                    "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "Sprite");
-
-  obj.AddStrExpression("AnimationName",
-                       _("Animation name"),
-                       _("Name of the animation of the object"),
-                       _("Animations and images"),
-                       "res/actions/animation.png")
       .AddParameter("object", _("Object"), "Sprite");
 
   obj.AddExpression("Sprite",
@@ -593,27 +624,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     _("Number of frames in the current animation of the object"),
                     _("Animations and images"),
                     "res/actions/sprite.png")
-      .AddParameter("object", _("Object"), "Sprite");
-
-  obj.AddExpression("AnimationSpeedScale",
-                    _("Animation speed scale"),
-                    _("Animation speed scale"),
-                    _("Animations and images"),
-                    "res/actions/animation.png")
-      .AddParameter("object", _("Object"), "Sprite");
-
-  obj.AddExpression("ScaleX",
-                    _("Scale of the width of an object"),
-                    _("Scale of the width of an object"),
-                    _("Size"),
-                    "res/actions/scaleWidth_black.png")
-      .AddParameter("object", _("Object"), "Sprite");
-
-  obj.AddExpression("ScaleY",
-                    _("Scale of the height of an object"),
-                    _("Scale of the height of an object"),
-                    _("Size"),
-                    "res/actions/scaleHeight_black.png")
       .AddParameter("object", _("Object"), "Sprite");
 
   obj.AddExpression("Opacity",

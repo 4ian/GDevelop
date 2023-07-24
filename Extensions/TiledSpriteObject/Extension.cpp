@@ -34,8 +34,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
               _("Tiled Sprite"),
               _("Displays an image repeated over an area."),
               "CppPlatform/Extensions/TiledSpriteIcon.png")
-          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
-          .AddDefaultBehavior("ResizableCapacity::ResizableBehavior")
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .SetCategoryFullName(_("General"));
 
   obj.AddCondition("Opacity",

@@ -29,7 +29,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "EffectBehavior",
       _("Effect capability"),
-      "Animation",
+      "Effect",
       _("Apply visual effects to objects."),
       "",
       "res/actions/effect24.png",

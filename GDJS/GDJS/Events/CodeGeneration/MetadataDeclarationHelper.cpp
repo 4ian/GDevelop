@@ -108,10 +108,10 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
-          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
-          .AddDefaultBehavior("ResizableCapacity::ResizableBehavior")
-          .AddDefaultBehavior("ScalableCapacity::ScalableBehavior")
-          .AddDefaultBehavior("FlippableCapacity::FlippableBehavior");
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.

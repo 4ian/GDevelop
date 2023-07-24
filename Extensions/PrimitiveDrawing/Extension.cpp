@@ -32,10 +32,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "events."),
               "CppPlatform/Extensions/primitivedrawingicon.png")
           .SetCategoryFullName(_("Advanced"))
-          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
-          .AddDefaultBehavior("ResizableCapacity::ResizableBehavior")
-          .AddDefaultBehavior("ScalableCapacity::ScalableBehavior")
-          .AddDefaultBehavior("FlippableCapacity::FlippableBehavior");
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction(

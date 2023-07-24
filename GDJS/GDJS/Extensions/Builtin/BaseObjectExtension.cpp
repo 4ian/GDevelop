@@ -259,48 +259,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["ObjectVariableChildCount"].SetFunctionName(
       "getVariableChildCount");
 
-  // Instructions for the Resizable capability
-  objectActions["SetSize"].SetFunctionName("setSize");
-  objectConditions["Width"].SetFunctionName("getWidth");
-  objectActions["SetWidth"].SetFunctionName("setWidth");
-  objectConditions["Height"].SetFunctionName("getHeight");
-  objectActions["SetHeight"].SetFunctionName("setHeight");
-
-  // Instructions for the Scalable capability
-  objectExpressions["Scale"].SetFunctionName("getScale");
-  objectConditions["Scale"].SetFunctionName("getScale");
-  objectActions["SetScale"].SetFunctionName("setScale");
-  objectExpressions["ScaleX"].SetFunctionName("getScaleX");
-  objectConditions["ScaleX"].SetFunctionName("getScaleX");
-  objectActions["SetScaleX"].SetFunctionName("setScaleX");
-  objectExpressions["ScaleY"].SetFunctionName("getScaleY");
-  objectConditions["ScaleY"].SetFunctionName("getScaleY");
-  objectActions["SetScaleY"].SetFunctionName("setScaleY");
-
-  // Instructions for the Flippable capability
-  objectActions["FlipX"].SetFunctionName("flipX");
-  objectActions["FlipY"].SetFunctionName("flipY");
-  objectConditions["FlippedX"].SetFunctionName("isFlippedX");
-  objectConditions["FlippedY"].SetFunctionName("isFlippedY");
-
-  // Instructions for the Animable capability
-  objectExpressions["AnimationIndex"].SetFunctionName("getAnimationIndex");
-  objectConditions["AnimationIndex"].SetFunctionName("getAnimationIndex");
-  objectActions["SetAnimationIndex"].SetFunctionName("setAnimationIndex");
-  objectStrExpressions["AnimationName"].SetFunctionName("getAnimationName");
-  objectConditions["AnimationName"].SetFunctionName("isCurrentAnimationName");
-  objectActions["SetAnimationName"].SetFunctionName("setAnimationName");
-  objectActions["PauseAnimation"].SetFunctionName("pauseAnimation");
-  objectActions["PlayAnimation"].SetFunctionName("resumeAnimation");
-  objectExpressions["AnimationSpeedScale"].SetFunctionName(
-      "getAnimationSpeedScale");
-  objectConditions["AnimationSpeedScale"].SetFunctionName(
-      "getAnimationSpeedScale");
-  objectActions["SetAnimationSpeedScale"].SetFunctionName(
-      "setAnimationSpeedScale");
-  objectConditions["IsAnimationPaused"].SetFunctionName("isAnimationPaused");
-  objectConditions["HasAnimationEnded"].SetFunctionName("hasAnimationEnded");
-
   GetAllActions()["MoveObjects"].SetCustomCodeGenerator(
       [](gd::Instruction &,
          gd::EventsCodeGenerator &,

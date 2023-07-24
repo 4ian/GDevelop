@@ -33,11 +33,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                      "most elements of a game"),
                                    "CppPlatform/Extensions/spriteicon.png")
           .SetCategoryFullName(_("General"))
-          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
-          .AddDefaultBehavior("ResizableCapacity::ResizableBehavior")
-          .AddDefaultBehavior("ScalableCapacity::ScalableBehavior")
-          .AddDefaultBehavior("FlippableCapacity::FlippableBehavior")
-          .AddDefaultBehavior("AnimatableCapacity::AnimatableBehavior");
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
+          .AddDefaultBehavior("AnimatableCapability::AnimatableBehavior");
 
   obj.AddAction("Opacity",
                 _("Sprite opacity"),

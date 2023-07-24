@@ -35,8 +35,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  _("Displays a text on the screen."),
                                  "CppPlatform/Extensions/texticon.png")
           .SetCategoryFullName(_("Text"))
-          .AddDefaultBehavior("EffectCapacity::EffectBehavior")
-          .AddDefaultBehavior("ScalableCapacity::ScalableBehavior");
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior");
 
   obj.AddAction("String",
                 _("Modify the text"),

@@ -82,10 +82,24 @@ Project::~Project() {}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
-std::unique_ptr<gd::Object> Project::CreateObject(
-    const gd::String& type, const gd::String& name) const {
-  // TODO Add the default behavior of the object and mark them as transient.
-  return gd::make_unique<Object>(name, type, CreateObjectConfiguration(type));
+std::unique_ptr<gd::Object>
+Project::CreateObject(const gd::String &objectType, const gd::String &name) const {
+  std::unique_ptr<gd::Object> object =
+      gd::make_unique<Object>(name, objectType, CreateObjectConfiguration(objectType));
+
+  auto &platform = GetCurrentPlatform();
+  auto &objectMetadata = gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+  for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+    auto &behaviorMetadata =
+        gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      gd::LogWarning("Object: " + objectType + " has an unknown default behavior: " + behaviorType);
+      continue;
+    }
+    object->AddNewBehavior(*this, behaviorType,
+                           behaviorMetadata.GetDefaultName());
+  }
+  return std::move(object);
 }
 
 std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(

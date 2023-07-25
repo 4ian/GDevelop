@@ -15,7 +15,7 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import {
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   type LeaderboardCustomizationSettings,
 } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
@@ -26,9 +26,9 @@ import SkipBack from '../../UI/CustomSvgIcons/SkipBack';
 import Error from '../../UI/CustomSvgIcons/Error';
 
 type Props = {|
-  entries: ?Array<LeaderboardDisplayData>,
+  entries: ?Array<LeaderboardEntry>,
   customizationSettings: ?LeaderboardCustomizationSettings,
-  onDeleteEntry: (entry: LeaderboardDisplayData) => Promise<void>,
+  onDeleteEntry: (entry: LeaderboardEntry) => Promise<void>,
   isLoading: boolean,
   erroredEntry?: {| entryId: string, message: React.Node |},
   navigation: {|

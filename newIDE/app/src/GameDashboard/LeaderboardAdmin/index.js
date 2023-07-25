@@ -48,7 +48,7 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
@@ -460,7 +460,7 @@ export const LeaderboardAdmin = ({
 
   const onDeleteEntry = async (
     i18n: I18nType,
-    entry: LeaderboardDisplayData
+    entry: LeaderboardEntry
   ) => {
     if (!currentLeaderboard) return;
     const answer = await showConfirmation({

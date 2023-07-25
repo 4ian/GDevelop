@@ -314,7 +314,7 @@ const SpritesList = ({
         if (allDirectionSpritesHaveSameCollisionMasks) {
           copySpritePolygons(direction.getSprite(0), sprite);
         }
-        onSpriteAdded(sprite); // We call this before adding the sprite to the direction as it will be deleted afterwards.
+        onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
         direction.addSprite(sprite);
         sprite.delete();
       });

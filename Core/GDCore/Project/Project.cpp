@@ -88,21 +88,40 @@ Project::CreateObject(const gd::String &objectType, const gd::String &name) cons
       gd::make_unique<Object>(name, objectType, CreateObjectConfiguration(objectType));
 
   auto &platform = GetCurrentPlatform();
-  auto &objectMetadata = gd::MetadataProvider::GetObjectMetadata(platform, objectType);
-  if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
-    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
-  }
-  for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+  auto &project = *this;
+  auto addDefaultBehavior =
+      [&platform,
+       &project,
+       &object,
+       &objectType](const gd::String& behaviorType) {
     auto &behaviorMetadata =
         gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
     if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
       gd::LogWarning("Object: " + objectType + " has an unknown default behavior: " + behaviorType);
-      continue;
+      return;
     }
-    auto* behavior = object->AddNewBehavior(*this, behaviorType,
-                           behaviorMetadata.GetDefaultName());
+    auto* behavior = object->AddNewBehavior(project, behaviorType,
+                          behaviorMetadata.GetDefaultName());
     behavior->SetDefaultBehavior(true);
+  };
+
+  if (Project::HasEventsBasedObject(objectType)) {
+    addDefaultBehavior("EffectCapability::EffectBehavior");
+    addDefaultBehavior("ResizableCapability::ResizableBehavior");
+    addDefaultBehavior("ScalableCapability::ScalableBehavior");
+    addDefaultBehavior("FlippableCapability::FlippableBehavior");
   }
+  else {
+    auto &objectMetadata = gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+    if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
+      gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
+    }
+    for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+      addDefaultBehavior(behaviorType);
+    }
+  }
+
+  
   return std::move(object);
 }
 

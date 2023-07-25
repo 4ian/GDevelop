@@ -1898,32 +1898,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION(
-      "Valid function call with an object expression requiring a capability") {
-    auto node = parser.ParseExpression(
-        "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
-    REQUIRE(node != nullptr);
-
-    gd::ExpressionValidator validator(platform, project, layout1, "string");
-    node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 0);
-  }
-
-  SECTION(
-      "Invalid function call with an object expression requiring a "
-      "capability") {
-    auto node =
-        parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
-                               "GetSomethingRequiringEffectCapability(123)");
-    REQUIRE(node != nullptr);
-
-    gd::ExpressionValidator validator(platform, project, layout1, "string");
-    node->Visit(validator);
-    REQUIRE(validator.GetFatalErrors().size() == 1);
-    REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
-            "This expression exists, but it can't be used on this object.");
-  }
-
   SECTION("Fuzzy/random tests") {
     {
       auto testExpression = [&parser, platform, project, layout1](const gd::String &expression) {

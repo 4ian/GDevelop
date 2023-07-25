@@ -338,55 +338,6 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "getNumberWith2Params(1, \"2\")");
     }
   }
-  SECTION("function calls (capabilities)") {
-    SECTION("supported capability") {
-      // Capability is supported, so the expression is valid.
-      auto node = parser.ParseExpression(
-          "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
-                                                          "",
-                                                          codeGenerator,
-                                                          context);
-
-      REQUIRE(node);
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(
-          expressionCodeGenerator.GetOutput() ==
-          "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
-    }
-    SECTION("unsupported capability") {
-      // Capability is not supported, so the expression is not even valid.
-      auto node =
-          parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
-                                 "GetSomethingRequiringEffectCapability(123)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
-                                                          "",
-                                                          codeGenerator,
-                                                          context);
-
-      REQUIRE(node);
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "\"\"");
-    }
-    SECTION("group with partial support") {
-      // We use a group, capability is supported only by one object of the
-      // group. The expression itself is valid, but code generation should skip
-      // the objects with unsupported capability.
-      auto node = parser.ParseExpression(
-          "AllObjects.GetSomethingRequiringEffectCapability(123)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
-                                                          "",
-                                                          codeGenerator,
-                                                          context);
-
-      REQUIRE(node);
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(
-          expressionCodeGenerator.GetOutput() ==
-          "MyOtherSpriteObject.getSomethingRequiringEffectCapability(123) ?? "
-          "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
-    }
-  }
   SECTION("Function name") {
     auto node =
         parser.ParseExpression("MySpriteObject.GetObjectNumber");

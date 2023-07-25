@@ -57,7 +57,9 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
-      enumeratedInstruction => enumeratedInstruction.type === 'AnimatableCapability::AnimatableBehavior::SetName'
+      enumeratedInstruction =>
+        enumeratedInstruction.type ===
+        'AnimatableCapability::AnimatableBehavior::SetName'
     );
 
     if (!setAnimationNameInstruction) {

@@ -14,7 +14,10 @@ describe('EnumerateInstructions', () => {
 
     // Test for the proper presence of a few conditions
     expect(
-      instructions.find(instruction => instruction.type === 'AnimatableCapability::HasAnimationEnded')
+      instructions.find(
+        instruction =>
+          instruction.type === 'AnimatableCapability::HasAnimationEnded'
+      )
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Animation finished',

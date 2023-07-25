@@ -172,6 +172,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
   onReplaceByDirection: (newDirection: gdDirection) => void,
+  onSpriteAdded: (sprite: gdSprite) => void,
   onSpriteUpdated?: () => void,
   onFirstSpriteUpdated?: () => void,
   onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
@@ -186,6 +187,7 @@ const SpritesList = ({
   resourcesLoader,
   resourceManagementProps,
   onReplaceByDirection,
+  onSpriteAdded,
   onSpriteUpdated,
   onFirstSpriteUpdated,
   onChangeName,
@@ -312,6 +314,7 @@ const SpritesList = ({
         if (allDirectionSpritesHaveSameCollisionMasks) {
           copySpritePolygons(direction.getSprite(0), sprite);
         }
+        onSpriteAdded(sprite); // We call this before adding the sprite to the direction as it will be deleted afterwards.
         direction.addSprite(sprite);
         sprite.delete();
       });
@@ -336,6 +339,7 @@ const SpritesList = ({
       resourceManagementProps,
       forceUpdate,
       onSpriteUpdated,
+      onSpriteAdded,
       onFirstSpriteUpdated,
     ]
   );

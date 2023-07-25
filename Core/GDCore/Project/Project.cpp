@@ -89,6 +89,9 @@ Project::CreateObject(const gd::String &objectType, const gd::String &name) cons
 
   auto &platform = GetCurrentPlatform();
   auto &objectMetadata = gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+  if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
+    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
+  }
   for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
     auto &behaviorMetadata =
         gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
@@ -96,8 +99,9 @@ Project::CreateObject(const gd::String &objectType, const gd::String &name) cons
       gd::LogWarning("Object: " + objectType + " has an unknown default behavior: " + behaviorType);
       continue;
     }
-    object->AddNewBehavior(*this, behaviorType,
+    auto* behavior = object->AddNewBehavior(*this, behaviorType,
                            behaviorMetadata.GetDefaultName());
+    behavior->SetDefaultBehavior(true);
   }
   return std::move(object);
 }

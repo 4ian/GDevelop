@@ -60,8 +60,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
+      .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple();
@@ -77,8 +77,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
+      .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple();

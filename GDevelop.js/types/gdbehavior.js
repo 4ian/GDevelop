@@ -10,6 +10,7 @@ declare class gdBehavior {
   initializeContent(): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  isDefaultBehavior(): boolean;
   delete(): void;
   ptr: number;
 };

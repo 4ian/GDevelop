@@ -390,6 +390,10 @@ const CollisionMasksEditor = ({
                       animation
                     </Trans>
                   }
+                  hideControlsForSprite={(sprite: gdSprite) =>
+                    spriteConfiguration.adaptCollisionMaskAutomatically() ||
+                    sprite.isFullImageCollisionMask()
+                  }
                 />
               </Column>
             </Line>

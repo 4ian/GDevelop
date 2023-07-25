@@ -36,7 +36,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  "CppPlatform/Extensions/texticon.png")
           .SetCategoryFullName(_("Text"))
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
-          .AddDefaultBehavior("ScalableCapability::ScalableBehavior");
+          .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
 
   obj.AddAction("String",
                 _("Modify the text"),
@@ -240,6 +241,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Show the shadow"));
 
+  // Deprecated
   obj.AddAction("Opacity",
                 _("Text opacity"),
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "
@@ -257,6 +259,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetOpacity")
       .SetGetter("GetOpacity");
 
+  // Deprecated
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Text object, between 0 (fully "
@@ -529,6 +532,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetHidden()
       .SetFunctionName("GetScaleY");
 
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity of a Text object"),
                     _("Opacity of a Text object"),

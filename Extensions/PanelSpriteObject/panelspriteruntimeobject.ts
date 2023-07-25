@@ -29,7 +29,7 @@ namespace gdjs {
    */
   export class PanelSpriteRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable {
+    implements gdjs.Resizable, gdjs.OpacityHandler {
     _rBorder: integer;
     _lBorder: integer;
     _tBorder: integer;
@@ -213,10 +213,6 @@ namespace gdjs {
       this.setHeight(newHeight);
     }
 
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -228,10 +224,6 @@ namespace gdjs {
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }

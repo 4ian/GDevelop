@@ -48,7 +48,9 @@ namespace gdjs {
   /**
    * Shows a text input on the screen the player can type text into.
    */
-  export class TextInputRuntimeObject extends gdjs.RuntimeObject {
+  export class TextInputRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
@@ -202,18 +204,12 @@ namespace gdjs {
       this._renderer.onDestroy();
     }
 
-    /**
-     * Set object opacity.
-     */
-    setOpacity(opacity): void {
+    setOpacity(opacity: float): void {
       this.opacity = Math.max(0, Math.min(255, opacity));
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get object opacity.
-     */
-    getOpacity() {
+    getOpacity(): float {
       return this.opacity;
     }
 

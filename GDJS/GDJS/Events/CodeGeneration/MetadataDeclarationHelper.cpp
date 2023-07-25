@@ -112,7 +112,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
-          .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
 
   // TODO EBO Use full type to identify object to avoid collision.
   // Objects are identified by their name alone.
@@ -326,7 +327,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
       .AddParameter("object", _("Object"), objectType)
       .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions())
       .SetFunctionName("setOpacity")
-      .SetGetter("getOpacity");
+      .SetGetter("getOpacity")
+      .SetHidden();
 
   return objectMetadata;
 }

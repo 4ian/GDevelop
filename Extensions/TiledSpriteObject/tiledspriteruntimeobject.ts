@@ -19,7 +19,7 @@ namespace gdjs {
    */
   export class TiledSpriteRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable {
+    implements gdjs.Resizable, gdjs.OpacityHandler {
     _xOffset: float = 0;
     _yOffset: float = 0;
     opacity: float = 255;
@@ -211,10 +211,6 @@ namespace gdjs {
       return this._yOffset;
     }
 
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -226,10 +222,6 @@ namespace gdjs {
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }

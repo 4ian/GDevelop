@@ -175,7 +175,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
-      .setCategoryFullName(_('Text'));
+      .setCategoryFullName(_('Text'))
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     object
       .addExpressionAndConditionAndAction(
@@ -192,6 +193,7 @@ module.exports = {
       .setFunctionName('setText')
       .setGetter('getText');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -210,7 +212,8 @@ module.exports = {
         )
       )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addExpressionAndCondition(

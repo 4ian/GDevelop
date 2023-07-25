@@ -36,8 +36,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
               "CppPlatform/Extensions/TiledSpriteIcon.png")
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior")
           .SetCategoryFullName(_("General"));
 
+  // Deprecated
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Tiled Sprite, between 0 (fully "
@@ -51,8 +53,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardRelationalOperatorParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Opacity to compare to (0-255)")));
+              _("Opacity to compare to (0-255)")))
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction(
          "SetOpacity",
          _("Change Tiled Sprite opacity"),
@@ -67,14 +71,17 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters(
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Opacity (0-255)")));
+              _("Opacity (0-255)")))
+      .SetHidden();
 
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity"),
                     _("Opacity"),
                     _("Visibility"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Object"), "TiledSprite");
+      .AddParameter("object", _("Object"), "TiledSprite")
+      .SetHidden();
 
   obj.AddAction(
          "SetColor",

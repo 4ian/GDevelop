@@ -174,7 +174,8 @@ module.exports = {
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
       )
-      .setCategoryFullName(_('Text'));
+      .setCategoryFullName(_('Text'))
+      .addDefaultBehavior("OpacityCapability::OpacityBehavior");
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -433,6 +434,14 @@ module.exports = {
     ];
 
     addSettersAndGettersToObject(object, setterAndGetterProperties, 'BBText');
+
+    const actions = object.getAllActions();
+    const conditions = object.getAllConditions();
+    const expressions = object.getAllExpressions();
+
+    actions.get('BBText::SetOpacity').setHidden();
+    conditions.get('BBText::IsOpacity').setHidden();
+    expressions.get('GetOpacity').setHidden();
 
     return extension;
   },

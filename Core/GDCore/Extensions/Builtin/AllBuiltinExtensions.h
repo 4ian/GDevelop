@@ -48,6 +48,7 @@ class GD_CORE_API BuiltinExtensionsImplementer {
   static void ImplementsFlippableExtension(gd::PlatformExtension& extension);
   static void ImplementsAnimatableExtension(gd::PlatformExtension& extension);
   static void ImplementsEffectExtension(gd::PlatformExtension& extension);
+  static void ImplementsOpacityExtension(gd::PlatformExtension& extension);
 };
 
 }  // namespace gd

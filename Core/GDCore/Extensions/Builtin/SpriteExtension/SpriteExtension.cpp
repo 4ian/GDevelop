@@ -37,8 +37,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior")
           .AddDefaultBehavior("AnimatableCapability::AnimatableBehavior");
 
+  // Deprecated
   obj.AddAction("Opacity",
                 _("Sprite opacity"),
                 _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
@@ -53,7 +55,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Opacity (0-255)")))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetHidden();
 
   // Deprecated
   obj.AddAction("ChangeAnimation",
@@ -435,6 +438,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
               _("Scale (1 by default)")))
       .MarkAsAdvanced();
 
+  // Deprecated
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Sprite, between 0 (fully "
@@ -449,7 +453,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
           "number",
           ParameterOptions::MakeNewOptions().SetDescription(
               _("Opacity to compare to (0-255)")))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetHidden();
 
   obj.AddCondition(
          "BlendMode",
@@ -626,12 +631,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/sprite.png")
       .AddParameter("object", _("Object"), "Sprite");
 
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity"),
                     _("Opacity"),
                     _("Opacity"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Object"), "Sprite");
+      .AddParameter("object", _("Object"), "Sprite")
+      .SetHidden();
 
   extension
       .AddCondition("Collision",

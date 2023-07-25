@@ -287,7 +287,8 @@ module.exports = {
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
-      );
+      )
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:
     object
@@ -525,6 +526,8 @@ module.exports = {
       .setGetter('isDisabled');
 
     // Other expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -543,7 +546,8 @@ module.exports = {
         )
       )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addScopedCondition(

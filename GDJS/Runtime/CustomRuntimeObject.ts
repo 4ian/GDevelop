@@ -21,7 +21,11 @@ namespace gdjs {
    */
   export class CustomRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
+    implements
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable,
+      gdjs.OpacityHandler {
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
@@ -580,10 +584,7 @@ namespace gdjs {
     }
 
     // Visibility and display :
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
+
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -595,10 +596,6 @@ namespace gdjs {
       this.getRenderer().updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }

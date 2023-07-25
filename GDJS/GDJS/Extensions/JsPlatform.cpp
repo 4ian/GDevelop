@@ -36,6 +36,7 @@
 #include "GDJS/Extensions/Builtin/Capacities/FlippableExtension.h"
 #include "GDJS/Extensions/Builtin/Capacities/ResizableExtension.h"
 #include "GDJS/Extensions/Builtin/Capacities/ScalableExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/OpacityExtension.h"
 
 namespace gdjs {
 
@@ -126,6 +127,9 @@ void JsPlatform::ReloadBuiltinExtensions() {
   std::cout.flush();
   AddExtension(
       std::shared_ptr<gd::PlatformExtension>(new ScalableExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new OpacityExtension));
   std::cout.flush();
   std::cout << "done." << std::endl;
 

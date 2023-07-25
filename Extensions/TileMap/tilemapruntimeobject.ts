@@ -7,7 +7,7 @@ namespace gdjs {
    */
   export class TileMapRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable {
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler {
     _frameElapsedTime: float = 0;
     _opacity: float;
     _tilemapJsonFile: string;
@@ -321,18 +321,11 @@ namespace gdjs {
       this._renderer.updateAngle();
     }
 
-    /**
-     * Set object opacity.
-     * @param opacity The new opacity of the object (0-255).
-     */
     setOpacity(opacity: float): void {
       this._opacity = opacity;
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get object opacity.
-     */
     getOpacity(): float {
       return this._opacity;
     }

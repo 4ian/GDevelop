@@ -208,6 +208,7 @@ const defineTileMap = function (
     .addDefaultBehavior('EffectCapability::EffectBehavior')
     .addDefaultBehavior('ResizableCapability::ResizableBehavior')
     .addDefaultBehavior('ScalableCapability::ScalableBehavior')
+    .addDefaultBehavior('OpacityCapability::OpacityBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js')

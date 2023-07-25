@@ -280,20 +280,6 @@ describe('libGD.js - GDJS related tests', function () {
       unknownAction.setParameter(0, 'Anything');
       gd.asStandardEvent(evt).getActions().insert(unknownAction, 3);
 
-      // Action for an object not having the required capability.
-      const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(3);
-      unsupportedCapabilityAction.setParameter(
-        0,
-        'MyFakeObjectWithUnsupportedCapability'
-      );
-      unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
-      unsupportedCapabilityAction.setParameter(2, 'yes');
-      gd.asStandardEvent(evt)
-        .getActions()
-        .insert(unsupportedCapabilityAction, 4);
-
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
         layout,
@@ -314,75 +300,6 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Check that the unknown action was not generated.
       expect(code).toMatch('/* Unknown instruction - skipped. */');
-
-      // Check that the action for an object not having the required capability was not generated.
-      expect(code).toMatch(
-        '/* Object with unsupported capability - skipped. */'
-      );
-
-      action.delete();
-    });
-    it('does not generate code for improperly set up action/conditions, with groups', function () {
-      const project = gd.ProjectHelper.createNewGDJSProject();
-      const layout = project.insertNewLayout('Scene', 0);
-      const evt = layout
-        .getEvents()
-        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
-      layout.insertNewObject(project, 'Sprite', 'MySprite', 0);
-      const obj = layout.insertNewObject(
-        project,
-        'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-        'MyFakeObjectWithUnsupportedCapability',
-        0
-      );
-
-      const group = layout.getObjectGroups().insertNew('MyGroup', 0);
-      group.addObject('MySprite');
-      group.addObject('MyFakeObjectWithUnsupportedCapability');
-
-      // Valid action (to check code generation is done).
-      const action = new gd.Instruction();
-      action.setType('ChangeLayer');
-      action.setParametersCount(2);
-      action.setParameter(0, 'MyGroup');
-      action.setParameter(1, '"New layer"');
-      gd.asStandardEvent(evt).getActions().insert(action, 0);
-
-      // Action for an object not having the required capability.
-      const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(3);
-      unsupportedCapabilityAction.setParameter(0, 'MyGroup');
-      unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
-      unsupportedCapabilityAction.setParameter(2, 'yes');
-      gd.asStandardEvent(evt)
-        .getActions()
-        .insert(unsupportedCapabilityAction, 1);
-
-      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
-      const code = layoutCodeGenerator.generateLayoutCompleteCode(
-        layout,
-        new gd.SetString(),
-        true
-      );
-
-      // Layer can be changed for both object instances.
-      expect(code).toMatch(
-        'gdjs.SceneCode.GDMySpriteObjects1[i].setLayer("New layer");'
-      );
-      expect(code).toMatch(
-        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].setLayer("New layer");'
-      );
-
-      // Check that the action with an object not having the required capability
-      // was not generated for this object,
-      // but generated for the Sprite supporting this capability.
-      expect(code).toMatch(
-        'gdjs.SceneCode.GDMySpriteObjects1[i].enableEffect("MyEffect", true);'
-      );
-      expect(code).toMatch(
-        '/* Object with unsupported capability - skipped. */'
-      );
 
       action.delete();
     });

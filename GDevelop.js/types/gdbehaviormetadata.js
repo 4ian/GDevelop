@@ -30,6 +30,7 @@ declare class gdBehaviorMetadata {
   getObjectType(): string;
   isPrivate(): boolean;
   setPrivate(): gdBehaviorMetadata;
+  isHidden(): boolean;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
   delete(): void;

@@ -35,7 +35,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       "res/actions/effect24.png",
       "EffectBehavior",
       std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>());
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
 
   aut.AddAction("EnableEffect",
                 _("Enable an object effect"),

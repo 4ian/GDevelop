@@ -405,6 +405,10 @@ const BehaviorsEditor = (props: Props) => {
               const behavior = object.getBehavior(behaviorName);
               const behaviorTypeName = behavior.getTypeName();
 
+              if (behavior.isDefaultBehavior()) {
+                return null;
+              }
+
               const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                 gd.JsPlatform.get(),
                 behaviorTypeName

@@ -71,17 +71,19 @@ export default function NewBehaviorDialog({
               eventsFunctionsExtension
             )
           : [];
-      return behaviorMetadataList.map(behavior => ({
-        type: behavior.type,
-        fullName: behavior.fullName,
-        description: behavior.description,
-        previewIconUrl: behavior.previewIconUrl,
-        objectType: behavior.objectType,
-        category: behavior.category,
-        // PlatformExtension don't have tags so the information from EventsFunctionsExtension is lost.
-        // TODO (tags): Add tags to PlatformExtension, handle them in MetadataDeclarationHelper and enumerateBehaviorsMetadata.
-        tags: [],
-      }));
+      return behaviorMetadataList
+        .filter(behavior => !behavior.behaviorMetadata.isHidden())
+        .map(behavior => ({
+          type: behavior.type,
+          fullName: behavior.fullName,
+          description: behavior.description,
+          previewIconUrl: behavior.previewIconUrl,
+          objectType: behavior.objectType,
+          category: behavior.category,
+          // PlatformExtension don't have tags so the information from EventsFunctionsExtension is lost.
+          // TODO (tags): Add tags to PlatformExtension, handle them in MetadataDeclarationHelper and enumerateBehaviorsMetadata.
+          tags: [],
+        }));
     },
     [project, eventsFunctionsExtension]
   );

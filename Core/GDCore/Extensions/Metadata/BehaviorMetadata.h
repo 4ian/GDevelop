@@ -275,6 +275,21 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   }
 
   /**
+   * Check if the behavior is hidden - it can be used but not attached to
+   * objects by users.
+   */
+  bool IsHidden() const { return isHidden; }
+
+  /**
+   * Set that the behavior is hidden - it can be used but not attached to
+   * objects by users.
+   */
+  BehaviorMetadata &SetHidden() {
+    isHidden = true;
+    return *this;
+  }
+
+  /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
    * 
    * \note Returns a dumb Behavior for events based behaviors as CustomBehavior
@@ -331,6 +346,7 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   gd::String iconFilename;
   gd::String objectType;
   bool isPrivate = false;
+  bool isHidden = false;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

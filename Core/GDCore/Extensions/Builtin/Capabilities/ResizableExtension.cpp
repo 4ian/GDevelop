@@ -34,7 +34,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
       "res/actions/scale24_black.png",
       "ResizableBehavior",
       std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>());
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
 
   aut.AddAction("SetWidth",
                 _("Width"),

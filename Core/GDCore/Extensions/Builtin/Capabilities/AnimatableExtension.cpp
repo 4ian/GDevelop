@@ -35,7 +35,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       "res/actions/animation24.png",
       "AnimatableBehavior",
       std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>());
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
 
   aut.AddExpressionAndConditionAndAction(
          "number",

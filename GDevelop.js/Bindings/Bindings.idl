@@ -1739,6 +1739,8 @@ interface BehaviorMetadata {
     boolean IsPrivate();
     [Ref] BehaviorMetadata SetPrivate();
 
+    boolean IsHidden();
+
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
 };

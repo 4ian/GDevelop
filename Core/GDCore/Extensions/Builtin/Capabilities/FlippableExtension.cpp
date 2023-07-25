@@ -35,7 +35,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
       "res/actions/flipX24.png",
       "FlippableBehavior",
       std::make_shared<gd::Behavior>(),
-      std::make_shared<gd::BehaviorsSharedData>());
+      std::make_shared<gd::BehaviorsSharedData>())
+    .SetHidden();
 
   aut.AddAction("FlipX",
                 _("Flip the object horizontally"),

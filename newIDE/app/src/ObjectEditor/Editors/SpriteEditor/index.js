@@ -227,10 +227,8 @@ export default function SpriteEditor({
       const firstDirection = firstAnimation.getDirection(0);
       if (firstDirection.getSpritesCount() === 0) return;
       const firstSprite = firstDirection.getSprite(0);
-      const firstSpriteCollisionMask = firstSprite.getCustomCollisionMask();
-      sprite.setFullImageCollisionMask(!firstSpriteCollisionMask);
-      if (firstSpriteCollisionMask)
-        sprite.setCustomCollisionMask(firstSpriteCollisionMask);
+      sprite.setFullImageCollisionMask(firstSprite.isFullImageCollisionMask());
+      sprite.setCustomCollisionMask(firstSprite.getCustomCollisionMask());
 
       forceUpdate();
     },

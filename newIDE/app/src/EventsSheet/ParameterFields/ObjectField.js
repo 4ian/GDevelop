@@ -14,6 +14,8 @@ import { Trans } from '@lingui/macro';
 import { nameAndIconContainer } from '../EventsTree/ClassNames';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
+const gd: libGDevelop = global.gd;
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
     const { currentlyRunningInAppTutorial } = React.useContext(
@@ -31,7 +33,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { parameterMetadata } = props;
+    const {
+      project,
+      parameterMetadata,
+      parameterIndex,
+      instructionMetadata,
+      expressionMetadata,
+    } = props;
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -45,10 +53,46 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
+    const behaviorConstraints = React.useMemo(
+      () => {
+        const functionMetadata = instructionMetadata || expressionMetadata;
+        if (!project || !functionMetadata || parameterIndex === undefined) {
+          return [];
+        }
+        const behaviorConstraints: Array<{
+          behaviorName: string,
+          behaviorType: string,
+        }> = [];
+        for (
+          let index = parameterIndex + 1;
+          index < functionMetadata.getParametersCount();
+          index++
+        ) {
+          const behaviorParameter = functionMetadata.getParameter(index);
+          if (behaviorParameter.getType() !== 'behavior') {
+            break;
+          }
+          const behaviorType = behaviorParameter.getExtraInfo();
+          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            behaviorType
+          );
+          if (behaviorMetadata.isHidden()) {
+            behaviorConstraints.push({
+              behaviorName: behaviorMetadata.getDefaultName(),
+              behaviorType,
+            });
+          }
+        }
+        return behaviorConstraints;
+      },
+      [expressionMetadata, instructionMetadata, parameterIndex, project]
+    );
+
     return (
       <ObjectSelector
         margin={props.isInline ? 'none' : 'dense'}
-        project={props.project}
+        project={project}
         value={props.value}
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
@@ -56,13 +100,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // Some instructions apply to all objects BUT not some objects
         // lacking a specific capability usually offered by all objects.
         allowedObjectType={allowedObjectType}
+        behaviorConstraints={behaviorConstraints}
         globalObjectsContainer={props.globalObjectsContainer}
         objectsContainer={props.objectsContainer}
         floatingLabelText={description}
         helperMarkdownText={longDescription}
         id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-object-selector`
+          parameterIndex !== undefined
+            ? `parameter-${parameterIndex}-object-selector`
             : undefined
         }
         fullWidth

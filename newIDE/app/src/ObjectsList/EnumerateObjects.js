@@ -222,29 +222,74 @@ export const enumerateGroups = (
 export const enumerateObjectsAndGroups = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  type: ?string = undefined
+  type: ?string = undefined,
+  behaviorConstraints?: Array<{
+    behaviorName: string,
+    behaviorType: string,
+  }> = []
 ) => {
-  // TODO Check behaviors
   const filterObject = (object: gdObject): boolean => {
+    const behaviorNames = behaviorConstraints
+      ? gd
+          .getBehaviorsOfObject(
+            globalObjectsContainer,
+            objectsContainer,
+            object.getName(),
+            false
+          )
+          .toJSArray()
+      : [];
     return (
-      !type ||
-      gd.getTypeOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        object.getName(),
-        false
-      ) === type
+      (!type ||
+        gd.getTypeOfObject(
+          globalObjectsContainer,
+          objectsContainer,
+          object.getName(),
+          false
+        ) === type) &&
+      behaviorConstraints.every(({ behaviorName, behaviorType }) =>
+        behaviorNames.some(behaviorName => {
+          return (
+            gd.getTypeOfBehavior(
+              globalObjectsContainer,
+              objectsContainer,
+              behaviorName,
+              false
+            ) === behaviorType
+          );
+        })
+      )
     );
   };
   const filterGroup = (group: gdObjectGroup): boolean => {
-    return (
-      !type ||
-      gd.getTypeOfObject(
+    const behaviorNames = gd
+      .getBehaviorsOfObject(
         globalObjectsContainer,
         objectsContainer,
         group.getName(),
         true
-      ) === type
+      )
+      .toJSArray();
+    return (
+      (!type ||
+        gd.getTypeOfObject(
+          globalObjectsContainer,
+          objectsContainer,
+          group.getName(),
+          true
+        ) === type) &&
+      behaviorConstraints.every(({ behaviorName, behaviorType }) =>
+        behaviorNames.some(behaviorName => {
+          return (
+            gd.getTypeOfBehavior(
+              globalObjectsContainer,
+              objectsContainer,
+              behaviorName,
+              true
+            ) === behaviorType
+          );
+        })
+      )
     );
   };
 

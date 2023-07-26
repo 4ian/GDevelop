@@ -22,6 +22,7 @@ type Props = {|
 
   /** If specified, only this object type should be allowed to be selected. */
   allowedObjectType?: ?string,
+  behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
 
   noGroups?: boolean,
 
@@ -53,6 +54,7 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
+  behaviorConstraints,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
@@ -60,12 +62,14 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
+  behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     globalObjectsContainer,
     objectsContainer,
-    allowedObjectType || undefined
+    allowedObjectType || undefined,
+    behaviorConstraints || []
   );
   const objects = list.allObjectsList.map(({ object }) => {
     return {
@@ -135,6 +139,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       id,
       excludedObjectOrGroupNames,
       hintText,
+      behaviorConstraints,
       ...otherProps
     } = props;
 
@@ -144,6 +149,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       objectsContainer,
       noGroups,
       allowedObjectType,
+      behaviorConstraints,
       excludedObjectOrGroupNames,
     });
 

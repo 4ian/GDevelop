@@ -105,7 +105,7 @@ const DirectionTools = ({
 
   const hasSprites = direction.getSpritesCount();
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <I18n>

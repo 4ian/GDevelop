@@ -58,7 +58,7 @@ const SectionContainer = ({
   renderFooter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <Column useFullHeight noMargin expand>

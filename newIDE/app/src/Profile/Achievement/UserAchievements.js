@@ -48,7 +48,7 @@ const UserAchievements = ({
   const [achievements, setAchievements] = useState<?Array<Achievement>>(null);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const fetchAchievements = useCallback(async () => {
     try {

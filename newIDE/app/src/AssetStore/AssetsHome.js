@@ -28,6 +28,7 @@ const cellSpacing = 2;
 
 const getCategoryColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
+    case 'xsmall':
     case 'small':
       return 2;
     case 'medium':
@@ -43,8 +44,9 @@ const getCategoryColumns = (windowWidth: WidthType) => {
 
 const getAssetPacksColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
-    case 'small':
+    case 'xsmall':
       return 1;
+    case 'small':
     case 'medium':
       return 2;
     case 'large':
@@ -372,7 +374,10 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         />
       ));
 
-    const privateAssetPacksTiles: Array<React.Node> = privateAssetPacksListingData
+    const privateAssetPacksTiles: Array<React.Node> = [];
+    const privateAssetPackBundleTiles: Array<React.Node> = [];
+
+    privateAssetPacksListingData
       .filter(
         assetPackListingData =>
           !openedAssetCategory ||
@@ -384,23 +389,49 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       }))
       .sort((a, b) => a.pos - b.pos)
       .map(sortObject => sortObject.listingData)
-      .map(assetPackListingData => (
-        <PrivateAssetPackTile
-          assetPackListingData={assetPackListingData}
-          onSelect={() => {
-            onPrivateAssetPackSelection(assetPackListingData);
-          }}
-          owned={
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === assetPackListingData.id
-            )
-          }
-          key={assetPackListingData.id}
-        />
-      ));
+      .sort((a, b) => {
+        // Put owned first.
+        if (
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(pack => pack.id === a.id)
+        )
+          return -1;
+        if (
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(pack => pack.id === b.id)
+        )
+          return 1;
 
-    const allTiles = mergeArraysPerGroup(
+        return 0;
+      })
+      .filter(Boolean)
+      .forEach(assetPackListingData => {
+        const tile = (
+          <PrivateAssetPackTile
+            assetPackListingData={assetPackListingData}
+            onSelect={() => {
+              onPrivateAssetPackSelection(assetPackListingData);
+            }}
+            owned={
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              )
+            }
+            key={assetPackListingData.id}
+          />
+        );
+        if (
+          assetPackListingData.includedListableProductIds &&
+          !!assetPackListingData.includedListableProductIds.length
+        ) {
+          privateAssetPackBundleTiles.push(tile);
+        } else {
+          privateAssetPacksTiles.push(tile);
+        }
+      });
+
+    const allStandAloneTiles = mergeArraysPerGroup(
       privateAssetPacksTiles,
       starterPacksTiles,
       2,
@@ -433,6 +464,25 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         id="asset-store-home"
         data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
       >
+        <Column>
+          <Line>
+            <Text size="block-title">
+              {openedAssetCategoryTitle ? (
+                openedAssetCategoryTitle
+              ) : (
+                <Trans>Bundles</Trans>
+              )}
+            </Text>
+          </Line>
+        </Column>
+        <GridList
+          cols={getAssetPacksColumns(windowWidth)}
+          style={styles.grid}
+          cellHeight="auto"
+          spacing={cellSpacing}
+        >
+          {privateAssetPackBundleTiles}
+        </GridList>
         {openedAssetCategory ? null : (
           <>
             <Column>
@@ -469,7 +519,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {allTiles}
+          {allStandAloneTiles}
         </GridList>
       </ScrollView>
     );

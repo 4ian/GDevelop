@@ -85,7 +85,7 @@ const ResponseMediaGallery = ({
 }: Props) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const mobileExtremeItemsPadding =
     isSmall && horizontalOuterMarginToEatOnMobile

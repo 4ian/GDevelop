@@ -39,8 +39,10 @@ const useStyles = makeStyles({
 
 const getHelpItemsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
-    case 'small':
+    case 'xsmall':
       return 1;
+    case 'small':
+      return 2;
     case 'medium':
       return 3;
     case 'large':
@@ -54,6 +56,8 @@ const getHelpItemsColumnsFromWidth = (width: WidthType) => {
 
 const getTutorialsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
+    case 'xsmall':
+      return 1;
     case 'small':
       return 2;
     case 'medium':
@@ -104,7 +108,10 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
-  const isSmallOrMedium = windowWidth === 'small' || windowWidth === 'medium';
+  const isSmallOrMedium =
+    windowWidth === 'xsmall' ||
+    windowWidth === 'small' ||
+    windowWidth === 'medium';
   const helpItems: {
     title: React.Node,
     description: React.Node,

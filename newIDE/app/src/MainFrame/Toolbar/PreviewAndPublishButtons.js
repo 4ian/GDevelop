@@ -41,7 +41,7 @@ export default function PreviewAndPublishButtons({
   exportProject,
 }: PreviewAndPublishButtonsProps) {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const previewBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [

@@ -89,7 +89,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     onSelectInstances,
   } = props;
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,

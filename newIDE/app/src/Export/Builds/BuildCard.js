@@ -140,7 +140,7 @@ export const BuildCard = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const nameInput = React.useRef<?TextFieldInterface>(null);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 

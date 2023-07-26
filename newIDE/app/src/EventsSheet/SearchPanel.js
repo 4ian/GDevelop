@@ -62,7 +62,7 @@ const SearchPanel = (
   ref
 ) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const searchTextField = React.useRef<?TextFieldInterface>(null);
   const replaceTextField = React.useRef<?TextFieldInterface>(null);
 

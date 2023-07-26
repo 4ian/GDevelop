@@ -51,7 +51,7 @@ export default function InlinePopover(props: Props) {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <ClickAwayListener

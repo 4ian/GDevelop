@@ -39,7 +39,7 @@ export const NewResourceDialog = ({
   onChooseResources,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const storageProvider = React.useMemo(() => getStorageProvider(), [
     getStorageProvider,
   ]);

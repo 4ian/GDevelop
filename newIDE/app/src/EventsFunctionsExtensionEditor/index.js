@@ -1402,7 +1402,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       <React.Fragment>
         <ResponsiveWindowMeasurer>
           {windowWidth =>
-            windowWidth === 'small' ? (
+            windowWidth === 'small' || windowWidth === 'xsmall' ? (
               <EditorNavigator
                 ref={editorNavigator =>
                   (this._editorNavigator = editorNavigator)

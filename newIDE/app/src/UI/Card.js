@@ -38,7 +38,7 @@ const Card = ({
   disabled,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <MUICard

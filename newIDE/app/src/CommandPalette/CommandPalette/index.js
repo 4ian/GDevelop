@@ -55,7 +55,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
     const windowWidth = useResponsiveWindowWidth();
-    const isSmall = windowWidth === 'small';
+    const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
     const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');

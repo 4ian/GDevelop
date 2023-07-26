@@ -115,7 +115,10 @@ export const HomePageMenu = ({
   onOpenAbout,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmallOrMedium = windowWidth === 'small' || windowWidth === 'medium';
+  const isSmallOrMedium =
+    windowWidth === 'xsmall' ||
+    windowWidth === 'small' ||
+    windowWidth === 'medium';
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   const [
     isHomePageMenuDrawerOpen,

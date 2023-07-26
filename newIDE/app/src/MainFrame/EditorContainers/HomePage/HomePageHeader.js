@@ -35,7 +35,7 @@ export const HomePageHeader = ({
   canSave,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <I18n>

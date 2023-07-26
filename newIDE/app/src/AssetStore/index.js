@@ -122,7 +122,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
     const windowWidth = useResponsiveWindowWidth();
-    const isSmall = windowWidth === 'small';
+    const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
       !isOnHomePage && !openedAssetShortHeader

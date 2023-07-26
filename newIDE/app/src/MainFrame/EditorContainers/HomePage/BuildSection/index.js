@@ -75,8 +75,10 @@ const styles = {
 
 const getTemplatesGridSizeFromWidth = (width: WidthType) => {
   switch (width) {
-    case 'small':
+    case 'xsmall':
       return 2;
+    case 'small':
+      return 3;
     case 'medium':
       return 4;
     case 'large':
@@ -439,7 +441,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onCloudProjectsChanged,
     } = authenticatedUser;
     const windowWidth = useResponsiveWindowWidth();
-    const isSmall = windowWidth === 'small';
+    const isMobile = windowWidth === 'xsmall';
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
@@ -571,7 +573,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             )}
             <Line>
               <Column noMargin expand>
-                {!isSmall && (
+                {!isMobile && (
                   <LineStackLayout justifyContent="space-between">
                     <Column expand>
                       <Text color="secondary">
@@ -615,7 +617,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         key={file.fileMetadata.fileIdentifier}
                         file={file}
                         storageProviders={storageProviders}
-                        isWindowWidthMediumOrLarger={!isSmall}
+                        isWindowWidthMediumOrLarger={!isMobile}
                         onOpenRecentFile={onOpenRecentFile}
                       />
                     ))

@@ -26,7 +26,7 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 
 const getStyles = ({ windowWidth }) => ({
   formContainer: {
-    width: windowWidth === 'small' ? '95%' : '60%',
+    width: windowWidth === 'xsmall' || windowWidth === 'small' ? '95%' : '60%',
     marginTop: 20,
   },
 });

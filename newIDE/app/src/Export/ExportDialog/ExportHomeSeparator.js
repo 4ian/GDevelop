@@ -6,7 +6,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const ExportHomeSeparator = () => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const theme = React.useContext(GDevelopThemeContext);
   return (
     !isSmall && (

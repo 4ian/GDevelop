@@ -22,7 +22,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 
 const getStyles = ({ windowWidth }) => ({
   formContainer: {
-    width: windowWidth === 'small' ? '95%' : '70%',
+    width: windowWidth === 'xsmall' || windowWidth === 'small' ? '95%' : '70%',
     marginTop: 20,
   },
 });

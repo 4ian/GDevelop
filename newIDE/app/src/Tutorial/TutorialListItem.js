@@ -47,7 +47,7 @@ const TutorialListItem = ({ tutorial }: Props) => {
   const isImageLoadingRef = React.useRef(true);
 
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <ListItem

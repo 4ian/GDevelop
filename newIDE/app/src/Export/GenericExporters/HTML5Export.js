@@ -15,11 +15,14 @@ import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
-const getIconStyle = windowWidth => ({
-  height: windowWidth === 'small' ? 30 : 48,
-  width: windowWidth === 'small' ? 30 : 48,
-  margin: 10,
-});
+const getIconStyle = windowWidth => {
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  return {
+    height: isSmall ? 30 : 48,
+    width: isSmall ? 30 : 48,
+    margin: 10,
+  };
+};
 
 export const ExplanationHeader = () => {
   const windowWidth = useResponsiveWindowWidth();

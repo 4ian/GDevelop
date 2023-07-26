@@ -4,7 +4,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from './Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
@@ -63,6 +66,20 @@ const dialogActionPadding = 24;
 
 // Mobile.
 const dialogSmallPadding = 8;
+
+const getDefaultMaxWidthFromSize = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return false;
+    case 'medium':
+    case 'large':
+      return 'md';
+    case 'xlarge':
+      return 'lg';
+    default:
+      return 'md';
+  }
+};
 
 const styles = {
   dialogContainer: {
@@ -225,7 +242,7 @@ const Dialog = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
@@ -333,7 +350,11 @@ const Dialog = ({
           ...(fullHeight ? styles.fullHeightModal : {}),
         },
       }}
-      maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
+      maxWidth={
+        maxWidth !== undefined
+          ? maxWidth
+          : getDefaultMaxWidthFromSize(windowWidth)
+      }
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >

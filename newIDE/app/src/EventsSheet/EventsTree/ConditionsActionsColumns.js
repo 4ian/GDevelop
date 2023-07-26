@@ -31,7 +31,9 @@ const styles = {
  * and stacked on a small one.
  */
 const ConditionsActionsColumns = (props: Props) => {
-  if (props.windowWidth === 'small') {
+  const isSmall =
+    props.windowWidth === 'small' || props.windowWidth === 'xsmall';
+  if (isSmall) {
     return (
       <div style={styles.oneColumnContainer} className={props.className}>
         {props.renderConditionsList({

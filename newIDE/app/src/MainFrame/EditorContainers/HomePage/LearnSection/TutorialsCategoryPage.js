@@ -12,8 +12,10 @@ import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasure
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
-    case 'small':
+    case 'xsmall':
       return 1;
+    case 'small':
+      return 2;
     case 'medium':
       return 3;
     case 'large':

@@ -45,7 +45,7 @@ const LoginDialog = ({
   error,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [

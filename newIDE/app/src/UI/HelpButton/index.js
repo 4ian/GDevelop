@@ -19,7 +19,7 @@ type PropsType = {
  */
 const HelpButton = (props: PropsType) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   if (!props.helpPagePath) return null;
   const helpLink = getHelpLink(props.helpPagePath, props.anchor);
   if (!helpLink) return null;

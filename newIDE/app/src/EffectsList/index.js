@@ -624,7 +624,7 @@ export default function EffectsList(props: Props) {
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const getDuplicatedUniqueEffectMetadata = React.useCallback(
     () => {

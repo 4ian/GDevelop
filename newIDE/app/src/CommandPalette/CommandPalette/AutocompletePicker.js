@@ -91,7 +91,7 @@ type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
 export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -129,6 +129,8 @@ const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMedium = windowWidth === 'medium';
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
@@ -145,7 +147,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
-      if (windowWidth === 'small' || windowWidth === 'medium') return null;
+      if (isSmall || isMedium) return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -158,7 +160,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap, windowWidth]
+    [shortcutMap, isSmall, isMedium]
   );
 
   const getItemText = React.useCallback(
@@ -192,7 +194,7 @@ const AutocompletePicker = (
           ContainerComponent="div"
           classes={{
             container: classes.listItemContainer,
-            root: windowWidth === 'small' ? classes.rootSmallPadding : null,
+            root: isSmall ? classes.rootSmallPadding : null,
           }}
         >
           <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
@@ -204,7 +206,7 @@ const AutocompletePicker = (
     [
       classes.listItemContainer,
       classes.rootSmallPadding,
-      windowWidth,
+      isSmall,
       getItemText,
       getItemHint,
       getItemIcon,

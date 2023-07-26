@@ -35,7 +35,7 @@ export const ResponsivePaperOrDrawer = ({
   children: React.Node,
 |}) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   if (!isSmall) {
     if (!open) return null;
     return (

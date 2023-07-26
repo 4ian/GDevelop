@@ -32,9 +32,21 @@ import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopServices/InAppTutorial';
 
-const getColumnsFromWidth = (width: WidthType) => (width === 'small' ? 1 : 3);
+const getColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'xsmall':
+      return 1;
+    case 'small':
+      return 2;
+    case 'medium':
+    case 'large':
+    case 'xlarge':
+    default:
+      return 3;
+  }
+};
 
-const MAX_COLUMNS = getColumnsFromWidth('large');
+const MAX_COLUMNS = getColumnsFromWidth('xlarge');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -93,7 +105,7 @@ const GetStartedSection = ({
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isMobile = windowWidth === 'xsmall';
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
@@ -379,7 +391,7 @@ const GetStartedSection = ({
                   <div
                     style={{
                       ...styles.cardTextContainer,
-                      padding: isSmall ? 10 : 20,
+                      padding: isMobile ? 10 : 20,
                     }}
                   >
                     <ColumnStackLayout

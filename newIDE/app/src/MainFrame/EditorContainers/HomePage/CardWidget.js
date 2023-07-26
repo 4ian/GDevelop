@@ -64,7 +64,7 @@ export const CardWidget = ({
 }: Props) => {
   const classes = useStylesForWidget(useDefaultDisabledStyle);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const widgetMaxWidth =
     size === 'banner'

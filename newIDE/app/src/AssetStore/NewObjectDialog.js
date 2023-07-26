@@ -114,7 +114,7 @@ export default function NewObjectDialog({
   canInstallPrivateAsset,
 }: Props) {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,

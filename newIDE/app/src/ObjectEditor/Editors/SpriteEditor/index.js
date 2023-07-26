@@ -110,7 +110,7 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;

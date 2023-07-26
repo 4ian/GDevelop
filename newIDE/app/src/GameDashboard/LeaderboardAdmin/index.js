@@ -210,7 +210,7 @@ export const LeaderboardAdmin = ({
 }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );

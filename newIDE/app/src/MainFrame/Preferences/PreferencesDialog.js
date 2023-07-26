@@ -36,7 +36,7 @@ type Props = {|
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false

@@ -122,7 +122,7 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
+  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const isAlreadyReceived =
     !!receivedAssetPacks &&

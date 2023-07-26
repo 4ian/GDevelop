@@ -114,6 +114,7 @@ export default function NewObjectDialog({
   canInstallPrivateAsset,
 }: Props) {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,
@@ -433,7 +434,7 @@ export default function NewObjectDialog({
                   },
                 ]}
                 // Enforce scroll on small screen, because the tabs have long names.
-                variant={windowWidth === 'small' ? 'scrollable' : undefined}
+                variant={isSmall ? 'scrollable' : undefined}
               />
             }
           >

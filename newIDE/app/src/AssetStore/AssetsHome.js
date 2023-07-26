@@ -15,19 +15,46 @@ import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 
-const columns = 3;
-const columnsForSmallWindow = 1;
-const columnsForMediumWindow = 2;
-const categoryColumns = 4;
-const categoryColumnsForSmallWindow = 2;
-const categoryColumnsForMediumWindow = 3;
 const cellSpacing = 2;
+
+const getCategoryColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    case 'xlarge':
+      return 6;
+    default:
+      return 3;
+  }
+};
+
+const getAssetPacksColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 2;
+    case 'large':
+      return 3;
+    case 'xlarge':
+      return 5;
+    default:
+      return 2;
+  }
+};
 
 export const assetCategories = {
   'full-game-pack': {
@@ -416,13 +443,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={
-                windowWidth === 'small'
-                  ? categoryColumnsForSmallWindow
-                  : windowWidth === 'medium'
-                  ? categoryColumnsForMediumWindow
-                  : categoryColumns
-              }
+              cols={getCategoryColumns(windowWidth)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -443,13 +464,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </Line>
         </Column>
         <GridList
-          cols={
-            windowWidth === 'small'
-              ? columnsForSmallWindow
-              : windowWidth === 'medium'
-              ? columnsForMediumWindow
-              : columns
-          }
+          cols={getAssetPacksColumns(windowWidth)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

@@ -85,10 +85,10 @@ const ResponseMediaGallery = ({
 }: Props) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const isSmall = windowWidth === 'small';
 
   const mobileExtremeItemsPadding =
-    isMobile && horizontalOuterMarginToEatOnMobile
+    isSmall && horizontalOuterMarginToEatOnMobile
       ? 2 * horizontalOuterMarginToEatOnMobile
       : 0;
 
@@ -105,7 +105,7 @@ const ResponseMediaGallery = ({
             paddingRight: mobileExtremeItemsPadding,
           },
         },
-        root: isMobile
+        root: isSmall
           ? {
               scrollbarHeight: 'none' /* For Firefox */,
               '-ms-overflow-style': 'none' /* For Internet Explorer and Edge */,
@@ -115,7 +115,7 @@ const ResponseMediaGallery = ({
             }
           : undefined,
       }),
-    [mobileExtremeItemsPadding, isMobile]
+    [mobileExtremeItemsPadding, isSmall]
   )();
 
   const [
@@ -144,7 +144,7 @@ const ResponseMediaGallery = ({
 
   const selectedMedia = mediaItems[selectedMediaIndex];
 
-  if (isMobile) {
+  if (isSmall) {
     return (
       <div
         style={{

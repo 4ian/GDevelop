@@ -25,10 +25,11 @@ type Props = {|
 
 export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
-  const height = windowWidth === 'small' ? undefined : ICON_DESKTOP_HEIGHT;
-  const width = windowWidth === 'small' ? '100%' : undefined;
+  const height = isSmall ? undefined : ICON_DESKTOP_HEIGHT;
+  const width = isSmall ? '100%' : undefined;
 
   return (
     <div style={styles.iconBackground}>

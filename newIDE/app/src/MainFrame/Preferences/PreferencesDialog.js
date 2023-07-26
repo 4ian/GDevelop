@@ -36,6 +36,7 @@ type Props = {|
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false
@@ -98,7 +99,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               : []),
           ]}
           // Enforce scroll on small screen, because the tabs have long names.
-          variant={windowWidth === 'small' ? 'scrollable' : undefined}
+          variant={isSmall ? 'scrollable' : undefined}
         />
       }
     >

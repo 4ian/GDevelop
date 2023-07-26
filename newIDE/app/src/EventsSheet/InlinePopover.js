@@ -51,6 +51,7 @@ export default function InlinePopover(props: Props) {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   return (
     <ClickAwayListener
@@ -101,9 +102,9 @@ export default function InlinePopover(props: Props) {
           ...styles.popover,
           // On mobile, make it take full screen width, but not too much for large mobile phones.
           // On desktop, make it take a min width, to ensure most fields with translations are well displayed.
-          width: windowWidth === 'small' ? '100%' : 'auto',
-          minWidth: windowWidth === 'small' ? 'auto' : 320,
-          maxWidth: windowWidth === 'small' ? 320 : 600,
+          width: isSmall ? '100%' : 'auto',
+          minWidth: isSmall ? 'auto' : 320,
+          maxWidth: isSmall ? 320 : 600,
         }}
         placement="bottom-start"
         onKeyDown={event => {

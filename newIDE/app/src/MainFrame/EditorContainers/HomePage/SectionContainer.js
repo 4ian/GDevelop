@@ -58,6 +58,7 @@ const SectionContainer = ({
   renderFooter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   return (
     <Column useFullHeight noMargin expand>
@@ -65,7 +66,7 @@ const SectionContainer = ({
         style={{
           ...styles.scrollContainer,
           display: flexBody ? 'flex' : 'block',
-          ...(windowWidth === 'small'
+          ...(isSmall
             ? styles.mobileScrollContainer
             : styles.desktopScrollContainer),
         }}
@@ -102,9 +103,7 @@ const SectionContainer = ({
       </Paper>
       {renderFooter && (
         <Paper
-          style={
-            windowWidth === 'small' ? styles.mobileFooter : styles.desktopFooter
-          }
+          style={isSmall ? styles.mobileFooter : styles.desktopFooter}
           square
           background="dark"
         >

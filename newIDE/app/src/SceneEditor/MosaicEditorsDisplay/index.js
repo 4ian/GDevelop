@@ -89,6 +89,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     onSelectInstances,
   } = props;
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
@@ -408,7 +409,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   return (
     <EditorMosaic
       editors={editors}
-      limitToOneSecondaryEditor={windowWidth === 'small'}
+      limitToOneSecondaryEditor={isSmall}
       initialNodes={
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }

@@ -93,6 +93,7 @@ const GetStartedSection = ({
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );
@@ -378,7 +379,7 @@ const GetStartedSection = ({
                   <div
                     style={{
                       ...styles.cardTextContainer,
-                      padding: windowWidth === 'small' ? 10 : 20,
+                      padding: isSmall ? 10 : 20,
                     }}
                   >
                     <ColumnStackLayout

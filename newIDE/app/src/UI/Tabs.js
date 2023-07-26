@@ -86,7 +86,8 @@ export function Tabs<TabName>({
   const shouldScroll =
     (windowWidth === 'small' && options.length >= 3) ||
     (windowWidth === 'medium' && options.length >= 5) ||
-    (windowWidth === 'large' && options.length >= 7);
+    (windowWidth === 'large' && options.length >= 7) ||
+    (windowWidth === 'xlarge' && options.length >= 8);
   const automaticScreenVariant = shouldScroll ? 'scrollable' : 'fullWidth';
   return (
     <MUITabs

@@ -18,6 +18,7 @@ export default function HotReloadPreviewButton({
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>
@@ -25,7 +26,7 @@ export default function HotReloadPreviewButton({
     <Trans>Run a preview</Trans>
   );
 
-  return windowWidth !== 'small' ? (
+  return !isSmall ? (
     <FlatButton
       leftIcon={icon}
       label={label}

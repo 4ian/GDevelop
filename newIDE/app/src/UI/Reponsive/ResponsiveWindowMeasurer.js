@@ -3,7 +3,7 @@ import * as React from 'react';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import useOnResize from '../../Utils/UseOnResize';
 
-export type WidthType = 'small' | 'medium' | 'large';
+export type WidthType = 'small' | 'medium' | 'large' | 'xlarge';
 
 type Props = {|
   children: (width: WidthType) => React.Node,
@@ -31,5 +31,7 @@ export const useResponsiveWindowWidth = (): WidthType => {
     ? 'small'
     : window.innerWidth < 1150
     ? 'medium'
-    : 'large';
+    : window.innerWidth < 1500
+    ? 'large'
+    : 'xlarge';
 };

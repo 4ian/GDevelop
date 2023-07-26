@@ -115,6 +115,7 @@ export const HomePageMenu = ({
   onOpenAbout,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmallOrMedium = windowWidth === 'small' || windowWidth === 'medium';
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   const [
     isHomePageMenuDrawerOpen,
@@ -145,14 +146,14 @@ export const HomePageMenu = ({
     <>
       <Paper
         style={{
-          ...(windowWidth === 'large' ? styles.desktopMenu : styles.mobileMenu),
+          ...(!isSmallOrMedium ? styles.desktopMenu : styles.mobileMenu),
           borderRight: `1px solid ${GDevelopTheme.home.separator.color}`,
         }}
         square
         background="dark"
       >
         <Column expand>
-          {windowWidth !== 'large' && (
+          {isSmallOrMedium && (
             <IconButton
               onClick={() => setIsHomePageMenuDrawerOpen(true)}
               size="small"
@@ -167,7 +168,7 @@ export const HomePageMenu = ({
               onClick={() => setActiveTab(tab)}
               getIcon={getIcon}
               isActive={activeTab === tab}
-              hideLabel={windowWidth !== 'large'}
+              hideLabel={isSmallOrMedium}
               id={id}
             />
           ))}
@@ -182,7 +183,7 @@ export const HomePageMenu = ({
                 onClick={onClick}
                 getIcon={getIcon}
                 isActive={false}
-                hideLabel={windowWidth !== 'large'}
+                hideLabel={isSmallOrMedium}
                 id={id}
               />
             ))}

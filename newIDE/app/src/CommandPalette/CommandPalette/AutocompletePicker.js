@@ -91,6 +91,7 @@ type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
 export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -108,7 +109,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
       ContainerComponent="div"
       classes={{
         container: classes.listItemContainer,
-        root: windowWidth === 'small' ? classes.rootSmallPadding : null,
+        root: isSmall ? classes.rootSmallPadding : null,
       }}
     >
       <ListItemIcon>

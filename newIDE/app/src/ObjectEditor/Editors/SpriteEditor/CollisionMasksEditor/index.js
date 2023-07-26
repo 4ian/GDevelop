@@ -314,9 +314,9 @@ const CollisionMasksEditor = ({
   );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const screenSize = useResponsiveWindowWidth();
-  const editorNodes =
-    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+  const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
+  const editorNodes = isSmall ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';

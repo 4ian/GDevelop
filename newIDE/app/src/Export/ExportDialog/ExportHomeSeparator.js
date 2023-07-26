@@ -6,9 +6,10 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const ExportHomeSeparator = () => {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const theme = React.useContext(GDevelopThemeContext);
   return (
-    windowWidth !== 'small' && (
+    !isSmall && (
       <Column justifyContent="center" noMargin>
         <span
           style={{

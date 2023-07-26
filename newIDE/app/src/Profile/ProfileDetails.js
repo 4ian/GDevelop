@@ -106,6 +106,7 @@ const ProfileDetails = ({
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   if (error)
     return (
@@ -281,7 +282,7 @@ const ProfileDetails = ({
                   </Line>
                   <Line expand noMargin justifyContent="start">
                     <GridList
-                      cols={windowWidth === 'small' ? 1 : 3}
+                      cols={isSmall ? 1 : 3}
                       cellHeight="auto"
                       spacing={2}
                     >

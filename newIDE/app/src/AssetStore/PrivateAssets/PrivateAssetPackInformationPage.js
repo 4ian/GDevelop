@@ -27,7 +27,10 @@ import Link from '../../UI/Link';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import Cross from '../../UI/CustomSvgIcons/Cross';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
@@ -42,10 +45,22 @@ import {
 import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
-const sameCreatorPackCountForSmallWindow = 2;
-const sameCreatorPackCountForMediumWindow = 3;
-const sameCreatorPackCount = 4;
 const cellSpacing = 2;
+
+const getSameCreatorPackColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    case 'xlarge':
+      return 5;
+    default:
+      return 3;
+  }
+};
 
 const sortedContentType = [
   'sprite',
@@ -107,6 +122,7 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   const isAlreadyReceived =
     !!receivedAssetPacks &&
@@ -282,7 +298,7 @@ const PrivateAssetPackInformationPage = ({
                     )}
                     <Paper
                       variant="outlined"
-                      style={{ padding: windowWidth === 'small' ? 20 : 30 }}
+                      style={{ padding: isSmall ? 20 : 30 }}
                       background="medium"
                     >
                       <Column noMargin>
@@ -394,13 +410,7 @@ const PrivateAssetPackInformationPage = ({
                     </Line>
                     <Line>
                       <GridList
-                        cols={
-                          windowWidth === 'small'
-                            ? sameCreatorPackCountForSmallWindow
-                            : windowWidth === 'medium'
-                            ? sameCreatorPackCountForMediumWindow
-                            : sameCreatorPackCount
-                        }
+                        cols={getSameCreatorPackColumns(windowWidth)}
                         cellHeight="auto"
                         spacing={cellSpacing}
                       >

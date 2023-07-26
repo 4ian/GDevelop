@@ -41,6 +41,7 @@ export default function PreviewAndPublishButtons({
   exportProject,
 }: PreviewAndPublishButtonsProps) {
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   const previewBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
@@ -127,7 +128,7 @@ export default function PreviewAndPublishButtons({
         disabled={!isPreviewEnabled}
         icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
         label={
-          windowWidth !== 'small' ? (
+          !isSmall ? (
             hasPreviewsRunning ? (
               <Trans>Update</Trans>
             ) : (
@@ -142,7 +143,7 @@ export default function PreviewAndPublishButtons({
         primary
         onClick={exportProject}
         icon={<PublishIcon />}
-        label={windowWidth !== 'small' ? <Trans>Publish</Trans> : null}
+        label={!isSmall ? <Trans>Publish</Trans> : null}
         id={'toolbar-publish-button'}
       />
     </LineStackLayout>

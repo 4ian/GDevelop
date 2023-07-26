@@ -110,6 +110,7 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;
@@ -585,7 +586,7 @@ export default function SpriteEditor({
               justifyContent="space-between"
               noColumnMargin
             >
-              {windowWidth !== 'small' ? (
+              {!isSmall ? (
                 <ResponsiveLineStackLayout noMargin noColumnMargin>
                   <FlatButton
                     label={<Trans>Edit collision masks</Trans>}

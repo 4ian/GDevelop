@@ -47,6 +47,7 @@ const TutorialListItem = ({ tutorial }: Props) => {
   const isImageLoadingRef = React.useRef(true);
 
   const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
 
   return (
     <ListItem
@@ -62,7 +63,7 @@ const TutorialListItem = ({ tutorial }: Props) => {
         <ResponsiveLineStackLayout noMargin>
           <CorsAwareImage
             style={
-              windowWidth === 'small'
+              isSmall
                 ? styles.smallScreenThumbnailImage
                 : styles.thumbnailImageWithDescription
             }

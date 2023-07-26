@@ -80,8 +80,11 @@ const getTemplatesGridSizeFromWidth = (width: WidthType) => {
     case 'medium':
       return 4;
     case 'large':
-    default:
       return 6;
+    case 'xlarge':
+      return 7;
+    default:
+      return 4;
   }
 };
 
@@ -436,6 +439,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onCloudProjectsChanged,
     } = authenticatedUser;
     const windowWidth = useResponsiveWindowWidth();
+    const isSmall = windowWidth === 'small';
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({
@@ -475,7 +479,6 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
     });
 
-    const isWindowWidthMediumOrLarger = windowWidth !== 'small';
     const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
     return (
@@ -568,7 +571,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
             )}
             <Line>
               <Column noMargin expand>
-                {isWindowWidthMediumOrLarger && (
+                {!isSmall && (
                   <LineStackLayout justifyContent="space-between">
                     <Column expand>
                       <Text color="secondary">
@@ -612,9 +615,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                         key={file.fileMetadata.fileIdentifier}
                         file={file}
                         storageProviders={storageProviders}
-                        isWindowWidthMediumOrLarger={
-                          isWindowWidthMediumOrLarger
-                        }
+                        isWindowWidthMediumOrLarger={!isSmall}
                         onOpenRecentFile={onOpenRecentFile}
                       />
                     ))

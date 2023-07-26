@@ -137,6 +137,7 @@ const TooltipBody = ({
   goToNextStep,
 }: TooltipBodyProps) => {
   const screenWidth = useResponsiveWindowWidth();
+  const isSmall = screenWidth === 'small';
   const titleAndDescription = (
     <Column noMargin>
       {tooltip.title && (
@@ -159,8 +160,8 @@ const TooltipBody = ({
       style={{
         ...styles.descriptionImage,
         width: tooltip.image.width || '100%',
-        maxWidth: screenWidth === 'small' ? 150 : '100%',
-        maxHeight: screenWidth === 'small' ? 150 : '100%',
+        maxWidth: isSmall ? 150 : '100%',
+        maxHeight: isSmall ? 150 : '100%',
       }}
     />
   );
@@ -170,18 +171,17 @@ const TooltipBody = ({
       <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
     </Column>
   );
-  const imageAndButton =
-    screenWidth === 'small' ? (
-      <LineStackLayout noMargin alignItems="center">
-        {image}
-        {button}
-      </LineStackLayout>
-    ) : (
-      <Column noMargin alignItems="center">
-        {image}
-        {button}
-      </Column>
-    );
+  const imageAndButton = isSmall ? (
+    <LineStackLayout noMargin alignItems="center">
+      {image}
+      {button}
+    </LineStackLayout>
+  ) : (
+    <Column noMargin alignItems="center">
+      {image}
+      {button}
+    </Column>
+  );
 
   return (
     <Column noMargin>
@@ -300,6 +300,7 @@ const InAppTutorialTooltipDisplayer = ({
   goToNextStep,
 }: Props) => {
   const screenWidth = useResponsiveWindowWidth();
+  const isSmall = screenWidth === 'small';
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -328,7 +329,7 @@ const InAppTutorialTooltipDisplayer = ({
   const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
   const placement =
-    screenWidth === 'small' && tooltip.mobilePlacement
+    isSmall && tooltip.mobilePlacement
       ? tooltip.mobilePlacement
       : tooltip.placement || 'bottom';
   const backgroundColor =
@@ -361,7 +362,7 @@ const InAppTutorialTooltipDisplayer = ({
         style={{
           zIndex: getDisplayZIndexForHighlighter(anchorElement),
           maxWidth: 'min(90%, 300px)',
-          width: screenWidth === 'small' ? '100%' : undefined,
+          width: isSmall ? '100%' : undefined,
         }}
       >
         {({ TransitionProps }) => (

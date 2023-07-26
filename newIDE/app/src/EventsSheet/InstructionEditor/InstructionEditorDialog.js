@@ -140,7 +140,7 @@ export default function InstructionEditorDialog({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
-  const windowWidth = useResponsiveWindowWidth();
+  const windowWidth: WidthType = useResponsiveWindowWidth();
   const instructionType: string = instruction.getType();
   const [
     newBehaviorDialogOpen,
@@ -316,7 +316,8 @@ export default function InstructionEditorDialog({
           />,
         ]}
         secondaryActions={[
-          windowWidth !== 'large' && step !== 'object-or-free-instructions' ? (
+          (windowWidth === 'small' || windowWidth === 'medium') &&
+          step !== 'object-or-free-instructions' ? (
             <FlatButton
               label={<Trans>Back</Trans>}
               primary={false}
@@ -357,7 +358,7 @@ export default function InstructionEditorDialog({
             parameters: renderParameters,
           }}
           getColumns={() => {
-            if (windowWidth === 'large') {
+            if (windowWidth === 'large' || windowWidth === 'xlarge') {
               return [
                 {
                   columnName: 'instruction-or-object-selector',

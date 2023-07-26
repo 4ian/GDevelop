@@ -224,11 +224,12 @@ const Dialog = ({
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
-  const size = useResponsiveWindowWidth();
+  const windowWidth = useResponsiveWindowWidth();
+  const isSmall = windowWidth === 'small';
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
-  const isFullScreen = size === 'small' && !noMobileFullScreen;
+  const isFullScreen = isSmall && !noMobileFullScreen;
 
   const classesForDangerousDialog = useDangerousStylesForDialog();
   const classesForDialogContent = useStylesForDialogContent();

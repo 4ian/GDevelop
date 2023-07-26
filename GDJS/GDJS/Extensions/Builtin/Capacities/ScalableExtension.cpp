@@ -13,37 +13,40 @@ namespace gdjs {
 ScalableExtension::ScalableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsScalableExtension(*this);
 
-  auto& actions = GetAllActionsForBehavior("ScalableBehavior");
-  auto& conditions = GetAllConditionsForBehavior("ScalableBehavior");
-  auto& expressions = GetAllExpressionsForBehavior("ScalableBehavior");
+  auto& actions = GetAllActionsForBehavior("ScalableCapability::ScalableBehavior");
+  auto& conditions = GetAllConditionsForBehavior("ScalableCapability::ScalableBehavior");
+  auto& expressions = GetAllExpressionsForBehavior("ScalableCapability::ScalableBehavior");
 
-  actions["SetValue"]
+  actions["ScalableCapability::ScalableBehavior::SetValue"]
       .SetFunctionName("setScale")
+      .SetGetter("getScale")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  conditions["Value"]
+  conditions["ScalableCapability::ScalableBehavior::Value"]
       .SetFunctionName("getScale")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  expressions["Value"]
+  expressions["ScalableCapability::ScalableBehavior::Value"]
       .SetFunctionName("getScale")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 
-  actions["SetX"]
+  actions["ScalableCapability::ScalableBehavior::SetX"]
       .SetFunctionName("setScaleX")
+      .SetGetter("getScaleX")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  conditions["X"]
+  conditions["ScalableCapability::ScalableBehavior::X"]
       .SetFunctionName("getScaleX")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  expressions["X"]
+  expressions["ScalableCapability::ScalableBehavior::X"]
       .SetFunctionName("getScaleX")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 
-  actions["SetY"]
+  actions["ScalableCapability::ScalableBehavior::SetY"]
       .SetFunctionName("setScaleY")
+      .SetGetter("getScaleY")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  conditions["Y"]
+  conditions["ScalableCapability::ScalableBehavior::Y"]
       .SetFunctionName("getScaleY")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  expressions["Y"]
+  expressions["ScalableCapability::ScalableBehavior::Y"]
       .SetFunctionName("getScaleY")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 }

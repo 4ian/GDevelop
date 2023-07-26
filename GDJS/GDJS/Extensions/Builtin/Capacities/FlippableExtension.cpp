@@ -13,20 +13,20 @@ namespace gdjs {
 FlippableExtension::FlippableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsFlippableExtension(*this);
 
-  auto& actions = GetAllActionsForBehavior("FlippableBehavior");
-  auto& conditions = GetAllConditionsForBehavior("FlippableBehavior");
+  auto& actions = GetAllActionsForBehavior("FlippableCapability::FlippableBehavior");
+  auto& conditions = GetAllConditionsForBehavior("FlippableCapability::FlippableBehavior");
 
-  actions["FlipX"]
+  actions["FlippableCapability::FlippableBehavior::FlipX"]
       .SetFunctionName("flipX")
       .SetIncludeFile("object-capabilities/FlippableBehavior.js");
-  conditions["FlippedX"]
+  conditions["FlippableCapability::FlippableBehavior::FlippedX"]
       .SetFunctionName("isFlippedX")
       .SetIncludeFile("object-capabilities/FlippableBehavior.js");
 
-  actions["FlipY"]
+  actions["FlippableCapability::FlippableBehavior::FlipY"]
       .SetFunctionName("flipY")
       .SetIncludeFile("object-capabilities/FlippableBehavior.js");
-  conditions["FlippedY"]
+  conditions["FlippableCapability::FlippableBehavior::FlippedY"]
       .SetFunctionName("isFlippedY")
       .SetIncludeFile("object-capabilities/FlippableBehavior.js");
 }

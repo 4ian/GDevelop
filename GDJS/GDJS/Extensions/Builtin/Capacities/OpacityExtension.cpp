@@ -13,17 +13,18 @@ namespace gdjs {
 OpacityExtension::OpacityExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsOpacityExtension(*this);
 
-  auto& actions = GetAllActionsForBehavior("OpacityBehavior");
-  auto& conditions = GetAllConditionsForBehavior("OpacityBehavior");
-  auto& expressions = GetAllExpressionsForBehavior("OpacityBehavior");
+  auto& actions = GetAllActionsForBehavior("OpacityCapability::OpacityBehavior");
+  auto& conditions = GetAllConditionsForBehavior("OpacityCapability::OpacityBehavior");
+  auto& expressions = GetAllExpressionsForBehavior("OpacityCapability::OpacityBehavior");
 
-  actions["SetValue"]
+  actions["OpacityCapability::OpacityBehavior::SetValue"]
       .SetFunctionName("setOpacity")
+      .SetGetter("getOpacity")
       .SetIncludeFile("object-capabilities/OpacityBehavior.js");
-  conditions["Value"]
+  conditions["OpacityCapability::OpacityBehavior::Value"]
       .SetFunctionName("getOpacity")
       .SetIncludeFile("object-capabilities/OpacityBehavior.js");
-  expressions["Value"]
+  expressions["OpacityCapability::OpacityBehavior::Value"]
       .SetFunctionName("getOpacity")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 }

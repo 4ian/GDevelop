@@ -13,24 +13,24 @@ namespace gdjs {
 ResizableExtension::ResizableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsResizableExtension(*this);
 
-  auto& actions = GetAllActionsForBehavior("ResizableBehavior");
-  auto& conditions = GetAllConditionsForBehavior("ResizableBehavior");
+  auto& actions = GetAllActionsForBehavior("ResizableCapability::ResizableBehavior");
+  auto& conditions = GetAllConditionsForBehavior("ResizableCapability::ResizableBehavior");
 
-  actions["SetWidth"]
+  actions["ResizableCapability::ResizableBehavior::SetWidth"]
       .SetFunctionName("setWidth")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
-  conditions["Width"]
+  conditions["ResizableCapability::ResizableBehavior::Width"]
       .SetFunctionName("getWidth")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
 
-  actions["SetHeight"]
+  actions["ResizableCapability::ResizableBehavior::SetHeight"]
       .SetFunctionName("setHeight")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
-  conditions["Height"]
+  conditions["ResizableCapability::ResizableBehavior::Height"]
       .SetFunctionName("getHeight")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
 
-  actions["SetSize"]
+  actions["ResizableCapability::ResizableBehavior::SetSize"]
       .SetFunctionName("setSize")
       .SetIncludeFile("object-capabilities/ResizableBehavior.js");
 }

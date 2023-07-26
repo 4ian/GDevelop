@@ -13,49 +13,52 @@ namespace gdjs {
 AnimatableExtension::AnimatableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAnimatableExtension(*this);
 
-  auto& actions = GetAllActionsForBehavior("AnimatableBehavior");
-  auto& conditions = GetAllConditionsForBehavior("AnimatableBehavior");
-  auto& expressions = GetAllExpressionsForBehavior("AnimatableBehavior");
-  auto& strExpressions = GetAllStrExpressionsForBehavior("AnimatableBehavior");
+  auto& actions = GetAllActionsForBehavior("AnimatableCapability::AnimatableBehavior");
+  auto& conditions = GetAllConditionsForBehavior("AnimatableCapability::AnimatableBehavior");
+  auto& expressions = GetAllExpressionsForBehavior("AnimatableCapability::AnimatableBehavior");
+  auto& strExpressions = GetAllStrExpressionsForBehavior("AnimatableCapability::AnimatableBehavior");
 
-  actions["SetIndex"]
-      .SetFunctionName("setScale")
+  actions["AnimatableCapability::AnimatableBehavior::SetIndex"]
+      .SetFunctionName("setAnimationIndex")
+      .SetGetter("getAnimationIndex")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  conditions["Index"]
-      .SetFunctionName("getScale")
+  conditions["AnimatableCapability::AnimatableBehavior::Index"]
+      .SetFunctionName("getAnimationIndex")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
   expressions["Index"]
-      .SetFunctionName("getScale")
+      .SetFunctionName("getAnimationIndex")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 
-  actions["SetName"]
-      .SetFunctionName("setScale")
+  actions["AnimatableCapability::AnimatableBehavior::SetName"]
+      .SetFunctionName("setAnimationName")
+      .SetGetter("getAnimationName")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  conditions["Name"]
-      .SetFunctionName("getScale")
+  conditions["AnimatableCapability::AnimatableBehavior::Name"]
+      .SetFunctionName("getAnimationName")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
   strExpressions["Name"]
-      .SetFunctionName("getScale")
+      .SetFunctionName("getAnimationName")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 
-  actions["SetAnimationSpeedScale"]
+  actions["AnimatableCapability::AnimatableBehavior::SetAnimationSpeedScale"]
       .SetFunctionName("setAnimationSpeedScale")
+      .SetGetter("getAnimationSpeedScale")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  conditions["AnimationSpeedScale"]
+  conditions["AnimatableCapability::AnimatableBehavior::AnimationSpeedScale"]
       .SetFunctionName("getAnimationSpeedScale")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
   expressions["AnimationSpeedScale"]
       .SetFunctionName("getAnimationSpeedScale")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 
-  actions["PauseAnimation"]
-      .SetFunctionName("setScale")
+  actions["AnimatableCapability::AnimatableBehavior::PauseAnimation"]
+      .SetFunctionName("pauseAnimation")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
   actions["PlayAnimation"]
-      .SetFunctionName("setScale")
+      .SetFunctionName("resumeAnimation")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 
-  conditions["IsAnimationPaused"]
+  conditions["AnimatableCapability::AnimatableBehavior::IsAnimationPaused"]
       .SetFunctionName("isAnimationPaused")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
   conditions["HasAnimationEnded"]

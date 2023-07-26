@@ -13,25 +13,25 @@ namespace gdjs {
 EffectExtension::EffectExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsEffectExtension(*this);
 
-  auto& actions = GetAllActionsForBehavior("EffectBehavior");
-  auto& conditions = GetAllConditionsForBehavior("EffectBehavior");
-  auto& expressions = GetAllExpressionsForBehavior("EffectBehavior");
-  auto& strExpressions = GetAllStrExpressionsForBehavior("EffectBehavior");
+  auto& actions = GetAllActionsForBehavior("EffectCapability::EffectBehavior");
+  auto& conditions = GetAllConditionsForBehavior("EffectCapability::EffectBehavior");
+  auto& expressions = GetAllExpressionsForBehavior("EffectCapability::EffectBehavior");
+  auto& strExpressions = GetAllStrExpressionsForBehavior("EffectCapability::EffectBehavior");
 
-  actions["SetEffectDoubleParameter"]
+  actions["EffectCapability::EffectBehavior::SetEffectDoubleParameter"]
       .SetFunctionName("setEffectDoubleParameter")
       .SetIncludeFile("object-capabilities/EffectBehavior.js");
-  actions["SetEffectStringParameter"]
+  actions["EffectCapability::EffectBehavior::SetEffectStringParameter"]
       .SetFunctionName("setEffectStringParameter")
       .SetIncludeFile("object-capabilities/EffectBehavior.js");
-  actions["SetEffectBooleanParameter"]
+  actions["EffectCapability::EffectBehavior::SetEffectBooleanParameter"]
       .SetFunctionName("setEffectBooleanParameter")
       .SetIncludeFile("object-capabilities/EffectBehavior.js");
 
-  actions["EnableEffect"]
+  actions["EffectCapability::EffectBehavior::EnableEffect"]
       .SetFunctionName("enableEffect")
       .SetIncludeFile("object-capabilities/EffectBehavior.js");
-  conditions["IsEffectEnabled"]
+  conditions["EffectCapability::EffectBehavior::IsEffectEnabled"]
       .SetFunctionName("isEffectEnabled")
       .SetIncludeFile("object-capabilities/EffectBehavior.js");
 }

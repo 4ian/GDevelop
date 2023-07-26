@@ -66,7 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
       .UseStandardParameters(
-          "string", gd::ParameterOptions::MakeNewOptions().SetDescription(
+          "objectAnimationName", gd::ParameterOptions::MakeNewOptions().SetDescription(
                         _("Animation name")))
       .MarkAsSimple();
 

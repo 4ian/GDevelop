@@ -458,10 +458,7 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  const onDeleteEntry = async (
-    i18n: I18nType,
-    entry: LeaderboardEntry
-  ) => {
+  const onDeleteEntry = async (i18n: I18nType, entry: LeaderboardEntry) => {
     if (!currentLeaderboard) return;
     const answer = await showConfirmation({
       title: t`Delete score ${entry.score} from ${entry.playerName}`,

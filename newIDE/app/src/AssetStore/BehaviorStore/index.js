@@ -191,7 +191,7 @@ export const BehaviorStore = ({
                   onRequestSearch={() => {}}
                   tagsHandler={tagsHandler}
                   tags={filters && filters.allTags}
-                  placeholder={t`Search extensions`}
+                  placeholder={t`Search behaviors`}
                   autoFocus="desktop"
                 />
               </Column>
@@ -206,10 +206,10 @@ export const BehaviorStore = ({
                   {
                     label: preferences.values.showCommunityExtensions
                       ? i18n._(
-                          t`Hide community extensions (not officially reviewed)`
+                          t`Hide community behaviors (not officially reviewed)`
                         )
                       : i18n._(
-                          t`Show community extensions (not officially reviewed)`
+                          t`Show community behaviors (not officially reviewed)`
                         ),
                     click: () => {
                       preferences.setShowCommunityExtensions(
@@ -262,7 +262,6 @@ export const BehaviorStore = ({
           )}
         />
       </ColumnStackLayout>
-      )}
     </React.Fragment>
   );
 };

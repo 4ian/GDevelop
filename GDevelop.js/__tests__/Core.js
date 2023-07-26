@@ -124,6 +124,7 @@ describe('libGD.js', function () {
         'AnimatableCapability',
         'EffectCapability',
         'FlippableCapability',
+        'OpacityCapability',
         'ResizableCapability',
         'ScalableCapability',
         'Sprite',

@@ -33,7 +33,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
       _("Change the object opacity."),
       "",
       "res/actions/opacity24.png",
-      "ResizableBehavior",
+      "OpacityBehavior",
       std::make_shared<gd::Behavior>(),
       std::make_shared<gd::BehaviorsSharedData>())
     .SetHidden();

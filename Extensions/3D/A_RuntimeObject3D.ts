@@ -18,7 +18,7 @@ namespace gdjs {
    */
   export abstract class RuntimeObject3D
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable, gdjs.Base3DHandler {
     /**
      * Position on the Z axis.
      */

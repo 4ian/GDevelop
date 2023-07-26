@@ -39,6 +39,190 @@ module.exports = {
       .setIcon('res/conditions/3d_box.svg');
 
     {
+      const base3D = extension.addBehavior(
+          "Base3DBehavior",
+          _("3D capability"),
+          "Object3D",
+          _("Move the object in 3D space."),
+          "",
+          "res/conditions/3d_box.svg",
+          "Base3DBehavior",
+          new gd.Behavior(),
+          new gd.BehaviorsSharedData())
+        .setHidden();
+
+      base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Z',
+          _('Z (elevation)'),
+          _('the Z position (the "elevation")'),
+          _('the Z position'),
+          _('Position'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setZ')
+        .setGetter('getZ');
+
+      base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Depth',
+          _('Depth (size on Z axis)'),
+          _('the depth (size on Z axis)'),
+          _('the depth'),
+          _('Size'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setDepth')
+        .setGetter('getDepth');
+
+        base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'ScaleZ',
+          _('Scale on Z axis'),
+          _("the depth's scale of an object"),
+          _("the depth's scale"),
+          _('Size'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Scale (1 by default)')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setScaleZ')
+        .setGetter('getScaleZ');
+
+        base3D
+        .addScopedAction(
+          'FlipZ',
+          _('Flip the object on Z'),
+          _('Flip the object on Z axis'),
+          _('Flip on Z axis _PARAM0_: _PARAM1_'),
+          _('Effects'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('yesorno', _('Activate flipping'))
+        .markAsSimple()
+        .setFunctionName('flipZ');
+
+        base3D
+        .addScopedCondition(
+          'FlippedZ',
+          _('Flipped on Z'),
+          _('Check if the object is flipped on Z axis'),
+          _('_PARAM0_ is flipped on Z axis'),
+          _('Effects'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .setFunctionName('isFlippedZ');
+
+        base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'RotationX',
+          _('Rotation on X axis'),
+          _('the rotation on X axis'),
+          _('the rotation on X axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRotationX')
+        .setGetter('getRotationX');
+
+        base3D
+        .addExpressionAndConditionAndAction(
+          'number',
+          'RotationY',
+          _('Rotation on Y axis'),
+          _('the rotation on Y axis'),
+          _('the rotation on Y axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setRotationY')
+        .setGetter('getRotationY');
+
+        base3D
+        .addScopedAction(
+          'TurnAroundX',
+          _('Turn around X axis'),
+          _(
+            "Turn the object around X axis. This axis doesn't move with the object rotation."
+          ),
+          _('Turn _PARAM0_ from _PARAM1_° around X axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('number', _('Rotation angle'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundX');
+
+        base3D
+        .addScopedAction(
+          'TurnAroundY',
+          _('Turn around Y axis'),
+          _(
+            "Turn the object around Y axis. This axis doesn't move with the object rotation."
+          ),
+          _('Turn _PARAM0_ from _PARAM1_° around Y axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('number', _('Rotation angle'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundY');
+
+        base3D
+        .addScopedAction(
+          'TurnAroundZ',
+          _('Turn around Z axis'),
+          _(
+            "Turn the object around Z axis. This axis doesn't move with the object rotation."
+          ),
+          _('Turn _PARAM0_ from _PARAM1_° around Z axis'),
+          _('Angle'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'))
+        .addParameter("behavior", _("Behavior"), "Base3DBehavior")
+        .addParameter('number', _('Rotation angle'), '', false)
+        .markAsAdvanced()
+        .setFunctionName('turnAroundZ');
+    }
+
+    {
       const object = extension
         .addObject(
           'Model3DObject',
@@ -53,12 +237,15 @@ module.exports = {
         .addDefaultBehavior('ScalableCapability::ScalableBehavior')
         .addDefaultBehavior('FlippableCapability::FlippableBehavior')
         .addDefaultBehavior('AnimatableCapability::AnimatableBehavior')
+        .addDefaultBehavior('Scene3D::Base3DBehavior')
         .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject3DRenderer.js');
 
       // Properties expressions/conditions/actions:
+
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -71,9 +258,12 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setHidden()
         .setFunctionName('setZ')
         .setGetter('getZ');
 
+      
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -86,6 +276,7 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setHidden()
         .setFunctionName('setDepth')
         .setGetter('getDepth');
 
@@ -257,6 +448,7 @@ module.exports = {
         .setFunctionName('setScaleY')
         .setGetter('getScaleY');
 
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -275,6 +467,7 @@ module.exports = {
           )
         )
         .markAsAdvanced()
+        .setHidden()
         .setFunctionName('setScaleZ')
         .setGetter('getScaleZ');
 
@@ -312,6 +505,7 @@ module.exports = {
         .markAsSimple()
         .setFunctionName('flipY');
 
+      // Deprecated
       object
         .addScopedAction(
           'FlipZ',
@@ -325,6 +519,7 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject')
         .addParameter('yesorno', _('Activate flipping'))
         .markAsSimple()
+        .setHidden()
         .setFunctionName('flipZ');
 
       // Deprecated
@@ -357,6 +552,7 @@ module.exports = {
         .setHidden()
         .setFunctionName('isFlippedY');
 
+      // Deprecated
       object
         .addScopedCondition(
           'FlippedZ',
@@ -368,8 +564,10 @@ module.exports = {
           'res/conditions/3d_box.svg'
         )
         .addParameter('object', _('3D model'), 'Model3DObject')
+        .setHidden()
         .setFunctionName('isFlippedZ');
 
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -382,9 +580,11 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setHidden()
         .setFunctionName('setRotationX')
         .setGetter('getRotationX');
 
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -397,9 +597,11 @@ module.exports = {
         )
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setHidden()
         .setFunctionName('setRotationY')
         .setGetter('getRotationY');
 
+      // Deprecated
       object
         .addScopedAction(
           'TurnAroundX',
@@ -415,8 +617,10 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
+        .setHidden()
         .setFunctionName('turnAroundX');
 
+      // Deprecated
       object
         .addScopedAction(
           'TurnAroundY',
@@ -432,8 +636,10 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
+        .setHidden()
         .setFunctionName('turnAroundY');
 
+      // Deprecated
       object
         .addScopedAction(
           'TurnAroundZ',
@@ -449,8 +655,10 @@ module.exports = {
         .addParameter('object', _('3D model'), 'Model3DObject', false)
         .addParameter('number', _('Rotation angle'), '', false)
         .markAsAdvanced()
+        .setHidden()
         .setFunctionName('turnAroundZ');
 
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -470,6 +678,7 @@ module.exports = {
         .setFunctionName('setAnimationIndex')
         .setGetter('getAnimationIndex');
 
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'string',
@@ -492,6 +701,7 @@ module.exports = {
         .setFunctionName('setAnimationName')
         .setGetter('getAnimationName');
 
+      // Deprecated
       object
         .addAction(
           'PauseAnimation',
@@ -507,6 +717,7 @@ module.exports = {
         .setHidden()
         .setFunctionName('pauseAnimation');
 
+      // Deprecated
       object
         .addAction(
           'ResumeAnimation',
@@ -522,6 +733,7 @@ module.exports = {
         .setHidden()
         .setFunctionName('resumeAnimation');
 
+      // Deprecated
       object
         .addExpressionAndConditionAndAction(
           'number',
@@ -544,6 +756,7 @@ module.exports = {
         .setFunctionName('setAnimationSpeedScale')
         .setGetter('getAnimationSpeedScale');
 
+      // Deprecated
       object
         .addCondition(
           'IsAnimationPaused',
@@ -559,6 +772,7 @@ module.exports = {
         .setHidden()
         .setFunctionName('isAnimationPaused');
 
+      // Deprecated
       object
         .addCondition(
           'HasAnimationEnded',
@@ -903,12 +1117,15 @@ module.exports = {
       .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior')
       .addDefaultBehavior('FlippableCapability::FlippableBehavior')
+      .addDefaultBehavior('Scene3D::Base3DBehavior')
       .setIncludeFile('Extensions/3D/A_RuntimeObject3D.js')
       .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
       .addIncludeFile('Extensions/3D/Cube3DRuntimeObject.js')
       .addIncludeFile('Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js');
 
     // Properties expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -921,9 +1138,11 @@ module.exports = {
       )
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setHidden()
       .setFunctionName('setZ')
       .setGetter('getZ');
 
+      // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -936,6 +1155,7 @@ module.exports = {
       )
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+      .setHidden()
       .setFunctionName('setDepth')
       .setGetter('getDepth');
 
@@ -1090,6 +1310,7 @@ module.exports = {
       .setFunctionName('setScaleY')
       .setGetter('getScaleY');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -1108,6 +1329,7 @@ module.exports = {
         )
       )
       .markAsAdvanced()
+      .setHidden()
       .setFunctionName('setScaleZ')
       .setGetter('getScaleZ');
 
@@ -1145,6 +1367,7 @@ module.exports = {
       .setHidden()
       .setFunctionName('flipY');
 
+    // Deprecated
     object
       .addScopedAction(
         'FlipZ',
@@ -1158,6 +1381,7 @@ module.exports = {
       .addParameter('object', _('3D cube'), 'Cube3DObject')
       .addParameter('yesorno', _('Activate flipping'))
       .markAsSimple()
+      .setHidden()
       .setFunctionName('flipZ');
 
     // Deprecated
@@ -1190,6 +1414,7 @@ module.exports = {
       .setHidden()
       .setFunctionName('isFlippedY');
 
+    // Deprecated
     object
       .addScopedCondition(
         'FlippedZ',
@@ -1201,8 +1426,10 @@ module.exports = {
         'res/conditions/3d_box.svg'
       )
       .addParameter('object', _('3D cube'), 'Cube3DObject')
+      .setHidden()
       .setFunctionName('isFlippedZ');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -1216,8 +1443,10 @@ module.exports = {
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setRotationX')
+      .setHidden()
       .setGetter('getRotationX');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -1231,6 +1460,7 @@ module.exports = {
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setRotationY')
+      .setHidden()
       .setGetter('getRotationY');
 
     object
@@ -1257,6 +1487,7 @@ module.exports = {
       .setFunctionName('setFaceVisibility')
       .setGetter('isFaceVisible');
 
+    // Deprecated
     object
       .addScopedAction(
         'TurnAroundX',
@@ -1272,8 +1503,10 @@ module.exports = {
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('number', _('Rotation angle'), '', false)
       .markAsAdvanced()
+      .setHidden()
       .setFunctionName('turnAroundX');
 
+    // Deprecated
     object
       .addScopedAction(
         'TurnAroundY',
@@ -1289,8 +1522,10 @@ module.exports = {
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('number', _('Rotation angle'), '', false)
       .markAsAdvanced()
+      .setHidden()
       .setFunctionName('turnAroundY');
 
+    // Deprecated
     object
       .addScopedAction(
         'TurnAroundZ',
@@ -1306,6 +1541,7 @@ module.exports = {
       .addParameter('object', _('3D cube'), 'Cube3DObject', false)
       .addParameter('number', _('Rotation angle'), '', false)
       .markAsAdvanced()
+      .setHidden()
       .setFunctionName('turnAroundZ');
 
     object

@@ -86,7 +86,7 @@ namespace gdjs {
     getScaleZ(): float;
 
     flipZ(enable: boolean): void;
-    
+
     isFlippedZ(): boolean;
   }
 
@@ -229,14 +229,11 @@ namespace gdjs {
     flipZ(enable: boolean): void {
       this.object.flipZ(enable);
     }
-    
+
     isFlippedZ(): boolean {
       return this.object.isFlippedZ();
     }
   }
 
-  gdjs.registerBehavior(
-    'Scene3D::Base3DBehavior',
-    gdjs.Base3DBehavior
-  );
+  gdjs.registerBehavior('Scene3D::Base3DBehavior', gdjs.Base3DBehavior);
 }

@@ -899,6 +899,7 @@ const defineCollisionMask = function (
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
 
+  // Deprecated
   object
     .addScopedAction(
       'Scale',
@@ -922,6 +923,7 @@ const defineCollisionMask = function (
       )
     )
     .markAsAdvanced()
+    .setHidden()
     .getCodeExtraInformation()
     .setFunctionName('setScale')
     .setGetter('getScale');

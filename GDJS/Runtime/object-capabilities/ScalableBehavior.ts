@@ -27,9 +27,11 @@ namespace gdjs {
     setScaleY(newScale: number): void;
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     * Get the scale of the object (or the geometric mean of the X and Y scale
+     * in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     * @return the scale of the object (or the geometric mean of the X and
+     * Y scale in case they are different).
      */
     getScale(): number;
 

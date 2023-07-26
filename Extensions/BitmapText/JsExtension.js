@@ -176,7 +176,8 @@ module.exports = {
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
       .setCategoryFullName(_('Text'))
-      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior')
+      .addDefaultBehavior('ScalableCapability::ScalableBehavior');
 
     object
       .addExpressionAndConditionAndAction(
@@ -229,6 +230,7 @@ module.exports = {
       .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontSize');
 
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -246,6 +248,7 @@ module.exports = {
           _('Scale (1 by default)')
         )
       )
+      .setHidden()
       .setFunctionName('setScale')
       .setGetter('getScale');
 

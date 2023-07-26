@@ -1798,7 +1798,7 @@ describe('libGD.js', function () {
       expect(object.getBehavior('Draggable')).toBe(behavior);
     });
 
-    const spriteDefaultBehaviorCount = 5;
+    const spriteDefaultBehaviorCount = 6;
 
     it('can have its behaviors retrieved with gd.getBehaviorsOfObject', function () {
       let behaviors = gd.getBehaviorsOfObject(

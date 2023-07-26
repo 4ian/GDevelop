@@ -23,7 +23,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsOpacityExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Size"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Visibility"))
       .SetIcon("res/actions/opacity24.png");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(

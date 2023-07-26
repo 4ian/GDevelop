@@ -9,13 +9,13 @@ namespace gdjs {
      * Get the index of the animation being played.
      * @return The index of the new animation being played
      */
-    getAnimationIndex(): number;
+    getAnimationIndex(): integer;
 
     /**
      * Change the animation being played.
      * @param animationIndex The index of the new animation to be played
      */
-    setAnimationIndex(animationIndex: number): void;
+    setAnimationIndex(animationIndex: integer): void;
 
     /**
      * Get the name of the animation being played.
@@ -81,11 +81,11 @@ namespace gdjs {
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
-    getAnimationIndex(): number {
+    getAnimationIndex(): integer {
       return this.object.getAnimationIndex();
     }
 
-    setAnimationIndex(animationIndex: number): void {
+    setAnimationIndex(animationIndex: integer): void {
       this.object.setAnimationIndex(animationIndex);
     }
 
@@ -117,11 +117,11 @@ namespace gdjs {
       this.object.resumeAnimation();
     }
 
-    getAnimationSpeedScale(): number {
+    getAnimationSpeedScale(): float {
       return this.object.getAnimationSpeedScale();
     }
 
-    setAnimationSpeedScale(ratio: number): void {
+    setAnimationSpeedScale(ratio: float): void {
       this.object.setAnimationSpeedScale(ratio);
     }
   }

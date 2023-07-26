@@ -78,27 +78,27 @@ namespace gdjs {
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       this.object.setScale(newScale);
     }
 
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       this.object.setScaleX(newScale);
     }
 
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       this.object.setScaleY(newScale);
     }
 
-    getScale(): number {
+    getScale(): float {
       return this.object.getScale();
     }
 
-    getScaleY(): number {
+    getScaleY(): float {
       return this.object.getScaleY();
     }
 
-    getScaleX(): number {
+    getScaleX(): float {
       return this.object.getScaleX();
     }
   }

@@ -15,7 +15,7 @@ namespace gdjs {
      * Get the transparency of the object.
      * @return The opacity, between 0 (transparent) and 255 (opaque).
      */
-    getOpacity(): number;
+    getOpacity(): float;
   }
 
   /**
@@ -48,11 +48,11 @@ namespace gdjs {
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
-    setOpacity(opacity: number): void {
+    setOpacity(opacity: float): void {
       this.object.setOpacity(opacity);
     }
 
-    getOpacity(): number {
+    getOpacity(): float {
       return this.object.getOpacity();
     }
   }

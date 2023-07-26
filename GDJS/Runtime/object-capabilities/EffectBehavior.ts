@@ -89,7 +89,7 @@ namespace gdjs {
     setEffectDoubleParameter(
       name: string,
       parameterName: string,
-      value: number
+      value: float
     ): boolean {
       return this.object.setEffectDoubleParameter(name, parameterName, value);
     }

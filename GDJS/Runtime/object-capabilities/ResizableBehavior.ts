@@ -58,15 +58,15 @@ namespace gdjs {
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
-    setWidth(newWidth: number): void {
+    setWidth(newWidth: float): void {
       this.object.setWidth(newWidth);
     }
 
-    setHeight(newHeight: number): void {
+    setHeight(newHeight: float): void {
       this.object.setHeight(newHeight);
     }
 
-    setSize(newWidth: number, newHeight: number): void {
+    setSize(newWidth: float, newHeight: float): void {
       this.object.setSize(newWidth, newHeight);
     }
   }

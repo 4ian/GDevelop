@@ -103,7 +103,7 @@ const useEditorTabsStateSaving = ({
     ]
   );
 
-  const hasARecordForEditorTabs = React.useCallback(
+  const hasAPreviousSaveForEditorTabsState = React.useCallback(
     (project: gdProject) => {
       const projectId = project.getProjectUuid();
       return !!getEditorStateForProject(projectId);
@@ -111,7 +111,7 @@ const useEditorTabsStateSaving = ({
     [getEditorStateForProject]
   );
 
-  const openEditorsAccordingToPersistedState = React.useCallback(
+  const openEditorTabsFromPersistedState = React.useCallback(
     (project: gdProject) => {
       const projectId = project.getProjectUuid();
       const editorState = getEditorStateForProject(projectId);
@@ -177,8 +177,8 @@ const useEditorTabsStateSaving = ({
   );
 
   return {
-    hasARecordForEditorTabs,
-    openEditorsAccordingToPersistedState,
+    hasAPreviousSaveForEditorTabsState,
+    openEditorTabsFromPersistedState,
   };
 };
 

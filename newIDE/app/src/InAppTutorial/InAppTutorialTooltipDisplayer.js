@@ -136,8 +136,8 @@ const TooltipBody = ({
   buttonLabel,
   goToNextStep,
 }: TooltipBodyProps) => {
-  const screenWidth = useResponsiveWindowWidth();
-  const isSmall = screenWidth === 'small';
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'xsmall';
   const titleAndDescription = (
     <Column noMargin>
       {tooltip.title && (
@@ -160,8 +160,8 @@ const TooltipBody = ({
       style={{
         ...styles.descriptionImage,
         width: tooltip.image.width || '100%',
-        maxWidth: isSmall ? 150 : '100%',
-        maxHeight: isSmall ? 150 : '100%',
+        maxWidth: isMobile ? 150 : '100%',
+        maxHeight: isMobile ? 150 : '100%',
       }}
     />
   );
@@ -171,7 +171,7 @@ const TooltipBody = ({
       <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
     </Column>
   );
-  const imageAndButton = isSmall ? (
+  const imageAndButton = isMobile ? (
     <LineStackLayout noMargin alignItems="center">
       {image}
       {button}
@@ -299,8 +299,8 @@ const InAppTutorialTooltipDisplayer = ({
   endTutorial,
   goToNextStep,
 }: Props) => {
-  const screenWidth = useResponsiveWindowWidth();
-  const isSmall = screenWidth === 'small';
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'xsmall';
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -329,7 +329,7 @@ const InAppTutorialTooltipDisplayer = ({
   const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
   const placement =
-    isSmall && tooltip.mobilePlacement
+    isMobile && tooltip.mobilePlacement
       ? tooltip.mobilePlacement
       : tooltip.placement || 'bottom';
   const backgroundColor =
@@ -362,7 +362,7 @@ const InAppTutorialTooltipDisplayer = ({
         style={{
           zIndex: getDisplayZIndexForHighlighter(anchorElement),
           maxWidth: 'min(90%, 300px)',
-          width: isSmall ? '100%' : undefined,
+          width: isMobile ? '100%' : undefined,
         }}
       >
         {({ TransitionProps }) => (

@@ -43,9 +43,9 @@ export const ShortcutsReminder = ({
   shortcutMap: ShortcutMap,
 |}) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
-  if (isSmall) return null;
+  if (isMobileOrTablet) return null;
   if (!!electron) return null;
 
   return (

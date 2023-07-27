@@ -114,7 +114,7 @@ export default function NewObjectDialog({
   canInstallPrivateAsset,
 }: Props) {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobile = windowWidth === 'xsmall';
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,
@@ -433,8 +433,8 @@ export default function NewObjectDialog({
                     id: 'new-object-from-scratch-tab',
                   },
                 ]}
-                // Enforce scroll on small screen, because the tabs have long names.
-                variant={isSmall ? 'scrollable' : undefined}
+                // Enforce scroll on mobile, because the tabs have long names.
+                variant={isMobile ? 'scrollable' : undefined}
               />
             }
           >

@@ -16,10 +16,10 @@ import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMea
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 const getIconStyle = windowWidth => {
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobile = windowWidth === 'xsmall';
   return {
-    height: isSmall ? 30 : 48,
-    width: isSmall ? 30 : 48,
+    height: isMobile ? 30 : 48,
+    width: isMobile ? 30 : 48,
     margin: 10,
   };
 };

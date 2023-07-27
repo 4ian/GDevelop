@@ -35,8 +35,8 @@ export const ResponsivePaperOrDrawer = ({
   children: React.Node,
 |}) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
-  if (!isSmall) {
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
+  if (!isMobileOrTablet) {
     if (!open) return null;
     return (
       <Paper style={styles.paper} background="medium">

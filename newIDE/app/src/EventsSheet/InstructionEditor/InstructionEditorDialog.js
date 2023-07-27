@@ -141,8 +141,9 @@ export default function InstructionEditorDialog({
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
   const windowWidth: WidthType = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
-  const isMedium = windowWidth === 'medium';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isSmallLaptop = windowWidth === 'medium';
+  const isLargeScreen = windowWidth === 'large' || windowWidth === 'xlarge';
   const instructionType: string = instruction.getType();
   const [
     newBehaviorDialogOpen,
@@ -159,7 +160,7 @@ export default function InstructionEditorDialog({
     if (origin === 'parameters' && chosenObjectName) {
       setStep(
         // "medium" displays 2 columns, so "Back" button should go back to the first screen.
-        isMedium ? 'object-or-free-instructions' : 'object-instructions'
+        isSmallLaptop ? 'object-or-free-instructions' : 'object-instructions'
       );
     } else {
       setStep('object-or-free-instructions');
@@ -316,7 +317,8 @@ export default function InstructionEditorDialog({
           />,
         ]}
         secondaryActions={[
-          (isSmall || isMedium) && step !== 'object-or-free-instructions' ? (
+          (isMobileOrTablet || isSmallLaptop) &&
+          step !== 'object-or-free-instructions' ? (
             <FlatButton
               label={<Trans>Back</Trans>}
               primary={false}
@@ -329,7 +331,7 @@ export default function InstructionEditorDialog({
             helpPagePath={instructionHelpPage || '/events'}
             label={
               !instructionHelpPage ||
-              (isSmall || step === 'object-or-free-instructions') ? (
+              (isMobileOrTablet || step === 'object-or-free-instructions') ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (
                 <Trans>Help for this condition</Trans>
@@ -356,7 +358,7 @@ export default function InstructionEditorDialog({
             parameters: renderParameters,
           }}
           getColumns={() => {
-            if (windowWidth === 'large' || windowWidth === 'xlarge') {
+            if (isLargeScreen) {
               return [
                 {
                   columnName: 'instruction-or-object-selector',
@@ -371,7 +373,7 @@ export default function InstructionEditorDialog({
                   ratio: !chosenObjectName ? 2 : 1,
                 },
               ].filter(Boolean);
-            } else if (windowWidth === 'medium') {
+            } else if (isSmallLaptop) {
               if (step === 'object-or-free-instructions') {
                 return [
                   {

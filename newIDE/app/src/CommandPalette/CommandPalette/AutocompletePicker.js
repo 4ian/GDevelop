@@ -91,7 +91,7 @@ type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
 export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -109,7 +109,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
       ContainerComponent="div"
       classes={{
         container: classes.listItemContainer,
-        root: isSmall ? classes.rootSmallPadding : null,
+        root: isMobileOrTablet ? classes.rootSmallPadding : null,
       }}
     >
       <ListItemIcon>
@@ -129,7 +129,7 @@ const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
   const isMedium = windowWidth === 'medium';
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
@@ -147,7 +147,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
-      if (isSmall || isMedium) return null;
+      if (isMobileOrTablet || isMedium) return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -160,7 +160,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap, isSmall, isMedium]
+    [shortcutMap, isMobileOrTablet, isMedium]
   );
 
   const getItemText = React.useCallback(
@@ -194,7 +194,7 @@ const AutocompletePicker = (
           ContainerComponent="div"
           classes={{
             container: classes.listItemContainer,
-            root: isSmall ? classes.rootSmallPadding : null,
+            root: isMobileOrTablet ? classes.rootSmallPadding : null,
           }}
         >
           <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
@@ -206,7 +206,7 @@ const AutocompletePicker = (
     [
       classes.listItemContainer,
       classes.rootSmallPadding,
-      isSmall,
+      isMobileOrTablet,
       getItemText,
       getItemHint,
       getItemIcon,

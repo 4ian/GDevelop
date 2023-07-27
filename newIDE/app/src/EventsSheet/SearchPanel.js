@@ -62,7 +62,7 @@ const SearchPanel = (
   ref
 ) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobile = windowWidth === 'xsmall';
   const searchTextField = React.useRef<?TextFieldInterface>(null);
   const replaceTextField = React.useRef<?TextFieldInterface>(null);
 
@@ -193,8 +193,8 @@ const SearchPanel = (
                   label: <Trans>Search in event sentences</Trans>,
                 },
               ]}
-              // Enforce scroll on small screen, because the tabs have long names.
-              variant={isSmall ? 'scrollable' : undefined}
+              // Enforce scroll on very small screens, because the tabs have long names.
+              variant={isMobile ? 'scrollable' : undefined}
             />
           </Column>
         </Line>
@@ -313,7 +313,7 @@ const SearchPanel = (
                       setMatchCase(!checked);
                     }}
                   />
-                  {!isSmall && (
+                  {!isMobile && (
                     <Text>
                       <Trans>Search in:</Trans>
                     </Text>

@@ -15,6 +15,7 @@ import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
 import TutorialButton from '../../UI/TutorialButton';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type ExporterSection = 'automated' | 'manual' | 'home';
 export type ExporterKey =
@@ -68,6 +69,8 @@ const ExportDialog = ({
   manualExporters,
   onlineWebExporter,
 }: Props) => {
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'xsmall';
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -182,12 +185,20 @@ const ExportDialog = ({
           <TutorialButton
             key="tutorial"
             tutorialId="export-to-itch"
-            label={<Trans>How to export to Itch.io"</Trans>}
+            label={
+              isMobile ? 'Itch.io' : <Trans>How to export to Itch.io"</Trans>
+            }
           />
         ) : null,
         <FlatButton
           key="builds"
-          label={<Trans>See this game builds</Trans>}
+          label={
+            isMobile ? (
+              <Trans>Builds</Trans>
+            ) : (
+              <Trans>See this game builds</Trans>
+            )
+          }
           onClick={openBuildDialog}
           disabled={isNavigationDisabled}
         />,

@@ -624,7 +624,7 @@ export default function EffectsList(props: Props) {
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const getDuplicatedUniqueEffectMetadata = React.useCallback(
     () => {
@@ -904,7 +904,9 @@ export default function EffectsList(props: Props) {
                     <FlatButton
                       key={'copy-all-effects'}
                       leftIcon={<CopyIcon />}
-                      label={isSmall ? '' : <Trans>Copy all effects</Trans>}
+                      label={
+                        isMobileOrTablet ? '' : <Trans>Copy all effects</Trans>
+                      }
                       onClick={() => {
                         copyAllEffects();
                       }}
@@ -912,7 +914,7 @@ export default function EffectsList(props: Props) {
                     <FlatButton
                       key={'paste-effects'}
                       leftIcon={<PasteIcon />}
-                      label={isSmall ? '' : <Trans>Paste</Trans>}
+                      label={isMobileOrTablet ? '' : <Trans>Paste</Trans>}
                       onClick={() => {
                         pasteEffectsAtTheEnd();
                       }}

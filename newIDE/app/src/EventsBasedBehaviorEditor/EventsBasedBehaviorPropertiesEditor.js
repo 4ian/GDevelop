@@ -359,7 +359,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
   );
 
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <I18n>
@@ -838,7 +838,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                     <FlatButton
                       key={'paste-properties'}
                       leftIcon={<PasteIcon />}
-                      label={isSmall ? '' : <Trans>Paste</Trans>}
+                      label={isMobileOrTablet ? '' : <Trans>Paste</Trans>}
                       onClick={() => {
                         pastePropertiesAtTheEnd();
                       }}

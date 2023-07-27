@@ -16,8 +16,10 @@ type Props = {|
  */
 const ResponsiveRaisedButton = (props: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
-  return <RaisedButton {...props} label={isSmall ? '' : props.label} />;
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
+  return (
+    <RaisedButton {...props} label={isMobileOrTablet ? '' : props.label} />
+  );
 };
 
 export default ResponsiveRaisedButton;

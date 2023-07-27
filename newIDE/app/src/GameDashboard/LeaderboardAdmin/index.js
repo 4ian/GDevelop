@@ -210,7 +210,7 @@ export const LeaderboardAdmin = ({
 }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
@@ -1184,7 +1184,7 @@ export const LeaderboardAdmin = ({
               <div
                 style={{
                   ...styles.rightColumn,
-                  paddingLeft: isSmall ? 0 : 20,
+                  paddingLeft: isMobileOrTablet ? 0 : 20,
                 }}
               >
                 <Line alignItems="center" justifyContent="flex-end">

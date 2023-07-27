@@ -29,10 +29,10 @@ const cellSpacing = 2;
 const getCategoryColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
     case 'xsmall':
-    case 'small':
       return 2;
-    case 'medium':
+    case 'small':
       return 3;
+    case 'medium':
     case 'large':
       return 4;
     case 'xlarge':
@@ -47,8 +47,8 @@ const getAssetPacksColumns = (windowWidth: WidthType) => {
     case 'xsmall':
       return 1;
     case 'small':
-    case 'medium':
       return 2;
+    case 'medium':
     case 'large':
       return 3;
     case 'xlarge':
@@ -374,8 +374,10 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         />
       ));
 
-    const privateAssetPacksTiles: Array<React.Node> = [];
+    const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+    const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
     const privateAssetPackBundleTiles: Array<React.Node> = [];
+    const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
     privateAssetPacksListingData
       .filter(
@@ -389,35 +391,20 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       }))
       .sort((a, b) => a.pos - b.pos)
       .map(sortObject => sortObject.listingData)
-      .sort((a, b) => {
-        // Put owned first.
-        if (
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(pack => pack.id === a.id)
-        )
-          return -1;
-        if (
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(pack => pack.id === b.id)
-        )
-          return 1;
-
-        return 0;
-      })
       .filter(Boolean)
       .forEach(assetPackListingData => {
+        const isPackOwned =
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(
+            pack => pack.id === assetPackListingData.id
+          );
         const tile = (
           <PrivateAssetPackTile
             assetPackListingData={assetPackListingData}
             onSelect={() => {
               onPrivateAssetPackSelection(assetPackListingData);
             }}
-            owned={
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              )
-            }
+            owned={isPackOwned}
             key={assetPackListingData.id}
           />
         );
@@ -425,18 +412,34 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           assetPackListingData.includedListableProductIds &&
           !!assetPackListingData.includedListableProductIds.length
         ) {
-          privateAssetPackBundleTiles.push(tile);
+          if (isPackOwned) {
+            privateOwnedAssetPackBundleTiles.push(tile);
+          } else {
+            privateAssetPackBundleTiles.push(tile);
+          }
         } else {
-          privateAssetPacksTiles.push(tile);
+          if (isPackOwned) {
+            privateOwnedAssetPackStandAloneTiles.push(tile);
+          } else {
+            privateAssetPackStandAloneTiles.push(tile);
+          }
         }
       });
 
-    const allStandAloneTiles = mergeArraysPerGroup(
-      privateAssetPacksTiles,
-      starterPacksTiles,
-      2,
-      1
-    );
+    const allBundleTiles = [
+      ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+      ...privateAssetPackBundleTiles,
+    ];
+
+    const allStandAloneTiles = [
+      ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+      mergeArraysPerGroup(
+        privateAssetPackStandAloneTiles,
+        starterPacksTiles,
+        2,
+        1
+      ),
+    ];
 
     const categoryTiles = Object.entries(assetCategories).map(
       // $FlowExpectedError - Object.entries does not infer well the type of the value.
@@ -467,11 +470,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         <Column>
           <Line>
             <Text size="block-title">
-              {openedAssetCategoryTitle ? (
-                openedAssetCategoryTitle
-              ) : (
-                <Trans>Bundles</Trans>
-              )}
+              <Trans>Bundles</Trans>
             </Text>
           </Line>
         </Column>
@@ -481,7 +480,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {privateAssetPackBundleTiles}
+          {allBundleTiles}
         </GridList>
         {openedAssetCategory ? null : (
           <>

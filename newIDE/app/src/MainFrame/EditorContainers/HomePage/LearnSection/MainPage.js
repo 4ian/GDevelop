@@ -108,10 +108,9 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
-  const isSmallOrMedium =
-    windowWidth === 'xsmall' ||
-    windowWidth === 'small' ||
-    windowWidth === 'medium';
+  const isMobile = windowWidth === 'xsmall';
+  const isTabletOrSmallLaptop =
+    windowWidth === 'small' || windowWidth === 'medium';
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -247,7 +246,7 @@ const MainPage = ({
               </Text>
             </Column>
             <LineStackLayout noMargin>
-              {!isSmallOrMedium && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -256,10 +255,16 @@ const MainPage = ({
                   }}
                   primary
                   leftIcon={<Upload />}
-                  label={<Trans>Submit your project as an example</Trans>}
+                  label={
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit an example</Trans>
+                    ) : (
+                      <Trans>Submit your project as an example</Trans>
+                    )
+                  }
                 />
               )}
-              {!isSmallOrMedium && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -269,7 +274,13 @@ const MainPage = ({
                   primary
                   leftIcon={<TranslateIcon />}
                   label={
-                    <Trans>Submit a tutorial translated in your language</Trans>
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit a tutorial</Trans>
+                    ) : (
+                      <Trans>
+                        Submit a tutorial translated in your language
+                      </Trans>
+                    )
                   }
                 />
               )}

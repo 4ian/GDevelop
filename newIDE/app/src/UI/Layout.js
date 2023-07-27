@@ -150,9 +150,9 @@ export const ResponsiveLineStackLayout = ({
   children,
 }: ResponsiveLineStackLayoutProps) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
-  return width === 'small' || isSmall ? (
+  return width === 'small' || isMobileOrTablet ? (
     <ColumnStackLayout
       id={id}
       noMargin={noMargin || noColumnMargin}

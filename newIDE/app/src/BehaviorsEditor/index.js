@@ -103,7 +103,7 @@ const BehaviorsEditor = (props: Props) => {
   );
 
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
@@ -582,7 +582,9 @@ const BehaviorsEditor = (props: Props) => {
                 <FlatButton
                   key={'copy-all-behaviors'}
                   leftIcon={<CopyIcon />}
-                  label={isSmall ? '' : <Trans>Copy all behaviors</Trans>}
+                  label={
+                    isMobileOrTablet ? '' : <Trans>Copy all behaviors</Trans>
+                  }
                   onClick={() => {
                     copyAllBehaviors();
                   }}
@@ -590,7 +592,7 @@ const BehaviorsEditor = (props: Props) => {
                 <FlatButton
                   key={'paste-behaviors'}
                   leftIcon={<PasteIcon />}
-                  label={isSmall ? '' : <Trans>Paste</Trans>}
+                  label={isMobileOrTablet ? '' : <Trans>Paste</Trans>}
                   onClick={() => {
                     pasteBehaviors();
                   }}

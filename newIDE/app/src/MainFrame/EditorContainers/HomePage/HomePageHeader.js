@@ -35,7 +35,7 @@ export const HomePageHeader = ({
   canSave,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
   return (
     <I18n>
@@ -74,7 +74,7 @@ export const HomePageHeader = ({
           </Column>
           <Column>
             <LineStackLayout noMargin alignItems="center">
-              {!electron && !isNativeMobileApp() && !isSmall && (
+              {!electron && !isNativeMobileApp() && !isMobileOrTablet && (
                 <FlatButton
                   label={<Trans>Download desktop app</Trans>}
                   onClick={() =>

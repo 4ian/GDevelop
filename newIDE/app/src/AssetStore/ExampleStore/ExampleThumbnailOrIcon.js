@@ -9,7 +9,7 @@ const styles = {
   iconBackground: {
     flex: 0,
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'left',
   },
   icon: {
     ...iconWithBackgroundStyle,
@@ -25,11 +25,12 @@ type Props = {|
 
 export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobile = windowWidth === 'xsmall';
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
-  const height = isSmall ? undefined : ICON_DESKTOP_HEIGHT;
-  const width = isSmall ? '100%' : undefined;
+  // Make the icon be full width on mobile.
+  const height = isMobile ? undefined : ICON_DESKTOP_HEIGHT;
+  const width = isMobile ? '100%' : undefined;
 
   return (
     <div style={styles.iconBackground}>

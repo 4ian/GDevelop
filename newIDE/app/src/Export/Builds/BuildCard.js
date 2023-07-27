@@ -140,7 +140,7 @@ export const BuildCard = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const nameInput = React.useRef<?TextFieldInterface>(null);
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobile = windowWidth === 'xsmall';
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 
@@ -245,7 +245,7 @@ export const BuildCard = ({
             }
             header={
               <Line noMargin alignItems="start" justifyContent="space-between">
-                {!isSmall && <BuildAndCreatedAt build={build} />}
+                {!isMobile && <BuildAndCreatedAt build={build} />}
                 <Column expand noMargin justifyContent="center">
                   <Line noMargin justifyContent="end">
                     {isOnlineBuild ? (
@@ -274,7 +274,7 @@ export const BuildCard = ({
             }
           >
             <Column expand noMargin>
-              {isSmall && <BuildAndCreatedAt build={build} />}
+              {isMobile && <BuildAndCreatedAt build={build} />}
               <Spacer />
               <Line noMargin>
                 {isEditingName ? (

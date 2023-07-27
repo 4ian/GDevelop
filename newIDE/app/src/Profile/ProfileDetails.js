@@ -21,7 +21,10 @@ import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 import FlatButton from '../UI/FlatButton';
 import Coffee from '../UI/CustomSvgIcons/Coffee';
 import { GridList } from '@material-ui/core';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
@@ -30,6 +33,22 @@ import {
   communityLinksConfig,
   type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
+
+const getAssetPackColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'xsmall':
+      return 1;
+    case 'small':
+      return 2;
+    case 'medium':
+      return 3;
+    case 'large':
+    case 'xlarge':
+      return 4;
+    default:
+      return 3;
+  }
+};
 
 const CommunityLinksLines = ({
   isAuthenticatedUserProfile,
@@ -106,7 +125,6 @@ const ProfileDetails = ({
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small' || windowWidth === 'xsmall';
 
   if (error)
     return (
@@ -282,7 +300,7 @@ const ProfileDetails = ({
                   </Line>
                   <Line expand noMargin justifyContent="start">
                     <GridList
-                      cols={isSmall ? 1 : 3}
+                      cols={getAssetPackColumnsFromWidth(windowWidth)}
                       cellHeight="auto"
                       spacing={2}
                     >

@@ -2101,6 +2101,7 @@ const MainFrame = (props: Props) => {
             // app, prevent this, as it will be deleted when the app is updated.
             const appPath = remote.app.getAppPath();
             const saveAsLocationPath = fileIdentifier;
+            console.log(appPath, saveAsLocationPath);
             if (saveAsLocationPath.startsWith(appPath)) {
               await showAlert({
                 title: t`Warning`,

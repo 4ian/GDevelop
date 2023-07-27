@@ -3,43 +3,70 @@
 export default class BrowserEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<?any> => {
     return new Promise(resolve => {
-      const adhocInput = document.createElement('input');
-      adhocInput.type = 'file';
-      adhocInput.multiple = false;
-      adhocInput.accept = 'application/json,.json';
-      adhocInput.onchange = e => {
-        const file = e.target.files[0];
-        return resolve(file);
-      };
+      if (window.showOpenFilePicker) {
+        window
+          .showOpenFilePicker({
+            types: [
+              {
+                description: 'GDevelop Extension',
+                accept: {
+                  'application/json': ['.json'],
+                },
+              },
+            ],
+            excludeAcceptAllOption: true,
+            multiple: false,
+          })
+          .then(([handle]) => {
+            if (!handle) return resolve(null);
+            resolve(handle.getFile());
+          })
+          .catch(() => {
+            resolve(null);
+          });
+      } else {
+        const adhocInput = document.createElement('input');
+        adhocInput.type = 'file';
+        adhocInput.multiple = false;
+        adhocInput.accept = 'application/json,.json';
+        adhocInput.onchange = e => {
+          const file = e.target.files[0];
+          return resolve(file);
+        };
 
-      // There is no built-in way to know if the user closed the file picking dialog
-      // with the cancel button. What follows is an implementation that follows
-      // https://stackoverflow.com/questions/71435515/how-can-i-detect-that-the-cancel-button-has-been-clicked-on-a-input-type-file.
+        // There is no built-in way to know if the user closed the file picking dialog
+        // with the cancel button. What follows is an implementation that follows
+        // https://stackoverflow.com/questions/71435515/how-can-i-detect-that-the-cancel-button-has-been-clicked-on-a-input-type-file.
+        // TODO: Find a better way to detect this since it looks like the `change` event
+        // does not have enough time to propagate when the user selects a file from the dialog
+        // by double-clicking it.
 
-      const onFocusBackWindow = () => {
-        window.removeEventListener('focus', onFocusBackWindow);
-        if (document.body) {
-          document.body.addEventListener(
-            'pointermove',
-            onFilePickingDialogFinishedClosing
-          );
-        }
-      };
-      const onFilePickingDialogFinishedClosing = () => {
-        if (document.body) {
-          document.body.removeEventListener(
-            'pointermove',
-            onFilePickingDialogFinishedClosing
-          );
-        }
-        if (!adhocInput.files.length) {
-          console.log('No file selected.');
-          resolve(null);
-        }
-      };
-      window.addEventListener('focus', onFocusBackWindow);
+        const onFocusBackWindow = () => {
+          window.removeEventListener('focus', onFocusBackWindow);
+          if (document.body) {
+            document.body.addEventListener(
+              'pointermove',
+              onFilePickingDialogFinishedClosing
+            );
+          }
+        };
 
-      adhocInput.click();
+        const onFilePickingDialogFinishedClosing = () => {
+          if (document.body) {
+            document.body.removeEventListener(
+              'pointermove',
+              onFilePickingDialogFinishedClosing
+            );
+          }
+          if (!adhocInput.files.length) {
+            console.log('No file selected.');
+            resolve(null);
+          }
+        };
+
+        window.addEventListener('focus', onFocusBackWindow);
+        adhocInput.click();
+      }
     });
   };
 

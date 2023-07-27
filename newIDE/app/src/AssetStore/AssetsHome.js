@@ -372,72 +372,86 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         />
       ));
 
-    const privateAssetPackStandAloneTiles: Array<React.Node> = [];
-    const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-    const privateAssetPackBundleTiles: Array<React.Node> = [];
-    const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
+    const { allStandAloneTiles, allBundleTiles } = React.useMemo(
+      () => {
+        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+        const privateAssetPackBundleTiles: Array<React.Node> = [];
+        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-    privateAssetPacksListingData
-      .filter(
-        assetPackListingData =>
-          !openedAssetCategory ||
-          assetPackListingData.categories.includes(openedAssetCategory)
-      )
-      .map((listingData, index) => ({
-        pos: assetPackRandomOrdering.privateAssetPacks[index],
-        listingData,
-      }))
-      .sort((a, b) => a.pos - b.pos)
-      .map(sortObject => sortObject.listingData)
-      .filter(Boolean)
-      .forEach(assetPackListingData => {
-        const isPackOwned =
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(
-            pack => pack.id === assetPackListingData.id
-          );
-        const tile = (
-          <PrivateAssetPackTile
-            assetPackListingData={assetPackListingData}
-            onSelect={() => {
-              onPrivateAssetPackSelection(assetPackListingData);
-            }}
-            owned={isPackOwned}
-            key={assetPackListingData.id}
-          />
-        );
-        if (
-          assetPackListingData.includedListableProductIds &&
-          !!assetPackListingData.includedListableProductIds.length
-        ) {
-          if (isPackOwned) {
-            privateOwnedAssetPackBundleTiles.push(tile);
-          } else {
-            privateAssetPackBundleTiles.push(tile);
-          }
-        } else {
-          if (isPackOwned) {
-            privateOwnedAssetPackStandAloneTiles.push(tile);
-          } else {
-            privateAssetPackStandAloneTiles.push(tile);
-          }
-        }
-      });
+        privateAssetPacksListingData
+          .filter(
+            assetPackListingData =>
+              !openedAssetCategory ||
+              assetPackListingData.categories.includes(openedAssetCategory)
+          )
+          .map((listingData, index) => ({
+            pos: assetPackRandomOrdering.privateAssetPacks[index],
+            listingData,
+          }))
+          .sort((a, b) => a.pos - b.pos)
+          .map(sortObject => sortObject.listingData)
+          .filter(Boolean)
+          .forEach(assetPackListingData => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              );
+            const tile = (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackListingData}
+                onSelect={() => {
+                  onPrivateAssetPackSelection(assetPackListingData);
+                }}
+                owned={isPackOwned}
+                key={assetPackListingData.id}
+              />
+            );
+            if (
+              assetPackListingData.includedListableProductIds &&
+              !!assetPackListingData.includedListableProductIds.length
+            ) {
+              if (isPackOwned) {
+                privateOwnedAssetPackBundleTiles.push(tile);
+              } else {
+                privateAssetPackBundleTiles.push(tile);
+              }
+            } else {
+              if (isPackOwned) {
+                privateOwnedAssetPackStandAloneTiles.push(tile);
+              } else {
+                privateAssetPackStandAloneTiles.push(tile);
+              }
+            }
+          });
 
-    const allBundleTiles = [
-      ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
-      ...privateAssetPackBundleTiles,
-    ];
+        const allBundleTiles = [
+          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+          ...privateAssetPackBundleTiles,
+        ];
 
-    const allStandAloneTiles = [
-      ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
-      mergeArraysPerGroup(
-        privateAssetPackStandAloneTiles,
+        const allStandAloneTiles = [
+          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+          mergeArraysPerGroup(
+            privateAssetPackStandAloneTiles,
+            starterPacksTiles,
+            2,
+            1
+          ),
+        ];
+
+        return { allStandAloneTiles, allBundleTiles };
+      },
+      [
+        privateAssetPacksListingData,
+        openedAssetCategory,
+        assetPackRandomOrdering,
+        onPrivateAssetPackSelection,
         starterPacksTiles,
-        2,
-        1
-      ),
-    ];
+        receivedAssetPacks,
+      ]
+    );
 
     const categoryTiles = Object.entries(assetCategories).map(
       // $FlowExpectedError - Object.entries does not infer well the type of the value.
@@ -465,21 +479,25 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         id="asset-store-home"
         data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
       >
-        <Column>
-          <Line>
-            <Text size="block-title">
-              <Trans>Bundles</Trans>
-            </Text>
-          </Line>
-        </Column>
-        <GridList
-          cols={getAssetPacksColumns(windowWidth)}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={cellSpacing}
-        >
-          {allBundleTiles}
-        </GridList>
+        {allBundleTiles.length ? (
+          <>
+            <Column>
+              <Line>
+                <Text size="block-title">
+                  <Trans>Bundles</Trans>
+                </Text>
+              </Line>
+            </Column>
+            <GridList
+              cols={getAssetPacksColumns(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {allBundleTiles}
+            </GridList>
+          </>
+        ) : null}
         {openedAssetCategory ? null : (
           <>
             <Column>

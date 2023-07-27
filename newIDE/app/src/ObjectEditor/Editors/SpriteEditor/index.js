@@ -214,10 +214,25 @@ export default function SpriteEditor({
           }
         }
       }
-
       forceUpdate();
     },
     [spriteConfiguration, project, forceUpdate]
+  );
+
+  const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
+    (sprite: gdSprite) => {
+      if (spriteConfiguration.getAnimationsCount() === 0) return;
+      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (firstAnimation.getDirectionsCount() === 0) return;
+      const firstDirection = firstAnimation.getDirection(0);
+      if (firstDirection.getSpritesCount() === 0) return;
+      const firstSprite = firstDirection.getSprite(0);
+      sprite.setFullImageCollisionMask(firstSprite.isFullImageCollisionMask());
+      sprite.setCustomCollisionMask(firstSprite.getCustomCollisionMask());
+
+      forceUpdate();
+    },
+    [spriteConfiguration, forceUpdate]
   );
 
   const moveAnimation = React.useCallback(
@@ -538,6 +553,17 @@ export default function SpriteEditor({
                                                 }
                                               : undefined
                                           }
+                                          onSpriteAdded={(sprite: gdSprite) => {
+                                            // If a sprite is added, we want to ensure it gets the automatic
+                                            // collision mask of the object, if the option is enabled.
+                                            if (
+                                              spriteConfiguration.adaptCollisionMaskAutomatically()
+                                            ) {
+                                              onApplyFirstSpriteCollisionMaskToSprite(
+                                                sprite
+                                              );
+                                            }
+                                          }}
                                         />
                                       );
                                     }

@@ -189,7 +189,7 @@ const ExportDialog = ({
               isMobileScreen ? (
                 'Itch.io'
               ) : (
-                <Trans>How to export to Itch.io"</Trans>
+                <Trans>How to export to Itch.io</Trans>
               )
             }
           />

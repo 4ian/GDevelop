@@ -11,7 +11,6 @@ const downloadStringContentAsFile = (
   const adhocLink = document.createElement('a');
   adhocLink.href = blobUrl;
   adhocLink.download = filename;
-  adhocLink.innerHTML = 'Click here to download the file';
   if (document.body) {
     document.body.appendChild(adhocLink);
     adhocLink.click();

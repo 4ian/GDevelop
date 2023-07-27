@@ -59,7 +59,6 @@ export default class BrowserEventsFunctionsExtensionOpener {
             );
           }
           if (!adhocInput.files.length) {
-            console.log('No file selected.');
             resolve(null);
           }
         };

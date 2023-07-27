@@ -172,6 +172,9 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
+import optionalRequire from '../Utils/OptionalRequire';
+
+const remote = optionalRequire('@electron/remote');
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2089,6 +2092,23 @@ const MainFrame = (props: Props) => {
           if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
+          const fileIdentifier = saveAsLocation.fileIdentifier;
+          if (
+            newStorageProvider.internalName === 'LocalFile' &&
+            fileIdentifier
+          ) {
+            // If the user is saving locally and chose the same location as the
+            // app, prevent this, as it will be deleted when the app is updated.
+            const appPath = remote.app.getAppPath();
+            const saveAsLocationPath = fileIdentifier;
+            if (saveAsLocationPath.startsWith(appPath)) {
+              await showAlert({
+                title: t`Warning`,
+                message: t`You are trying to save the project in the same folder as the application. This is not recommended, as the folder will be deleted when the application is updated. Please choose another location.`,
+              });
+              return;
+            }
+          }
           newSaveAsLocation = saveAsLocation;
         }
 
@@ -2196,6 +2216,7 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreMoved,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      showAlert,
     ]
   );
 

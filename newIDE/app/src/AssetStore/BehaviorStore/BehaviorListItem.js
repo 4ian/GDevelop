@@ -90,7 +90,7 @@ export const BehaviorListItem = ({
     alreadyAdded ||
     isObjectIncompatible ||
     behaviorShortHeader.tier === 'community' ||
-    behaviorShortHeader.isDeprecated;
+    (behaviorShortHeader.isDeprecated || false);
   const hasInfoButton = behaviorShortHeader.authors || false;
   const iconStyle = {
     paddingTop: hasInfoButton ? 10 : hasChip ? 6 : 4,

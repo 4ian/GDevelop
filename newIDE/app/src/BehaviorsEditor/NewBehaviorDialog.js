@@ -55,7 +55,10 @@ export default function NewBehaviorDialog({
     installExtension
   );
 
-  const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
+  const deprecatedBehaviorsInformation = React.useMemo(
+    () => getDeprecatedBehaviorsInformation(),
+    []
+  );
 
   const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
     () => {

@@ -133,7 +133,7 @@ const transformTagsAsStringToTagsAsArray = <
 /** Check if the IDE version, passed as argument, satisfy the version required by the extension. */
 export const isCompatibleWithExtension = (
   ideVersion: string,
-  extensionShortHeader: ExtensionShortHeader
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ) =>
   extensionShortHeader.gdevelopVersion
     ? semverSatisfies(ideVersion, extensionShortHeader.gdevelopVersion, {
@@ -191,7 +191,7 @@ const adaptBehaviorHeader = (
 };
 
 export const getExtensionHeader = (
-  extensionShortHeader: ExtensionShortHeader
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<ExtensionHeader> => {
   return axios.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;

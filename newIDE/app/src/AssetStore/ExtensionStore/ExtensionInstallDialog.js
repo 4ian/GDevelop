@@ -6,6 +6,7 @@ import FlatButton from '../../UI/FlatButton';
 import {
   type ExtensionShortHeader,
   type ExtensionHeader,
+  type BehaviorShortHeader,
   getExtensionHeader,
   isCompatibleWithExtension,
 } from '../../Utils/GDevelopServices/Extension';
@@ -55,10 +56,10 @@ const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
 };
 
 type Props = {|
-  extensionShortHeader: ExtensionShortHeader,
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader,
   isInstalling: boolean,
   onClose: () => void,
-  onInstall: () => Promise<void>,
+  onInstall?: () => Promise<void>,
   onEdit?: () => void,
   project: gdProject,
 |};
@@ -114,7 +115,7 @@ const ExtensionInstallDialog = ({
   const canInstallExtension = !isInstalling && isCompatible;
   const onInstallExtension = React.useCallback(
     () => {
-      if (canInstallExtension) {
+      if (canInstallExtension && onInstall) {
         if (alreadyInstalled) {
           let dialogText =
             'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
@@ -164,35 +165,37 @@ const ExtensionInstallDialog = ({
           onClick={onClose}
           disabled={isInstalling}
         />,
-        <LeftLoader isLoading={isInstalling} key="install">
-          <DialogPrimaryButton
-            id="install-extension-button"
-            label={
-              !isCompatible ? (
-                <Trans>Not compatible</Trans>
-              ) : alreadyInstalled ? (
-                fromStore ? (
-                  extensionUpdate ? (
-                    extensionShortHeader.tier === 'community' ? (
-                      <Trans>Update (could break the project)</Trans>
+        onInstall ? (
+          <LeftLoader isLoading={isInstalling} key="install">
+            <DialogPrimaryButton
+              id="install-extension-button"
+              label={
+                !isCompatible ? (
+                  <Trans>Not compatible</Trans>
+                ) : alreadyInstalled ? (
+                  fromStore ? (
+                    extensionUpdate ? (
+                      extensionShortHeader.tier === 'community' ? (
+                        <Trans>Update (could break the project)</Trans>
+                      ) : (
+                        <Trans>Update</Trans>
+                      )
                     ) : (
-                      <Trans>Update</Trans>
+                      <Trans>Re-install</Trans>
                     )
                   ) : (
-                    <Trans>Re-install</Trans>
+                    <Trans>Replace existing extension</Trans>
                   )
                 ) : (
-                  <Trans>Replace existing extension</Trans>
+                  <Trans>Install in project</Trans>
                 )
-              ) : (
-                <Trans>Install in project</Trans>
-              )
-            }
-            primary
-            onClick={onInstallExtension}
-            disabled={!canInstallExtension}
-          />
-        </LeftLoader>,
+              }
+              primary
+              onClick={onInstallExtension}
+              disabled={!canInstallExtension}
+            />
+          </LeftLoader>
+        ) : null,
       ]}
       secondaryActions={[
         onEdit ? (
@@ -225,7 +228,7 @@ const ExtensionInstallDialog = ({
       open
       cannotBeDismissed={isInstalling}
       onRequestClose={onClose}
-      onApply={onInstallExtension}
+      onApply={onInstall ? onInstallExtension : onClose}
     >
       <ColumnStackLayout expand noMargin>
         <Line alignItems="flex-start" noMargin>
@@ -252,7 +255,11 @@ const ExtensionInstallDialog = ({
             </Line>
           </Column>
         </Line>
-        <Text noMargin>{extensionShortHeader.shortDescription}</Text>
+        <Text noMargin>
+          {extensionHeader
+            ? extensionHeader.shortDescription
+            : extensionShortHeader.shortDescription || ''}
+        </Text>
         <Divider />
         {extensionHeader && (
           <MarkdownText

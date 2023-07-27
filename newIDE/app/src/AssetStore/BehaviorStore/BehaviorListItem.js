@@ -159,17 +159,21 @@ export const BehaviorListItem = ({
               {behaviorShortHeader.authors && (
                 <Tooltip
                   title={
-                    <Line>
-                      <div style={{ flexWrap: 'wrap' }}>
-                        {behaviorShortHeader.authors.map(author => (
-                          <UserPublicProfileChip
-                            user={author}
-                            key={author.id}
-                            variant="outlined"
-                          />
-                        ))}
-                      </div>
-                    </Line>
+                    behaviorShortHeader.authors.length > 0 ? (
+                      <Line>
+                        <div style={{ flexWrap: 'wrap' }}>
+                          {behaviorShortHeader.authors.map(author => (
+                            <UserPublicProfileChip
+                              user={author}
+                              key={author.id}
+                              variant="outlined"
+                            />
+                          ))}
+                        </div>
+                      </Line>
+                    ) : (
+                      ''
+                    )
                   }
                 >
                   <IconButton

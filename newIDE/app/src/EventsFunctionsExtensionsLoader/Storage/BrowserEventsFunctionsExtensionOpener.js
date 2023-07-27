@@ -48,13 +48,20 @@ export default class BrowserEventsFunctionsExtensionOpener {
       try {
         const reader = new FileReader();
         reader.onloadend = event => {
-          const content = reader.result;
-          if (!content) {
-            throw new Error('The selected file is empty');
+          try {
+            const content = reader.result;
+            if (!content) {
+              throw new Error('The selected file is empty');
+            }
+            // content should be a string since the method readAsText guarantees it.
+            // $FlowExpectedError
+            return resolve(JSON.parse(content));
+          } catch (error) {
+            console.error('An error occurred when parsing the file content: ', {
+              error,
+            });
+            reject(error);
           }
-          // content should be a string since the method readAsText guarantees it.
-          // $FlowExpectedError
-          return resolve(JSON.parse(content));
         };
         reader.readAsText(file, 'UTF-8');
       } catch (error) {

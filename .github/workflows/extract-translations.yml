@@ -4,6 +4,8 @@ name: Extract translations
 on:
   # Execute for all commits (to ensure translations extraction works)
   push:
+    branches:
+      - "**"
     tags-ignore:
       - "**" # Don't run on new tags
   # Allows to run this workflow manually from the Actions tab.

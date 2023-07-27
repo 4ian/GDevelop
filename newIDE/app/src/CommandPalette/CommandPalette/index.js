@@ -55,8 +55,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
     const windowWidth = useResponsiveWindowWidth();
-    const isMobileOrTablet =
-      windowWidth === 'small' || windowWidth === 'xsmall';
+    const isMobileScreen = windowWidth === 'small';
     const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
@@ -191,7 +190,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 onInputChange={setSearchText}
                 items={allCommands}
                 placeholder={
-                  isMobileOrTablet
+                  isMobileScreen
                     ? t`Search`
                     : t`Start typing a command or searching something...`
                 }

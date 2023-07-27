@@ -3,7 +3,11 @@ import * as React from 'react';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import useOnResize from '../../Utils/UseOnResize';
 
-export type WidthType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge';
+// Typically, small corresponds to mobile phones.
+// Medium corresponds to tablets and small screens.
+// Large corresponds to most laptop and desktop screens.
+// Xlarge corresponds to large desktop screens.
+export type WidthType = 'small' | 'medium' | 'large' | 'xlarge';
 
 type Props = {|
   children: (width: WidthType) => React.Node,
@@ -27,9 +31,7 @@ export const useResponsiveWindowWidth = (): WidthType => {
     return 'medium';
   }
 
-  return window.innerWidth < 500 || window.innerHeight < 350
-    ? 'xsmall'
-    : window.innerWidth < 950
+  return window.innerWidth < 500 || window.innerHeight < 500
     ? 'small'
     : window.innerWidth < 1150
     ? 'medium'

@@ -28,11 +28,10 @@ const cellSpacing = 2;
 
 const getCategoryColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
-    case 'xsmall':
-      return 2;
     case 'small':
-      return 3;
+      return 2;
     case 'medium':
+      return 3;
     case 'large':
       return 4;
     case 'xlarge':
@@ -44,11 +43,10 @@ const getCategoryColumns = (windowWidth: WidthType) => {
 
 const getAssetPacksColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
-    case 'xsmall':
-      return 1;
     case 'small':
-      return 2;
+      return 1;
     case 'medium':
+      return 2;
     case 'large':
       return 3;
     case 'xlarge':

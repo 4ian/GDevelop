@@ -42,8 +42,7 @@ import {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
-import FlatButton from '../UI/FlatButton';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -101,9 +100,6 @@ const BehaviorsEditor = (props: Props) => {
     },
     [justAddedBehaviorName]
   );
-
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
 
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
@@ -579,20 +575,18 @@ const BehaviorsEditor = (props: Props) => {
           <Column>
             <LineStackLayout noMargin>
               <LineStackLayout expand>
-                <FlatButton
+                <ResponsiveFlatButton
                   key={'copy-all-behaviors'}
                   leftIcon={<CopyIcon />}
-                  label={
-                    isMobileOrTablet ? '' : <Trans>Copy all behaviors</Trans>
-                  }
+                  label={<Trans>Copy all behaviors</Trans>}
                   onClick={() => {
                     copyAllBehaviors();
                   }}
                 />
-                <FlatButton
+                <ResponsiveFlatButton
                   key={'paste-behaviors'}
                   leftIcon={<PasteIcon />}
-                  label={isMobileOrTablet ? '' : <Trans>Paste</Trans>}
+                  label={<Trans>Paste</Trans>}
                   onClick={() => {
                     pasteBehaviors();
                   }}

@@ -24,12 +24,15 @@ import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
-const getStyles = ({ windowWidth }) => ({
-  formContainer: {
-    width: windowWidth === 'xsmall' || windowWidth === 'small' ? '95%' : '60%',
-    marginTop: 20,
-  },
-});
+const getStyles = ({ windowWidth }) => {
+  const isMobileScreen = windowWidth === 'small';
+  return {
+    formContainer: {
+      width: isMobileScreen ? '95%' : '60%',
+      marginTop: 20,
+    },
+  };
+};
 
 type Props = {|
   onClose: () => void,

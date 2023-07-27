@@ -34,11 +34,10 @@ import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../../../../Utils/GDevelopService
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
-    case 'xsmall':
-      return 1;
     case 'small':
-      return 2;
+      return 1;
     case 'medium':
+      return 2;
     case 'large':
     case 'xlarge':
     default:
@@ -105,7 +104,7 @@ const GetStartedSection = ({
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'xsmall';
+  const isMobile = windowWidth === 'small';
   const { currentlyRunningInAppTutorial } = React.useContext(
     InAppTutorialContext
   );

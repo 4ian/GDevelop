@@ -25,12 +25,12 @@ type Props = {|
 
 export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
   // Make the icon be full width on mobile.
-  const height = isMobile ? undefined : ICON_DESKTOP_HEIGHT;
-  const width = isMobile ? '100%' : undefined;
+  const height = isMobileScreen ? undefined : ICON_DESKTOP_HEIGHT;
+  const width = isMobileScreen ? '100%' : undefined;
 
   return (
     <div style={styles.iconBackground}>

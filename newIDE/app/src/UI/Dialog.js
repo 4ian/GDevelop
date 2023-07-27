@@ -70,7 +70,7 @@ const dialogSmallPadding = 8;
 const getDefaultMaxWidthFromSize = (windowWidth: WidthType) => {
   switch (windowWidth) {
     case 'small':
-      return false;
+      return false; // Full width
     case 'medium':
     case 'large':
       return 'md';
@@ -242,11 +242,11 @@ const Dialog = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
-  const isFullScreen = isMobileOrTablet && !noMobileFullScreen;
+  const isFullScreen = isMobileScreen && !noMobileFullScreen;
 
   const classesForDangerousDialog = useDangerousStylesForDialog();
   const classesForDialogContent = useStylesForDialogContent();

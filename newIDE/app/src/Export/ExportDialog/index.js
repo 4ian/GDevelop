@@ -70,7 +70,7 @@ const ExportDialog = ({
   onlineWebExporter,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
   const [
     chosenExporterSection,
     setChosenExporterSection,
@@ -186,14 +186,18 @@ const ExportDialog = ({
             key="tutorial"
             tutorialId="export-to-itch"
             label={
-              isMobile ? 'Itch.io' : <Trans>How to export to Itch.io"</Trans>
+              isMobileScreen ? (
+                'Itch.io'
+              ) : (
+                <Trans>How to export to Itch.io"</Trans>
+              )
             }
           />
         ) : null,
         <FlatButton
           key="builds"
           label={
-            isMobile ? (
+            isMobileScreen ? (
               <Trans>Builds</Trans>
             ) : (
               <Trans>See this game builds</Trans>

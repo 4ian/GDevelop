@@ -18,7 +18,7 @@ export default function HotReloadPreviewButton({
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>
@@ -27,7 +27,7 @@ export default function HotReloadPreviewButton({
   );
 
   // Hide the text on mobile, to avoid taking too much space.
-  return !isMobile ? (
+  return !isMobileScreen ? (
     <FlatButton
       leftIcon={icon}
       label={label}

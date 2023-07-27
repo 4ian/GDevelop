@@ -81,11 +81,9 @@ const styles = {
 };
 
 export const getIndentWidth = (windowWidth: WidthType) =>
-  windowWidth === 'small' || windowWidth === 'xsmall'
-    ? smallIndentWidth
-    : defaultIndentWidth;
+  windowWidth === 'small' ? smallIndentWidth : defaultIndentWidth;
 const getEventContainerStyle = (windowWidth: WidthType) =>
-  windowWidth === 'small' || windowWidth === 'xsmall'
+  windowWidth === 'small'
     ? styles.smallEventContainer
     : styles.defaultEventContainer;
 

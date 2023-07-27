@@ -6,7 +6,7 @@ import { Spacer } from './Grid';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
-type Props = {|
+export type FlatButtonProps = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
   primary?: boolean,
@@ -30,7 +30,7 @@ type Props = {|
 /**
  * A "outlined" button based on Material-UI button.
  */
-const FlatButton = React.forwardRef<Props, ButtonInterface>(
+const FlatButton = React.forwardRef<FlatButtonProps, ButtonInterface>(
   (
     {
       label,
@@ -41,7 +41,7 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
       disabled,
       id,
       ...otherProps
-    }: Props,
+    }: FlatButtonProps,
     ref
   ) => {
     // In theory, focus ripple is only shown after a keyboard interaction

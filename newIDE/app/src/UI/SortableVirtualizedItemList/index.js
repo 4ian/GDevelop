@@ -77,8 +77,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       scaleUpItemIconWhenSelected,
     } = this.props;
 
-    const isMobileOrTablet =
-      windowWidth === 'small' || windowWidth === 'xsmall';
+    const isMobileScreen = windowWidth === 'small';
 
     const nameBeingEdited = renamedItem === item;
     const itemName = getItemName(item);
@@ -106,7 +105,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
         onEdit={onEditItem}
-        hideMenuButton={isMobileOrTablet}
+        hideMenuButton={isMobileScreen}
         scaleUpItemIconWhenSelected={scaleUpItemIconWhenSelected}
       />
     );

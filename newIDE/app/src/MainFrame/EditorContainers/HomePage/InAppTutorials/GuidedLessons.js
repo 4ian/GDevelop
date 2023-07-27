@@ -38,11 +38,10 @@ import Object3D from './Icons/Object3D';
 
 const getColumnsFromWidth = (width: WidthType) => {
   switch (width) {
-    case 'xsmall':
-      return 1;
     case 'small':
-      return 2;
+      return 1;
     case 'medium':
+      return 2;
     case 'large':
       return 3;
     case 'xlarge':

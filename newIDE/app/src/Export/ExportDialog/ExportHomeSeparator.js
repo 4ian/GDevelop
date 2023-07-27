@@ -6,9 +6,9 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const ExportHomeSeparator = () => {
   const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'xsmall' || windowWidth === 'small';
+  const isMobileScreen = windowWidth === 'small';
   const theme = React.useContext(GDevelopThemeContext);
-  return !isMobileOrTablet ? (
+  return !isMobileScreen ? (
     <Column justifyContent="center" noMargin>
       <span
         style={{
@@ -20,7 +20,7 @@ const ExportHomeSeparator = () => {
       />
     </Column>
   ) : (
-    <Line justifyContent="center" noMargin>
+    <Line justifyContent="center">
       <span
         style={{
           width: '80%',

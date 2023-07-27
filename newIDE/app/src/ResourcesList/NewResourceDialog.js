@@ -39,7 +39,7 @@ export const NewResourceDialog = ({
   onChooseResources,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
   const storageProvider = React.useMemo(() => getStorageProvider(), [
     getStorageProvider,
   ]);
@@ -155,7 +155,7 @@ export const NewResourceDialog = ({
             { label: <Trans>Choose a file</Trans>, value: 'import' },
           ]}
           // Enforce scroll on very small screens, because the tabs have long names.
-          variant={isMobile ? 'scrollable' : undefined}
+          variant={isMobileScreen ? 'scrollable' : undefined}
         />
       }
     >

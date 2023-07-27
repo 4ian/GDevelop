@@ -122,7 +122,7 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState(false);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
 
   const isAlreadyReceived =
     !!receivedAssetPacks &&
@@ -298,7 +298,7 @@ const PrivateAssetPackInformationPage = ({
                     )}
                     <Paper
                       variant="outlined"
-                      style={{ padding: isMobileOrTablet ? 20 : 30 }}
+                      style={{ padding: isMobileScreen ? 20 : 30 }}
                       background="medium"
                     >
                       <Column noMargin>

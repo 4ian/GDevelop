@@ -50,9 +50,8 @@ import {
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
-import FlatButton from '../UI/FlatButton';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type ConnectDragSource } from 'react-dnd';
+import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -623,9 +622,6 @@ export default function EffectsList(props: Props) {
 
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
-
   const getDuplicatedUniqueEffectMetadata = React.useCallback(
     () => {
       if (effectsContainer.getEffectsCount() < 2) {
@@ -901,20 +897,18 @@ export default function EffectsList(props: Props) {
               <Column>
                 <Line noMargin>
                   <LineStackLayout expand>
-                    <FlatButton
+                    <ResponsiveFlatButton
                       key={'copy-all-effects'}
                       leftIcon={<CopyIcon />}
-                      label={
-                        isMobileOrTablet ? '' : <Trans>Copy all effects</Trans>
-                      }
+                      label={<Trans>Copy all effects</Trans>}
                       onClick={() => {
                         copyAllEffects();
                       }}
                     />
-                    <FlatButton
+                    <ResponsiveFlatButton
                       key={'paste-effects'}
                       leftIcon={<PasteIcon />}
-                      label={isMobileOrTablet ? '' : <Trans>Paste</Trans>}
+                      label={<Trans>Paste</Trans>}
                       onClick={() => {
                         pasteEffectsAtTheEnd();
                       }}

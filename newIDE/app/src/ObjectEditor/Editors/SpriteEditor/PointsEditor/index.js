@@ -201,8 +201,8 @@ const PointsEditor = ({
 
   // Keep panes vertical for small screens, side-by-side for large screens
   const windowWidth = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
-  const editorNodes = isMobileOrTablet
+  const isMobileScreen = windowWidth === 'small';
+  const editorNodes = isMobileScreen
     ? verticalMosaicNodes
     : horizontalMosaicNodes;
 

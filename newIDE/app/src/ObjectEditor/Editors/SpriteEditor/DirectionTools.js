@@ -105,7 +105,7 @@ const DirectionTools = ({
 
   const hasSprites = direction.getSpritesCount();
   const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'xsmall';
+  const isMobileScreen = windowWidth === 'small';
 
   return (
     <I18n>
@@ -120,7 +120,7 @@ const DirectionTools = ({
               {!!imageResourceExternalEditors.length && (
                 <TextButton
                   label={i18n._(
-                    isMobile
+                    isMobileScreen
                       ? hasSprites
                         ? t`Edit`
                         : t`Create`

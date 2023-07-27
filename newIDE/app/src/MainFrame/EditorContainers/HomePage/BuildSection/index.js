@@ -75,10 +75,8 @@ const styles = {
 
 const getTemplatesGridSizeFromWidth = (width: WidthType) => {
   switch (width) {
-    case 'xsmall':
-      return 2;
     case 'small':
-      return 3;
+      return 2;
     case 'medium':
       return 4;
     case 'large':
@@ -441,7 +439,7 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       onCloudProjectsChanged,
     } = authenticatedUser;
     const windowWidth = useResponsiveWindowWidth();
-    const isMobile = windowWidth === 'xsmall';
+    const isMobile = windowWidth === 'small';
     const forceUpdate = useForceUpdate();
 
     React.useImperativeHandle(ref, () => ({

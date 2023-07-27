@@ -141,8 +141,8 @@ export default function InstructionEditorDialog({
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
   const windowWidth: WidthType = useResponsiveWindowWidth();
-  const isMobileOrTablet = windowWidth === 'small' || windowWidth === 'xsmall';
-  const isSmallLaptop = windowWidth === 'medium';
+  const isMobileScreen = windowWidth === 'small';
+  const isMediumScreen = windowWidth === 'medium';
   const isLargeScreen = windowWidth === 'large' || windowWidth === 'xlarge';
   const instructionType: string = instruction.getType();
   const [
@@ -160,7 +160,7 @@ export default function InstructionEditorDialog({
     if (origin === 'parameters' && chosenObjectName) {
       setStep(
         // "medium" displays 2 columns, so "Back" button should go back to the first screen.
-        isSmallLaptop ? 'object-or-free-instructions' : 'object-instructions'
+        isMediumScreen ? 'object-or-free-instructions' : 'object-instructions'
       );
     } else {
       setStep('object-or-free-instructions');
@@ -317,7 +317,7 @@ export default function InstructionEditorDialog({
           />,
         ]}
         secondaryActions={[
-          (isMobileOrTablet || isSmallLaptop) &&
+          (isMobileScreen || isMediumScreen) &&
           step !== 'object-or-free-instructions' ? (
             <FlatButton
               label={<Trans>Back</Trans>}
@@ -331,7 +331,7 @@ export default function InstructionEditorDialog({
             helpPagePath={instructionHelpPage || '/events'}
             label={
               !instructionHelpPage ||
-              (isMobileOrTablet || step === 'object-or-free-instructions') ? (
+              (isMobileScreen || step === 'object-or-free-instructions') ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (
                 <Trans>Help for this condition</Trans>
@@ -373,7 +373,7 @@ export default function InstructionEditorDialog({
                   ratio: !chosenObjectName ? 2 : 1,
                 },
               ].filter(Boolean);
-            } else if (isSmallLaptop) {
+            } else if (isMediumScreen) {
               if (step === 'object-or-free-instructions') {
                 return [
                   {

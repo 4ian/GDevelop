@@ -1,7 +1,10 @@
 //@flow
 import { diff } from 'semver/functions/diff';
 import { useMemo } from 'react';
-import type { ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
+import type {
+  ExtensionShortHeader,
+  BehaviorShortHeader,
+} from '../../Utils/GDevelopServices/Extension';
 
 type UpdateType = 'patch' | 'minor' | 'major';
 type UpdateMetadata = {|
@@ -43,16 +46,18 @@ const getUpdateMetadataFromVersions = (
 
 export const useExtensionUpdate = (
   project: gdProject,
-  extension: ExtensionShortHeader
+  extension: ExtensionShortHeader | BehaviorShortHeader
 ): UpdateMetadata | null => {
   return useMemo<UpdateMetadata | null>(
-    () =>
-      project.hasEventsFunctionsExtensionNamed(extension.name)
+    () => {
+      const extensionName = extension.extensionName || extension.name;
+      return project.hasEventsFunctionsExtensionNamed(extensionName)
         ? getUpdateMetadataFromVersions(
-            project.getEventsFunctionsExtension(extension.name).getVersion(),
+            project.getEventsFunctionsExtension(extensionName).getVersion(),
             extension.version
           )
-        : null,
+        : null;
+    },
     [project, extension]
   );
 };

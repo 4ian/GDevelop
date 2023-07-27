@@ -4,13 +4,17 @@ import { type BehaviorShortHeader } from '../../Utils/GDevelopServices/Extension
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
-import { Column } from '../../UI/Grid';
+import { Line, Column } from '../../UI/Grid';
 import { IconContainer } from '../../UI/IconContainer';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import Chip from '../../UI/Chip';
 import { LineStackLayout } from '../../UI/Layout';
 import { type SearchableBehaviorMetadata } from './BehaviorStoreContext';
+import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import Tooltip from '@material-ui/core/Tooltip';
+import CircledInfo from '../../UI/CustomSvgIcons/SmallCircledInfo';
+import IconButton from '../../UI/IconButton';
 
 const styles = {
   button: { width: '100%' },
@@ -19,9 +23,6 @@ const styles = {
     textAlign: 'left',
     overflow: 'hidden',
     width: '100%',
-  },
-  icon: {
-    paddingTop: 4,
   },
 };
 
@@ -32,6 +33,7 @@ type Props = {|
   behaviorShortHeader: BehaviorShortHeader | SearchableBehaviorMetadata,
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
+  onShowDetails: () => void,
   onHeightComputed: number => void,
 |};
 
@@ -42,6 +44,7 @@ export const BehaviorListItem = ({
   behaviorShortHeader,
   matches,
   onChoose,
+  onShowDetails,
   onHeightComputed,
 }: Props) => {
   const alreadyAdded = objectBehaviorsTypes.includes(behaviorShortHeader.type);
@@ -83,6 +86,16 @@ export const BehaviorListItem = ({
     [isEnabled, onChoose]
   );
 
+  const hasChip =
+    alreadyAdded ||
+    isObjectIncompatible ||
+    behaviorShortHeader.tier === 'community' ||
+    behaviorShortHeader.isDeprecated ||
+    (behaviorShortHeader.authors || false);
+  const iconStyle = {
+    paddingTop: hasChip ? 10 : 4,
+  };
+
   return (
     <ButtonBase
       id={id}
@@ -97,7 +110,7 @@ export const BehaviorListItem = ({
         ref={containerRef}
       >
         <LineStackLayout>
-          <div style={styles.icon}>
+          <div style={iconStyle}>
             <IconContainer
               alt={behaviorShortHeader.fullName}
               src={behaviorShortHeader.previewIconUrl}
@@ -105,7 +118,7 @@ export const BehaviorListItem = ({
             />
           </div>
           <Column expand>
-            <LineStackLayout noMargin alignItems="baseline">
+            <LineStackLayout noMargin alignItems="center">
               <Text
                 noMargin
                 allowBrowserAutoTranslate={false}
@@ -142,6 +155,33 @@ export const BehaviorListItem = ({
                   label={<Trans>Deprecated</Trans>}
                   color="primary"
                 />
+              )}
+              {behaviorShortHeader.authors && (
+                <Tooltip
+                  title={
+                    <Line>
+                      <div style={{ flexWrap: 'wrap' }}>
+                        {behaviorShortHeader.authors.map(author => (
+                          <UserPublicProfileChip
+                            user={author}
+                            key={author.id}
+                            variant="outlined"
+                          />
+                        ))}
+                      </div>
+                    </Line>
+                  }
+                >
+                  <IconButton
+                    size="small"
+                    onClick={e => {
+                      e.stopPropagation();
+                      onShowDetails();
+                    }}
+                  >
+                    <CircledInfo />
+                  </IconButton>
+                </Tooltip>
               )}
             </LineStackLayout>
             <Text

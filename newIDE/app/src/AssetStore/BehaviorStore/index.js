@@ -21,6 +21,7 @@ import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import IconButton from '../../UI/IconButton';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import ExtensionInstallDialog from '../ExtensionStore/ExtensionInstallDialog';
 
 export const useExtensionUpdateAlertDialog = () => {
   const { showConfirmation } = useAlertDialog();
@@ -60,6 +61,10 @@ export const BehaviorStore = ({
   onChoose,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
+  const [
+    selectedBehaviorShortHeader,
+    setSelectedBehaviorShortHeader,
+  ] = React.useState<?BehaviorShortHeader>(null);
   const {
     filters,
     searchResults,
@@ -258,10 +263,23 @@ export const BehaviorStore = ({
               onChoose={() => {
                 installAndChoose(behaviorShortHeader);
               }}
+              onShowDetails={() => {
+                if (behaviorShortHeader.headerUrl) {
+                  setSelectedBehaviorShortHeader(behaviorShortHeader);
+                }
+              }}
             />
           )}
         />
       </ColumnStackLayout>
+      {!!selectedBehaviorShortHeader && (
+        <ExtensionInstallDialog
+          project={project}
+          isInstalling={isInstalling}
+          extensionShortHeader={selectedBehaviorShortHeader}
+          onClose={() => setSelectedBehaviorShortHeader(null)}
+        />
+      )}
     </React.Fragment>
   );
 };

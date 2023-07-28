@@ -292,7 +292,9 @@ export const isTryingToSaveInForbiddenPath = (
   // If the user is saving locally and chose the same location as where the
   // executable is running, prevent this, as it will be deleted when the app is updated.
   const exePath = remote.app.getPath('exe');
+  if (!exePath) return false; // This should not happen, but let's be safe.
+  const gdevelopDirectory = path.dirname(exePath);
   const saveAsLocationPath = fileIdentifier;
-  console.log(exePath, saveAsLocationPath);
-  return saveAsLocationPath.startsWith(exePath);
+  console.log(gdevelopDirectory, saveAsLocationPath);
+  return saveAsLocationPath.startsWith(gdevelopDirectory);
 };

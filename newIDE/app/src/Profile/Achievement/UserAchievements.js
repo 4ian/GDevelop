@@ -48,6 +48,7 @@ const UserAchievements = ({
   const [achievements, setAchievements] = useState<?Array<Achievement>>(null);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const fetchAchievements = useCallback(async () => {
     try {
@@ -84,7 +85,7 @@ const UserAchievements = ({
             <div
               style={{
                 ...styles.summary,
-                padding: windowWidth === 'small' ? '0 20' : '20',
+                padding: isMobileScreen ? '0 20' : '20',
               }}
             >
               <Trophy color="secondary" fontSize="large" />

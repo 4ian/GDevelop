@@ -73,11 +73,14 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
     fetchProfile();
   };
 
+  const dialogSize =
+    assetPacksListingData && assetPacksListingData.length > 4 ? 'md' : 'sm';
+
   return (
     <Dialog
       title={null} // Specific case where the title is handled by the content.
-      open={true}
-      maxWidth="sm"
+      open
+      maxWidth={dialogSize}
       actions={[
         <FlatButton
           key="close"

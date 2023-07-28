@@ -110,6 +110,7 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;
@@ -585,7 +586,7 @@ export default function SpriteEditor({
               justifyContent="space-between"
               noColumnMargin
             >
-              {windowWidth !== 'small' ? (
+              {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
                 <ResponsiveLineStackLayout noMargin noColumnMargin>
                   <FlatButton
                     label={<Trans>Edit collision masks</Trans>}

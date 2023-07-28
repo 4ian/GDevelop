@@ -65,7 +65,7 @@ export const setupInstructionParameters = (
         );
       });
 
-    if (behaviorNames.length > 0) {
+    if (behaviorNames.length === 1) {
       const currentParameterValue = instruction
         .getParameter(maybeBehaviorParameterIndex)
         .getPlainString();

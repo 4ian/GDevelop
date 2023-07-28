@@ -172,6 +172,7 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
+import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2089,6 +2090,18 @@ const MainFrame = (props: Props) => {
           if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
+
+          if (
+            newStorageProvider.internalName === 'LocalFile' &&
+            saveAsLocation.fileIdentifier &&
+            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
+          ) {
+            await showAlert({
+              title: t`Choose another location`,
+              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
+            });
+            return;
+          }
           newSaveAsLocation = saveAsLocation;
         }
 
@@ -2196,6 +2209,7 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreMoved,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      showAlert,
     ]
   );
 
@@ -2267,6 +2281,17 @@ const MainFrame = (props: Props) => {
         // may have changed (if the user opened another project). So we read and
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
+
+        if (
+          storageProviderInternalName === 'LocalFile' &&
+          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
+        ) {
+          await showAlert({
+            title: t`Choose another location`,
+            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+          });
+          // We don't block the save, as the user may want to save it anyway.
+        }
 
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
@@ -2350,6 +2375,7 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      showAlert,
     ]
   );
 

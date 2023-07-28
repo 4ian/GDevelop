@@ -283,3 +283,14 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
     />
   );
 };
+
+export const isTryingToSaveInForbiddenPath = (filePath: string): boolean => {
+  if (!remote) return false; // This should not happen, but let's be safe.
+  // If the user is saving locally and chose the same location as where the
+  // executable is running, prevent this, as it will be deleted when the app is updated.
+  const exePath = remote.app.getPath('exe');
+  if (!exePath) return false; // This should not happen, but let's be safe.
+  const gdevelopDirectory = path.dirname(exePath);
+  console.log(gdevelopDirectory, filePath);
+  return filePath.startsWith(gdevelopDirectory);
+};

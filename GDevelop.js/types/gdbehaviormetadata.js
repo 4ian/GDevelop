@@ -28,6 +28,7 @@ declare class gdBehaviorMetadata {
   addRequiredFile(resourceFile: string): gdBehaviorMetadata;
   setObjectType(objectType: string): gdBehaviorMetadata;
   getObjectType(): string;
+  getRequiredBehaviorTypes(): gdVectorString;
   isPrivate(): boolean;
   setPrivate(): gdBehaviorMetadata;
   isHidden(): boolean;

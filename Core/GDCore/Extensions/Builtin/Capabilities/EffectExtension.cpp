@@ -38,7 +38,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       std::make_shared<gd::BehaviorsSharedData>())
     .SetHidden();
 
-  aut.AddAction("EnableEffect",
+  aut.AddScopedAction("EnableEffect",
                 _("Enable an object effect"),
                 _("Enable an effect on the object"),
                 _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
@@ -51,7 +51,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple();
 
-  aut.AddAction("SetEffectDoubleParameter",
+  aut.AddScopedAction("SetEffectDoubleParameter",
                 _("Effect parameter (number)"),
                 _("Change the value of a parameter of an effect.") + "\n" +
                     _("You can find the parameter names (and change the effect "
@@ -67,7 +67,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("expression", _("New value"))
       .MarkAsSimple();
 
-  aut.AddAction("SetEffectStringParameter",
+  aut.AddScopedAction("SetEffectStringParameter",
                 _("Effect parameter (string)"),
                 _("Change the value (string) of a parameter of an effect.") +
                     "\n" +
@@ -84,7 +84,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("string", _("New value"))
       .MarkAsSimple();
 
-  aut.AddAction("SetEffectBooleanParameter",
+  aut.AddScopedAction("SetEffectBooleanParameter",
                 _("Effect parameter (enable or disable)"),
                 _("Enable or disable a parameter of an effect.") + "\n" +
                     _("You can find the parameter names (and change the effect "
@@ -100,7 +100,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple();
 
-  aut.AddCondition("IsEffectEnabled",
+  aut.AddScopedCondition("IsEffectEnabled",
                    _("Effect is enabled"),
                    _("Check if the effect on an object is enabled."),
                    _("Effect _PARAM1_ of _PARAM0_ is enabled"),

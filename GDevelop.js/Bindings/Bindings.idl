@@ -1735,6 +1735,7 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();
+    [Const, Ref] VectorString GetRequiredBehaviorTypes();
 
     boolean IsPrivate();
     [Ref] BehaviorMetadata SetPrivate();

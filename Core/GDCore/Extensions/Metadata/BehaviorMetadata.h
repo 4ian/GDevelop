@@ -260,6 +260,11 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   const gd::String& GetObjectType() const { return objectType; }
 
   /**
+   * \brief Get the types of the behaviors that are required by this behavior.
+   */
+  const std::vector<gd::String>& GetRequiredBehaviorTypes() const;
+
+  /**
    * Check if the behavior is private - it can't be used outside of its
    * extension.
    */
@@ -345,13 +350,13 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   gd::String group;
   gd::String iconFilename;
   gd::String objectType;
+  mutable std::vector<gd::String> requiredBehaviors;
   bool isPrivate = false;
   bool isHidden = false;
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;
   std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance;
-  bool isEventBased;
 };
 
 }  // namespace gd

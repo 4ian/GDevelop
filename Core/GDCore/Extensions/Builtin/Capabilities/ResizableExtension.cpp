@@ -37,7 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
       std::make_shared<gd::BehaviorsSharedData>())
     .SetHidden();
 
-  aut.AddAction("SetWidth",
+  aut.AddScopedAction("SetWidth",
                 _("Width"),
                 _("Change the width of the object."),
                 _("the width"),
@@ -50,7 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                                      ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
-  aut.AddCondition("Width",
+  aut.AddScopedCondition("Width",
                    _("Width"),
                    _("Compare the width of the object."),
                    _("the width"),
@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
-  aut.AddAction("SetHeight",
+  aut.AddScopedAction("SetHeight",
                 _("Height"),
                 _("Change the height of the object."),
                 _("the height"),
@@ -76,7 +76,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
                                      ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
-  aut.AddCondition("Height",
+  aut.AddScopedCondition("Height",
                    _("Height"),
                    _("Compare the height of the object."),
                    _("the height"),
@@ -89,7 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
           "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
-  aut.AddAction("SetSize",
+  aut.AddScopedAction("SetSize",
                 _("Size"),
                 _("Change the size of an object."),
                 _("Change the size of _PARAM0_: set to _PARAM1_ x _PARAM2_"),

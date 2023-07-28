@@ -70,7 +70,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
                         _("Animation name")))
       .MarkAsSimple();
 
-  aut.AddAction("PauseAnimation",
+  aut.AddScopedAction("PauseAnimation",
                 _("Pause the animation"),
                 _("Pause the animation of the object"),
                 _("Pause the animation of _PARAM0_"),
@@ -81,7 +81,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
       .MarkAsSimple();
 
-  aut.AddAction("PlayAnimation",
+  aut.AddScopedAction("PlayAnimation",
                 _("Resume the animation"),
                 _("Resume the animation of the object"),
                 _("Resume the animation of _PARAM0_"),
@@ -108,7 +108,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
                         _("Speed scale")))
       .MarkAsSimple();
 
-  aut.AddCondition("IsAnimationPaused",
+  aut.AddScopedCondition("IsAnimationPaused",
                    _("Animation paused"),
                    _("Check if the animation of an object is paused."),
                    _("The animation of _PARAM0_ is paused"),
@@ -119,7 +119,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
       .AddParameter("behavior", _("Behavior"), "AnimatableBehavior")
       .MarkAsSimple();
 
-  aut.AddCondition("HasAnimationEnded",
+  aut.AddScopedCondition("HasAnimationEnded",
                    _("Animation finished"),
                    _("Check if the animation being played by the Sprite object "
                      "is finished."),

@@ -54,14 +54,14 @@ AnimatableExtension::AnimatableExtension() {
   actions["AnimatableCapability::AnimatableBehavior::PauseAnimation"]
       .SetFunctionName("pauseAnimation")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  actions["PlayAnimation"]
+  actions["AnimatableCapability::AnimatableBehavior::PlayAnimation"]
       .SetFunctionName("resumeAnimation")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 
   conditions["AnimatableCapability::AnimatableBehavior::IsAnimationPaused"]
       .SetFunctionName("isAnimationPaused")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  conditions["HasAnimationEnded"]
+  conditions["AnimatableCapability::AnimatableBehavior::HasAnimationEnded"]
       .SetFunctionName("hasAnimationEnded")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 }

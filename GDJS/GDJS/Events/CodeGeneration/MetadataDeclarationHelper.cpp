@@ -8,6 +8,8 @@
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/CustomBehavior.h"
+#include "GDCore/Project/CustomBehaviorsSharedData.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Project.h"
@@ -71,15 +73,26 @@ const gd::String &MetadataDeclarationHelper::GetExtensionIconUrl(
  * events based behavior.
  */
 gd::BehaviorMetadata &MetadataDeclarationHelper::DeclareBehaviorMetadata(
+    const gd::Project &project,
     gd::PlatformExtension &extension,
     const gd::EventsBasedBehavior &eventsBasedBehavior) {
   auto &behaviorMetadata =
       extension
-          .AddEventsBasedBehavior(eventsBasedBehavior.GetName(),
-                                  eventsBasedBehavior.GetFullName() ||
-                                      eventsBasedBehavior.GetName(),
-                                  eventsBasedBehavior.GetDescription(), "",
-                                  GetExtensionIconUrl(extension))
+          .AddBehavior(
+              eventsBasedBehavior.GetName(),
+              eventsBasedBehavior.GetFullName() ||
+                  eventsBasedBehavior.GetName(),
+              eventsBasedBehavior.GetName(),
+              eventsBasedBehavior.GetDescription(), "",
+              GetExtensionIconUrl(extension), "",
+              std::make_shared<gd::CustomBehavior>(
+                  eventsBasedBehavior.GetName(), project,
+                  PlatformExtension::GetBehaviorFullType(
+                      extension.GetName(), eventsBasedBehavior.GetName())),
+              std::make_shared<gd::CustomBehaviorsSharedData>(
+                  eventsBasedBehavior.GetName(), project,
+                  PlatformExtension::GetBehaviorFullType(
+                      extension.GetName(), eventsBasedBehavior.GetName())))
           .SetObjectType(eventsBasedBehavior.GetObjectType());
 
   if (eventsBasedBehavior.IsPrivate())
@@ -1438,7 +1451,7 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
     const gd::EventsBasedBehavior &eventsBasedBehavior,
     std::map<gd::String, gd::String> &behaviorMethodMangledNames) {
   auto &behaviorMetadata =
-      DeclareBehaviorMetadata(extension, eventsBasedBehavior);
+      DeclareBehaviorMetadata(project, extension, eventsBasedBehavior);
 
   auto &eventsFunctionsContainer = eventsBasedBehavior.GetEventsFunctions();
 

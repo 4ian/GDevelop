@@ -38,10 +38,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
       std::make_shared<gd::BehaviorsSharedData>())
     .SetHidden();
 
-  aut.AddAction("FlipX",
+  aut.AddScopedAction("FlipX",
                 _("Flip the object horizontally"),
                 _("Flip the object horizontally"),
-                _("Flip horizontally _PARAM0_: _PARAM1_"),
+                _("Flip horizontally _PARAM0_: _PARAM2_"),
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
@@ -50,10 +50,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple();
 
-  aut.AddAction("FlipY",
+  aut.AddScopedAction("FlipY",
                 _("Flip the object vertically"),
                 _("Flip the object vertically"),
-                _("Flip vertically _PARAM0_: _PARAM1_"),
+                _("Flip vertically _PARAM0_: _PARAM2_"),
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
@@ -62,7 +62,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple();
 
-  aut.AddCondition("FlippedX",
+  aut.AddScopedCondition("FlippedX",
                    _("Horizontally flipped"),
                    _("Check if the object is horizontally flipped"),
                    _("_PARAM0_ is horizontally flipped"),
@@ -72,7 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFlippableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "FlippableBehavior");
 
-  aut.AddCondition("FlippedY",
+  aut.AddScopedCondition("FlippedY",
                    _("Vertically flipped"),
                    _("Check if the object is vertically flipped"),
                    _("_PARAM0_ is vertically flipped"),

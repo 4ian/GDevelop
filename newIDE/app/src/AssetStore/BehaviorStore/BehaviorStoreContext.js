@@ -25,6 +25,10 @@ export type SearchableBehaviorMetadata = {|
   fullName: string,
   description: string,
   objectType: string,
+  /**
+   * All required behaviors including transitive ones.
+   */
+  allRequiredBehaviorTypes: Array<string>,
   previewIconUrl: string,
   category: string,
   tags: string[],

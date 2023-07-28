@@ -17,6 +17,7 @@ import { Line } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { MarkdownText } from '../UI/MarkdownText';
 import RouterContext, { type Route } from '../MainFrame/RouterContext';
+import Paper from '../UI/Paper';
 
 type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
@@ -127,53 +128,55 @@ export const AnnouncementsFeed = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Line noMargin={!addMargins}>
-          <ColumnStackLayout noMargin={!addMargins} expand>
-            {displayedAnnouncements.map(announcement => {
-              const { buttonLabelByLocale, buttonUrl } = announcement;
-              const {
-                title,
-                message,
-                isMarkdownImageOnly,
-                onInternalClick,
-              } = getAnnouncementContent(i18n, announcement);
+        <Paper square background="dark">
+          <Line noMargin={!addMargins}>
+            <ColumnStackLayout noMargin={!addMargins} expand>
+              {displayedAnnouncements.map(announcement => {
+                const { buttonLabelByLocale, buttonUrl } = announcement;
+                const {
+                  title,
+                  message,
+                  isMarkdownImageOnly,
+                  onInternalClick,
+                } = getAnnouncementContent(i18n, announcement);
 
-              return (
-                <AlertMessage
-                  kind={announcement.type}
-                  renderRightButton={
-                    buttonLabelByLocale && buttonUrl
-                      ? () => (
-                          <RaisedButton
-                            label={selectMessageByLocale(
-                              i18n,
-                              buttonLabelByLocale
-                            )}
-                            onClick={() => Window.openExternalURL(buttonUrl)}
-                          />
-                        )
-                      : null
-                  }
-                  onHide={
-                    canClose
-                      ? () => {
-                          showAnnouncement(announcement.id, false);
-                        }
-                      : null
-                  }
-                  hideButtonSize="small"
-                  key={announcement.id}
-                  markdownImageOnly={isMarkdownImageOnly}
-                >
-                  {title ? <Text size="block-title">{title}</Text> : null}
-                  <div onClick={onInternalClick}>
-                    <MarkdownText source={message} allowParagraphs={false} />
-                  </div>
-                </AlertMessage>
-              );
-            })}
-          </ColumnStackLayout>
-        </Line>
+                return (
+                  <AlertMessage
+                    kind={announcement.type}
+                    renderRightButton={
+                      buttonLabelByLocale && buttonUrl
+                        ? () => (
+                            <RaisedButton
+                              label={selectMessageByLocale(
+                                i18n,
+                                buttonLabelByLocale
+                              )}
+                              onClick={() => Window.openExternalURL(buttonUrl)}
+                            />
+                          )
+                        : null
+                    }
+                    onHide={
+                      canClose
+                        ? () => {
+                            showAnnouncement(announcement.id, false);
+                          }
+                        : null
+                    }
+                    hideButtonSize="small"
+                    key={announcement.id}
+                    markdownImageOnly={isMarkdownImageOnly}
+                  >
+                    {title ? <Text size="block-title">{title}</Text> : null}
+                    <div onClick={onInternalClick}>
+                      <MarkdownText source={message} allowParagraphs={false} />
+                    </div>
+                  </AlertMessage>
+                );
+              })}
+            </ColumnStackLayout>
+          </Line>
+        </Paper>
       )}
     </I18n>
   );

@@ -523,6 +523,7 @@ interface Project {
     [Const, Value] DOMString FREE_GetTypeOfBehavior([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Value] VectorString FREE_GetBehaviorsOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
+    boolean FREE_IsDefaultBehavior([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfBehaviorInObjectOrGroup([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
 
     //Inherited from gd::ObjectsContainer

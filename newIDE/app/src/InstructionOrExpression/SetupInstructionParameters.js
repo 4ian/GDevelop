@@ -45,6 +45,7 @@ export const setupInstructionParameters = (
     }
 
     const allowedBehaviorType = maybeBehaviorParameterMetadata.getExtraInfo();
+    // TODO Factorize it with BehaviorField
     const behaviorNames = gd
       .getBehaviorsOfObject(
         globalObjectsContainer,
@@ -62,7 +63,15 @@ export const setupInstructionParameters = (
             behaviorName,
             false
           ) === allowedBehaviorType
-        );
+        ) &&
+        (allowedBehaviorType ||
+          !gd.isDefaultBehavior(
+            globalObjectsContainer,
+            objectsContainer,
+            objectName,
+            behaviorName,
+            true
+          ));
       });
 
     if (behaviorNames.length > 0) {

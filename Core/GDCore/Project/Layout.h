@@ -450,6 +450,17 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::String &objectOrGroupName,
                                             const gd::String &behaviorName,
                                             bool searchInGroups = true);
+
+/**
+ * \brief Check if a behavior is a default one or doesn't exist in an object or
+ * all object of a group.
+ */
+bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
+                                   gd::String objectOrGroupName,
+                                   gd::String behaviorName,
+                                   bool searchInGroups = true);
+
 /**
  * \brief Get the type of a behavior if an object or some object of a group has it.
  */

@@ -2093,11 +2093,12 @@ const MainFrame = (props: Props) => {
 
           if (
             newStorageProvider.internalName === 'LocalFile' &&
-            isTryingToSaveInForbiddenPath(saveAsLocation)
+            saveAsLocation.fileIdentifier &&
+            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
           ) {
             await showAlert({
-              title: t`Warning`,
-              message: t`You are trying to save the project in the same folder as the application. This is not recommended, as the folder will be deleted when the application is updated. Please choose another location.`,
+              title: t`Choose another location`,
+              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
             });
             return;
           }
@@ -2281,6 +2282,17 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
+        if (
+          storageProviderInternalName === 'LocalFile' &&
+          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
+        ) {
+          await showAlert({
+            title: t`Choose another location`,
+            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+          });
+          // We don't block the save, as the user may want to save it anyway.
+        }
+
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata,
@@ -2363,6 +2375,7 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      showAlert,
     ]
   );
 

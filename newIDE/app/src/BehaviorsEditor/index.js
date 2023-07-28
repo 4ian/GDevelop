@@ -217,12 +217,15 @@ const BehaviorsEditor = (props: Props) => {
         BEHAVIORS_CLIPBOARD_KIND,
         mapVector(object.getAllBehaviorNames(), behaviorName => {
           const behavior = object.getBehavior(behaviorName);
+          if (behavior.isDefaultBehavior()) {
+            return null;
+          }
           return {
             name: behaviorName,
             type: behavior.getTypeName(),
             serializedBehavior: serializeToJSObject(behavior),
           };
-        })
+        }).filter(Boolean)
       );
       forceUpdate();
     },

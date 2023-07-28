@@ -236,7 +236,6 @@ namespace gdjs {
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
-
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
         const autoData = objectData.behaviors[i];
@@ -244,6 +243,7 @@ namespace gdjs {
         this._behaviors.push(new Ctor(instanceContainer, autoData, this));
         this._behaviorsTable.put(autoData.name, this._behaviors[i]);
       }
+      console.log(this.name + ": " + this._behaviors.map(behavior => behavior.name));
       this._timers = new Hashtable();
     }
 

@@ -16,6 +16,7 @@ import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { MarkdownText } from '../UI/MarkdownText';
+import RouterContext, { type Route } from '../MainFrame/RouterContext';
 
 type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
@@ -32,6 +33,7 @@ export const AnnouncementsFeed = ({
     AnnouncementsFeedContext
   );
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
+  const { navigateToRoute } = React.useContext(RouterContext);
 
   if (error) {
     return (
@@ -65,6 +67,7 @@ export const AnnouncementsFeed = ({
     title: string,
     message: string,
     isMarkdownImageOnly?: boolean,
+    onInternalClick?: () => void,
   |} => {
     const title = selectMessageByLocale(i18n, announcement.titleByLocale);
     const message = selectMessageByLocale(
@@ -75,23 +78,46 @@ export const AnnouncementsFeed = ({
     if (!title) {
       const markdownClickableImageRegex = /\[!\[(?<alt>[^\][]*)\]\((?<imageSource>[^\s]*)\)\]\((?<linkHref>[^\s]*)\)/;
       let matches = message.match(markdownClickableImageRegex);
-      if (
-        matches &&
-        matches.groups &&
-        matches.groups.alt &&
-        matches.groups.imageSource &&
-        matches.groups.linkHref
-      ) {
-        return { title, message, isMarkdownImageOnly: true };
+      let groups = matches && matches.groups;
+      if (groups && groups.alt && groups.imageSource && groups.linkHref) {
+        // If the href is pointing to the editor, this can be an internal link,
+        // so we don't open a new link, and instead use the internal router
+        // to navigate to the right page/dialog.
+        if (groups.linkHref.startsWith('https://editor.gdevelop.io')) {
+          const urlParams = new URLSearchParams(
+            groups.linkHref.replace(/.*\?/, '')
+          );
+          // $FlowFixMe - Assume that the arguments are always valid.
+          const route: ?Route = urlParams.get('initial-dialog');
+          const otherParams = {};
+          urlParams.forEach((value, key) => {
+            if (key !== 'initial-dialog') otherParams[key] = value;
+          });
+          if (route) {
+            const onInternalClick = () => navigateToRoute(route, otherParams);
+            const messageWithoutHref = message.replace(
+              markdownClickableImageRegex,
+              `![${groups.alt}](${groups.imageSource})`
+            );
+            return {
+              title,
+              message: messageWithoutHref,
+              isMarkdownImageOnly: true,
+              onInternalClick,
+            };
+          }
+        }
+
+        return {
+          title,
+          message,
+          isMarkdownImageOnly: true,
+        };
       }
       const markdownImageRegex = /!\[(?<alt>[^\][]*)\]\((?<imageSource>[^\s]*)\)/;
       matches = message.match(markdownImageRegex);
-      if (
-        matches &&
-        matches.groups &&
-        matches.groups.alt &&
-        matches.groups.imageSource
-      ) {
+      groups = matches && matches.groups;
+      if (groups && groups.alt && groups.imageSource) {
         return { title, message, isMarkdownImageOnly: true };
       }
     }
@@ -109,6 +135,7 @@ export const AnnouncementsFeed = ({
                 title,
                 message,
                 isMarkdownImageOnly,
+                onInternalClick,
               } = getAnnouncementContent(i18n, announcement);
 
               return (
@@ -139,7 +166,9 @@ export const AnnouncementsFeed = ({
                   markdownImageOnly={isMarkdownImageOnly}
                 >
                   {title ? <Text size="block-title">{title}</Text> : null}
-                  <MarkdownText source={message} allowParagraphs={false} />
+                  <div onClick={onInternalClick}>
+                    <MarkdownText source={message} allowParagraphs={false} />
+                  </div>
                 </AlertMessage>
               );
             })}

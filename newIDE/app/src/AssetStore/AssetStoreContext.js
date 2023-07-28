@@ -187,7 +187,10 @@ export const AssetStoreStateProvider = ({
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [environment, setEnvironment] = React.useState<Environment>('live');
   const [error, setError] = React.useState<?Error>(null);
-  const initialPackUserFriendlySlug = React.useRef<?string>(null);
+  const [
+    initialPackUserFriendlySlug,
+    setInitialPackUserFriendlySlug,
+  ] = React.useState<?string>(null);
   const initialPackOpened = React.useRef<boolean>(false);
   const { showAlert } = useAlertDialog();
 
@@ -317,18 +320,18 @@ export const AssetStoreStateProvider = ({
   // open the asset pack with the slug that was asked to be initially loaded.
   React.useEffect(
     () => {
-      if (initialPackOpened.current) {
-        // The pack was already opened, don't re-open it again even
+      if (!initialPackUserFriendlySlug || initialPackOpened.current) {
+        // If there is no initial pack or
+        // if the pack was already opened, don't re-open it again even
         // if the effect run again.
         return;
       }
 
-      const userFriendlySlug = initialPackUserFriendlySlug.current;
       if (
         publicAssetPacks &&
         receivedAssetPacks &&
         privateAssetPacks &&
-        userFriendlySlug
+        initialPackUserFriendlySlug
       ) {
         initialPackOpened.current = true;
 
@@ -336,22 +339,26 @@ export const AssetStoreStateProvider = ({
         const assetPack = getAssetPackFromUserFriendlySlug({
           publicAssetPacks,
           receivedAssetPacks,
-          userFriendlySlug,
+          userFriendlySlug: initialPackUserFriendlySlug,
         });
 
         if (assetPack) {
           navigationState.openPackPage(assetPack);
+          initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
+          setInitialPackUserFriendlySlug(null);
           return;
         }
 
         // Otherwise, try to open the information page of a pack not yet bought.
         const privateAssetPack = getPrivateAssetPackListingData({
           privateAssetPacks,
-          userFriendlySlug,
+          userFriendlySlug: initialPackUserFriendlySlug,
         });
 
         if (privateAssetPack) {
           navigationState.openPrivateAssetPackInformationPage(privateAssetPack);
+          initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
+          setInitialPackUserFriendlySlug(null);
           return;
         }
 
@@ -367,6 +374,7 @@ export const AssetStoreStateProvider = ({
       privateAssetPacks,
       navigationState,
       showAlert,
+      initialPackUserFriendlySlug,
     ]
   );
 
@@ -409,13 +417,6 @@ export const AssetStoreStateProvider = ({
     chosenCategory,
     chosenFilters,
     searchFilters
-  );
-
-  const setInitialPackUserFriendlySlug = React.useCallback(
-    (newInitialPackUserFriendlySlug: string) => {
-      initialPackUserFriendlySlug.current = newInitialPackUserFriendlySlug;
-    },
-    []
   );
 
   const assetStoreState = React.useMemo(

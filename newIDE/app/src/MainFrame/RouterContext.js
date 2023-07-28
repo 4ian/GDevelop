@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Window from '../Utils/Window';
 
-type Route =
+export type Route =
   | 'onboarding' // For compatibility when there was only one tutorial.
   | 'guided-lesson' // New way of opening a tutorial.
   | 'subscription'
@@ -14,7 +14,7 @@ type RouteKey =
   | 'games-dashboard-tab'
   | 'asset-pack'
   | 'tutorial-id';
-type RouteArguments = { [RouteKey]: string };
+export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|
   routeArguments: RouteArguments,

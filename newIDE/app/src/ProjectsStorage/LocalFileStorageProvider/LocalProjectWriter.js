@@ -283,3 +283,16 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
     />
   );
 };
+
+export const isTryingToSaveInForbiddenPath = (
+  saveAsLocation: SaveAsLocation
+): boolean => {
+  const fileIdentifier = saveAsLocation.fileIdentifier;
+  if (!fileIdentifier) return false;
+  // If the user is saving locally and chose the same location as where the
+  // executable is running, prevent this, as it will be deleted when the app is updated.
+  const exePath = remote.app.getPath('exe');
+  const saveAsLocationPath = fileIdentifier;
+  console.log(exePath, saveAsLocationPath);
+  return saveAsLocationPath.startsWith(exePath);
+};

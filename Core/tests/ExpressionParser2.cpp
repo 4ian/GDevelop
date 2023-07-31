@@ -29,8 +29,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithUnsupportedCapability",
-                          "MyFakeObjectWithUnsupportedCapability",
+                          "MyExtension::FakeObjectWithSupportedCapability",
+                          "MyFakeObjectWithSupportedCapability",
                           2);
 
   gd::ExpressionParser2 parser;

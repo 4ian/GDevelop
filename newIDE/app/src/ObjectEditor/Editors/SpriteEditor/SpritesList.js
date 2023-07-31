@@ -295,6 +295,7 @@ const SpritesList = ({
         allDirectionSpritesHaveSameCollisionMasks,
         allDirectionSpritesHaveSamePoints,
       } = checkDirectionPointsAndCollisionsMasks(direction);
+      const spritesCountBeforeAdding = direction.getSpritesCount();
 
       const resources = await resourceManagementProps.onChooseResource({
         initialSourceName: resourceSource.name,
@@ -328,8 +329,8 @@ const SpritesList = ({
       await resourceManagementProps.onFetchNewlyAddedResources();
 
       if (resources.length && onSpriteUpdated) onSpriteUpdated();
-      if (direction.getSpritesCount() === 1 && onFirstSpriteUpdated) {
-        // If the sprites count is 1, we can assume the first sprite was added.
+      if (spritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+        // If there was no sprites before, we can assume the first sprite was added.
         onFirstSpriteUpdated();
       }
     },
@@ -408,6 +409,7 @@ const SpritesList = ({
               copySpritePolygons(direction.getSprite(0), sprite);
             }
           }
+          onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
           newDirection.addSprite(sprite);
           sprite.delete();
         });
@@ -449,6 +451,7 @@ const SpritesList = ({
       objectName,
       onReplaceByDirection,
       onSpriteUpdated,
+      onSpriteAdded,
       onFirstSpriteUpdated,
       project,
       resourceManagementProps,

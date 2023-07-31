@@ -3480,12 +3480,12 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layoutExpression =
         CreateExpressionWithLayerParameter(project, layout.GetEvents());
 
-    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layout",
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "");
 
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
-            "MyExtension::CameraCenterX(\"My layout\") + "
-            "MyExtension::CameraCenterX(\"My layout\")");
+            "MyExtension::CameraCenterX(\"My layer\") + "
+            "MyExtension::CameraCenterX(\"My layer\")");
   }
 
   SECTION("Can't rename a layer from an empty name") {

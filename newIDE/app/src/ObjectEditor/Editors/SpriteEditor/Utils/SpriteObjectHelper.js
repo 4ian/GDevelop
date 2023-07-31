@@ -275,6 +275,28 @@ export const allSpritesHaveSameCollisionMasksAs = (
   );
 };
 
+export const isFirstSpriteUsingFullImageCollisionMask = (
+  spriteObject: gdSpriteObject
+) => {
+  if (
+    spriteObject.getAnimationsCount() > 0 &&
+    spriteObject.getAnimation(0).getDirectionsCount() > 0 &&
+    spriteObject
+      .getAnimation(0)
+      .getDirection(0)
+      .getSpritesCount() > 0
+  ) {
+    // We look at the first sprite of the first animation as the reference.
+    const firstSprite = spriteObject
+      .getAnimation(0)
+      .getDirection(0)
+      .getSprite(0);
+
+    return firstSprite.isFullImageCollisionMask();
+  }
+  return false;
+};
+
 export const deleteSpritesFromAnimation = (
   animation: gdAnimation,
   spritePtrs: {

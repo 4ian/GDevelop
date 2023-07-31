@@ -13,6 +13,7 @@ import {
   allDirectionSpritesHaveSameCollisionMasksAs,
   deleteSpritesFromAnimation,
   duplicateSpritesInAnimation,
+  isFirstSpriteUsingFullImageCollisionMask,
 } from './Utils/SpriteObjectHelper';
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
@@ -295,6 +296,9 @@ const SpritesList = ({
         allDirectionSpritesHaveSameCollisionMasks,
         allDirectionSpritesHaveSamePoints,
       } = checkDirectionPointsAndCollisionsMasks(direction);
+      const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
+        spriteConfiguration
+      );
       const spritesCountBeforeAdding = direction.getSpritesCount();
 
       const resources = await resourceManagementProps.onChooseResource({
@@ -314,6 +318,9 @@ const SpritesList = ({
         }
         if (allDirectionSpritesHaveSameCollisionMasks) {
           copySpritePolygons(direction.getSprite(0), sprite);
+        }
+        if (shouldUseFullImageCollisionMask) {
+          sprite.setFullImageCollisionMask(true);
         }
         onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
         direction.addSprite(sprite);
@@ -342,6 +349,7 @@ const SpritesList = ({
       onSpriteUpdated,
       onSpriteAdded,
       onFirstSpriteUpdated,
+      spriteConfiguration,
     ]
   );
 
@@ -355,6 +363,9 @@ const SpritesList = ({
         allDirectionSpritesHaveSameCollisionMasks,
         allDirectionSpritesHaveSamePoints,
       } = checkDirectionPointsAndCollisionsMasks(direction);
+      const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
+        spriteConfiguration
+      );
 
       try {
         setExternalEditorOpened(true);
@@ -409,6 +420,9 @@ const SpritesList = ({
               copySpritePolygons(direction.getSprite(0), sprite);
             }
           }
+          if (shouldUseFullImageCollisionMask) {
+            sprite.setFullImageCollisionMask(true);
+          }
           onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
           newDirection.addSprite(sprite);
           sprite.delete();
@@ -457,6 +471,7 @@ const SpritesList = ({
       resourceManagementProps,
       resourcesLoader,
       onChangeName,
+      spriteConfiguration,
     ]
   );
 

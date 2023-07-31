@@ -56,22 +56,22 @@ export const setupInstructionParameters = (
       .toJSArray()
       .filter(behaviorName => {
         return (
-          !allowedBehaviorType ||
-          gd.getTypeOfBehavior(
-            globalObjectsContainer,
-            objectsContainer,
-            behaviorName,
-            false
-          ) === allowedBehaviorType
-        ) &&
-        (allowedBehaviorType ||
-          !gd.isDefaultBehavior(
-            globalObjectsContainer,
-            objectsContainer,
-            objectName,
-            behaviorName,
-            true
-          ));
+          (!allowedBehaviorType ||
+            gd.getTypeOfBehavior(
+              globalObjectsContainer,
+              objectsContainer,
+              behaviorName,
+              false
+            ) === allowedBehaviorType) &&
+          (allowedBehaviorType ||
+            !gd.isDefaultBehavior(
+              globalObjectsContainer,
+              objectsContainer,
+              objectName,
+              behaviorName,
+              true
+            ))
+        );
       });
 
     if (

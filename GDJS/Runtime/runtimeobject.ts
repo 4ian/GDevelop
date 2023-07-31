@@ -243,7 +243,6 @@ namespace gdjs {
         this._behaviors.push(new Ctor(instanceContainer, autoData, this));
         this._behaviorsTable.put(autoData.name, this._behaviors[i]);
       }
-      console.log(this.name + ": " + this._behaviors.map(behavior => behavior.name));
       this._timers = new Hashtable();
     }
 

@@ -13,6 +13,9 @@ namespace gdjs {
 AnimatableExtension::AnimatableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAnimatableExtension(*this);
 
+  GetBehaviorMetadata("AnimatableCapability::AnimatableBehavior")
+      .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
+
   auto& actions = GetAllActionsForBehavior("AnimatableCapability::AnimatableBehavior");
   auto& conditions = GetAllConditionsForBehavior("AnimatableCapability::AnimatableBehavior");
   auto& expressions = GetAllExpressionsForBehavior("AnimatableCapability::AnimatableBehavior");

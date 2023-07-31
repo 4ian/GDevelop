@@ -13,6 +13,9 @@ namespace gdjs {
 FlippableExtension::FlippableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsFlippableExtension(*this);
 
+  GetBehaviorMetadata("FlippableCapability::FlippableBehavior")
+      .SetIncludeFile("object-capabilities/FlippableBehavior.js");
+
   auto& actions = GetAllActionsForBehavior("FlippableCapability::FlippableBehavior");
   auto& conditions = GetAllConditionsForBehavior("FlippableCapability::FlippableBehavior");
 

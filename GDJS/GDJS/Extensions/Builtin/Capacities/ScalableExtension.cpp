@@ -13,6 +13,9 @@ namespace gdjs {
 ScalableExtension::ScalableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsScalableExtension(*this);
 
+  GetBehaviorMetadata("ScalableCapability::ScalableBehavior")
+      .SetIncludeFile("object-capabilities/ScalableBehavior.js");
+
   auto& actions = GetAllActionsForBehavior("ScalableCapability::ScalableBehavior");
   auto& conditions = GetAllConditionsForBehavior("ScalableCapability::ScalableBehavior");
   auto& expressions = GetAllExpressionsForBehavior("ScalableCapability::ScalableBehavior");

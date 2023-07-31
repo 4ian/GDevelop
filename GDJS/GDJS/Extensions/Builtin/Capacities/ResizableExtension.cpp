@@ -13,6 +13,9 @@ namespace gdjs {
 ResizableExtension::ResizableExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsResizableExtension(*this);
 
+  GetBehaviorMetadata("ResizableCapability::ResizableBehavior")
+      .SetIncludeFile("object-capabilities/ResizableBehavior.js");
+
   auto& actions = GetAllActionsForBehavior("ResizableCapability::ResizableBehavior");
   auto& conditions = GetAllConditionsForBehavior("ResizableCapability::ResizableBehavior");
 

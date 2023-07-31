@@ -13,6 +13,9 @@ namespace gdjs {
 OpacityExtension::OpacityExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsOpacityExtension(*this);
 
+  GetBehaviorMetadata("OpacityCapability::OpacityBehavior")
+      .SetIncludeFile("object-capabilities/OpacityBehavior.js");
+
   auto& actions = GetAllActionsForBehavior("OpacityCapability::OpacityBehavior");
   auto& conditions = GetAllConditionsForBehavior("OpacityCapability::OpacityBehavior");
   auto& expressions = GetAllExpressionsForBehavior("OpacityCapability::OpacityBehavior");

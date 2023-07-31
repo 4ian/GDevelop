@@ -13,6 +13,9 @@ namespace gdjs {
 EffectExtension::EffectExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsEffectExtension(*this);
 
+  GetBehaviorMetadata("EffectCapability::EffectBehavior")
+      .SetIncludeFile("object-capabilities/EffectBehavior.js");
+
   auto& actions = GetAllActionsForBehavior("EffectCapability::EffectBehavior");
   auto& conditions = GetAllConditionsForBehavior("EffectCapability::EffectBehavior");
   auto& expressions = GetAllExpressionsForBehavior("EffectCapability::EffectBehavior");

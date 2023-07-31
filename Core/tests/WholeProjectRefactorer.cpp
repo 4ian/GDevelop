@@ -3348,7 +3348,17 @@ const gd::Instruction &CreateActionWithLayerParameter(gd::Project &project,
   action.SetParameter(3, gd::Expression("\"My layer\""));
   return event.GetActions().Insert(action);
 }
+const gd::Instruction &CreateActionWithEmptyLayerParameter(gd::Project &project,
+                                                      gd::EventsList &events) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
+  gd::Instruction action;
+  action.SetType("MyExtension::SetCameraCenterX");
+  action.SetParametersCount(4);
+  action.SetParameter(3, gd::Expression(""));
+  return event.GetActions().Insert(action);
+}
 const gd::Instruction &
 CreateExpressionWithLayerParameter(gd::Project &project,
                                    gd::EventsList &events) {
@@ -3442,6 +3452,57 @@ TEST_CASE("RenameLayer", "[common]") {
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::CameraCenterX(\"layerA\") + "
             "MyExtension::CameraCenterX(\"layerA\")");
+  }
+
+  SECTION("Can rename a layer when a layer parameter is empty") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutAction =
+        CreateActionWithEmptyLayerParameter(project, layout.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "layerA");
+
+    REQUIRE(layoutAction.GetParameter(0).GetPlainString() == "");
+  }
+
+  SECTION("Can't rename a layer to an empty name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layout",
+                                            "");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My layout\") + "
+            "MyExtension::CameraCenterX(\"My layout\")");
+  }
+
+  SECTION("Can't rename a layer from an empty name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "", "My layer");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"\") + "
+            "MyExtension::CameraCenterX(\"\")");
   }
 }
 

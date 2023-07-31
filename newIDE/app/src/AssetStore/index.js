@@ -21,18 +21,12 @@ import {
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
-import {
-  BoxSearchResults,
-  type BoxSearchResultsInterface,
-} from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
   AssetStoreFilterPanel,
   clearAllFilters,
 } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
-import { AssetCard } from './AssetCard';
-import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
@@ -58,6 +52,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import Music from '../UI/CustomSvgIcons/Music';
+import AssetList from './AssetList';
 
 const capitalize = (str: string) => {
   return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -99,7 +94,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const {
       publicAssetPacks,
       privateAssetPacks,
-      searchResults,
       error,
       fetchAssetsAndFilters,
       navigationState,
@@ -178,12 +172,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         isAssetPackAudioOnly(openedAssetPack)
       );
     const assetsHome = React.useRef<?AssetsHomeInterface>(null);
-    const boxSearchResults = React.useRef<?BoxSearchResultsInterface>(null);
     const assetDetails = React.useRef<?AssetDetailsInterface>(null);
     const getScrollView = React.useCallback(() => {
-      return (
-        assetsHome.current || boxSearchResults.current || assetDetails.current
-      );
+      return assetsHome.current || assetDetails.current;
     }, []);
     const saveScrollPosition = React.useCallback(
       () => {
@@ -630,45 +621,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               <PlaceholderLoader />
             )
           ) : isOnSearchResultPage ? (
-            <BoxSearchResults
-              ref={boxSearchResults}
-              baseSize={128}
-              onRetry={fetchAssetsAndFilters}
-              error={error}
-              searchItems={searchResults}
-              spacing={8}
-              renderSearchItem={(assetShortHeader, size) => (
-                <AssetCard
-                  id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
-                  size={size}
-                  onOpenDetails={() => onOpenDetails(assetShortHeader)}
-                  assetShortHeader={assetShortHeader}
-                />
-              )}
-              noResultPlaceholder={
-                openedAssetPack &&
-                openedAssetPack.content &&
-                isAssetPackAudioOnly(openedAssetPack) ? (
-                  <Column expand justifyContent="center" alignItems="center">
-                    <AlertMessage
-                      kind="info"
-                      renderRightButton={() =>
-                        renderPrivateAssetPackAudioFilesDownloadButton(
-                          openedAssetPack
-                        )
-                      }
-                    >
-                      <Trans>
-                        Download all the sounds of the asset pack in one click
-                        and use them in your project.
-                      </Trans>
-                    </AlertMessage>
-                  </Column>
-                ) : (
-                  <NoResultPlaceholder
-                    onClear={() => clearAllFilters(assetFiltersState)}
-                  />
-                )
+            <AssetList
+              onOpenDetails={onOpenDetails}
+              renderPrivateAssetPackAudioFilesDownloadButton={
+                renderPrivateAssetPackAudioFilesDownloadButton
               }
             />
           ) : openedAssetShortHeader ? (

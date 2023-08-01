@@ -16,13 +16,14 @@ describe('EnumerateInstructions', () => {
     expect(
       instructions.find(
         instruction =>
-          instruction.type === 'AnimatableCapability::HasAnimationEnded'
+          instruction.type ===
+          'AnimatableCapability::AnimatableBehavior::HasAnimationEnded'
       )
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Animation finished',
         fullGroupName: 'General/Animatable capability/Animations and images',
-        type: 'AnimatableCapability::HasAnimationEnded',
+        type: 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded',
       })
     );
     expect(
@@ -128,7 +129,8 @@ describe('EnumerateInstructions', () => {
     expect(getObjectParameterIndex(triggerOnce.metadata)).toBe(-1);
 
     const spriteAnimationEnded = conditions.filter(
-      ({ type }) => type === 'AnimatableCapability::HasAnimationEnded'
+      ({ type }) =>
+        type === 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded'
     )[0];
     expect(spriteAnimationEnded).not.toBeUndefined();
     expect(getObjectParameterIndex(spriteAnimationEnded.metadata)).toBe(0);
@@ -151,7 +153,7 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Animation finished',
-          type: 'AnimatableCapability::HasAnimationEnded',
+          type: 'AnimatableCapability::AnimatableBehavior::HasAnimationEnded',
         }),
         expect.objectContaining({
           displayedName: 'The cursor/touch is on an object',

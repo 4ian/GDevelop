@@ -1900,6 +1900,32 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION(
+      "Valid function call with a default behavior") {
+    auto node = parser.ParseExpression(
+        "FakeObjectWithDefaultBehavior.Effect::GetSomethingRequiringEffectCapability(123)");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator(platform, project, layout1, "string");
+    node->Visit(validator);
+    REQUIRE(validator.GetAllErrors().size() == 0);
+  }
+
+  SECTION(
+      "Invalid function call with an object that doesn't have a default behavior") {
+    auto node =
+        parser.ParseExpression("MySpriteObject.Effect::"
+                               "GetSomethingRequiringEffectCapability(123)");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator(platform, project, layout1, "string");
+    node->Visit(validator);
+    REQUIRE(validator.GetFatalErrors().size() == 0);
+    REQUIRE(validator.GetAllErrors().size() == 1);
+    REQUIRE(validator.GetAllErrors()[0]->GetMessage() ==
+            "This behavior is not attached to this object.");
+  }
+
   SECTION("Fuzzy/random tests") {
     {
       auto testExpression = [&parser, platform, project, layout1](const gd::String &expression) {

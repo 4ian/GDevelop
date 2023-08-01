@@ -52,7 +52,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import Music from '../UI/CustomSvgIcons/Music';
-import AssetList from './AssetList';
+import AssetsList, { type AssetsListInterface } from './AssetsList';
 
 const capitalize = (str: string) => {
   return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -173,8 +173,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       );
     const assetsHome = React.useRef<?AssetsHomeInterface>(null);
     const assetDetails = React.useRef<?AssetDetailsInterface>(null);
+    const assetsList = React.useRef<?AssetsListInterface>(null);
     const getScrollView = React.useCallback(() => {
-      return assetsHome.current || assetDetails.current;
+      return assetsHome.current || assetDetails.current || assetsList.current;
     }, []);
     const saveScrollPosition = React.useCallback(
       () => {
@@ -621,7 +622,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               <PlaceholderLoader />
             )
           ) : isOnSearchResultPage ? (
-            <AssetList
+            <AssetsList
+              ref={assetsList}
               onOpenDetails={onOpenDetails}
               renderPrivateAssetPackAudioFilesDownloadButton={
                 renderPrivateAssetPackAudioFilesDownloadButton

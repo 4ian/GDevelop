@@ -43,7 +43,6 @@ const styles = {
     bottom: 0,
     left: 0,
     right: 0,
-    height: 48,
     color: '#fff',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -104,13 +103,20 @@ export const AssetCard = ({
             />
           )}
         </div>
-        <div style={styles.titleContainer}>
+        <div
+          style={{
+            ...styles.titleContainer,
+            height: assetShortHeader.shortDescription ? 40 : 20,
+          }}
+        >
           <Text noMargin style={styles.title} color="inherit">
             {assetShortHeader.name}
           </Text>
-          <Text noMargin style={styles.title} size="body2" color="inherit">
-            {assetShortHeader.shortDescription}
-          </Text>
+          {assetShortHeader.shortDescription && (
+            <Text noMargin style={styles.title} size="body2" color="inherit">
+              {assetShortHeader.shortDescription}
+            </Text>
+          )}
         </div>
       </div>
     </ButtonBase>

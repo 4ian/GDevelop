@@ -163,6 +163,7 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         '  getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;',
         '  getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;',
         '  getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;',
+        '  isDefaultBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): boolean;',
         '  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;',
         '',
         '  removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;',

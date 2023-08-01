@@ -3361,7 +3361,8 @@ const gd::Instruction &CreateActionWithEmptyLayerParameter(gd::Project &project,
 }
 const gd::Instruction &
 CreateExpressionWithLayerParameter(gd::Project &project,
-                                   gd::EventsList &events) {
+                                   gd::EventsList &events,
+                                   const gd::String &layerName) {
   gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
       events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
@@ -3369,8 +3370,8 @@ CreateExpressionWithLayerParameter(gd::Project &project,
   action.SetType("MyExtension::DoSomething");
   action.SetParametersCount(1);
   action.SetParameter(
-      0, gd::Expression("MyExtension::CameraCenterX(\"My layer\") + "
-                        "MyExtension::CameraCenterX(\"My layer\")"));
+      0, gd::Expression("MyExtension::CameraCenterX(\"" + layerName + "\") + "
+                        "MyExtension::CameraCenterX(\"" + layerName + "\")"));
   return event.GetActions().Insert(action);
 }
 } // namespace
@@ -3400,13 +3401,13 @@ TEST_CASE("RenameLayer", "[common]") {
         project, otherExternalEvents.GetEvents());
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
     auto &externalExpression =
-        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents());
+        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents(), "My layer");
     auto &otherLayoutExpression =
-        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents());
+        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents(), "My layer");
     auto &otherExternalExpression = CreateExpressionWithLayerParameter(
-        project, otherExternalEvents.GetEvents());
+        project, otherExternalEvents.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "My renamed layer");
@@ -3444,7 +3445,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layout = project.InsertNewLayout("My layout", 0);
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "layerA");
@@ -3478,7 +3479,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layout = project.InsertNewLayout("My layout", 0);
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "");
@@ -3496,7 +3497,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layout = project.InsertNewLayout("My layout", 0);
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "", "My layer");
 

@@ -176,8 +176,7 @@ const getAutocompletionsForObjectExpressions = function(
     filterExpressions(objectExpressions, prefix),
     expressionAutocompletionContext.scope
   );
-
-  return getAutocompletionsForExpressions(
+  const autocompletions = getAutocompletionsForExpressions(
     filteredObjectExpressions,
     prefix,
     completionDescription.getReplacementStartPosition(),
@@ -185,6 +184,53 @@ const getAutocompletionsForObjectExpressions = function(
     isExact,
     type
   );
+
+  const behaviorNames = gd.getBehaviorsOfObject(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName,
+    true
+  );
+  mapVector(behaviorNames, behaviorName => {
+    const behaviorType = gd.getTypeOfBehaviorInObjectOrGroup(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName,
+      behaviorName,
+      true
+    );
+    if (!behaviorType) {
+      return;
+    }
+    const behaviorExpressions = enumerateBehaviorExpressions(
+      type,
+      behaviorType
+    );
+    const filteredBehaviorExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      filterExpressions(behaviorExpressions, prefix),
+      expressionAutocompletionContext.scope
+    );
+    const behaviorExpressionAutocompletions = getAutocompletionsForExpressions(
+      filteredBehaviorExpressions,
+      prefix,
+      completionDescription.getReplacementStartPosition(),
+      completionDescription.getReplacementEndPosition(),
+      isExact,
+      type
+    );
+    behaviorExpressionAutocompletions.forEach(autocompletion => {
+      autocompletion.completion =
+        behaviorName +
+        gd.PlatformExtension.getNamespaceSeparator() +
+        autocompletion.completion;
+    });
+    autocompletions.push.apply(
+      autocompletions,
+      behaviorExpressionAutocompletions
+    );
+  });
+
+  return autocompletions;
 };
 
 const getAutocompletionsForBehaviorExpressions = function(

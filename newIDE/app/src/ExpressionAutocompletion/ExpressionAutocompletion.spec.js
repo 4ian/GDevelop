@@ -257,6 +257,43 @@ describe('ExpressionAutocompletion', () => {
       );
     });
 
+    it('can autocomplete behavior expressions directly from object', () => {
+      const { project, testLayout, parser } = makeTestContext();
+      const scope = { layout: testLayout };
+
+      const expressionNode = parser
+        .parseExpression('MySpriteObject.SpeedSc')
+        .get();
+      const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        gd.JsPlatform.get(),
+        project,
+        testLayout,
+        'string',
+        expressionNode,
+        16
+      );
+      const autocompletions = getAutocompletionsFromDescriptions(
+        {
+          gd,
+          project: project,
+          globalObjectsContainer: project,
+          objectsContainer: testLayout,
+          scope,
+        },
+        completionDescriptions
+      );
+      expect(autocompletions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            completion: 'Animation::SpeedScale',
+            addParenthesis: true,
+            isExact: false,
+            shouldConvertToString: true,
+          }),
+        ])
+      );
+    });
+
     it('can autocomplete object points', () => {
       const { project, testLayout, parser } = makeTestContext();
       const scope = { layout: testLayout };

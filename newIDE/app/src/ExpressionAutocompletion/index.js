@@ -61,6 +61,7 @@ export type ExpressionAutocompletion =
   | {|
       ...BaseExpressionAutocompletion,
       kind: 'Behavior',
+      behaviorType?: string,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -509,14 +510,24 @@ const getAutocompletionsForBehavior = function(
     )
     .toJSArray()
     .filter(behaviorName => behaviorName.indexOf(prefix) !== -1)
-    .map(behaviorName => ({
-      kind: 'Behavior',
-      completion: behaviorName,
-      replacementStartPosition: completionDescription.getReplacementStartPosition(),
-      replacementEndPosition: completionDescription.getReplacementEndPosition(),
-      addNamespaceSeparator: true,
-      isExact,
-    }));
+    .map(behaviorName => {
+      const behaviorType = gd.getTypeOfBehaviorInObjectOrGroup(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+        behaviorName,
+        true
+      );
+      return {
+        kind: 'Behavior',
+        completion: behaviorName,
+        replacementStartPosition: completionDescription.getReplacementStartPosition(),
+        replacementEndPosition: completionDescription.getReplacementEndPosition(),
+        addNamespaceSeparator: true,
+        isExact,
+        behaviorType,
+      };
+    });
 };
 
 export const getAutocompletionsFromDescriptions = (

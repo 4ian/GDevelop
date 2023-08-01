@@ -21,7 +21,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
 
-  auto &myObject = layout1.InsertNewObject(project, "BuiltinObject", "MyObject", 0);
+  // Create an instance of BuiltinObject.
+  // This is not possible in practice.
+  auto &myObject = layout1.InsertNewObject(project, "", "MyObject", 0);
   myObject.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
 
   auto &myGroup = layout1.GetObjectGroups().InsertNew("MyGroup", 0);
@@ -29,8 +31,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 1);
   layout1.InsertNewObject(project,
-                          "MyExtension::FakeObjectWithSupportedCapability",
-                          "MyFakeObjectWithSupportedCapability",
+                          "MyExtension::FakeObjectWithDefaultBehavior",
+                          "FakeObjectWithDefaultBehavior",
                           2);
 
   gd::ExpressionParser2 parser;

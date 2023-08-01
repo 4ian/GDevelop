@@ -499,6 +499,19 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                        .AddDefaultBehavior("MyExtension::EffectBehavior");
   }
 
+  // Declare an event-based behavior to avoid warnings.
+  {
+    extension->AddBehavior("MyEventsBasedBehavior",
+                            "My event-based behavior",
+                            "MyEventsBasedBehavior",
+                            "Avoid warnings",
+                            "Group",
+                            "Icon.png",
+                            "MyEventsBasedBehavior",
+                            gd::make_unique<gd::Behavior>(),
+                            gd::make_unique<gd::BehaviorsSharedData>());
+  }
+
   // Actions and expressions with several parameter types.
   {
     extension

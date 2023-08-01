@@ -7,6 +7,7 @@ import { AssetCard } from './AssetCard';
 import {
   type AssetShortHeader,
   type PrivateAssetPack,
+  type PublicAssetPack,
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
 import AlertMessage from '../UI/AlertMessage';
@@ -30,13 +31,14 @@ import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 const getAssetSize = (windowWidth: WidthType) => {
   switch (windowWidth) {
     case 'small':
-      return 100;
+      return 80;
     case 'medium':
+      return 120;
     case 'large':
     case 'xlarge':
-      return 128;
+      return 130;
     default:
-      return 125;
+      return 120;
   }
 };
 
@@ -53,10 +55,8 @@ const useStylesForGridListItem = makeStyles(theme =>
   createStyles({
     root: {
       '&:focus': {
-        border: `2px solid ${theme.palette.primary.main}`,
-        outline: 'none',
+        outline: `2px solid ${theme.palette.primary.main}`,
       },
-      '&:focus-visible': { outline: 'unset' },
     },
   })
 );
@@ -102,19 +102,30 @@ export type AssetsListInterface = {|
 |};
 
 type Props = {|
+  assets: ?Array<AssetShortHeader>,
+  privateAssetPacks?: ?Array<PrivateAssetPack>,
+  publicAssetPacks?: ?Array<PublicAssetPack>,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
-  renderPrivateAssetPackAudioFilesDownloadButton: (
+  renderPrivateAssetPackAudioFilesDownloadButton?: (
     assetPack: PrivateAssetPack
   ) => React.Node,
+  noResultsPlaceHolder?: React.Node,
+  error?: ?Error,
 |};
 
 const AssetsList = React.forwardRef<Props, AssetsListInterface>(
   (
-    { onOpenDetails, renderPrivateAssetPackAudioFilesDownloadButton }: Props,
+    {
+      assets,
+      onOpenDetails,
+      renderPrivateAssetPackAudioFilesDownloadButton,
+      noResultsPlaceHolder,
+      privateAssetPacks,
+      publicAssetPacks,
+    }: Props,
     ref
   ) => {
     const {
-      searchResults,
       error,
       fetchAssetsAndFilters,
       assetFiltersState,
@@ -141,8 +152,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
 
     const assetTiles = React.useMemo(
       () =>
-        searchResults
-          ? searchResults
+        assets
+          ? assets
               .map(assetShortHeader => (
                 <AssetCardTile
                   assetShortHeader={assetShortHeader}
@@ -153,8 +164,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
               ))
               .splice(0, 200) // Limit the number of displayed assets to avoid performance issues
           : null,
-      [searchResults, onOpenDetails, windowWidth]
+      [assets, onOpenDetails, windowWidth]
     );
+
+    console.log(assetTiles);
 
     return (
       <ScrollView ref={scrollView} id="asset-store-listing">
@@ -174,7 +187,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           </GridList>
         ) : openedAssetPack &&
           openedAssetPack.content &&
-          isAssetPackAudioOnly(openedAssetPack) ? (
+          isAssetPackAudioOnly(openedAssetPack) &&
+          renderPrivateAssetPackAudioFilesDownloadButton ? (
           <Column expand justifyContent="center" alignItems="center">
             <AlertMessage
               kind="info"
@@ -189,9 +203,11 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             </AlertMessage>
           </Column>
         ) : (
-          <NoResultPlaceholder
-            onClear={() => clearAllFilters(assetFiltersState)}
-          />
+          noResultsPlaceHolder || (
+            <NoResultPlaceholder
+              onClear={() => clearAllFilters(assetFiltersState)}
+            />
+          )
         )}
       </ScrollView>
     );

@@ -24,10 +24,9 @@ import SelectOption from '../UI/SelectOption';
 import IconButton from '../UI/IconButton';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
-import { AssetCard } from './AssetCard';
+import AssetsList from './AssetsList';
 import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import Link from '../UI/Link';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
@@ -117,7 +116,6 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       licenses,
       environment,
       error: filterError,
-      fetchAssetsAndFilters,
       useSearchItem,
     } = React.useContext(AssetStoreContext);
     const [asset, setAsset] = React.useState<?Asset>(null);
@@ -539,30 +537,20 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 </Text>
               </Line>
               <Line expand noMargin justifyContent="center">
-                <BoxSearchResults
-                  baseSize={128}
-                  onRetry={fetchAssetsAndFilters}
-                  error={filterError}
-                  searchItems={truncatedSearchResults}
-                  spacing={8}
-                  renderSearchItem={(assetShortHeader, size) => (
-                    <AssetCard
-                      size={size}
-                      onOpenDetails={() => {
-                        setAsset(null);
-                        onOpenDetails(assetShortHeader);
-                      }}
-                      assetShortHeader={assetShortHeader}
-                    />
-                  )}
-                  noResultPlaceholder={
+                <AssetsList
+                  assets={truncatedSearchResults}
+                  onOpenDetails={assetShortHeader => {
+                    setAsset(null);
+                    onOpenDetails(assetShortHeader);
+                  }}
+                  noResultsPlaceHolder={
                     <Line alignItems="flex-start">
                       <EmptyMessage>
                         <Trans>No similar asset was found.</Trans>
                       </EmptyMessage>
                     </Line>
                   }
-                  noScroll
+                  error={filterError}
                 />
               </Line>
             </Column>

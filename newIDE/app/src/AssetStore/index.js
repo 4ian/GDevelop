@@ -92,6 +92,7 @@ const identifyAssetPackKind = ({
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
   (props: Props, ref) => {
     const {
+      searchResults,
       publicAssetPacks,
       privateAssetPacks,
       error,
@@ -623,7 +624,9 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             )
           ) : isOnSearchResultPage ? (
             <AssetsList
+              assets={searchResults}
               ref={assetsList}
+              error={error}
               onOpenDetails={onOpenDetails}
               renderPrivateAssetPackAudioFilesDownloadButton={
                 renderPrivateAssetPackAudioFilesDownloadButton

@@ -6,7 +6,6 @@ import {
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
 import { getPixelatedImageRendering } from '../Utils/CssHelpers';
-import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
@@ -48,6 +47,9 @@ const styles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     backgroundColor: 'rgb(0,0,0,0.5)',
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
   },
   title: {
     whiteSpace: 'nowrap',
@@ -80,45 +82,40 @@ export const AssetCard = ({
       : undefined),
   };
   return (
-    <ButtonBase onClick={onOpenDetails} focusRipple>
-      <div
-        id={id}
-        style={{ ...styles.cardContainer, width: size, height: size }}
-      >
-        <div style={{ ...styles.previewContainer, width: size, height: size }}>
-          <CheckeredBackground />
-          {isPrivate ? (
-            <AuthorizedAssetImage
-              key={previewImageUrl}
-              style={style}
-              url={previewImageUrl}
-              alt={assetShortHeader.name}
-            />
-          ) : (
-            <CorsAwareImage
-              key={previewImageUrl}
-              style={style}
-              src={previewImageUrl}
-              alt={assetShortHeader.name}
-            />
-          )}
-        </div>
-        <div
-          style={{
-            ...styles.titleContainer,
-            height: assetShortHeader.shortDescription ? 40 : 20,
-          }}
-        >
-          <Text noMargin style={styles.title} color="inherit">
-            {assetShortHeader.name}
-          </Text>
-          {assetShortHeader.shortDescription && (
-            <Text noMargin style={styles.title} size="body2" color="inherit">
-              {assetShortHeader.shortDescription}
-            </Text>
-          )}
-        </div>
+    <div id={id} style={{ ...styles.cardContainer, width: size, height: size }}>
+      <div style={{ ...styles.previewContainer, width: size, height: size }}>
+        <CheckeredBackground />
+        {isPrivate ? (
+          <AuthorizedAssetImage
+            key={previewImageUrl}
+            style={style}
+            url={previewImageUrl}
+            alt={assetShortHeader.name}
+          />
+        ) : (
+          <CorsAwareImage
+            key={previewImageUrl}
+            style={style}
+            src={previewImageUrl}
+            alt={assetShortHeader.name}
+          />
+        )}
       </div>
-    </ButtonBase>
+      <div
+        style={{
+          ...styles.titleContainer,
+          height: assetShortHeader.shortDescription ? 40 : 20,
+        }}
+      >
+        <Text noMargin style={styles.title} color="inherit">
+          {assetShortHeader.name}
+        </Text>
+        {assetShortHeader.shortDescription && (
+          <Text noMargin style={styles.title} size="body2" color="inherit">
+            {assetShortHeader.shortDescription}
+          </Text>
+        )}
+      </div>
+    </div>
   );
 };

@@ -286,6 +286,16 @@ describe('ExpressionAutocompletion', () => {
           }),
         ])
       );
+      expect(autocompletions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            completion: 'Animation::SpeedScale',
+            addParenthesis: true,
+            isExact: false,
+            shouldConvertToString: true,
+          }),
+        ])
+      );
     });
 
     it('can autocomplete object points', () => {

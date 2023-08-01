@@ -94,7 +94,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAnimatableExtension(
 
   aut.AddExpressionAndConditionAndAction(
          "number",
-         "AnimationSpeedScale",
+         "SpeedScale",
          _("Animation speed scale"),
          _("the animation speed scale (1 = the default speed, >1 = faster and "
            "<1 = slower)"),

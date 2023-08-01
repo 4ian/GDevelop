@@ -43,14 +43,14 @@ AnimatableExtension::AnimatableExtension() {
       .SetFunctionName("getAnimationName")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 
-  actions["AnimatableCapability::AnimatableBehavior::SetAnimationSpeedScale"]
+  actions["AnimatableCapability::AnimatableBehavior::SetSpeedScale"]
       .SetFunctionName("setAnimationSpeedScale")
       .SetGetter("getAnimationSpeedScale")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  conditions["AnimatableCapability::AnimatableBehavior::AnimationSpeedScale"]
+  conditions["AnimatableCapability::AnimatableBehavior::SpeedScale"]
       .SetFunctionName("getAnimationSpeedScale")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
-  expressions["AnimationSpeedScale"]
+  expressions["SpeedScale"]
       .SetFunctionName("getAnimationSpeedScale")
       .SetIncludeFile("object-capabilities/AnimatableBehavior.js");
 

@@ -16,6 +16,39 @@ import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 
+export const getBehaviorConstraints = (
+  platform: gdPlatform,
+  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  parameterIndex: number
+) => {
+  const behaviorConstraints: Array<{
+    behaviorName: string,
+    behaviorType: string,
+  }> = [];
+  for (
+    let index = parameterIndex + 1;
+    index < functionMetadata.getParametersCount();
+    index++
+  ) {
+    const behaviorParameter = functionMetadata.getParameter(index);
+    if (behaviorParameter.getType() !== 'behavior') {
+      break;
+    }
+    const behaviorType = behaviorParameter.getExtraInfo();
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      platform,
+      behaviorType
+    );
+    if (behaviorMetadata.isHidden()) {
+      behaviorConstraints.push({
+        behaviorName: behaviorMetadata.getDefaultName(),
+        behaviorType,
+      });
+    }
+  }
+  return behaviorConstraints;
+};
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
     const { currentlyRunningInAppTutorial } = React.useContext(
@@ -59,32 +92,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         if (!project || !functionMetadata || parameterIndex === undefined) {
           return [];
         }
-        const behaviorConstraints: Array<{
-          behaviorName: string,
-          behaviorType: string,
-        }> = [];
-        for (
-          let index = parameterIndex + 1;
-          index < functionMetadata.getParametersCount();
-          index++
-        ) {
-          const behaviorParameter = functionMetadata.getParameter(index);
-          if (behaviorParameter.getType() !== 'behavior') {
-            break;
-          }
-          const behaviorType = behaviorParameter.getExtraInfo();
-          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-            project.getCurrentPlatform(),
-            behaviorType
-          );
-          if (behaviorMetadata.isHidden()) {
-            behaviorConstraints.push({
-              behaviorName: behaviorMetadata.getDefaultName(),
-              behaviorType,
-            });
-          }
-        }
-        return behaviorConstraints;
+        return getBehaviorConstraints(
+          project.getCurrentPlatform(),
+          functionMetadata,
+          parameterIndex
+        );
       },
       [expressionMetadata, instructionMetadata, parameterIndex, project]
     );

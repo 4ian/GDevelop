@@ -48,6 +48,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
           <Trans>While these conditions are true:</Trans>
         </div>
         <InstructionsList
+          platform={this.props.project.getCurrentPlatform()}
           instrsList={whileEvent.getWhileConditions()}
           style={
             {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
@@ -86,6 +87,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
           windowWidth={this.props.windowWidth}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={whileEvent.getConditions()}
               style={style}
               className={className}
@@ -115,6 +117,7 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={whileEvent.getActions()}
               style={
                 {

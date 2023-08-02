@@ -29,6 +29,7 @@ const styles = {
 };
 
 type Props = {|
+  platform: gdPlatform,
   instrsList: gdInstructionsList,
   areConditions: boolean,
   onAddNewInstruction: InstructionsListContext => void,
@@ -72,6 +73,7 @@ const addButtonTooltipLabelMouse = t`Right-click for quick menu`;
 const addButtonTooltipLabelTouch = t`Long press for quick menu`;
 
 export default function InstructionsList({
+  platform,
   addButtonId,
   addButtonLabel,
   areConditions,
@@ -132,6 +134,7 @@ export default function InstructionsList({
 
     return (
       <Instruction
+        platform={platform}
         instruction={instruction}
         isCondition={areConditions}
         key={instruction.ptr}

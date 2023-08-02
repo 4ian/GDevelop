@@ -111,21 +111,18 @@ const getObjectsAndGroupsDataSource = ({
     : fullList;
 };
 
-const checkHasRequiredCapability = ({
-  project,
+export const checkHasRequiredCapability = ({
   globalObjectsContainer,
   objectsContainer,
   behaviorConstraints,
   objectName,
 }: {|
-  project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string,
   behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
 |}) => {
   if (!behaviorConstraints) return true;
-  if (!project) return true;
 
   const object = getObjectByName(
     globalObjectsContainer,
@@ -195,7 +192,6 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       ).length !== 0;
 
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
-      project,
       globalObjectsContainer,
       objectsContainer,
       objectName: value,

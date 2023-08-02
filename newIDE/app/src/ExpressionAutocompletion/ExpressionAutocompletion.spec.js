@@ -262,7 +262,7 @@ describe('ExpressionAutocompletion', () => {
       const scope = { layout: testLayout };
 
       const expressionNode = parser
-        .parseExpression('MySpriteObject.SpeedSc')
+        .parseExpression('MySpriteObjectWithBehaviors.Speed')
         .get();
       const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
         gd.JsPlatform.get(),
@@ -270,7 +270,7 @@ describe('ExpressionAutocompletion', () => {
         testLayout,
         'string',
         expressionNode,
-        16
+        'MySpriteObjectWithBehaviors.Speed'.length - 1
       );
       const autocompletions = getAutocompletionsFromDescriptions(
         {
@@ -285,7 +285,7 @@ describe('ExpressionAutocompletion', () => {
       expect(autocompletions).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            completion: 'Animation::SpeedScale',
+            completion: 'PlatformerObject::JumpSpeed',
             addParenthesis: true,
             isExact: false,
             shouldConvertToString: true,

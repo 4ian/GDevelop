@@ -23,6 +23,10 @@ type Props = {|
 
   /** If specified, only this object type should be allowed to be selected. */
   allowedObjectType?: ?string,
+  /**
+   * If specified, an object without these behaviors won't be selectable.
+   * Note that groups with at least 1 incompatible object won't be shown.
+   */
   behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
 
   noGroups?: boolean,

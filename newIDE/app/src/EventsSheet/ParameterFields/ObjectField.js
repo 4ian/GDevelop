@@ -110,7 +110,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
         // Some instructions apply to all objects BUT not some objects
-        // lacking a specific capability usually offered by all objects.
+        // lacking a specific capability offered by a default behavior.
         allowedObjectType={allowedObjectType}
         behaviorConstraints={behaviorConstraints}
         globalObjectsContainer={props.globalObjectsContainer}

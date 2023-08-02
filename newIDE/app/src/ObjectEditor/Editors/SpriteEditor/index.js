@@ -336,7 +336,7 @@ export default function SpriteEditor({
             ? undefined // Don't check the current animation name as we're changing it.
             : spriteConfiguration.getAnimation(index).getName();
         }
-      );
+      ).filter(Boolean);
 
       if (newName !== '' && otherNames.some(name => name === newName)) {
         // The indexes can be used as a key because errors are cleared when
@@ -350,7 +350,6 @@ export default function SpriteEditor({
         return;
       }
 
-      const oldName = animation.getName();
       animation.setName(newName);
       // TODO EBO Refactor event-based object events when an animation is renamed.
       if (layout && object) {
@@ -358,7 +357,7 @@ export default function SpriteEditor({
           project,
           layout,
           object,
-          oldName,
+          currentName,
           newName
         );
       }

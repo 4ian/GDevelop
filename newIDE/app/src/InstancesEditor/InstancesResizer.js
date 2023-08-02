@@ -139,7 +139,9 @@ export default class InstancesResizer {
     deltaY: number,
     grabbingLocation: ResizeGrabbingLocation,
     proportional: boolean,
-    noGridSnap: boolean
+    noGridSnap: boolean,
+    project: gdProject,
+    layout: gdLayout
   ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
@@ -220,6 +222,7 @@ export default class InstancesResizer {
         ? (initialSelectionAABB.height() + flippedTotalDeltaY) /
           initialSelectionAABB.height()
         : flippedTotalDeltaY;
+    let scaleZ = Math.max(scaleX, scaleY);
 
     const hasRotatedInstance = areAnyInstancesNotStraight(nonLockedInstances);
 
@@ -288,6 +291,14 @@ export default class InstancesResizer {
           ? initialUnrotatedInstanceAABB.height()
           : 1;
 
+      const defaultSize = this.instanceMeasurer.getUnrotatedInstanceSize(
+        selectedInstance
+      );
+
+      const initialDepth = selectedInstance.hasCustomDepth()
+        ? selectedInstance.getCustomDepth()
+        : defaultSize[2];
+
       // The position and size of an instance describe the shape
       // before the rotation is applied.
       // The calculus is like a 90° or 270° rotation of the basis around the scaling.
@@ -299,6 +310,7 @@ export default class InstancesResizer {
       let newY = initialInstanceOriginPosition.y;
       let newWidth = initialWidth;
       let newHeight = initialHeight;
+      let newDepth = initialDepth;
       if (
         !proportional &&
         !hasRotatedInstance &&
@@ -306,6 +318,7 @@ export default class InstancesResizer {
       ) {
         newWidth = scaleY * initialWidth;
         newHeight = scaleX * initialHeight;
+        newDepth = scaleZ * initialDepth;
 
         // These 4 variables are the positions and vector after the scaling.
         // It's easier to scale the instance center
@@ -332,6 +345,7 @@ export default class InstancesResizer {
       } else {
         newWidth = scaleX * initialWidth;
         newHeight = scaleY * initialHeight;
+        newDepth = scaleZ * initialDepth;
         newX =
           (initialInstanceOriginPosition.x - fixedPointX) * scaleX +
           fixedPointX;
@@ -357,6 +371,16 @@ export default class InstancesResizer {
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setCustomWidth(Math.round(newWidth));
       selectedInstance.setCustomHeight(Math.round(newHeight));
+
+      const associatedObjectName = selectedInstance.getObjectName();
+      const object = getObjectByName(project, layout, associatedObjectName);
+      const is3DInstance = object.is3DObject();
+
+      if (is3DInstance) {
+        newDepth = scaleZ * defaultSize[2];
+
+        selectedInstance.setCustomDepth(Math.round(newDepth));
+      }
     }
   }
 

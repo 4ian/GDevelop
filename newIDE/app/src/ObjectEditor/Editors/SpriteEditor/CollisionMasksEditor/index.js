@@ -12,11 +12,11 @@ import ImagePreview, {
 } from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
-  allSpritesHaveSameCollisionMasksAs,
+  allAnimationSpritesHaveSameCollisionMasksAs,
   copyAnimationsSpriteCollisionMasks,
+  allObjectSpritesHaveSameCollisionMaskAs,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import EditorMosaic, {
@@ -103,12 +103,7 @@ const CollisionMasksEditor = ({
     setSameCollisionMasksForAnimations,
   ] = React.useState(
     sprite
-      ? every(
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
-            return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
-          })
-        )
+      ? allObjectSpritesHaveSameCollisionMaskAs(sprite, spriteConfiguration)
       : false
   );
 
@@ -118,7 +113,7 @@ const CollisionMasksEditor = ({
     setSameCollisionMasksForSprites,
   ] = React.useState(
     sprite && animation
-      ? allSpritesHaveSameCollisionMasksAs(sprite, animation)
+      ? allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
       : false
   );
 
@@ -165,7 +160,7 @@ const CollisionMasksEditor = ({
       if (!animation || !sprite) return;
 
       setSameCollisionMasksForSprites(
-        allSpritesHaveSameCollisionMasksAs(sprite, animation)
+        allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
       );
     },
     [animation, sprite]

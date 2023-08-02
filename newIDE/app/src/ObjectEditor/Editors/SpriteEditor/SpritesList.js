@@ -14,6 +14,9 @@ import {
   deleteSpritesFromAnimation,
   duplicateSpritesInAnimation,
   isFirstSpriteUsingFullImageCollisionMask,
+  allObjectSpritesHaveSameCollisionMaskAs,
+  allObjectSpritesHaveSamePointsAs,
+  getCurrentElements,
 } from './Utils/SpriteObjectHelper';
 import ResourcesLoader from '../../../ResourcesLoader';
 import {
@@ -144,13 +147,15 @@ const SortableList = SortableContainer(
 const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   let allDirectionSpritesHaveSamePoints = false;
   let allDirectionSpritesHaveSameCollisionMasks = false;
-  if (direction.getSpritesCount() !== 0) {
+  const firstDirectionSprite =
+    direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+  if (firstDirectionSprite) {
     allDirectionSpritesHaveSamePoints = allDirectionSpritesHaveSamePointsAs(
-      direction.getSprite(0),
+      firstDirectionSprite,
       direction
     );
     allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
-      direction.getSprite(0),
+      firstDirectionSprite,
       direction
     );
   }
@@ -158,6 +163,44 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   return {
     allDirectionSpritesHaveSamePoints,
     allDirectionSpritesHaveSameCollisionMasks,
+  };
+};
+
+/**
+ * Check if all sprites of the object have the same points and collision masks
+ */
+const checkObjectPointsAndCollisionsMasks = (
+  spriteConfiguration: gdSpriteObject
+) => {
+  let allObjectSpritesHaveSamePoints = false;
+  let allObjectSpritesHaveSameCollisionMasks = false;
+  const firstObjectSprite =
+    spriteConfiguration.getAnimationsCount() > 0 &&
+    spriteConfiguration.getAnimation(0).getDirectionsCount() > 0 &&
+    spriteConfiguration
+      .getAnimation(0)
+      .getDirection(0)
+      .getSpritesCount() > 0
+      ? spriteConfiguration
+          .getAnimation(0)
+          .getDirection(0)
+          .getSprite(0)
+      : null;
+
+  if (firstObjectSprite) {
+    allObjectSpritesHaveSamePoints = allObjectSpritesHaveSamePointsAs(
+      firstObjectSprite,
+      spriteConfiguration
+    );
+    allObjectSpritesHaveSameCollisionMasks = allObjectSpritesHaveSameCollisionMaskAs(
+      firstObjectSprite,
+      spriteConfiguration
+    );
+  }
+
+  return {
+    allObjectSpritesHaveSamePoints,
+    allObjectSpritesHaveSameCollisionMasks,
   };
 };
 
@@ -296,10 +339,18 @@ const SpritesList = ({
         allDirectionSpritesHaveSameCollisionMasks,
         allDirectionSpritesHaveSamePoints,
       } = checkDirectionPointsAndCollisionsMasks(direction);
+      const {
+        allObjectSpritesHaveSameCollisionMasks,
+        allObjectSpritesHaveSamePoints,
+      } = checkObjectPointsAndCollisionsMasks(spriteConfiguration);
       const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
         spriteConfiguration
       );
-      const spritesCountBeforeAdding = direction.getSpritesCount();
+      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+      const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
+        .sprite;
+      const firstDirectionSprite =
+        directionSpritesCountBeforeAdding > 0 ? direction.getSprite(0) : null;
 
       const resources = await resourceManagementProps.onChooseResource({
         initialSourceName: resourceSource.name,
@@ -313,12 +364,28 @@ const SpritesList = ({
 
         const sprite = new gd.Sprite();
         sprite.setImageName(resource.getName());
-        if (allDirectionSpritesHaveSamePoints) {
-          copySpritePoints(direction.getSprite(0), sprite);
+
+        // Copy points if toggles were set before adding the sprite.
+        if (allObjectSpritesHaveSamePoints && firstObjectSprite) {
+          // Copy points from the first sprite of the object, if existing.
+          copySpritePoints(firstObjectSprite, sprite);
+        } else if (allDirectionSpritesHaveSamePoints && firstDirectionSprite) {
+          // Copy points from the first sprite of the direction, if this is not the first one we add.
+          copySpritePoints(firstDirectionSprite, sprite);
         }
-        if (allDirectionSpritesHaveSameCollisionMasks) {
-          copySpritePolygons(direction.getSprite(0), sprite);
+
+        // Copy collision masks if toggles were set before adding the sprite.
+        if (allObjectSpritesHaveSameCollisionMasks && firstObjectSprite) {
+          // Copy collision masks from the first sprite of the object, if existing.
+          copySpritePolygons(firstObjectSprite, sprite);
+        } else if (
+          allDirectionSpritesHaveSameCollisionMasks &&
+          firstDirectionSprite
+        ) {
+          // Copy collision masks from the first sprite of the direction, if this is not the first one we add.
+          copySpritePolygons(firstDirectionSprite, sprite);
         }
+
         if (shouldUseFullImageCollisionMask) {
           sprite.setFullImageCollisionMask(true);
         }
@@ -336,7 +403,7 @@ const SpritesList = ({
       await resourceManagementProps.onFetchNewlyAddedResources();
 
       if (resources.length && onSpriteUpdated) onSpriteUpdated();
-      if (spritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+      if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
         // If there was no sprites before, we can assume the first sprite was added.
         onFirstSpriteUpdated();
       }

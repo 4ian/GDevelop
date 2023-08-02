@@ -168,7 +168,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
   );
 };
 
-export const allSpritesHaveSamePointsAs = (
+export const allAnimationSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
@@ -176,6 +176,18 @@ export const allSpritesHaveSamePointsAs = (
     mapFor(0, animation.getDirectionsCount(), i => {
       const direction = animation.getDirection(i);
       return allDirectionSpritesHaveSamePointsAs(originalSprite, direction);
+    })
+  );
+};
+
+export const allObjectSpritesHaveSamePointsAs = (
+  originalSprite: gdSprite,
+  spriteObject: gdSpriteObject
+) => {
+  return every(
+    mapFor(0, spriteObject.getAnimationsCount(), i => {
+      const animation = spriteObject.getAnimation(i);
+      return allAnimationSpritesHaveSamePointsAs(originalSprite, animation);
     })
   );
 };
@@ -260,7 +272,7 @@ export const allDirectionSpritesHaveSameCollisionMasksAs = (
   );
 };
 
-export const allSpritesHaveSameCollisionMasksAs = (
+export const allAnimationSpritesHaveSameCollisionMasksAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
@@ -275,26 +287,26 @@ export const allSpritesHaveSameCollisionMasksAs = (
   );
 };
 
+export const allObjectSpritesHaveSameCollisionMaskAs = (
+  originalSprite: gdSprite,
+  spriteObject: gdSpriteObject
+) => {
+  return every(
+    mapFor(0, spriteObject.getAnimationsCount(), i => {
+      const animation = spriteObject.getAnimation(i);
+      return allAnimationSpritesHaveSameCollisionMasksAs(
+        originalSprite,
+        animation
+      );
+    })
+  );
+};
+
 export const isFirstSpriteUsingFullImageCollisionMask = (
   spriteObject: gdSpriteObject
 ) => {
-  if (
-    spriteObject.getAnimationsCount() > 0 &&
-    spriteObject.getAnimation(0).getDirectionsCount() > 0 &&
-    spriteObject
-      .getAnimation(0)
-      .getDirection(0)
-      .getSpritesCount() > 0
-  ) {
-    // We look at the first sprite of the first animation as the reference.
-    const firstSprite = spriteObject
-      .getAnimation(0)
-      .getDirection(0)
-      .getSprite(0);
-
-    return firstSprite.isFullImageCollisionMask();
-  }
-  return false;
+  const firstSprite = getCurrentElements(spriteObject, 0, 0, 0).sprite;
+  return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };
 
 export const deleteSpritesFromAnimation = (

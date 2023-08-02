@@ -280,7 +280,6 @@ export const useSearchItem = <SearchItem: SearchableItem>(
   React.useEffect(
     () => {
       let discardSearch = false;
-      console.log('searching with ', searchText);
       if (!searchText) {
         setSearchResults(
           filterSearchItems(

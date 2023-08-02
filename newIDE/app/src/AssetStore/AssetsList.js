@@ -1,25 +1,16 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { Column } from '../UI/Grid';
 import { AssetStoreContext } from './AssetStoreContext';
-import { AssetCard } from './AssetCard';
 import {
   type AssetShortHeader,
-  type PrivateAssetPack,
   type PublicAssetPack,
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
-import AlertMessage from '../UI/AlertMessage';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { clearAllFilters } from './AssetStoreFilterPanel';
-import {
-  GridList,
-  GridListTile,
-  createStyles,
-  makeStyles,
-} from '@material-ui/core';
+import { GridList } from '@material-ui/core';
 import {
   useResponsiveWindowWidth,
   type WidthType,
@@ -27,10 +18,14 @@ import {
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
-import { PrivateAssetPackTile, PublicAssetPackTile } from './AssetPackTiles';
+import {
+  AssetCardTile,
+  PrivateAssetPackTile,
+  PublicAssetPackTile,
+} from './AssetPackTiles';
+import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
 
 const ASSETS_DISPLAY_LIMIT = 100;
 
@@ -72,51 +67,6 @@ const styles = {
   },
 };
 
-const useStylesForGridListItem = makeStyles(theme =>
-  createStyles({
-    root: {
-      '&:focus': {
-        outline: `2px solid ${theme.palette.primary.main}`,
-      },
-    },
-  })
-);
-
-const AssetCardTile = ({
-  assetShortHeader,
-  onOpenDetails,
-  size,
-}: {|
-  assetShortHeader: AssetShortHeader,
-  onOpenDetails: () => void,
-  size: number,
-|}) => {
-  const classesForGridListItem = useStylesForGridListItem();
-
-  return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
-          onOpenDetails();
-        }
-      }}
-      onClick={onOpenDetails}
-      style={{
-        margin: cellSpacing / 2,
-      }}
-    >
-      <AssetCard
-        id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
-        onOpenDetails={onOpenDetails}
-        assetShortHeader={assetShortHeader}
-        size={size}
-      />
-    </GridListTile>
-  );
-};
-
 export type AssetsListInterface = {|
   getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
@@ -127,9 +77,6 @@ type Props = {|
   privateAssetPackListingDatas?: ?Array<PrivateAssetPackListingData>,
   publicAssetPacks?: ?Array<PublicAssetPack>,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
-  renderPrivateAssetPackAudioFilesDownloadButton?: (
-    assetPack: PrivateAssetPack
-  ) => React.Node,
   noResultsPlaceHolder?: React.Node,
   error?: ?Error,
   onPrivateAssetPackSelection?: (
@@ -143,7 +90,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     {
       assetShortHeaders,
       onOpenDetails,
-      renderPrivateAssetPackAudioFilesDownloadButton,
       noResultsPlaceHolder,
       privateAssetPackListingDatas,
       publicAssetPacks,
@@ -152,7 +98,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     }: Props,
     ref
   ) => {
-    console.log(publicAssetPacks, privateAssetPackListingDatas);
     const {
       error,
       fetchAssetsAndFilters,
@@ -161,7 +106,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     } = React.useContext(AssetStoreContext);
     const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
     const currentPage = navigationState.getCurrentPage();
-    const { openedAssetPack } = currentPage;
+    const { openedAssetPack, filtersState } = currentPage;
+    const chosenCategory = filtersState.chosenCategory;
     const windowWidth = useResponsiveWindowWidth();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -179,7 +125,38 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       },
     }));
 
-    console.log(assetShortHeaders);
+    const folderTags = React.useMemo(
+      () => {
+        const firstLevelTags = new Set();
+        if (!chosenCategory || !assetShortHeaders) return firstLevelTags;
+        // We are in a pack, calculate first level folders based on asset tags.
+        // Tags are stored from top to bottom, in the list of tags of an asset.
+        // We first remove all tags that are either the chosen category (the pack)
+        // or a tag that is applied to all assets (for example "pixel art")
+        // and then we take the first tag of each asset.
+        assetShortHeaders.forEach(assetShortHeader => {
+          const tags = assetShortHeader.tags.filter(
+            tag => tag !== chosenCategory.node.name
+          );
+          if (tags.length > 0) firstLevelTags.add(tags[0]);
+        });
+
+        console.log(firstLevelTags);
+
+        // Then we remove the tags that are present in all assets, they're not useful, or not a folder.
+        firstLevelTags.forEach(tag => {
+          const allAssetsHaveThisTag = assetShortHeaders.every(asset =>
+            asset.tags.includes(tag)
+          );
+          if (allAssetsHaveThisTag) firstLevelTags.delete(tag);
+        });
+
+        return firstLevelTags;
+      },
+      [chosenCategory, assetShortHeaders]
+    );
+
+    console.log(folderTags);
 
     const assetTiles = React.useMemo(
       () =>
@@ -191,6 +168,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                   onOpenDetails={() => onOpenDetails(assetShortHeader)}
                   size={getAssetSize(windowWidth)}
                   key={assetShortHeader.id}
+                  margin={cellSpacing / 2}
                 />
               ))
               .splice(0, ASSETS_DISPLAY_LIMIT) // Limit the number of displayed assets to avoid performance issues
@@ -323,21 +301,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           </GridList>
         ) : openedAssetPack &&
           openedAssetPack.content &&
-          isAssetPackAudioOnly(openedAssetPack) &&
-          renderPrivateAssetPackAudioFilesDownloadButton ? (
-          <Column expand justifyContent="center" alignItems="center">
-            <AlertMessage
-              kind="info"
-              renderRightButton={() =>
-                renderPrivateAssetPackAudioFilesDownloadButton(openedAssetPack)
-              }
-            >
-              <Trans>
-                Download all the sounds of the asset pack in one click and use
-                them in your project.
-              </Trans>
-            </AlertMessage>
-          </Column>
+          isAssetPackAudioOnly(openedAssetPack) ? (
+          <PrivateAssetPackAudioFilesDownloadButton
+            assetPack={openedAssetPack}
+          />
         ) : (
           noResultsPlaceHolder || (
             <NoResultPlaceholder

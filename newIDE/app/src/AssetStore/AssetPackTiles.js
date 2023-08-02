@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type PublicAssetPack } from '../Utils/GDevelopServices/Asset';
+import {
+  type PublicAssetPack,
+  type AssetShortHeader,
+} from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { GridListTile, createStyles, makeStyles } from '@material-ui/core';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
@@ -11,6 +14,7 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
 import { PrivateAssetPackPriceTag } from './PrivateAssets/PrivateAssetPackPriceTag';
+import { AssetCard } from './AssetCard';
 
 const styles = {
   priceTagContainer: {
@@ -46,6 +50,43 @@ const useStylesForGridListItem = makeStyles(theme =>
     },
   })
 );
+
+export const AssetCardTile = ({
+  assetShortHeader,
+  onOpenDetails,
+  size,
+  margin,
+}: {|
+  assetShortHeader: AssetShortHeader,
+  onOpenDetails: () => void,
+  size: number,
+  margin?: number,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onOpenDetails();
+        }
+      }}
+      onClick={onOpenDetails}
+      style={{
+        margin,
+      }}
+    >
+      <AssetCard
+        id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
+        onOpenDetails={onOpenDetails}
+        assetShortHeader={assetShortHeader}
+        size={size}
+      />
+    </GridListTile>
+  );
+};
 
 export const PublicAssetPackTile = ({
   assetPack,

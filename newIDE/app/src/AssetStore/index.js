@@ -48,11 +48,9 @@ import {
   isSearchResultPage,
   type AssetStorePageState,
 } from './AssetStoreNavigator';
-import RaisedButton from '../UI/RaisedButton';
 import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
-import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
-import Music from '../UI/CustomSvgIcons/Music';
 import AssetsList, { type AssetsListInterface } from './AssetsList';
+import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
 
 const capitalize = (str: string) => {
   return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -143,13 +141,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const { onPurchaseSuccessful, receivedAssetPacks } = React.useContext(
       AuthenticatedUserContext
     );
-    const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
-      PrivateAssetsAuthorizationContext
-    );
-    const [
-      isAudioArchiveUrlLoading,
-      setIsAudioArchiveUrlLoading,
-    ] = React.useState(false);
 
     // The saved scroll position must not be reset by a scroll event until it
     // has been applied.
@@ -399,42 +390,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       ]
     );
 
-    const renderPrivateAssetPackAudioFilesDownloadButton = React.useCallback(
-      (assetPack: PrivateAssetPack) => {
-        return (
-          <RaisedButton
-            primary
-            label={
-              isAudioArchiveUrlLoading ? (
-                <Trans>Loading...</Trans>
-              ) : (
-                <Trans>Download pack sounds</Trans>
-              )
-            }
-            icon={<Music />}
-            disabled={isAudioArchiveUrlLoading}
-            onClick={async () => {
-              setIsAudioArchiveUrlLoading(true);
-              const url = await getPrivateAssetPackAudioArchiveUrl(
-                assetPack.id
-              );
-              setIsAudioArchiveUrlLoading(false);
-              if (!url) {
-                console.error(
-                  `Could not generate url for premium asset pack with name ${
-                    assetPack.name
-                  }`
-                );
-                return;
-              }
-              Window.openExternalURL(url);
-            }}
-          />
-        );
-      },
-      [getPrivateAssetPackAudioArchiveUrl, isAudioArchiveUrlLoading]
-    );
-
     React.useEffect(
       () => {
         if (shouldAutofocusSearchbar && searchBar.current) {
@@ -454,7 +409,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             await setIsFiltersPanelOpen(false);
           }
           if (!isAssetDetailLoading.current) {
-            console.log('applygin scroll');
             applyBackScrollPosition();
           }
         };
@@ -584,11 +538,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                       {openedAssetPack &&
                       openedAssetPack.content &&
                       doesAssetPackContainAudio(openedAssetPack) &&
-                      !isAssetPackAudioOnly(openedAssetPack)
-                        ? renderPrivateAssetPackAudioFilesDownloadButton(
-                            openedAssetPack
-                          )
-                        : null}
+                      !isAssetPackAudioOnly(openedAssetPack) ? (
+                        <PrivateAssetPackAudioFilesDownloadButton
+                          assetPack={openedAssetPack}
+                        />
+                      ) : null}
                     </Column>
                   </>
                 )}
@@ -639,9 +593,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               ref={assetsList}
               error={error}
               onOpenDetails={onOpenDetails}
-              renderPrivateAssetPackAudioFilesDownloadButton={
-                renderPrivateAssetPackAudioFilesDownloadButton
-              }
               onPrivateAssetPackSelection={selectPrivateAssetPack}
               onPublicAssetPackSelection={selectPublicAssetPack}
             />

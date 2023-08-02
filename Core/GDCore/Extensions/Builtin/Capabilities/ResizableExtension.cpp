@@ -47,7 +47,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions())
+                                     ParameterOptions::MakeNewOptions().SetDescription(
+                                        _("Width")))
       .MarkAsAdvanced();
 
   aut.AddScopedCondition("Width",
@@ -60,7 +61,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions())
+          "number", ParameterOptions::MakeNewOptions().SetDescription(
+                        _("Width")))
       .MarkAsAdvanced();
 
   aut.AddScopedAction("SetHeight",
@@ -73,7 +75,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions())
+                                     ParameterOptions::MakeNewOptions().SetDescription(
+                                        _("Height")))
       .MarkAsAdvanced();
 
   aut.AddScopedCondition("Height",
@@ -86,7 +89,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsResizableExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "ResizableBehavior")
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions())
+          "number", ParameterOptions::MakeNewOptions().SetDescription(
+                        _("Height")))
       .MarkAsAdvanced();
 
   aut.AddScopedAction("SetSize",

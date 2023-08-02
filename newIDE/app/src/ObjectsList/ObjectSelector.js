@@ -9,6 +9,7 @@ import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
+import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
@@ -110,6 +111,41 @@ const getObjectsAndGroupsDataSource = ({
     : fullList;
 };
 
+const checkHasRequiredCapability = ({
+  project,
+  globalObjectsContainer,
+  objectsContainer,
+  behaviorConstraints,
+  objectName,
+}: {|
+  project: ?gdProject,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  objectName: string,
+  behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
+|}) => {
+  if (!behaviorConstraints) return true;
+  if (!project) return true;
+
+  const object = getObjectByName(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName
+  );
+  if (!object) {
+    // Either the object does not exist or it's a group - not a problem because:
+    // - if the object does not exist, we can't know its capabilities, we assume it has all.
+    // - a group is assumed to have all the capabilities.
+    return true;
+  }
+
+  return behaviorConstraints.every(
+    ({ behaviorName, behaviorType }) =>
+      object.hasBehaviorNamed(behaviorName) &&
+      object.getBehavior(behaviorName).getTypeName() === behaviorType
+  );
+};
+
 export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
 const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
@@ -158,8 +194,13 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
 
-    // TODO Check behaviors
-    const hasObjectWithRequiredCapability = false;
+    const hasObjectWithRequiredCapability = checkHasRequiredCapability({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      objectName: value,
+      behaviorConstraints,
+    });
     const errorText = !hasObjectWithRequiredCapability ? (
       <Trans>This object exists, but can't be used here.</Trans>
     ) : !hasValidChoice ? (

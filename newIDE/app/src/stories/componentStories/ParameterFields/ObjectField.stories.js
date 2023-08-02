@@ -83,11 +83,10 @@ export const WrongObjectType = () => {
 };
 WrongObjectType.storyName = 'Error: wrong object type';
 
-// TODO Update stories with object requiring a behavior.
 export const WithRequiredBehavior = () => {
   const instructionMetadata = gd.MetadataProvider.getActionMetadata(
     gd.JsPlatform.get(),
-    'EnableEffect'
+    'EffectCapability::EffectBehavior::EnableEffect'
   );
 
   return (
@@ -100,6 +99,7 @@ export const WithRequiredBehavior = () => {
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           instructionMetadata={instructionMetadata}
+          parameterIndex={0}
           value={value}
           onChange={onChange}
         />

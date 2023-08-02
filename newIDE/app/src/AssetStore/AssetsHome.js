@@ -433,7 +433,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
 
         const allStandAloneTiles = [
           ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
-          mergeArraysPerGroup(
+          ...mergeArraysPerGroup(
             privateAssetPackStandAloneTiles,
             starterPacksTiles,
             2,

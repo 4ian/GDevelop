@@ -21,6 +21,7 @@ import {
   TRIVIAL_FIRST_BEHAVIOR,
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
+import { mapVector } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -60,6 +61,33 @@ export default function NewBehaviorDialog({
     []
   );
 
+  const getAllRequiredBehaviorTypes = React.useCallback(
+    (
+      behaviorMetadata: gdBehaviorMetadata,
+      allRequiredBehaviorTypes: Array<string> = []
+    ): Array<string> => {
+      mapVector(
+        behaviorMetadata.getRequiredBehaviorTypes(),
+        requiredBehaviorType => {
+          if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
+            return;
+          }
+          allRequiredBehaviorTypes.push(requiredBehaviorType);
+          const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            requiredBehaviorType
+          );
+          getAllRequiredBehaviorTypes(
+            requiredBehaviorMetadata,
+            allRequiredBehaviorTypes
+          );
+        }
+      );
+      return allRequiredBehaviorTypes;
+    },
+    [project]
+  );
+
   const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
     () => {
       const platform = project.getCurrentPlatform();
@@ -80,16 +108,15 @@ export default function NewBehaviorDialog({
           previewIconUrl: behavior.previewIconUrl,
           objectType: behavior.objectType,
           category: behavior.category,
-          // TODO make this transitive
-          allRequiredBehaviorTypes: behavior.behaviorMetadata
-            .getRequiredBehaviorTypes()
-            .toJSArray(),
+          allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
+            behavior.behaviorMetadata
+          ),
           // PlatformExtension don't have tags so the information from EventsFunctionsExtension is lost.
           // TODO (tags): Add tags to PlatformExtension, handle them in MetadataDeclarationHelper and enumerateBehaviorsMetadata.
           tags: [],
         }));
     },
-    [project, eventsFunctionsExtension]
+    [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
   );
 
   const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(

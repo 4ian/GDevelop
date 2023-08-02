@@ -6,7 +6,6 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridList from '@material-ui/core/GridList';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
-import { PrivateAssetPackPriceTag } from './PrivateAssets/PrivateAssetPackPriceTag';
 import type {
   PublicAssetPacks,
   PublicAssetPack,
@@ -23,6 +22,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import Paper from '../UI/Paper';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { PrivateAssetPackTile, PublicAssetPackTile } from './AssetPackTiles';
 
 const cellSpacing = 2;
 
@@ -145,113 +145,6 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
-const PublicAssetPackTile = ({
-  assetPack,
-  onSelect,
-  style,
-}: {|
-  assetPack: PublicAssetPack,
-  onSelect: () => void,
-  /** Props needed so that GridList component can adjust tile size */
-  style?: any,
-|}) => {
-  const classesForGridListItem = useStylesForGridListItem();
-  return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={onSelect}
-    >
-      <Paper
-        id={`asset-pack-${assetPack.tag.replace(/\s/g, '-')}`}
-        elevation={2}
-        style={styles.paper}
-        background="light"
-      >
-        <CorsAwareImage
-          key={assetPack.name}
-          style={styles.previewImage}
-          src={assetPack.thumbnailUrl}
-          alt={`Preview image of asset pack ${assetPack.name}`}
-        />
-        <Column>
-          <Line justifyContent="space-between" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {assetPack.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              <Trans>{assetPack.assetsCount} Assets</Trans>
-              {assetPack.userFriendlyPrice
-                ? ' - ' + assetPack.userFriendlyPrice
-                : null}
-            </Text>
-          </Line>
-        </Column>
-      </Paper>
-    </GridListTile>
-  );
-};
-
-export const PrivateAssetPackTile = ({
-  assetPackListingData,
-  onSelect,
-  style,
-  owned,
-}: {|
-  assetPackListingData: PrivateAssetPackListingData,
-  onSelect: () => void,
-  /** Props needed so that GidList component can adjust tile size */
-  style?: any,
-  owned: boolean,
-|}) => {
-  const classesForGridListItem = useStylesForGridListItem();
-  return (
-    <GridListTile
-      classes={classesForGridListItem}
-      tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
-        if (shouldValidate(event)) {
-          onSelect();
-        }
-      }}
-      style={style}
-      onClick={onSelect}
-    >
-      <Paper elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage
-          key={assetPackListingData.name}
-          style={styles.previewImage}
-          src={assetPackListingData.thumbnailUrls[0]}
-          alt={`Preview image of asset pack ${assetPackListingData.name}`}
-        />
-        <div style={styles.priceTagContainer}>
-          <PrivateAssetPackPriceTag
-            privateAssetPackListingData={assetPackListingData}
-            withOverlay
-            owned={owned}
-          />
-        </div>
-        <Column>
-          <Line justifyContent="space-between" noMargin>
-            <Text style={styles.packTitle} size="body2">
-              {assetPackListingData.name}
-            </Text>
-            <Text style={styles.packTitle} color="primary" size="body2">
-              <Trans>{assetPackListingData.description}</Trans>
-            </Text>
-          </Line>
-        </Column>
-      </Paper>
-    </GridListTile>
-  );
-};
-
 export const CategoryTile = ({
   id,
   title,
@@ -306,7 +199,7 @@ export type AssetsHomeInterface = {|
 
 type Props = {|
   publicAssetPacks: PublicAssetPacks,
-  privateAssetPacksListingData: Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   assetPackRandomOrdering: {|
     starterPacks: Array<number>,
     privateAssetPacks: Array<number>,
@@ -321,7 +214,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
   (
     {
       publicAssetPacks: { starterPacks },
-      privateAssetPacksListingData,
+      privateAssetPackListingDatas,
       assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
@@ -379,7 +272,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         const privateAssetPackBundleTiles: Array<React.Node> = [];
         const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-        privateAssetPacksListingData
+        privateAssetPackListingDatas
           .filter(
             assetPackListingData =>
               !openedAssetCategory ||
@@ -444,7 +337,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         return { allStandAloneTiles, allBundleTiles };
       },
       [
-        privateAssetPacksListingData,
+        privateAssetPackListingDatas,
         openedAssetCategory,
         assetPackRandomOrdering,
         onPrivateAssetPackSelection,

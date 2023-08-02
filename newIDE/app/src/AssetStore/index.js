@@ -65,11 +65,11 @@ export type AssetStoreInterface = {|
 |};
 
 const identifyAssetPackKind = ({
-  privateAssetPacks,
+  privateAssetPackListingDatas,
   publicAssetPacks,
   assetPack,
 }: {|
-  privateAssetPacks: ?Array<PrivateAssetPackListingData>,
+  privateAssetPackListingDatas: ?Array<PrivateAssetPackListingData>,
   publicAssetPacks: ?PublicAssetPacks,
   assetPack: PrivateAssetPack | PublicAssetPack | null,
 |}) => {
@@ -80,8 +80,8 @@ const identifyAssetPackKind = ({
   // won't break this detection in the future (for example, if public asset packs get an `id`,
   // this won't break).
   return assetPack.id &&
-    privateAssetPacks &&
-    !!privateAssetPacks.find(({ id }) => id === assetPack.id)
+    privateAssetPackListingDatas &&
+    !!privateAssetPackListingDatas.find(({ id }) => id === assetPack.id)
     ? 'private'
     : publicAssetPacks &&
       publicAssetPacks.starterPacks.find(({ tag }) => tag === assetPack.tag)
@@ -92,9 +92,11 @@ const identifyAssetPackKind = ({
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
   (props: Props, ref) => {
     const {
-      searchResults,
+      assetShortHeadersSearchResults,
+      publicAssetPacksSearchResults,
+      privateAssetPackListingDatasSearchResults,
       publicAssetPacks,
-      privateAssetPacks,
+      privateAssetPackListingDatas,
       error,
       fetchAssetsAndFilters,
       navigationState,
@@ -222,7 +224,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         const assetPackKind = identifyAssetPackKind({
           assetPack: openedAssetPack,
           publicAssetPacks,
-          privateAssetPacks,
+          privateAssetPackListingDatas,
         });
         sendAssetOpened({
           id: assetShortHeader.id,
@@ -238,7 +240,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [
         openedAssetPack,
         publicAssetPacks,
-        privateAssetPacks,
+        privateAssetPackListingDatas,
         saveScrollPosition,
         navigationState,
       ]
@@ -452,6 +454,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             await setIsFiltersPanelOpen(false);
           }
           if (!isAssetDetailLoading.current) {
+            console.log('applygin scroll');
             applyBackScrollPosition();
           }
         };
@@ -466,14 +469,14 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       () => {
         if (
           !openedPrivateAssetPackListingData ||
-          !privateAssetPacks ||
+          !privateAssetPackListingDatas ||
           !receivedAssetPacks
         )
           return null;
 
         const receivedAssetPackIds = receivedAssetPacks.map(pack => pack.id);
 
-        return privateAssetPacks
+        return privateAssetPackListingDatas
           .filter(
             pack =>
               pack.sellerId === openedPrivateAssetPackListingData.sellerId &&
@@ -481,7 +484,11 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           )
           .sort((pack1, pack2) => pack1.name.localeCompare(pack2.name));
       },
-      [openedPrivateAssetPackListingData, privateAssetPacks, receivedAssetPacks]
+      [
+        openedPrivateAssetPackListingData,
+        privateAssetPackListingDatas,
+        receivedAssetPacks,
+      ]
     );
 
     return (
@@ -607,12 +614,12 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 </AlertMessage>
               </PlaceholderError>
             ) : publicAssetPacks &&
-              privateAssetPacks &&
+              privateAssetPackListingDatas &&
               assetPackRandomOrdering ? (
               <AssetsHome
                 ref={assetsHome}
                 publicAssetPacks={publicAssetPacks}
-                privateAssetPacksListingData={privateAssetPacks}
+                privateAssetPackListingDatas={privateAssetPackListingDatas}
                 assetPackRandomOrdering={assetPackRandomOrdering}
                 onPublicAssetPackSelection={selectPublicAssetPack}
                 onPrivateAssetPackSelection={selectPrivateAssetPack}
@@ -624,13 +631,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             )
           ) : isOnSearchResultPage ? (
             <AssetsList
-              assets={searchResults}
+              publicAssetPacks={publicAssetPacksSearchResults}
+              privateAssetPackListingDatas={
+                privateAssetPackListingDatasSearchResults
+              }
+              assetShortHeaders={assetShortHeadersSearchResults}
               ref={assetsList}
               error={error}
               onOpenDetails={onOpenDetails}
               renderPrivateAssetPackAudioFilesDownloadButton={
                 renderPrivateAssetPackAudioFilesDownloadButton
               }
+              onPrivateAssetPackSelection={selectPrivateAssetPack}
+              onPublicAssetPackSelection={selectPublicAssetPack}
             />
           ) : openedAssetShortHeader ? (
             <AssetDetails

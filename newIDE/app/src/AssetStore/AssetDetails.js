@@ -538,7 +538,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
               </Line>
               <Line expand noMargin justifyContent="center">
                 <AssetsList
-                  assets={truncatedSearchResults}
+                  assetShortHeaders={truncatedSearchResults}
                   onOpenDetails={assetShortHeader => {
                     setAsset(null);
                     onOpenDetails(assetShortHeader);

@@ -10,6 +10,7 @@ import {
   type PublicAssetPack,
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import AlertMessage from '../UI/AlertMessage';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { clearAllFilters } from './AssetStoreFilterPanel';
@@ -27,6 +28,11 @@ import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { mergeArraysPerGroup } from '../Utils/Array';
+import { PrivateAssetPackTile, PublicAssetPackTile } from './AssetPackTiles';
+
+const ASSETS_DISPLAY_LIMIT = 100;
 
 const getAssetSize = (windowWidth: WidthType) => {
   switch (windowWidth) {
@@ -39,6 +45,21 @@ const getAssetSize = (windowWidth: WidthType) => {
       return 130;
     default:
       return 120;
+  }
+};
+
+const getAssetPacksColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 2;
+    case 'large':
+      return 3;
+    case 'xlarge':
+      return 5;
+    default:
+      return 2;
   }
 };
 
@@ -102,8 +123,8 @@ export type AssetsListInterface = {|
 |};
 
 type Props = {|
-  assets: ?Array<AssetShortHeader>,
-  privateAssetPacks?: ?Array<PrivateAssetPack>,
+  assetShortHeaders: ?Array<AssetShortHeader>,
+  privateAssetPackListingDatas?: ?Array<PrivateAssetPackListingData>,
   publicAssetPacks?: ?Array<PublicAssetPack>,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
   renderPrivateAssetPackAudioFilesDownloadButton?: (
@@ -111,26 +132,34 @@ type Props = {|
   ) => React.Node,
   noResultsPlaceHolder?: React.Node,
   error?: ?Error,
+  onPrivateAssetPackSelection?: (
+    assetPack: PrivateAssetPackListingData
+  ) => void,
+  onPublicAssetPackSelection?: (assetPack: PublicAssetPack) => void,
 |};
 
 const AssetsList = React.forwardRef<Props, AssetsListInterface>(
   (
     {
-      assets,
+      assetShortHeaders,
       onOpenDetails,
       renderPrivateAssetPackAudioFilesDownloadButton,
       noResultsPlaceHolder,
-      privateAssetPacks,
+      privateAssetPackListingDatas,
       publicAssetPacks,
+      onPrivateAssetPackSelection,
+      onPublicAssetPackSelection,
     }: Props,
     ref
   ) => {
+    console.log(publicAssetPacks, privateAssetPackListingDatas);
     const {
       error,
       fetchAssetsAndFilters,
       assetFiltersState,
       navigationState,
     } = React.useContext(AssetStoreContext);
+    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
     const currentPage = navigationState.getCurrentPage();
     const { openedAssetPack } = currentPage;
     const windowWidth = useResponsiveWindowWidth();
@@ -150,10 +179,12 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       },
     }));
 
+    console.log(assetShortHeaders);
+
     const assetTiles = React.useMemo(
       () =>
-        assets
-          ? assets
+        assetShortHeaders
+          ? assetShortHeaders
               .map(assetShortHeader => (
                 <AssetCardTile
                   assetShortHeader={assetShortHeader}
@@ -162,12 +193,98 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                   key={assetShortHeader.id}
                 />
               ))
-              .splice(0, 200) // Limit the number of displayed assets to avoid performance issues
+              .splice(0, ASSETS_DISPLAY_LIMIT) // Limit the number of displayed assets to avoid performance issues
           : null,
-      [assets, onOpenDetails, windowWidth]
+      [assetShortHeaders, onOpenDetails, windowWidth]
     );
 
-    console.log(assetTiles);
+    const publicPacksTiles: Array<React.Node> = React.useMemo(
+      () => {
+        if (!publicAssetPacks || !onPublicAssetPackSelection) return [];
+        return publicAssetPacks.map((assetPack, index) => (
+          <PublicAssetPackTile
+            assetPack={assetPack}
+            onSelect={() => onPublicAssetPackSelection(assetPack)}
+            key={`${assetPack.tag}-${index}`}
+          />
+        ));
+      },
+      [publicAssetPacks, onPublicAssetPackSelection]
+    );
+
+    const { allStandAlonePackTiles, allBundlePackTiles } = React.useMemo(
+      () => {
+        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+        const privateAssetPackBundleTiles: Array<React.Node> = [];
+        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
+
+        if (!privateAssetPackListingDatas || !receivedAssetPacks) {
+          return {
+            allStandAlonePackTiles: [],
+            allBundlePackTiles: [],
+          };
+        }
+
+        !!onPrivateAssetPackSelection &&
+          privateAssetPackListingDatas.forEach(assetPackListingData => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              );
+            const tile = (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackListingData}
+                onSelect={() => {
+                  onPrivateAssetPackSelection(assetPackListingData);
+                }}
+                owned={isPackOwned}
+                key={assetPackListingData.id}
+              />
+            );
+            if (
+              assetPackListingData.includedListableProductIds &&
+              !!assetPackListingData.includedListableProductIds.length
+            ) {
+              if (isPackOwned) {
+                privateOwnedAssetPackBundleTiles.push(tile);
+              } else {
+                privateAssetPackBundleTiles.push(tile);
+              }
+            } else {
+              if (isPackOwned) {
+                privateOwnedAssetPackStandAloneTiles.push(tile);
+              } else {
+                privateAssetPackStandAloneTiles.push(tile);
+              }
+            }
+          });
+
+        const allBundlePackTiles = [
+          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+          ...privateAssetPackBundleTiles,
+        ];
+
+        const allStandAlonePackTiles = [
+          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+          ...mergeArraysPerGroup(
+            privateAssetPackStandAloneTiles,
+            publicPacksTiles,
+            2,
+            1
+          ),
+        ];
+
+        return { allStandAlonePackTiles, allBundlePackTiles };
+      },
+      [
+        privateAssetPackListingDatas,
+        onPrivateAssetPackSelection,
+        publicPacksTiles,
+        receivedAssetPacks,
+      ]
+    );
 
     return (
       <ScrollView ref={scrollView} id="asset-store-listing">
@@ -180,7 +297,26 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             </Trans>
           </PlaceholderError>
         )}
-
+        {!openedAssetPack && allBundlePackTiles.length ? (
+          <GridList
+            cols={getAssetPacksColumns(windowWidth)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={cellSpacing}
+          >
+            {allBundlePackTiles}
+          </GridList>
+        ) : null}
+        {!openedAssetPack && allStandAlonePackTiles.length ? (
+          <GridList
+            cols={getAssetPacksColumns(windowWidth)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={cellSpacing}
+          >
+            {allStandAlonePackTiles}
+          </GridList>
+        ) : null}
         {assetTiles && assetTiles.length ? (
           <GridList style={styles.grid} cellHeight="auto">
             {assetTiles}

@@ -25,7 +25,6 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { PrivateAssetPackTile } from '../AssetStore/AssetsHome';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import Link from '../UI/Link';
@@ -33,6 +32,7 @@ import {
   communityLinksConfig,
   type CommunityLinks,
 } from '../Utils/GDevelopServices/User';
+import { PrivateAssetPackTile } from '../AssetStore/AssetPackTiles';
 
 const getAssetPackColumnsFromWidth = (width: WidthType) => {
   switch (width) {

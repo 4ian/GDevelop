@@ -37,13 +37,13 @@ import { MarkdownText } from '../../UI/MarkdownText';
 import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
-import { PrivateAssetPackTile } from '../AssetsHome';
 import {
   purchaseAppStoreProduct,
   shouldUseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
 import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { PrivateAssetPackTile } from '../AssetPackTiles';
 
 const cellSpacing = 2;
 

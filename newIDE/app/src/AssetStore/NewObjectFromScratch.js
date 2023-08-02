@@ -102,7 +102,7 @@ export const CustomObjectPackResults = ({
           />
         </Line>
         <AssetsList
-          assets={selectedAssetPackSearchResults}
+          assetShortHeaders={selectedAssetPackSearchResults}
           error={error}
           onOpenDetails={assetShortHeader => {
             if (isAssetBeingInstalled) return;

@@ -10,6 +10,7 @@ import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 const paddingSize = 10;
 const styles = {
@@ -43,18 +44,14 @@ const styles = {
     left: 0,
     right: 0,
     color: '#fff',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     backgroundColor: 'rgb(0,0,0,0.5)',
-    alignItems: 'center',
-    display: 'flex',
+    display: 'inline-block', // Necessary to have the text ellipsis working.
+    textAlign: 'center',
     flexDirection: 'column',
   },
   title: {
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    ...textEllipsisStyle,
+    overflowWrap: 'break-word',
   },
 };
 

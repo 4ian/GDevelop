@@ -16,6 +16,9 @@ import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingS
 import Paper from '../../../UI/Paper';
 import { mapVector } from '../../../Utils/MapFor';
 import { Trans } from '@lingui/macro';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+
+const gd: libGDevelop = global.gd;
 
 const defaultTextStyle = {
   // Break words if they are too long to fit on a single line.
@@ -23,16 +26,26 @@ const defaultTextStyle = {
   overflowWrap: 'break-word',
 };
 
-const AutocompletionIcon = React.memo(({ src }) => (
-  <img
-    alt=""
-    src={src}
-    style={{
-      maxWidth: 16,
-      maxHeight: 16,
-    }}
-  />
-));
+const AutocompletionIcon = React.memo(({ src }) => {
+  const {
+    palette: { type: paletteType },
+  } = React.useContext(GDevelopThemeContext);
+
+  const shouldInvertGrayScale =
+    paletteType === 'dark' &&
+    (src.startsWith('data:image/svg+xml') || src.includes('_black'));
+  return (
+    <img
+      src={src}
+      alt=""
+      style={{
+        maxWidth: 16,
+        maxHeight: 16,
+        filter: shouldInvertGrayScale ? 'grayscale(1) invert(1)' : undefined,
+      }}
+    />
+  );
+});
 
 const formatParameterTypesString = (
   parameterRenderingService: ParameterRenderingServiceType,
@@ -195,10 +208,12 @@ const DisplayedObjectAutocompletion = React.forwardRef(
 const DisplayedBehaviorAutocompletion = React.forwardRef(
   (
     {
+      project,
       expressionAutocompletion,
       isSelected,
       onClick,
     }: {|
+      project: ?gdProject,
       expressionAutocompletion: ExpressionAutocompletion,
       isSelected: boolean,
       onClick: () => void,
@@ -210,6 +225,14 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
     ) : (
       expressionAutocompletion.completion
     );
+    const behaviorType = expressionAutocompletion.behaviorType || null;
+    const thumbnail =
+      project && behaviorType
+        ? gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            behaviorType
+          ).getIconFilename()
+        : 'res/types/behavior.png';
     return (
       <ButtonBase
         style={styles.button}
@@ -221,7 +244,7 @@ const DisplayedBehaviorAutocompletion = React.forwardRef(
         onClick={onClick}
         ref={ref}
       >
-        <AutocompletionIcon src={'res/types/behavior.png'} />
+        <AutocompletionIcon src={thumbnail} />
         <Spacer />
         <Text style={defaultTextStyle} noMargin align="left">
           {title}
@@ -409,6 +432,7 @@ export default function ExpressionAutocompletionsDisplayer({
                   ) : expressionAutocompletion.kind === 'Behavior' ? (
                     <DisplayedBehaviorAutocompletion
                       key={index}
+                      project={project}
                       expressionAutocompletion={expressionAutocompletion}
                       onClick={() => onChoose(expressionAutocompletion)}
                       isSelected={isSelected}

@@ -3,6 +3,9 @@ import Rectangle from '../Utils/Rectangle';
 import { roundPositionForResizing } from '../Utils/GridHelpers';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 import { type InstanceMeasurer } from './InstancesRenderer';
+import getObjectByName from '../Utils/GetObjectByName';
+
+
 
 export type ResizeGrabbingLocation =
   | 'TopLeft'
@@ -36,10 +39,10 @@ export const resizeGrabbingRelativePositions = {
   Right: [1, 0.5],
 };
 
-export const canMoveOnX = (location: ResizeGrabbingLocation) =>
+export const canMoveOnX = (location: ResizeGrabbingLocation): boolean =>
   location !== 'Top' && location !== 'Bottom';
 
-export const canMoveOnY = (location: ResizeGrabbingLocation) =>
+export const canMoveOnY = (location: ResizeGrabbingLocation): boolean =>
   location !== 'Left' && location !== 'Right';
 
 const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
@@ -83,7 +86,7 @@ export default class InstancesResizer {
     this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  _getOrCreateInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateInstanceAABB(instance: gdInitialInstance): Rectangle {
     const initialInstanceAABB = this._instanceAABBs[instance.ptr];
     if (initialInstanceAABB) return initialInstanceAABB;
 
@@ -92,7 +95,7 @@ export default class InstancesResizer {
     ] = this.instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
-  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance) {
+  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance): Rectangle {
     const initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
       instance.ptr
     ];
@@ -106,7 +109,7 @@ export default class InstancesResizer {
     ));
   }
 
-  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance): {} {
     const initialPosition = this._instancePositions[instance.ptr];
     if (initialPosition) return initialPosition;
 

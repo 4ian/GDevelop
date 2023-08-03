@@ -577,16 +577,16 @@ gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContain
   if (groupsObjects.empty()) {
     return "";
   }
-  // Check that all objects have the same type.
-  auto behaviorType = GetTypeOfBehaviorInObjectOrGroup(project, layout, groupsObjects[0], behaviorName,
-                                    false);
+  // Check that all objects have the behavior with the same type.
+  auto behaviorType = GetTypeOfBehaviorInObjectOrGroup(
+      project, layout, groupsObjects[0], behaviorName, false);
   for (auto &&object : groupsObjects) {
     if (GetTypeOfBehaviorInObjectOrGroup(project, layout, object, behaviorName,
                                     false) != behaviorType) {
-      return behaviorType;
+      return "";
     }
   }
-  return "";
+  return behaviorType;
 }
 
 gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,

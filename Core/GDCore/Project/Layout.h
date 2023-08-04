@@ -443,7 +443,7 @@ gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        gd::String objectName,
                                        bool searchInGroups = true);
 /**
- * \brief Check if an object or all object of a group has a behavior.
+ * \brief Check if an object or all objects of a group has a behavior.
  */
 bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::ObjectsContainer &layout,
@@ -453,7 +453,7 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
 
 /**
  * \brief Check if a behavior is a default one or doesn't exist in an object or
- * all object of a group.
+ * all objects of a group.
  */
 bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
@@ -462,7 +462,7 @@ bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
                                    bool searchInGroups = true);
 
 /**
- * \brief Get the type of a behavior if an object or some object of a group has it.
+ * \brief Get the type of a behavior if an object or all objects of a group has it.
  */
 gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::ObjectsContainer &layout,

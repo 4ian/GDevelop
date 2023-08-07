@@ -11,6 +11,10 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '..';
 import { unzipFirstEntryOfBlob } from '../../Utils/Zip.js/Utils';
 
+export const CLOUD_PROJECT_AUTOSAVE_CACHE_KEY =
+  'gdevelop-cloud-project-autosave';
+const CLOUD_PROJECT_AUTOSAVE_PREFIX = 'cache-autosave:';
+
 class CloudProjectReadingError extends Error {
   constructor() {
     super();
@@ -30,6 +34,29 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   content: Object,
 |}> => {
   const cloudProjectId = fileMetadata.fileIdentifier;
+
+  if (cloudProjectId.startsWith(CLOUD_PROJECT_AUTOSAVE_PREFIX)) {
+    if (!('caches' in window)) throw new Error('Cache API is not available.');
+    const { profile } = authenticatedUser;
+    if (!profile) {
+      throw new Error(
+        'User seems not to be logged in. Cannot retrieve autosaved filed from cache.'
+      );
+    }
+    const hasCache = await caches.has(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+    if (!hasCache) {
+      throw new Error('Cloud project autosave cache could not be retrieved.');
+    }
+    const cloudProjectId = fileMetadata.fileIdentifier.replace(
+      CLOUD_PROJECT_AUTOSAVE_PREFIX,
+      ''
+    );
+    const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+    const cacheKey = `${profile.id}/${cloudProjectId}`;
+    const cachedResponse = await cache.match(cacheKey);
+    const cachedSerializedProject = await cachedResponse.text();
+    return { content: JSON.parse(cachedSerializedProject) };
+  }
 
   onProgress && onProgress((1 / 4) * 100, t`Calibrating sensors`);
   const cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
@@ -65,4 +92,32 @@ export const generateOnEnsureCanAccessResources = (
 ): Promise<void> => {
   const cloudProjectId = fileMetadata.fileIdentifier;
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
+};
+
+export const generateHasAutoSave = (
+  authenticatedUser: AuthenticatedUser
+) => async (
+  fileMetadata: FileMetadata,
+  compareLastModified: boolean
+): Promise<boolean> => {
+  if (!('caches' in window)) return false;
+  const { profile } = authenticatedUser;
+  if (!profile) return false;
+  const hasCache = await caches.has(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+  if (!hasCache) return false;
+  const cloudProjectId = fileMetadata.fileIdentifier;
+  const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+  const cacheKey = `${profile.id}/${cloudProjectId}`;
+  const cachedResponse = await cache.match(cacheKey);
+  return !!cachedResponse;
+};
+
+export const generateOnGetAutoSave = (
+  authenticatedUser: AuthenticatedUser
+) => async (fileMetadata: FileMetadata): Promise<FileMetadata> => {
+  if (!('caches' in window)) return fileMetadata;
+  return {
+    ...fileMetadata,
+    fileIdentifier: CLOUD_PROJECT_AUTOSAVE_PREFIX + fileMetadata.fileIdentifier,
+  };
 };

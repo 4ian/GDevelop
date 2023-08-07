@@ -1,7 +1,7 @@
 // @flow
 import { serializeToJSObject } from '../../Utils/Serializer';
 
-const downloadStringContentAsFile = (
+const downloadStringContentAsFile = async (
   filename: string,
   content: string
 ): Promise<void> => {
@@ -16,30 +16,32 @@ const downloadStringContentAsFile = (
     adhocLink.click();
     adhocLink.remove();
   } else {
-    return Promise.reject(new Error("Document body couldn't be found."));
+    throw new Error("Document body couldn't be found.");
   }
-  return Promise.resolve();
+  return;
 };
 
 export default class BrowserEventsFunctionsExtensionWriter {
-  static chooseEventsFunctionExtensionFile = (
+  static chooseEventsFunctionExtensionFile = async (
     extensionName?: string
   ): Promise<?string> => {
-    return Promise.resolve(extensionName);
+    return extensionName;
   };
 
-  static writeEventsFunctionsExtension = (
+  static writeEventsFunctionsExtension = async (
     extension: gdEventsFunctionsExtension,
     filename: string
   ): Promise<void> => {
     const serializedObject = serializeToJSObject(extension);
-    return downloadStringContentAsFile(
-      filename,
-      JSON.stringify(serializedObject)
-    ).catch(err => {
-      console.error('Unable to write the events function extension:', err);
-      throw err;
-    });
+    try {
+      await downloadStringContentAsFile(
+        filename,
+        JSON.stringify(serializedObject)
+      );
+    } catch (error) {
+      console.error('Unable to write the events function extension:', error);
+      throw error;
+    }
   };
 
   static chooseCustomObjectFile = (objectName?: string): Promise<?string> => {

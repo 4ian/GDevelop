@@ -69,33 +69,24 @@ export default class BrowserEventsFunctionsExtensionOpener {
     });
   };
 
-  static readEventsFunctionExtensionFile = (file: any): Promise<Object> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const reader = new FileReader();
-        reader.onloadend = event => {
-          try {
-            const content = reader.result;
-            if (!content) {
-              throw new Error('The selected file is empty');
-            }
-            // content should be a string since the method readAsText guarantees it.
-            // $FlowExpectedError
-            return resolve(JSON.parse(content));
-          } catch (error) {
-            console.error('An error occurred when parsing the file content: ', {
-              error,
-            });
-            reject(error);
-          }
-        };
-        reader.readAsText(file, 'UTF-8');
-      } catch (error) {
-        console.error('An error occurred when reading the file: ', {
-          error,
-        });
-        reject(error);
-      }
-    });
+  static readEventsFunctionExtensionFile = async (
+    file: any
+  ): Promise<Object> => {
+    if (!(file instanceof File)) {
+      console.error('Given file is not a JS File object. Instead it is:', {
+        file,
+      });
+      throw new Error('Given file is not a JS File object.');
+    }
+
+    try {
+      const content = await file.text();
+      return JSON.parse(content);
+    } catch (error) {
+      console.error('An error occurred when parsing the file content: ', {
+        error,
+      });
+      throw error;
+    }
   };
 }

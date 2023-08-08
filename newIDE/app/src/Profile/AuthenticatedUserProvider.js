@@ -81,6 +81,13 @@ type State = {|
   userSnackbarMessage: ?React.Node,
 |};
 
+const cleanUserTracesOnDevice = async () => {
+  await Promise.all([
+    clearCloudProjectCookies(),
+    burstCloudProjectAutoSaveCache(),
+  ]);
+};
+
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
   State
@@ -636,8 +643,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this.props.authentication.logout();
     }
     this._markAuthenticatedUserAsLoggedOut();
-    clearCloudProjectCookies();
-    burstCloudProjectAutoSaveCache();
+    cleanUserTracesOnDevice();
     this.showUserSnackbar({
       message: <Trans>You're now logged out</Trans>,
     });
@@ -769,7 +775,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       await authentication.deleteAccount(authentication.getAuthorizationHeader);
       this._markAuthenticatedUserAsLoggedOut();
-      clearCloudProjectCookies();
+      cleanUserTracesOnDevice();
       this.openEditProfileDialog(false);
       this.showUserSnackbar({
         message: <Trans>Your account has been deleted!</Trans>,

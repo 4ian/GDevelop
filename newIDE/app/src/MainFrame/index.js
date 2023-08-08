@@ -858,7 +858,7 @@ const MainFrame = (props: Props) => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
-        hasAutoSave,
+        getAutoSaveCreationDate,
         onGetAutoSave,
         onOpen,
         getOpenErrorMessage,
@@ -874,12 +874,15 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return fileMetadata;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, true);
-        if (!canOpenAutosave) return fileMetadata;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          true
+        );
+        if (!autoSaveCreationDate) return fileMetadata;
 
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
@@ -893,12 +896,15 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return null;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, false);
-        if (!canOpenAutosave) return null;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          false
+        );
+        if (!autoSaveCreationDate) return null;
 
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,

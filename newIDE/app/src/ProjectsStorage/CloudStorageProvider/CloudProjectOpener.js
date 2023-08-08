@@ -95,31 +95,33 @@ export const generateOnEnsureCanAccessResources = (
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
 };
 
-export const generateHasAutoSave = (
+export const generateGetAutoSaveCreationDate = (
   authenticatedUser: AuthenticatedUser
 ) => async (
   fileMetadata: FileMetadata,
   compareLastModified: boolean
-): Promise<boolean> => {
-  if (!('caches' in window)) return false;
+): Promise<?number> => {
+  if (!('caches' in window)) return null;
   const { profile } = authenticatedUser;
-  if (!profile) return false;
+  if (!profile) return null;
 
   const hasCache = await caches.has(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
-  if (!hasCache) return false;
+  if (!hasCache) return null;
 
   const cloudProjectId = fileMetadata.fileIdentifier;
   const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
   const cacheKey = `${profile.id}/${cloudProjectId}`;
   const cachedResponse = await cache.match(cacheKey);
-  if (!compareLastModified) return !!cachedResponse;
-
-  const saveTime = fileMetadata.lastModifiedDate;
-  if (!saveTime) return false;
+  if (!cachedResponse) return null
 
   const cachedResponseBody = await cachedResponse.text();
   const autoSavedTime = JSON.parse(cachedResponseBody).createdAt;
-  return autoSavedTime > saveTime + 5000;
+  if (!compareLastModified) return autoSavedTime;
+
+  const saveTime = fileMetadata.lastModifiedDate;
+  if (!saveTime) return null;
+
+  return autoSavedTime > saveTime + 5000 ? autoSavedTime : null;
 };
 
 export const generateOnGetAutoSave = (

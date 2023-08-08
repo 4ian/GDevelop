@@ -19,7 +19,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import {
   generateOnOpen,
   generateOnEnsureCanAccessResources,
-  generateHasAutoSave,
+  generateGetAutoSaveCreationDate,
   generateOnGetAutoSave,
 } from './CloudProjectOpener';
 import Cloud from '../../UI/CustomSvgIcons/Cloud';
@@ -70,7 +70,7 @@ export default ({
       closeDialog
     ),
     onAutoSaveProject: generateOnAutoSaveProject(authenticatedUser),
-    hasAutoSave: generateHasAutoSave(authenticatedUser),
+    getAutoSaveCreationDate: generateGetAutoSaveCreationDate(authenticatedUser),
     onGetAutoSave: generateOnGetAutoSave(authenticatedUser),
     onChangeProjectProperty: generateOnChangeProjectProperty(authenticatedUser),
     getOpenErrorMessage: (error: Error): MessageDescriptor => {

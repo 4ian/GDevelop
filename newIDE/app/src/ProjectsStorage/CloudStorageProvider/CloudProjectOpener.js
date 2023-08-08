@@ -38,7 +38,7 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   const cloudProjectId = fileMetadata.fileIdentifier;
 
   if (cloudProjectId.startsWith(CLOUD_PROJECT_AUTOSAVE_PREFIX)) {
-    if (!('caches' in window)) throw new Error('Cache API is not available.');
+    if (!isCacheApiAvailable) throw new Error('Cache API is not available.');
     const { profile } = authenticatedUser;
     if (!profile) {
       throw new Error(

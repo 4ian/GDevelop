@@ -450,6 +450,13 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
                                             const gd::String &objectOrGroupName,
                                             const gd::String &behaviorName,
                                             bool searchInGroups = true);
+/**
+ * \brief Get the names of behavior of a given type if an object or all objects of a group has it.
+ */
+std::vector<gd::String> GD_CORE_API GetBehaviorNamesInObjectOrGroup(
+    const gd::ObjectsContainer &project, const gd::ObjectsContainer &layout,
+    const gd::String &objectOrGroupName, const gd::String &behaviorType,
+    bool searchInGroups);
 
 /**
  * \brief Check if a behavior is a default one or doesn't exist in an object or

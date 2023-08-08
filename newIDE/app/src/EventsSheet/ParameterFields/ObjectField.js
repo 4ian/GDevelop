@@ -16,15 +16,12 @@ import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 const gd: libGDevelop = global.gd;
 
-export const getBehaviorConstraints = (
+export const getRequiredBehaviorTypes = (
   platform: gdPlatform,
   functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
   parameterIndex: number
 ) => {
-  const behaviorConstraints: Array<{
-    behaviorName: string,
-    behaviorType: string,
-  }> = [];
+  const requiredBehaviorTypes: Array<string> = [];
   for (
     let index = parameterIndex + 1;
     index < functionMetadata.getParametersCount();
@@ -40,13 +37,10 @@ export const getBehaviorConstraints = (
       behaviorType
     );
     if (behaviorMetadata.isHidden()) {
-      behaviorConstraints.push({
-        behaviorName: behaviorMetadata.getDefaultName(),
-        behaviorType,
-      });
+      requiredBehaviorTypes.push(behaviorType);
     }
   }
-  return behaviorConstraints;
+  return requiredBehaviorTypes;
 };
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
@@ -86,13 +80,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
-    const behaviorConstraints = React.useMemo(
+    const requiredBehaviorTypes = React.useMemo(
       () => {
         const functionMetadata = instructionMetadata || expressionMetadata;
         if (!project || !functionMetadata || parameterIndex === undefined) {
           return [];
         }
-        return getBehaviorConstraints(
+        return getRequiredBehaviorTypes(
           project.getCurrentPlatform(),
           functionMetadata,
           parameterIndex
@@ -112,7 +106,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // Some instructions apply to all objects BUT not some objects
         // lacking a specific capability offered by a default behavior.
         allowedObjectType={allowedObjectType}
-        behaviorConstraints={behaviorConstraints}
+        requiredBehaviorTypes={requiredBehaviorTypes}
         globalObjectsContainer={props.globalObjectsContainer}
         objectsContainer={props.objectsContainer}
         floatingLabelText={description}
@@ -124,7 +118,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         }
         fullWidth
         errorTextIfInvalid={
-          allowedObjectType || behaviorConstraints.length > 0 ? (
+          allowedObjectType || requiredBehaviorTypes.length > 0 ? (
             <Trans>The object does not exist or can't be used here.</Trans>
           ) : (
             <Trans>Enter the name of an object.</Trans>

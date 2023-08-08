@@ -16,6 +16,8 @@ import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
@@ -27,7 +29,7 @@ type Props = {|
    * If specified, an object without these behaviors won't be selectable.
    * Note that groups with at least 1 incompatible object won't be shown.
    */
-  behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
+  requiredBehaviorTypes?: Array<string>,
 
   noGroups?: boolean,
 
@@ -59,7 +61,7 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
-  behaviorConstraints,
+  requiredBehaviorTypes,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
@@ -67,14 +69,14 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
-  behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
+  requiredBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     globalObjectsContainer,
     objectsContainer,
     allowedObjectType || undefined,
-    behaviorConstraints || []
+    requiredBehaviorTypes || []
   );
   const objects = list.allObjectsList.map(({ object }) => {
     return {
@@ -118,15 +120,15 @@ const getObjectsAndGroupsDataSource = ({
 export const checkHasRequiredCapability = ({
   globalObjectsContainer,
   objectsContainer,
-  behaviorConstraints,
+  requiredBehaviorTypes,
   objectName,
 }: {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string,
-  behaviorConstraints?: Array<{ behaviorName: string, behaviorType: string }>,
+  requiredBehaviorTypes?: Array<string>,
 |}) => {
-  if (!behaviorConstraints) return true;
+  if (!requiredBehaviorTypes) return true;
 
   const object = getObjectByName(
     globalObjectsContainer,
@@ -140,10 +142,17 @@ export const checkHasRequiredCapability = ({
     return true;
   }
 
-  return behaviorConstraints.every(
-    ({ behaviorName, behaviorType }) =>
-      object.hasBehaviorNamed(behaviorName) &&
-      object.getBehavior(behaviorName).getTypeName() === behaviorType
+  return requiredBehaviorTypes.every(
+    behaviorType =>
+      gd
+        .getBehaviorNamesInObjectOrGroup(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName,
+          behaviorType,
+          false
+        )
+        .size() > 0
   );
 };
 
@@ -176,7 +185,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       id,
       excludedObjectOrGroupNames,
       hintText,
-      behaviorConstraints,
+      requiredBehaviorTypes,
       ...otherProps
     } = props;
 
@@ -186,7 +195,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       objectsContainer,
       noGroups,
       allowedObjectType,
-      behaviorConstraints,
+      requiredBehaviorTypes,
       excludedObjectOrGroupNames,
     });
 
@@ -199,7 +208,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       globalObjectsContainer,
       objectsContainer,
       objectName: value,
-      behaviorConstraints,
+      requiredBehaviorTypes,
     });
     const errorText = !hasObjectWithRequiredCapability ? (
       <Trans>This object exists, but can't be used here.</Trans>

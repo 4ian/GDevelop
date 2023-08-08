@@ -222,73 +222,52 @@ export const enumerateGroups = (
 export const enumerateObjectsAndGroups = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  type: ?string = undefined,
-  behaviorConstraints?: Array<{
-    behaviorName: string,
-    behaviorType: string,
-  }> = []
+  objectType: ?string = undefined,
+  behaviorTypes?: Array<string> = []
 ) => {
   const filterObject = (object: gdObject): boolean => {
-    const behaviorNames = behaviorConstraints
-      ? gd
-          .getBehaviorsOfObject(
-            globalObjectsContainer,
-            objectsContainer,
-            object.getName(),
-            false
-          )
-          .toJSArray()
-      : [];
     return (
-      (!type ||
+      (!objectType ||
         gd.getTypeOfObject(
           globalObjectsContainer,
           objectsContainer,
           object.getName(),
           false
-        ) === type) &&
-      behaviorConstraints.every(({ behaviorName, behaviorType }) =>
-        behaviorNames.some(behaviorName => {
-          return (
-            gd.getTypeOfBehavior(
+        ) === objectType) &&
+      behaviorTypes.every(
+        behaviorType =>
+          gd
+            .getBehaviorNamesInObjectOrGroup(
               globalObjectsContainer,
               objectsContainer,
-              behaviorName,
+              object.getName(),
+              behaviorType,
               false
-            ) === behaviorType
-          );
-        })
+            )
+            .size() > 0
       )
     );
   };
   const filterGroup = (group: gdObjectGroup): boolean => {
-    const behaviorNames = gd
-      .getBehaviorsOfObject(
-        globalObjectsContainer,
-        objectsContainer,
-        group.getName(),
-        true
-      )
-      .toJSArray();
     return (
-      (!type ||
+      (!objectType ||
         gd.getTypeOfObject(
           globalObjectsContainer,
           objectsContainer,
           group.getName(),
           true
-        ) === type) &&
-      behaviorConstraints.every(({ behaviorName, behaviorType }) =>
-        behaviorNames.some(behaviorName => {
-          return (
-            gd.getTypeOfBehavior(
+        ) === objectType) &&
+      behaviorTypes.every(
+        behaviorType =>
+          gd
+            .getBehaviorNamesInObjectOrGroup(
               globalObjectsContainer,
               objectsContainer,
-              behaviorName,
+              group.getName(),
+              behaviorType,
               true
-            ) === behaviorType
-          );
-        })
+            )
+            .size() > 0
       )
     );
   };

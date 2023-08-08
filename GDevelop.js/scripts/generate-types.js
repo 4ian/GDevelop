@@ -165,6 +165,7 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
         '  getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;',
         '  isDefaultBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): boolean;',
         '  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;',
+        '  getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;',
         '',
         '  removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;',
         '  swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;',

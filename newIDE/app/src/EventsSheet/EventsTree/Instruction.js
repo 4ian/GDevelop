@@ -41,7 +41,7 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { getBehaviorConstraints } from '../ParameterFields/ObjectField';
+import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
 import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
 
 const gd: libGDevelop = global.gd;
@@ -317,7 +317,7 @@ const Instruction = (props: Props) => {
                   globalObjectsContainer,
                   objectsContainer,
                   objectName: objectOrGroupName,
-                  behaviorConstraints: getBehaviorConstraints(
+                  requiredBehaviorTypes: getRequiredBehaviorTypes(
                     platform,
                     metadata,
                     parameterIndex

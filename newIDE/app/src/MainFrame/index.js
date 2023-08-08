@@ -761,7 +761,6 @@ const MainFrame = (props: Props) => {
               ...fileMetadata,
               name: project.getName(),
               gameId: project.getProjectUuid(),
-              lastModifiedDate: Date.now(),
             },
             storageProviderName: storageProvider.internalName,
           });

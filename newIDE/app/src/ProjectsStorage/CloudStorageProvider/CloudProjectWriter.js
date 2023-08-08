@@ -285,5 +285,13 @@ export const generateOnAutoSaveProject = (
   const cloudProjectId = fileMetadata.fileIdentifier;
   const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
   const cacheKey = `${profile.id}/${cloudProjectId}`;
-  cache.put(cacheKey, new Response(serializeToJSON(project)));
+  cache.put(
+    cacheKey,
+    new Response(
+      JSON.stringify({
+        project: serializeToJSON(project),
+        createdAt: Date.now(),
+      })
+    )
+  );
 };

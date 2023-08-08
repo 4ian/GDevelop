@@ -54,7 +54,8 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
     const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
     const cacheKey = `${profile.id}/${cloudProjectId}`;
     const cachedResponse = await cache.match(cacheKey);
-    const cachedSerializedProject = await cachedResponse.text();
+    const cachedResponseBody = await cachedResponse.text();
+    const cachedSerializedProject = JSON.parse(cachedResponseBody).project;
     return { content: JSON.parse(cachedSerializedProject) };
   }
 

@@ -14,7 +14,8 @@ import { unzipFirstEntryOfBlob } from '../../Utils/Zip.js/Utils';
 export const CLOUD_PROJECT_AUTOSAVE_CACHE_KEY =
   'gdevelop-cloud-project-autosave';
 const CLOUD_PROJECT_AUTOSAVE_PREFIX = 'cache-autosave:';
-export const isCacheApiAvailable = 'caches' in window;
+export const isCacheApiAvailable =
+  typeof window !== 'undefined' && 'caches' in window;
 
 class CloudProjectReadingError extends Error {
   constructor() {

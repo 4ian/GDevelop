@@ -112,7 +112,7 @@ export const generateGetAutoSaveCreationDate = (
   const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
   const cacheKey = `${profile.id}/${cloudProjectId}`;
   const cachedResponse = await cache.match(cacheKey);
-  if (!cachedResponse) return null
+  if (!cachedResponse) return null;
 
   const cachedResponseBody = await cachedResponse.text();
   const autoSavedTime = JSON.parse(cachedResponseBody).createdAt;
@@ -132,4 +132,9 @@ export const generateOnGetAutoSave = (
     ...fileMetadata,
     fileIdentifier: CLOUD_PROJECT_AUTOSAVE_PREFIX + fileMetadata.fileIdentifier,
   };
+};
+
+export const burstCloudProjectAutoSaveCache = async () => {
+  if (!('caches' in window)) return;
+  await caches.delete(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
 };

@@ -51,6 +51,7 @@ import AdditionalUserInfoDialog, {
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
+import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
 
 type Props = {|
   authentication: Authentication,
@@ -636,6 +637,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
     this._markAuthenticatedUserAsLoggedOut();
     clearCloudProjectCookies();
+    burstCloudProjectAutoSaveCache();
     this.showUserSnackbar({
       message: <Trans>You're now logged out</Trans>,
     });

@@ -17,7 +17,10 @@ import {
   createZipWithSingleTextFile,
   unzipFirstEntryOfBlob,
 } from '../../Utils/Zip.js/Utils';
-import { CLOUD_PROJECT_AUTOSAVE_CACHE_KEY } from './CloudProjectOpener';
+import {
+  CLOUD_PROJECT_AUTOSAVE_CACHE_KEY,
+  isCacheApiAvailable,
+} from './CloudProjectOpener';
 
 const zipProject = async (project: gdProject): Promise<[Blob, string]> => {
   const projectJson = serializeToJSON(project);
@@ -281,20 +284,22 @@ export const onRenderNewProjectSaveAsLocationChooser = ({
 
 export const generateOnAutoSaveProject = (
   authenticatedUser: AuthenticatedUser
-) => async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
-  if (!('caches' in window)) return;
-  const { profile } = authenticatedUser;
-  if (!profile) return;
-  const cloudProjectId = fileMetadata.fileIdentifier;
-  const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
-  const cacheKey = `${profile.id}/${cloudProjectId}`;
-  cache.put(
-    cacheKey,
-    new Response(
-      JSON.stringify({
-        project: serializeToJSON(project),
-        createdAt: Date.now(),
-      })
-    )
-  );
-};
+) =>
+  isCacheApiAvailable
+    ? async (project: gdProject, fileMetadata: FileMetadata): Promise<void> => {
+        const { profile } = authenticatedUser;
+        if (!profile) return;
+        const cloudProjectId = fileMetadata.fileIdentifier;
+        const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+        const cacheKey = `${profile.id}/${cloudProjectId}`;
+        cache.put(
+          cacheKey,
+          new Response(
+            JSON.stringify({
+              project: serializeToJSON(project),
+              createdAt: Date.now(),
+            })
+          )
+        );
+      }
+    : undefined;

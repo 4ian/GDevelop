@@ -104,13 +104,22 @@ export const generateHasAutoSave = (
   if (!('caches' in window)) return false;
   const { profile } = authenticatedUser;
   if (!profile) return false;
+
   const hasCache = await caches.has(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
   if (!hasCache) return false;
+
   const cloudProjectId = fileMetadata.fileIdentifier;
   const cache = await caches.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
   const cacheKey = `${profile.id}/${cloudProjectId}`;
   const cachedResponse = await cache.match(cacheKey);
-  return !!cachedResponse;
+  if (!compareLastModified) return !!cachedResponse;
+
+  const saveTime = fileMetadata.lastModifiedDate;
+  if (!saveTime) return false;
+
+  const cachedResponseBody = await cachedResponse.text();
+  const autoSavedTime = JSON.parse(cachedResponseBody).createdAt;
+  return autoSavedTime > saveTime + 5000;
 };
 
 export const generateOnGetAutoSave = (

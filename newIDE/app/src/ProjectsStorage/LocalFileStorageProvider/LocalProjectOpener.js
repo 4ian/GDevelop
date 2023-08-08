@@ -82,14 +82,11 @@ export const hasAutoSave = async (
       // showing the warning if the user has just saved the project, or if the
       // project has been decompressed from a zip file, causing the last modified
       // time to be the time of decompression.
-      if (autoSavedTime > saveTime + 5000) {
-        return true;
-      }
+      return autoSavedTime > saveTime + 5000;
     } catch (err) {
       console.error('Unable to compare *.autosave to project', err);
       return false;
     }
-    return false;
   }
   return false;
 };

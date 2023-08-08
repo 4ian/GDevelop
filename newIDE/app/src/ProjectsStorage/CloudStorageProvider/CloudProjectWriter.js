@@ -86,9 +86,12 @@ export const generateOnSaveProject = (
       // Do not throw, as this is not a blocking error.
     }
   }
-  const newFileMetadata = {
+  const newFileMetadata: FileMetadata = {
     ...fileMetadata,
     gameId: project.getProjectUuid(),
+    // lastModifiedDate is not set since it will be set by backend services
+    // and then frontend will use it to transform the list of cloud project
+    // items into a list of FileMetadata.
   };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,

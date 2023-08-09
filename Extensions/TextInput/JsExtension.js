@@ -288,6 +288,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
       )
+      .addDefaultBehavior('ResizableCapability::ResizableBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:

@@ -50,7 +50,7 @@ namespace gdjs {
    */
   export class TextInputRuntimeObject
     extends gdjs.RuntimeObject
-    implements gdjs.OpacityHandler {
+    implements gdjs.Resizable, gdjs.OpacityHandler {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
@@ -213,18 +213,15 @@ namespace gdjs {
       return this.opacity;
     }
 
-    /**
-     * Set the width of the object, if applicable.
-     * @param width The new width in pixels.
-     */
+    setSize(width: number, height: number): void {
+      this.setWidth(width);
+      this.setHeight(height);
+    }
+
     setWidth(width: float): void {
       this._width = width;
     }
 
-    /**
-     * Set the height of the object, if applicable.
-     * @param height The new height in pixels.
-     */
     setHeight(height: float): void {
       this._height = height;
     }

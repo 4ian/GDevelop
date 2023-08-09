@@ -18,6 +18,7 @@ type SearchableItem =
 
 export interface SearchFilter<SearchItem> {
   getPertinence(searchItem: SearchItem): number;
+  hasFilters(): boolean;
 }
 
 export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
@@ -33,6 +34,10 @@ export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
       searchItem.tags.some(tag => this.tags.has(tag))
       ? 1
       : 0;
+  }
+
+  hasFilters(): boolean {
+    return this.tags.size > 0;
   }
 }
 

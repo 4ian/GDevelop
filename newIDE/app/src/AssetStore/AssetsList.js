@@ -143,6 +143,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       navigationState,
       licenses,
       authors,
+      assetFiltersState,
+      assetPackFiltersState,
       privateAssetPackListingDatas: allPrivateAssetPackListingDatas,
     } = React.useContext(AssetStoreContext);
     const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
@@ -173,10 +175,57 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         scrollViewElement.scrollToPosition(y);
       },
     }));
+
+    const hasAssetPackFiltersApplied = React.useMemo(
+      // When a pack is opened, the asset pack filters are not hidden, but not relevant either.
+      () => !openedAssetPack && assetPackFiltersState.typeFilter.hasFilters(),
+      [assetPackFiltersState, openedAssetPack]
+    );
+
+    const hasAssetFiltersApplied = React.useMemo(
+      () =>
+        assetFiltersState.animatedFilter.hasFilters() ||
+        assetFiltersState.viewpointFilter.hasFilters() ||
+        assetFiltersState.colorFilter.hasFilters() ||
+        assetFiltersState.dimensionFilter.hasFilters() ||
+        assetFiltersState.licenseFilter.hasFilters() ||
+        assetFiltersState.objectTypeFilter.hasFilters(),
+      [assetFiltersState]
+    );
+
+    const hasOnlySelectedOwnedAssetPacks = React.useMemo(
+      () =>
+        // When a pack is opened, the asset pack filters are not hidden, but not relevant either.
+        !openedAssetPack &&
+        assetPackFiltersState.typeFilter.isOwned &&
+        !assetPackFiltersState.typeFilter.isPremium &&
+        !assetPackFiltersState.typeFilter.isFree &&
+        !hasAssetFiltersApplied,
+      [assetPackFiltersState, hasAssetFiltersApplied, openedAssetPack]
+    );
+    const noResultComponent =
+      noResultsPlaceHolder || hasOnlySelectedOwnedAssetPacks ? (
+        <NoResultPlaceholder
+          message={<Trans>You don't own any pack yet!</Trans>}
+          onClear={clearAllFilters}
+        />
+      ) : hasAssetPackFiltersApplied && hasAssetFiltersApplied ? (
+        <NoResultPlaceholder
+          message={
+            <Trans>
+              Cannot filter on both asset packs and assets at the same time. Try
+              clearing one of the filters!
+            </Trans>
+          }
+          onClear={clearAllFilters}
+        />
+      ) : (
+        <NoResultPlaceholder onClear={clearAllFilters} />
+      );
+
     const [selectedFolders, setSelectedFolders] = React.useState<Array<string>>(
       []
     );
-
     React.useEffect(
       () => {
         if (chosenCategory) {
@@ -203,25 +252,6 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         setSelectedFolders(selectedFolders.slice(0, folderIndex + 1));
       },
       [selectedFolders]
-    );
-
-    const selectedPrivateAssetPackListingData = React.useMemo(
-      () => {
-        if (
-          !allPrivateAssetPackListingDatas ||
-          !openedAssetPack ||
-          !openedAssetPack.id // public pack selected.
-        )
-          return null;
-
-        // As the list should already been fetched, we can find the selected pack
-        // if it is a private pack.
-        return allPrivateAssetPackListingDatas.find(
-          privateAssetPackListingData =>
-            privateAssetPackListingData.id === openedAssetPack.id
-        );
-      },
-      [allPrivateAssetPackListingDatas, openedAssetPack]
     );
 
     const folderTags: Array<string> = React.useMemo(
@@ -254,35 +284,68 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [folderTags, navigateInsideFolder]
     );
 
+    const selectedPrivateAssetPackListingData = React.useMemo(
+      () => {
+        if (
+          !allPrivateAssetPackListingDatas ||
+          !openedAssetPack ||
+          !openedAssetPack.id // public pack selected.
+        )
+          return null;
+
+        // As the list should already been fetched, we can find the selected pack
+        // if it is a private pack.
+        return allPrivateAssetPackListingDatas.find(
+          privateAssetPackListingData =>
+            privateAssetPackListingData.id === openedAssetPack.id
+        );
+      },
+      [allPrivateAssetPackListingDatas, openedAssetPack]
+    );
+
     const assetTiles = React.useMemo(
-      () =>
-        assetShortHeaders
-          ? assetShortHeaders
-              .filter(assetShortHeader => {
-                if (!selectedFolders.length) return true;
-                const allAssetTags = assetShortHeader.tags;
-                // Check that the asset has all the selected folders tags.
-                return selectedFolders.every(folderTag =>
-                  allAssetTags.includes(folderTag)
-                );
-              })
-              .map(assetShortHeader => (
-                <AssetCardTile
-                  assetShortHeader={assetShortHeader}
-                  onOpenDetails={() => onOpenDetails(assetShortHeader)}
-                  size={getAssetSize(windowWidth)}
-                  key={assetShortHeader.id}
-                  margin={cellSpacing / 2}
-                />
-              ))
-              .splice(0, ASSETS_DISPLAY_LIMIT) // Limit the number of displayed assets to avoid performance issues
-          : null,
-      [assetShortHeaders, onOpenDetails, windowWidth, selectedFolders]
+      () => {
+        if (!assetShortHeaders) return null; // Loading
+        if (hasAssetPackFiltersApplied && !openedAssetPack) return []; // Don't show assets if filtering on asset packs.)
+
+        return assetShortHeaders
+          .filter(assetShortHeader => {
+            if (!selectedFolders.length) return true;
+            const allAssetTags = assetShortHeader.tags;
+            // Check that the asset has all the selected folders tags.
+            return selectedFolders.every(folderTag =>
+              allAssetTags.includes(folderTag)
+            );
+          })
+          .map(assetShortHeader => (
+            <AssetCardTile
+              assetShortHeader={assetShortHeader}
+              onOpenDetails={() => onOpenDetails(assetShortHeader)}
+              size={getAssetSize(windowWidth)}
+              key={assetShortHeader.id}
+              margin={cellSpacing / 2}
+            />
+          ))
+          .splice(0, ASSETS_DISPLAY_LIMIT); // Limit the number of displayed assets to avoid performance issues
+      },
+      [
+        assetShortHeaders,
+        onOpenDetails,
+        windowWidth,
+        selectedFolders,
+        hasAssetPackFiltersApplied,
+        openedAssetPack,
+      ]
     );
 
     const publicPacksTiles: Array<React.Node> = React.useMemo(
       () => {
-        if (!publicAssetPacks || !onPublicAssetPackSelection) return [];
+        if (
+          !publicAssetPacks ||
+          !onPublicAssetPackSelection ||
+          hasAssetFiltersApplied // Don't show public packs if filtering on assets.
+        )
+          return [];
         return publicAssetPacks.map((assetPack, index) => (
           <PublicAssetPackTile
             assetPack={assetPack}
@@ -291,7 +354,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           />
         ));
       },
-      [publicAssetPacks, onPublicAssetPackSelection]
+      [publicAssetPacks, onPublicAssetPackSelection, hasAssetFiltersApplied]
     );
 
     const { allStandAlonePackTiles, allBundlePackTiles } = React.useMemo(
@@ -301,7 +364,11 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         const privateAssetPackBundleTiles: Array<React.Node> = [];
         const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-        if (!privateAssetPackListingDatas || !receivedAssetPacks) {
+        if (
+          !privateAssetPackListingDatas ||
+          !receivedAssetPacks ||
+          hasAssetFiltersApplied // Don't show private packs if filtering on assets.
+        ) {
           return {
             allStandAlonePackTiles: [],
             allBundlePackTiles: [],
@@ -365,6 +432,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         onPrivateAssetPackSelection,
         publicPacksTiles,
         receivedAssetPacks,
+        hasAssetFiltersApplied,
       ]
     );
 
@@ -589,11 +657,12 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <PrivateAssetPackAudioFilesDownloadButton
             assetPack={openedAssetPack}
           />
-        ) : (
-          noResultsPlaceHolder || (
-            <NoResultPlaceholder onClear={() => clearAllFilters()} />
-          )
-        )}
+        ) : null}
+        {assetTiles &&
+          !assetTiles.length &&
+          !allBundlePackTiles.length &&
+          !allStandAlonePackTiles.length &&
+          noResultComponent}
         {onPrivateAssetPackSelection &&
           openAuthorPublicProfileDialog &&
           authorPublicProfile && (

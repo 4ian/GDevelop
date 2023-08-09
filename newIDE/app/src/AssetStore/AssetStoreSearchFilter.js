@@ -32,6 +32,10 @@ export class ObjectTypeAssetStoreSearchFilter
       ? 1
       : 0;
   }
+
+  hasFilters(): boolean {
+    return this.objectTypes.size > 0;
+  }
 }
 
 export class LicenseAssetStoreSearchFilter
@@ -56,6 +60,10 @@ export class LicenseAssetStoreSearchFilter
       )
       ? 1
       : 0;
+  }
+
+  hasFilters(): boolean {
+    return this.attributionFreeOnly;
   }
 }
 
@@ -100,20 +108,9 @@ export class AssetPackTypeStoreSearchFilter
     if (this.isFree && !searchItem.prices) return 1;
     return 0;
   }
-}
 
-export class PricePrivateAssetPackStoreSearchFilter
-  implements SearchFilter<PrivateAssetPackListingData> {
-  isFree: boolean;
-  isPremium: boolean;
-
-  constructor(isFree: boolean = false, isPremium: boolean = false) {
-    this.isFree = isFree;
-    this.isPremium = isPremium;
-  }
-
-  getPertinence(searchItem: PrivateAssetPackListingData): number {
-    return !this.isFree || this.isPremium ? 1 : 0;
+  hasFilters(): boolean {
+    return this.isFree || this.isPremium || this.isOwned;
   }
 }
 
@@ -137,6 +134,10 @@ export class AnimatedAssetStoreSearchFilter
       (!this.mustHaveSeveralState || hasSeveralState)
       ? 1
       : 0;
+  }
+
+  hasFilters(): boolean {
+    return this.mustBeAnimated || this.mustHaveSeveralState;
   }
 }
 
@@ -171,6 +172,13 @@ export class DimensionAssetStoreSearchFilter
           searchItem.height <= this.dimensionMax))
       ? 1
       : 0;
+  }
+
+  hasFilters(): boolean {
+    return (
+      this.dimensionMin !== DimensionAssetStoreSearchFilter.boundMin ||
+      this.dimensionMax !== DimensionAssetStoreSearchFilter.boundMax
+    );
   }
 }
 
@@ -246,6 +254,10 @@ export class ColorAssetStoreSearchFilter
       scoreMax = Math.max(scoreMax, score);
     }
     return scoreMax;
+  }
+
+  hasFilters(): boolean {
+    return !!this.color;
   }
 }
 
@@ -338,5 +350,9 @@ export class SimilarAssetStoreSearchFilter
     }
 
     return colorSimilitude;
+  }
+
+  hasFilters(): boolean {
+    return true;
   }
 }

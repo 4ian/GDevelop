@@ -6,6 +6,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import Music from '../../UI/CustomSvgIcons/Music';
 import Window from '../../Utils/Window';
+import { Column } from '../../UI/Grid';
 
 const PrivateAssetPackAudioFilesDownloadButton = ({
   assetPack,
@@ -21,32 +22,34 @@ const PrivateAssetPackAudioFilesDownloadButton = ({
   ] = React.useState(false);
 
   return (
-    <RaisedButton
-      primary
-      label={
-        isAudioArchiveUrlLoading ? (
-          <Trans>Loading...</Trans>
-        ) : (
-          <Trans>Download pack sounds</Trans>
-        )
-      }
-      icon={<Music />}
-      disabled={isAudioArchiveUrlLoading}
-      onClick={async () => {
-        setIsAudioArchiveUrlLoading(true);
-        const url = await getPrivateAssetPackAudioArchiveUrl(assetPack.id);
-        setIsAudioArchiveUrlLoading(false);
-        if (!url) {
-          console.error(
-            `Could not generate url for premium asset pack with name ${
-              assetPack.name
-            }`
-          );
-          return;
+    <Column expand alignItems="center" justifyContent="center">
+      <RaisedButton
+        primary
+        label={
+          isAudioArchiveUrlLoading ? (
+            <Trans>Loading...</Trans>
+          ) : (
+            <Trans>Download pack sounds</Trans>
+          )
         }
-        Window.openExternalURL(url);
-      }}
-    />
+        icon={<Music />}
+        disabled={isAudioArchiveUrlLoading}
+        onClick={async () => {
+          setIsAudioArchiveUrlLoading(true);
+          const url = await getPrivateAssetPackAudioArchiveUrl(assetPack.id);
+          setIsAudioArchiveUrlLoading(false);
+          if (!url) {
+            console.error(
+              `Could not generate url for premium asset pack with name ${
+                assetPack.name
+              }`
+            );
+            return;
+          }
+          Window.openExternalURL(url);
+        }}
+      />
+    </Column>
   );
 };
 

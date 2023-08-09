@@ -22,17 +22,13 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { type SearchBarInterface } from '../UI/SearchBar';
-import {
-  AssetStoreFilterPanel,
-  clearAllFilters,
-} from './AssetStoreFilterPanel';
+import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
-import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { AssetDetails, type AssetDetailsInterface } from './AssetDetails';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -51,10 +47,6 @@ import {
 import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
 import AssetsList, { type AssetsListInterface } from './AssetsList';
 import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
-
-const capitalize = (str: string) => {
-  return str ? str[0].toUpperCase() + str.substr(1) : '';
-};
 
 type Props = {||};
 
@@ -100,7 +92,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       navigationState,
       searchText,
       setSearchText,
-      assetFiltersState,
+      clearAllFilters,
       assetPackRandomOrdering,
     } = React.useContext(AssetStoreContext);
     const currentPage = navigationState.getCurrentPage();
@@ -156,6 +148,18 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       []
     );
 
+    const reApplySearchTextIfNeeded = React.useCallback(
+      (page: AssetStorePageState): boolean => {
+        const previousSearchText = page.searchText || '';
+        if (searchText !== previousSearchText) {
+          setSearchText(previousSearchText);
+          return true;
+        }
+        return false;
+      },
+      [searchText, setSearchText]
+    );
+
     const canShowFiltersPanel =
       !openedAssetShortHeader && // Don't show filters on asset page.
       !openedPrivateAssetPackListingData && // Don't show filters on private asset pack information page.
@@ -183,7 +187,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     );
     // This is also called when the asset detail page has loaded.
     const applyBackScrollPosition = React.useCallback(
-      () => {
+      (page: AssetStorePageState) => {
         if (hasAppliedSavedScrollPosition.current) {
           return;
         }
@@ -191,7 +195,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         if (!scrollView) {
           return;
         }
-        const scrollPosition = currentPage.scrollPosition;
+        const scrollPosition = page.scrollPosition;
         if (scrollPosition) scrollView.scrollToPosition(scrollPosition);
         // If no saved scroll position, force scroll to 0 in case the displayed component
         // is the same as the previous page so the scroll is naturally kept between pages
@@ -199,7 +203,27 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         else scrollView.scrollToPosition(0);
         hasAppliedSavedScrollPosition.current = true;
       },
-      [getScrollView, currentPage]
+      [getScrollView]
+    );
+
+    React.useLayoutEffect(
+      () => {
+        // When going back to the homepage from a page where the asset filters
+        // were open, we must first close the panel and then apply the scroll position.
+        const applyEffect = async () => {
+          if (isOnHomePage) {
+            clearAllFilters();
+            await setIsFiltersPanelOpen(false);
+          }
+          if (!isAssetDetailLoading.current) {
+            applyBackScrollPosition(currentPage);
+          }
+        };
+        applyEffect();
+      },
+      // clearAllFilters is not stable, so don't list it.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [isOnHomePage, applyBackScrollPosition, currentPage]
     );
 
     React.useImperativeHandle(ref, () => ({
@@ -226,7 +250,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           assetPackKind,
         });
         saveScrollPosition();
-        navigationState.openDetailPage(assetShortHeader);
+        const previousSearchText = searchText;
+        // Don't reset search text when opening an asset as the search bar is not active.
+        // This helps speeding up the navigation when going back to the results page.
+        navigationState.openDetailPage({
+          assetShortHeader,
+          previousSearchText,
+        });
       },
       [
         openedAssetPack,
@@ -234,6 +264,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         privateAssetPackListingDatas,
         saveScrollPosition,
         navigationState,
+        searchText,
       ]
     );
 
@@ -253,13 +284,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           Window.openExternalURL(assetPack.externalWebLink);
         } else {
           saveScrollPosition();
-          setSearchText('');
-          navigationState.openPackPage(assetPack);
+          const previousSearchText = searchText;
+          setSearchText(''); // Reset search text when opening a pack.
+          navigationState.openPackPage({ assetPack, previousSearchText });
           openFiltersPanelIfAppropriate();
         }
       },
       [
         navigationState,
+        searchText,
         saveScrollPosition,
         setSearchText,
         openFiltersPanelIfAppropriate,
@@ -282,12 +315,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             assetPackId: assetPackListingData.id,
             assetPackKind: 'private',
           });
-
-          setSearchText('');
           saveScrollPosition();
-          navigationState.openPrivateAssetPackInformationPage(
-            assetPackListingData
-          );
+          const previousSearchText = searchText;
+          setSearchText(''); // Reset search text when opening a pack.
+          navigationState.openPrivateAssetPackInformationPage({
+            assetPack: assetPackListingData,
+            previousSearchText,
+          });
           return;
         }
 
@@ -301,7 +335,12 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           source: 'store-home',
         });
         saveScrollPosition();
-        navigationState.openPackPage(receivedAssetPack);
+        const previousSearchText = searchText;
+        setSearchText(''); // Reset search text when opening a pack.
+        navigationState.openPackPage({
+          assetPack: receivedAssetPack,
+          previousSearchText,
+        });
         openFiltersPanelIfAppropriate();
       },
       [
@@ -310,6 +349,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         navigationState,
         setSearchText,
         openFiltersPanelIfAppropriate,
+        searchText,
       ]
     );
 
@@ -339,9 +379,12 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           if (receivedAssetPack) {
             // The user has received the pack, close the pack information dialog, and open the pack in the search.
             setSearchText('');
+            navigationState.clearPreviousPageFromHistory(); // Clear the previous page from history to avoid going back to the pack information page.
+            navigationState.openPackPage({
+              assetPack: receivedAssetPack,
+              previousSearchText: '', // We were on a pack page.
+            });
             openFiltersPanelIfAppropriate();
-            saveScrollPosition();
-            navigationState.openPackPage(receivedAssetPack);
           }
         }
       },
@@ -370,13 +413,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         saveScrollPosition();
         setSearchText('');
         if (privateAssetPack) {
-          navigationState.openPackPage(privateAssetPack);
+          navigationState.openPackPage({
+            assetPack: privateAssetPack,
+            previousSearchText: '', // We were on an asset page.
+          });
         } else if (publicAssetPack) {
-          navigationState.openPackPage(publicAssetPack);
+          navigationState.openPackPage({
+            assetPack: publicAssetPack,
+            previousSearchText: '', // We were on an asset page.
+          });
         } else {
           navigationState.openTagPage(tag);
         }
-        clearAllFilters(assetFiltersState);
+        clearAllFilters();
         openFiltersPanelIfAppropriate();
       },
       [
@@ -384,7 +433,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         receivedAssetPacks,
         publicAssetPacks,
         saveScrollPosition,
-        assetFiltersState,
+        clearAllFilters,
         navigationState,
         openFiltersPanelIfAppropriate,
       ]
@@ -397,26 +446,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         }
       },
       [shouldAutofocusSearchbar]
-    );
-
-    React.useLayoutEffect(
-      () => {
-        // When going back to the homepage from a page where the asset filters
-        // were open, we must first close the panel and then apply the scroll position.
-        const applyEffect = async () => {
-          if (isOnHomePage) {
-            clearAllFilters(assetFiltersState);
-            await setIsFiltersPanelOpen(false);
-          }
-          if (!isAssetDetailLoading.current) {
-            applyBackScrollPosition();
-          }
-        };
-        applyEffect();
-      },
-      // assetFiltersState is not stable, so don't list it.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [isOnHomePage, applyBackScrollPosition]
     );
 
     const privateAssetPackFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
@@ -456,7 +485,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               setSearchText('');
               const page = navigationState.openHome();
               setScrollUpdateIsNeeded(page);
-              clearAllFilters(assetFiltersState);
+              clearAllFilters();
               setIsFiltersPanelOpen(false);
             }}
             size="small"
@@ -508,9 +537,20 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     icon={<ChevronArrowLeft />}
                     label={<Trans>Back</Trans>}
                     primary={false}
-                    onClick={() => {
+                    onClick={async () => {
                       const page = navigationState.backToPreviousPage();
-                      setScrollUpdateIsNeeded(page);
+                      const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                        page
+                      );
+                      if (isUpdatingSearchtext) {
+                        // Updating the search is not instant, so we cannot apply the scroll position
+                        // right away. We force a wait as there's no easy way to know when results are completely updated.
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        setScrollUpdateIsNeeded(page);
+                        applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
+                      } else {
+                        setScrollUpdateIsNeeded(page);
+                      }
                     }}
                   />
                 </Column>
@@ -518,17 +558,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateAssetPackListingData ||
                   filtersState.chosenCategory) && (
                   <>
-                    <Column expand alignItems="center">
-                      <Text size="block-title" noMargin>
-                        {openedAssetPack
-                          ? openedAssetPack.name
-                          : openedPrivateAssetPackListingData
-                          ? openedPrivateAssetPackListingData.name
-                          : filtersState.chosenCategory
-                          ? capitalize(filtersState.chosenCategory.node.name)
-                          : ''}
-                      </Text>
-                    </Column>
                     <Column
                       expand
                       alignItems="flex-end"
@@ -602,7 +631,8 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onTagSelection={selectTag}
               assetShortHeader={openedAssetShortHeader}
               onOpenDetails={onOpenDetails}
-              onAssetLoaded={applyBackScrollPosition}
+              onAssetLoaded={() => applyBackScrollPosition(currentPage)}
+              onPrivateAssetPackSelection={selectPrivateAssetPack}
             />
           ) : !!openedPrivateAssetPackListingData ? (
             <PrivateAssetPackInformationPage
@@ -644,12 +674,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     </Line>
                   </Column>
                   <Line justifyContent="space-between" alignItems="center">
-                    <AssetStoreFilterPanel
-                      assetFiltersState={assetFiltersState}
-                      onChoiceChange={() => {
-                        navigationState.openSearchResultPage();
-                      }}
-                    />
+                    <AssetStoreFilterPanel />
                   </Line>
                 </Column>
               </ScrollView>

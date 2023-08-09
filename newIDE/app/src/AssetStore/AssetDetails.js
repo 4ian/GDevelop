@@ -13,6 +13,7 @@ import {
   isPixelArt,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
@@ -32,7 +33,6 @@ import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuth
 import AuthorizedAssetImage from './PrivateAssets/AuthorizedAssetImage';
 import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
-import PublicProfileContext from '../Profile/PublicProfileContext';
 import {
   getUserPublicProfilesByIds,
   type UserPublicProfile,
@@ -40,6 +40,7 @@ import {
 import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ArrowRight from '../UI/CustomSvgIcons/ArrowRight';
 import ArrowLeft from '../UI/CustomSvgIcons/ArrowLeft';
+import PublicProfileDialog from '../Profile/PublicProfileDialog';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -87,6 +88,7 @@ type Props = {|
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
   onAssetLoaded?: () => void,
+  onPrivateAssetPackSelection: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -108,7 +110,13 @@ export type AssetDetailsInterface = {|
 
 export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
   (
-    { onTagSelection, assetShortHeader, onOpenDetails, onAssetLoaded }: Props,
+    {
+      onTagSelection,
+      assetShortHeader,
+      onOpenDetails,
+      onAssetLoaded,
+      onPrivateAssetPackSelection,
+    }: Props,
     ref
   ) => {
     const {
@@ -128,10 +136,13 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const { fetchPrivateAsset } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
-    const { openUserPublicProfile } = React.useContext(PublicProfileContext);
     const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
       UserPublicProfile[]
     >([]);
+    const [
+      selectedAuthorPublicProfile,
+      setSelectedAuthorPublicProfile,
+    ] = React.useState<?UserPublicProfile>(null);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -323,7 +334,9 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                               key={userPublicProfile.id}
                               href="#"
                               onClick={() =>
-                                openUserPublicProfile(userPublicProfile.id)
+                                setSelectedAuthorPublicProfile(
+                                  userPublicProfile
+                                )
                               }
                             >
                               {username}
@@ -554,6 +567,16 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                 />
               </Line>
             </Column>
+          )}
+          {selectedAuthorPublicProfile && (
+            <PublicProfileDialog
+              userId={selectedAuthorPublicProfile.id}
+              onClose={() => setSelectedAuthorPublicProfile(null)}
+              onAssetPackOpen={assetPack => {
+                onPrivateAssetPackSelection(assetPack);
+                setSelectedAuthorPublicProfile(null);
+              }}
+            />
           )}
         </Column>
       </ScrollView>

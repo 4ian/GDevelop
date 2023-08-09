@@ -24,6 +24,7 @@ import {
   ColorAssetStoreSearchFilter,
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
+  AssetPackTypeStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import {
   type NavigationState,
@@ -58,6 +59,11 @@ export type AssetFiltersState = {|
   setLicenseFilter: LicenseAssetStoreSearchFilter => void,
 |};
 
+export type AssetPackFiltersState = {|
+  typeFilter: AssetPackTypeStoreSearchFilter,
+  setTypeFilter: AssetPackTypeStoreSearchFilter => void,
+|};
+
 type AssetStoreState = {|
   filters: ?Filters,
   publicAssetPacks: ?PublicAssetPacks,
@@ -78,6 +84,8 @@ type AssetStoreState = {|
   searchText: string,
   setSearchText: string => void,
   assetFiltersState: AssetFiltersState,
+  assetPackFiltersState: AssetPackFiltersState,
+  clearAllFilters: () => void,
   navigationState: NavigationState,
   currentPage: AssetStorePageState,
   useSearchItem: (
@@ -119,11 +127,17 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     licenseFilter: new LicenseAssetStoreSearchFilter(),
     setLicenseFilter: filter => {},
   },
+  assetPackFiltersState: {
+    typeFilter: new AssetPackTypeStoreSearchFilter({}),
+    setTypeFilter: filter => {},
+  },
+  clearAllFilters: () => {},
   navigationState: {
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => assetStoreHomePageState,
     openHome: () => assetStoreHomePageState,
     clearHistory: () => {},
+    clearPreviousPageFromHistory: () => {},
     openSearchResultPage: () => {},
     openTagPage: tag => {},
     openAssetCategoryPage: category => {},
@@ -247,7 +261,9 @@ export const AssetStoreStateProvider = ({
   );
   // When one of the filter change, we need to rebuild the array
   // for the search.
-  const searchFilters = React.useMemo<Array<SearchFilter<AssetShortHeader>>>(
+  const assetSearchFilters = React.useMemo<
+    Array<SearchFilter<AssetShortHeader>>
+  >(
     () => [
       animatedFilter,
       viewpointFilter,
@@ -265,6 +281,16 @@ export const AssetStoreStateProvider = ({
       licenseFilter,
     ]
   );
+
+  const [
+    assetPackTypeFilter,
+    setAssetPackTypeFilter,
+  ] = React.useState<AssetPackTypeStoreSearchFilter>(
+    new AssetPackTypeStoreSearchFilter({ receivedAssetPacks })
+  );
+  const assetPackSearchFilters = React.useMemo<
+    Array<SearchFilter<PublicAssetPack | PrivateAssetPackListingData>>
+  >(() => [assetPackTypeFilter], [assetPackTypeFilter]);
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -357,7 +383,10 @@ export const AssetStoreStateProvider = ({
         });
 
         if (assetPack) {
-          navigationState.openPackPage(assetPack);
+          navigationState.openPackPage({
+            assetPack,
+            previousSearchText: searchText,
+          });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
           return;
@@ -370,7 +399,10 @@ export const AssetStoreStateProvider = ({
         });
 
         if (privateAssetPack) {
-          navigationState.openPrivateAssetPackInformationPage(privateAssetPack);
+          navigationState.openPrivateAssetPackInformationPage({
+            assetPack: privateAssetPack,
+            previousSearchText: searchText,
+          });
           initialPackOpened.current = false; // Allow to open the pack again if the effect run again.
           setInitialPackUserFriendlySlug(null);
           return;
@@ -389,6 +421,7 @@ export const AssetStoreStateProvider = ({
       navigationState,
       showAlert,
       initialPackUserFriendlySlug,
+      searchText,
     ]
   );
 
@@ -466,27 +499,85 @@ export const AssetStoreStateProvider = ({
     searchText,
     chosenCategory,
     chosenFilters,
-    searchFilters
+    assetSearchFilters
   );
 
-  const publicAssetPacksFilters = React.useMemo(() => [], []);
   const publicAssetPacksSearchResults: ?Array<PublicAssetPack> = useSearchItem(
     publicAssetPacksByTag,
     getPublicAssetPackSearchTerms,
     searchText,
     chosenCategory,
     null,
-    publicAssetPacksFilters
+    // $FlowFixMe - this filter works for both public and private packs
+    assetPackSearchFilters
   );
 
-  const privateAssetPackListingDatasFilters = React.useMemo(() => [], []);
   const privateAssetPackListingDatasSearchResults: ?Array<PrivateAssetPackListingData> = useSearchItem(
     privateAssetPackListingDatasById,
     getPrivateAssetPackListingDataSearchTerms,
     searchText,
     chosenCategory,
     null,
-    privateAssetPackListingDatasFilters
+    // $FlowFixMe - this filter works for both public and private packs
+    assetPackSearchFilters
+  );
+
+  const assetFiltersState: AssetFiltersState = React.useMemo(
+    () => ({
+      animatedFilter,
+      setAnimatedFilter,
+      viewpointFilter,
+      setViewpointFilter,
+      dimensionFilter,
+      setDimensionFilter,
+      objectTypeFilter,
+      setObjectTypeFilter,
+      colorFilter,
+      setColorFilter,
+      licenseFilter,
+      setLicenseFilter,
+    }),
+    [
+      animatedFilter,
+      setAnimatedFilter,
+      viewpointFilter,
+      setViewpointFilter,
+      dimensionFilter,
+      setDimensionFilter,
+      objectTypeFilter,
+      setObjectTypeFilter,
+      colorFilter,
+      setColorFilter,
+      licenseFilter,
+      setLicenseFilter,
+    ]
+  );
+
+  const assetPackFiltersState: AssetPackFiltersState = React.useMemo(
+    () => ({
+      typeFilter: assetPackTypeFilter,
+      setTypeFilter: setAssetPackTypeFilter,
+    }),
+    [assetPackTypeFilter, setAssetPackTypeFilter]
+  );
+
+  const clearAllFilters = React.useCallback(
+    () => {
+      assetFiltersState.setAnimatedFilter(new AnimatedAssetStoreSearchFilter());
+      assetFiltersState.setViewpointFilter(new TagAssetStoreSearchFilter());
+      assetFiltersState.setDimensionFilter(
+        new DimensionAssetStoreSearchFilter()
+      );
+      assetFiltersState.setObjectTypeFilter(
+        new ObjectTypeAssetStoreSearchFilter()
+      );
+      assetFiltersState.setColorFilter(new ColorAssetStoreSearchFilter());
+      assetFiltersState.setLicenseFilter(new LicenseAssetStoreSearchFilter());
+      assetPackFiltersState.setTypeFilter(
+        new AssetPackTypeStoreSearchFilter({})
+      );
+    },
+    [assetFiltersState, assetPackFiltersState]
   );
 
   const assetStoreState = React.useMemo(
@@ -508,20 +599,9 @@ export const AssetStoreStateProvider = ({
       currentPage,
       searchText,
       setSearchText,
-      assetFiltersState: {
-        animatedFilter,
-        setAnimatedFilter,
-        viewpointFilter,
-        setViewpointFilter,
-        dimensionFilter,
-        setDimensionFilter,
-        objectTypeFilter,
-        setObjectTypeFilter,
-        colorFilter,
-        setColorFilter,
-        licenseFilter,
-        setLicenseFilter,
-      },
+      assetFiltersState,
+      assetPackFiltersState,
+      clearAllFilters,
       useSearchItem: (
         searchText,
         chosenCategory,
@@ -555,13 +635,9 @@ export const AssetStoreStateProvider = ({
       navigationState,
       currentPage,
       searchText,
-      animatedFilter,
-      viewpointFilter,
-      dimensionFilter,
-      objectTypeFilter,
-      colorFilter,
-      licenseFilter,
-      setLicenseFilter,
+      assetFiltersState,
+      assetPackFiltersState,
+      clearAllFilters,
       assetShortHeadersById,
       setInitialPackUserFriendlySlug,
     ]

@@ -69,13 +69,13 @@ export const MyProfile = (args: ArgsTypes) => (
 );
 
 export const OtherUserProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} assetPacksListingData={[]} />
+  <ProfileDetails {...args} assetPacksListingDatas={[]} />
 );
 
 export const OtherUserProfileWithPremiumAssetPacks = (args: ArgsTypes) => (
   <ProfileDetails
     {...args}
-    assetPacksListingData={getAssetPacksListingData(args.profile.id)}
+    assetPacksListingDatas={getAssetPacksListingData(args.profile.id)}
     onAssetPackOpen={action('open asset pack')}
   />
 );

@@ -5,11 +5,12 @@ import { AssetStoreContext } from './AssetStoreContext';
 import {
   type AssetShortHeader,
   type PublicAssetPack,
+  type Author,
+  type License,
   isAssetPackAudioOnly,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
-import { clearAllFilters } from './AssetStoreFilterPanel';
 import { GridList } from '@material-ui/core';
 import {
   useResponsiveWindowWidth,
@@ -22,10 +23,40 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import {
   AssetCardTile,
+  AssetFolderTile,
   PrivateAssetPackTile,
   PublicAssetPackTile,
 } from './AssetPackTiles';
 import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
+import { CorsAwareImage } from '../UI/CorsAwareImage';
+import { Column, LargeSpacer, Line } from '../UI/Grid';
+import Text from '../UI/Text';
+import { LineStackLayout } from '../UI/Layout';
+import {
+  getUserPublicProfile,
+  type UserPublicProfile,
+} from '../Utils/GDevelopServices/User';
+import Link from '../UI/Link';
+import PublicProfileDialog from '../Profile/PublicProfileDialog';
+import Window from '../Utils/Window';
+import Breadcrumbs from '../UI/Breadcrumbs';
+
+const capitalize = (str: string) => {
+  return str ? str[0].toUpperCase() + str.substr(1) : '';
+};
+
+const indexOfOccurrence = (
+  haystack: Array<string>,
+  needle: string,
+  occurrence: number
+) => {
+  var counter = 0;
+  var index = -1;
+  do {
+    index = haystack.indexOf(needle, index + 1);
+  } while (index !== -1 && ++counter < occurrence);
+  return index;
+};
 
 const ASSETS_DISPLAY_LIMIT = 100;
 
@@ -58,12 +89,34 @@ const getAssetPacksColumns = (windowWidth: WidthType) => {
   }
 };
 
+const getAssetFoldersColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+    case 'medium':
+      return 1;
+    case 'large':
+    case 'xlarge':
+      return 2;
+    default:
+      return 2;
+  }
+};
+
 const cellSpacing = 8;
 const styles = {
   grid: {
-    margin: 0, // Remove the default margin of the grid.
+    margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
+  },
+  previewImage: {
+    width: 200,
+    // Prevent cumulative layout shift by enforcing
+    // the 16:9 ratio.
+    aspectRatio: '16 / 9',
+    objectFit: 'cover',
+    position: 'relative',
+    background: '#7147ed',
   },
 };
 
@@ -101,10 +154,21 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     const {
       error,
       fetchAssetsAndFilters,
-      assetFiltersState,
+      clearAllFilters,
       navigationState,
+      licenses,
+      authors,
+      privateAssetPackListingDatas: allPrivateAssetPackListingDatas,
     } = React.useContext(AssetStoreContext);
     const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+    const [
+      authorPublicProfile,
+      setAuthorPublicProfile,
+    ] = React.useState<?UserPublicProfile>(null);
+    const [
+      openAuthorPublicProfileDialog,
+      setOpenAuthorPublicProfileDialog,
+    ] = React.useState<boolean>(false);
     const currentPage = navigationState.getCurrentPage();
     const { openedAssetPack, filtersState } = currentPage;
     const chosenCategory = filtersState.chosenCategory;
@@ -124,44 +188,140 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         scrollViewElement.scrollToPosition(y);
       },
     }));
-
-    const folderTags = React.useMemo(
-      () => {
-        const firstLevelTags = new Set();
-        if (!chosenCategory || !assetShortHeaders) return firstLevelTags;
-        // We are in a pack, calculate first level folders based on asset tags.
-        // Tags are stored from top to bottom, in the list of tags of an asset.
-        // We first remove all tags that are either the chosen category (the pack)
-        // or a tag that is applied to all assets (for example "pixel art")
-        // and then we take the first tag of each asset.
-        assetShortHeaders.forEach(assetShortHeader => {
-          const tags = assetShortHeader.tags.filter(
-            tag => tag !== chosenCategory.node.name
-          );
-          if (tags.length > 0) firstLevelTags.add(tags[0]);
-        });
-
-        console.log(firstLevelTags);
-
-        // Then we remove the tags that are present in all assets, they're not useful, or not a folder.
-        firstLevelTags.forEach(tag => {
-          const allAssetsHaveThisTag = assetShortHeaders.every(asset =>
-            asset.tags.includes(tag)
-          );
-          if (allAssetsHaveThisTag) firstLevelTags.delete(tag);
-        });
-
-        return firstLevelTags;
-      },
-      [chosenCategory, assetShortHeaders]
+    const [selectedFolders, setSelectedFolders] = React.useState<Array<string>>(
+      []
     );
 
-    console.log(folderTags);
+    React.useEffect(
+      () => {
+        if (chosenCategory) {
+          setSelectedFolders([chosenCategory.node.name]);
+        } else {
+          setSelectedFolders([]);
+        }
+      },
+      [chosenCategory]
+    );
+
+    const navigateInsideFolder = React.useCallback(
+      folderTag => setSelectedFolders([...selectedFolders, folderTag]),
+      [selectedFolders]
+    );
+    const goBackToFolderIndex = React.useCallback(
+      folderIndex => {
+        if (folderIndex >= selectedFolders.length || folderIndex < 0) {
+          console.warn(
+            'Trying to go back to a folder that is not in the selected folders.'
+          );
+          return;
+        }
+        setSelectedFolders(selectedFolders.slice(0, folderIndex + 1));
+      },
+      [selectedFolders]
+    );
+
+    const selectedPrivateAssetPackListingData = React.useMemo(
+      () => {
+        if (
+          !allPrivateAssetPackListingDatas ||
+          !openedAssetPack ||
+          !openedAssetPack.id // public pack selected.
+        )
+          return null;
+
+        // As the list should already been fetched, we can find the selected pack
+        // if it is a private pack.
+        return allPrivateAssetPackListingDatas.find(
+          privateAssetPackListingData =>
+            privateAssetPackListingData.id === openedAssetPack.id
+        );
+      },
+      [allPrivateAssetPackListingDatas, openedAssetPack]
+    );
+
+    const folderTags: Array<string> = React.useMemo(
+      () => {
+        if (!selectedFolders.length || !assetShortHeaders) return [];
+        /** @type {string[][]} */
+        const assetTagsAfterPackTag = [];
+        const allTagsAfterPackTag = new Set();
+        // We are in a pack, calculate first level folders based on asset tags.
+        // Tags are stored from top to bottom, in the list of tags of an asset.
+        // We first detect where the chosen category is, as this is the pack, and
+        // remove this tags and the others before (that could be bundles).
+
+        assetShortHeaders.forEach(assetShortHeader => {
+          const allAssetTags = assetShortHeader.tags;
+          const lastSelectedFolder =
+            selectedFolders[selectedFolders.length - 1];
+          const occurencesOfLastSelectedFolderInSelectedFolders = selectedFolders.filter(
+            folder => folder === lastSelectedFolder
+          ).length;
+          const lastSelectedFolderIndex = indexOfOccurrence(
+            allAssetTags,
+            selectedFolders[selectedFolders.length - 1],
+            occurencesOfLastSelectedFolderInSelectedFolders
+          );
+          if (lastSelectedFolderIndex === -1) return allAssetTags; // This shouldn't happen, but just in case.
+          const tagsAfterPackTags = allAssetTags.filter(
+            (tag, index) => index > lastSelectedFolderIndex
+          );
+          if (tagsAfterPackTags.length > 0)
+            assetTagsAfterPackTag.push(tagsAfterPackTags);
+          tagsAfterPackTags.forEach(tag => allTagsAfterPackTag.add(tag));
+        });
+
+        // Then we remove the tags that are present in all assets, they're not useful, or not a folder.
+        // (For example: "pixel art")
+        const tagsPresentInAllAssets = Array.from(allTagsAfterPackTag).filter(
+          tag =>
+            assetTagsAfterPackTag.filter(tags => tags.includes(tag)).length ===
+            assetTagsAfterPackTag.length
+        );
+        const assetTagsAfterPackTagWithoutNonFolderTags = assetTagsAfterPackTag.map(
+          tags => tags.filter(tag => !tagsPresentInAllAssets.includes(tag))
+        );
+
+        // Then we create the folders list, corresponding to the first level tags.
+        const firstLevelTags = new Set();
+        assetTagsAfterPackTagWithoutNonFolderTags.forEach(
+          tags => firstLevelTags.add(tags[0]) // Only add the top one, as this will be the first folder.
+        );
+
+        return Array.from(firstLevelTags).filter(Boolean);
+      },
+      [assetShortHeaders, selectedFolders]
+    );
+
+    const folderTiles = React.useMemo(
+      () =>
+        // Don't show folders if we are searching.
+        folderTags.length > 0
+          ? folderTags.map(folderTag => (
+              <AssetFolderTile
+                tag={folderTag}
+                key={folderTag}
+                onSelect={() => {
+                  navigateInsideFolder(folderTag);
+                }}
+              />
+            ))
+          : [],
+      [folderTags, navigateInsideFolder]
+    );
 
     const assetTiles = React.useMemo(
       () =>
         assetShortHeaders
           ? assetShortHeaders
+              .filter(assetShortHeader => {
+                if (!selectedFolders.length) return true;
+                const allAssetTags = assetShortHeader.tags;
+                // Check that the asset has all the selected folders tags.
+                return selectedFolders.every(folderTag =>
+                  allAssetTags.includes(folderTag)
+                );
+              })
               .map(assetShortHeader => (
                 <AssetCardTile
                   assetShortHeader={assetShortHeader}
@@ -173,7 +333,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
               ))
               .splice(0, ASSETS_DISPLAY_LIMIT) // Limit the number of displayed assets to avoid performance issues
           : null,
-      [assetShortHeaders, onOpenDetails, windowWidth]
+      [assetShortHeaders, onOpenDetails, windowWidth, selectedFolders]
     );
 
     const publicPacksTiles: Array<React.Node> = React.useMemo(
@@ -264,8 +424,66 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       ]
     );
 
+    const packMainImageUrl = openedAssetPack
+      ? openedAssetPack.thumbnailUrl
+        ? openedAssetPack.thumbnailUrl
+        : openedAssetPack.previewImageUrls
+        ? openedAssetPack.previewImageUrls[0]
+        : null
+      : null;
+
+    React.useEffect(
+      () => {
+        (async () => {
+          if (!selectedPrivateAssetPackListingData) {
+            setAuthorPublicProfile(null);
+            return;
+          }
+          try {
+            const authorProfile = await getUserPublicProfile(
+              selectedPrivateAssetPackListingData.sellerId
+            );
+
+            setAuthorPublicProfile(authorProfile);
+          } catch (error) {
+            console.error(error);
+            // Do not block the UI if the author profile can't be fetched.
+          }
+        })();
+      },
+      [selectedPrivateAssetPackListingData]
+    );
+
+    const publicAssetPackAuthors: ?Array<Author> = React.useMemo(
+      () =>
+        openedAssetPack && authors && openedAssetPack.authors
+          ? openedAssetPack.authors
+              .map(author => {
+                return authors.find(({ name }) => name === author.name);
+              })
+              .filter(Boolean)
+          : [],
+      [openedAssetPack, authors]
+    );
+
+    const publicAssetPackLicenses: ?Array<License> = React.useMemo(
+      () =>
+        openedAssetPack && licenses && openedAssetPack.licenses
+          ? openedAssetPack.licenses
+              .map(license => {
+                return licenses.find(({ name }) => name === license.name);
+              })
+              .filter(Boolean)
+          : [],
+      [openedAssetPack, licenses]
+    );
+
     return (
-      <ScrollView ref={scrollView} id="asset-store-listing">
+      <ScrollView
+        ref={scrollView}
+        id="asset-store-listing"
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
         {!assetTiles && !error && <PlaceholderLoader />}
         {!assetTiles && error && (
           <PlaceholderError onRetry={fetchAssetsAndFilters}>
@@ -276,25 +494,147 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           </PlaceholderError>
         )}
         {!openedAssetPack && allBundlePackTiles.length ? (
-          <GridList
-            cols={getAssetPacksColumns(windowWidth)}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={cellSpacing}
-          >
-            {allBundlePackTiles}
-          </GridList>
+          <Line expand>
+            <Column noMargin expand>
+              <GridList
+                cols={getAssetPacksColumns(windowWidth)}
+                style={styles.grid}
+                cellHeight="auto"
+                spacing={cellSpacing / 2}
+              >
+                {allBundlePackTiles}
+              </GridList>
+            </Column>
+          </Line>
         ) : null}
         {!openedAssetPack && allStandAlonePackTiles.length ? (
-          <GridList
-            cols={getAssetPacksColumns(windowWidth)}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={cellSpacing}
-          >
-            {allStandAlonePackTiles}
-          </GridList>
+          <Line expand>
+            <Column noMargin expand>
+              <GridList
+                cols={getAssetPacksColumns(windowWidth)}
+                style={styles.grid}
+                cellHeight="auto"
+                spacing={cellSpacing / 2}
+              >
+                {allStandAlonePackTiles}
+              </GridList>
+            </Column>
+          </Line>
         ) : null}
+        {openedAssetPack && (
+          <Column>
+            <LineStackLayout>
+              {packMainImageUrl && (
+                <>
+                  <CorsAwareImage
+                    key={openedAssetPack.name}
+                    style={styles.previewImage}
+                    src={
+                      openedAssetPack.thumbnailUrl
+                        ? openedAssetPack.thumbnailUrl
+                        : openedAssetPack.previewImageUrls
+                        ? openedAssetPack.previewImageUrls[0]
+                        : ''
+                    }
+                    alt={`Preview image of asset pack ${openedAssetPack.name}`}
+                  />
+                  <LargeSpacer />
+                </>
+              )}
+              <Column noMargin alignItems="flex-start" expand>
+                <Text size="bold-title">{openedAssetPack.name}</Text>
+                {!!publicAssetPackAuthors &&
+                  publicAssetPackAuthors.map(author => (
+                    <Text size="body" key={author.name}>
+                      <Trans>by</Trans>{' '}
+                      <Link
+                        key={author.name}
+                        href={author.website}
+                        onClick={() => Window.openExternalURL(author.website)}
+                      >
+                        {author.name}
+                      </Link>
+                    </Text>
+                  ))}
+                {!!publicAssetPackLicenses &&
+                  publicAssetPackLicenses.length > 0 && (
+                    <Text size="body">
+                      <Trans>
+                        Type of License:{' '}
+                        {
+                          <Link
+                            href={publicAssetPackLicenses[0].website}
+                            onClick={() =>
+                              Window.openExternalURL(
+                                publicAssetPackLicenses[0].website
+                              )
+                            }
+                          >
+                            {publicAssetPackLicenses[0].name}
+                          </Link>
+                        }
+                      </Trans>
+                    </Text>
+                  )}
+                {authorPublicProfile && (
+                  <Text displayInlineAsSpan size="sub-title">
+                    <Trans>by</Trans>{' '}
+                    <Link
+                      onClick={() => setOpenAuthorPublicProfileDialog(true)}
+                      href="#"
+                    >
+                      {authorPublicProfile.username || ''}
+                    </Link>
+                  </Text>
+                )}
+              </Column>
+            </LineStackLayout>
+          </Column>
+        )}
+        {openedAssetPack &&
+        (folderTiles.length || (assetTiles && assetTiles.length)) ? (
+          <Column>
+            <Text size="section-title">
+              <Trans>Content</Trans>
+            </Text>
+          </Column>
+        ) : null}
+        {selectedFolders.length > 1 ? (
+          <Column>
+            <Line>
+              <Breadcrumbs
+                steps={selectedFolders.map((folder, index) => {
+                  if (index === selectedFolders.length - 1) {
+                    return {
+                      label: capitalize(folder),
+                    };
+                  }
+                  return {
+                    label: capitalize(folder),
+                    onClick: () => {
+                      goBackToFolderIndex(index);
+                    },
+                    href: '#',
+                  };
+                })}
+              />
+            </Line>
+          </Column>
+        ) : null}
+        {openedAssetPack && folderTiles.length ? (
+          <Column justifyContent="center">
+            <GridList
+              style={styles.grid}
+              cellHeight="auto"
+              cols={getAssetFoldersColumns(windowWidth)}
+              spacing={cellSpacing / 2}
+            >
+              {folderTiles}
+            </GridList>
+            <LargeSpacer />
+          </Column>
+        ) : null}
+
         {assetTiles && assetTiles.length ? (
           <GridList style={styles.grid} cellHeight="auto">
             {assetTiles}
@@ -307,11 +647,22 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           />
         ) : (
           noResultsPlaceHolder || (
-            <NoResultPlaceholder
-              onClear={() => clearAllFilters(assetFiltersState)}
-            />
+            <NoResultPlaceholder onClear={() => clearAllFilters()} />
           )
         )}
+        {onPrivateAssetPackSelection &&
+          openAuthorPublicProfileDialog &&
+          authorPublicProfile && (
+            <PublicProfileDialog
+              userId={authorPublicProfile.id}
+              onClose={() => setOpenAuthorPublicProfileDialog(false)}
+              onAssetPackOpen={assetPackListingData => {
+                onPrivateAssetPackSelection(assetPackListingData);
+                setOpenAuthorPublicProfileDialog(false);
+                setAuthorPublicProfile(null);
+              }}
+            />
+          )}
       </ScrollView>
     );
   }

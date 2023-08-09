@@ -1,6 +1,11 @@
 // @flow
 import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type PrivateAssetPack,
+  type PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import {
   type RGBColor,
   rgbToHsl,
@@ -51,6 +56,64 @@ export class LicenseAssetStoreSearchFilter
       )
       ? 1
       : 0;
+  }
+}
+
+export class AssetPackTypeStoreSearchFilter
+  implements SearchFilter<PublicAssetPack | PrivateAssetPackListingData> {
+  isFree: boolean;
+  isPremium: boolean;
+  isOwned: boolean;
+  receivedAssetPacks: Array<PrivateAssetPack>;
+
+  constructor({
+    isFree = false,
+    isPremium = false,
+    isOwned = false,
+    receivedAssetPacks = [],
+  }: {|
+    isFree?: boolean,
+    isPremium?: boolean,
+    isOwned?: boolean,
+    receivedAssetPacks?: ?Array<PrivateAssetPack>,
+  |}) {
+    this.isFree = isFree;
+    this.isPremium = isPremium;
+    this.isOwned = isOwned;
+    this.receivedAssetPacks = receivedAssetPacks || [];
+  }
+
+  getPertinence(
+    searchItem: PublicAssetPack | PrivateAssetPackListingData
+  ): number {
+    // Return all packs when no filter is selected.
+    if (!this.isFree && !this.isPremium && !this.isOwned) return 1;
+    if (
+      this.isOwned &&
+      searchItem.prices &&
+      this.receivedAssetPacks
+        .map(assetPack => assetPack.id)
+        .includes(searchItem.id)
+    )
+      return 1;
+    if (this.isPremium && searchItem.prices) return 1;
+    if (this.isFree && !searchItem.prices) return 1;
+    return 0;
+  }
+}
+
+export class PricePrivateAssetPackStoreSearchFilter
+  implements SearchFilter<PrivateAssetPackListingData> {
+  isFree: boolean;
+  isPremium: boolean;
+
+  constructor(isFree: boolean = false, isPremium: boolean = false) {
+    this.isFree = isFree;
+    this.isPremium = isPremium;
+  }
+
+  getPertinence(searchItem: PrivateAssetPackListingData): number {
+    return !this.isFree || this.isPremium ? 1 : 0;
   }
 }
 

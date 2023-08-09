@@ -45,7 +45,7 @@ import { formatPrivateAssetPackPrice } from './PrivateAssetPackPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import {
   PrivateAssetPackTile,
-  PromoBundleAssetPackTile,
+  PromoBundleAssetPackCard,
 } from '../AssetPackTiles';
 import { AssetStoreContext } from '../AssetStoreContext';
 
@@ -203,7 +203,7 @@ const PrivateAssetPackInformationPage = ({
               pack => pack.id === bundleContainingPack.id
             );
           return (
-            <PromoBundleAssetPackTile
+            <PromoBundleAssetPackCard
               assetPackListingData={bundleContainingPack}
               onSelect={() => onAssetPackOpen(bundleContainingPack)}
               owned={isBundleOwned}

@@ -267,7 +267,7 @@ export const PrivateAssetPackTile = ({
   );
 };
 
-export const PromoBundleAssetPackTile = ({
+export const PromoBundleAssetPackCard = ({
   assetPackListingData,
   onSelect,
   owned,

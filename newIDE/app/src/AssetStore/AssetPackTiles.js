@@ -9,7 +9,7 @@ import {
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import GridListTile from '@material-ui/core/GridListTile';
 import createStyles from '@material-ui/core/styles/createStyles';
-import makeStyles from '@material-ui/core/styles/withStyles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../UI/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';

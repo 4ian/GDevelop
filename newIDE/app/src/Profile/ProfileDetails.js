@@ -136,8 +136,6 @@ const ProfileDetails = ({
 
   const assetPackTiles = React.useMemo(
     () => {
-      console.log('assetPacksListingDatas', assetPacksListingDatas);
-      console.log('onAssetPackOpen', onAssetPackOpen);
       if (
         !onAssetPackOpen ||
         !assetPacksListingDatas ||

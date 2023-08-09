@@ -185,9 +185,6 @@ const PrivateAssetPackInformationPage = ({
     () => {
       if (!assetPack || !privateAssetPackListingDatas) return null;
 
-      console.log(privateAssetPackListingDatas);
-      console.log(assetPack);
-
       const bundlesContainingPack = privateAssetPackListingDatas.filter(
         privatePackListingData =>
           privatePackListingData.includedListableProductIds &&
@@ -195,8 +192,6 @@ const PrivateAssetPackInformationPage = ({
             assetPack.id
           )
       );
-
-      console.log(bundlesContainingPack);
 
       if (!bundlesContainingPack.length) return null;
 

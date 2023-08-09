@@ -818,7 +818,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         duplicateObject,
         editName,
         getAllObjectTags,
-        layout,
         onAddNewObject,
         onAddObjectInstance,
         onEditObject,
@@ -831,6 +830,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         eventsFunctionsExtensionWriter,
         preferences.values.userShortcutMap,
         canSetAsGlobalObject,
+        initialInstances,
       ]
     );
 

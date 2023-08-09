@@ -6,7 +6,9 @@ import {
   type AssetShortHeader,
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
-import { GridListTile, createStyles, makeStyles } from '@material-ui/core';
+import GridListTile from '@material-ui/core/GridListTile';
+import createStyles from '@material-ui/core/styles/createStyles';
+import makeStyles from '@material-ui/core/styles/withStyles';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../UI/Paper';
 import { CorsAwareImage } from '../UI/CorsAwareImage';

@@ -11,7 +11,7 @@ import {
 } from '../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
-import { GridList } from '@material-ui/core';
+import GridList from '@material-ui/core/GridList';
 import {
   useResponsiveWindowWidth,
   type WidthType,

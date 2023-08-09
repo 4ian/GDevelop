@@ -15,7 +15,7 @@ namespace gdjs {
   }
 
   /**
-   * A behavior that forward the Flippable interface to its object.
+   * A behavior that forwards the Flippable interface to its object.
    */
   export class FlippableBehavior
     extends gdjs.RuntimeBehavior

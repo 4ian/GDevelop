@@ -51,7 +51,7 @@ namespace gdjs {
   }
 
   /**
-   * A behavior that forward the Scalable interface to its object.
+   * A behavior that forwards the Scalable interface to its object.
    */
   export class ScalableBehavior
     extends gdjs.RuntimeBehavior

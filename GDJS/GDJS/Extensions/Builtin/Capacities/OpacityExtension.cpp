@@ -27,7 +27,7 @@ OpacityExtension::OpacityExtension() {
   conditions["OpacityCapability::OpacityBehavior::Value"]
       .SetFunctionName("getOpacity")
       .SetIncludeFile("object-capabilities/OpacityBehavior.js");
-  expressions["OpacityCapability::OpacityBehavior::Value"]
+  expressions["Value"]
       .SetFunctionName("getOpacity")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 }

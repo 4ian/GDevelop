@@ -52,7 +52,7 @@ namespace gdjs {
   }
 
   /**
-   * A behavior that forward the Animatable interface to its object.
+   * A behavior that forwards the Animatable interface to its object.
    */
   export class AnimatableBehavior
     extends gdjs.RuntimeBehavior

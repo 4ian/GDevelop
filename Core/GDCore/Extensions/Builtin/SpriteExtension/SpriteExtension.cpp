@@ -617,6 +617,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .SetHidden()
       .AddParameter("object", _("Object"), "Sprite");
 
+  // Deprecated
+  obj.AddExpression("Animation",
+                    _("Animation"),
+                    _("Animation of the object"),
+                    _("Animations and images"),
+                    "res/actions/animation.png")
+      .SetHidden()
+      .AddParameter("object", _("Object"), "Sprite");
+
+  // Deprecated
+  obj.AddStrExpression("AnimationName",
+                       _("Animation name"),
+                       _("Name of the animation of the object"),
+                       _("Animations and images"),
+                       "res/actions/animation.png")
+      .SetHidden()
+      .AddParameter("object", _("Object"), "Sprite");
+
   obj.AddExpression("Sprite",
                     _("Image"),
                     _("Current frame of the animation of the object"),
@@ -629,6 +647,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     _("Number of frames in the current animation of the object"),
                     _("Animations and images"),
                     "res/actions/sprite.png")
+      .AddParameter("object", _("Object"), "Sprite");
+
+  // Deprecated
+  obj.AddExpression("AnimationSpeedScale",
+                    _("Animation speed scale"),
+                    _("Animation speed scale"),
+                    _("Animations and images"),
+                    "res/actions/animation.png")
+      .SetHidden()
+      .AddParameter("object", _("Object"), "Sprite");
+
+  obj.AddExpression("ScaleX",
+                    _("Scale of the width of an object"),
+                    _("Scale of the width of an object"),
+                    _("Size"),
+                    "res/actions/scaleWidth_black.png")
+      .SetHidden()
+      .AddParameter("object", _("Object"), "Sprite");
+
+  obj.AddExpression("ScaleY",
+                    _("Scale of the height of an object"),
+                    _("Scale of the height of an object"),
+                    _("Size"),
+                    "res/actions/scaleHeight_black.png")
+      .SetHidden()
       .AddParameter("object", _("Object"), "Sprite");
 
   // Deprecated

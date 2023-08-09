@@ -29,7 +29,7 @@ namespace gdjs {
   }
 
   /**
-   * A behavior that forward the Resizable interface to its object.
+   * A behavior that forwards the Resizable interface to its object.
    */
   export class ResizableBehavior
     extends gdjs.RuntimeBehavior

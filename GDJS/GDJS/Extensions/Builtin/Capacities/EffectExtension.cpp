@@ -18,8 +18,6 @@ EffectExtension::EffectExtension() {
 
   auto& actions = GetAllActionsForBehavior("EffectCapability::EffectBehavior");
   auto& conditions = GetAllConditionsForBehavior("EffectCapability::EffectBehavior");
-  auto& expressions = GetAllExpressionsForBehavior("EffectCapability::EffectBehavior");
-  auto& strExpressions = GetAllStrExpressionsForBehavior("EffectCapability::EffectBehavior");
 
   actions["EffectCapability::EffectBehavior::SetEffectDoubleParameter"]
       .SetFunctionName("setEffectDoubleParameter")

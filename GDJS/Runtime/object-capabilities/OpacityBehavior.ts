@@ -19,7 +19,7 @@ namespace gdjs {
   }
 
   /**
-   * A behavior that forward the Opacity interface to its object.
+   * A behavior that forwards the Opacity interface to its object.
    */
   export class OpacityBehavior
     extends gdjs.RuntimeBehavior

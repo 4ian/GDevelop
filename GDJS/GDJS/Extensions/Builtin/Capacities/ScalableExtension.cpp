@@ -27,7 +27,7 @@ ScalableExtension::ScalableExtension() {
   conditions["ScalableCapability::ScalableBehavior::Value"]
       .SetFunctionName("getScale")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  expressions["ScalableCapability::ScalableBehavior::Value"]
+  expressions["Value"]
       .SetFunctionName("getScale")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 
@@ -38,7 +38,7 @@ ScalableExtension::ScalableExtension() {
   conditions["ScalableCapability::ScalableBehavior::X"]
       .SetFunctionName("getScaleX")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  expressions["ScalableCapability::ScalableBehavior::X"]
+  expressions["X"]
       .SetFunctionName("getScaleX")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 
@@ -49,7 +49,7 @@ ScalableExtension::ScalableExtension() {
   conditions["ScalableCapability::ScalableBehavior::Y"]
       .SetFunctionName("getScaleY")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
-  expressions["ScalableCapability::ScalableBehavior::Y"]
+  expressions["Y"]
       .SetFunctionName("getScaleY")
       .SetIncludeFile("object-capabilities/ScalableBehavior.js");
 }

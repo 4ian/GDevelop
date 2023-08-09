@@ -117,7 +117,6 @@ export const AssetCardTile = ({
     >
       <AssetCard
         id={`asset-card-${assetShortHeader.name.replace(/\s/g, '-')}`}
-        onOpenDetails={onOpenDetails}
         assetShortHeader={assetShortHeader}
         size={size}
       />

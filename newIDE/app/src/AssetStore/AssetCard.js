@@ -59,15 +59,9 @@ type Props = {|
   id?: string,
   size: number,
   assetShortHeader: AssetShortHeader,
-  onOpenDetails: () => void,
 |};
 
-export const AssetCard = ({
-  id,
-  assetShortHeader,
-  onOpenDetails,
-  size,
-}: Props) => {
+export const AssetCard = ({ id, assetShortHeader, size }: Props) => {
   const previewImageUrl = assetShortHeader.previewImageUrls[0];
   const isPrivate = isPrivateAsset(assetShortHeader);
   const style = {

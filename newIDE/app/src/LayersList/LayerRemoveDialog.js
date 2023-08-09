@@ -41,8 +41,9 @@ export default class LayerRemoveDialog extends Component<Props, State> {
   render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
+    // TODO Create an helper function to take into account instances from external layouts.
     const instancesCountInLayout = getInstanceCountInLayoutForLayer(
-      this.props.layersContainer,
+      this.props.layersContainer.getInitialInstances(),
       this.props.layerRemoved
     );
 

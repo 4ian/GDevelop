@@ -718,6 +718,10 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.instancesSelection.unselectInstancesOnLayer(layerName);
               this.props.initialInstances.removeAllInstancesOnLayer(layerName);
             } else {
+              // TODO Make the instances move on the layout and its external layout.
+              // This code only moves the instances from the current layout or
+              // external layout. It results to instances with an invalid layer.
+
               // Instances are not invalidated, so we can keep the selection.
               this.props.initialInstances.moveInstancesToLayer(
                 layerName,
@@ -1397,8 +1401,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {
-    const { layout } = this.props;
-    const instancesToSelect = getInstancesInLayoutForObject(layout, objectName);
+    const { initialInstances } = this.props;
+    const instancesToSelect = getInstancesInLayoutForObject(
+      initialInstances,
+      objectName
+    );
     this.instancesSelection.selectInstances({
       instances: instancesToSelect,
       ignoreSeal: true,

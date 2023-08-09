@@ -21,6 +21,7 @@ import {
 import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
+import RaisedButton from '../UI/RaisedButton';
 
 const capitalize = (str: string) => {
   return str ? str[0].toUpperCase() + str.substr(1) : '';
@@ -267,9 +268,11 @@ export const PrivateAssetPackTile = ({
 export const PromoBundleAssetPackTile = ({
   assetPackListingData,
   onSelect,
+  owned,
 }: {|
   assetPackListingData: PrivateAssetPackListingData,
   onSelect: () => void,
+  owned: boolean,
 |}) => {
   return (
     <I18n>
@@ -290,25 +293,43 @@ export const PromoBundleAssetPackTile = ({
               />
               <Column expand alignItems="flex-start" justifyContent="center">
                 <Text color="primary" size="section-title">
-                  <Trans>Get {assetPackListingData.description}!</Trans>
+                  {!owned ? (
+                    <Trans>Get {assetPackListingData.description}!</Trans>
+                  ) : (
+                    <Trans>You already own this pack!</Trans>
+                  )}
                 </Text>
                 <Text style={styles.packTitle} color="primary" size="body2">
-                  <Trans>
-                    This pack is included in this bundle for{' '}
-                    {formatPrivateAssetPackPrice({
-                      i18n,
-                      privateAssetPackListingData: assetPackListingData,
-                    })}
-                    !
-                  </Trans>
+                  {!owned ? (
+                    <Trans>
+                      This pack is included in this bundle for{' '}
+                      {formatPrivateAssetPackPrice({
+                        i18n,
+                        privateAssetPackListingData: assetPackListingData,
+                      })}
+                      !
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      It is included in the bundle {assetPackListingData.name}.
+                    </Trans>
+                  )}
                 </Text>
               </Column>
               <Column justifyContent="center">
-                <FlatButton
-                  label={<Trans>See this bundle</Trans>}
-                  onClick={() => onSelect()}
-                  primary
-                />
+                {!owned ? (
+                  <FlatButton
+                    label={<Trans>See this bundle</Trans>}
+                    onClick={onSelect}
+                    primary
+                  />
+                ) : (
+                  <RaisedButton
+                    label={<Trans>See this bundle</Trans>}
+                    onClick={onSelect}
+                    primary
+                  />
+                )}
               </Column>
             </Line>
           </div>

@@ -207,12 +207,13 @@ const PrivateAssetPackInformationPage = ({
             !!receivedAssetPacks.find(
               pack => pack.id === bundleContainingPack.id
             );
-          return !isBundleOwned ? (
+          return (
             <PromoBundleAssetPackTile
               assetPackListingData={bundleContainingPack}
               onSelect={() => onAssetPackOpen(bundleContainingPack)}
+              owned={isBundleOwned}
             />
-          ) : null;
+          );
         })
         .filter(Boolean);
     },

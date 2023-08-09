@@ -47,6 +47,8 @@ import {
 import { ResponsivePaperOrDrawer } from '../UI/ResponsivePaperOrDrawer';
 import AssetsList, { type AssetsListInterface } from './AssetsList';
 import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAssetPackAudioFilesDownloadButton';
+import Text from '../UI/Text';
+import { capitalize } from 'lodash';
 
 type Props = {||};
 
@@ -558,6 +560,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateAssetPackListingData ||
                   filtersState.chosenCategory) && (
                   <>
+                    {!openedAssetPack && !openedPrivateAssetPackListingData && (
+                      // Only show the category name if we're not on an asset pack page.
+                      <Column expand alignItems="center">
+                        <Text size="block-title" noMargin>
+                          {filtersState.chosenCategory
+                            ? capitalize(filtersState.chosenCategory.node.name)
+                            : ''}
+                        </Text>
+                      </Column>
+                    )}
                     <Column
                       expand
                       alignItems="flex-end"

@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import capitalize from 'lodash/capitalize';
 import { AssetStoreContext } from './AssetStoreContext';
 import {
   type AssetShortHeader,
@@ -40,10 +41,6 @@ import Link from '../UI/Link';
 import PublicProfileDialog from '../Profile/PublicProfileDialog';
 import Window from '../Utils/Window';
 import Breadcrumbs from '../UI/Breadcrumbs';
-
-const capitalize = (str: string) => {
-  return str ? str[0].toUpperCase() + str.substr(1) : '';
-};
 
 const indexOfOccurrence = (
   haystack: Array<string>,

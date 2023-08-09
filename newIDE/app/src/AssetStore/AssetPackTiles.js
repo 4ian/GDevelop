@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import capitalize from 'lodash/capitalize';
 import {
   type PublicAssetPack,
   type AssetShortHeader,
@@ -24,10 +25,6 @@ import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-
-const capitalize = (str: string) => {
-  return str ? str[0].toUpperCase() + str.substr(1) : '';
-};
 
 const styles = {
   priceTagContainer: {

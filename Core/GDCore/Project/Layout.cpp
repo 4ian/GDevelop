@@ -595,6 +595,10 @@ bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
     return project.GetObject(objectOrGroupName).HasBehaviorNamed(behaviorName);
   }
 
+  if (!searchInGroups) {
+    return false;
+  }
+
   // Search in groups
   const gd::ObjectsContainer *container;
   if (layout.GetObjectGroups().Has(objectOrGroupName)) {
@@ -637,6 +641,10 @@ bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
            object.GetBehavior(behaviorName).IsDefaultBehavior();
   }
 
+  if (!searchInGroups) {
+    return false;
+  }
+
   // Search in groups
   const gd::ObjectsContainer *container;
   if (layout.GetObjectGroups().Has(objectOrGroupName)) {
@@ -677,6 +685,10 @@ gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContain
     auto &object = project.GetObject(objectOrGroupName);
     return object.HasBehaviorNamed(behaviorName) ?
            object.GetBehavior(behaviorName).GetTypeName() : "";
+  }
+
+  if (!searchInGroups) {
+    return "";
   }
 
   // Search in groups

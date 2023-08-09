@@ -1120,6 +1120,7 @@ interface InitialInstancesContainer {
     boolean SomeInstancesAreOnLayer([Const] DOMString layer);
     void RenameInstancesOfObject([Const] DOMString oldName, [Const] DOMString newName);
     void RemoveInstance([Const, Ref] InitialInstance inst);
+    unsigned long GetLayerInstancesCount([Const] DOMString layerName);
 
     [Ref] InitialInstance InsertNewInitialInstance();
     [Ref] InitialInstance InsertInitialInstance([Const, Ref] InitialInstance inst);
@@ -2374,6 +2375,9 @@ interface WholeProjectRefactorer {
     [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
     [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
     boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
+    void STATIC_RemoveLayer([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
+    void STATIC_MergeLayers([Ref] Project project, [Ref] Layout layout, [Const] DOMString originLayerName, [Const] DOMString targetLayerName);
+    unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
 };
 
 interface PropertyFunctionGenerator {

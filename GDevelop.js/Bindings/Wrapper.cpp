@@ -615,6 +615,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
+#define STATIC_RemoveLayer RemoveLayer
+#define STATIC_MergeLayers MergeLayers
+#define STATIC_GetLayoutAndExternalLayoutLayerInstancesCount GetLayoutAndExternalLayoutLayerInstancesCount
+
 #define STATIC_GenerateBehaviorGetterAndSetter GenerateBehaviorGetterAndSetter
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter

@@ -1599,6 +1599,54 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
   }
 }
 
+void WholeProjectRefactorer::RemoveLayer(gd::Project &project,
+                                         gd::Layout &layout,
+                                         const gd::String &layerName) {
+  if (layerName.empty())
+    return;
+
+  layout.GetInitialInstances().RemoveAllInstancesOnLayer(layerName);
+
+  std::vector<gd::String> externalLayoutsNames =
+      GetAssociatedExternalLayouts(project, layout);
+  for (gd::String name : externalLayoutsNames) {
+    auto &externalLayout = project.GetExternalLayout(name);
+    externalLayout.GetInitialInstances().RemoveAllInstancesOnLayer(layerName);
+  }
+}
+
+void WholeProjectRefactorer::MergeLayers(gd::Project &project,
+                                         gd::Layout &layout,
+                                         const gd::String &originLayerName,
+                                         const gd::String &targetLayerName) {
+  if (originLayerName == targetLayerName || originLayerName.empty())
+    return;
+
+  layout.GetInitialInstances().MoveInstancesToLayer(originLayerName,
+                                                    targetLayerName);
+
+  std::vector<gd::String> externalLayoutsNames =
+      GetAssociatedExternalLayouts(project, layout);
+  for (gd::String name : externalLayoutsNames) {
+    auto &externalLayout = project.GetExternalLayout(name);
+    externalLayout.GetInitialInstances().MoveInstancesToLayer(originLayerName,
+                                                              targetLayerName);
+  }
+}
+
+size_t WholeProjectRefactorer::GetLayoutAndExternalLayoutLayerInstancesCount(
+    gd::Project &project, gd::Layout &layout, const gd::String &layerName) {
+  size_t count = layout.GetInitialInstances().GetLayerInstancesCount(layerName);
+
+  std::vector<gd::String> externalLayoutsNames =
+      GetAssociatedExternalLayouts(project, layout);
+  for (gd::String name : externalLayoutsNames) {
+    auto &externalLayout = project.GetExternalLayout(name);
+    count += externalLayout.GetInitialInstances().GetLayerInstancesCount(layerName);
+  }
+  return count;
+}
+
 std::vector<gd::String>
 WholeProjectRefactorer::GetAssociatedExternalLayouts(gd::Project &project,
                                                      gd::Layout &layout) {

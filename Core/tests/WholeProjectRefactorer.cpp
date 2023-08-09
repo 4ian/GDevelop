@@ -3687,7 +3687,6 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     auto &wrongLayerExpression =
         CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
 
-    std::cout << "RenameLayerEffect" << std::endl;
     gd::WholeProjectRefactorer::RenameLayerEffect(project, layout, layer, "My effect",
                                             "My renamed effect");
 
@@ -3719,5 +3718,131 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     REQUIRE(wrongLayerExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
+  }
+}
+
+TEST_CASE("RemoveLayer", "[common]") {
+  SECTION("Can remove instances in a layout and its associated external layouts") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+    
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    otherExternalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 5);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 3);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
+
+    gd::WholeProjectRefactorer::RemoveLayer(project, layout, "My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 2);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
+  }
+}
+
+TEST_CASE("MergeLayers", "[common]") {
+  SECTION("Can merge instances from a layout into another layout (and their associated external layouts)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+    
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+    
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    otherExternalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 4);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
+
+    gd::WholeProjectRefactorer::MergeLayers(project, layout, "My layer", "");
+
+    // No instance was removed.
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 4);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    // No instance remain in "My layer".
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
+
+    // But layers with the same name in other layouts are untouched.
+    REQUIRE(otherInitialInstances.GetLayerInstancesCount("My layer") == 1);
+    REQUIRE(otherExternalInitialInstances.GetLayerInstancesCount("My layer") == 1);
+
+    // But other layers from the same layout are untouched.
+    REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My other layer") == 1);
   }
 }

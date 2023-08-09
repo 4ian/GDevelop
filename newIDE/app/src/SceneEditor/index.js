@@ -716,14 +716,16 @@ export default class SceneEditor extends React.Component<Props, State> {
           if (doRemove) {
             if (newLayer === null) {
               this.instancesSelection.unselectInstancesOnLayer(layerName);
-              this.props.initialInstances.removeAllInstancesOnLayer(layerName);
+              gd.WholeProjectRefactorer.removeLayer(
+                this.props.project,
+                this.props.layout,
+                layerName
+              );
             } else {
-              // TODO Make the instances move on the layout and its external layout.
-              // This code only moves the instances from the current layout or
-              // external layout. It results to instances with an invalid layer.
-
               // Instances are not invalidated, so we can keep the selection.
-              this.props.initialInstances.moveInstancesToLayer(
+              gd.WholeProjectRefactorer.mergeLayers(
+                this.props.project,
+                this.props.layout,
                 layerName,
                 newLayer
               );
@@ -1766,6 +1768,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 this.state.onCloseLayerRemoveDialog && (
                   <LayerRemoveDialog
                     open
+                    project={project}
                     layersContainer={layout}
                     layerRemoved={this.state.layerRemoved}
                     onClose={this.state.onCloseLayerRemoveDialog}

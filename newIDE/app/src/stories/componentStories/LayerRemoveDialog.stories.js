@@ -23,7 +23,8 @@ export const LayerWithInstances = () => {
   instance2.setObjectName('Object');
   instance2.setLayer('GUI');
 
-  const layout = new gd.Layout();
+  const project = new gd.Project();
+  const layout = project.insertNewLayout('NewScene', 0);
 
   layout.insertNewLayer('GUI', 0);
   layout.insertNewLayer('OtherLayer', 0);
@@ -37,7 +38,7 @@ export const LayerWithInstances = () => {
 
   React.useEffect(() => {
     return () => {
-      layout.delete();
+      project.delete();
     };
     // Delete layout on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,6 +47,7 @@ export const LayerWithInstances = () => {
   return (
     <LayerRemoveDialog
       open
+      project={project}
       layersContainer={layout}
       layerRemoved="GUI"
       onClose={action('onClose')}
@@ -53,13 +55,14 @@ export const LayerWithInstances = () => {
   );
 };
 export const LayerWithoutInstances = () => {
-  const layout = new gd.Layout();
+  const project = new gd.Project();
+  const layout = project.insertNewLayout('NewScene', 0);
   layout.insertNewLayer('GUI', 0);
   layout.insertNewLayer('OtherLayer', 0);
 
   React.useEffect(() => {
     return () => {
-      layout.delete();
+      project.delete();
     };
     // Delete layout on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +70,7 @@ export const LayerWithoutInstances = () => {
   return (
     <LayerRemoveDialog
       open
+      project={project}
       layersContainer={layout}
       layerRemoved="GUI"
       onClose={action('onClose')}

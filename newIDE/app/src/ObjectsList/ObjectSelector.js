@@ -128,7 +128,7 @@ export const checkHasRequiredCapability = ({
   objectName: string,
   requiredBehaviorTypes?: Array<string>,
 |}) => {
-  if (!requiredBehaviorTypes || requiredBehaviorTypes === 0) return true;
+  if (!requiredBehaviorTypes || requiredBehaviorTypes.length === 0) return true;
 
   const object = getObjectByName(
     globalObjectsContainer,

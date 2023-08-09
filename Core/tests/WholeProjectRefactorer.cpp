@@ -3837,11 +3837,11 @@ TEST_CASE("MergeLayers", "[common]") {
     REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
     REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
 
-    // But layers with the same name in other layouts are untouched.
+    // Layers with the same name in other layouts are untouched.
     REQUIRE(otherInitialInstances.GetLayerInstancesCount("My layer") == 1);
     REQUIRE(otherExternalInitialInstances.GetLayerInstancesCount("My layer") == 1);
 
-    // But other layers from the same layout are untouched.
+    // Other layers from the same layout are untouched.
     REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
     REQUIRE(externalInitialInstances.GetLayerInstancesCount("My other layer") == 1);
   }

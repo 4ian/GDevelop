@@ -586,7 +586,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                   <Text size="body" displayInlineAsSpan>
                     <Trans>by</Trans>{' '}
                     {publicAssetPackAuthors.map((author, index) => (
-                      <>
+                      <React.Fragment key={author.name}>
                         {index > 0 && <>, </>}
                         <Link
                           key={author.name}
@@ -595,7 +595,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                         >
                           {author.name}
                         </Link>
-                      </>
+                      </React.Fragment>
                     ))}
                   </Text>
                 )}

@@ -328,7 +328,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         }
 
         // The user has received the pack, open it.
-        setSearchText('');
         sendAssetPackOpened({
           assetPackName: assetPackListingData.name,
           assetPackId: assetPackListingData.id,

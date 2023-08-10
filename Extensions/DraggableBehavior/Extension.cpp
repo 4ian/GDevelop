@@ -21,6 +21,7 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("User interface")
+      .SetTags("drag")
       .SetExtensionHelpPath("/behaviors/draggable");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(

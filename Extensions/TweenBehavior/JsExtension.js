@@ -74,6 +74,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setCategory('Visual effect')
+      .SetTags("tween, interpolation, smooth")
       .setExtensionHelpPath('/behaviors/tween');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Tweening'))

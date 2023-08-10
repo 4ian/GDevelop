@@ -66,7 +66,6 @@ const styles = {
     height: 32,
   },
   promoLineContainer: {
-    border: '2px solid #DDD1FF',
     borderRadius: 8,
     padding: 2,
     flex: 1,
@@ -277,11 +276,18 @@ export const PromoBundleAssetPackCard = ({
   onSelect: () => void,
   owned: boolean,
 |}) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <I18n>
       {({ i18n }) => (
         <Line expand>
-          <div style={styles.promoLineContainer} onClick={onSelect}>
+          <div
+            style={{
+              ...styles.promoLineContainer,
+              border: `2px solid ${gdevelopTheme.palette.secondary}`,
+            }}
+            onClick={onSelect}
+          >
             <Line expand noMargin>
               <CorsAwareImage
                 key={assetPackListingData.name}

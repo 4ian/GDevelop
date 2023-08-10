@@ -3809,7 +3809,7 @@ TEST_CASE("MergeLayers", "[common]") {
     externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
     externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
     externalInitialInstances.InsertNewInitialInstance().SetLayer("");
-    initialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My other layer");
 
     auto &otherInitialInstances = otherLayout.GetInitialInstances();
     otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");

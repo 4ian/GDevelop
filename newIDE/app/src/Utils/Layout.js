@@ -56,11 +56,3 @@ export const getInstanceCountInLayoutForObject = (
   return getInstancesInLayoutForObject(initialInstancesContainer, objectName)
     .length;
 };
-
-export const getInstanceCountInLayoutForLayer = (
-  initialInstancesContainer: gdInitialInstancesContainer,
-  layerName: string
-): number => {
-  return getInstancesInLayoutForLayer(initialInstancesContainer, layerName)
-    .length;
-};

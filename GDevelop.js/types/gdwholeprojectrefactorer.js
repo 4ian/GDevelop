@@ -38,6 +38,9 @@ declare class gdWholeProjectRefactorer {
   static findInvalidRequiredBehaviorProperties(project: gdProject): gdVectorUnfilledRequiredBehaviorPropertyProblem;
   static getBehaviorsWithType(obj: gdObject, type: string): gdVectorString;
   static fixInvalidRequiredBehaviorProperties(project: gdProject): boolean;
+  static removeLayer(project: gdProject, layout: gdLayout, layerName: string): void;
+  static mergeLayers(project: gdProject, layout: gdLayout, originLayerName: string, targetLayerName: string): void;
+  static getLayoutAndExternalLayoutLayerInstancesCount(project: gdProject, layout: gdLayout, layerName: string): number;
   delete(): void;
   ptr: number;
 };

@@ -119,15 +119,17 @@ export default class LayerRemoveDialog extends Component<Props, State> {
             </Trans>
           ) : (
             <Trans>
-              There are {instancesCountInLayout} object instances on this
-              layout. What do you want to do?
+              There are {instancesCountInLayout} object instances on this layer.
+              Should they be moved to another layer?
             </Trans>
           )}
         </Text>
         {instancesCountInLayout > 0 && (
           <>
             <Text>
-              <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
+              <Trans>
+                Move objects from layer {this.props.layerRemoved} to:
+              </Trans>
             </Text>
             <SelectField
               value={this.state.selectedLayer}

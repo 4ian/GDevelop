@@ -78,9 +78,7 @@ export default function NewBehaviorDialog({
         previewIconUrl: behavior.previewIconUrl,
         objectType: behavior.objectType,
         category: behavior.category,
-        // PlatformExtension don't have tags so the information from EventsFunctionsExtension is lost.
-        // TODO (tags): Add tags to PlatformExtension, handle them in MetadataDeclarationHelper and enumerateBehaviorsMetadata.
-        tags: [],
+        tags: behavior.tags,
       }));
     },
     [project, eventsFunctionsExtension]

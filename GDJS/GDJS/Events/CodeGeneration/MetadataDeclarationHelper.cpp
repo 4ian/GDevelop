@@ -34,6 +34,10 @@ void MetadataDeclarationHelper::DeclareExtension(
       .SetExtensionHelpPath(eventsFunctionsExtension.GetHelpPath())
       .SetIconUrl(eventsFunctionsExtension.GetIconUrl());
 
+  for(auto tag : eventsFunctionsExtension.GetTags()) {
+    extension.AddTag(tag);
+  }
+
   if (!fullName.empty()) {
     extension.AddInstructionOrExpressionGroupMetadata(fullName).SetIcon(
         eventsFunctionsExtension.GetIconUrl());

@@ -1790,6 +1790,9 @@ interface PlatformExtension {
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
+    [Const, Ref] VectorString GetTags();
+    [Ref] PlatformExtension SetTags([Const] DOMString csvTags);
+
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
                                         [Const] DOMString type,
                                         [Const] DOMString name,

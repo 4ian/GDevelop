@@ -40,7 +40,7 @@ export const LayerWithInstances = () => {
     return () => {
       project.delete();
     };
-    // Delete layout on unmount
+    // Delete project on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -64,7 +64,7 @@ export const LayerWithoutInstances = () => {
     return () => {
       project.delete();
     };
-    // Delete layout on unmount
+    // Delete project on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (

@@ -78,6 +78,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     marginTop: 16,
     padding: '0 16px 16px 16px',
     position: 'relative',

@@ -94,6 +94,10 @@ const styles = {
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
+  scrollView: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   previewImage: {
     width: 200,
     // Prevent cumulative layout shift by enforcing
@@ -101,7 +105,6 @@ const styles = {
     aspectRatio: '16 / 9',
     objectFit: 'cover',
     position: 'relative',
-    background: '#7147ed',
   },
 };
 
@@ -121,6 +124,7 @@ type Props = {|
     assetPack: PrivateAssetPackListingData
   ) => void,
   onPublicAssetPackSelection?: (assetPack: PublicAssetPack) => void,
+  noScroll?: boolean,
 |};
 
 const AssetsList = React.forwardRef<Props, AssetsListInterface>(
@@ -133,6 +137,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       publicAssetPacks,
       onPrivateAssetPackSelection,
       onPublicAssetPackSelection,
+      noScroll,
     }: Props,
     ref
   ) => {
@@ -155,6 +160,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
     const [
       openAuthorPublicProfileDialog,
       setOpenAuthorPublicProfileDialog,
+    ] = React.useState<boolean>(false);
+    const [
+      isNavigatingInsideFolder,
+      setIsNavigatingInsideFolder,
     ] = React.useState<boolean>(false);
     const currentPage = navigationState.getCurrentPage();
     const { openedAssetPack, filtersState } = currentPage;
@@ -251,6 +260,21 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         }
         setSelectedFolders(selectedFolders.slice(0, folderIndex + 1));
       },
+      [selectedFolders]
+    );
+
+    // When selected folders change, set a flag to know that we are navigating inside a folder.
+    // This allows showing a fake loading indicator.
+    React.useEffect(
+      () => {
+        setIsNavigatingInsideFolder(true);
+        const timeoutId = setTimeout(
+          () => setIsNavigatingInsideFolder(false),
+          100
+        );
+        return () => clearTimeout(timeoutId);
+      },
+      // Apply the effect only when the selected folders change.
       [selectedFolders]
     );
 
@@ -494,7 +518,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       <ScrollView
         ref={scrollView}
         id="asset-store-listing"
-        style={{ display: 'flex', flexDirection: 'column' }}
+        style={{
+          ...styles.scrollView,
+          ...(noScroll ? { overflow: 'hidden' } : {}),
+        }}
       >
         {!assetTiles && !error && <PlaceholderLoader />}
         {!assetTiles && error && (
@@ -555,19 +582,24 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
               )}
               <Column noMargin alignItems="flex-start" expand>
                 <Text size="bold-title">{openedAssetPack.name}</Text>
-                {!!publicAssetPackAuthors &&
-                  publicAssetPackAuthors.map(author => (
-                    <Text size="body" key={author.name}>
-                      <Trans>by</Trans>{' '}
-                      <Link
-                        key={author.name}
-                        href={author.website}
-                        onClick={() => Window.openExternalURL(author.website)}
-                      >
-                        {author.name}
-                      </Link>
-                    </Text>
-                  ))}
+                {!!publicAssetPackAuthors && publicAssetPackAuthors.length && (
+                  <Text size="body" displayInlineAsSpan>
+                    <Trans>by</Trans>{' '}
+                    {publicAssetPackAuthors.map((author, index) => (
+                      <>
+                        {index > 0 && <>, </>}
+                        <Link
+                          key={author.name}
+                          href={author.website}
+                          onClick={() => Window.openExternalURL(author.website)}
+                        >
+                          {author.name}
+                        </Link>
+                      </>
+                    ))}
+                  </Text>
+                )}
+
                 {!!publicAssetPackLicenses &&
                   publicAssetPackLicenses.length > 0 && (
                     <Text size="body">
@@ -646,8 +678,9 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             <LargeSpacer />
           </Column>
         ) : null}
-
-        {assetTiles && assetTiles.length ? (
+        {isNavigatingInsideFolder ? (
+          <PlaceholderLoader />
+        ) : assetTiles && assetTiles.length ? (
           <GridList style={styles.grid} cellHeight="auto">
             {assetTiles}
           </GridList>

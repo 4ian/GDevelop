@@ -148,7 +148,7 @@ export const ExampleListItem = ({
             </Column>
           </ResponsiveLineStackLayout>
         </ButtonBase>
-        <Column noMargin justifyContent="flex-end">
+        <Column justifyContent="flex-end">
           <Line noMargin justifyContent="flex-end">
             <FlatButtonWithSplitMenu
               label={<Trans>Open</Trans>}

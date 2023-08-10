@@ -93,6 +93,7 @@ const styles = {
     overflowX: 'hidden',
     // Always show the vertical scrollbar to avoid rendering issues:
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
   tag: { marginRight: 2 },
   consoleTextArea: {

@@ -21,6 +21,7 @@ const styles = {
   propertiesContainer: {
     padding: 8,
     overflowY: 'scroll',
+    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     overflowX: 'hidden',
     flex: 1,
   },

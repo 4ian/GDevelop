@@ -25,6 +25,7 @@ import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 const styles = {
   priceTagContainer: {
@@ -40,7 +41,11 @@ const styles = {
     aspectRatio: '16 / 9',
     objectFit: 'cover',
     position: 'relative',
-    background: '#7147ed',
+  },
+  promoImage: {
+    width: '20%',
+    minWidth: 200,
+    margin: 4,
   },
   paper: {
     margin: 4,
@@ -282,9 +287,7 @@ export const PromoBundleAssetPackCard = ({
                 key={assetPackListingData.name}
                 style={{
                   ...styles.previewImage,
-                  width: '20%',
-                  minWidth: 200,
-                  margin: 4,
+                  ...styles.promoImage,
                 }}
                 src={assetPackListingData.thumbnailUrls[0]}
                 alt={`Preview image of bundle ${assetPackListingData.name}`}
@@ -354,6 +357,7 @@ export const CategoryTile = ({
   style?: any,
 |}) => {
   const classesForGridListItem = useStylesForGridListItem();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <GridListTile
       classes={classesForGridListItem}
@@ -368,7 +372,10 @@ export const CategoryTile = ({
     >
       <Paper id={id} elevation={2} style={styles.paper} background="light">
         <CorsAwareImage
-          style={styles.previewImage}
+          style={{
+            ...styles.previewImage,
+            background: gdevelopTheme.palette.primary,
+          }}
           src={imageSource}
           alt={imageAlt}
         />

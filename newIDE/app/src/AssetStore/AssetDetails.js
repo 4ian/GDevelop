@@ -73,11 +73,6 @@ const styles = {
   arrowContainer: {
     padding: 6,
   },
-  scrollView: {
-    // This is needed to make the scroll view take the full height of the container,
-    // allowing the Autosizer of the BoxSearchResults to be visible.
-    display: 'flex',
-  },
 };
 
 const makeFirstLetterUppercase = (str: string) =>
@@ -297,7 +292,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
 
     return (
-      <ScrollView ref={scrollView} style={styles.scrollView}>
+      <ScrollView ref={scrollView}>
         <Column expand noMargin>
           <Line justifyContent="space-between" noMargin>
             <Column>
@@ -556,6 +551,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                     setAsset(null);
                     onOpenDetails(assetShortHeader);
                   }}
+                  noScroll
                   noResultsPlaceHolder={
                     <Line alignItems="flex-start">
                       <EmptyMessage>

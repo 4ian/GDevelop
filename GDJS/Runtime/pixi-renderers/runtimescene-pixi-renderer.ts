@@ -252,7 +252,7 @@ namespace gdjs {
         // TODO: replace by a loop like in 3D?
         pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
         pixiRenderer.render(this._pixiContainer, {
-          clear: this._runtimeScene.clearCanvas,
+          clear: this._runtimeScene.getClearCanvas(),
         });
         this._layerRenderingMetrics.rendered2DLayersCount++;
       }

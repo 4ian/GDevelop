@@ -34,7 +34,7 @@ namespace gdjs {
     _backgroundColor: integer = 0;
 
     /** Should the canvas be cleared before this scene rendering. */
-    clearCanvas: boolean = true;
+    _clearCanvas: boolean = true;
 
     _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
@@ -526,6 +526,20 @@ namespace gdjs {
      */
     getBackgroundColor(): number {
       return this._backgroundColor;
+    }
+    
+    /**
+     * Set whether the canvas should be cleared before this scene rendering.
+     */
+    setClearCanvas(shouldClearCanvas: boolean): void {
+      this._clearCanvas = shouldClearCanvas;
+    }
+
+    /**
+     * Get whether the canvas should be cleared before this scene rendering.
+     */
+    getClearCanvas(): boolean {
+      return this._clearCanvas;
     }
 
     /**

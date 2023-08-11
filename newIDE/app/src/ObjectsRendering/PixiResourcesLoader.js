@@ -2,13 +2,20 @@
 import slugs from 'slugs';
 import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
+import * as PIXI_SPINE from 'pixi-spine';
 import * as THREE from 'three';
 import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
+import { ISkeleton } from 'pixi-spine';
 const gd: libGDevelop = global.gd;
+
+// PIXI_SPINE.SpineParser.registerLoaderPlugin();
+PIXI.Loader.registerPlugin(PIXI_SPINE.SpineParser);
+
+type ResourcePromise<T> = { [resourceName: string]: Promise<T> };
 
 const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
@@ -16,9 +23,9 @@ const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
-const loadedOrLoading3DModelPromises: {
-  [resourceName: string]: Promise<THREE.THREE_ADDONS.GLTF>,
-} = {};
+const loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
+const atlasPromises: ResourcePromise<string> = {};
+const spineDataPromises: ResourcePromise<ISkeleton> = {};
 
 const createInvalidModel = (): GLTF => {
   /**
@@ -349,6 +356,56 @@ export default class PixiResourcesLoader {
     return loadingPromise;
   }
 
+  static async getSpineData(
+    project: gdProject,
+    spineName: string,
+    atlasImageName: string,
+    atlasTextName: string
+  ): Promise<any> {
+    const loader = PIXI.Loader.shared;
+    const resourceManager = project.getResourcesManager();
+    const resourcesData = [
+      [spineName, 'json'],
+      [atlasImageName, 'image'],
+      [atlasTextName, 'atlas'],
+    ];
+
+    for (const [resName, resKind] of resourcesData) {
+      if (!resourceManager.hasResource(resName)) {
+        return Promise.reject(`Unknown ${resKind} file ${resName}.`);
+      }
+      if (resourceManager.getResource(resName).getKind() !== resKind) {
+        return Promise.reject(`The resource called ${resName} is not of appropriate file type ${resKind}.`);
+      }
+    }
+ 
+    // https://github.com/pixijs/spine/blob/master/examples/preload_atlas_text.md
+    if (!atlasPromises[atlasTextName]) {
+      atlasPromises[atlasTextName] = new Promise(resolve => {
+        loader
+          .add(atlasTextName, ResourcesLoader.getResourceFullUrl(project, atlasTextName, { isResourceForPixi: true }), { xhrType: 'text' })
+          .load((_, atlasData) =>  resolve(atlasData[atlasTextName].data))
+      });
+    }
+
+    if (!spineDataPromises[spineName]) {
+      spineDataPromises[spineName] = new Promise(resolve => {
+        atlasPromises[atlasTextName].then(atlasRawData => {
+          const metadata = {
+            image: this.getPIXITexture(project, atlasImageName),
+            atlasRawData,
+          };
+
+          loader
+            .add(spineName, ResourcesLoader.getResourceFullUrl(project, spineName, { isResourceForPixi: true }), { metadata })
+            .load((_, jsonData) => resolve(jsonData[spineName].spineData));
+        })
+      });
+    }
+
+    return spineDataPromises[spineName];
+  }
+
   /**
    * Return the PIXI video texture represented by the given resource.
    * If not loaded, it will load it.
@@ -531,37 +588,4 @@ export default class PixiResourcesLoader {
       .then(response => response.data);
   }
 
-  static getResourceAtlasData(
-    project: gdProject,
-    resourceName: string
-  ): Promise<any> {
-    if (!project.getResourcesManager().hasResource(resourceName)) {
-      return Promise.reject(`Unknown atlas file ${resourceName}.`);
-    }
-
-    const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'atlas') {
-      return Promise.reject(`The resource called ${resourceName} is not a json file.`);
-    }
-
-    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-      isResourceForPixi: true,
-    });
-
-    // const gltfLoader = getOrCreateGltfLoader();
-    // gltfLoader.withCredentials = checkIfCredentialsRequired(url);
-    // return new Promise((resolve, reject) => {
-    //   gltfLoader.load(
-    //     url,
-    //     gltf => {
-    //       traverseToSetBasicMaterialFromMeshes(gltf.scene);
-    //       resolve(gltf);
-    //     },
-    //     undefined,
-    //     error => {
-    //       reject(error);
-    //     }
-    //   );
-    // });
-  }
 }

@@ -1,4 +1,5 @@
 import * as PixiModule from 'pixi.js';
+import * as PixiSpineModule from 'pixi-spine';
 
 declare global {
   /**
@@ -18,5 +19,6 @@ declare global {
    */
   namespace GlobalPIXIModule {
     export import PIXI = PixiModule;
+    export import PIXI_SPINE = PixiSpineModule;
   }
 }

@@ -140,6 +140,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _textManager: TextManager;
     _model3DManager: Model3DManager;
     _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
@@ -227,6 +228,10 @@ namespace gdjs {
         this._data.resources.resources,
         this._resourcesLoader
       );
+      this._textManager = new gdjs.TextManager(
+        this._data.resources.resources,
+        this._resourcesLoader
+      )
       this._bitmapFontManager = new gdjs.BitmapFontManager(
         this._data.resources.resources,
         this._resourcesLoader,
@@ -312,13 +317,18 @@ namespace gdjs {
      * @param projectData The object (usually stored in data.json) containing the full project data
      */
     setProjectData(projectData: ProjectData): void {
+      const { resources } = projectData.resources;
+
       this._data = projectData;
-      this._imageManager.setResources(this._data.resources.resources);
-      this._soundManager.setResources(this._data.resources.resources);
-      this._fontManager.setResources(this._data.resources.resources);
-      this._jsonManager.setResources(this._data.resources.resources);
-      this._bitmapFontManager.setResources(this._data.resources.resources);
-      this._model3DManager.setResources(this._data.resources.resources);
+      [
+        this._imageManager,
+        this._soundManager,
+        this._fontManager,
+        this._jsonManager,
+        this._textManager,
+        this._bitmapFontManager,
+        this._model3DManager,
+      ].forEach((manager) => manager.setResources(resources));
     }
 
     /**
@@ -390,6 +400,15 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    /**
+     * Get the text manager of the game, used to load text from game
+     * resources.
+     * @return The text manager for the game
+     */
+    getTextManager(): gdjs.TextManager {
+      return this._textManager;
     }
 
     /**
@@ -759,9 +778,9 @@ namespace gdjs {
                           }
                         },
                         function (model3DTotalCount) {
-                          that._bitmapFontManager
-                            .loadBitmapFontData((count) => {
-                              var percent = Math.floor(
+                          that._textManager.preload(
+                            function (count, total) {
+                              const percent = Math.floor(
                                 ((texturesTotalCount +
                                   audioTotalCount +
                                   fontTotalCount +
@@ -772,15 +791,36 @@ namespace gdjs {
                                   100
                               );
                               loadingScreen.setPercent(percent);
-                              if (progressCallback) progressCallback(percent);
-                            })
-                            .then(() => loadingScreen.unload())
-                            .then(() =>
-                              gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                            )
-                            .then(() => {
-                              callback();
-                            });
+                              if (progressCallback) {
+                                progressCallback(percent);
+                              }
+                            },
+                            function (textsTotalCount) {
+                              that._bitmapFontManager
+                                .loadBitmapFontData((count) => {
+                                  var percent = Math.floor(
+                                    ((texturesTotalCount +
+                                      audioTotalCount +
+                                      fontTotalCount +
+                                      jsonTotalCount +
+                                      model3DTotalCount +
+                                      textsTotalCount +
+                                      count) /
+                                      allAssetsTotal) *
+                                      100
+                                  );
+                                  loadingScreen.setPercent(percent);
+                                  if (progressCallback) progressCallback(percent);
+                                })
+                                .then(() => loadingScreen.unload())
+                                .then(() =>
+                                  gdjs.getAllAsynchronouslyLoadingLibraryPromise()
+                                )
+                                .then(() => {
+                                  callback();
+                                });
+                            }
+                          )
                         }
                       );
                     }

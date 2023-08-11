@@ -1,12 +1,14 @@
 namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
+  import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
    */
   export class SpineRuntimeObjectPixiRenderer {
     _object: gdjs.SpineRuntimeObject;
-    _pixiObject: PIXI.BitmapText;
+    _pixiObject: PIXI.Container;
+    _spine!: Promise<PIXI_SPINE.Spine>;
 
     /**
      * @param runtimeObject The object to render
@@ -14,22 +16,11 @@ namespace gdjs {
      */
     constructor(
       runtimeObject: gdjs.SpineRuntimeObject,
-      instanceContainer: gdjs.RuntimeInstanceContainer
+      private instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-
-      // Obtain the bitmap font to use in the object.
-      const bitmapFont = instanceContainer
-        .getGame()
-        .getBitmapFontManager()
-        .obtainBitmapFont(
-          runtimeObject._bitmapFontResourceName,
-          runtimeObject._textureAtlasResourceName
-        );
-      this._pixiObject = new PIXI.BitmapText(runtimeObject._text, {
-        fontName: bitmapFont.font,
-        fontSize: bitmapFont.size,
-      });
+      this._pixiObject = new PIXI.Container();
+      this.constructSpine();
 
       // Set the object on the scene
       instanceContainer
@@ -37,20 +28,11 @@ namespace gdjs {
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
-      // Set the anchor in the center, so that the object rotates around
-      // its center.
-      // @ts-ignore
-      this._pixiObject.anchor.x = 0.5;
-      // @ts-ignore
-      this._pixiObject.anchor.y = 0.5;
-
-      this.updateAlignment();
-      this.updateTextContent();
+      this.updateTimeScale();
+      this.updatePosition();
       this.updateAngle();
       this.updateOpacity();
       this.updateScale();
-      this.updateWrappingWidth();
-      this.updateTint();
     }
 
     getRendererObject() {
@@ -58,102 +40,25 @@ namespace gdjs {
     }
 
     onDestroy() {
-      // Mark the font from the object as not used anymore.
-      this._object
-        .getInstanceContainer()
-        .getGame()
-        .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
-
       this._pixiObject.destroy();
     }
 
-    getFontSize() {
-      return this._pixiObject.fontSize;
-    }
-
-    updateFont(): void {
-      // Get the new bitmap font to use
-      const bitmapFont = this._object
-        .getInstanceContainer()
-        .getGame()
-        .getBitmapFontManager()
-        .obtainBitmapFont(
-          this._object._bitmapFontResourceName,
-          this._object._textureAtlasResourceName
-        );
-
-      // Mark the old font as not used anymore
-      this._object
-        .getInstanceContainer()
-        .getGame()
-        .getBitmapFontManager()
-        .releaseBitmapFont(this._pixiObject.fontName);
-
-      // Update the font used by the object:
-      this._pixiObject.fontName = bitmapFont.font;
-      this._pixiObject.fontSize = bitmapFont.size;
-      this.updatePosition();
-    }
-
-    updateTint(): void {
-      this._pixiObject.tint = gdjs.rgbToHexNumber(
-        this._object._tint[0],
-        this._object._tint[1],
-        this._object._tint[2]
-      );
-      this._pixiObject.dirty = true;
-    }
-
-    /**
-     * Get the tint of the bitmap object as a "R;G;B" string.
-     * @returns the tint of bitmap object in "R;G;B" format.
-     */
-    getTint(): string {
-      return (
-        this._object._tint[0] +
-        ';' +
-        this._object._tint[1] +
-        ';' +
-        this._object._tint[2]
-      );
+    updateTimeScale() {
+      this._spine.then(spine => spine.state.timeScale = this._object.getTimeScale());
     }
 
     updateScale(): void {
-      this._pixiObject.scale.set(Math.max(this._object._scale, 0));
-      this.updatePosition();
+      this._pixiObject.scale.set(Math.max(this._object.getScale(), 0));
     }
 
     getScale() {
+      // is it ok ? see it as a pattern
       return Math.max(this._pixiObject.scale.x, this._pixiObject.scale.y);
     }
 
-    updateWrappingWidth(): void {
-      if (this._object._wordWrap) {
-        this._pixiObject.maxWidth =
-          this._object._wrappingWidth / this._object._scale;
-        this._pixiObject.dirty = true;
-      } else {
-        this._pixiObject.maxWidth = 0;
-        this._pixiObject.dirty = true;
-      }
-      this.updatePosition();
-    }
-
-    updateTextContent(): void {
-      this._pixiObject.text = this._object._text;
-      this.updatePosition();
-    }
-
-    updateAlignment(): void {
-      // @ts-ignore - assume align is always a valid value.
-      this._pixiObject.align = this._object._align;
-      this.updatePosition();
-    }
-
     updatePosition(): void {
-      this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
-      this._pixiObject.position.y = this._object.y + this.getHeight() / 2;
+      this._pixiObject.position.x = this._object.x;
+      this._pixiObject.position.y = this._object.y;
     }
 
     updateAngle(): void {
@@ -161,15 +66,80 @@ namespace gdjs {
     }
 
     updateOpacity(): void {
-      this._pixiObject.alpha = this._object._opacity / 255;
+      this._pixiObject.alpha = this._object.getOpacity() / 255;
     }
 
     getWidth(): float {
-      return this._pixiObject.textWidth * this.getScale();
+      return this._pixiObject.width;
     }
 
     getHeight(): float {
-      return this._pixiObject.textHeight * this.getScale();
+      return this._pixiObject.height;
+    }
+
+    setWidth(width: float): void {
+      this._spine.then(spine => {
+        spine.width = width;
+        this.updateBounds(spine);
+      });
+    }
+
+    setHeight(height: float): void {
+      this._spine.then(spine => {
+        spine.height = height;
+        this.updateBounds(spine);
+      });
+    }
+
+    setSize(width: float, height: float): void {
+      this._spine?.then(spine => {
+        spine.width = width;
+        spine.height = height;
+        this.updateBounds(spine);
+      });
+    }
+
+    setAnimation(animation: string, loop: boolean) {
+      this._spine?.then(s => {
+        s.state.setAnimation(0, animation, loop);
+        this.updateBounds(s);
+      });
+    }
+
+    private constructSpine() {
+      const game = this.instanceContainer.getGame();
+      const spineJson = game.getJsonManager().getLoadedJson(this._object.jsonResourceName)!;
+      const atlasText = game.getTextManager().get(this._object.atlasResourceName)!;
+      const atlasImage = game.getImageManager().getPIXITexture(this._object.imageResourceName)!;
+
+      this._spine = this.getSpineSkeleton(spineJson, atlasText, atlasImage)
+        .then(skeleton => {
+          const s = new PIXI_SPINE.Spine(skeleton);
+          this._pixiObject.addChild(s);
+          this.updateBounds(s);
+
+          return s;
+        });
+    }
+
+    private updateBounds(s: PIXI_SPINE.Spine) {
+      const localBounds = s.getLocalBounds(undefined, true);
+      s.position.set(-localBounds.x * s.scale.x, -localBounds.y * s.scale.y);
+    }
+
+    private getSpineSkeleton(spineJson: Object, atlasText: string, atlasImage: PIXI.Texture) {
+      return new Promise<PIXI_SPINE.ISkeletonData>((resolve) => {
+        new PIXI_SPINE.TextureAtlas(
+          atlasText,
+          (_, textureCb) => textureCb(atlasImage.baseTexture),
+          (atlas) => {
+            const resourceMoc = {};
+            const spineParser = new PIXI_SPINE.SpineParser();
+            spineParser.parseData(resourceMoc as any, spineParser.createJsonParser(), atlas, spineJson);
+            
+            resolve((resourceMoc as unknown as { spineData: PIXI_SPINE.ISkeletonData }).spineData);
+          });
+      });
     }
   }
   export const SpineRuntimeObjectRenderer = SpineRuntimeObjectPixiRenderer;

@@ -26,6 +26,7 @@ set(
 	TextEntryObject
 	TextObject
 	TiledSpriteObject
+	Spine
 	TopDownMovementBehavior)
 
 # Automatically add all listed extensions

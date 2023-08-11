@@ -83,7 +83,7 @@ export const allResourceKindsAndMetadata = [
     createNewResource: () => new gd.Model3DResource(),
   },
   {
-    kind: 'Atlas',
+    kind: 'atlas',
     displayName: t`Atlas`,
     fileExtensions: ['atlas'],
     createNewResource: () => new gd.AtlasResource(),

@@ -25,131 +25,33 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
+
     extension
       .setExtensionInformation(
-        'Spine',
+        'SpineObject',
         _('Spine'),
-        _(
-          'Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'
-        ),
+        _('Displays a Spine animation.'),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bitmap_text')
-      .setCategory('Text');
+      .setExtensionHelpPath('/objects/spine')
+      .setCategory('General');
+
     extension
       .addInstructionOrExpressionGroupMetadata(_('Spine'))
-      .setIcon('JsPlatform/Extensions/bitmapfont32.png');
-
-    const bitmapTextObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError
-    bitmapTextObject.updateProperty = function (
-      objectContent,
-      propertyName,
-      newValue
-    ) {
-      if (propertyName in objectContent) {
-        if (typeof objectContent[propertyName] === 'boolean')
-          objectContent[propertyName] = newValue === '1';
-        else if (typeof objectContent[propertyName] === 'number')
-          objectContent[propertyName] = parseFloat(newValue);
-        else objectContent[propertyName] = newValue;
-        return true;
-      }
-
-      return false;
-    };
-    // $FlowExpectedError
-    bitmapTextObject.getProperties = function (objectContent) {
-      const objectProperties = new gd.MapStringPropertyDescriptor();
-
-      objectProperties
-        .getOrCreate('jsonResourceName')
-        .setValue(objectContent.jsonResourceName)
-        .setType('resource')
-        .addExtraInfo('json')
-        .setLabel(_('Spine JSON'))
-        .setGroup(_('Spine Files'));
-      
-      objectProperties
-        .getOrCreate('atlasResourceName')
-        .setValue(objectContent.atlasResourceName)
-        .setType('resource')
-        .addExtraInfo('atlas')
-        .setLabel(_('Atlas file'))
-        .setGroup(_('Spine Files'));
-
-      objectProperties
-        .getOrCreate('imageResourceName')
-        .setValue(objectContent.textureAtlasResourceName)
-        .setType('resource')
-        .addExtraInfo('image')
-        .setLabel(_('Spine atlas image'))
-        .setGroup(_('Spine Files'));
-
-      objectProperties
-        .getOrCreate('opacity')
-        .setValue(objectContent.opacity.toString())
-        .setType('number')
-        .setLabel(_('Opacity (0-255)'))
-        .setGroup(_('Appearance'));
-
-      objectProperties
-        .getOrCreate('scale')
-        .setValue(objectContent.scale.toString())
-        .setType('number')
-        .setLabel(_('Text scale'))
-        .setGroup(_('Appearance'));
-
-      return objectProperties;
-    };
-    bitmapTextObject.setRawJSONContent(
-      JSON.stringify({
-        opacity: 255,
-        scale: 1,
-        jsonResourceName: '',
-        atlasResourceName: '',
-        imageResourceName: '',
-      })
-    );
-
-    // $FlowExpectedError
-    bitmapTextObject.updateInitialInstanceProperty = function (
-      objectContent,
-      instance,
-      propertyName,
-      newValue,
-      project,
-      layout
-    ) {
-      return false;
-    };
-    // $FlowExpectedError
-    bitmapTextObject.getInitialInstanceProperties = function (
-      content,
-      instance,
-      project,
-      layout
-    ) {
-      var instanceProperties = new gd.MapStringPropertyDescriptor();
-      return instanceProperties;
-    };
+      .setIcon('CppPlatform/Extensions/spriteicon.png');
 
     const object = extension
       .addObject(
         'SpineObject',
         _('Spine'),
-        _(
-          'Display and animate Spine skeleton. Select Spine files (json, atlas, image).'
-        ),
-        'JsPlatform/Extensions/bitmapfont32.png',
-        bitmapTextObject
+        _('Display and animate Spine skeleton. Select Spine files (json, atlas, image).'),
+        'CppPlatform/Extensions/spriteicon.png',
+        new gd.SpineObjectConfiguration()
       )
       .setIncludeFile('Extensions/Spine/spineruntimeobject.js')
-      .addIncludeFile(
-        'Extensions/Spine/spineruntimeobject-pixi-renderer.js'
-      )
-      .setCategoryFullName(_('Text'));
+      .addIncludeFile('Extensions/Spine/spineruntimeobject-pixi-renderer.js')
+      .setCategoryFullName(_('General'));
 
     object
       .addExpressionAndConditionAndAction(
@@ -161,7 +63,7 @@ module.exports = {
         '',
         'res/conditions/opacity24.png'
       )
-      .addParameter('object', _('Bitmap text'), 'SpineObject', false)
+      .addParameter('object', _('Spine'), 'SpineObject', false)
       .useStandardParameters(
         'number',
         gd.ParameterOptions.makeNewOptions().setDescription(
@@ -181,7 +83,7 @@ module.exports = {
         '',
         'res/actions/scale24_black.png'
       )
-      .addParameter('object', _('Bitmap text'), 'SpineObject', false)
+      .addParameter('object', _('Spine'), 'SpineObject', false)
       .useStandardParameters(
         'number',
         gd.ParameterOptions.makeNewOptions().setDescription(
@@ -190,6 +92,47 @@ module.exports = {
       )
       .setFunctionName('setScale')
       .setGetter('getScale');
+    
+    
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Animation',
+          _('Animation (by number)'),
+          _(
+            'the number of the animation played by the object (the number from the animations list)'
+          ),
+          _('the number of the animation'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('Spine'), 'SpineObject')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .markAsSimple()
+        .setFunctionName('setAnimationIndex')
+        .setGetter('getAnimationIndex');
+
+      object
+        .addExpressionAndConditionAndAction(
+          'string',
+          'AnimationName',
+          _('Animation (by name)'),
+          _('the animation played by the object'),
+          _('the animation'),
+          _('Animations and images'),
+          'res/actions/animation24.png'
+        )
+        .addParameter('object', _('Spine'), 'SpineObject')
+        .useStandardParameters(
+          'objectAnimationName',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Animation name')
+          )
+        )
+        .markAsAdvanced()
+        .setFunctionName('setAnimationName')
+        .setGetter('getAnimationName');
+
 
     return extension;
   },
@@ -219,9 +162,9 @@ module.exports = {
     objectsEditorService /*: ObjectsEditorService */
   ) {
     objectsEditorService.registerEditorConfiguration(
-      'Spine::SpineObject',
+      'SpineObject::SpineObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/bitmap_text',
+        helpPagePath: '/objects/spine',
       })
     );
   },
@@ -233,327 +176,144 @@ module.exports = {
   registerInstanceRenderers: function (
     objectsRenderingService /*: ObjectsRenderingService */
   ) {
-    const RenderedInstance = objectsRenderingService.RenderedInstance;
-    const PIXI = objectsRenderingService.PIXI;
+    const { PIXI, RenderedInstance } = objectsRenderingService;
 
-    /** The bitmap font used in case another font can't be loaded. */
-    let defaultBitmapFont = null;
+    class RenderedSpineInstance extends RenderedInstance {
+      _spine;
+      _rect = new PIXI.Graphics();
+      _initialWidth;
+      _initialHeight;
+      _animationIndex;
 
-    const defaultBitmapFontInstallKey = 'GD-DEFAULT-BITMAP-FONT';
-
-    /**
-     * Map counting the number of "reference" to a bitmap font. This is useful
-     * to uninstall a bitmap font when not used anymore.
-     */
-    const bitmapFontUsageCount = {};
-
-    /**
-     * We patch the installed font to use a name that is unique for each font data and texture,
-     * to avoid conflicts between different font files using the same font name (by default, the
-     * font name used by Pixi is the one inside the font data, but this name is not necessarily unique.
-     * For example, 2 resources can use the same font, or we can have multiple objects with the same
-     * font data and different textures).
-     */
-    const patchBitmapFont = (bitmapFont, bitmapFontInstallKey) => {
-      const defaultName = bitmapFont.font;
-      bitmapFont.font = bitmapFontInstallKey;
-      PIXI.BitmapFont.available[bitmapFontInstallKey] = bitmapFont;
-
-      delete PIXI.BitmapFont.available[defaultName];
-      return PIXI.BitmapFont.available[bitmapFontInstallKey];
-    };
-
-    /**
-     * Return a default bitmap font to be used in case another font can't be loaded.
-     */
-    const getDefaultBitmapFont = () => {
-      if (defaultBitmapFont) return defaultBitmapFont;
-
-      const defaultBitmapFontStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 20,
-        padding: 5,
-        align: 'left',
-        fill: '#ffffff',
-        wordWrap: true,
-        lineHeight: 20,
-      });
-
-      defaultBitmapFont = patchBitmapFont(
-        PIXI.BitmapFont.from(
-          defaultBitmapFontStyle.fontFamily,
-          defaultBitmapFontStyle,
-          {
-            chars: [
-              [' ', '~'], // All the printable ASCII characters
-            ],
-          }
-        ),
-        defaultBitmapFontInstallKey
-      );
-      return defaultBitmapFont;
-    };
-
-    /**
-     * Given a bitmap font resource name and a texture atlas resource name, returns the PIXI.BitmapFont
-     * for it.
-     * The font must be released with `releaseBitmapFont` when not used anymore - so that it can be removed
-     * from memory when not used by any instance.
-     *
-     * @param pixiResourcesLoader
-     * @param project
-     * @param bitmapFontResourceName
-     * @param textureAtlasResourceName
-     */
-    const obtainBitmapFont = (
-      pixiResourcesLoader,
-      project,
-      bitmapFontResourceName,
-      textureAtlasResourceName
-    ) => {
-      const bitmapFontInstallKey =
-        bitmapFontResourceName + '@' + textureAtlasResourceName;
-
-      if (PIXI.BitmapFont.available[bitmapFontInstallKey]) {
-        // Return the existing BitmapFont that is already in memory and already installed.
-        bitmapFontUsageCount[bitmapFontInstallKey] =
-          (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
-        return Promise.resolve(PIXI.BitmapFont.available[bitmapFontInstallKey]);
-      }
-
-      // Get the atlas texture, the bitmap font data and install the font:
-      const texture = pixiResourcesLoader.getPIXITexture(
-        project,
-        textureAtlasResourceName
-      );
-
-      const loadBitmapFont = () =>
-        pixiResourcesLoader
-          .getBitmapFontData(project, bitmapFontResourceName)
-          .then((fontData) => {
-            if (!texture.valid)
-              throw new Error(
-                'Tried to install a BitmapFont with an invalid texture.'
-              );
-
-            const bitmapFont = patchBitmapFont(
-              PIXI.BitmapFont.install(fontData, texture),
-              bitmapFontInstallKey
-            );
-            bitmapFontUsageCount[bitmapFontInstallKey] =
-              (bitmapFontUsageCount[bitmapFontInstallKey] || 0) + 1;
-
-            return bitmapFont;
-          })
-          .catch((err) => {
-            console.warn('Unable to load font data:', err);
-            console.info(
-              'Is the texture atlas properly set for the Spine object? The default font will be used instead.'
-            );
-
-            const bitmapFont = getDefaultBitmapFont();
-            return bitmapFont;
-          });
-
-      if (!texture.valid) {
-        // Post pone texture update if texture is not loaded.
-        // (otherwise, the bitmap font would not get updated when the
-        // texture is loaded and updated).
-        return new Promise((resolve) => {
-          texture.once('update', () => {
-            resolve(loadBitmapFont());
-          });
-        });
-      } else {
-        // We're ready to load the bitmap font now, as the texture
-        // is already loaded.
-        return loadBitmapFont();
-      }
-    };
-
-    /**
-     * When a font is not used by an object anymore (object destroyed or font changed),
-     * call this function to decrease the internal count of objects using the font.
-     *
-     * Fonts are unloaded when not used anymore.
-     */
-    const releaseBitmapFont = (bitmapFontInstallKey) => {
-      if (bitmapFontInstallKey === defaultBitmapFontInstallKey) {
-        // Never uninstall the default bitmap font.
-        return;
-      }
-
-      if (!bitmapFontUsageCount[bitmapFontInstallKey]) {
-        console.error(
-          'BitmapFont with name ' +
-            bitmapFontInstallKey +
-            ' was tried to be released but was never marked as used.'
-        );
-        return;
-      }
-      bitmapFontUsageCount[bitmapFontInstallKey]--;
-
-      if (bitmapFontUsageCount[bitmapFontInstallKey] === 0) {
-        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
-        console.info(
-          'Uninstalled BitmapFont "' + bitmapFontInstallKey + '" from memory.'
-        );
-      }
-    };
-
-    /**
-     * Renderer for instances of Spine inside the IDE.
-     *
-     * @extends RenderedSpineInstance
-     * @class RenderedSpineInstance
-     * @constructor
-     */
-    function RenderedSpineInstance(
-      project,
-      layout,
-      instance,
-      associatedObjectConfiguration,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+      constructor(
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
-
-      // We'll track changes of the font to trigger the loading of the new font.
-      this._currentBitmapFontResourceName = '';
-      this._currentTextureAtlasResourceName = '';
-
-      this._pixiObject = new PIXI.Spine('', {
-        // Use a default font. The proper font will be loaded in `update` method.
-        fontName: getDefaultBitmapFont().font,
-      });
-
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
-    }
-    RenderedSpineInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
-
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedSpineInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      objectConfiguration
-    ) {
-      return 'JsPlatform/Extensions/bitmapfont24.png';
-    };
-
-    // This is called to update the PIXI object on the scene editor
-    RenderedSpineInstance.prototype.update = function () {
-      const properties = this._associatedObjectConfiguration.getProperties();
-
-      // Update the rendered text properties (note: Pixi is only
-      // applying changes if there were changed).
-      const rawText = properties.get('text').getValue();
-      this._pixiObject.text = rawText;
-
-      const opacity = properties.get('opacity').getValue();
-      this._pixiObject.alpha = opacity / 255;
-
-      const align = properties.get('align').getValue();
-      this._pixiObject.align = align;
-
-      const color = properties.get('tint').getValue();
-      this._pixiObject.tint =
-        objectsRenderingService.rgbOrHexToHexNumber(color);
-
-      const scale = properties.get('scale').getValue() || 1;
-      this._pixiObject.scale.set(scale);
-
-      // Track the changes in font to load the new requested font.
-      const bitmapFontResourceName = properties
-        .get('bitmapFontResourceName')
-        .getValue();
-      const textureAtlasResourceName = properties
-        .get('textureAtlasResourceName')
-        .getValue();
-
-      if (
-        this._currentBitmapFontResourceName !== bitmapFontResourceName ||
-        this._currentTextureAtlasResourceName !== textureAtlasResourceName
       ) {
-        // Release the old font (if it was installed).
-        releaseBitmapFont(this._pixiObject.fontName);
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
 
-        // Temporarily go back to the default font, as the PIXI.Spine
-        // object does not support being displayed with a font not installed at all.
-        // It will be replaced as soon as the proper font is loaded.
-        this._pixiObject.fontName = getDefaultBitmapFont().font;
+        // there is issue with spine selection. mouse events are not triggering during interaction.
+        // create the invisible background rectangle to fill spine range.
+        this._rect.alpha = 0;
+        this._pixiObject = new PIXI.Container();
+        this._pixiObject.addChild(this._rect);
+        this._pixiContainer.addChild(this._pixiObject);
 
-        this._currentBitmapFontResourceName = bitmapFontResourceName;
-        this._currentTextureAtlasResourceName = textureAtlasResourceName;
-        obtainBitmapFont(
-          this._pixiResourcesLoader,
-          this._project,
-          this._currentBitmapFontResourceName,
-          this._currentTextureAtlasResourceName
-        ).then((bitmapFont) => {
-          this._pixiObject.fontName = bitmapFont.font;
-          this._pixiObject.fontSize = bitmapFont.size;
-          this._pixiObject.dirty = true;
-        });
+        this.loadSpine();
+        this.update();
       }
 
-      // Set up the wrapping width if enabled.
-      const wordWrap = properties.get('wordWrap').getValue() === 'true';
-      if (wordWrap && this._instance.hasCustomSize()) {
-        this._pixiObject.maxWidth =
-          this.getCustomWidth() / this._pixiObject.scale.x;
-        this._pixiObject.dirty = true;
-      } else {
-        this._pixiObject.maxWidth = 0;
-        this._pixiObject.dirty = true;
+      // use smth better. can I create texture of default spine stage ?
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/3d_box.svg';
       }
 
-      this._pixiObject.position.x =
-        this._instance.getX() + (this._pixiObject.textWidth * scale) / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + (this._pixiObject.textHeight * scale) / 2;
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-    };
+      loadSpine() {
+        const jsonResourceName = this.properties.get('jsonResourceName').getValue();
+        const imageResourceName = this.properties.get('imageResourceName').getValue();
+        const atlasResourceName = this.properties.get('atlasResourceName').getValue();
 
-    RenderedSpineInstance.prototype.onRemovedFromScene = function () {
-      RenderedInstance.prototype.onRemovedFromScene.call(this);
+        this._pixiResourcesLoader
+          .getSpineData(this._project, jsonResourceName, imageResourceName, atlasResourceName)
+          .then((spineData) => {;
+            this._spine = new PIXI.Spine(spineData);
+            this._pixiObject.addChild(this._spine);
+            this.update();
+          });
+      }
 
-      releaseBitmapFont(this._pixiObject.fontName);
-      this._pixiObject.destroy();
-    };
+      update() {
+        // instance settings
+        this._pixiObject.position.set(this._instance.getX(), this._instance.getY());
 
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedSpineInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
-    };
+        // object settings
+        this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedSpineInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
-    };
+        const width = this.getWidth();
+        const height = this.getHeight();
+
+        this._rect.clear();
+        this._rect.beginFill(0xFFFFFF);
+        this._rect.lineStyle(0, 0xFFFFFF);
+        this._rect.drawRect(0, 0, width, height);
+
+        if (this._spine) {
+          const s = this._spine;
+          s.width = width;
+          s.height = height;
+          s.alpha = this.properties.get('opacity').getValue() / 255;
+          const localBounds = s.getLocalBounds(undefined, true);
+          s.position.set(-localBounds.x * s.scale.x, -localBounds.y * s.scale.y);
+        }
+
+        this._pixiObject.calculateBounds();
+      }
+
+      setAnimation(index) {
+        const s = this._spine;
+        const {configuration} = this;
+
+        if (!s || configuration.hasNoAnimations() || index === this._animationIndex) {
+          return;
+        }
+
+        // should I do that ? maybe just { return; } ?
+        if (!Number.isInteger(index) || index < 0) {
+          index = 0;
+        } else if (configuration.getAnimationsCount() <= index) {
+          index = configuration.getAnimationsCount() - 1;
+        }
+
+        this._animationIndex = index;
+        const animation = configuration.getAnimation(index);
+        const name = animation.getName?.();
+        const source = animation.getSource?.();
+        const shouldLoop = animation.shouldLoop?.();
+
+        // reset scale to track new animation range
+        // if custome size is set it will be reinitialized in update method
+        s.scale.set(1, 1);
+        s.state.setAnimation(0, source, shouldLoop);
+        s.state.tracks[0].trackTime = 0;
+        s.update(0);
+        s.autoUpdate = false;
+        this._initialWidth = s.width;
+        this._initialHeight = s.height;
+      }
+
+      getDefaultWidth() {
+        const scale = +this.properties.get('scale').getValue() || 1;
+
+        return typeof this._initialWidth === 'number' ? this._initialWidth * scale : 256;
+      }
+
+      getDefaultHeight() {
+        const scale = +this.properties.get('scale').getValue() || 1;
+
+        return typeof this._initialHeight === 'number' ? this._initialHeight * scale : 256;
+      }
+
+      get configuration() {
+        return gd.asSpineConfiguration(this._associatedObjectConfiguration);
+      }
+
+      get properties() {
+        return this._associatedObjectConfiguration.getProperties();
+      }
+    }
 
     objectsRenderingService.registerInstanceRenderer(
-      'Spine::SpineObject',
+      'SpineObject::SpineObject',
       RenderedSpineInstance
     );
   },

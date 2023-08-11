@@ -8,20 +8,10 @@ import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import Checkbox from '../../UI/Checkbox';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Tooltip from '@material-ui/core/Tooltip';
-import { MarkdownText } from '../../UI/MarkdownText';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
-import MeasurementUnitDocumentation from '../../PropertiesEditor/MeasurementUnitDocumentation';
-import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
-import AlertMessage from '../../UI/AlertMessage';
-import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import ResourcesLoader from '../../ResourcesLoader';
 import IconButton from '../../UI/IconButton';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
@@ -36,186 +26,16 @@ import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+import { PropertyResourceSelector, PropertyField, styles } from './Model3DEditor';
+import { ISkeletonData } from 'pixi-spine';
 
-const gd: libGDevelop = global.gd;
+const { gd }: libGDevelop = global;
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget(
-  'model3d-animations-list'
+  'spine-animations-list'
 );
 
-export const styles = {
-  rowContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    marginTop: 5,
-  },
-  rowContent: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-  },
-};
-
-export const hasLight = (layout: ?gd.Layout) => {
-  if (!layout) {
-    return true;
-  }
-  for (let layerIndex = 0; layerIndex < layout.getLayersCount(); layerIndex++) {
-    const layer = layout.getLayerAt(layerIndex);
-    if (layer.getRenderingType() === '2d') {
-      continue;
-    }
-    const effects = layer.getEffects();
-    for (
-      let effectIndex = 0;
-      effectIndex < effects.getEffectsCount();
-      effectIndex++
-    ) {
-      const effect = effects.getEffectAt(effectIndex);
-      const type = effect.getEffectType();
-      if (
-        type === 'Scene3D::AmbientLight' ||
-        type === 'Scene3D::DirectionalLight' ||
-        type === 'Scene3D::HemisphereLight'
-      ) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-type PropertyFieldProps = {|
-  objectConfiguration: gdObjectConfiguration,
-  propertyName: string,
-|};
-
-export const PropertyField = ({
-  objectConfiguration,
-  propertyName,
-}: PropertyFieldProps) => {
-  const forceUpdate = useForceUpdate();
-  const properties = objectConfiguration.getProperties();
-
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      forceUpdate();
-    },
-    [objectConfiguration, forceUpdate]
-  );
-
-  const property = properties.get(propertyName);
-  const measurementUnit = property.getMeasurementUnit();
-  const endAdornment = {
-    label: getMeasurementUnitShortLabel(measurementUnit),
-    tooltipContent: (
-      <MeasurementUnitDocumentation
-        label={measurementUnit.getLabel()}
-        description={measurementUnit.getDescription()}
-        elementsWithWords={measurementUnit.getElementsWithWords()}
-      />
-    ),
-  };
-  return (
-    <Column noMargin expand key={propertyName}>
-      <SemiControlledTextField
-        commitOnBlur
-        floatingLabelFixed
-        floatingLabelText={property.getLabel()}
-        onChange={value => onChangeProperty(propertyName, value)}
-        value={property.getValue()}
-        endAdornment={
-          <Tooltip title={endAdornment.tooltipContent}>
-            <InputAdornment position="end">{endAdornment.label}</InputAdornment>
-          </Tooltip>
-        }
-      />
-    </Column>
-  );
-};
-
-export const PropertyCheckbox = ({
-  objectConfiguration,
-  propertyName,
-}: PropertyFieldProps) => {
-  const forceUpdate = useForceUpdate();
-  const properties = objectConfiguration.getProperties();
-
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      forceUpdate();
-    },
-    [objectConfiguration, forceUpdate]
-  );
-
-  const property = properties.get(propertyName);
-  return (
-    <Checkbox
-      checked={property.getValue() === 'true'}
-      label={
-        <React.Fragment>
-          <Line noMargin>{property.getLabel()}</Line>
-          <FormHelperText style={{ display: 'inline' }}>
-            <MarkdownText source={property.getDescription()} />
-          </FormHelperText>
-        </React.Fragment>
-      }
-      onCheck={(_, value) => {
-        onChangeProperty(propertyName, value ? '1' : '0');
-      }}
-    />
-  );
-};
-
-type PropertyResourceSelectorProps = {|
-  objectConfiguration: gdObjectConfiguration,
-  propertyName: string,
-  project: gd.Project,
-  resourceManagementProps: ResourceManagementProps,
-  onChange: (value: string) => void,
-|};
-
-export const PropertyResourceSelector = ({
-  objectConfiguration,
-  propertyName,
-  project,
-  resourceManagementProps,
-  onChange,
-}: PropertyResourceSelectorProps) => {
-  const forceUpdate = useForceUpdate();
-  const { current: resourcesLoader } = React.useRef(ResourcesLoader);
-  const properties = objectConfiguration.getProperties();
-
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      onChange(value);
-      forceUpdate();
-    },
-    [objectConfiguration, onChange, forceUpdate]
-  );
-
-  const property = properties.get(propertyName);
-  const extraInfos = property.getExtraInfo();
-  return (
-    <ResourceSelector
-      project={project}
-      // $FlowExpectedError
-      resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
-      floatingLabelText={property.getLabel()}
-      resourceManagementProps={resourceManagementProps}
-      initialResourceName={property.getValue()}
-      onChange={value => onChangeProperty(propertyName, value)}
-      resourcesLoader={resourcesLoader}
-      fullWidth
-    />
-  );
-};
-
-const Model3DEditor = ({
+const SpineEditor = ({
   objectConfiguration,
   project,
   layout,
@@ -253,71 +73,95 @@ const Model3DEditor = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const forceUpdate = useForceUpdate();
 
-  const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
-  console.log('Model3DEditod, ', model3DConfiguration, objectConfiguration)
+  const spineConfiguration = gd.asSpineConfiguration(objectConfiguration);
+  console.log('SpineEditod, ', spineConfiguration, objectConfiguration)
   const properties = objectConfiguration.getProperties();
 
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
 
-  const [model3D, setModel3D] = React.useState<?GLTF>(null);
-  const getModel3D = React.useCallback(
-    (modelResourceName: string) => {
-      PixiResourcesLoader.get3DModel(project, modelResourceName).then(
-        newModel3d => {
-          setModel3D(newModel3d);
+  const [skeleton, setSkeleton] = React.useState<?ISkeletonData>(null);
+  const getSkeleton = React.useCallback(
+    (jsonResourceName: string, imageResourceName: string, atlasResourceName: string) => {
+      if ([jsonResourceName, imageResourceName, atlasResourceName].some(resName => !resName)) {
+        return;
+      }
+
+      PixiResourcesLoader.getSpineData(project, jsonResourceName, imageResourceName, atlasResourceName).then(
+        newSkeleton => {
+          setSkeleton(newSkeleton);
         }
       );
     },
     [project]
   );
-  getModel3D(properties.get('modelResourceName').getValue());
-
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      forceUpdate();
-    },
-    [objectConfiguration, forceUpdate]
+  getSkeleton(
+    properties.get('jsonResourceName').getValue(),
+    properties.get('imageResourceName').getValue(),
+    properties.get('atlasResourceName').getValue()
   );
 
-  const onChangeModelResourceName = React.useCallback(
-    (modelResourceName: string) => {
-      getModel3D(modelResourceName);
+  const onChangeJsonResourceName = React.useCallback(
+    (jsonResourceName: string) => {
+      getSkeleton(
+        jsonResourceName,
+        properties.get('imageResourceName').getValue(),
+        properties.get('atlasResourceName').getValue()
+      );
     },
-    [getModel3D]
+    [getSkeleton]
+  );
+  const onChangeImageResourceName = React.useCallback(
+    (imageResourceName: string) => {
+      getSkeleton(
+        properties.get('jsonResourceName').getValue(),
+        imageResourceName,
+        properties.get('atlasResourceName').getValue()
+      );
+    },
+    [getSkeleton]
+  );
+  const onChangeAtlasResourceName = React.useCallback(
+    (atlasResourceName: string) => {
+      getSkeleton(
+        properties.get('jsonResourceName').getValue(),
+        properties.get('imageResourceName').getValue(),
+        atlasResourceName
+      );
+    },
+    [getSkeleton]
   );
 
   const scanNewAnimations = React.useCallback(
     () => {
-      if (!model3D) {
+      if (!skeleton) {
         return;
       }
       setNameErrors({});
 
       const animationSources = mapFor(
         0,
-        model3DConfiguration.getAnimationsCount(),
+        spineConfiguration.getAnimationsCount(),
         animationIndex =>
-          model3DConfiguration.getAnimation(animationIndex).getSource()
+          spineConfiguration.getAnimation(animationIndex).getSource()
       );
 
       let hasAddedAnimation = false;
-      for (const resourceAnimation of model3D.animations) {
+      for (const resourceAnimation of skeleton.animations) {
         if (animationSources.includes(resourceAnimation.name)) {
           continue;
         }
-        const newAnimationName = model3DConfiguration.hasAnimationNamed(
+        const newAnimationName = spineConfiguration.hasAnimationNamed(
           resourceAnimation.name
         )
           ? ''
           : resourceAnimation.name;
 
-        const newAnimation = new gd.Model3DAnimation();
+        const newAnimation = new gd.SpineAnimation();
         newAnimation.setName(newAnimationName);
         newAnimation.setSource(resourceAnimation.name);
-        model3DConfiguration.addAnimation(newAnimation);
+        spineConfiguration.addAnimation(newAnimation);
         newAnimation.delete();
         hasAddedAnimation = true;
       }
@@ -338,14 +182,14 @@ const Model3DEditor = ({
       } else {
         showAlert({
           title: t`No new animation`,
-          message: t`Every animation from the GLB file is already in the list.`,
+          message: t`Every animation from the Spine file is already in the list.`,
         });
       }
     },
     [
       forceUpdate,
-      model3D,
-      model3DConfiguration,
+      skeleton,
+      spineConfiguration,
       onObjectUpdated,
       onSizeUpdated,
       showAlert,
@@ -356,8 +200,8 @@ const Model3DEditor = ({
     () => {
       setNameErrors({});
 
-      const emptyAnimation = new gd.Model3DAnimation();
-      model3DConfiguration.addAnimation(emptyAnimation);
+      const emptyAnimation = new gd.SpineAnimation();
+      spineConfiguration.addAnimation(emptyAnimation);
       emptyAnimation.delete();
       forceUpdate();
       onSizeUpdated();
@@ -373,19 +217,19 @@ const Model3DEditor = ({
         }
       }, 100); // A few ms is enough for a new render to be done.
     },
-    [forceUpdate, onObjectUpdated, onSizeUpdated, model3DConfiguration]
+    [forceUpdate, onObjectUpdated, onSizeUpdated, spineConfiguration]
   );
 
   const removeAnimation = React.useCallback(
     animationIndex => {
       setNameErrors({});
 
-      model3DConfiguration.removeAnimation(animationIndex);
+      spineConfiguration.removeAnimation(animationIndex);
       forceUpdate();
       onSizeUpdated();
       if (onObjectUpdated) onObjectUpdated();
     },
-    [forceUpdate, onObjectUpdated, onSizeUpdated, model3DConfiguration]
+    [forceUpdate, onObjectUpdated, onSizeUpdated, spineConfiguration]
   );
 
   const moveAnimation = React.useCallback(
@@ -395,26 +239,26 @@ const Model3DEditor = ({
 
       setNameErrors({});
 
-      model3DConfiguration.moveAnimation(
+      spineConfiguration.moveAnimation(
         draggedIndex,
         targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
       );
       forceUpdate();
     },
-    [model3DConfiguration, forceUpdate]
+    [spineConfiguration, forceUpdate]
   );
 
   const changeAnimationName = React.useCallback(
     (animationIndex, newName) => {
-      const currentName = model3DConfiguration
+      const currentName = spineConfiguration
         .getAnimation(animationIndex)
         .getName();
       if (currentName === newName) return;
-      const animation = model3DConfiguration.getAnimation(animationIndex);
+      const animation = spineConfiguration.getAnimation(animationIndex);
 
       setNameErrors({});
 
-      if (newName !== '' && model3DConfiguration.hasAnimationNamed(newName)) {
+      if (newName !== '' && spineConfiguration.hasAnimationNamed(newName)) {
         // The indexes can be used as a key because errors are cleared when
         // animations are moved.
         setNameErrors({
@@ -441,7 +285,7 @@ const Model3DEditor = ({
       if (onObjectUpdated) onObjectUpdated();
     },
     [
-      model3DConfiguration,
+      spineConfiguration,
       layout,
       object,
       forceUpdate,
@@ -451,8 +295,8 @@ const Model3DEditor = ({
     ]
   );
 
-  const sourceSelectOptions = model3D
-    ? model3D.animations.map(animation => {
+  const sourceSelectOptions = skeleton
+    ? skeleton.animations.map(animation => {
         return (
           <SelectOption
             key={animation.name}
@@ -470,160 +314,46 @@ const Model3DEditor = ({
         <ColumnStackLayout noMargin>
           <PropertyResourceSelector
             objectConfiguration={objectConfiguration}
-            propertyName="modelResourceName"
+            propertyName="jsonResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onChange={onChangeModelResourceName}
+            onChange={onChangeJsonResourceName}
           />
-          <SelectField
-            value={properties.get('materialType').getValue()}
-            floatingLabelText={properties.get('materialType').getLabel()}
-            helperMarkdownText={properties.get('materialType').getDescription()}
-            onChange={(event, index, newValue) => {
-              onChangeProperty('materialType', newValue);
-            }}
-          >
-            <SelectOption
-              label={t`No lighting effect`}
-              value="Basic"
-              key="Basic"
-            />
-            <SelectOption
-              label={t`Emit all ambient light`}
-              value="StandardWithoutMetalness"
-              key="StandardWithoutMetalness"
-            />
-            <SelectOption
-              label={t`Keep model material`}
-              value="KeepOriginal"
-              key="KeepOriginal"
-            />
-          </SelectField>
-          {properties.get('materialType').getValue() !== 'Basic' &&
-            !hasLight(layout) && (
-              <AlertMessage kind="error">
-                <Trans>
-                  Make sure to set up a light in the effects of the layer or
-                  chose "No lighting effect" - otherwise the object will appear
-                  black.
-                </Trans>
-              </AlertMessage>
-            )}
-          <Text size="block-title" noMargin>
-            <Trans>Default orientation</Trans>
-          </Text>
-          <ResponsiveLineStackLayout expand noColumnMargin>
-            <PropertyField
-              objectConfiguration={objectConfiguration}
-              propertyName="rotationX"
-            />
-            <PropertyField
-              objectConfiguration={objectConfiguration}
-              propertyName="rotationY"
-            />
-            <PropertyField
-              objectConfiguration={objectConfiguration}
-              propertyName="rotationZ"
-            />
-          </ResponsiveLineStackLayout>
-          <Text size="block-title" noMargin>
-            <Trans>Default size</Trans>
-          </Text>
-          <ResponsiveLineStackLayout expand noColumnMargin>
-            <PropertyField
-              objectConfiguration={objectConfiguration}
-              propertyName="width"
-            />
-            <PropertyField
-              objectConfiguration={objectConfiguration}
-              propertyName="height"
-            />
-            <PropertyField
-              objectConfiguration={objectConfiguration}
-              propertyName="depth"
-            />
-          </ResponsiveLineStackLayout>
-          <PropertyCheckbox
+          <PropertyResourceSelector
             objectConfiguration={objectConfiguration}
-            propertyName="keepAspectRatio"
+            propertyName="imageResourceName"
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            onChange={onChangeImageResourceName}
+          />
+          <PropertyResourceSelector
+            objectConfiguration={objectConfiguration}
+            propertyName="atlasResourceName"
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            onChange={onChangeAtlasResourceName}
           />
           <Text size="block-title" noMargin>
-            <Trans>Points</Trans>
+            <Trans>Appearance</Trans>
           </Text>
-          <ResponsiveLineStackLayout expand noColumnMargin>
-            <SelectField
-              value={properties.get('originLocation').getValue()}
-              floatingLabelText={properties.get('originLocation').getLabel()}
-              helperMarkdownText={properties
-                .get('originLocation')
-                .getDescription()}
-              onChange={(event, index, newValue) => {
-                onChangeProperty('originLocation', newValue);
-              }}
-              fullWidth
-            >
-              <SelectOption
-                label={t`Model origin`}
-                value="ModelOrigin"
-                key="ModelOrigin"
-              />
-              <SelectOption
-                label={t`Top-left corner`}
-                value="TopLeft"
-                key="TopLeftCorner"
-              />
-              <SelectOption
-                label={t`Object center`}
-                value="ObjectCenter"
-                key="ObjectCenter"
-              />
-              <SelectOption
-                label={t`Bottom center (on Z axis)`}
-                value="BottomCenterZ"
-                key="BottomCenterZ"
-              />
-              <SelectOption
-                label={t`Bottom center (on Y axis)`}
-                value="BottomCenterY"
-                key="BottomCenterY"
-              />
-            </SelectField>
-            <SelectField
-              value={properties.get('centerLocation').getValue()}
-              floatingLabelText={properties.get('centerLocation').getLabel()}
-              helperMarkdownText={properties
-                .get('centerLocation')
-                .getDescription()}
-              onChange={(event, index, newValue) => {
-                onChangeProperty('centerLocation', newValue);
-              }}
-              fullWidth
-            >
-              <SelectOption
-                label={t`Model origin`}
-                value="ModelOrigin"
-                key="ModelOrigin"
-              />
-              <SelectOption
-                label={t`Object center`}
-                value="ObjectCenter"
-                key="ObjectCenter"
-              />
-              <SelectOption
-                label={t`Bottom center (on Z axis)`}
-                value="BottomCenterZ"
-                key="BottomCenterZ"
-              />
-              <SelectOption
-                label={t`Bottom center (on Y axis)`}
-                value="BottomCenterY"
-                key="BottomCenterY"
-              />
-            </SelectField>
-          </ResponsiveLineStackLayout>
+          <PropertyField
+            objectConfiguration={objectConfiguration}
+            propertyName="scale"
+          />
+          <PropertyField
+            objectConfiguration={objectConfiguration}
+            propertyName="opacity"
+          />
+          <Text size="block-title" noMargin>
+            <Trans>Play</Trans>
+          </Text>
+          <PropertyField
+            objectConfiguration={objectConfiguration}
+            propertyName="timeScale"
+          />
           <Text size="block-title">Animations</Text>
           <Column noMargin expand useFullHeight>
-            {model3DConfiguration.getAnimationsCount() === 0 ? (
+            {spineConfiguration.getAnimationsCount() === 0 ? (
               <Column noMargin expand justifyContent="center">
                 <EmptyPlaceholder
                   title={<Trans>Add your first animation</Trans>}
@@ -640,9 +370,9 @@ const Model3DEditor = ({
               <React.Fragment>
                 {mapFor(
                   0,
-                  model3DConfiguration.getAnimationsCount(),
+                  spineConfiguration.getAnimationsCount(),
                   animationIndex => {
-                    const animation = model3DConfiguration.getAnimation(
+                    const animation = spineConfiguration.getAnimation(
                       animationIndex
                     );
 
@@ -730,7 +460,7 @@ const Model3DEditor = ({
                                   margin="dense"
                                   fullWidth
                                   floatingLabelText={
-                                    <Trans>GLB animation name</Trans>
+                                    <Trans>Spine animation name</Trans>
                                   }
                                   translatableHintText={t`Choose an animation`}
                                 >
@@ -778,4 +508,4 @@ const Model3DEditor = ({
   );
 };
 
-export default Model3DEditor;
+export default SpineEditor;

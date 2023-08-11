@@ -229,7 +229,9 @@ const localResourceSources: Array<ResourceSource> = [
       />
     ),
   })),
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => {
+    console.log('Choose from asset store Local');
+    return {
     name: `resource-store-${kind}`,
     displayName: t`Choose from asset store`,
     displayTab: 'standalone',
@@ -242,7 +244,7 @@ const localResourceSources: Array<ResourceSource> = [
         key={`resource-store-${kind}`}
       />
     ),
-  })),
+  }}),
 ];
 
 export default localResourceSources;

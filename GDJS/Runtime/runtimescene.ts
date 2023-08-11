@@ -32,6 +32,10 @@ namespace gdjs {
     _requestedChange: SceneChangeRequest;
     /** Black background by default. */
     _backgroundColor: integer = 0;
+
+    /** Should the canvas be cleared before this scene rendering. */
+    clearCanvas: boolean = true;
+
     _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 

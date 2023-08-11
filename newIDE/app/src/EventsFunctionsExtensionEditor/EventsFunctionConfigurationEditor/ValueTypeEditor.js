@@ -120,6 +120,36 @@ export default function ValueTypeEditor({
                     label={t`Created objects`}
                   />
                 )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="imageResource"
+                    label={t`Image resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="audioResource"
+                    label={t`Audio resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="jsonResource"
+                    label={t`JSON resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="fontResource"
+                    label={t`Font resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="bitmapFontResource"
+                    label={t`Bitmap font resource (JavaScript only)`}
+                  />
+                )}
               </SelectField>
             )}
             {valueTypeMetadata.isObject() && (

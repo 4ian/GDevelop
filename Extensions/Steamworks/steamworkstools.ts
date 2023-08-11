@@ -9,7 +9,7 @@ namespace gdjs {
 
       try {
         const steamworks_js = remote.require(
-          '@gdevelop/steamworks.js'
+          'steamworks.js'
         ) as typeof import('steamworks.js');
 
         // Sets the proper electron flags for the steam overlay to function properly

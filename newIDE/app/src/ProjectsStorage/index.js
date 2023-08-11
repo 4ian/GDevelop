@@ -133,10 +133,10 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata
   ) => Promise<void>,
-  hasAutoSave?: (
+  getAutoSaveCreationDate?: (
     fileMetadata: FileMetadata,
     compareLastModified: boolean
-  ) => Promise<boolean>,
+  ) => Promise<?number>,
   onGetAutoSave?: (fileMetadata: FileMetadata) => Promise<FileMetadata>,
 |};
 

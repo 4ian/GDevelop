@@ -134,8 +134,19 @@ void InitialInstancesContainer::MoveInstancesToLayer(
   }
 }
 
+std::size_t InitialInstancesContainer::GetLayerInstancesCount(
+    const gd::String &layerName) const {
+  std::size_t count = 0;
+  for (const gd::InitialInstance &instance : initialInstances) {
+    if (instance.GetLayer() == layerName) {
+      count++;
+    }
+  }
+  return count;
+}
+
 bool InitialInstancesContainer::SomeInstancesAreOnLayer(
-    const gd::String& layerName) {
+    const gd::String& layerName) const {
   return std::any_of(initialInstances.begin(),
                      initialInstances.end(),
                      [&layerName](const InitialInstance& currentInstance) {
@@ -144,7 +155,7 @@ bool InitialInstancesContainer::SomeInstancesAreOnLayer(
 }
 
 bool InitialInstancesContainer::HasInstancesOfObject(
-    const gd::String& objectName) {
+    const gd::String& objectName) const {
   return std::any_of(initialInstances.begin(),
                      initialInstances.end(),
                      [&objectName](const InitialInstance& currentInstance) {

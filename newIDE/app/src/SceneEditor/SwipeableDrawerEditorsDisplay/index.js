@@ -286,6 +286,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       project={project}
                       objectsContainer={layout}
                       layout={layout}
+                      initialInstances={initialInstances}
                       onSelectAllInstancesOfObjectInLayout={
                         props.onSelectAllInstancesOfObjectInLayout
                       }

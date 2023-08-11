@@ -48,7 +48,7 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
@@ -210,6 +210,7 @@ export const LeaderboardAdmin = ({
 }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
@@ -458,10 +459,7 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  const onDeleteEntry = async (
-    i18n: I18nType,
-    entry: LeaderboardDisplayData
-  ) => {
+  const onDeleteEntry = async (i18n: I18nType, entry: LeaderboardEntry) => {
     if (!currentLeaderboard) return;
     const answer = await showConfirmation({
       title: t`Delete score ${entry.score} from ${entry.playerName}`,
@@ -1186,7 +1184,7 @@ export const LeaderboardAdmin = ({
               <div
                 style={{
                   ...styles.rightColumn,
-                  paddingLeft: windowWidth === 'small' ? 0 : 20,
+                  paddingLeft: isMobileScreen ? 0 : 20,
                 }}
               >
                 <Line alignItems="center" justifyContent="flex-end">

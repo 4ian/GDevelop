@@ -12,6 +12,7 @@ branches:
   only:
     - master
     - /experimental-build.*/
+skip_tags: true # Don't rebuild on tags.
 init:
   - ps: Install-Product node 16
   - cmd: set NODE_OPTIONS=--max-old-space-size=8192

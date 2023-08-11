@@ -716,10 +716,16 @@ export default class SceneEditor extends React.Component<Props, State> {
           if (doRemove) {
             if (newLayer === null) {
               this.instancesSelection.unselectInstancesOnLayer(layerName);
-              this.props.initialInstances.removeAllInstancesOnLayer(layerName);
+              gd.WholeProjectRefactorer.removeLayer(
+                this.props.project,
+                this.props.layout,
+                layerName
+              );
             } else {
               // Instances are not invalidated, so we can keep the selection.
-              this.props.initialInstances.moveInstancesToLayer(
+              gd.WholeProjectRefactorer.mergeLayers(
+                this.props.project,
+                this.props.layout,
                 layerName,
                 newLayer
               );
@@ -1397,8 +1403,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {
-    const { layout } = this.props;
-    const instancesToSelect = getInstancesInLayoutForObject(layout, objectName);
+    const { initialInstances } = this.props;
+    const instancesToSelect = getInstancesInLayoutForObject(
+      initialInstances,
+      objectName
+    );
     this.instancesSelection.selectInstances({
       instances: instancesToSelect,
       ignoreSeal: true,
@@ -1759,6 +1768,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 this.state.onCloseLayerRemoveDialog && (
                   <LayerRemoveDialog
                     open
+                    project={project}
                     layersContainer={layout}
                     layerRemoved={this.state.layerRemoved}
                     onClose={this.state.onCloseLayerRemoveDialog}

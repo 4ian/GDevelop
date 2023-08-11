@@ -122,20 +122,21 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
     const windowWidth = useResponsiveWindowWidth();
+    const isMobileScreen = windowWidth === 'small';
 
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
       !isOnHomePage && !openedAssetShortHeader
     );
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (windowWidth === 'small') {
+        if (isMobileScreen) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [windowWidth]
+      [isMobileScreen]
     );
 
     const [

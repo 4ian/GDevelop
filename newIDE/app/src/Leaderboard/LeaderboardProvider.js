@@ -4,18 +4,14 @@ import * as React from 'react';
 import LeaderboardContext from './LeaderboardContext';
 import {
   type Leaderboard,
-  type LeaderboardEntry,
-  type LeaderboardExtremePlayerScore,
   type LeaderboardSortOption,
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   type LeaderboardUpdatePayload,
   createLeaderboard as doCreateLeaderboard,
   updateLeaderboard as doUpdateLeaderboard,
   resetLeaderboard as doResetLeaderboard,
   deleteLeaderboardEntry as doDeleteLeaderboardEntry,
   deleteLeaderboard as doDeleteLeaderboard,
-  extractExtremeScoreDisplayData,
-  extractEntryDisplayData,
   listLeaderboardEntries,
   listGameActiveLeaderboards,
 } from '../Utils/GDevelopServices/Play';
@@ -34,14 +30,14 @@ type ReducerState = {|
   currentLeaderboard: ?Leaderboard,
   leaderboardsByIds: ?{| [string]: Leaderboard |},
   displayOnlyBestEntry: boolean,
-  entries: ?Array<LeaderboardDisplayData>,
+  entries: ?Array<LeaderboardEntry>,
   mapPageIndexToUri: {| [number]: string |},
   pageIndex: number,
 |};
 
 type ReducerAction =
   | {| type: 'SET_LEADERBOARDS', payload: ?Array<Leaderboard> |}
-  | {| type: 'SET_ENTRIES', payload: ?Array<LeaderboardDisplayData> |}
+  | {| type: 'SET_ENTRIES', payload: ?Array<LeaderboardEntry> |}
   | {| type: 'SET_NEXT_PAGE_URI', payload: string |}
   | {| type: 'SELECT_LEADERBOARD', payload: string |}
   | {| type: 'SET_PAGE_INDEX', payload: number |}
@@ -266,27 +262,13 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         forceUri: uriToUse,
       });
       if (!data) return;
-      const fetchedEntries:
-        | LeaderboardEntry[]
-        | LeaderboardExtremePlayerScore[] = data.entries;
+      const fetchedEntries: LeaderboardEntry[] = data.entries;
 
       if (data.nextPageUri) {
         dispatch({ type: 'SET_NEXT_PAGE_URI', payload: data.nextPageUri });
       }
 
-      let entriesToDisplay: LeaderboardDisplayData[] = [];
-      if (displayOnlyBestEntry) {
-        entriesToDisplay = fetchedEntries.map(entry =>
-          // $FlowFixMe
-          extractExtremeScoreDisplayData(entry)
-        );
-      } else {
-        entriesToDisplay = fetchedEntries.map(entry =>
-          // $FlowFixMe
-          extractEntryDisplayData(entry)
-        );
-      }
-      dispatch({ type: 'SET_ENTRIES', payload: entriesToDisplay });
+      dispatch({ type: 'SET_ENTRIES', payload: fetchedEntries });
     },
     [currentLeaderboardId, displayOnlyBestEntry, gameId]
   );

@@ -1132,6 +1132,22 @@ export const fakePrivateAssetShortHeader1: AssetShortHeader = {
   dominantColors: [255],
 };
 
+export const fakePrivateAsset1: Asset = {
+  ...fakePrivateAssetShortHeader1,
+  description: 'A very nice Dino.',
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  dominantColors: [255],
+  objectAssets: [
+    {
+      object: {},
+      resources: [],
+      requiredExtensions: [],
+    },
+  ],
+};
+
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
   authorIds: [],

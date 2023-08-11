@@ -51,6 +51,7 @@ import AdditionalUserInfoDialog, {
 import { Trans } from '@lingui/macro';
 import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
+import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
 
 type Props = {|
   authentication: Authentication,
@@ -79,6 +80,13 @@ type State = {|
   changeEmailInProgress: boolean,
   userSnackbarMessage: ?React.Node,
 |};
+
+const cleanUserTracesOnDevice = async () => {
+  await Promise.all([
+    clearCloudProjectCookies(),
+    burstCloudProjectAutoSaveCache(),
+  ]);
+};
 
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
@@ -635,7 +643,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       await this.props.authentication.logout();
     }
     this._markAuthenticatedUserAsLoggedOut();
-    clearCloudProjectCookies();
+    cleanUserTracesOnDevice();
     this.showUserSnackbar({
       message: <Trans>You're now logged out</Trans>,
     });
@@ -767,7 +775,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       await authentication.deleteAccount(authentication.getAuthorizationHeader);
       this._markAuthenticatedUserAsLoggedOut();
-      clearCloudProjectCookies();
+      cleanUserTracesOnDevice();
       this.openEditProfileDialog(false);
       this.showUserSnackbar({
         message: <Trans>Your account has been deleted!</Trans>,

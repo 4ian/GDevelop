@@ -12,11 +12,11 @@ import ImagePreview, {
 } from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
-  allSpritesHaveSameCollisionMasksAs,
+  allAnimationSpritesHaveSameCollisionMasksAs,
   copyAnimationsSpriteCollisionMasks,
+  allObjectSpritesHaveSameCollisionMaskAs,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import EditorMosaic, {
@@ -103,12 +103,7 @@ const CollisionMasksEditor = ({
     setSameCollisionMasksForAnimations,
   ] = React.useState(
     sprite
-      ? every(
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
-            return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
-          })
-        )
+      ? allObjectSpritesHaveSameCollisionMaskAs(sprite, spriteConfiguration)
       : false
   );
 
@@ -118,7 +113,7 @@ const CollisionMasksEditor = ({
     setSameCollisionMasksForSprites,
   ] = React.useState(
     sprite && animation
-      ? allSpritesHaveSameCollisionMasksAs(sprite, animation)
+      ? allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
       : false
   );
 
@@ -165,7 +160,7 @@ const CollisionMasksEditor = ({
       if (!animation || !sprite) return;
 
       setSameCollisionMasksForSprites(
-        allSpritesHaveSameCollisionMasksAs(sprite, animation)
+        allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
       );
     },
     [animation, sprite]
@@ -314,9 +309,11 @@ const CollisionMasksEditor = ({
   );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const screenSize = useResponsiveWindowWidth();
-  const editorNodes =
-    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
+  const editorNodes = isMobileScreen
+    ? verticalMosaicNodes
+    : horizontalMosaicNodes;
 
   if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
@@ -389,6 +386,10 @@ const CollisionMasksEditor = ({
                       Share same collision masks for all sprites of this
                       animation
                     </Trans>
+                  }
+                  hideControlsForSprite={(sprite: gdSprite) =>
+                    spriteConfiguration.adaptCollisionMaskAutomatically() ||
+                    sprite.isFullImageCollisionMask()
                   }
                 />
               </Column>

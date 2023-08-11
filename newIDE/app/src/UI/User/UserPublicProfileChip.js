@@ -8,6 +8,7 @@ import User from '../CustomSvgIcons/User';
 const styles = {
   chip: {
     marginRight: 2,
+    marginLeft: 2,
     marginBottom: 2,
   },
 };
@@ -15,9 +16,14 @@ const styles = {
 type Props = {|
   user: UserPublicProfile,
   isClickable?: boolean,
+  variant?: 'default' | 'outlined',
 |};
 
-export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
+export const UserPublicProfileChip = ({
+  user,
+  isClickable = false,
+  variant,
+}: Props) => {
   const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (
@@ -25,6 +31,7 @@ export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
       icon={<User />}
       size="small"
       style={styles.chip}
+      variant={variant}
       label={user.username}
       key={user.username}
       onClick={isClickable ? () => openUserPublicProfile(user.id) : null}

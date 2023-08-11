@@ -12,7 +12,23 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 import { emptyStorageProvider } from '../../../ProjectsStorage/ProjectStorageProviders';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
 
-export const withSomeEffectsForALayer = () => (
+export const withSomeEffectsForAMixedLayer = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <EffectsList
+        target="layer"
+        layerRenderingType="2d+3d"
+        project={testProject.project}
+        resourceManagementProps={fakeResourceManagementProps}
+        effectsContainer={testProject.layerWithEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
+        onEffectsUpdated={action('effects updated')}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const withSomeEffectsForA2DLayer = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -20,7 +36,26 @@ export const withSomeEffectsForALayer = () => (
         layerRenderingType="2d"
         project={testProject.project}
         resourceManagementProps={fakeResourceManagementProps}
-        effectsContainer={testProject.layerWithEffects.getEffects()}
+        effectsContainer={testProject.layerWith2DEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
+        onEffectsUpdated={action('effects updated')}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+// TODO Add a story with 2 effects of the same type that should be unique.
+// Note that this can't be done until the list of unique effect is hardcoded.
+
+export const withSomeEffectsForA3DLayer = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <EffectsList
+        target="layer"
+        layerRenderingType="3d"
+        project={testProject.project}
+        resourceManagementProps={fakeResourceManagementProps}
+        effectsContainer={testProject.layerWith3DEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}
       />
@@ -60,7 +95,23 @@ export const withAnEffectWithoutEffectTypeForALayer = () => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForALayer2D = () => (
+export const withoutEffectsForAMixedLayer = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <EffectsList
+        target="layer"
+        layerRenderingType="2d+3d"
+        project={testProject.project}
+        resourceManagementProps={fakeResourceManagementProps}
+        effectsContainer={testProject.layerWithoutEffects.getEffects()}
+        onEffectsRenamed={action('effects renamed')}
+        onEffectsUpdated={action('effects updated')}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const withoutEffectsForA2DLayer = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -83,7 +134,7 @@ export const withoutEffectsForALayer2D = () => (
   </DragAndDropContextProvider>
 );
 
-export const withoutEffectsForALayer3D = () => (
+export const withoutEffectsForA3DLayer = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <EffectsList
@@ -98,24 +149,6 @@ export const withoutEffectsForALayer3D = () => (
           onChooseResource: () => Promise.reject('Unimplemented'),
           resourceExternalEditors: fakeResourceExternalEditors,
         }}
-        effectsContainer={testProject.layerWithoutEffects.getEffects()}
-        onEffectsRenamed={action('effects renamed')}
-        onEffectsUpdated={action('effects updated')}
-      />
-    </FixedHeightFlexContainer>
-  </DragAndDropContextProvider>
-);
-
-// TODO Add a story with 2 effects of the same type that should be unique.
-
-export const withoutEffectsForAMixedLayer = () => (
-  <DragAndDropContextProvider>
-    <FixedHeightFlexContainer height={600}>
-      <EffectsList
-        target="layer"
-        layerRenderingType="2d+3d"
-        project={testProject.project}
-        resourceManagementProps={fakeResourceManagementProps}
         effectsContainer={testProject.layerWithoutEffects.getEffects()}
         onEffectsRenamed={action('effects renamed')}
         onEffectsUpdated={action('effects updated')}

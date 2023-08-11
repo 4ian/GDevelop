@@ -34,6 +34,10 @@ import DropIndicator from '../../../UI/SortableVirtualizedItemList/DropIndicator
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { getMatchingCollisionMask } from './CollisionMasksEditor/CollisionMaskHelper';
+import {
+  getCurrentElements,
+  getTotalSpritesCount,
+} from './Utils/SpriteObjectHelper';
 
 const gd: libGDevelop = global.gd;
 
@@ -110,6 +114,7 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;
@@ -214,10 +219,25 @@ export default function SpriteEditor({
           }
         }
       }
-
       forceUpdate();
     },
     [spriteConfiguration, project, forceUpdate]
+  );
+
+  const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
+    (sprite: gdSprite) => {
+      if (spriteConfiguration.getAnimationsCount() === 0) return;
+      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (firstAnimation.getDirectionsCount() === 0) return;
+      const firstDirection = firstAnimation.getDirection(0);
+      if (firstDirection.getSpritesCount() === 0) return;
+      const firstSprite = firstDirection.getSprite(0);
+      sprite.setFullImageCollisionMask(firstSprite.isFullImageCollisionMask());
+      sprite.setCustomCollisionMask(firstSprite.getCustomCollisionMask());
+
+      forceUpdate();
+    },
+    [spriteConfiguration, forceUpdate]
   );
 
   const moveAnimation = React.useCallback(
@@ -271,9 +291,31 @@ export default function SpriteEditor({
 
   const removeAnimation = React.useCallback(
     async (index: number, i18n: I18nType) => {
+      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const isDeletingLastSprites =
+        spriteConfiguration
+          .getAnimation(index)
+          .getDirection(0)
+          .getSpritesCount() === totalSpritesCount;
+      const firstSpriteInAnimationDeleted = getCurrentElements(
+        spriteConfiguration,
+        index,
+        0,
+        0
+      ).sprite;
+      const isUsingCustomCollisionMask =
+        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        firstSpriteInAnimationDeleted &&
+        !firstSpriteInAnimationDeleted.isFullImageCollisionMask();
+      const shouldWarnBecauseLosingCustomCollisionMask =
+        isDeletingLastSprites && isUsingCustomCollisionMask;
+
+      const message = shouldWarnBecauseLosingCustomCollisionMask
+        ? t`Are you sure you want to remove this animation? You will lose the custom collision mask you have set for this object.`
+        : t`Are you sure you want to remove this animation?`;
       const deleteAnswer = await showConfirmation({
         title: t`Remove the animation`,
-        message: t`Are you sure you want to remove this animation?`,
+        message,
         confirmButtonLabel: t`Remove`,
         dismissButtonLabel: t`Cancel`,
       });
@@ -291,6 +333,11 @@ export default function SpriteEditor({
         // If the first animation is removed and the collision mask is
         // automatically adapted, then recompute it.
         onCreateMatchingSpriteCollisionMask();
+      }
+      if (shouldWarnBecauseLosingCustomCollisionMask) {
+        // The user has deleted the last custom collision mask, so revert to automatic
+        // collision mask adaptation.
+        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
       }
       if (onObjectUpdated) onObjectUpdated();
     },
@@ -320,7 +367,7 @@ export default function SpriteEditor({
             ? undefined // Don't check the current animation name as we're changing it.
             : spriteConfiguration.getAnimation(index).getName();
         }
-      );
+      ).filter(Boolean);
 
       if (newName !== '' && otherNames.some(name => name === newName)) {
         // The indexes can be used as a key because errors are cleared when
@@ -334,7 +381,6 @@ export default function SpriteEditor({
         return;
       }
 
-      const oldName = animation.getName();
       animation.setName(newName);
       // TODO EBO Refactor event-based object events when an animation is renamed.
       if (layout && object) {
@@ -342,7 +388,7 @@ export default function SpriteEditor({
           project,
           layout,
           object,
-          oldName,
+          currentName,
           newName
         );
       }
@@ -538,6 +584,17 @@ export default function SpriteEditor({
                                                 }
                                               : undefined
                                           }
+                                          onSpriteAdded={(sprite: gdSprite) => {
+                                            // If a sprite is added, we want to ensure it gets the automatic
+                                            // collision mask of the object, if the option is enabled.
+                                            if (
+                                              spriteConfiguration.adaptCollisionMaskAutomatically()
+                                            ) {
+                                              onApplyFirstSpriteCollisionMaskToSprite(
+                                                sprite
+                                              );
+                                            }
+                                          }}
                                         />
                                       );
                                     }
@@ -559,7 +616,7 @@ export default function SpriteEditor({
               justifyContent="space-between"
               noColumnMargin
             >
-              {windowWidth !== 'small' ? (
+              {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
                 <ResponsiveLineStackLayout noMargin noColumnMargin>
                   <FlatButton
                     label={<Trans>Edit collision masks</Trans>}

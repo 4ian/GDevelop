@@ -7,10 +7,12 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
 import enumerateLayers from './EnumerateLayers';
-import { getInstanceCountInLayoutForLayer } from '../Utils/Layout';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   open: boolean,
+  project: gdProject,
   layersContainer: gdLayout,
   layerRemoved: string,
   onClose: (doRemove: boolean, newLayer: string | null) => void,
@@ -41,7 +43,8 @@ export default class LayerRemoveDialog extends Component<Props, State> {
   render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
-    const instancesCountInLayout = getInstanceCountInLayoutForLayer(
+    const instancesCountInLayout = gd.WholeProjectRefactorer.getLayoutAndExternalLayoutLayerInstancesCount(
+      this.props.project,
       this.props.layersContainer,
       this.props.layerRemoved
     );
@@ -116,15 +119,17 @@ export default class LayerRemoveDialog extends Component<Props, State> {
             </Trans>
           ) : (
             <Trans>
-              There are {instancesCountInLayout} object instances on this
-              layout. What do you want to do?
+              There are {instancesCountInLayout} object instances on this layer.
+              Should they be moved to another layer?
             </Trans>
           )}
         </Text>
         {instancesCountInLayout > 0 && (
           <>
             <Text>
-              <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
+              <Trans>
+                Move objects from layer {this.props.layerRemoved} to:
+              </Trans>
             </Text>
             <SelectField
               value={this.state.selectedLayer}

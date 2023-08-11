@@ -39,13 +39,6 @@ export type EnumeratedExpressionMetadata = {|
   parameters: Array<gdParameterMetadata>,
 |};
 
-// This is copied from gd::WholeProjectRefactorer (see GetBehaviorFullType)
-// Could be factored into a single C++ function in gd::PlatformExtension?
-const getBehaviorFullType = (extensionName: string, behaviorName: string) => {
-  const separator = gd.PlatformExtension.getNamespaceSeparator();
-  return extensionName + separator + behaviorName;
-};
-
 // An object representing InstructionMetadata or ExpressionMetadata.
 // Allow to use most information without paying the cost to call the
 // InstructionMetadata/ExpressionMetadata methods. In theory,
@@ -103,7 +96,7 @@ const isFunctionVisibleInGivenScope = (
       (behaviorMetadata &&
         eventsBasedBehavior &&
         eventsFunctionsExtension &&
-        getBehaviorFullType(
+        gd.PlatformExtension.getBehaviorFullType(
           eventsFunctionsExtension.getName(),
           eventsBasedBehavior.getName()
         ) === behaviorMetadata.getName()) ||

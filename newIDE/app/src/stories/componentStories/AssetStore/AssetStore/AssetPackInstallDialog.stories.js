@@ -8,6 +8,7 @@ import paperDecorator from '../../../PaperDecorator';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import {
   fakeAsset1,
+  fakePrivateAsset1,
   fakeAssetPacks,
   fakeAssetShortHeader1,
   fakeAssetShortHeader2,
@@ -190,7 +191,7 @@ export const LayoutPrivateAssetInstallSuccess = () => (
     value={{
       authorizationToken: null,
       updateAuthorizationToken: async () => {},
-      fetchPrivateAsset: async () => null,
+      fetchPrivateAsset: async () => fakePrivateAsset1,
       installPrivateAsset: async () => ({
         // Mock a successful installation
         createdObjects: [],
@@ -221,7 +222,7 @@ export const LayoutPrivateAssetInstallFailure = () => (
     value={{
       authorizationToken: null,
       updateAuthorizationToken: async () => {},
-      fetchPrivateAsset: async () => null,
+      fetchPrivateAsset: async () => fakePrivateAsset1,
       // Mock an error
       installPrivateAsset: async () => {
         throw new Error('Fake error during installation of a private asset.');
@@ -260,6 +261,26 @@ export const LayoutPrivateAssetButCantInstall = () => (
       onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
       resourceManagementProps={fakeResourceManagementProps}
       canInstallPrivateAsset={() => false}
+    />
+  </AssetStoreStateProvider>
+);
+
+export const LayoutPrivateAssetButInstallingTooMany = () => (
+  <AssetStoreStateProvider>
+    <AssetPackInstallDialog
+      assetPack={fakeAssetPacks.starterPacks[0]}
+      assetShortHeaders={Array.from(
+        { length: 120 },
+        (_, index) => fakePrivateAssetShortHeader1
+      )}
+      addedAssetIds={new Set<string>()}
+      onClose={action('onClose')}
+      onAssetsAdded={action('onAssetsAdded')}
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      onObjectsAddedFromAssets={action('onObjectsAddedFromAssets')}
+      resourceManagementProps={fakeResourceManagementProps}
+      canInstallPrivateAsset={() => true}
     />
   </AssetStoreStateProvider>
 );

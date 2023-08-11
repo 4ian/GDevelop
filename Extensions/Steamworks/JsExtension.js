@@ -58,7 +58,7 @@ module.exports = {
       .addDependency()
       .setName('Steamworks')
       .setDependencyType('npm')
-      .setExportName('@gdevelop/steamworks.js')
+      .setExportName('steamworks.js')
       // Note: Updating steamworks.js here only updates it for the game builds,
       // also update newIDE/electron-app/app/package.json to update it for previews as well!
       .setVersion('0.2.0');

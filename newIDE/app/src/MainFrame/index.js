@@ -761,7 +761,6 @@ const MainFrame = (props: Props) => {
               ...fileMetadata,
               name: project.getName(),
               gameId: project.getProjectUuid(),
-              lastModifiedDate: Date.now(),
             },
             storageProviderName: storageProvider.internalName,
           });
@@ -859,7 +858,7 @@ const MainFrame = (props: Props) => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
-        hasAutoSave,
+        getAutoSaveCreationDate,
         onGetAutoSave,
         onOpen,
         getOpenErrorMessage,
@@ -875,16 +874,21 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return fileMetadata;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, true);
-        if (!canOpenAutosave) return fileMetadata;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          true
+        );
+        if (!autoSaveCreationDate) return fileMetadata;
 
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
-          message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
+          message: t`GDevelop automatically saved a newer version of this project on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}. This new version might differ from the one that you manually saved. Which version would you like to open?`,
           dismissButtonLabel: t`My manual save`,
           confirmButtonLabel: t`GDevelop auto-save`,
         });
@@ -894,16 +898,21 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return null;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, false);
-        if (!canOpenAutosave) return null;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          false
+        );
+        if (!autoSaveCreationDate) return null;
 
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
-          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}). Would you like to try to load it instead?`,
           confirmButtonLabel: t`Load autosave`,
         });
         if (!answer) return null;

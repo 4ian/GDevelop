@@ -208,7 +208,16 @@ export const BehaviorStoreStateProvider = ({
     () => {
       const tagsSet = new Set();
       for (const type in allBehaviors) {
-        allBehaviors[type].tags.forEach(tag => tagsSet.add(tag));
+        const behavior = allBehaviors[type];
+        behavior.tags.forEach(tag => {
+          if (
+            showCommunityExtensions ||
+            !behavior.tier ||
+            !excludedCommunityTiers.has(behavior.tier)
+          ) {
+            tagsSet.add(tag);
+          }
+        });
       }
       const sortedTags = [...tagsSet].sort((tag1, tag2) =>
         tag1.toLowerCase().localeCompare(tag2.toLowerCase())
@@ -219,7 +228,7 @@ export const BehaviorStoreStateProvider = ({
         tagsTree: [],
       };
     },
-    [allBehaviors]
+    [allBehaviors, showCommunityExtensions]
   );
 
   const defaultFirstSearchItemIds = React.useMemo(

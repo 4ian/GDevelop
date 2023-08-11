@@ -456,6 +456,26 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject);
 
+  /**
+   * \brief Remove all the instances from one layer.
+   */
+  static void RemoveLayer(gd::Project &project, gd::Layout &layout,
+                          const gd::String &layerName);
+
+  /**
+   * \brief Move all the instances from one layer into another.
+   */
+  static void MergeLayers(gd::Project &project, gd::Layout &layout,
+                          const gd::String &originLayerName,
+                          const gd::String &targetLayerName);
+
+  /**
+   * \brief Return the number of instances on the layer named \a layerName and
+   * all its associated layouts.
+   */
+  static size_t GetLayoutAndExternalLayoutLayerInstancesCount(
+      gd::Project &project, gd::Layout &layout, const gd::String &layerName);
+
   virtual ~WholeProjectRefactorer(){};
 
  private:

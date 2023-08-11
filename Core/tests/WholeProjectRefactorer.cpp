@@ -3348,10 +3348,21 @@ const gd::Instruction &CreateActionWithLayerParameter(gd::Project &project,
   action.SetParameter(3, gd::Expression("\"My layer\""));
   return event.GetActions().Insert(action);
 }
+const gd::Instruction &CreateActionWithEmptyLayerParameter(gd::Project &project,
+                                                      gd::EventsList &events) {
+  gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
+      events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
+  gd::Instruction action;
+  action.SetType("MyExtension::SetCameraCenterX");
+  action.SetParametersCount(4);
+  action.SetParameter(3, gd::Expression(""));
+  return event.GetActions().Insert(action);
+}
 const gd::Instruction &
 CreateExpressionWithLayerParameter(gd::Project &project,
-                                   gd::EventsList &events) {
+                                   gd::EventsList &events,
+                                   const gd::String &layerName) {
   gd::StandardEvent &event = dynamic_cast<gd::StandardEvent &>(
       events.InsertNewEvent(project, "BuiltinCommonInstructions::Standard"));
 
@@ -3359,8 +3370,8 @@ CreateExpressionWithLayerParameter(gd::Project &project,
   action.SetType("MyExtension::DoSomething");
   action.SetParametersCount(1);
   action.SetParameter(
-      0, gd::Expression("MyExtension::CameraCenterX(\"My layer\") + "
-                        "MyExtension::CameraCenterX(\"My layer\")"));
+      0, gd::Expression("MyExtension::CameraCenterX(\"" + layerName + "\") + "
+                        "MyExtension::CameraCenterX(\"" + layerName + "\")"));
   return event.GetActions().Insert(action);
 }
 } // namespace
@@ -3390,13 +3401,13 @@ TEST_CASE("RenameLayer", "[common]") {
         project, otherExternalEvents.GetEvents());
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
     auto &externalExpression =
-        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents());
+        CreateExpressionWithLayerParameter(project, externalEvents.GetEvents(), "My layer");
     auto &otherLayoutExpression =
-        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents());
+        CreateExpressionWithLayerParameter(project, otherLayout.GetEvents(), "My layer");
     auto &otherExternalExpression = CreateExpressionWithLayerParameter(
-        project, otherExternalEvents.GetEvents());
+        project, otherExternalEvents.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "My renamed layer");
@@ -3434,7 +3445,7 @@ TEST_CASE("RenameLayer", "[common]") {
     auto &layout = project.InsertNewLayout("My layout", 0);
 
     auto &layoutExpression =
-        CreateExpressionWithLayerParameter(project, layout.GetEvents());
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
 
     gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
                                             "layerA");
@@ -3442,6 +3453,57 @@ TEST_CASE("RenameLayer", "[common]") {
     REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::CameraCenterX(\"layerA\") + "
             "MyExtension::CameraCenterX(\"layerA\")");
+  }
+
+  SECTION("Can rename a layer when a layer parameter is empty") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutAction =
+        CreateActionWithEmptyLayerParameter(project, layout.GetEvents());
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "layerA");
+
+    REQUIRE(layoutAction.GetParameter(0).GetPlainString() == "");
+  }
+
+  SECTION("Can't rename a layer to an empty name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "My layer");
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "My layer",
+                                            "");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"My layer\") + "
+            "MyExtension::CameraCenterX(\"My layer\")");
+  }
+
+  SECTION("Can't rename a layer from an empty name") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+
+    auto &layoutExpression =
+        CreateExpressionWithLayerParameter(project, layout.GetEvents(), "");
+
+    gd::WholeProjectRefactorer::RenameLayer(project, layout, "", "My layer");
+
+    REQUIRE(layoutExpression.GetParameter(0).GetPlainString() ==
+            "MyExtension::CameraCenterX(\"\") + "
+            "MyExtension::CameraCenterX(\"\")");
   }
 }
 
@@ -3625,7 +3687,6 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     auto &wrongLayerExpression =
         CreateExpressionWithLayerEffectParameter(project, layout.GetEvents(), "My layer 2");
 
-    std::cout << "RenameLayerEffect" << std::endl;
     gd::WholeProjectRefactorer::RenameLayerEffect(project, layout, layer, "My effect",
                                             "My renamed effect");
 
@@ -3657,5 +3718,131 @@ TEST_CASE("RenameLayerEffect", "[common]") {
     REQUIRE(wrongLayerExpression.GetParameter(0).GetPlainString() ==
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\") + "
             "MyExtension::LayerEffectParameter(\"My layer 2\", \"My effect\")");
+  }
+}
+
+TEST_CASE("RemoveLayer", "[common]") {
+  SECTION("Can remove instances in a layout and its associated external layouts") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+    
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    otherExternalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 5);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 3);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
+
+    gd::WholeProjectRefactorer::RemoveLayer(project, layout, "My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 2);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
+  }
+}
+
+TEST_CASE("MergeLayers", "[common]") {
+  SECTION("Can merge instances from a layout into another layout (and their associated external layouts)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &layout = project.InsertNewLayout("My layout", 0);
+    auto &otherLayout = project.InsertNewLayout("My other layout", 1);
+
+    layout.InsertNewLayer("My layer", 0);
+    otherLayout.InsertNewLayer("My layer", 0);
+    
+    auto &externalLayout =
+        project.InsertNewExternalLayout("My external layout", 0);
+    auto &otherExternalLayout =
+        project.InsertNewExternalLayout("My other external layout", 0);
+    externalLayout.SetAssociatedLayout("My layout");
+    otherExternalLayout.SetAssociatedLayout("My other layout");
+
+    auto &initialInstances = layout.GetInitialInstances();
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("");
+    initialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+    
+    auto &externalInitialInstances = externalLayout.GetInitialInstances();
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("");
+    externalInitialInstances.InsertNewInitialInstance().SetLayer("My other layer");
+
+    auto &otherInitialInstances = otherLayout.GetInitialInstances();
+    otherInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    auto &otherExternalInitialInstances = otherExternalLayout.GetInitialInstances();
+    otherExternalInitialInstances.InsertNewInitialInstance().SetLayer("My layer");
+
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 4);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 3);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 2);
+
+    gd::WholeProjectRefactorer::MergeLayers(project, layout, "My layer", "");
+
+    // No instance was removed.
+    REQUIRE(initialInstances.GetInstancesCount() == 6);
+    REQUIRE(externalInitialInstances.GetInstancesCount() == 4);
+    REQUIRE(otherInitialInstances.GetInstancesCount() == 1);
+    REQUIRE(otherExternalInitialInstances.GetInstancesCount() == 1);
+
+    // No instance remain in "My layer".
+    REQUIRE(initialInstances.GetLayerInstancesCount("My layer") == 0);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My layer") == 0);
+
+    // Layers with the same name in other layouts are untouched.
+    REQUIRE(otherInitialInstances.GetLayerInstancesCount("My layer") == 1);
+    REQUIRE(otherExternalInitialInstances.GetLayerInstancesCount("My layer") == 1);
+
+    // Other layers from the same layout are untouched.
+    REQUIRE(initialInstances.GetLayerInstancesCount("My other layer") == 1);
+    REQUIRE(externalInitialInstances.GetLayerInstancesCount("My other layer") == 1);
   }
 }

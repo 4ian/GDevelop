@@ -17,7 +17,6 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ResourcesManager.h"
 
@@ -180,85 +179,90 @@ void ArbitraryResourceWorker::ExposeResource(gd::Resource& resource) {
 
 ArbitraryResourceWorker::~ArbitraryResourceWorker() {}
 
-/**
- * Launch the specified resource worker on every resource referenced in the
- * events.
- */
-class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
- public:
-  ResourceWorkerInEventsWorker(const gd::Project& project_,
-                               gd::ArbitraryResourceWorker& worker_)
-      : project(project_), worker(worker_){};
-  virtual ~ResourceWorkerInEventsWorker(){};
+bool ResourceWorkerInEventsWorker::DoVisitInstruction(gd::Instruction& instruction, bool isCondition) {
+  const auto& platform = project.GetCurrentPlatform();
+  const auto& metadata = isCondition
+                              ? gd::MetadataProvider::GetConditionMetadata(
+                                    platform, instruction.GetType())
+                              : gd::MetadataProvider::GetActionMetadata(
+                                    platform, instruction.GetType());
 
- private:
-  bool DoVisitInstruction(gd::Instruction& instruction, bool isCondition) {
-    const auto& platform = project.GetCurrentPlatform();
-    const auto& metadata = isCondition
-                               ? gd::MetadataProvider::GetConditionMetadata(
-                                     platform, instruction.GetType())
-                               : gd::MetadataProvider::GetActionMetadata(
-                                     platform, instruction.GetType());
+  gd::ParameterMetadataTools::IterateOverParametersWithIndex(
+      instruction.GetParameters(),
+      metadata.GetParameters(),
+      [this, &instruction](const gd::ParameterMetadata& parameterMetadata,
+                            const gd::Expression& parameterExpression,
+                            size_t parameterIndex,
+                            const gd::String& lastObjectName) {
+        const String& parameterValue = parameterExpression.GetPlainString();
+        if (parameterMetadata.GetType() ==
+                "police" ||  // Should be renamed fontResource
+            parameterMetadata.GetType() == "fontResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeFont(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "soundfile" ||
+                    parameterMetadata.GetType() ==
+                        "musicfile") {  // Should be renamed audioResource
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeAudio(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "bitmapFontResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeBitmapFont(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "imageResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeImage(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "jsonResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeJson(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "tilemapResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeTilemap(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "tilesetResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeTileset(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        } else if (parameterMetadata.GetType() == "model3DResource") {
+          gd::String updatedParameterValue = parameterValue;
+          worker.ExposeModel3D(updatedParameterValue);
+          instruction.SetParameter(parameterIndex, updatedParameterValue);
+        }
+      });
 
-    gd::ParameterMetadataTools::IterateOverParametersWithIndex(
-        instruction.GetParameters(),
-        metadata.GetParameters(),
-        [this, &instruction](const gd::ParameterMetadata& parameterMetadata,
-                             const gd::Expression& parameterExpression,
-                             size_t parameterIndex,
-                             const gd::String& lastObjectName) {
-          const String& parameterValue = parameterExpression.GetPlainString();
-          if (parameterMetadata.GetType() ==
-                  "police" ||  // Should be renamed fontResource
-              parameterMetadata.GetType() == "fontResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeFont(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "soundfile" ||
-                     parameterMetadata.GetType() ==
-                         "musicfile") {  // Should be renamed audioResource
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeAudio(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "bitmapFontResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeBitmapFont(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "imageResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeImage(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "jsonResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeJson(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "tilemapResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeTilemap(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "tilesetResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeTileset(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          } else if (parameterMetadata.GetType() == "model3DResource") {
-            gd::String updatedParameterValue = parameterValue;
-            worker.ExposeModel3D(updatedParameterValue);
-            instruction.SetParameter(parameterIndex, updatedParameterValue);
-          }
-        });
-
-    return false;
-  };
-
-  const gd::Project& project;
-  gd::ArbitraryResourceWorker& worker;
+  return false;
 };
 
 void LaunchResourceWorkerOnEvents(const gd::Project& project,
                                   gd::EventsList& events,
                                   gd::ArbitraryResourceWorker& worker) {
-  ResourceWorkerInEventsWorker eventsWorker(project, worker);
+  gd::ResourceWorkerInEventsWorker eventsWorker(project, worker);
   eventsWorker.Launch(events);
+}
+
+gd::ResourceWorkerInEventsWorker
+GetResourceWorkerOnEvents(const gd::Project &project,
+                          gd::ArbitraryResourceWorker &worker) {
+  gd::ResourceWorkerInEventsWorker eventsWorker(project, worker);
+  return eventsWorker;
+}
+
+void ResourceWorkerInObjectsWorker::DoVisitObject(gd::Object &object) {
+  object.GetConfiguration().ExposeResources(worker);
+};
+
+void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
+    // TODO Allow behaviors to expose resource
+};
+
+gd::ResourceWorkerInObjectsWorker
+GetResourceWorkerOnObjects(gd::ArbitraryResourceWorker &worker) {
+  gd::ResourceWorkerInObjectsWorker eventsWorker(worker);
+  return eventsWorker;
 }
 
 }  // namespace gd

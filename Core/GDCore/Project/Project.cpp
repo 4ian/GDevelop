@@ -22,6 +22,7 @@
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ProjectBrowserHelper.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -1035,32 +1036,15 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   worker.ExposeResources(resourcesManager);
   platformSpecificAssets.ExposeResources(worker);
 
-  // Add layouts resources
-  for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
-    for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j) {  // Add objects resources
-      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
-    }
+  // Add event resources
+  auto eventWorker = GetResourceWorkerOnEvents(*this, worker);
+  gd::ProjectBrowserHelper::ExposeProjectEvents(
+    *this, eventWorker);
 
-    LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
-  }
-  // Add external events resources
-  for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
-    LaunchResourceWorkerOnEvents(
-        *this, GetExternalEvents(s).GetEvents(), worker);
-  }
-  // Add events functions extensions resources
-  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
-    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
-    }
-  }
-
-  // Add global objects resources
-  for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).GetConfiguration().ExposeResources(worker);
-  }
+  // Add object configuration resources
+  auto objectWorker = GetResourceWorkerOnObjects(worker);
+  gd::ProjectBrowserHelper::ExposeProjectObjects(
+    *this, objectWorker);
 
   // Add loading screen background image if present
   if (loadingScreen.GetBackgroundImageResourceName() != "")

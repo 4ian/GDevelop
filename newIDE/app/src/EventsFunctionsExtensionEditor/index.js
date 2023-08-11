@@ -304,7 +304,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateName(newName)) {
+    if (!gd.Project.isNameSafe(newName)) {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
@@ -345,7 +345,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateName(newName)) {
+    if (!gd.Project.isNameSafe(newName)) {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
@@ -387,7 +387,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateName(newName)) {
+    if (!gd.Project.isNameSafe(newName)) {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
@@ -570,7 +570,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateName(newName)) {
+    if (!gd.Project.isNameSafe(newName)) {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
@@ -596,7 +596,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string,
     done: boolean => void
   ) => {
-    if (!gd.Project.validateName(newName)) {
+    if (!gd.Project.isNameSafe(newName)) {
       showWarningBox(
         i18n._(
           t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`

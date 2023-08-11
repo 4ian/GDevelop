@@ -53,7 +53,7 @@ type Props = {|
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
-  canRenameGroup: (newName: string, global: boolean) => boolean,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
     newName: string,
@@ -214,7 +214,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
     const { group, global } = groupWithContext;
-    const { globalObjectGroups, objectGroups } = this.props;
 
     this.setState({
       renamedGroupWithContext: null,
@@ -222,25 +221,20 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     if (group.getName() === newName) return;
 
-    if (objectGroups.has(newName) || globalObjectGroups.has(newName)) {
-      showWarningBox('Another object with this name already exists', {
-        delayToNextTick: true,
-      });
-      return;
-    }
+    const validatedNewName = this.props.getValidatedObjectOrGroupName(
+      newName,
+      global
+    );
+    this.props.onRenameGroup(groupWithContext, validatedNewName, doRename => {
+      if (!doRename) return;
 
-    if (this.props.canRenameGroup(newName, global)) {
-      this.props.onRenameGroup(groupWithContext, newName, doRename => {
-        if (!doRename) return;
+      group.setName(validatedNewName);
 
-        group.setName(newName);
-
-        this._onObjectGroupModified();
-        if (this.props.onGroupRenamed) {
-          this.props.onGroupRenamed();
-        }
-      });
-    }
+      this._onObjectGroupModified();
+      if (this.props.onGroupRenamed) {
+        this.props.onGroupRenamed();
+      }
+    });
   };
 
   _setAsGlobalGroup = (i18n: I18nType, groupWithContext: GroupWithContext) => {

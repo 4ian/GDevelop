@@ -515,10 +515,14 @@ interface Project {
 
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
+
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
-    boolean STATIC_ValidateName([Const] DOMString name);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
+
+    boolean STATIC_IsNameSafe([Const] DOMString name);
+    [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 
     [Const, Value] DOMString FREE_GetTypeOfBehavior([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);

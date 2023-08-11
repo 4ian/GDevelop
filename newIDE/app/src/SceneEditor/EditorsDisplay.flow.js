@@ -70,7 +70,7 @@ export type SceneEditorsDisplayProps = {|
     newName: string,
     done: (boolean) => void
   ) => void,
-  canRenameObjectGroup: (
+  getValidatedObjectOrGroupName: (
     newName: string,
     global: boolean,
     i18n: I18nType

@@ -100,9 +100,17 @@ describe('libGD.js', function () {
     });
 
     it('should validate object names', function () {
-      expect(gd.Project.validateName('ThisNameIs_Ok_123')).toBe(true);
-      expect(gd.Project.validateName('ThisName IsNot_Ok_123')).toBe(false);
-      expect(gd.Project.validateName('ThisNameIsNot_Ok!')).toBe(false);
+      expect(gd.Project.isNameSafe('ThisNameIs_Ok_123')).toBe(true);
+      expect(gd.Project.isNameSafe('ThisName IsNot_Ok_123')).toBe(false);
+      expect(gd.Project.isNameSafe('ThisNameIsNot_Ok!')).toBe(false);
+      expect(gd.Project.isNameSafe('1ThisNameIsNot_Ok_123')).toBe(false);
+      expect(gd.Project.getSafeName('ThisNameIs_Ok_123')).toBe('ThisNameIs_Ok_123');
+      expect(gd.Project.getSafeName('ThisName IsNot_Ok_123')).toBe('ThisName_IsNot_Ok_123');
+      expect(gd.Project.getSafeName('ThisNameIsNot_Ok!')).toBe('ThisNameIsNot_Ok_');
+      expect(gd.Project.getSafeName('1ThisNameIsNot_Ok_123')).toBe('_1ThisNameIsNot_Ok_123');
+      expect(gd.Project.getSafeName('官话 name')).toBe('___name');
+      expect(gd.Project.getSafeName('')).toBe('Unnamed');
+      expect(gd.Project.getSafeName('9')).toBe('_9');
     });
 
     it('should have a list of extensions', function () {

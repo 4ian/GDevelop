@@ -79,7 +79,7 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
               eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
             }
             onChange={text => {
-              if (gd.Project.validateName(text)) {
+              if (gd.Project.isNameSafe(text)) {
                 eventsBasedObject.setDefaultName(text);
                 forceUpdate();
               } else {

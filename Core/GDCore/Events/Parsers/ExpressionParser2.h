@@ -18,6 +18,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/MakeUnique.h"
+#include "GrammarTerminals.h"
 namespace gd {
 class Expression;
 class ObjectsContainer;
@@ -27,6 +28,8 @@ class ExpressionMetadata;
 }  // namespace gd
 
 namespace gd {
+
+using namespace gd::GrammarTerminals;
 
 /** \brief Parse an expression, returning a tree of node corresponding
  * to the parsed expression.
@@ -211,7 +214,7 @@ class GD_CORE_API ExpressionParser2 {
       }
       SkipIfChar(IsClosingParenthesis);
       return factor;
-    } else if (IsIdentifierAllowedChar()) {
+    } else if (CheckIfChar(IsAllowedInIdentifier)) {
       return Identifier();
     }
 
@@ -606,95 +609,6 @@ class GD_CORE_API ExpressionParser2 {
     return predicate(character);
   }
 
-  bool IsIdentifierAllowedChar() {
-    if (currentPosition >= expression.size()) return false;
-    gd::String::value_type character = expression[currentPosition];
-
-    // Quickly compare if the character is a number or ASCII character.
-    if ((character >= '0' && character <= '9') ||
-        (character >= 'A' && character <= 'Z') ||
-        (character >= 'a' && character <= 'z'))
-      return true;
-
-    // Otherwise do the full check against separators forbidden in identifiers.
-    if (!IsParameterSeparator(character) && !IsDot(character) &&
-        !IsQuote(character) && !IsBracket(character) &&
-        !IsExpressionOperator(character) && !IsTermOperator(character)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  static bool IsWhitespace(gd::String::value_type character) {
-    return character == ' ' || character == '\n' || character == '\r';
-  }
-
-  static bool IsParameterSeparator(gd::String::value_type character) {
-    return character == ',';
-  }
-
-  static bool IsDot(gd::String::value_type character) {
-    return character == '.';
-  }
-
-  static bool IsQuote(gd::String::value_type character) {
-    return character == '"';
-  }
-
-  static bool IsBracket(gd::String::value_type character) {
-    return character == '(' || character == ')' || character == '[' ||
-           character == ']' || character == '{' || character == '}';
-  }
-
-  static bool IsOpeningParenthesis(gd::String::value_type character) {
-    return character == '(';
-  }
-
-  static bool IsClosingParenthesis(gd::String::value_type character) {
-    return character == ')';
-  }
-
-  static bool IsOpeningSquareBracket(gd::String::value_type character) {
-    return character == '[';
-  }
-
-  static bool IsClosingSquareBracket(gd::String::value_type character) {
-    return character == ']';
-  }
-
-  static bool IsExpressionEndingChar(gd::String::value_type character) {
-    return character == ',' || IsClosingParenthesis(character) ||
-           IsClosingSquareBracket(character);
-  }
-
-  static bool IsExpressionOperator(gd::String::value_type character) {
-    return character == '+' || character == '-' || character == '<' ||
-           character == '>' || character == '?' || character == '^' ||
-           character == '=' || character == '\\' || character == ':' ||
-           character == '!';
-  }
-
-  static bool IsUnaryOperator(gd::String::value_type character) {
-    return character == '+' || character == '-';
-  }
-
-  static bool IsTermOperator(gd::String::value_type character) {
-    return character == '/' || character == '*';
-  }
-
-  static bool IsNumberFirstChar(gd::String::value_type character) {
-    return character == '.' || (character >= '0' && character <= '9');
-  }
-
-  static bool IsNonZeroDigit(gd::String::value_type character) {
-    return (character >= '1' && character <= '9');
-  }
-
-  static bool IsZeroDigit(gd::String::value_type character) {
-    return character == '0';
-  }
-
   bool IsNamespaceSeparator() {
     // Namespace separator is a special kind of delimiter as it is 2 characters
     // long
@@ -715,7 +629,7 @@ class GD_CORE_API ExpressionParser2 {
     gd::String name;
     size_t startPosition = currentPosition;
     while (currentPosition < expression.size() &&
-           (IsIdentifierAllowedChar()
+           (CheckIfChar(IsAllowedInIdentifier)
             // Allow whitespace in identifier name for compatibility
             || expression[currentPosition] == ' ')) {
       name += expression[currentPosition];

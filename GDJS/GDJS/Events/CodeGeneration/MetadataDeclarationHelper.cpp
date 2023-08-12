@@ -1352,7 +1352,7 @@ void MetadataDeclarationHelper::DeclareEventsFunctionParameters(
 }
 
 gd::String MetadataDeclarationHelper::GetExtensionCodeNamespacePrefix(
-    const gd::EventsFunctionsExtension eventsFunctionsExtension) {
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension) {
   return "gdjs.evtsExt__" + EventsCodeNameMangler::GetMangledName(
                                 eventsFunctionsExtension.GetName());
 }

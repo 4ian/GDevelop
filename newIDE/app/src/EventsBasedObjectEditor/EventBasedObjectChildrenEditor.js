@@ -76,9 +76,8 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   _getValidatedObjectOrGroupName = (newName: string, i18n: I18nType) => {
     const { eventsBasedObject } = this.props;
 
-    const safeNewName = gd.Project.getSafeName(newName);
     const safeAndUniqueNewName = newNameGenerator(
-      safeNewName,
+      gd.Project.getSafeName(newName),
       tentativeNewName => {
         if (
           eventsBasedObject.hasObjectNamed(tentativeNewName) ||

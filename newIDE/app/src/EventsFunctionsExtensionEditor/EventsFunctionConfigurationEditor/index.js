@@ -8,7 +8,6 @@ import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line } from '../../UI/Grid';
-import { showWarningBox } from '../../UI/Messages/MessageBox';
 import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
@@ -71,9 +70,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   _getValidatedObjectOrGroupName = (newName: string) => {
     const { objectsContainer, globalObjectsContainer } = this.props;
 
-    const safeNewName = gd.Project.getSafeName(newName);
     const safeAndUniqueNewName = newNameGenerator(
-      safeNewName,
+      gd.Project.getSafeName(newName),
       tentativeNewName => {
         if (
           objectsContainer.hasObjectNamed(tentativeNewName) ||

@@ -24,7 +24,6 @@ import Window from '../Utils/Window';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
@@ -833,9 +832,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     const { project, layout } = this.props;
 
-    const safeNewName = gd.Project.getSafeName(newName);
     const safeAndUniqueNewName = newNameGenerator(
-      safeNewName,
+      gd.Project.getSafeName(newName),
       tentativeNewName => {
         if (
           layout.hasObjectNamed(tentativeNewName) ||
@@ -846,7 +844,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           return true;
         }
 
-        // TODO: factor?
         if (global) {
           // If object or group is global, also check for other layouts' objects and groups names.
           const layoutName = layout.getName();

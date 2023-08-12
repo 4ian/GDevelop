@@ -366,7 +366,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           });
 
   GetAllConditions()["BuiltinCommonInstructions::OncePerInstance"]
-      .codeExtraInformation
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context)

@@ -1,5 +1,5 @@
 // @flow
-import path from 'path';
+import path from 'path-browserify';
 import { uploadObject } from '../../Utils/GDevelopServices/Preview';
 const gd: libGDevelop = global.gd;
 

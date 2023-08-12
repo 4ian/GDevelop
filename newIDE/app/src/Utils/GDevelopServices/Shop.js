@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import path from 'path';
+import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
 
 const client = axios.create({
@@ -28,6 +28,8 @@ export type PrivateAssetPackListingData = {|
 
   /** The id of the product on the app stores - if any. */
   appStoreProductId: string | null,
+
+  includedListableProductIds?: string[],
 |};
 
 type Purchase = {|
@@ -139,12 +141,14 @@ export const extractFilenameWithExtensionFromProductAuthorizedUrl = (
 export const getStripeCheckoutUrl = async (
   getAuthorizationHeader: () => Promise<string>,
   {
-    stripePriceId,
+    priceName,
+    productId,
     userId,
     customerEmail,
     password,
   }: {|
-    stripePriceId: string,
+    priceName: string,
+    productId: string,
     userId: string,
     customerEmail: string,
     password?: string,
@@ -154,7 +158,8 @@ export const getStripeCheckoutUrl = async (
   const response = await client.post(
     '/purchase/action/create-stripe-checkout-session',
     {
-      stripePriceId,
+      priceName,
+      productId,
       customerEmail,
       password,
     },

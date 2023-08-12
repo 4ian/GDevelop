@@ -43,12 +43,15 @@ const getColumnsFromWidth = (width: WidthType) => {
     case 'medium':
       return 2;
     case 'large':
-    default:
       return 3;
+    case 'xlarge':
+      return 4;
+    default:
+      return 2;
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('large');
+const MAX_COLUMNS = getColumnsFromWidth('xlarge');
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {

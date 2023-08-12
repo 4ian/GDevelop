@@ -469,10 +469,16 @@ export function createGdevelopTheme({
         backgroundColor: styles['ThemeSurfaceToolbarBackgroundColor'],
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
+      swipeableDrawer: {
+        topBar: {
+          pillColor: styles['ThemeSwipeableDrawerTopBarPillColor'],
+        },
+      },
       text: {
         color: {
           primary: styles['ThemeTextDefaultColor'],
           secondary: styles['ThemeTextSecondaryColor'],
+          disabled: styles['ThemeTextDisabledColor'],
         },
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],

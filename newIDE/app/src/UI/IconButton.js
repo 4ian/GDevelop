@@ -57,6 +57,9 @@ type Props = {|
   acceleratorString?: string,
   'aria-label'?: string,
 
+  disableRipple?: boolean,
+  disableFocusRipple?: boolean,
+
   color?: 'default',
 |};
 

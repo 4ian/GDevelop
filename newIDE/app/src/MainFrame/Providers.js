@@ -24,6 +24,7 @@ import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { BehaviorStoreStateProvider } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 import AlertProvider from '../UI/Alert/AlertProvider';
 import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
@@ -102,13 +103,15 @@ const Providers = ({
                                           <ResourceStoreStateProvider>
                                             <ExampleStoreStateProvider>
                                               <ExtensionStoreStateProvider>
-                                                <TutorialStateProvider>
-                                                  <AnnouncementsFeedStateProvider>
-                                                    <PrivateAssetsAuthorizationProvider>
-                                                      {children({ i18n })}
-                                                    </PrivateAssetsAuthorizationProvider>
-                                                  </AnnouncementsFeedStateProvider>
-                                                </TutorialStateProvider>
+                                                <BehaviorStoreStateProvider>
+                                                  <TutorialStateProvider>
+                                                    <AnnouncementsFeedStateProvider>
+                                                      <PrivateAssetsAuthorizationProvider>
+                                                        {children({ i18n })}
+                                                      </PrivateAssetsAuthorizationProvider>
+                                                    </AnnouncementsFeedStateProvider>
+                                                  </TutorialStateProvider>
+                                                </BehaviorStoreStateProvider>
                                               </ExtensionStoreStateProvider>
                                             </ExampleStoreStateProvider>
                                           </ResourceStoreStateProvider>

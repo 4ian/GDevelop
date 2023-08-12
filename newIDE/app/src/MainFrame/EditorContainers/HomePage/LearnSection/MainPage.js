@@ -44,24 +44,30 @@ const getHelpItemsColumnsFromWidth = (width: WidthType) => {
     case 'medium':
       return 3;
     case 'large':
-    default:
       return 4;
+    case 'xlarge':
+      return 5;
+    default:
+      return 3;
   }
 };
 
 const getTutorialsColumnsFromWidth = (width: WidthType) => {
   switch (width) {
     case 'small':
-      return 2;
+      return 1;
     case 'medium':
       return 3;
     case 'large':
-    default:
       return 5;
+    case 'xlarge':
+      return 6;
+    default:
+      return 3;
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('large');
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge');
 const styles = {
   grid: {
     textAlign: 'center',
@@ -98,6 +104,9 @@ const MainPage = ({
     InAppTutorialContext
   );
   const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
+  const isTabletOrSmallLaptop =
+    windowWidth === 'small' || windowWidth === 'medium';
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -233,7 +242,7 @@ const MainPage = ({
               </Text>
             </Column>
             <LineStackLayout noMargin>
-              {windowWidth === 'large' && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -242,10 +251,16 @@ const MainPage = ({
                   }}
                   primary
                   leftIcon={<Upload />}
-                  label={<Trans>Submit your project as an example</Trans>}
+                  label={
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit an example</Trans>
+                    ) : (
+                      <Trans>Submit your project as an example</Trans>
+                    )
+                  }
                 />
               )}
-              {windowWidth === 'large' && (
+              {!isMobile && (
                 <FlatButton
                   onClick={() => {
                     Window.openExternalURL(
@@ -255,7 +270,13 @@ const MainPage = ({
                   primary
                   leftIcon={<TranslateIcon />}
                   label={
-                    <Trans>Submit a tutorial translated in your language</Trans>
+                    isTabletOrSmallLaptop ? (
+                      <Trans>Submit a tutorial</Trans>
+                    ) : (
+                      <Trans>
+                        Submit a tutorial translated in your language
+                      </Trans>
+                    )
                   }
                 />
               )}

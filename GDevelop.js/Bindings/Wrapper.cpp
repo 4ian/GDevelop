@@ -17,6 +17,7 @@
 #include <GDCore/Extensions/Metadata/EffectMetadata.h>
 #include <GDCore/Extensions/Metadata/MetadataProvider.h>
 #include <GDCore/Extensions/Metadata/MultipleInstructionMetadata.h>
+#include <GDCore/Extensions/Metadata/AbstractFunctionMetadata.h>
 #include <GDCore/Extensions/Metadata/ParameterOptions.h>
 #include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
 #include <GDCore/Extensions/Platform.h>
@@ -84,6 +85,7 @@
 #include <GDJS/Events/CodeGeneration/ObjectCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/LayoutCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/MetadataDeclarationHelper.h>
 #include <GDJS/IDE/Exporter.h>
 #include <GDJS/IDE/ExporterHelper.h>
 #include <emscripten.h>
@@ -375,6 +377,12 @@ void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
   vec.erase(vec.begin() + pos);
 }
 
+void insertIntoVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
+                                       size_t pos,
+                                       const ParameterMetadata& parameterMetadata) {
+  vec.insert(vec.begin() + pos, parameterMetadata);
+}
+
 void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
                                    size_t oldIndex,
                                    size_t newIndex) {
@@ -607,6 +615,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetBehaviorsWithType
 #define STATIC_FixInvalidRequiredBehaviorProperties \
   FixInvalidRequiredBehaviorProperties
+#define STATIC_RemoveLayer RemoveLayer
+#define STATIC_MergeLayers MergeLayers
+#define STATIC_GetLayoutAndExternalLayoutLayerInstancesCount GetLayoutAndExternalLayoutLayerInstancesCount
+
 #define STATIC_GenerateBehaviorGetterAndSetter GenerateBehaviorGetterAndSetter
 #define STATIC_GenerateObjectGetterAndSetter GenerateObjectGetterAndSetter
 #define STATIC_CanGenerateGetterAndSetter CanGenerateGetterAndSetter
@@ -639,6 +651,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetObjectParameterIndexFor GetObjectParameterIndexFor
 
 #define STATIC_GetNamespaceSeparator GetNamespaceSeparator
+#define STATIC_GetBehaviorFullType GetBehaviorFullType
 #define STATIC_RenameEventsFunctionsExtension RenameEventsFunctionsExtension
 #define STATIC_UpdateExtensionNameInEventsBasedBehavior UpdateExtensionNameInEventsBasedBehavior
 #define STATIC_RenameEventsFunction RenameEventsFunction
@@ -680,6 +693,15 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetSharedPropertyConditionName GetSharedPropertyConditionName
 #define STATIC_GetSharedPropertyExpressionName GetSharedPropertyExpressionName
 #define STATIC_GetSharedPropertyToggleActionName GetSharedPropertyToggleActionName
+
+#define STATIC_DeclareExtension DeclareExtension
+#define STATIC_GenerateBehaviorMetadata GenerateBehaviorMetadata
+#define STATIC_GenerateObjectMetadata GenerateObjectMetadata
+#define STATIC_GetFreeFunctionCodeName GetFreeFunctionCodeName
+#define STATIC_IsBehaviorLifecycleEventsFunction IsBehaviorLifecycleEventsFunction
+#define STATIC_IsObjectLifecycleEventsFunction IsObjectLifecycleEventsFunction
+#define STATIC_IsExtensionLifecycleEventsFunction IsExtensionLifecycleEventsFunction
+#define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
 

@@ -23,11 +23,6 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
-import {
-  isBehaviorLifecycleEventsFunction,
-  isObjectLifecycleEventsFunction,
-  isExtensionLifecycleEventsFunction,
-} from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
@@ -318,7 +313,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       );
       return;
     }
-    if (isExtensionLifecycleEventsFunction(newName)) {
+    if (
+      gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(newName)
+    ) {
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle function of the extension. Choose another name for your function.`
@@ -357,7 +354,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       );
       return done(false);
     }
-    if (isBehaviorLifecycleEventsFunction(newName)) {
+    if (
+      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(newName)
+    ) {
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle method of the behavior. Choose another name for your custom function.`
@@ -397,7 +396,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       );
       return done(false);
     }
-    if (isObjectLifecycleEventsFunction(newName)) {
+    if (gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(newName)) {
       showWarningBox(
         i18n._(
           t`This name is reserved for a lifecycle method of the object. Choose another name for your custom function.`
@@ -1227,7 +1226,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
                 canRename={(eventsFunction: gdEventsFunction) => {
-                  return !isExtensionLifecycleEventsFunction(
+                  return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
                     eventsFunction.getName()
                   );
                 }}
@@ -1264,7 +1263,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   }
                   onDeleteEventsFunction={this._onDeleteEventsFunction}
                   canRename={(eventsFunction: gdEventsFunction) => {
-                    return !isObjectLifecycleEventsFunction(
+                    return !gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
                       eventsFunction.getName()
                     );
                   }}
@@ -1307,7 +1306,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   }
                   onDeleteEventsFunction={this._onDeleteEventsFunction}
                   canRename={(eventsFunction: gdEventsFunction) => {
-                    return !isBehaviorLifecycleEventsFunction(
+                    return !gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
                       eventsFunction.getName()
                     );
                   }}

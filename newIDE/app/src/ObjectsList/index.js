@@ -107,6 +107,7 @@ export type ObjectsListInterface = {|
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
+  initialInstances?: gdInitialInstancesContainer,
   objectsContainer: gdObjectsContainer,
   onSelectAllInstancesOfObjectInLayout?: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -152,6 +153,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     {
       project,
       layout,
+      initialInstances,
       objectsContainer,
       resourceManagementProps,
       onSelectAllInstancesOfObjectInLayout,
@@ -697,8 +699,11 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         index: number
       ) => {
         const { object } = objectWithContext;
-        const instanceCountOnScene = layout
-          ? getInstanceCountInLayoutForObject(layout, object.getName())
+        const instanceCountOnScene = initialInstances
+          ? getInstanceCountInLayoutForObject(
+              initialInstances,
+              object.getName()
+            )
           : undefined;
 
         const objectMetadata = gd.MetadataProvider.getObjectMetadata(
@@ -813,7 +818,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         duplicateObject,
         editName,
         getAllObjectTags,
-        layout,
         onAddNewObject,
         onAddObjectInstance,
         onEditObject,
@@ -826,6 +830,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         eventsFunctionsExtensionWriter,
         preferences.values.userShortcutMap,
         canSetAsGlobalObject,
+        initialInstances,
       ]
     );
 
@@ -941,4 +946,4 @@ const areEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.project === nextProps.project &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 
-export default React.memo<Props>(ObjectsList, areEqual);
+export default React.memo<Props, ObjectsListInterface>(ObjectsList, areEqual);

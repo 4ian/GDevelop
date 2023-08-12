@@ -31,7 +31,8 @@ const styles = {
  * and stacked on a small one.
  */
 const ConditionsActionsColumns = (props: Props) => {
-  if (props.windowWidth === 'small') {
+  const isMobileScreen = props.windowWidth === 'small';
+  if (isMobileScreen) {
     return (
       <div style={styles.oneColumnContainer} className={props.className}>
         {props.renderConditionsList({

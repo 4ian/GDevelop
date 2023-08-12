@@ -12,8 +12,8 @@ declare class gdSprite {
   delPoint(name: string): void;
   getPoint(name: string): gdPoint;
   hasPoint(name: string): boolean;
-  isCollisionMaskAutomatic(): boolean;
-  setCollisionMaskAutomatic(enabled: boolean): void;
+  isFullImageCollisionMask(): boolean;
+  setFullImageCollisionMask(enabled: boolean): void;
   getCustomCollisionMask(): gdVectorPolygon2d;
   setCustomCollisionMask(collisionMask: gdVectorPolygon2d): void;
   delete(): void;

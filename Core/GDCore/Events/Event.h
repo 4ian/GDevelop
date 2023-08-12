@@ -282,6 +282,14 @@ class GD_CORE_API BaseEvent {
    */
   bool IsFolded() const { return folded; }
 
+  /**
+   * \brief Return a list of all objects linked to the event.
+   */
+  virtual std::vector<gd::Expression*> GetAllObjectExpressions() {
+    std::vector<gd::Expression*> allObjectExpressions;
+    return allObjectExpressions;
+  }
+
   ///@}
 
   std::weak_ptr<gd::BaseEvent>

@@ -8,7 +8,7 @@ import {
   allResourceKindsAndMetadata,
 } from './ResourceSource';
 import { ResourceStore } from '../AssetStore/ResourceStore';
-import path from 'path';
+import path from 'path-browserify';
 import { Line } from '../UI/Grid';
 import { ColumnStackLayout, TextFieldWithButtonLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';

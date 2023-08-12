@@ -21,7 +21,7 @@ import {
 } from '.';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
-import EventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
+import { EventsFunctionParametersEditor } from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
 import HelpButton from '../../UI/HelpButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';

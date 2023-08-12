@@ -653,7 +653,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
            GetAllActions().begin();
        it != GetAllActions().end();) {
     if (it->second.codeExtraInformation.functionCallName.empty() &&
-        !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+        !it->second.HasCustomCodeGenerator()) {
       GetAllActions().erase(it++);
     } else
       ++it;
@@ -663,7 +663,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
            GetAllConditions().begin();
        it != GetAllConditions().end();) {
     if (it->second.codeExtraInformation.functionCallName.empty() &&
-        !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+        !it->second.HasCustomCodeGenerator()) {
       GetAllConditions().erase(it++);
     } else
       ++it;
@@ -673,7 +673,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
            GetAllExpressions().begin();
        it != GetAllExpressions().end();) {
     if (it->second.codeExtraInformation.functionCallName.empty() &&
-        !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+        !it->second.HasCustomCodeGenerator()) {
       GetAllExpressions().erase(it++);
     } else
       ++it;
@@ -683,7 +683,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
            GetAllStrExpressions().begin();
        it != GetAllStrExpressions().end();) {
     if (it->second.codeExtraInformation.functionCallName.empty() &&
-        !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+        !it->second.HasCustomCodeGenerator()) {
       GetAllStrExpressions().erase(it++);
     } else
       ++it;
@@ -699,7 +699,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.actionsInfos.begin();
          it != obj.actionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.actionsInfos.erase(it++);
       } else
         ++it;
@@ -709,7 +709,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.conditionsInfos.begin();
          it != obj.conditionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.conditionsInfos.erase(it++);
       } else
         ++it;
@@ -719,7 +719,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.expressionsInfos.begin();
          it != obj.expressionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.expressionsInfos.erase(it++);
       } else
         ++it;
@@ -729,7 +729,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.strExpressionsInfos.begin();
          it != obj.strExpressionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.strExpressionsInfos.erase(it++);
       } else
         ++it;
@@ -746,7 +746,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.actionsInfos.begin();
          it != obj.actionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.actionsInfos.erase(it++);
       } else
         ++it;
@@ -756,7 +756,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.conditionsInfos.begin();
          it != obj.conditionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.conditionsInfos.erase(it++);
       } else
         ++it;
@@ -766,7 +766,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.expressionsInfos.begin();
          it != obj.expressionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.expressionsInfos.erase(it++);
       } else
         ++it;
@@ -776,7 +776,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
              obj.strExpressionsInfos.begin();
          it != obj.strExpressionsInfos.end();) {
       if (it->second.codeExtraInformation.functionCallName.empty() &&
-          !it->second.codeExtraInformation.HasCustomCodeGenerator()) {
+          !it->second.HasCustomCodeGenerator()) {
         obj.strExpressionsInfos.erase(it++);
       } else
         ++it;

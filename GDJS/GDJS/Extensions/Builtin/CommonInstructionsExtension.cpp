@@ -46,7 +46,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   GetAllConditions()["BuiltinCommonInstructions::Always"].SetFunctionName(
       "gdjs.evtTools.common.logicalNegation");
 
-  GetAllConditions()["Egal"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllConditions()["Egal"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -77,7 +77,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
       .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
 
-  GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllConditions()["StrEqual"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -176,7 +176,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       });
 
   GetAllConditions()["BuiltinCommonInstructions::Or"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& parentContext) {
@@ -305,7 +305,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           });
 
   GetAllConditions()["BuiltinCommonInstructions::And"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& parentContext) {
@@ -325,10 +325,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           });
 
   GetAllConditions()["BuiltinCommonInstructions::Not"]
-      .codeExtraInformation.SetCustomCodeGenerator(
-          [](gd::Instruction& instruction,
-             gd::EventsCodeGenerator& codeGenerator,
-             gd::EventsCodeGenerationContext& parentContext) {
+      .SetCustomCodeGenerator(
+          [](gd::Instruction &instruction,
+             gd::EventsCodeGenerator &codeGenerator,
+             gd::EventsCodeGenerationContext &parentContext) {
             gd::String outputCode;
 
             outputCode += codeGenerator.GenerateConditionsListCode(
@@ -346,7 +346,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           });
 
   GetAllConditions()["BuiltinCommonInstructions::Once"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& context) {

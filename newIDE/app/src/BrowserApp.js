@@ -81,7 +81,9 @@ export const create = (authentication: Authentication) => {
               resourceMover={BrowserResourceMover}
               resourceFetcher={BrowserResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
-              getStorageProviderResourceOperations={getStorageProviderResourceOperations}
+              getStorageProviderResourceOperations={
+                getStorageProviderResourceOperations
+              }
               getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}

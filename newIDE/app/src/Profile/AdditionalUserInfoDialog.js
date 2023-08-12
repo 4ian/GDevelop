@@ -20,12 +20,15 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 
-const getStyles = ({ windowWidth }) => ({
-  formContainer: {
-    width: windowWidth === 'small' ? '95%' : '70%',
-    marginTop: 20,
-  },
-});
+const getStyles = ({ windowWidth }) => {
+  const isMobileScreen = windowWidth === 'small';
+  return {
+    formContainer: {
+      width: isMobileScreen ? '95%' : '70%',
+      marginTop: 20,
+    },
+  };
+};
 
 const gdevelopUsageOptions = [
   {

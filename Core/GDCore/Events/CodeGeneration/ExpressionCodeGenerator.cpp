@@ -216,10 +216,10 @@ gd::String ExpressionCodeGenerator::GenerateFreeFunctionCode(
     const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
     const ExpressionMetadata& expressionMetadata) {
   codeGenerator.AddIncludeFiles(
-      expressionMetadata.codeExtraInformation.GetIncludeFiles());
+      expressionMetadata.GetIncludeFiles());
 
   // Launch custom code generator if needed
-  if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (expressionMetadata.HasCustomCodeGenerator()) {
     return expressionMetadata.codeExtraInformation.customCodeGenerator(
         PrintParameters(parameters), codeGenerator, context);
   }
@@ -242,10 +242,10 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
       codeGenerator.GetObjectsAndGroups();
 
   codeGenerator.AddIncludeFiles(
-      expressionMetadata.codeExtraInformation.GetIncludeFiles());
+      expressionMetadata.GetIncludeFiles());
 
   // Launch custom code generator if needed
-  if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (expressionMetadata.HasCustomCodeGenerator()) {
     return expressionMetadata.codeExtraInformation.customCodeGenerator(
         PrintParameters(parameters), codeGenerator, context);
   }
@@ -300,10 +300,10 @@ gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
       codeGenerator.GetObjectsAndGroups();
 
   codeGenerator.AddIncludeFiles(
-      expressionMetadata.codeExtraInformation.GetIncludeFiles());
+      expressionMetadata.GetIncludeFiles());
 
   // Launch custom code generator if needed
-  if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
+  if (expressionMetadata.HasCustomCodeGenerator()) {
     return expressionMetadata.codeExtraInformation.customCodeGenerator(
         PrintParameters(parameters), codeGenerator, context);
   }

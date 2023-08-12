@@ -22,7 +22,8 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _contextMenu: ?ContextMenuInterface;
   _wrappedElement: ?any;
 
-  open = () => {
+  open = (event?: Event) => {
+    if (event && event.stopPropagation) event.stopPropagation();
     const { _contextMenu } = this;
     if (!_contextMenu) return;
 

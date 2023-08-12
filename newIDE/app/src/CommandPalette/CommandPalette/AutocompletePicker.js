@@ -91,6 +91,7 @@ type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
 export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -108,7 +109,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
       ContainerComponent="div"
       classes={{
         container: classes.listItemContainer,
-        root: windowWidth === 'small' ? classes.rootSmallPadding : null,
+        root: isMobileScreen ? classes.rootSmallPadding : null,
       }}
     >
       <ListItemIcon>
@@ -128,6 +129,8 @@ const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
+  const isMediumScreen = windowWidth === 'medium';
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
@@ -144,7 +147,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
-      if (windowWidth === 'small' || windowWidth === 'medium') return null;
+      if (isMobileScreen || isMediumScreen) return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -157,7 +160,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap, windowWidth]
+    [shortcutMap, isMobileScreen, isMediumScreen]
   );
 
   const getItemText = React.useCallback(
@@ -191,7 +194,7 @@ const AutocompletePicker = (
           ContainerComponent="div"
           classes={{
             container: classes.listItemContainer,
-            root: windowWidth === 'small' ? classes.rootSmallPadding : null,
+            root: isMobileScreen ? classes.rootSmallPadding : null,
           }}
         >
           <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
@@ -203,7 +206,7 @@ const AutocompletePicker = (
     [
       classes.listItemContainer,
       classes.rootSmallPadding,
-      windowWidth,
+      isMobileScreen,
       getItemText,
       getItemHint,
       getItemIcon,

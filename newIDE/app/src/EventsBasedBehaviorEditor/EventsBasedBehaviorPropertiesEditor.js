@@ -38,8 +38,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
-import FlatButton from '../UI/FlatButton';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 
@@ -357,9 +356,6 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
   const isClipboardContainingProperties = Clipboard.has(
     PROPERTIES_CLIPBOARD_KIND
   );
-
-  const windowWidth = useResponsiveWindowWidth();
-  const isSmall = windowWidth === 'small';
 
   return (
     <I18n>
@@ -835,10 +831,10 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
               <Column>
                 <Line noMargin>
                   <LineStackLayout expand>
-                    <FlatButton
+                    <ResponsiveFlatButton
                       key={'paste-properties'}
                       leftIcon={<PasteIcon />}
-                      label={isSmall ? '' : <Trans>Paste</Trans>}
+                      label={<Trans>Paste</Trans>}
                       onClick={() => {
                         pastePropertiesAtTheEnd();
                       }}

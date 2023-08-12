@@ -197,7 +197,21 @@ export const subscriptionForGoldUser: Subscription = {
   planId: 'gdevelop_gold',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
-  userId: 'silver-user',
+  userId: 'gold-user',
+};
+
+export const subscriptionForStartupUser: Subscription = {
+  planId: 'gdevelop_startup',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'startup-user',
+};
+
+export const subscriptionForBusinessUser: Subscription = {
+  planId: 'gdevelop_business',
+  createdAt: 1515084011000,
+  updatedAt: 1515084011000,
+  userId: 'business-user',
 };
 
 export const subscriptionForEducationPlan: Subscription = {
@@ -265,6 +279,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'NONE',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -299,6 +314,7 @@ export const limitsForSilverUser: Limits = {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'BASIC',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -333,12 +349,83 @@ export const limitsForGoldUser: Limits = {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
     },
   },
   limits: {
     'cordova-build': {
       current: 2,
       max: 70,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForStartupUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 500,
+      canMaximumCountBeIncreased: false,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 1000,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  message: undefined,
+};
+
+export const limitsForBusinessUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 500,
+      canMaximumCountBeIncreased: false,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: true,
+    },
+  },
+  limits: {
+    'cordova-build': {
+      current: 2,
+      max: 1000,
       limitReached: false,
     },
     'ai-project-generation': {
@@ -367,6 +454,7 @@ export const limitsReached: Limits = {
       maximumCountPerGame: 3,
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'BASIC',
+      canUseCustomCss: false,
     },
   },
   limits: {
@@ -454,6 +542,16 @@ export const fakeGoldAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUser,
   limits: limitsForGoldUser,
+};
+export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForStartupUser,
+  limits: limitsForStartupUser,
+};
+export const fakeBusinessAuthenticatedUser: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForBusinessUser,
+  limits: limitsForBusinessUser,
 };
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
@@ -1032,6 +1130,22 @@ export const fakePrivateAssetShortHeader1: AssetShortHeader = {
     'enemy',
   ],
   dominantColors: [255],
+};
+
+export const fakePrivateAsset1: Asset = {
+  ...fakePrivateAssetShortHeader1,
+  description: 'A very nice Dino.',
+  gdevelopVersion: '5.0.0-beta100',
+  version: '1.0.0',
+  authors: ['test author'],
+  dominantColors: [255],
+  objectAssets: [
+    {
+      object: {},
+      resources: [],
+      requiredExtensions: [],
+    },
+  ],
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {

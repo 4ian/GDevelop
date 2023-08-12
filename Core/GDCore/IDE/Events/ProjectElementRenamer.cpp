@@ -87,11 +87,22 @@ protected:
             std::unique_ptr<gd::ExpressionNode> &parameterNode,
             size_t parameterIndex, const gd::String &lastObjectName) {
           if (parameterMetadata.GetType() == "layer") {
-            // Remove quotes, it won't match if it's not a literal anyway.
-            lastLayerName = expressionPlainString.substr(
-                parameterNode->location.GetStartPosition() + 1,
-                parameterNode->location.GetEndPosition() -
-                    parameterNode->location.GetStartPosition() - 2);
+            if (parameterNode->location.GetEndPosition() -
+                    parameterNode->location.GetStartPosition() <
+                2) {
+              // This is either the base layer or an invalid layer name.
+              // Keep it as is.
+              lastLayerName = expressionPlainString.substr(
+                  parameterNode->location.GetStartPosition(),
+                  parameterNode->location.GetEndPosition() -
+                      parameterNode->location.GetStartPosition());
+            } else {
+              // Remove quotes, so it can be compared to the layer name.
+              lastLayerName = expressionPlainString.substr(
+                  parameterNode->location.GetStartPosition() + 1,
+                  parameterNode->location.GetEndPosition() -
+                      parameterNode->location.GetStartPosition() - 2);
+            }
           }
           if (parameterMetadata.GetType() == parameterType) {
             auto parameterExpressionPlainString = expressionPlainString.substr(
@@ -143,9 +154,15 @@ bool ProjectElementRenamer::DoVisitInstruction(gd::Instruction &instruction,
           const gd::Expression &parameterValue, size_t parameterIndex,
           const gd::String &lastObjectName) {
         if (parameterMetadata.GetType() == "layer") {
-          // Remove quotes, it won't match if it's not a literal anyway.
-          lastLayerName = parameterValue.GetPlainString().substr(
-              1, parameterValue.GetPlainString().length() - 2);
+          if (parameterValue.GetPlainString().length() < 2) {
+            // This is either the base layer or an invalid layer name.
+            // Keep it as is.
+            lastLayerName = parameterValue.GetPlainString();
+          } else {
+            // Remove quotes, so it can be compared to the layer name.
+            lastLayerName = parameterValue.GetPlainString().substr(
+                1, parameterValue.GetPlainString().length() - 2);
+          }
         }
 
         if (parameterMetadata.GetType() == parameterType &&
@@ -165,7 +182,6 @@ bool ProjectElementRenamer::DoVisitInstruction(gd::Instruction &instruction,
           node->Visit(finder);
 
           if (finder.GetOccurrences().size() > 0) {
-
             gd::String newNameWithQuotes = "\"" + newName + "\"";
             gd::String oldParameterValue = parameterValue.GetPlainString();
             gd::String newParameterValue;

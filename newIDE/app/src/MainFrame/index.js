@@ -172,6 +172,7 @@ import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
+import { isTryingToSaveInForbiddenPath } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -760,7 +761,6 @@ const MainFrame = (props: Props) => {
               ...fileMetadata,
               name: project.getName(),
               gameId: project.getProjectUuid(),
-              lastModifiedDate: Date.now(),
             },
             storageProviderName: storageProvider.internalName,
           });
@@ -858,7 +858,7 @@ const MainFrame = (props: Props) => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
-        hasAutoSave,
+        getAutoSaveCreationDate,
         onGetAutoSave,
         onOpen,
         getOpenErrorMessage,
@@ -874,16 +874,21 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return fileMetadata;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, true);
-        if (!canOpenAutosave) return fileMetadata;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          true
+        );
+        if (!autoSaveCreationDate) return fileMetadata;
 
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
-          message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
+          message: t`GDevelop automatically saved a newer version of this project on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}. This new version might differ from the one that you manually saved. Which version would you like to open?`,
           dismissButtonLabel: t`My manual save`,
           confirmButtonLabel: t`GDevelop auto-save`,
         });
@@ -893,16 +898,21 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return null;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, false);
-        if (!canOpenAutosave) return null;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          false
+        );
+        if (!autoSaveCreationDate) return null;
 
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
-          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}). Would you like to try to load it instead?`,
           confirmButtonLabel: t`Load autosave`,
         });
         if (!answer) return null;
@@ -2089,6 +2099,18 @@ const MainFrame = (props: Props) => {
           if (!saveAsLocation) {
             return; // Save as was cancelled.
           }
+
+          if (
+            newStorageProvider.internalName === 'LocalFile' &&
+            saveAsLocation.fileIdentifier &&
+            isTryingToSaveInForbiddenPath(saveAsLocation.fileIdentifier)
+          ) {
+            await showAlert({
+              title: t`Choose another location`,
+              message: t`You are trying to save the project in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location.`,
+            });
+            return;
+          }
           newSaveAsLocation = saveAsLocation;
         }
 
@@ -2196,6 +2218,7 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreMoved,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      showAlert,
     ]
   );
 
@@ -2267,6 +2290,17 @@ const MainFrame = (props: Props) => {
         // may have changed (if the user opened another project). So we read and
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
+
+        if (
+          storageProviderInternalName === 'LocalFile' &&
+          isTryingToSaveInForbiddenPath(currentFileMetadata.fileIdentifier)
+        ) {
+          await showAlert({
+            title: t`Choose another location`,
+            message: t`Your project is saved in the same folder as the application. This folder will be deleted when the application is updated. Please choose another location if you don't want to lose your project.`,
+          });
+          // We don't block the save, as the user may want to save it anyway.
+        }
 
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
@@ -2350,6 +2384,7 @@ const MainFrame = (props: Props) => {
       currentlyRunningInAppTutorial,
       cloudProjectRecoveryOpenedVersionId,
       cloudProjectSaveChoiceOpen,
+      showAlert,
     ]
   );
 

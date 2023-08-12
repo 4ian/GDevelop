@@ -7,6 +7,7 @@ declare class libGDevelop {
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
+  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
@@ -120,9 +121,8 @@ declare class libGDevelop {
   VectorPairStringTextFormatting: Class<gdVectorPairStringTextFormatting>;
   TextFormatting: Class<gdTextFormatting>;
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;
-  ExtraInformation: Class<gdExtraInformation>;
-  ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
   ParameterOptions: Class<gdParameterOptions>;
+  AbstractFunctionMetadata: Class<gdAbstractFunctionMetadata>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
   MultipleInstructionMetadata: Class<gdMultipleInstructionMetadata>;
@@ -235,4 +235,5 @@ declare class libGDevelop {
   ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
+  MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;
 };

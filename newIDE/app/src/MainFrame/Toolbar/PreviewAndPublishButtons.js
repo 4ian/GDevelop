@@ -3,13 +3,13 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { LineStackLayout } from '../../UI/Layout';
-import RaisedButton from '../../UI/RaisedButton';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -41,6 +41,7 @@ export default function PreviewAndPublishButtons({
   exportProject,
 }: PreviewAndPublishButtonsProps) {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const previewBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
@@ -127,7 +128,7 @@ export default function PreviewAndPublishButtons({
         disabled={!isPreviewEnabled}
         icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
         label={
-          windowWidth !== 'small' ? (
+          !isMobileScreen ? (
             hasPreviewsRunning ? (
               <Trans>Update</Trans>
             ) : (
@@ -138,11 +139,11 @@ export default function PreviewAndPublishButtons({
         id={'toolbar-preview-button'}
         buildMenuTemplate={previewBuildMenuTemplate}
       />
-      <RaisedButton
+      <ResponsiveRaisedButton
         primary
         onClick={exportProject}
         icon={<PublishIcon />}
-        label={windowWidth !== 'small' ? <Trans>Publish</Trans> : null}
+        label={<Trans>Publish</Trans>}
         id={'toolbar-publish-button'}
       />
     </LineStackLayout>

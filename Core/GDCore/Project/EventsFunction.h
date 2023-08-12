@@ -201,7 +201,7 @@ class GD_CORE_API EventsFunction {
   /**
    * \brief Returns true if the function is private.
    */
-  bool IsPrivate() { return isPrivate; }
+  bool IsPrivate() const { return isPrivate; }
 
   /**
    * \brief Sets the privateness of the function.

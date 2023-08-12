@@ -53,16 +53,26 @@ const PasswordPromptDialog = (props: {
       />,
     ]}
   >
-    <TextField
-      fullWidth
-      autoFocus="desktopAndMobileDevices"
-      value={props.passwordValue}
-      floatingLabelText={<Trans>Password</Trans>}
-      type="password"
-      onChange={(e, value) => {
-        props.setPasswordValue(value);
+    <form
+      onSubmit={event => {
+        // Prevent browser to navigate on form submission.
+        event.preventDefault();
+        props.onApply();
       }}
-    />
+      autocomplete="off"
+      name="asset-store-password"
+    >
+      <TextField
+        fullWidth
+        autoFocus="desktopAndMobileDevices"
+        value={props.passwordValue}
+        floatingLabelText={<Trans>Password</Trans>}
+        type="password"
+        onChange={(e, value) => {
+          props.setPasswordValue(value);
+        }}
+      />
+    </form>
   </Dialog>
 );
 
@@ -96,7 +106,8 @@ const PrivateAssetPackPurchaseDialog = ({
     try {
       setIsPurchasing(true);
       const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
-        stripePriceId: privateAssetPackListingData.prices[0].stripePriceId,
+        productId: privateAssetPackListingData.id,
+        priceName: privateAssetPackListingData.prices[0].name,
         userId: profile.id,
         customerEmail: profile.email,
         ...(password ? { password } : undefined),

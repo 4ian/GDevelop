@@ -5,7 +5,7 @@
  */
 var shell = require('shelljs');
 var fs = require('fs');
-var unzipper = require('unzipper');
+var AdmZip = require('adm-zip');
 var process = require('process');
 var path = require('path');
 const { hashElement } = require('folder-hash');
@@ -74,36 +74,32 @@ editorHasCorrectHash().then(({ isHashCorrect }) => {
       );
 
       try {
-        fs.createReadStream(zipFilePath)
-          .pipe(
-            unzipper.Extract({
-              path: path.join('../public/external/', editor),
-            })
-          )
-          .on('close', function() {
+        const zip = new AdmZip(zipFilePath);
+        zip.extractAllTo(
+          path.join('../public/external/', editor),
+          /*overwrite=*/ true
+        );
+
+        shell.echo(
+          '✅ Extracted ' +
+            editor +
+            '-editor.zip to public/external/' +
+            editor +
+            ' folder'
+        );
+        shell.rm(zipFilePath);
+        editorHasCorrectHash().then(({ isHashCorrect, actualFolderHash }) => {
+          if (!isHashCorrect) {
             shell.echo(
-              '✅ Extracted ' +
+              "❌ Can't verify that " +
                 editor +
-                '-editor.zip to public/external/' +
-                editor +
-                ' folder'
+                '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
             );
-            shell.rm(zipFilePath);
-            editorHasCorrectHash().then(
-              ({ isHashCorrect, actualFolderHash }) => {
-                if (!isHashCorrect) {
-                  shell.echo(
-                    "❌ Can't verify that " +
-                      editor +
-                      '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
-                  );
-                  shell.echo(
-                    `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
-                  );
-                }
-              }
+            shell.echo(
+              `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
             );
-          });
+          }
+        });
       } catch (e) {
         shell.echo(
           '❌ Error while extracting ' +
@@ -115,13 +111,11 @@ editorHasCorrectHash().then(({ isHashCorrect }) => {
         );
       }
     },
-    (e) => {
+    e => {
       shell.echo(
         `❌ Can't download ` +
           editor +
-          `-editor.zip (${
-            e
-          }), please check your internet connection`
+          `-editor.zip (${e}), please check your internet connection`
       );
       shell.exit(1);
       return;

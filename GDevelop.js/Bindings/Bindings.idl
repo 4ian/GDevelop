@@ -523,6 +523,7 @@ interface Project {
     [Const, Value] DOMString FREE_GetTypeOfBehavior([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Const, Value] DOMString FREE_GetTypeOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
     [Value] VectorString FREE_GetBehaviorsOfObject([Const, Ref] Layout layout, [Const] DOMString name, boolean searchInGroups);
+    [Const, Value] DOMString FREE_GetTypeOfBehaviorInObjectOrGroup([Const, Ref] Layout layout, [Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
 
     //Inherited from gd::ObjectsContainer
     [Ref] gdObject InsertNewObject([Ref] Project project, [Const] DOMString type, [Const] DOMString name, unsigned long pos);
@@ -1119,6 +1120,7 @@ interface InitialInstancesContainer {
     boolean SomeInstancesAreOnLayer([Const] DOMString layer);
     void RenameInstancesOfObject([Const] DOMString oldName, [Const] DOMString newName);
     void RemoveInstance([Const, Ref] InitialInstance inst);
+    unsigned long GetLayerInstancesCount([Const] DOMString layerName);
 
     [Ref] InitialInstance InsertNewInitialInstance();
     [Ref] InitialInstance InsertInitialInstance([Const, Ref] InitialInstance inst);
@@ -1268,32 +1270,31 @@ interface InstructionSentenceFormatter {
     [Value] VectorPairStringTextFormatting GetAsFormattedText([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadata);
 };
 
-//TODO: This should be renamed to InstructionCodeGenerationInformation
-[Prefix="gd::InstructionMetadata::"]
-interface ExtraInformation {
-    [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName_);
-    [Ref] ExtraInformation SetAsyncFunctionName([Const] DOMString functionName_);
-    [Ref] ExtraInformation SetManipulatedType([Const] DOMString type_);
-    [Ref] ExtraInformation SetGetter([Const] DOMString getter);
-    [Ref] ExtraInformation SetMutators([Const, Ref] MapStringString mutators);
-    [Ref] ExtraInformation SetIncludeFile([Const] DOMString includeFile);
-    [Ref] ExtraInformation AddIncludeFile([Const] DOMString includeFile);
-    [Const, Ref] VectorString GetIncludeFiles();
-};
-
-interface ExpressionCodeGenerationInformation {
-    [Ref] ExpressionCodeGenerationInformation SetFunctionName([Const] DOMString functionName);
-    [Ref] ExpressionCodeGenerationInformation SetStatic();
-    [Ref] ExpressionCodeGenerationInformation SetIncludeFile([Const] DOMString includeFile);
-    [Ref] ExpressionCodeGenerationInformation AddIncludeFile([Const] DOMString includeFile);
-    [Const, Ref] VectorString GetIncludeFiles();
-};
-
 interface ParameterOptions {
     [Ref] ParameterOptions SetDescription([Const] DOMString description);
     [Ref] ParameterOptions SetTypeExtraInfo([Const] DOMString typeExtraInfo);
 
     [Value] ParameterOptions STATIC_MakeNewOptions();
+};
+
+interface AbstractFunctionMetadata {
+    [Ref] AbstractFunctionMetadata AddParameter([Const] DOMString type,
+                                        [Const] DOMString description,
+                                        [Const] DOMString optionalObjectType,
+                                        boolean parameterIsOptional);
+    [Ref] AbstractFunctionMetadata AddCodeOnlyParameter(
+        [Const] DOMString type, [Const] DOMString supplementaryInformation);
+    [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
+    [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    
+    [Ref] AbstractFunctionMetadata SetHidden();
+    [Ref] AbstractFunctionMetadata SetPrivate();
+
+    [Ref] AbstractFunctionMetadata SetFunctionName([Const] DOMString functionName);
+    [Ref] AbstractFunctionMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] AbstractFunctionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface InstructionMetadata {
@@ -1348,15 +1349,20 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
 
-    [Ref] ExtraInformation GetCodeExtraInformation();
-
-    [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName);
-    [Ref] ExtraInformation SetAsyncFunctionName([Const] DOMString functionName);
-
+    [Ref] InstructionMetadata GetCodeExtraInformation();
+    
+    [Ref] InstructionMetadata SetFunctionName([Const] DOMString functionName_);
+    [Ref] InstructionMetadata SetAsyncFunctionName([Const] DOMString functionName_);
+    [Const, Ref] DOMString GetFunctionName();
+    [Const, Ref] DOMString GetAsyncFunctionName();
+    [Ref] InstructionMetadata SetManipulatedType([Const] DOMString type_);
+    [Ref] InstructionMetadata SetGetter([Const] DOMString getter);
+    [Ref] InstructionMetadata SetMutators([Const, Ref] MapStringString mutators);
     [Ref] InstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] InstructionMetadata AddIncludeFile([Const] DOMString includeFile);
     [Const, Ref] VectorString GetIncludeFiles();
 };
+InstructionMetadata implements AbstractFunctionMetadata;
 
 interface ExpressionMetadata {
     void ExpressionMetadata(
@@ -1404,14 +1410,16 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
-    [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
-
-    [Ref] ExpressionCodeGenerationInformation SetFunctionName([Const] DOMString functionName);
-
+    [Ref] ExpressionMetadata GetCodeExtraInformation();
+    
+    [Ref] ExpressionMetadata SetFunctionName([Const] DOMString functionName);
+    [Const, Ref] DOMString GetFunctionName();
+    [Ref] ExpressionMetadata SetStatic();
     [Ref] ExpressionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExpressionMetadata AddIncludeFile([Const] DOMString includeFile);
     [Const, Ref] VectorString GetIncludeFiles();
 };
+ExpressionMetadata implements AbstractFunctionMetadata;
 
 interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata AddParameter([Const] DOMString type,
@@ -1440,6 +1448,7 @@ interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata MarkAsComplex();
     [Ref] MultipleInstructionMetadata SetPrivate();
 };
+MultipleInstructionMetadata implements AbstractFunctionMetadata;
 
 interface DependencyMetadata {
     void DependencyMetadata();
@@ -1528,6 +1537,7 @@ interface VectorParameterMetadata {
     [Ref] ParameterMetadata at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
     void FREE_removeFromVectorParameterMetadata(unsigned long index);
+    void FREE_insertIntoVectorParameterMetadata(unsigned long index, [Const, Ref] ParameterMetadata parameterMetadata);
     void FREE_swapInVectorParameterMetadata(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
@@ -1907,6 +1917,8 @@ interface PlatformExtension {
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
     [Const, Value] DOMString STATIC_GetNamespaceSeparator();
+    [Const, Value] DOMString STATIC_GetBehaviorFullType(
+        [Const] DOMString extensionName, [Const] DOMString behaviorName);
 };
 
 interface EventsList {
@@ -2363,6 +2375,9 @@ interface WholeProjectRefactorer {
     [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
     [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
     boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
+    void STATIC_RemoveLayer([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
+    void STATIC_MergeLayers([Ref] Project project, [Ref] Layout layout, [Const] DOMString originLayerName, [Const] DOMString targetLayerName);
+    unsigned long STATIC_GetLayoutAndExternalLayoutLayerInstancesCount([Ref] Project project, [Ref] Layout layout, [Const] DOMString layerName);
 };
 
 interface PropertyFunctionGenerator {
@@ -2958,8 +2973,8 @@ interface Sprite {
     [Ref] Point GetPoint([Const] DOMString name);
     boolean HasPoint([Const] DOMString name);
 
-    boolean IsCollisionMaskAutomatic();
-    void SetCollisionMaskAutomatic(boolean enabled);
+    boolean IsFullImageCollisionMask();
+    void SetFullImageCollisionMask(boolean enabled);
 
     [Ref] VectorPolygon2d GetCustomCollisionMask();
     void SetCustomCollisionMask([Const, Ref] VectorPolygon2d collisionMask);
@@ -3016,6 +3031,9 @@ interface SpriteObject {
 
     void SetUpdateIfNotVisible(boolean updateIfNotVisible);
     boolean GetUpdateIfNotVisible();
+
+    boolean AdaptCollisionMaskAutomatically();
+    void SetAdaptCollisionMaskAutomatically(boolean adaptCollisionMaskAutomatically);
 };
 SpriteObject implements ObjectConfiguration;
 
@@ -3367,4 +3385,42 @@ interface JsCodeEvent {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+[Prefix="gdjs::"]
+interface MetadataDeclarationHelper {
+    void MetadataDeclarationHelper();
+    
+    void STATIC_DeclareExtension(
+        [Ref] PlatformExtension extension,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
+
+    [Ref] AbstractFunctionMetadata GenerateFreeFunctionMetadata(
+        [Const, Ref] Project project,
+        [Ref] PlatformExtension extension,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Const, Ref] EventsFunction eventsFunction);
+
+    [Ref] BehaviorMetadata STATIC_GenerateBehaviorMetadata(
+        [Const, Ref] Project project,
+        [Ref] PlatformExtension extension,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+        [Ref] MapStringString behaviorMethodMangledNames);
+
+    [Ref] ObjectMetadata STATIC_GenerateObjectMetadata(
+        [Const, Ref] Project project,
+        [Ref] PlatformExtension extension,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Ref] MapStringString objectMethodMangledNames);
+
+    [Const, Value] DOMString STATIC_GetFreeFunctionCodeName(
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Const, Ref] EventsFunction eventsFunction);
+
+    boolean STATIC_IsBehaviorLifecycleEventsFunction([Const] DOMString functionName);
+    boolean STATIC_IsObjectLifecycleEventsFunction([Const] DOMString functionName);
+    boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString functionName);
+    [Const, Value] DOMString STATIC_ShiftSentenceParamIndexes([Const] DOMString sentence, long offset);
 };

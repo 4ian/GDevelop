@@ -16,7 +16,9 @@ const loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 const loadedThreeTextures = {};
 const loadedThreeMaterials = {};
-const loaded3DModels = {};
+const loadedOrLoading3DModelPromises: {
+  [resourceName: string]: Promise<THREE.THREE_ADDONS.GLTF>,
+} = {};
 
 const createInvalidModel = (): GLTF => {
   /**
@@ -51,6 +53,37 @@ const getOrCreateGltfLoader = () => {
     gltfLoader.setDRACOLoader(dracoLoader);
   }
   return gltfLoader;
+};
+
+const load3DModel = (
+  project: gdProject,
+  resourceName: string
+): Promise<THREE.THREE_ADDONS.GLTF> => {
+  if (!project.getResourcesManager().hasResource(resourceName))
+    return Promise.resolve(invalidModel);
+
+  const resource = project.getResourcesManager().getResource(resourceName);
+  if (resource.getKind() !== 'model3D') return Promise.resolve(invalidModel);
+
+  const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
+    isResourceForPixi: true,
+  });
+
+  const gltfLoader = getOrCreateGltfLoader();
+  gltfLoader.withCredentials = checkIfCredentialsRequired(url);
+  return new Promise((resolve, reject) => {
+    gltfLoader.load(
+      url,
+      gltf => {
+        traverseToSetBasicMaterialFromMeshes(gltf.scene);
+        resolve(gltf);
+      },
+      undefined,
+      error => {
+        reject(error);
+      }
+    );
+  });
 };
 
 const determineCrossOrigin = (url: string) => {
@@ -308,37 +341,12 @@ export default class PixiResourcesLoader {
     project: gdProject,
     resourceName: string
   ): Promise<THREE.THREE_ADDONS.GLTF> {
-    const loaded3DModel = loaded3DModels[resourceName];
-    if (loaded3DModel) return Promise.resolve(loaded3DModel);
+    const promise = loadedOrLoading3DModelPromises[resourceName];
+    if (promise) return promise;
 
-    if (!project.getResourcesManager().hasResource(resourceName))
-      return Promise.resolve(invalidModel);
-
-    const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'model3D') return Promise.resolve(invalidModel);
-
-    const url = ResourcesLoader.getResourceFullUrl(project, resourceName, {
-      isResourceForPixi: true,
-    });
-
-    const gltfLoader = getOrCreateGltfLoader();
-    gltfLoader.withCredentials = checkIfCredentialsRequired(url);
-    // TODO Cache promises that are not yet resolved to void `load` being
-    // called more than once for the same resource.
-    return new Promise((resolve, reject) => {
-      gltfLoader.load(
-        url,
-        gltf => {
-          traverseToSetBasicMaterialFromMeshes(gltf.scene);
-          loaded3DModels[resourceName] = gltf;
-          resolve(gltf);
-        },
-        undefined,
-        error => {
-          reject(error);
-        }
-      );
-    });
+    const loadingPromise = load3DModel(project, resourceName);
+    loadedOrLoading3DModelPromises[resourceName] = loadingPromise;
+    return loadingPromise;
   }
 
   /**

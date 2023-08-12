@@ -224,7 +224,8 @@ export default class MaterialUIMenuImplementation
                 // $FlowFixMe - existence should be inferred by Flow.
                 item.enabled === false
               }
-              onClick={async () => {
+              onClick={async e => {
+                e.stopPropagation();
                 if (item.enabled === false) {
                   return;
                 }
@@ -269,7 +270,8 @@ export default class MaterialUIMenuImplementation
               dense
               key={'item' + item.label}
               disabled={item.enabled === false}
-              onClick={() => {
+              onClick={e => {
+                e.stopPropagation();
                 if (item.enabled === false) {
                   return;
                 }

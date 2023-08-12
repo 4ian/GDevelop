@@ -140,7 +140,10 @@ export default function InstructionEditorDialog({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
-  const windowWidth = useResponsiveWindowWidth();
+  const windowWidth: WidthType = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
+  const isMediumScreen = windowWidth === 'medium';
+  const isLargeScreen = windowWidth === 'large' || windowWidth === 'xlarge';
   const instructionType: string = instruction.getType();
   const [
     newBehaviorDialogOpen,
@@ -153,13 +156,11 @@ export default function InstructionEditorDialog({
   const shouldAutofocusInput = useShouldAutofocusInput();
 
   // Handle the back button
-  const stepBackFrom = (origin: StepName, windowWidth: WidthType) => {
+  const stepBackFrom = (origin: StepName) => {
     if (origin === 'parameters' && chosenObjectName) {
       setStep(
         // "medium" displays 2 columns, so "Back" button should go back to the first screen.
-        windowWidth === 'medium'
-          ? 'object-or-free-instructions'
-          : 'object-instructions'
+        isMediumScreen ? 'object-or-free-instructions' : 'object-instructions'
       );
     } else {
       setStep('object-or-free-instructions');
@@ -316,11 +317,12 @@ export default function InstructionEditorDialog({
           />,
         ]}
         secondaryActions={[
-          windowWidth !== 'large' && step !== 'object-or-free-instructions' ? (
+          (isMobileScreen || isMediumScreen) &&
+          step !== 'object-or-free-instructions' ? (
             <FlatButton
               label={<Trans>Back</Trans>}
               primary={false}
-              onClick={() => stepBackFrom(step, windowWidth)}
+              onClick={() => stepBackFrom(step)}
               key="back"
             />
           ) : null,
@@ -329,8 +331,7 @@ export default function InstructionEditorDialog({
             helpPagePath={instructionHelpPage || '/events'}
             label={
               !instructionHelpPage ||
-              (windowWidth === 'small' ||
-                step === 'object-or-free-instructions') ? (
+              (isMobileScreen || step === 'object-or-free-instructions') ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (
                 <Trans>Help for this condition</Trans>
@@ -357,7 +358,7 @@ export default function InstructionEditorDialog({
             parameters: renderParameters,
           }}
           getColumns={() => {
-            if (windowWidth === 'large') {
+            if (isLargeScreen) {
               return [
                 {
                   columnName: 'instruction-or-object-selector',
@@ -372,7 +373,7 @@ export default function InstructionEditorDialog({
                   ratio: !chosenObjectName ? 2 : 1,
                 },
               ].filter(Boolean);
-            } else if (windowWidth === 'medium') {
+            } else if (isMediumScreen) {
               if (step === 'object-or-free-instructions') {
                 return [
                   {

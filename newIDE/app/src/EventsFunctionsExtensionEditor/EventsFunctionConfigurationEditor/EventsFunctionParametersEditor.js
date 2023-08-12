@@ -231,16 +231,6 @@ export const EventsFunctionParametersEditor = ({
     ]
   );
 
-  const setStringSelectorExtraInfo = React.useCallback(
-    (parameter: gdParameterMetadata) => {
-      return (newExtraInfo: Array<string>) => {
-        parameter.setExtraInfo(JSON.stringify(newExtraInfo));
-        forceUpdate();
-      };
-    },
-    [forceUpdate]
-  );
-
   const parameters =
     eventsFunctionsContainer &&
     eventsFunction.getFunctionType() === gd.EventsFunction.ActionWithOperator

@@ -487,6 +487,7 @@ namespace gdjs {
         } else {
           obj.update(this);
         }
+        obj.getOnceTriggers().startNewFrame();
         obj.updateTimers(elapsedTime);
         allInstancesList[i].stepBehaviorsPreEvents(this);
       }

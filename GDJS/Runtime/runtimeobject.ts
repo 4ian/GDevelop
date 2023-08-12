@@ -182,6 +182,8 @@ namespace gdjs {
      */
     pick: boolean = false;
 
+    private readonly onceTriggers = new gdjs.OnceTriggers();
+
     //Hit boxes:
     protected _defaultHitBoxes: gdjs.Polygon[] = [];
     protected hitBoxes: gdjs.Polygon[];
@@ -376,6 +378,13 @@ namespace gdjs {
      */
     getInstanceContainer(): gdjs.RuntimeInstanceContainer {
       return this._runtimeScene;
+    }
+
+    /**
+     * The object's trigger onces states.
+     */
+    getOnceTriggers() {
+      return this.onceTriggers;
     }
 
     /**

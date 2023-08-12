@@ -99,7 +99,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       "res/conditions/once.png");
 
   extension
-      .AddCondition("OncePerObject",
+      .AddCondition("OncePerInstance",
                     _("Trigger once while true for an object"),
                     _("Run actions only once per instance of an object every "
                       "time the previous conditions start matching."),

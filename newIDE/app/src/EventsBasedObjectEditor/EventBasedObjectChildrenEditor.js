@@ -7,7 +7,6 @@ import * as React from 'react';
 import { Line } from '../UI/Grid';
 import ObjectsList, { type ObjectsListInterface } from '../ObjectsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';

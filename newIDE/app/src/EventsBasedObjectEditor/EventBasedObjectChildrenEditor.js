@@ -81,7 +81,9 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
       tentativeNewName => {
         if (
           eventsBasedObject.hasObjectNamed(tentativeNewName) ||
-          eventsBasedObject.getObjectGroups().has(tentativeNewName)
+          eventsBasedObject.getObjectGroups().has(tentativeNewName) ||
+          // TODO EBO Use a constant instead a hard coded value "Object".
+          tentativeNewName === 'Object'
         ) {
           return true;
         }
@@ -124,19 +126,6 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     done: boolean => void,
     i18n: I18nType
   ) => {
-    // TODO EBO Use a constant instead a hard coded value "Object".
-    if (newName === 'Object') {
-      showWarningBox(
-        i18n._(
-          t`"Object" is a reserved name, used for the parent object in the events (actions, conditions, expressions...). Please choose another name.`
-        ),
-        {
-          delayToNextTick: true,
-        }
-      );
-      return;
-    }
-
     const { object } = objectWithContext;
     const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 

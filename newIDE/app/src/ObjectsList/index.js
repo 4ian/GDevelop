@@ -464,7 +464,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
-        const { object, global } = objectWithContext;
+        const { global } = objectWithContext;
         onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
@@ -473,8 +473,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFinish(objectWithContext, validatedNewName, doRename => {
           if (!doRename) return;
 
-          // TODO: still useful?
-          object.setName(validatedNewName);
           onObjectModified(false);
         });
       },

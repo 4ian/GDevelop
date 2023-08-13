@@ -34,7 +34,8 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Movement');
+      .setCategory('Movement')
+      .setTags("physics, gravity, obstacle, collision");
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');

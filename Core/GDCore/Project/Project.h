@@ -983,7 +983,13 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Return true if \a name is valid (can be used safely for an object,
    * behavior, events function name, etc...).
    */
-  static bool ValidateName(const gd::String& name);
+  static bool IsNameSafe(const gd::String& name);
+
+  /**
+   * Return a name, based on the one passed in parameter, that can be safely used
+   * for an object, behavior, events function name, etc...
+   */
+  static gd::String GetSafeName(const gd::String& name); 
   ///@}
 
   /** \name External source files

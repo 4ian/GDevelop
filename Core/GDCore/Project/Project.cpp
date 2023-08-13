@@ -993,7 +993,7 @@ void Project::SerializeTo(SerializerElement& element) const {
         externalSourceFilesElement.AddChild("sourceFile"));
 }
 
-bool Project::ValidateName(const gd::String& name) {
+bool Project::IsNameSafe(const gd::String& name) {
   if (name.empty()) return false;
 
   if (isdigit(name[0])) return false;
@@ -1001,6 +1001,26 @@ bool Project::ValidateName(const gd::String& name) {
   gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
   return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
+}
+
+gd::String Project::GetSafeName(const gd::String& name) {
+  if (name.empty()) return "Unnamed";
+
+  gd::String newName = name;
+
+  if (isdigit(name[0])) newName = "_" + newName;
+
+  gd::String allowedCharacters =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+  
+  for (size_t i = 0;i < newName.size();++i) {
+    // Replace all unallowed letters by an underscore.
+    if (allowedCharacters.find_first_of(std::u32string(1, newName[i])) == gd::String::npos) {
+      newName.replace(i, 1, '_');
+    }
+  }
+
+  return newName;
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {

@@ -13,7 +13,6 @@ import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
@@ -88,46 +87,27 @@ type Props = {|
   behaviorObjectType?: string,
 |};
 
-const validatePropertyName = (
+const getValidatedPropertyName = (
   i18n: I18nType,
   properties: gdNamedPropertyDescriptorsList,
   newName: string
-) => {
-  if (!newName) {
-    showWarningBox(i18n._(t`The name of a property cannot be empty.`), {
-      delayToNextTick: true,
-    });
-    return false;
-  }
-  if (newName === 'name' || newName === 'type') {
-    showWarningBox(
-      i18n._(
-        t`The name of a property cannot be "name" or "type", as they are used by GDevelop internally.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-  if (properties.has(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is already used by another property. Choose a unique name for each property.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-  if (!gd.Project.validateName(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
+): string => {
+  const safeAndUniqueNewName = newNameGenerator(
+    gd.Project.getSafeName(newName),
+    tentativeNewName => {
+      if (
+        properties.has(tentativeNewName) ||
+        // The name of a property cannot be "name" or "type", as they are used by GDevelop internally.
+        (tentativeNewName === 'name' || tentativeNewName === 'type')
+      ) {
+        return true;
+      }
 
-  return true;
+      return false;
+    }
+  );
+
+  return safeAndUniqueNewName;
 };
 
 const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
@@ -426,21 +406,18 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           onChange={newName => {
                                             if (newName === property.getName())
                                               return;
-                                            if (
-                                              !validatePropertyName(
-                                                i18n,
-                                                properties,
-                                                newName
-                                              )
-                                            )
-                                              return;
 
-                                            props.onRenameProperty(
-                                              property.getName(),
+                                            const validatedNewName = getValidatedPropertyName(
+                                              i18n,
+                                              properties,
                                               newName
                                             );
+                                            props.onRenameProperty(
+                                              property.getName(),
+                                              validatedNewName
+                                            );
+                                            property.setName(validatedNewName);
 
-                                            property.setName(newName);
                                             forceUpdate();
                                             props.onPropertiesUpdated &&
                                               props.onPropertiesUpdated();

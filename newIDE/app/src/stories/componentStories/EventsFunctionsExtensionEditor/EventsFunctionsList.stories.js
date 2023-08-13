@@ -30,7 +30,10 @@ export const Default = () => (
         onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
         onAddEventsFunction={cb => cb({ functionType: 0, name: null })}
         onEventsFunctionAdded={() => {}}
-        onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
+        onRenameEventsFunction={(eventsFunction, newName, cb) => {
+          eventsFunction.setName(newName);
+          cb(true);
+        }}
         canRename={() => true}
       />
     </FixedHeightFlexContainer>

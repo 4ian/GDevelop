@@ -137,7 +137,7 @@ type Props = {|
   onObjectCreated: gdObject => void,
   onObjectSelected: (?ObjectWithContext) => void,
   onObjectPasted?: gdObject => void,
-  canRenameObject: (newName: string, global: boolean) => boolean,
+  getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onAddObjectInstance: (objectName: string) => void,
 
   getThumbnail: (
@@ -176,7 +176,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onObjectCreated,
       onObjectSelected,
       onObjectPasted,
-      canRenameObject,
+      getValidatedObjectOrGroupName,
       onAddObjectInstance,
 
       getThumbnail,
@@ -464,22 +464,20 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const rename = React.useCallback(
       (objectWithContext: ObjectWithContext, newName: string) => {
-        const { object, global } = objectWithContext;
+        const { global } = objectWithContext;
         onRenameObjectStart(null);
 
         if (getObjectWithContextName(objectWithContext) === newName) return;
 
-        if (canRenameObject(newName, global)) {
-          onRenameObjectFinish(objectWithContext, newName, doRename => {
-            if (!doRename) return;
+        const validatedNewName = getValidatedObjectOrGroupName(newName, global);
+        onRenameObjectFinish(objectWithContext, validatedNewName, doRename => {
+          if (!doRename) return;
 
-            object.setName(newName);
-            onObjectModified(false);
-          });
-        }
+          onObjectModified(false);
+        });
       },
       [
-        canRenameObject,
+        getValidatedObjectOrGroupName,
         onObjectModified,
         onRenameObjectStart,
         onRenameObjectFinish,

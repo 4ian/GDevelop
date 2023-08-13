@@ -9,7 +9,6 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
@@ -78,18 +77,9 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
             value={
               eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
             }
-            onChange={text => {
-              if (gd.Project.validateName(text)) {
-                eventsBasedObject.setDefaultName(text);
-                forceUpdate();
-              } else {
-                showWarningBox(
-                  i18n._(
-                    t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-                  ),
-                  { delayToNextTick: true }
-                );
-              }
+            onChange={newName => {
+              eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
+              forceUpdate();
             }}
             fullWidth
           />

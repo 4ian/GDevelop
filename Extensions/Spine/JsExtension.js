@@ -92,7 +92,35 @@ module.exports = {
       )
       .setFunctionName('setScale')
       .setGetter('getScale');
+
+      object
+        .addCondition(
+          'isAnimationComplete',
+          _('Animation complete'),
+          _('Check if the animation being played by the Spine object is complete.'),
+          _('The animation of _PARAM0_ is complete'),
+          _('Animations and images'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('Spine'), 'SpineObject')
+        .markAsSimple()
+        .setFunctionName('isAnimationComplete');
     
+      object
+        .addExpressionAndConditionAndAction(
+          'boolean',
+          'Updatable',
+          _('Updatable'),
+          _('an animation is updatable'),
+          _('Updatable'),
+          'res/conditions/animation24.png',
+          'res/conditions/animation.png'
+        )
+        .addParameter('object', _('Spine'), 'SpineObject')
+        .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setIsUpdatable')
+        .setGetter('isUpdatable');
     
       object
         .addExpressionAndConditionAndAction(

@@ -2,13 +2,31 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
   import PIXI_SPINE = GlobalPIXIModule.PIXI_SPINE;
 
+  type SpineCb<T = any> = (s: PIXI_SPINE.Spine) => T;
+
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
    */
   export class SpineRuntimeObjectPixiRenderer {
     _object: gdjs.SpineRuntimeObject;
     _pixiObject: PIXI.Container;
-    _spine!: Promise<PIXI_SPINE.Spine>;
+    _spine?: PIXI_SPINE.Spine;
+    _spinePromise!: Promise<PIXI_SPINE.Spine>;
+    private _isUpdatable = true;
+    private _isAnimationCompelete = true;
+
+    get isAnimationCompelete() {
+      return this._isAnimationCompelete;
+    }
+
+    get isUpdatable() {
+      return this._isUpdatable;
+    }
+
+    set isUpdatable(isUpdatable: boolean) {
+      this._isUpdatable = isUpdatable;
+      this.applySpineAction(spine => spine.autoUpdate = this._isUpdatable);
+    }
 
     /**
      * @param runtimeObject The object to render
@@ -44,7 +62,7 @@ namespace gdjs {
     }
 
     updateTimeScale() {
-      this._spine.then(spine => spine.state.timeScale = this._object.getTimeScale());
+      this.applySpineAction(spine => spine.state.timeScale = this._object.getTimeScale());
     }
 
     updateScale(): void {
@@ -78,21 +96,21 @@ namespace gdjs {
     }
 
     setWidth(width: float): void {
-      this._spine.then(spine => {
+      this.applySpineAction(spine => {
         spine.width = width;
         this.updateBounds(spine);
-      });
+      })
     }
 
     setHeight(height: float): void {
-      this._spine.then(spine => {
+      this.applySpineAction(spine => {
         spine.height = height;
         this.updateBounds(spine);
       });
     }
 
     setSize(width: float, height: float): void {
-      this._spine?.then(spine => {
+      this.applySpineAction(spine => {
         spine.width = width;
         spine.height = height;
         this.updateBounds(spine);
@@ -100,10 +118,20 @@ namespace gdjs {
     }
 
     setAnimation(animation: string, loop: boolean) {
-      this._spine?.then(s => {
+      this.applySpineAction(s => {
+        this._isAnimationCompelete = false;
+        s.state.addListener({ complete: () => this._isAnimationCompelete = true });
         s.state.setAnimation(0, animation, loop);
         this.updateBounds(s);
       });
+    }
+
+    private applySpineAction(action: SpineCb) {
+      if (this._spine) {
+        action(this._spine);
+      } else {
+        this._spinePromise.then(action);
+      }
     }
 
     private constructSpine() {
@@ -112,13 +140,13 @@ namespace gdjs {
       const atlasText = game.getTextManager().get(this._object.atlasResourceName)!;
       const atlasImage = game.getImageManager().getPIXITexture(this._object.imageResourceName)!;
 
-      this._spine = this.getSpineSkeleton(spineJson, atlasText, atlasImage)
+      this._spinePromise = this.getSpineSkeleton(spineJson, atlasText, atlasImage)
         .then(skeleton => {
-          const s = new PIXI_SPINE.Spine(skeleton);
-          this._pixiObject.addChild(s);
-          this.updateBounds(s);
+          this._spine = new PIXI_SPINE.Spine(skeleton);
+          this._pixiObject.addChild(this._spine);
+          this.updateBounds(this._spine);
 
-          return s;
+          return this._spine;
         });
     }
 

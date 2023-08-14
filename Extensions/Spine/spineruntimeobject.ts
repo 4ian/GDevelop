@@ -189,8 +189,20 @@ namespace gdjs {
       );
     }
 
-    isCurrentAnimationName(name): boolean {
+    isAnimationComplete(): boolean {
+      return this._renderer.isAnimationCompelete;
+    }
+
+    isCurrentAnimationName(name: string): boolean {
       return this.getAnimationName() === name;
+    }
+
+    setIsUpdatable(isUpdatable: boolean): void {
+      this._renderer.isUpdatable = isUpdatable;
+    }
+
+    isUpdatable(): boolean {
+      return this._renderer.isUpdatable;
     }
   }
 

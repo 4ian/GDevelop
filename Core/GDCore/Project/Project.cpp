@@ -23,6 +23,7 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/ProjectBrowserHelper.h"
+#include "GDCore/IDE/ResourceExposer.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -1025,30 +1026,7 @@ gd::String Project::GetSafeName(const gd::String& name) {
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::ProjectBrowserHelper::ExposeProjectEvents for a method that
-  // traverse the whole project (this time for events) and ExposeProjectEffects
-  // (this time for effects). Ideally, this method could be moved outside of
-  // gd::Project.
-
-  gd::ResourcesManager* resourcesManager = &GetResourcesManager();
-
-  // Add project resources
-  worker.ExposeResources(resourcesManager);
-  platformSpecificAssets.ExposeResources(worker);
-
-  // Add event resources
-  auto eventWorker = GetResourceWorkerOnEvents(*this, worker);
-  gd::ProjectBrowserHelper::ExposeProjectEvents(
-    *this, eventWorker);
-
-  // Add object configuration resources
-  auto objectWorker = GetResourceWorkerOnObjects(worker);
-  gd::ProjectBrowserHelper::ExposeProjectObjects(
-    *this, objectWorker);
-
-  // Add loading screen background image if present
-  if (loadingScreen.GetBackgroundImageResourceName() != "")
-    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+  gd::ResourceExposer::ExposeWholeProjectResources(*this, worker);
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

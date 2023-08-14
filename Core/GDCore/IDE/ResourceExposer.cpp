@@ -19,7 +19,11 @@
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/Effect.h"
 #include "GDCore/String.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/EffectMetadata.h"
 
 namespace gd {
 
@@ -30,23 +34,68 @@ void ResourceExposer::ExposeWholeProjectResources(gd::Project& project, gd::Arbi
 
   gd::ResourcesManager* resourcesManager = &(project.GetResourcesManager());
 
-  // Add project resources
+  // Expose any project resources as files.
   worker.ExposeResources(resourcesManager);
   project.GetPlatformSpecificAssets().ExposeResources(worker);
 
-  // Add event resources
+  // Expose event resources
   auto eventWorker = gd::GetResourceWorkerOnEvents(project, worker);
   gd::ProjectBrowserHelper::ExposeProjectEvents(
     project, eventWorker);
 
-  // Add object configuration resources
-  auto objectWorker = gd::GetResourceWorkerOnObjects(worker);
+  // Expose object configuration resources
+  auto objectWorker = gd::GetResourceWorkerOnObjects(project, worker);
   gd::ProjectBrowserHelper::ExposeProjectObjects(
     project, objectWorker);
 
-  // Add loading screen background image if present
+  // Expose layer effect resources
+  for (std::size_t layoutIndex = 0; layoutIndex < project.GetLayoutsCount();
+       layoutIndex++) {
+    auto &layout = project.GetLayout(layoutIndex);
+
+    for (std::size_t layerIndex = 0; layerIndex < layout.GetLayersCount();
+         layerIndex++) {
+      auto &layer = layout.GetLayer(layerIndex);
+
+      auto &effects = layer.GetEffects();
+      for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount();
+           effectIndex++) {
+        auto &effect = effects.GetEffect(effectIndex);
+        gd::ResourceExposer::ExposeEffectResources(project.GetCurrentPlatform(),
+                                                   effect, worker);
+      }
+    }
+  }
+
+  // Expose loading screen background image if present
   auto& loadingScreen = project.GetLoadingScreen();
   if (loadingScreen.GetBackgroundImageResourceName() != "")
     worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
 }
+
+void ResourceExposer::ExposeEffectResources(
+    gd::Platform &platform, gd::Effect &effect,
+    gd::ArbitraryResourceWorker &worker) {
+  auto &effectMetadata =
+      MetadataProvider::GetEffectMetadata(platform, effect.GetEffectType());
+
+  for (auto &propertyPair : effectMetadata.GetProperties()) {
+    auto &propertyName = propertyPair.first;
+    auto &propertyDescriptor = propertyPair.second;
+
+    if (propertyDescriptor.GetType() == "resource" &&
+        propertyDescriptor.GetExtraInfo().size() > 0) {
+      auto &resourceType = propertyDescriptor.GetExtraInfo()[0];
+
+      const gd::String &resourceName = effect.GetStringParameter(propertyName);
+      gd::String potentiallyUpdatedResourceName = resourceName;
+      worker.ExposeResourceWithType(resourceType,
+                                    potentiallyUpdatedResourceName);
+      if (potentiallyUpdatedResourceName != resourceName) {
+        effect.SetStringParameter(propertyName, potentiallyUpdatedResourceName);
+      }
+    }
+  }
+}
+
 } // namespace gd

@@ -55,6 +55,11 @@ class GD_CORE_API ArbitraryResourceWorker {
   void ExposeResources(gd::ResourcesManager *resourcesManager);
 
   /**
+   * \brief Expose a resource from a given type.
+   */
+  void ExposeResourceWithType(const gd::String& resourceType, gd::String& resourceName);
+
+  /**
    * \brief Expose an image, which is always a reference to a "image" resource.
    */
   virtual void ExposeImage(gd::String &imageName);
@@ -161,18 +166,19 @@ ResourceWorkerInEventsWorker GD_CORE_API GetResourceWorkerOnEvents(
 class GD_CORE_API ResourceWorkerInObjectsWorker
     : public gd::ArbitraryObjectsWorker {
 public:
-  ResourceWorkerInObjectsWorker(gd::ArbitraryResourceWorker &worker_)
-      : worker(worker_){};
+  ResourceWorkerInObjectsWorker(const gd::Project &project_, gd::ArbitraryResourceWorker &worker_)
+      : project(project_), worker(worker_){};
   ~ResourceWorkerInObjectsWorker() {}
 
 private:
   void DoVisitObject(gd::Object &object) override;
   void DoVisitBehavior(gd::Behavior &behavior) override;
 
+  const gd::Project &project;
   gd::ArbitraryResourceWorker &worker;
 };
 
 gd::ResourceWorkerInObjectsWorker GD_CORE_API
-GetResourceWorkerOnObjects(gd::ArbitraryResourceWorker &worker);
+GetResourceWorkerOnObjects(const gd::Project &project, gd::ArbitraryResourceWorker &worker);
 
 }  // namespace gd

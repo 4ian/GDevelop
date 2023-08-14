@@ -6,14 +6,16 @@
 #pragma once
 
 namespace gd {
+class Platform;
 class Project;
 class ArbitraryResourceWorker;
+class Effect;
 } // namespace gd
 
 namespace gd {
 
 /**
- * \brief 
+ * \brief
  */
 class GD_CORE_API ResourceExposer {
 public:
@@ -26,7 +28,11 @@ public:
    * \see WholeProjectRefactorer
    * \see ArbitraryResourceWorker
    */
-  static void ExposeWholeProjectResources(gd::Project& project, gd::ArbitraryResourceWorker& worker);
+  static void ExposeWholeProjectResources(gd::Project &project,
+                                          gd::ArbitraryResourceWorker &worker);
+
+  static void ExposeEffectResources(gd::Platform &platform, gd::Effect &effect,
+                                    gd::ArbitraryResourceWorker &worker);
 };
 
 } // namespace gd

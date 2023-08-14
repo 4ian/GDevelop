@@ -23,6 +23,7 @@
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "catch.hpp"
 #include "GDCore/IDE/ResourceExposer.h"
+#include "GDCore/Project/Effect.h"
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker {
  public:
@@ -132,5 +133,62 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
     REQUIRE(worker.images[0] == "res1");
     REQUIRE(worker.audios.size() == 1);
     REQUIRE(worker.audios[0] == "res4");
+  }
+
+  SECTION("Can find resource usage in layer effects") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& layout = project.InsertNewLayout("Scene", 0);
+    layout.InsertNewLayer("MyLayer", 0);
+    auto& layer = layout.GetLayer("MyLayer");
+    auto& effect = layer.GetEffects().InsertNewEffect("MyEffect", 0);
+    effect.SetEffectType("MyExtension::EffectWithResource");
+    effect.SetStringParameter("texture", "res1");
+
+    worker.files.clear();
+    worker.images.clear();
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.files.size() == 3);
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
+  }
+
+  SECTION("Can find resource usage in object effects") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    project.GetResourcesManager().AddResource(
+        "res1", "path/to/file1.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res2", "path/to/file2.png", "image");
+    project.GetResourcesManager().AddResource(
+        "res3", "path/to/file3.png", "image");
+    ArbitraryResourceWorkerTest worker;
+
+    auto& layout = project.InsertNewLayout("Scene", 0);
+    layout.InsertNewLayer("MyLayer", 0);
+    auto& layer = layout.GetLayer("MyLayer");
+    auto& object = layout.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    auto& effect = object.GetEffects().InsertNewEffect("MyEffect", 0);
+    effect.SetEffectType("MyExtension::EffectWithResource");
+    effect.SetStringParameter("texture", "res1");
+    
+    worker.files.clear();
+    worker.images.clear();
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
+    REQUIRE(worker.files.size() == 3);
+    REQUIRE(worker.images.size() == 1);
+    REQUIRE(worker.images[0] == "res1");
   }
 }

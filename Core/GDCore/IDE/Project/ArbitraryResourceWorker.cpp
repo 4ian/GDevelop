@@ -19,6 +19,9 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/Effect.h"
+#include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 using namespace std;
 
@@ -130,29 +133,9 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
           std::cout << targetResourceName << std::endl;
           gd::Resource& targetResource =
               resourcesManager->GetResource(targetResourceName);
-          const gd::String& targetResourceKind = targetResource.GetKind();
 
           gd::String potentiallyUpdatedTargetResourceName = targetResourceName;
-
-          if (targetResourceKind == "audio") {
-            ExposeAudio(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "bitmapFont") {
-            ExposeBitmapFont(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "font") {
-            ExposeFont(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "image") {
-            ExposeImage(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "json") {
-            ExposeJson(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "tilemap") {
-            ExposeTilemap(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "tileset") {
-            ExposeTileset(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "video") {
-            ExposeVideo(potentiallyUpdatedTargetResourceName);
-          } else if (targetResourceKind == "model3D") {
-            ExposeModel3D(potentiallyUpdatedTargetResourceName);
-          }
+          ExposeResourceWithType(targetResource.GetKind(), potentiallyUpdatedTargetResourceName);
 
           if (potentiallyUpdatedTargetResourceName != targetResourceName) {
             // The resource name was renamed. Also update the mapping.
@@ -167,6 +150,48 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
       }
     }
   }
+}
+
+void ArbitraryResourceWorker::ExposeResourceWithType(
+    const gd::String &resourceType, gd::String &resourceName) {
+  if (resourceType == "image") {
+    ExposeImage(resourceName);
+    return;
+  }
+  if (resourceType == "model3D") {
+    ExposeModel3D(resourceName);
+    return;
+  }
+  if (resourceType == "audio") {
+    ExposeAudio(resourceName);
+    return;
+  }
+  if (resourceType == "font") {
+    ExposeFont(resourceName);
+    return;
+  }
+  if (resourceType == "bitmapFont") {
+    ExposeBitmapFont(resourceName);
+    return;
+  }
+  if (resourceType == "tilemap") {
+    ExposeTilemap(resourceName);
+    return;
+  }
+  if (resourceType == "tileset") {
+    ExposeTileset(resourceName);
+    return;
+  }
+  if (resourceType == "json") {
+    ExposeJson(resourceName);
+    return;
+  }
+  if (resourceType == "video") {
+    ExposeVideo(resourceName);
+    return;
+  }
+  gd::LogWarning("Unexpected resource type: " + resourceType + " for: " + resourceName);
+  return;
 }
 
 void ArbitraryResourceWorker::ExposeResource(gd::Resource& resource) {
@@ -253,6 +278,12 @@ GetResourceWorkerOnEvents(const gd::Project &project,
 
 void ResourceWorkerInObjectsWorker::DoVisitObject(gd::Object &object) {
   object.GetConfiguration().ExposeResources(worker);
+  auto& effects = object.GetEffects();
+  for (size_t effectIndex = 0; effectIndex < effects.GetEffectsCount(); effectIndex++)
+  {
+    auto& effect = effects.GetEffect(effectIndex);
+    gd::ResourceExposer::ExposeEffectResources(project.GetCurrentPlatform(), effect, worker);
+  }
 };
 
 void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
@@ -260,8 +291,9 @@ void ResourceWorkerInObjectsWorker::DoVisitBehavior(gd::Behavior &behavior){
 };
 
 gd::ResourceWorkerInObjectsWorker
-GetResourceWorkerOnObjects(gd::ArbitraryResourceWorker &worker) {
-  gd::ResourceWorkerInObjectsWorker eventsWorker(worker);
+GetResourceWorkerOnObjects(const gd::Project &project,
+                           gd::ArbitraryResourceWorker &worker) {
+  gd::ResourceWorkerInObjectsWorker eventsWorker(project, worker);
   return eventsWorker;
 }
 

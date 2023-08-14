@@ -465,6 +465,17 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("layerEffectParameterName", _("Parameter name"));
   }
 
+  {
+      auto& effect = extension
+      ->AddEffect("EffectWithResource")
+      .SetFullName("Effect with resource")
+      .MarkAsOnlyWorkingFor2D();
+      auto& effectProperties = effect.GetProperties();
+      effectProperties["texture"]
+      .SetType("resource")
+      .AddExtraInfo("image");
+  }
+
   platform.AddExtension(commonInstructionsExtension);
   platform.AddExtension(baseObjectExtension);
   platform.AddExtension(extension);

@@ -114,7 +114,7 @@ module.exports = {
           _('Updatable'),
           _('an animation is updatable'),
           _('Updatable'),
-          'res/conditions/animation24.png',
+          '',
           'res/conditions/animation.png'
         )
         .addParameter('object', _('Spine'), 'SpineObject')

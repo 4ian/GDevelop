@@ -101,7 +101,6 @@ declare class gdProject extends gdObjectsContainer {
   getEventsBasedObject(type: string): gdEventsBasedObject;
   getVariables(): gdVariablesContainer;
   getResourcesManager(): gdResourcesManager;
-  exposeResources(worker: gdArbitraryResourceWorker): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   static isNameSafe(name: string): boolean;

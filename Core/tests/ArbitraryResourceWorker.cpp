@@ -22,6 +22,7 @@
 #include "DummyPlatform.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "catch.hpp"
+#include "GDCore/IDE/ResourceExposer.h"
 
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker {
  public:
@@ -55,7 +56,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
         "res4", "path/to/file4.png", "audio");
     ArbitraryResourceWorkerTest worker;
 
-    project.ExposeResources(worker);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
     REQUIRE(worker.files.size() == 4);
     REQUIRE(std::find(worker.files.begin(),
                       worker.files.end(),
@@ -78,7 +79,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
 
       worker.files.clear();
       worker.images.clear();
-      project.ExposeResources(worker);
+      gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
       REQUIRE(worker.files.size() == 4);
       REQUIRE(worker.images.size() == 1);
       REQUIRE(worker.images[0] == "res1");
@@ -124,7 +125,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
     standardEvent.GetActions().Insert(instruction);
     layout.GetEvents().InsertEvent(standardEvent);
 
-    project.ExposeResources(worker);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, worker);
     REQUIRE(worker.bitmapFonts.size() == 1);
     REQUIRE(worker.bitmapFonts[0] == "res3");
     REQUIRE(worker.images.size() == 1);

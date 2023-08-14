@@ -19,11 +19,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/IDE/ProjectBrowserHelper.h"
-#include "GDCore/IDE/ResourceExposer.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -1023,10 +1019,6 @@ gd::String Project::GetSafeName(const gd::String& name) {
   }
 
   return newName;
-}
-
-void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  gd::ResourceExposer::ExposeWholeProjectResources(*this, worker);
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

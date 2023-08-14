@@ -521,6 +521,8 @@ interface Project {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
+    boolean STATIC_IsUsageOfUnicodeIdentifierNamesAllowed();
+    void STATIC_AllowUsageOfUnicodeIdentifierNames(boolean enable);
     boolean STATIC_IsNameSafe([Const] DOMString name);
     [Const, Value] DOMString STATIC_GetSafeName([Const] DOMString name);
 
@@ -1291,7 +1293,7 @@ interface AbstractFunctionMetadata {
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
-    
+
     [Ref] AbstractFunctionMetadata SetHidden();
     [Ref] AbstractFunctionMetadata SetPrivate();
 
@@ -1354,7 +1356,7 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata MarkAsComplex();
 
     [Ref] InstructionMetadata GetCodeExtraInformation();
-    
+
     [Ref] InstructionMetadata SetFunctionName([Const] DOMString functionName_);
     [Ref] InstructionMetadata SetAsyncFunctionName([Const] DOMString functionName_);
     [Const, Ref] DOMString GetFunctionName();
@@ -1415,7 +1417,7 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
-    
+
     [Ref] ExpressionMetadata SetFunctionName([Const] DOMString functionName);
     [Const, Ref] DOMString GetFunctionName();
     [Ref] ExpressionMetadata SetStatic();
@@ -3397,7 +3399,7 @@ interface JsCodeEvent {
 [Prefix="gdjs::"]
 interface MetadataDeclarationHelper {
     void MetadataDeclarationHelper();
-    
+
     void STATIC_DeclareExtension(
         [Ref] PlatformExtension extension,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
@@ -3422,9 +3424,24 @@ interface MetadataDeclarationHelper {
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Ref] MapStringString objectMethodMangledNames);
 
+    [Const, Value] DOMString STATIC_GetExtensionCodeNamespacePrefix(
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
+
     [Const, Value] DOMString STATIC_GetFreeFunctionCodeName(
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction);
+
+    [Const, Value] DOMString STATIC_GetFreeFunctionCodeNamespace(
+        [Const, Ref] EventsFunction eventsFunction,
+        [Const] DOMString codeNamespacePrefix);
+
+    [Const, Value] DOMString STATIC_GetBehaviorFunctionCodeNamespace(
+        [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+        [Const] DOMString codeNamespacePrefix);
+
+    [Const, Value] DOMString STATIC_GetObjectFunctionCodeNamespace(
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString codeNamespacePrefix);
 
     boolean STATIC_IsBehaviorLifecycleEventsFunction([Const] DOMString functionName);
     boolean STATIC_IsObjectLifecycleEventsFunction([Const] DOMString functionName);

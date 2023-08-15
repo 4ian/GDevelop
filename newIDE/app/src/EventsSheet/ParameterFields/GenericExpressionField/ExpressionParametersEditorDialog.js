@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { Trans } from '@lingui/macro';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';

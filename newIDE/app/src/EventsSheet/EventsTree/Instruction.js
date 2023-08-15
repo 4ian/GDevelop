@@ -38,7 +38,7 @@ import {
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { makeVariablesContainersListFromEventsScope, type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
@@ -203,6 +203,7 @@ const Instruction = (props: Props) => {
     objectsContainer,
     id,
     resourcesManager,
+    scope,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -282,8 +283,10 @@ const Instruction = (props: Props) => {
                 .getRootNode();
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
+                // TODO: use EventsScope
                 globalObjectsContainer,
                 objectsContainer,
+                makeVariablesContainersListFromEventsScope(scope),
                 parameterType
               );
               expressionNode.visit(expressionValidator);

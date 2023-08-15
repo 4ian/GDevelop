@@ -27,7 +27,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <AudioResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -44,7 +44,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <ImageResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -61,7 +61,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <VideoResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -78,7 +78,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <BitmapFontResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -95,7 +95,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <FontResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -112,7 +112,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <JsonResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -129,7 +129,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <TilemapResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}
@@ -146,7 +146,7 @@ export const AllResourceFields = () => (
         render={(value, onChange) => (
           <Model3DResourceField
             project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
+            scope={{ project: testProject.project, layout: testProject.testLayout }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
             value={value}

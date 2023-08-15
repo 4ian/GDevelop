@@ -810,6 +810,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     } else {
       gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+        // TODO: use EventsScope
         project,
         layout,
         object.getName(),
@@ -979,6 +980,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     } else {
       gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+        // TODO: use EventsScope
         project,
         layout,
         group.getName(),

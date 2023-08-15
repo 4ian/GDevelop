@@ -288,6 +288,13 @@ interface VariablesContainer {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface VariablesContainersList {
+  [Value] VariablesContainersList STATIC_MakeNewVariablesContainersListForProjectAndLayout(
+        [Const, Ref] Project project,
+        [Const, Ref] Layout layout);
+  [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
+};
+
 interface ObjectGroup {
     void ObjectGroup();
 
@@ -2486,7 +2493,12 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
+    void ExpressionValidator(
+        [Const, Ref] Platform platform,
+        [Const, Ref] ObjectsContainer globalObjectsContainer,
+        [Const, Ref] ObjectsContainer objectsContainer,
+        [Const, Ref] VariablesContainersList variablesContainersList,
+        [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetAllErrors();
     [Const, Ref] VectorExpressionParserDiagnostic GetFatalErrors();

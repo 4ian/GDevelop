@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import * as React from 'react';
 import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';

@@ -15,7 +15,7 @@ import InstructionOrObjectSelector, {
 } from './InstructionOrObjectSelector';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import {
   useResponsiveWindowWidth,

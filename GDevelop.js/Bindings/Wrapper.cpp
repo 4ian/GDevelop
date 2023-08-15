@@ -78,6 +78,7 @@
 #include <GDCore/Project/PropertyDescriptor.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
+#include <GDCore/Project/VariablesContainersList.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
@@ -540,6 +541,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless
+#define STATIC_MakeNewVariablesContainersListForProjectAndLayout MakeNewVariablesContainersListForProjectAndLayout
+#define STATIC_MakeNewEmptyVariablesContainersList MakeNewEmptyVariablesContainersList
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata

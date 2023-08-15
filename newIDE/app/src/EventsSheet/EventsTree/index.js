@@ -26,7 +26,7 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';

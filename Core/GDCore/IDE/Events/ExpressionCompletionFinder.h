@@ -459,6 +459,7 @@ class GD_CORE_API ExpressionCompletionFinder
     } else {
       // Object function or behavior name
       if (IsCaretOn(node.identifierNameLocation)) {
+        // TODO: add completions for variable
         completions.push_back(ExpressionCompletionDescription::ForObject(
             type,
             node.identifierName,
@@ -473,6 +474,7 @@ class GD_CORE_API ExpressionCompletionFinder
         }
       } else if (IsCaretOn(node.identifierNameDotLocation) ||
                  IsCaretOn(node.childIdentifierNameLocation)) {
+        // TODO: add completions for child variable
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
             node.childIdentifierName,
             node.childIdentifierNameLocation.GetStartPosition(),
@@ -650,7 +652,7 @@ class GD_CORE_API ExpressionCompletionFinder
   std::vector<ExpressionCompletionDescription> completions;
   size_t searchedPosition;
   gd::ExpressionNode* maybeParentNodeAtLocation;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;

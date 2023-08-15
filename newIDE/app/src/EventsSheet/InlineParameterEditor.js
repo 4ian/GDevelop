@@ -3,7 +3,7 @@ import * as React from 'react';
 import InlinePopover from './InlinePopover';
 import ParameterRenderingService from './ParameterRenderingService';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
 import { getObjectParameterIndex } from '../InstructionOrExpression/EnumerateInstructions';
 import { type ParameterFieldInterface } from './ParameterFields/ParameterFieldCommons';

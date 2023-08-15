@@ -45,7 +45,7 @@ export const DefaultMediumScreenScopeInLayout = () => (
         <EventsTree
           events={testProject.testLayout.getEvents()}
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{ project: testProject.project, layout: testProject.testLayout }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           selection={getInitialSelection()}
@@ -86,7 +86,7 @@ export const DefaultSmallScreenScopeInLayout = () => (
         <EventsTree
           events={testProject.testLayout.getEvents()}
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{ project: testProject.project, layout: testProject.testLayout }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           selection={getInitialSelection()}
@@ -127,7 +127,7 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
         <EventsTree
           events={testProject.testLayout.getEvents()}
           project={testProject.project}
-          scope={{}}
+          scope={{ project: testProject.project }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           selection={getInitialSelection()}
@@ -168,7 +168,7 @@ export const EmptySmallScreenScopeInALayout = () => (
         <EventsTree
           events={testProject.emptyEventsList}
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{ project: testProject.project, layout: testProject.testLayout }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           selection={getInitialSelection()}

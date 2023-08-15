@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <vector>
+#include <optional>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -17,9 +18,11 @@
 namespace gd {
 class Expression;
 class ObjectsContainer;
+class VariablesContainer;
 class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
+class VariablesContainersList;
 }  // namespace gd
 
 namespace gd {
@@ -33,12 +36,15 @@ namespace gd {
 class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  public:
   ExpressionValidator(const gd::Platform &platform_,
+                      // TODO: use EventsScope
                       const gd::ObjectsContainer &globalObjectsContainer_,
                       const gd::ObjectsContainer &objectsContainer_,
+                      const gd::VariablesContainersList &variablesContainersList_,
                       const gd::String &rootType_)
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
+        variablesContainersList(variablesContainersList_),
         parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
         childType(Type::Unknown) {};
   virtual ~ExpressionValidator(){};
@@ -48,11 +54,13 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
    * any error including non-fatal ones.
    */
   static bool HasNoErrors(const gd::Platform &platform,
+                      // TODO: use EventsScope
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
+                      const gd::VariablesContainersList &variablesContainersList_,
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
-    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, rootType);
+    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, variablesContainersList_, rootType);
     node.Visit(validator);
     return validator.GetAllErrors().empty();
   }
@@ -82,7 +90,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
     ReportAnyError(node);
-    
+
     node.leftHandSide->Visit(*this);
     const Type leftType = childType;
 
@@ -190,15 +198,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
     childType = Type::Variable;
     if (parentType == Type::String) {
-      RaiseTypeError(_("Variables must be surrounded by VariableString()."),
-                     node.location);
+      ValidateVariable(node);
     } else if (parentType == Type::Number) {
-      RaiseTypeError(_("Variables must be surrounded by Variable()."),
-                     node.location);
+      ValidateVariable(node);
     } else if (parentType == Type::NumberOrString) {
-      RaiseTypeError(
-          _("Variables must be surrounded by Variable() or VariableString()."),
-          node.location);
+      ValidateVariable(node);
     } else if (parentType != Type::Variable) {
       RaiseTypeError(_("You entered a variable, but this type was expected:") +
                          " " + TypeToString(parentType),
@@ -227,19 +231,36 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     ReportAnyError(node);
     if (parentType == Type::String) {
-      RaiseTypeError(_("You must wrap your text inside double quotes "
-                            "(example: \"Hello world\")."),
-                          node.location);
+      auto variableType = ValidateMaybeObjectVariableOrVariable(node);
+
+      if (!variableType) {
+        // The identifier is not a variable, so either the variable is not properly declared
+        // or it's a text without quotes.
+        RaiseTypeError(_("You must wrap your text inside double quotes "
+                              "(example: \"Hello world\")."),
+                            node.location);
+      }
     }
     else if (parentType == Type::Number) {
-      RaiseTypeError(
-          _("You must enter a number."), node.location);
+      auto variableType = ValidateMaybeObjectVariableOrVariable(node);
+
+      if (!variableType) {
+        // The identifier is not a variable, so the variable is not properly declared.
+        RaiseTypeError(
+            _("You must enter a number."), node.location);
+      }
     }
     else if (parentType == Type::NumberOrString) {
-      RaiseTypeError(
-          _("You must enter a number or a text, wrapped inside double quotes "
-            "(example: \"Hello world\")."),
-          node.location);
+      auto variableType = ValidateMaybeObjectVariableOrVariable(node);
+
+      if (!variableType) {
+        // The identifier is not a variable, so either the variable is not properly declared
+        // or it's a text without quotes.
+        RaiseTypeError(
+            _("You must enter a number or a text, wrapped inside double quotes "
+              "(example: \"Hello world\")."),
+            node.location);
+      }
     }
     else if (parentType != Type::Object && parentType != Type::Variable) {
       // It can't happen.
@@ -278,6 +299,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  private:
   enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
+  std::optional<Type> ValidateMaybeObjectVariableOrVariable(const gd::IdentifierNode& identifier);
+  void ValidateVariable(const gd::VariableNode& variable);
 
   void ReportAnyError(const ExpressionNode& node, bool isFatal = true) {
     if (node.diagnostic && node.diagnostic->IsError()) {
@@ -291,7 +314,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
   }
 
-  void RaiseError(const gd::String &type, 
+  void RaiseError(const gd::String &type,
       const gd::String &message, const ExpressionParserLocation &location, bool isFatal = true) {
     auto diagnostic = gd::make_unique<ExpressionParserError>(
         type, message, location);
@@ -334,6 +357,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
+  const gd::VariablesContainersList &variablesContainersList;
 };
 
 }  // namespace gd

@@ -47,6 +47,10 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
+import {
+  makeVariablesContainersListFromEventsScope,
+  type EventsScope,
+} from '../../../InstructionOrExpression/EventsScope';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -122,8 +126,10 @@ const MAX_ERRORS_COUNT = 10;
 
 const extractErrors = (
   platform: gdPlatform,
+  project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  scope: EventsScope,
   expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
@@ -132,8 +138,10 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
+    // TODO: use EventsScope
     globalObjectsContainer,
     objectsContainer,
+    makeVariablesContainersListFromEventsScope(scope),
     expressionType
   );
   expressionNode.visit(expressionValidator);
@@ -436,8 +444,10 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
+      project,
       globalObjectsContainer,
       objectsContainer,
+      scope,
       expressionType,
       expressionNode
     );

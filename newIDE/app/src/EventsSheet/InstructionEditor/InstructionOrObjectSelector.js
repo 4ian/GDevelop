@@ -49,7 +49,7 @@ import {
   getObjectOrObjectGroupListItemValue,
   getInstructionListItemValue,
 } from './SelectorListItems/Keys';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import {
   type SearchResult,
   tuneMatches,

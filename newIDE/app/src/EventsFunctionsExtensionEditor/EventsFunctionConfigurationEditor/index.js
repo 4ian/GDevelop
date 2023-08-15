@@ -108,6 +108,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsFunction(
       project,
       eventsFunction,
+      // TODO: use EventsScope
       globalObjectsContainer,
       objectsContainer,
       group.getName(),

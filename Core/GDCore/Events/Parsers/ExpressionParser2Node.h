@@ -189,7 +189,7 @@ struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
  *
  * The name of a function to call on an object or the behavior,
  * for example: "MyObject.Function" or "MyObject.Physics".
- * 
+ *
  * A variable, potentially with accessor to its child,
  * for example: MyVariable or MyVariable.MyChild
  */
@@ -242,10 +242,10 @@ struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public Expres
  * \brief A variable with bracket accessor or at least 2 "dot" accessors.
  *
  * Example: MyVariable[MyChildren] or MyVariable.MyChildren.MyGranChildren.
- * 
+ *
  * Other cases like "MyVariable" or "MyVariable.MyChildren" are IdentifierNode
  * to allow handling ambiguities.
- * 
+ *
  * \see gd::IdentifierNode
  * \see gd::VariableAccessorNode
  * \see gd::VariableBracketAccessorNode
@@ -267,7 +267,7 @@ struct GD_CORE_API VariableNode : public FunctionCallOrObjectFunctionNameOrEmpty
 };
 
 /**
- * \brief A bracket accessor of a variable. Example: MyChild
+ * \brief A direct accessor to a child variable. Example: MyChild
  * in MyVariable.MyChild
  */
 struct GD_CORE_API VariableAccessorNode
@@ -285,7 +285,7 @@ struct GD_CORE_API VariableAccessorNode
 };
 
 /**
- * \brief A bracket accessor of a variable. Example: ["MyChild"]
+ * \brief A bracket accessor to a child variable. Example: ["MyChild"]
  * (in MyVariable["MyChild"]).
  */
 struct GD_CORE_API VariableBracketAccessorNode
@@ -303,10 +303,10 @@ struct GD_CORE_API VariableBracketAccessorNode
 /**
  * \brief The name of a function to call on an object or the behavior
  * For example: "MyObject.Physics::LinearVelocity".
- * 
+ *
  * Other cases like "MyObject.Function" or "MyObject.Physics" are IdentifierNode
  * to allow handling ambiguities.
- * 
+ *
  * \see gd::IdentifierNode
  */
 struct GD_CORE_API ObjectFunctionNameNode

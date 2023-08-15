@@ -1296,11 +1296,13 @@ void WholeProjectRefactorer::DoRenameObject(
   projectBrowser.ExposeFunctions(project, objectParameterRenamer);
 }
 
+// TODO: use EventsScope
 void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
     gd::Project &project, gd::Layout &layout, const gd::String &objectName,
     bool isObjectGroup, bool removeEventsAndGroups) {
   // Remove object in the current layout
   if (removeEventsAndGroups) {
+    // TODO: use EventsScope
     gd::EventsRefactorer::RemoveObjectInEvents(project.GetCurrentPlatform(),
                                                project, layout,
                                                layout.GetEvents(), objectName);
@@ -1321,6 +1323,7 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInLayout(
     for (auto &externalEventsName :
          GetAssociatedExternalEvents(project, layout.GetName())) {
       auto &externalEvents = project.GetExternalEvents(externalEventsName);
+      // TODO: use EventsScope
       gd::EventsRefactorer::RemoveObjectInEvents(
           project.GetCurrentPlatform(), project, layout,
           externalEvents.GetEvents(), objectName);
@@ -1493,6 +1496,7 @@ void WholeProjectRefactorer::RenameObjectEffect(gd::Project &project,
                                                projectElementRenamer);
 }
 
+// TODO: use EventsScope
 void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
     gd::Project &project, gd::EventsBasedObject &eventsBasedObject,
     gd::ObjectsContainer &globalObjectsContainer,
@@ -1507,6 +1511,7 @@ void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsBasedObject(
   }
 }
 
+// TODO: use EventsScope
 void WholeProjectRefactorer::ObjectOrGroupRemovedInEventsFunction(
     gd::Project &project, gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &globalObjectsContainer,
@@ -1578,6 +1583,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRenamed(
   }
 }
 
+// TODO: use EventsScope
 void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
     gd::Project &project, const gd::String &objectName, bool isObjectGroup,
     bool removeEventsAndGroups) {
@@ -1594,6 +1600,7 @@ void WholeProjectRefactorer::GlobalObjectOrGroupRemoved(
     if (layout.HasObjectNamed(objectName))
       continue;
 
+    // TODO: use EventsScope
     ObjectOrGroupRemovedInLayout(project, layout, objectName, isObjectGroup,
                                  removeEventsAndGroups);
   }

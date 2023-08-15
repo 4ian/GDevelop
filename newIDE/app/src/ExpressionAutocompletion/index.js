@@ -7,7 +7,7 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import { enumerateVariables } from '../EventsSheet/ParameterFields/EnumerateVariables';
 import flatten from 'lodash/flatten';
-import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import {
   enumerateFreeExpressions,
   filterExpressions,

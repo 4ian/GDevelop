@@ -17,7 +17,7 @@ import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 
 const styles = {
   addButton: {

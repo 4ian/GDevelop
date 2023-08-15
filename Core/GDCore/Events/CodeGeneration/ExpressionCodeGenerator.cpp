@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <vector>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
@@ -25,6 +26,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/VariablesContainersList.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 
@@ -46,9 +48,14 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     return generator.GenerateDefaultValue(rootType);
   }
 
+  auto variablesListContainer = codeGenerator.HasProjectAndLayout() ?
+    VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(codeGenerator.GetProject(), codeGenerator.GetLayout()) :
+    VariablesContainersList::MakeNewEmptyVariablesContainersList();
+
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     codeGenerator.GetGlobalObjectsAndGroups(),
                                     codeGenerator.GetObjectsAndGroups(),
+                                    variablesListContainer,
                                     rootType);
   node->Visit(validator);
   if (!validator.GetFatalErrors().empty()) {
@@ -104,20 +111,58 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,
                                             node);
-  EventsCodeGenerator::VariableScope scope =
-      type == "globalvar"
-          ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-          : ((type == "scenevar")
-                 ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                 : gd::EventsCodeGenerator::OBJECT_VARIABLE);
-  auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
-                                        codeGenerator.GetGlobalObjectsAndGroups(),
-                                        codeGenerator.GetObjectsAndGroups(),
-                                        rootObjectName,
-                                        node);
-  output += codeGenerator.GenerateGetVariable(
-      node.name, scope, context, objectName);
-  if (node.child) node.child->Visit(*this);
+
+  if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    // The node is a variable inside an expression waiting for a *variable* to be returned, not its value.
+    EventsCodeGenerator::VariableScope scope =
+        type == "globalvar"
+            ? gd::EventsCodeGenerator::PROJECT_VARIABLE
+            : ((type == "scenevar")
+                  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
+                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+
+    auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
+                                          codeGenerator.GetGlobalObjectsAndGroups(),
+                                          codeGenerator.GetObjectsAndGroups(),
+                                          rootObjectName,
+                                          node);
+    output += codeGenerator.GenerateGetVariable(
+        node.name, scope, context, objectName);
+    if (node.child) node.child->Visit(*this);
+  } else if (gd::ParameterMetadata::IsExpression("number", type) || gd::ParameterMetadata::IsExpression("string", type)) {
+    // The node represents a variable or an object variable in an expression waiting for its *value* to be returned.
+
+    if (hasObject with node.name in the codeGenerator containers) {
+      // Generate the code to access the object variable
+
+      output += codeGenerator.GenerateGetObjectVariables(node.name, context);
+      if (node.child) node.child->Visit(*this);
+      output += codeGenerator.GenerateVariableValueAs(type, ""); // TODO: Hacky as we pass an empty string because we don't have the full generation.
+    } else if (codeGenerator.HasProjectAndLayout()) {
+      // This could be adapted in the future if more scopes are supported.
+      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
+      if (codeGenerator.GetLayout().GetVariables().Has(node.name)) {
+        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
+      } else if (codeGenerator.GetProject().GetVariables().Has(node.name)) {
+        scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
+      } else {
+        // The node represents a non existing variable, so it's invalid.
+        output += GenerateDefaultValue(type);
+        return;
+      }
+
+      output += codeGenerator.GenerateGetVariable(node.name, scope, context, "");
+      if (node.child) node.child->Visit(*this);
+      output += codeGenerator.GenerateVariableValueAs(type, ""); // TODO: Hacky as we pass an empty string because we don't have the full generation.
+    } else {
+      // The identifier does not represents a variable (or a child variable), or not at least an existing
+      // one, nor an object variable. It's invalid.
+      output += GenerateDefaultValue(type);
+    }
+  } else {
+    // We're unsure why the variable is used here, this is invalid.
+    output += GenerateDefaultValue(type);
+  }
 }
 
 void ExpressionCodeGenerator::OnVisitVariableAccessorNode(
@@ -141,6 +186,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,
                                             node);
+
   if (gd::ParameterMetadata::IsObject(type)) {
     output +=
         codeGenerator.GenerateObject(node.identifierName, type, context);
@@ -162,15 +208,41 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       if (!node.childIdentifierName.empty()) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
-  } else if (node.childIdentifierName.empty()) {
-    output += "/* Error during generation, unrecognized identifier type: " +
-              codeGenerator.ConvertToString(type) + " with value " +
-              codeGenerator.ConvertToString(node.identifierName) + " */ " +
-              codeGenerator.ConvertToStringExplicit(node.identifierName);
-  }
-  else {
-    // This is for function names that are put in IdentifierNode
-    // because the type is needed to tell them apart from variables.
+  } else if (gd::ParameterMetadata::IsExpression("number", type) || gd::ParameterMetadata::IsExpression("string", type)) {
+      // The node represents a variable or an object.
+
+    if (hasObject with node.identifierName in the codeGenerator containers) {
+      // Generate the code to access the object variable
+
+    } else if (codeGenerator.HasProjectAndLayout()) {
+
+      // This is a variable.
+
+      // This could be adapted in the future if more scopes are supported.
+      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
+      if (codeGenerator.GetLayout().GetVariables().Has(node.identifierName)) {
+        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
+      } else if (codeGenerator.GetProject().GetVariables().Has(node.identifierName)) {
+        scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
+      } else {
+        // The node represents a non existing variable, so it's invalid.
+        output += GenerateDefaultValue(type);
+        return;
+      }
+
+      gd::String variableAccessorCode = codeGenerator.GenerateGetVariable(
+        node.identifierName, scope, context, "");
+      if (!node.childIdentifierName.empty()) {
+        variableAccessorCode += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
+      }
+      output += codeGenerator.GenerateVariableValueAs(type, variableAccessorCode);
+    } else {
+      // The identifier does not represents a variable (or a child variable), or not at least an existing
+      // one, nor an object variable. It's invalid.
+      output += GenerateDefaultValue(type);
+    }
+  } else {
+    // We're unsure what the identifier is used for here - it's probably not valid.
     output += GenerateDefaultValue(type);
   }
 }

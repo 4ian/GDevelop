@@ -1,6 +1,6 @@
 // @flow
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 export type ParameterRenderingServiceType = {

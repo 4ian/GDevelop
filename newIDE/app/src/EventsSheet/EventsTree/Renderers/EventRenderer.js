@@ -5,7 +5,7 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../../SelectionHandler';
-import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import { type ScreenType } from '../../../UI/Reponsive/ScreenTypeMeasurer';
 import { type WidthType } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 

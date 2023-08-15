@@ -21,7 +21,7 @@ export const DefaultStringNoScope = () => (
       selectedType=""
       onChoose={action('Expression chosen')}
       focusOnMount
-      scope={{}}
+      scope={{ project: testProject.project }}
     />
   </FixedHeightFlexContainer>
 );
@@ -33,7 +33,7 @@ export const DefaultNumberNoScope = () => (
       selectedType=""
       onChoose={action('Expression chosen')}
       focusOnMount
-      scope={{}}
+      scope={{ project: testProject.project }}
     />
   </FixedHeightFlexContainer>
 );

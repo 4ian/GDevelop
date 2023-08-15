@@ -3477,8 +3477,10 @@ describe('libGD.js', function () {
 
       const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
+        // TODO: use EventsScope
         project,
         layout,
+        gd.VariablesContainersList.makeNewVariablesContainersListForProjectAndLayout(project, layout)
         type);
       expressionNode.visit(expressionValidator);
       if (expectedError2) {

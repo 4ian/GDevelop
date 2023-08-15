@@ -975,15 +975,35 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   ///@}
 
-  /** \name Other
+  /** \name Identifier names
    */
   ///@{
+
+  /**
+   * Check if unicode names are allowed in identifier names.
+   * \see IsNameSafe
+   * \see GetSafeName
+   */
+  static bool IsUsageOfUnicodeIdentifierNamesAllowed() { return allowUsageOfUnicodeIdentifierNames; };
+
+  /**
+   * Set if unicode names are allowed in identifier names.
+   * \see IsNameSafe
+   * \see GetSafeName
+   */
+  static void AllowUsageOfUnicodeIdentifierNames(bool enable);
 
   /**
    * Return true if \a name is valid (can be used safely for an object,
    * behavior, events function name, etc...).
    */
-  static bool ValidateName(const gd::String& name);
+  static bool IsNameSafe(const gd::String& name);
+
+  /**
+   * Return a name, based on the one passed in parameter, that can be safely used
+   * for an object, behavior, events function name, etc...
+   */
+  static gd::String GetSafeName(const gd::String& name);
   ///@}
 
   /** \name External source files
@@ -1118,6 +1138,8 @@ class GD_CORE_API Project : public ObjectsContainer {
                                         ///< time the project was saved.
   mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
                                         ///< time the project was saved.
+
+  static bool allowUsageOfUnicodeIdentifierNames;
 };
 
 }  // namespace gd

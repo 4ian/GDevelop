@@ -13,7 +13,6 @@ import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
-import { showWarningBox } from '../../UI/Messages/MessageBox';
 import { ParametersIndexOffsets } from '../../EventsFunctionsExtensionsLoader';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -61,30 +60,6 @@ const styles = {
   parametersContainer: {
     flex: 1,
   },
-};
-
-const validateParameterName = (i18n: I18nType, newName: string) => {
-  if (!newName) {
-    showWarningBox(
-      i18n._(
-        t`The name of a parameter can not be empty. Enter a name for the parameter or you won't be able to use it.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-
-  if (!gd.Project.validateName(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-
-  return true;
 };
 
 export const EventsFunctionParametersEditor = ({
@@ -358,9 +333,7 @@ export const EventsFunctionParametersEditor = ({
                           translatableHintText={t`Enter the parameter name (mandatory)`}
                           value={parameter.getName()}
                           onChange={text => {
-                            if (!validateParameterName(i18n, text)) return;
-
-                            parameter.setName(text);
+                            parameter.setName(gd.Project.getSafeName(text));
                             forceUpdate();
                             onParametersUpdated();
                           }}

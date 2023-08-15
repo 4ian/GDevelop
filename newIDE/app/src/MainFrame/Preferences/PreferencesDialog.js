@@ -69,6 +69,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setUse3DEditor,
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
+    setAllowUsageOfUnicodeIdentifierNames,
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
@@ -351,6 +352,19 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             label={
               <Trans>
                 Show custom objects in the extension editor (experimental)
+              </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) =>
+              setAllowUsageOfUnicodeIdentifierNames(check)
+            }
+            toggled={values.allowUsageOfUnicodeIdentifierNames}
+            labelPosition="right"
+            label={
+              <Trans>
+                Allow unicode characters (non English languages and emojis) in
+                object, behavior and other names (experimental)
               </Trans>
             }
           />

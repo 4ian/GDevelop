@@ -422,6 +422,32 @@ class GD_CORE_API PlatformExtension {
   const gd::String& GetIconUrl() const { return iconUrl; }
 
   /**
+   * \brief Return keywords that help search engines find this extension.
+   */
+  const std::vector<gd::String>& GetTags() const { return tags; }
+
+  /**
+   * \brief Set keywords that help search engines find this extension.
+   */
+  PlatformExtension& SetTags(const gd::String& csvTags) {
+    tags.clear();
+    tags = csvTags.Split(',');
+    for (size_t i = 0; i < tags.size(); i++)
+    {
+      tags[i] = tags[i].Trim().LowerCase();
+    }
+    return *this;
+  }
+
+  /**
+   * \brief Add a keyword that help search engines find this extension.
+   */
+  PlatformExtension& AddTag(const gd::String& tag) {
+    tags.push_back(tag);
+    return *this;
+  }
+
+  /**
    * \brief Check if the extension is flagged as being deprecated.
    */
   bool IsDeprecated() const { return deprecated; }
@@ -661,6 +687,7 @@ private:
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation.
   gd::String iconUrl;   ///< The URL to the icon to be shown for this extension.
+  std::vector<gd::String> tags;
 
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;

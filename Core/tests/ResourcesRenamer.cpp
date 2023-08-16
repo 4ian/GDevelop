@@ -11,6 +11,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Project.h"
 #include "catch.hpp"
+#include "GDCore/IDE/ResourceExposer.h"
 
 TEST_CASE("ResourcesRenamer", "[common]") {
   SECTION("It renames resources that are exposed") {
@@ -34,7 +35,7 @@ TEST_CASE("ResourcesRenamer", "[common]") {
     project.GetPlatformSpecificAssets().Set(
         "android", "some-other-icon", "Resource2");
 
-    project.ExposeResources(resourcesRenamer);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesRenamer);
 
     // Check that resources were renamed were used.
     REQUIRE(project.GetPlatformSpecificAssets().Get("android", "some-icon") ==
@@ -72,7 +73,7 @@ TEST_CASE("ResourcesRenamer", "[common]") {
     project.GetPlatformSpecificAssets().Set(
         "android", "some-other-icon", "Resource2");
 
-    project.ExposeResources(resourcesRenamer);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesRenamer);
 
     // TODO: This should not be necessary, but for now not all resources support embeddeds,
     // so we must call it manually:

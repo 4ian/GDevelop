@@ -565,6 +565,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
 #define STATIC_ReplaceStringInEvents ReplaceStringInEvents
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
+#define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 
 #define STATIC_GetBehaviorMetadata GetBehaviorMetadata
 #define STATIC_GetObjectMetadata GetObjectMetadata

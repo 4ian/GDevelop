@@ -20,9 +20,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -1053,50 +1051,6 @@ gd::String Project::GetSafeName(const gd::String& name) {
   }
 
   return newName;
-}
-
-void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::ProjectBrowserHelper::ExposeProjectEvents for a method that
-  // traverse the whole project (this time for events) and ExposeProjectEffects
-  // (this time for effects). Ideally, this method could be moved outside of
-  // gd::Project.
-
-  gd::ResourcesManager* resourcesManager = &GetResourcesManager();
-
-  // Add project resources
-  worker.ExposeResources(resourcesManager);
-  platformSpecificAssets.ExposeResources(worker);
-
-  // Add layouts resources
-  for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
-    for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j) {  // Add objects resources
-      GetLayout(s).GetObject(j).GetConfiguration().ExposeResources(worker);
-    }
-
-    LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
-  }
-  // Add external events resources
-  for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
-    LaunchResourceWorkerOnEvents(
-        *this, GetExternalEvents(s).GetEvents(), worker);
-  }
-  // Add events functions extensions resources
-  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
-    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
-    }
-  }
-
-  // Add global objects resources
-  for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).GetConfiguration().ExposeResources(worker);
-  }
-
-  // Add loading screen background image if present
-  if (loadingScreen.GetBackgroundImageResourceName() != "")
-    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

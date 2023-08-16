@@ -516,8 +516,6 @@ interface Project {
     [Ref] VariablesContainer GetVariables();
     [Ref] ResourcesManager GetResourcesManager();
 
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 
@@ -2248,6 +2246,10 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+};
+
+interface ResourceExposer {
+    void STATIC_ExposeWholeProjectResources([Ref] Project project, [Ref] ArbitraryResourceWorker worker);
 };
 
 interface WholeProjectRefactorer {

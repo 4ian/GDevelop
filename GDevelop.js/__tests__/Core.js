@@ -1398,7 +1398,7 @@ describe('libGD.js', function () {
       );
 
       const worker = new gd.ResourcesInUseHelper();
-      project.exposeResources(worker);
+      gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(
         1
       );
@@ -1409,7 +1409,7 @@ describe('libGD.js', function () {
       gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
 
       const newWorker = new gd.ResourcesInUseHelper();
-      project.exposeResources(newWorker);
+      gd.ResourceExposer.exposeWholeProjectResources(project, newWorker);
       expect(
         newWorker.getAllImages().toNewVectorString().toJSArray().length
       ).toBe(1);
@@ -1442,7 +1442,7 @@ describe('libGD.js', function () {
         },
       });
 
-      project.exposeResources(worker);
+      gd.ResourceExposer.exposeWholeProjectResources(project, worker);
       project.delete();
     });
   });
@@ -3151,7 +3151,7 @@ describe('libGD.js', function () {
       // Check that ResourcesMergingHelper can update the filenames
       const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
       resourcesMergingHelper.setBaseDirectory('/my/project/');
-      project.exposeResources(resourcesMergingHelper);
+      gd.ResourceExposer.exposeWholeProjectResources(project, resourcesMergingHelper);
 
       const oldAndNewFilenames =
         resourcesMergingHelper.getAllResourcesOldAndNewFilename();

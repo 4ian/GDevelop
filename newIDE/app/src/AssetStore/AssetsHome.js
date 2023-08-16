@@ -289,25 +289,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         id="asset-store-home"
         data={{ isFiltered: !!openedAssetCategory ? 'true' : 'false' }}
       >
-        {allBundleTiles.length ? (
-          <>
-            <Column>
-              <Line>
-                <Text size="block-title">
-                  <Trans>Bundles</Trans>
-                </Text>
-              </Line>
-            </Column>
-            <GridList
-              cols={getAssetPacksColumns(windowWidth)}
-              style={styles.grid}
-              cellHeight="auto"
-              spacing={cellSpacing}
-            >
-              {allBundleTiles}
-            </GridList>
-          </>
-        ) : null}
         {openedAssetCategory ? null : (
           <>
             <Column>
@@ -327,6 +308,25 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         )}
+        {allBundleTiles.length ? (
+          <>
+            <Column>
+              <Line>
+                <Text size="block-title">
+                  <Trans>Bundles</Trans>
+                </Text>
+              </Line>
+            </Column>
+            <GridList
+              cols={getAssetPacksColumns(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              {allBundleTiles}
+            </GridList>
+          </>
+        ) : null}
         <Column>
           <Line>
             <Text size="block-title">

@@ -181,7 +181,7 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
-  const bundlesNotOwnedContainingPackTiles = React.useMemo(
+  const bundlesContainingPackTiles = React.useMemo(
     () => {
       if (!assetPack || !privateAssetPackListingDatas) return null;
 
@@ -195,22 +195,42 @@ const PrivateAssetPackInformationPage = ({
 
       if (!bundlesContainingPack.length) return null;
 
-      return bundlesContainingPack
+      const ownedBundlesContainingPack = bundlesContainingPack.filter(
+        bundleContainingPack =>
+          !!receivedAssetPacks &&
+          !!receivedAssetPacks.find(pack => pack.id === bundleContainingPack.id)
+      );
+      const notOwnedBundlesContainingPack = bundlesContainingPack.filter(
+        bundleContainingPack =>
+          !ownedBundlesContainingPack.find(
+            ownedBundleContainingPack =>
+              ownedBundleContainingPack.id === bundleContainingPack.id
+          )
+      );
+
+      const allTiles = ownedBundlesContainingPack
         .map(bundleContainingPack => {
-          const isBundleOwned =
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === bundleContainingPack.id
-            );
           return (
             <PromoBundleAssetPackCard
               assetPackListingData={bundleContainingPack}
               onSelect={() => onAssetPackOpen(bundleContainingPack)}
-              owned={isBundleOwned}
+              owned
             />
           );
         })
-        .filter(Boolean);
+        .concat(
+          notOwnedBundlesContainingPack.map(bundleContainingPack => {
+            return (
+              <PromoBundleAssetPackCard
+                assetPackListingData={bundleContainingPack}
+                onSelect={() => onAssetPackOpen(bundleContainingPack)}
+                owned={false}
+              />
+            );
+          })
+        );
+
+      return allTiles;
     },
     [
       assetPack,
@@ -220,7 +240,7 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
-  const packsFromTheSameAuthorTiles = React.useMemo(
+  const otherPacksFromTheSameAuthorTiles = React.useMemo(
     () => {
       if (
         !privateAssetPacksFromSameCreatorListingData ||
@@ -230,25 +250,31 @@ const PrivateAssetPackInformationPage = ({
       )
         return null;
 
-      return privateAssetPacksFromSameCreatorListingData.map(
-        assetPackFromSameCreator => {
-          const isPackOwned =
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === assetPackFromSameCreator.id
+      return (
+        privateAssetPacksFromSameCreatorListingData
+          // Do not display the pack currently opened.
+          .filter(
+            assetPackFromSameCreator => assetPackFromSameCreator.id !== id
+          )
+          .map(assetPackFromSameCreator => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackFromSameCreator.id
+              );
+            return (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackFromSameCreator}
+                key={assetPackFromSameCreator.id}
+                onSelect={() => onAssetPackOpen(assetPackFromSameCreator)}
+                owned={isPackOwned}
+              />
             );
-          return (
-            <PrivateAssetPackTile
-              assetPackListingData={assetPackFromSameCreator}
-              key={assetPackFromSameCreator.id}
-              onSelect={() => onAssetPackOpen(assetPackFromSameCreator)}
-              owned={isPackOwned}
-            />
-          );
-        }
+          })
       );
     },
     [
+      id,
       privateAssetPacksFromSameCreatorListingData,
       onAssetPackOpen,
       receivedAssetPacks,
@@ -529,12 +555,12 @@ const PrivateAssetPackInformationPage = ({
                     </Paper>
                   </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
-                {bundlesNotOwnedContainingPackTiles &&
-                bundlesNotOwnedContainingPackTiles.length ? (
+                {bundlesContainingPackTiles &&
+                bundlesContainingPackTiles.length ? (
                   <>
                     <ColumnStackLayout noMargin>
                       <LargeSpacer />
-                      {bundlesNotOwnedContainingPackTiles}
+                      {bundlesContainingPackTiles}
                       <LargeSpacer />
                     </ColumnStackLayout>
                   </>
@@ -559,26 +585,27 @@ const PrivateAssetPackInformationPage = ({
                     </Line>
                   </>
                 )}
-                {packsFromTheSameAuthorTiles && (
-                  <>
-                    <Line>
-                      <Text size="block-title">
-                        <Trans>From the same author</Trans>
-                      </Text>
-                    </Line>
-                    <Line>
-                      <GridList
-                        cols={getPackColumns(windowWidth)}
-                        cellHeight="auto"
-                        spacing={cellSpacing / 2}
-                        style={styles.grid}
-                      >
-                        {packsFromTheSameAuthorTiles}
-                      </GridList>
-                      <Grid />
-                    </Line>
-                  </>
-                )}
+                {otherPacksFromTheSameAuthorTiles &&
+                  otherPacksFromTheSameAuthorTiles.length > 0 && (
+                    <>
+                      <Line>
+                        <Text size="block-title">
+                          <Trans>From the same author</Trans>
+                        </Text>
+                      </Line>
+                      <Line>
+                        <GridList
+                          cols={getPackColumns(windowWidth)}
+                          cellHeight="auto"
+                          spacing={cellSpacing / 2}
+                          style={styles.grid}
+                        >
+                          {otherPacksFromTheSameAuthorTiles}
+                        </GridList>
+                        <Grid />
+                      </Line>
+                    </>
+                  )}
               </ScrollView>
             </Column>
           ) : null}

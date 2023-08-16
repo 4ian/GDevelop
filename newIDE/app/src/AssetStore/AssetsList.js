@@ -582,7 +582,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
               )}
               <Column noMargin alignItems="flex-start" expand>
                 <Text size="bold-title">{openedAssetPack.name}</Text>
-                {!!publicAssetPackAuthors && publicAssetPackAuthors.length && (
+                {!!publicAssetPackAuthors && publicAssetPackAuthors.length > 0 && (
                   <Text size="body" displayInlineAsSpan>
                     <Trans>by</Trans>{' '}
                     {publicAssetPackAuthors.map((author, index) => (

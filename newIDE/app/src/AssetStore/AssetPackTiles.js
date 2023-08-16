@@ -286,7 +286,6 @@ export const PromoBundleAssetPackCard = ({
               ...styles.promoLineContainer,
               border: `2px solid ${gdevelopTheme.palette.secondary}`,
             }}
-            onClick={onSelect}
           >
             <Line expand noMargin>
               <CorsAwareImage

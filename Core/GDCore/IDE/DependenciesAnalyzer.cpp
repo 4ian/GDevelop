@@ -43,41 +43,31 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
   for (unsigned int i = 0; i < events.size(); ++i) {
     const gd::LinkEvent* linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);
     if (linkEvent) {
-      DependenciesAnalyzer analyzer(*this);
-
       gd::String linked = linkEvent->GetTarget();
       if (project.HasExternalEventsNamed(linked)) {
         if (std::find(parentExternalEvents.begin(),
                       parentExternalEvents.end(),
-                      linked) != parentExternalEvents.end())
-          return false;  // Circular dependency!
-
-        externalEventsDependencies.insert(
-            linked);  // There is a direct dependency
-        analyzer.AddParentExternalEvents(linked);
-        if (!analyzer.Analyze(project.GetExternalEvents(linked).GetEvents()))
+                      linked) != parentExternalEvents.end()) {
+          // Circular dependency!
           return false;
-
+        }
+        externalEventsDependencies.insert(linked);
+        parentExternalEvents.push_back(linked);
+        if (!Analyze(project.GetExternalEvents(linked).GetEvents()))
+          return false;
+        parentExternalEvents.pop_back();
       } else if (project.HasLayoutNamed(linked)) {
         if (std::find(parentScenes.begin(), parentScenes.end(), linked) !=
-            parentScenes.end())
-          return false;  // Circular dependency!
-
-        scenesDependencies.insert(linked);  // There is a direct dependency
-        analyzer.AddParentScene(linked);
-        if (!analyzer.Analyze(project.GetLayout(linked).GetEvents()))
+            parentScenes.end()) {
+          // Circular dependency!
           return false;
+        }
+        scenesDependencies.insert(linked);
+        parentScenes.push_back(linked);
+        if (!Analyze(project.GetLayout(linked).GetEvents()))
+          return false;
+        parentScenes.pop_back();
       }
-
-      // Update with indirect dependencies.
-      scenesDependencies.insert(analyzer.GetScenesDependencies().begin(),
-                                analyzer.GetScenesDependencies().end());
-      externalEventsDependencies.insert(
-          analyzer.GetExternalEventsDependencies().begin(),
-          analyzer.GetExternalEventsDependencies().end());
-      sourceFilesDependencies.insert(
-          analyzer.GetSourceFilesDependencies().begin(),
-          analyzer.GetSourceFilesDependencies().end());
     }
 
     // Search for source files dependencies

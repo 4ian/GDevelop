@@ -107,13 +107,6 @@ class GD_CORE_API DependenciesAnalyzer {
    */
   bool Analyze(const gd::EventsList& events);
 
-  void AddParentScene(gd::String parentScene) {
-    parentScenes.push_back(parentScene);
-  };
-  void AddParentExternalEvents(gd::String parentExternalEvents_) {
-    parentExternalEvents.push_back(parentExternalEvents_);
-  };
-
   std::set<gd::String> scenesDependencies;
   std::set<gd::String> externalEventsDependencies;
   std::set<gd::String> sourceFilesDependencies;

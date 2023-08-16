@@ -51,22 +51,26 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
           // Circular dependency!
           return false;
         }
-        externalEventsDependencies.insert(linked);
-        parentExternalEvents.push_back(linked);
-        if (!Analyze(project.GetExternalEvents(linked).GetEvents()))
-          return false;
-        parentExternalEvents.pop_back();
+        bool isDependencyAdded = externalEventsDependencies.insert(linked).second;
+        if (isDependencyAdded) {
+          parentExternalEvents.push_back(linked);
+          if (!Analyze(project.GetExternalEvents(linked).GetEvents()))
+            return false;
+          parentExternalEvents.pop_back();
+        }
       } else if (project.HasLayoutNamed(linked)) {
         if (std::find(parentScenes.begin(), parentScenes.end(), linked) !=
             parentScenes.end()) {
           // Circular dependency!
           return false;
         }
-        scenesDependencies.insert(linked);
-        parentScenes.push_back(linked);
-        if (!Analyze(project.GetLayout(linked).GetEvents()))
-          return false;
-        parentScenes.pop_back();
+        bool isDependencyAdded = scenesDependencies.insert(linked).second;
+        if (isDependencyAdded) {
+          parentScenes.push_back(linked);
+          if (!Analyze(project.GetLayout(linked).GetEvents()))
+            return false;
+          parentScenes.pop_back();
+        }
       }
     }
 

@@ -39,11 +39,6 @@ class GD_CORE_API DependenciesAnalyzer {
 
   /**
    * \brief Constructor for analyzing the dependencies of external events.
-   *
-   * You can also call then
-   * DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene to check if the
-   * external events can be compiled separately and called by a scene. \see
-   * DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene
    */
   DependenciesAnalyzer(const gd::Project& project_,
                        const gd::ExternalEvents& externalEvents);
@@ -59,18 +54,6 @@ class GD_CORE_API DependenciesAnalyzer {
    * this case, no events code generation must done).
    */
   bool Analyze();
-
-  /**
-   * Check if the external events (passed in the constructor) can be compiled
-   * and called by a single scene:<br> This is possible when the link calling
-   * the external events does not have any parent event and when this situation
-   * occurs only in a single scene and not in another.
-   *
-   * \return The name of the scene which is able to call the compiled external
-   * events. If empty, no scene is able to call them. (So external events have
-   * to be included directly by links).
-   */
-  gd::String ExternalEventsCanBeCompiledForAScene();
 
   /**
    * \brief Return the scenes being dependencies of the scene or external events

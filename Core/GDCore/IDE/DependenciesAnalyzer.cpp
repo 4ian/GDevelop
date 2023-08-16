@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
 #include "DependenciesAnalyzer.h"
 #include <algorithm>
 #include "GDCore/Events/Builtin/LinkEvent.h"
@@ -29,9 +28,9 @@ DependenciesAnalyzer::DependenciesAnalyzer(const gd::Project& project_,
 
 bool DependenciesAnalyzer::Analyze() {
   if (layout)
-    return Analyze(layout->GetEvents(), true);
+    return Analyze(layout->GetEvents());
   else if (externalEvents)
-    return Analyze(externalEvents->GetEvents(), true);
+    return Analyze(externalEvents->GetEvents());
 
   std::cout << "ERROR: DependenciesAnalyzer called without any layout or "
                "external events.";
@@ -40,7 +39,7 @@ bool DependenciesAnalyzer::Analyze() {
 
 DependenciesAnalyzer::~DependenciesAnalyzer() {}
 
-bool DependenciesAnalyzer::Analyze(const gd::EventsList& events, bool isOnTopLevel) {
+bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
   for (unsigned int i = 0; i < events.size(); ++i) {
     const gd::LinkEvent* linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);
     if (linkEvent) {
@@ -55,10 +54,8 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events, bool isOnTopLev
 
         externalEventsDependencies.insert(
             linked);  // There is a direct dependency
-        if (!isOnTopLevel) notTopLevelExternalEventsDependencies.insert(linked);
         analyzer.AddParentExternalEvents(linked);
-        if (!analyzer.Analyze(project.GetExternalEvents(linked).GetEvents(),
-                              isOnTopLevel))
+        if (!analyzer.Analyze(project.GetExternalEvents(linked).GetEvents()))
           return false;
 
       } else if (project.HasLayoutNamed(linked)) {
@@ -67,10 +64,8 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events, bool isOnTopLev
           return false;  // Circular dependency!
 
         scenesDependencies.insert(linked);  // There is a direct dependency
-        if (!isOnTopLevel) notTopLevelScenesDependencies.insert(linked);
         analyzer.AddParentScene(linked);
-        if (!analyzer.Analyze(project.GetLayout(linked).GetEvents(),
-                              isOnTopLevel))
+        if (!analyzer.Analyze(project.GetLayout(linked).GetEvents()))
           return false;
       }
 
@@ -83,21 +78,6 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events, bool isOnTopLev
       sourceFilesDependencies.insert(
           analyzer.GetSourceFilesDependencies().begin(),
           analyzer.GetSourceFilesDependencies().end());
-      notTopLevelScenesDependencies.insert(
-          analyzer.GetNotTopLevelScenesDependencies().begin(),
-          analyzer.GetNotTopLevelScenesDependencies().end());
-      notTopLevelExternalEventsDependencies.insert(
-          analyzer.GetNotTopLevelExternalEventsDependencies().begin(),
-          analyzer.GetNotTopLevelExternalEventsDependencies().end());
-
-      if (!isOnTopLevel) {
-        notTopLevelScenesDependencies.insert(
-            analyzer.GetScenesDependencies().begin(),
-            analyzer.GetScenesDependencies().end());
-        notTopLevelExternalEventsDependencies.insert(
-            analyzer.GetExternalEventsDependencies().begin(),
-            analyzer.GetExternalEventsDependencies().end());
-      }
     }
 
     // Search for source files dependencies
@@ -112,45 +92,9 @@ bool DependenciesAnalyzer::Analyze(const gd::EventsList& events, bool isOnTopLev
 
     // Analyze sub events dependencies
     if (events[i].CanHaveSubEvents()) {
-      if (!Analyze(events[i].GetSubEvents(), false)) return false;
+      if (!Analyze(events[i].GetSubEvents())) return false;
     }
   }
 
   return true;
 }
-
-gd::String DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene() {
-  if (!externalEvents) {
-    std::cout << "ERROR: ExternalEventsCanBeCompiledForAScene called without "
-                 "external events set!"
-              << std::endl;
-    return "";
-  }
-
-  gd::String sceneName;
-  for (unsigned int i = 0; i < project.GetLayoutsCount(); ++i) {
-    // For each layout, compute the dependencies and the dependencies which are
-    // not coming from a top level event.
-    DependenciesAnalyzer analyzer(project, project.GetLayout(i));
-    if (!analyzer.Analyze()) continue;  // Analyze failed -> Cyclic dependencies
-    const std::set<gd::String>& dependencies =
-        analyzer.GetExternalEventsDependencies();
-    const std::set<gd::String>& notTopLevelDependencies =
-        analyzer.GetNotTopLevelExternalEventsDependencies();
-
-    // Check if the external events is a dependency, and that is is only present
-    // as a link on the top level.
-    if (dependencies.find(externalEvents->GetName()) != dependencies.end() &&
-        notTopLevelDependencies.find(externalEvents->GetName()) ==
-            notTopLevelDependencies.end()) {
-      if (!sceneName.empty())
-        return "";  // External events can be compiled only if one scene is
-                    // including them.
-      else
-        sceneName = project.GetLayout(i).GetName();
-    }
-  }
-
-  return sceneName;  // External events can be compiled and used for the scene.
-}
-#endif

@@ -96,25 +96,6 @@ class GD_CORE_API DependenciesAnalyzer {
     return sourceFilesDependencies;
   };
 
-  /**
-   * \brief Return the scenes being dependencies of the scene or external events
-   * passed in the constructor, but being not top level dependencies: The links
-   * including them are not a top level events (i.e: They have a parent event).
-   */
-  const std::set<gd::String>& GetNotTopLevelScenesDependencies() const {
-    return notTopLevelScenesDependencies;
-  };
-
-  /**
-   * \brief Return the external events being dependencies of the scene or
-   * external events passed in the constructor, but being not top level
-   * dependencies: The links including them are not a top level events (i.e:
-   * They have a parent event).
-   */
-  const std::set<gd::String>& GetNotTopLevelExternalEventsDependencies() const {
-    return notTopLevelExternalEventsDependencies;
-  };
-
  private:
   /**
    * \brief Analyze the dependencies of the events.
@@ -124,7 +105,7 @@ class GD_CORE_API DependenciesAnalyzer {
    * (they have no parents). \return false if a circular dependency exists, true
    * otherwise.
    */
-  bool Analyze(const gd::EventsList& events, bool isOnTopLevel);
+  bool Analyze(const gd::EventsList& events);
 
   void AddParentScene(gd::String parentScene) {
     parentScenes.push_back(parentScene);
@@ -133,23 +114,9 @@ class GD_CORE_API DependenciesAnalyzer {
     parentExternalEvents.push_back(parentExternalEvents_);
   };
 
-  /**
-   * Return true if all links pointing to external events called \a
-   * externalEventsName are only at the top level of \a events. The function
-   * return false as soon as it discover a link to external events which is not
-   * at the top level ( i.e: It has a parent event ).
-   *
-   * \warning The function assumes that there are not cyclic dependencies.
-   */
-  bool CheckIfExternalEventsIsLinkedOnlyAtTopLevel(
-      const gd::String& externalEventsName,
-      std::vector<std::shared_ptr<gd::BaseEvent> >& events);
-
   std::set<gd::String> scenesDependencies;
   std::set<gd::String> externalEventsDependencies;
   std::set<gd::String> sourceFilesDependencies;
-  std::set<gd::String> notTopLevelScenesDependencies;
-  std::set<gd::String> notTopLevelExternalEventsDependencies;
   std::vector<gd::String>
       parentScenes;  ///< Used to check for circular dependencies.
   std::vector<gd::String>

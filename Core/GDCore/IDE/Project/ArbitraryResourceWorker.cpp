@@ -190,7 +190,7 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
     ExposeVideo(resourceName);
     return;
   }
-  gd::LogWarning("Unexpected resource type: " + resourceType + " for: " + resourceName);
+  gd::LogError("Unexpected resource type: " + resourceType + " for: " + resourceName);
   return;
 }
 

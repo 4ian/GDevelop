@@ -62,8 +62,7 @@ export const renderInstructionOrExpressionTree = <
               // TODO: This id is used by in app tutorials. When in app tutorials
               // are linked to GDevelop versions, change this id to be more accurate
               // using getInstructionOrExpressionIdentifier
-              'instruction-item-' +
-              instructionMetadata.type.replace(/:/g, '-')
+              'instruction-item-' + instructionMetadata.type.replace(/:/g, '-')
             }
             leftIcon={
               <ListIcon

@@ -21,8 +21,7 @@ export const getFolderTagsFromAssetShortHeaders = ({
   assetShortHeaders: Array<AssetShortHeader>,
   selectedFolders: Array<string>,
 |}): Array<string> => {
-  /** @type {string[][]} */
-  const assetTagsAfterPackTag = [];
+  const assetTagsAfterPackTag: string[][] = [];
   const allTagsAfterPackTag = new Set();
   // We are in a pack, calculate first level folders based on asset tags.
   // Tags are stored from top to bottom, in the list of tags of an asset.
